@@ -705,6 +705,10 @@ msgstr "Tabelas unidas por vírgula não são mapeadas; trate-as como INNER JOIN
 msgid "Saved datasets"
 msgstr "Conjuntos de dados salvos"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the people and groups listed below can access this {resource}."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
@@ -881,10 +885,10 @@ msgid "Copied"
 msgstr "Copiado"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below "
-"to share more broadly."
-msgstr "Adicione um membro ou um grupo de usuários para conceder acesso. Use o "
-"acesso geral abaixo para compartilhar de forma mais ampla."
+#~ msgid "Add a member or a user group to grant access. Use General access below "
+#~ "to share more broadly."
+#~ msgstr "Adicione um membro ou um grupo de usuários para conceder acesso. Use o "
+#~ "acesso geral abaixo para compartilhar de forma mais ampla."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -1117,6 +1121,11 @@ msgstr "Todas as colunas"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
 msgstr "Resumo dos dados"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Add a member or a user group to grant access. Use General access above "
+"to share more broadly."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -1363,6 +1372,10 @@ msgstr "Sincronizar dados!"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr " quem também tem "
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Give access to additional members"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -2772,10 +2785,10 @@ msgstr "Selecione uma fonte de dados e suas colunas de latitude e longitude "
 "para plotá-la."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app "
-"access still need a direct share above."
-msgstr "Controla o padrão para o restante do workspace. Pessoas sem acesso ao "
-"aplicativo ainda precisam de um compartilhamento direto acima."
+#~ msgid "Controls the default for the rest of the workspace. People without app "
+#~ "access still need a direct share above."
+#~ msgstr "Controla o padrão para o restante do workspace. Pessoas sem acesso ao "
+#~ "aplicativo ainda precisam de um compartilhamento direto acima."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -3364,6 +3377,11 @@ msgstr "A entidade falhou ao carregar. Por favor, tente novamente mais tarde ou 
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Comprar {seatsToAdd} assento"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share below."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "Conte as linhas em {datasetName} por {groupByColumn}"
@@ -3781,10 +3799,10 @@ msgid "No saved datasets found."
 msgstr "Nenhum conjunto de dados salvo encontrado."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this "
-"{resource}, in addition to whatever's listed above."
-msgstr "Todo membro do workspace que pode abrir o aplicativo {app} recebe este "
-"papel neste {resource}, além do que está listado acima."
+#~ msgid "Every workspace member who can open the {app} app gets this role on this "
+#~ "{resource}, in addition to whatever's listed above."
+#~ msgstr "Todo membro do workspace que pode abrir o aplicativo {app} recebe este "
+#~ "papel neste {resource}, além do que está listado acima."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -5256,9 +5274,9 @@ msgid "Editor"
 msgstr "Editor"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Only the people and groups listed above can access this {resource}."
-msgstr "Apenas as pessoas e grupos listados acima podem acessar este "
-"{resource}."
+#~ msgid "Only the people and groups listed above can access this {resource}."
+#~ msgstr "Apenas as pessoas e grupos listados acima podem acessar este "
+#~ "{resource}."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -5900,6 +5918,11 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "Seu espaço de trabalho utilizou todos os {currentSeatUsage} de seus "
 "{totalSeats} assentos."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed below."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "

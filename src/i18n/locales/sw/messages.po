@@ -701,6 +701,10 @@ msgstr "Majedwali yaliyounganishwa kwa koma hayajawekwa; yashughulikie kama "
 msgid "Saved datasets"
 msgstr "Seti za data zilizohifadhiwa"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the people and groups listed below can access this {resource}."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
@@ -877,10 +881,10 @@ msgid "Copied"
 msgstr "Imeandikwa"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below "
-"to share more broadly."
-msgstr "Ongeza mwanachama au kundi la watumiaji ili kutoa ufikiaji. Tumia "
-"ufikiaji wa Kawaida hapa chini kushiriki kwa upana zaidi."
+#~ msgid "Add a member or a user group to grant access. Use General access below "
+#~ "to share more broadly."
+#~ msgstr "Ongeza mwanachama au kundi la watumiaji ili kutoa ufikiaji. Tumia "
+#~ "ufikiaji wa Kawaida hapa chini kushiriki kwa upana zaidi."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -1113,6 +1117,11 @@ msgstr "Safu zote"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
 msgstr "Muhtasari wa Data"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Add a member or a user group to grant access. Use General access above "
+"to share more broadly."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -1358,6 +1367,10 @@ msgstr "Sanidisha data!"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr " ambaye pia ana "
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Give access to additional members"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -2767,10 +2780,10 @@ msgstr "Chagua chanzo cha data na safu zake za latitudo na longitudo ili "
 "kuichora kwenye ramani."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app "
-"access still need a direct share above."
-msgstr "Inadhibiti chaguo la msingi kwa sehemu nyingine ya ofisi. Watu wasio na "
-"ufikiaji wa programu bado wanahitaji kushiriki moja kwa moja juu."
+#~ msgid "Controls the default for the rest of the workspace. People without app "
+#~ "access still need a direct share above."
+#~ msgstr "Inadhibiti chaguo la msingi kwa sehemu nyingine ya ofisi. Watu wasio na "
+#~ "ufikiaji wa programu bado wanahitaji kushiriki moja kwa moja juu."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -3356,6 +3369,11 @@ msgstr "Kitu hakikupata kupakia. Tafadhali jaribu tena baadaye au wasiliana na "
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Nunua kiti {seatsToAdd}"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share below."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "Hesabu safu katika {datasetName} kwa {groupByColumn}"
@@ -3772,11 +3790,11 @@ msgid "No saved datasets found."
 msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this "
-"{resource}, in addition to whatever's listed above."
-msgstr "Kila mwanachama wa eneo la kazi anayeweza kufungua programu ya {app} "
-"anapata jukumu hili kwenye {resource}, pamoja na yale yaliyoorodheshwa "
-"hapo juu."
+#~ msgid "Every workspace member who can open the {app} app gets this role on this "
+#~ "{resource}, in addition to whatever's listed above."
+#~ msgstr "Kila mwanachama wa eneo la kazi anayeweza kufungua programu ya {app} "
+#~ "anapata jukumu hili kwenye {resource}, pamoja na yale yaliyoorodheshwa "
+#~ "hapo juu."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -5244,9 +5262,9 @@ msgid "Editor"
 msgstr "Mhariri"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Only the people and groups listed above can access this {resource}."
-msgstr "Ni watu na vikundi vilivyoorodheshwa hapo juu pekee wanaoweza kufikia "
-"{resource} hii."
+#~ msgid "Only the people and groups listed above can access this {resource}."
+#~ msgstr "Ni watu na vikundi vilivyoorodheshwa hapo juu pekee wanaoweza kufikia "
+#~ "{resource} hii."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -5886,6 +5904,11 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "Eneo lako la kazi limetumia {currentSeatUsage} ya viti vyake "
 "{totalSeats}."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed below."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "

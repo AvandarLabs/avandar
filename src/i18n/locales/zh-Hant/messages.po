@@ -677,6 +677,10 @@ msgstr "逗號連接的資料表無法對應；請將其視為 ON true 的 INNER
 msgid "Saved datasets"
 msgstr "已保存的數據集"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the people and groups listed below can access this {resource}."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
@@ -843,9 +847,9 @@ msgid "Copied"
 msgstr "已複製"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below "
-"to share more broadly."
-msgstr "添加成員或用戶組以授予訪問權限。使用下方的一般訪問來更廣泛地分享。"
+#~ msgid "Add a member or a user group to grant access. Use General access below "
+#~ "to share more broadly."
+#~ msgstr "添加成員或用戶組以授予訪問權限。使用下方的一般訪問來更廣泛地分享。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -1075,6 +1079,11 @@ msgstr "所有列"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
 msgstr "數據摘要"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Add a member or a user group to grant access. Use General access above "
+"to share more broadly."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
@@ -1314,6 +1323,10 @@ msgstr "同步數據！"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr "也有"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Give access to additional members"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -2660,9 +2673,9 @@ msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "選取資料來源及其緯度與經度欄，將資料繪製於地圖上。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app "
-"access still need a direct share above."
-msgstr "控制工作區其餘部分的預設。沒有應用訪問權限的人仍然需要直接共享以上內容。"
+#~ msgid "Controls the default for the rest of the workspace. People without app "
+#~ "access still need a direct share above."
+#~ msgstr "控制工作區其餘部分的預設。沒有應用訪問權限的人仍然需要直接共享以上內容。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -3236,6 +3249,11 @@ msgstr "實體加載失敗。請稍後再試或聯繫支持。"
 msgid "Purchase {seatsToAdd} seat"
 msgstr "購買 {seatsToAdd} 個座位"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share below."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
@@ -3639,9 +3657,9 @@ msgid "No saved datasets found."
 msgstr "未找到已保存的資料集。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this "
-"{resource}, in addition to whatever's listed above."
-msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource} 上獲得此角色，此外還包括上述列出的內容。"
+#~ msgid "Every workspace member who can open the {app} app gets this role on this "
+#~ "{resource}, in addition to whatever's listed above."
+#~ msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource} 上獲得此角色，此外還包括上述列出的內容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -5065,8 +5083,8 @@ msgid "Editor"
 msgstr "編輯者"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Only the people and groups listed above can access this {resource}."
-msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
+#~ msgid "Only the people and groups listed above can access this {resource}."
+#~ msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -5686,6 +5704,11 @@ msgstr "X 軸標籤顏色"
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座位。"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed below."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "

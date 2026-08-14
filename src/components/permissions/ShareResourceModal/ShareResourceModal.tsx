@@ -14,6 +14,7 @@ import {
   hasPrincipalId,
 } from "./buildShareSummary/buildShareSummary";
 import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
+import { useShareCopy } from "./shareCopy";
 import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
@@ -66,6 +67,7 @@ export function ShareResourceModal({
   onClose,
 }: Props): JSX.Element {
   const { t, i18n } = useLingui();
+  const shareCopy = useShareCopy();
   const workspace = useCurrentWorkspace();
   const workspaceId = workspace.id as WorkspaceId;
 
@@ -252,32 +254,48 @@ export function ShareResourceModal({
         <Trans>Share &ldquo;{resourceName}&rdquo;</Trans>
       </Text>
 
-      <ShareAddPrincipalRow
-        members={(members ?? []).map((member) => {
-          return {
-            value: member.userId,
-            label: member.displayName || member.fullName,
-          };
-        })}
-        groups={(userGroups ?? []).map((group) => {
-          return { value: group.id, label: group.name };
-        })}
-        isAdding={isUpserting}
-        isDisabled={
-          generalAccess.displayedValue === "private" || generalAccess.isBusy
-        }
-        onAdd={({ principalType, principalId, role }) => {
-          upsertShare({
-            workspaceId,
-            resourceType,
-            resourceId,
-            principalType,
-            principalId,
-            role,
-            requiresAppAccess: false,
-          });
-        }}
+      <ShareGeneralAccess
+        resourceType={resourceType}
+        value={generalAccess.displayedValue}
+        isOwner={generalAccess.isOwner}
+        isBusy={generalAccess.isBusy}
+        workspaceShareRole={workspaceShare?.role ?? null}
+        onChange={generalAccess.onChange}
+        onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
       />
+
+      <Stack gap="xs">
+        <Text fw={600} size="sm">
+          {shareCopy.additionalAccessHeading}
+        </Text>
+
+        <ShareAddPrincipalRow
+          members={(members ?? []).map((member) => {
+            return {
+              value: member.userId,
+              label: member.displayName || member.fullName,
+            };
+          })}
+          groups={(userGroups ?? []).map((group) => {
+            return { value: group.id, label: group.name };
+          })}
+          isAdding={isUpserting}
+          isDisabled={
+            generalAccess.displayedValue === "private" || generalAccess.isBusy
+          }
+          onAdd={({ principalType, principalId, role }) => {
+            upsertShare({
+              workspaceId,
+              resourceType,
+              resourceId,
+              principalType,
+              principalId,
+              role,
+              requiresAppAccess: false,
+            });
+          }}
+        />
+      </Stack>
 
       <SharePrincipalList
         shares={displayShares}
@@ -316,16 +334,6 @@ export function ShareResourceModal({
           }
           deleteShare({ shareId: share.id });
         }}
-      />
-
-      <ShareGeneralAccess
-        resourceType={resourceType}
-        value={generalAccess.displayedValue}
-        isOwner={generalAccess.isOwner}
-        isBusy={generalAccess.isBusy}
-        workspaceShareRole={workspaceShare?.role ?? null}
-        onChange={generalAccess.onChange}
-        onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
       />
 
       <ShareSummaryLine spans={spans} />

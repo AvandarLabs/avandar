@@ -34,6 +34,7 @@ export type ShareCopy = {
   ownerBadgeTooltip: (resource: string) => string;
   peopleWithAccessHeading: string;
   generalAccessHeading: string;
+  additionalAccessHeading: string;
   emptyState: {
     noMembersOrTags: string;
   };
@@ -49,13 +50,13 @@ export function useShareCopy(): ShareCopy {
   const privateConfirmCopy = usePrivateConfirmCopy();
   return {
     addPlaceholder: t`Search by name or user group`,
-    addHelper: t`Add a member or a user group to grant access. Use General access below to share more broadly.`,
-    generalAccessHelper: t`Controls the default for the rest of the workspace. People without app access still need a direct share above.`,
+    addHelper: t`Add a member or a user group to grant access. Use General access above to share more broadly.`,
+    generalAccessHelper: t`Controls the default for the rest of the workspace. People without app access still need a direct share below.`,
     restrictedOptionTooltip: (resource: string): string => {
-      return t`Only the people and groups listed above can access this ${resource}.`;
+      return t`Only the people and groups listed below can access this ${resource}.`;
     },
     workspaceOptionTooltip: (resource: string, app: string): string => {
-      return t`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed above.`;
+      return t`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed below.`;
     },
     cancelLabel: t`Cancel`,
     privateOptionLabel: t`Only me`,
@@ -78,6 +79,7 @@ export function useShareCopy(): ShareCopy {
     },
     peopleWithAccessHeading: t`People with access`,
     generalAccessHeading: t`General access`,
+    additionalAccessHeading: t`Give access to additional members`,
     emptyState: {
       noMembersOrTags: t`No members or user groups yet. Invite members or create user groups in Workspace settings.`,
     },
