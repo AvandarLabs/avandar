@@ -1,14 +1,16 @@
+import { Model } from "@avandar/models";
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/panels/LayerFormPanel/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerFormPanel/LayerFormPanel.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
 
 type Props = {
   axis: "latitude" | "longitude";
-  dataSourceId: string | undefined;
+  dataSourceId: Model.TypedId<QueryDataSource> | undefined;
   layer: MapLayer.T;
   onLayerChange: LayerChangeHandler;
 };

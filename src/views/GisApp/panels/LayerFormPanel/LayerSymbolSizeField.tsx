@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { notifyError } from "@/utils/notifications/notify";
@@ -5,10 +6,11 @@ import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSing
 import { MapLayerUpdates } from "@/views/GisApp/panels/LayerFormPanel/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerFormPanel/LayerFormPanel.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
 
 type Props = {
-  dataSourceId: string | undefined;
+  dataSourceId: Model.TypedId<QueryDataSource> | undefined;
   layer: MapLayer.T;
   onLayerChange: LayerChangeHandler;
 };
