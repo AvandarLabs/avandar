@@ -5,9 +5,9 @@ import { useState } from "react";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
+import { appForResource } from "./copy/appForResource";
 import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
-import { appForResource, useShareCopy } from "./shareCopy";
 import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type {
   ResourceShareRow,
@@ -55,7 +55,6 @@ type GeneralAccessActions = UseGeneralAccessControlOptions & {
     options: Parameters<typeof ResourceShareClient.makeResourcePrivate>[0],
   ) => void;
   setWantsRestricted: (value: boolean) => void;
-  shareCopy: ReturnType<typeof useShareCopy>;
 };
 
 function _getShareCounts(sharingState: ResourceSharingState): {
@@ -97,7 +96,6 @@ function _requestMakePrivate(options: Readonly<GeneralAccessActions>): void {
     return;
   }
   openMakePrivateConfirmModal({
-    shareCopy: options.shareCopy,
     resourceName: options.resourceName,
     app: appLabel(appForResource(options.resourceType)),
     numUsers,
@@ -219,7 +217,6 @@ export function useGeneralAccessControl(
 ): GeneralAccessControl {
   const { t } = useLingui();
   const currentUser = useCurrentUser();
-  const shareCopy = useShareCopy();
   const [wantsRestricted, setWantsRestricted] = useState(false);
   const [makePrivate, isMakingPrivate] =
     ResourceShareClient.useMakeResourcePrivate({
@@ -249,7 +246,6 @@ export function useGeneralAccessControl(
       options.sharingState?.ownerId === currentUser.id,
     makePrivate,
     setWantsRestricted,
-    shareCopy,
   };
   return _createGeneralAccessControl({
     actions: actionOptions,

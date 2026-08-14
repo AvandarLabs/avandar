@@ -14,7 +14,6 @@ import {
   hasPrincipalId,
 } from "./buildShareSummary/buildShareSummary";
 import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
-import { useShareCopy } from "./shareCopy";
 import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
@@ -67,7 +66,6 @@ export function ShareResourceModal({
   onClose,
 }: Props): JSX.Element {
   const { t, i18n } = useLingui();
-  const shareCopy = useShareCopy();
   const workspace = useCurrentWorkspace();
   const workspaceId = workspace.id as WorkspaceId;
 
@@ -266,7 +264,7 @@ export function ShareResourceModal({
 
       <Stack gap="xs">
         <Text fw={600} size="sm">
-          {shareCopy.additionalAccessHeading}
+          <Trans>Give access to additional members</Trans>
         </Text>
 
         <ShareAddPrincipalRow

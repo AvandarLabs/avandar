@@ -51,7 +51,7 @@ msgstr "You are offline. Download an offline chat model using the cloud icon "
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "No columns detected for this dataset. Falling back to all columns."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr "1 group"
 
@@ -94,7 +94,7 @@ msgstr "Value column"
 msgid "Monthly"
 msgstr "Monthly"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {name}."
 msgstr "Remove access for {name}."
 
@@ -447,7 +447,7 @@ msgstr "Monospace headlines"
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "Recommended if you have 4 GB RAM or need the lightest download."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "1 person"
 
@@ -591,7 +591,7 @@ msgstr "Table"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Search the data catalog to add open datasets to your workspace."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr "{shareClause} will lose access."
 
@@ -617,7 +617,7 @@ msgstr "Small"
 msgid "Go to Privacy log"
 msgstr "Go to Privacy log"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No matches"
 msgstr "No matches"
 
@@ -693,7 +693,7 @@ msgstr "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 msgid "Saved datasets"
 msgstr "Saved datasets"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Only the people and groups listed below can access this {resource}."
 
@@ -868,12 +868,6 @@ msgstr "Welcome to your first workspace"
 msgid "Copied"
 msgstr "Copied"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Add a member or a user group to grant access. Use General access below "
-#~ "to share more broadly."
-#~ msgstr "Add a member or a user group to grant access. Use General access below "
-#~ "to share more broadly."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "Add to workspace"
@@ -971,7 +965,7 @@ msgstr "Confirm"
 msgid "is equal to..."
 msgstr "is equal to..."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} groups"
 
@@ -1105,16 +1099,11 @@ msgstr "All columns"
 msgid "Data Summary"
 msgstr "Data Summary"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
-
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "This {resource} is currently only accessible to its owner."
-#~ msgstr "This {resource} is currently only accessible to its owner."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1242,7 +1231,7 @@ msgstr "Select a dataset from the list to view its metadata."
 msgid "Medium"
 msgstr "Medium"
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "Everyone in {app} will lose access."
 
@@ -1353,7 +1342,7 @@ msgstr "Sync data!"
 msgid " who also have "
 msgstr " who also have "
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Give access to additional members"
 msgstr "Give access to additional members"
 
@@ -1744,7 +1733,7 @@ msgstr "PDF downloaded."
 msgid "Workspace ID"
 msgstr "Workspace ID"
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} people"
 
@@ -1883,7 +1872,7 @@ msgstr "your dataset"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
@@ -2673,7 +2662,7 @@ msgstr "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
 "including workspace admins."
 msgstr "Only you can access this {resource}. Everyone else loses access, "
@@ -2747,12 +2736,6 @@ msgstr "Back to the login page"
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "Pick a data source and its latitude and longitude columns to plot it."
-
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Controls the default for the rest of the workspace. People without app "
-#~ "access still need a direct share above."
-#~ msgstr "Controls the default for the rest of the workspace. People without app "
-#~ "access still need a direct share above."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2876,7 +2859,7 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY uses a non-column expression."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "Make private"
 
@@ -3335,7 +3318,7 @@ msgstr "The entity failed to load. Please try again later or reach out to "
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Purchase {seatsToAdd} seat"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Controls the default for the rest of the workspace. People without app "
 "access still need a direct share below."
 msgstr "Controls the default for the rest of the workspace. People without app "
@@ -3752,12 +3735,6 @@ msgstr "Dataset saved successfully!"
 msgid "No saved datasets found."
 msgstr "No saved datasets found."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Every workspace member who can open the {app} app gets this role on this "
-#~ "{resource}, in addition to whatever's listed above."
-#~ msgstr "Every workspace member who can open the {app} app gets this role on "
-#~ "this {resource}, in addition to whatever's listed above."
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
@@ -3795,7 +3772,7 @@ msgstr "Overlapping"
 msgid "Download"
 msgstr "Download"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No members or user groups yet. Invite members or create user groups in "
 "Workspace settings."
 msgstr "No members or user groups yet. Invite members or create user groups in "
@@ -4440,7 +4417,7 @@ msgstr "Discovery clarification"
 msgid "Can't save dataset"
 msgstr "Can't save dataset"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the owner can make this {resource} private."
 msgstr "Only the owner can make this {resource} private."
 
@@ -4448,7 +4425,7 @@ msgstr "Only the owner can make this {resource} private."
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "That query failed. Please fix the SQL and try again."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only me"
 msgstr "Only me"
 
@@ -4573,7 +4550,7 @@ msgstr "Delete dataset"
 msgid "Warning"
 msgstr "Warning"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "When on, members of this group only get access if they already have "
 "{app} access in the workspace. When off, every member of the group gets "
 "access here, even if they normally can't open {app}."
@@ -4724,7 +4701,7 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr "Only you will be able to open it. You can share it again at any time."
 
@@ -4740,7 +4717,7 @@ msgstr "Welcome back!"
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "There was an error while trying to authenticate with Google Sheets."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
 "settings."
 msgstr "The owner always has admin access. To change owner, use the {resource} "
@@ -4977,7 +4954,7 @@ msgstr "Manage how you appear in {0} and the account you use to sign in."
 msgid "Extra small"
 msgstr "Extra small"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalList.tsx
 msgid "People with access"
 msgstr "People with access"
 
@@ -5215,10 +5192,6 @@ msgstr "Tone"
 msgid "Editor"
 msgstr "Editor"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-#~ msgid "Only the people and groups listed above can access this {resource}."
-#~ msgstr "Only the people and groups listed above can access this {resource}."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "Organization"
@@ -5306,7 +5279,7 @@ msgstr "Dataset columns"
 msgid "Could not prepare the offline chat model."
 msgstr "Could not prepare the offline chat model."
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "Make \"{resourceName}\" private?"
 
@@ -5400,7 +5373,7 @@ msgstr "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
 msgid "Column outline"
 msgstr "Column outline"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/roleSelectTooltip.ts
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "What this person or group can do. Viewer = read only, Editor = edit "
@@ -5851,7 +5824,7 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
 "{resource}, in addition to whatever's listed below."
 msgstr "Every workspace member who can open the {app} app gets this role on "
@@ -5901,7 +5874,6 @@ msgstr "Neutral failure"
 msgid "Please try again or reach out to support."
 msgstr "Please try again or reach out to support."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "General access"
@@ -5948,7 +5920,7 @@ msgstr "You have not created any dashboards"
 msgid "Beta"
 msgstr "Beta"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "Search by name or user group"
 
@@ -6078,7 +6050,7 @@ msgstr "Fill opacity"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
 
-#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} and {groupClause}"
 

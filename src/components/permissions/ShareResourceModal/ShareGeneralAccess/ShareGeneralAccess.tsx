@@ -1,12 +1,13 @@
 import { Tooltip } from "@avandar/ui";
 import { matchLiteral } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { appForResource } from "../copy/appForResource";
+import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
-import { appForResource, useShareCopy } from "../shareCopy";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -36,14 +37,13 @@ export function ShareGeneralAccess({
   onWorkspaceRoleChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const shareCopy = useShareCopy();
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
   const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
     isOwner,
     labels: {
-      private: shareCopy.privateOptionLabel,
+      private: t`Only me`,
       restricted: t`Restricted`,
       workspace: t`Anyone in ${app}`,
     },
@@ -52,21 +52,21 @@ export function ShareGeneralAccess({
   const generalAccessTooltip = matchLiteral(value, {
     private: () => {
       return isOwner ?
-          shareCopy.privateOptionTooltip(resource)
-        : shareCopy.privateOptionDisabledTooltip(resource);
+          t`Only you can access this ${resource}. Everyone else loses access, including workspace admins.`
+        : t`Only the owner can make this ${resource} private.`;
     },
     restricted: () => {
-      return shareCopy.restrictedOptionTooltip(resource);
+      return t`Only the people and groups listed below can access this ${resource}.`;
     },
     workspace: () => {
-      return shareCopy.workspaceOptionTooltip(resource, app);
+      return t`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed below.`;
     },
   });
 
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {shareCopy.generalAccessHeading}
+        <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
         <Tooltip label={generalAccessTooltip} multiline w={320}>
@@ -89,7 +89,7 @@ export function ShareGeneralAccess({
           />
         </Tooltip>
         {value === "workspace" ?
-          <Tooltip label={shareCopy.roleSelectTooltip}>
+          <Tooltip label={roleSelectTooltip()}>
             <Select
               w={120}
               disabled={isBusy}
@@ -111,7 +111,10 @@ export function ShareGeneralAccess({
         : null}
       </Group>
       <Text size="xs" c="dimmed">
-        {shareCopy.generalAccessHelper}
+        <Trans>
+          Controls the default for the rest of the workspace. People without app
+          access still need a direct share below.
+        </Trans>
       </Text>
     </Stack>
   );

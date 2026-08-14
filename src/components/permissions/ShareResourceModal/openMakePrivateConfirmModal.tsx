@@ -1,9 +1,9 @@
+import { t } from "@lingui/core/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import type { ShareCopy } from "./shareCopy";
+import { makePrivateConfirmCopy } from "./copy/makePrivateConfirmCopy";
 
 type OpenMakePrivateConfirmModalOptions = {
-  shareCopy: ShareCopy;
   resourceName: string;
   app: string;
   numUsers: number;
@@ -18,7 +18,7 @@ type OpenMakePrivateConfirmModalOptions = {
 export function openMakePrivateConfirmModal(
   options: Readonly<OpenMakePrivateConfirmModalOptions>,
 ): void {
-  const { title, body, confirmLabel } = options.shareCopy.privateConfirmCopy({
+  const { title, body, confirmLabel } = makePrivateConfirmCopy({
     resourceName: options.resourceName,
     numUsers: options.numUsers,
     numGroups: options.numGroups,
@@ -29,7 +29,7 @@ export function openMakePrivateConfirmModal(
   modals.openConfirmModal({
     title,
     children: <Text size="sm">{body}</Text>,
-    labels: { confirm: confirmLabel, cancel: options.shareCopy.cancelLabel },
+    labels: { confirm: confirmLabel, cancel: t`Cancel` },
     confirmProps: { color: "danger" },
     onConfirm: options.onConfirm,
   });
