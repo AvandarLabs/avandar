@@ -56,6 +56,10 @@ msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Aucune colonne détectée pour cet ensemble de données. Retour à toutes "
 "les colonnes."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "1 group"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "Trier par"
@@ -454,6 +458,10 @@ msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
 "téléchargement le plus léger."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "1 person"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← Retour"
@@ -597,6 +605,10 @@ msgstr "Tableau"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Recherchez dans le catalogue de données pour ajouter des ensembles de "
 "données ouverts à votre espace de travail."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{shareClause} will lose access."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -971,6 +983,10 @@ msgstr "Confirmer"
 msgid "is equal to..."
 msgstr "est égal à..."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{numGroups} groups"
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Certaines données doivent provenir de jeux de données existants"
@@ -1102,9 +1118,9 @@ msgstr "Résumé des données"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "This {resource} is currently only accessible to its owner."
-msgstr "Ce {resource} est actuellement accessible uniquement à son "
-"propriétaire."
+#~ msgid "This {resource} is currently only accessible to its owner."
+#~ msgstr "Ce {resource} est actuellement accessible uniquement à son "
+#~ "propriétaire."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1235,6 +1251,10 @@ msgstr "Sélectionnez un jeu de données dans la liste pour voir ses métadonné
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "Moyen"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Everyone in {app} will lose access."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1747,6 +1767,10 @@ msgstr "PDF téléchargé."
 msgid "Workspace ID"
 msgstr "ID de l'espace de travail"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{numUsers} people"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "Générez une requête pour configurer cette visualisation."
@@ -1888,6 +1912,7 @@ msgstr "votre ensemble de données"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
@@ -2674,6 +2699,11 @@ msgstr "Ce membre possède {privateTotal} ressources privées. Il ne peut pas "
 "travail. Réattribuez donc la propriété depuis le journal de "
 "confidentialité."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only you can access this {resource}. Everyone else loses access, "
+"including workspace admins."
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Choisir un modèle"
@@ -2875,6 +2905,10 @@ msgstr "URL"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY utilise une expression qui n’est pas une colonne."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Make private"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -4456,9 +4490,17 @@ msgstr "Clarification de la découverte"
 msgid "Can't save dataset"
 msgstr "Impossible de sauvegarder le jeu de données"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the owner can make this {resource} private."
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "Cette requête a échoué. Veuillez corriger le SQL et réessayer."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only me"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -4736,6 +4778,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "Je n’ai pas pu générer de SQL hors ligne. Reformulez votre demande ou "
 "reconnectez-vous pour utiliser le chat cloud."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only you will be able to open it. You can share it again at any time."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "Ajouté à \"{dashboardName}\""
@@ -4972,6 +5018,10 @@ msgstr "Impossible de charger les données cartographiques"
 msgid "Nothing more to load"
 msgstr "Rien de plus à charger"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Could not make private"
+msgstr ""
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "Réinitialiser l’application"
@@ -5082,6 +5132,10 @@ msgstr "Vous avez besoin d'un accès administrateur sur cette ressource pour "
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "S'il y a plusieurs valeurs {fieldName} pour un {0}, alors..."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "Only you have access to this {resource}."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5316,6 +5370,10 @@ msgstr "Colonnes de l'ensemble de données"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "Impossible de préparer le modèle de chat hors ligne."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Make \"{resourceName}\" private?"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
@@ -6098,6 +6156,10 @@ msgstr "Opacité du remplissage"
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Pour confirmer, tapez <0>{confirmationTarget}</0> ci-dessous :"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{peopleClause} and {groupClause}"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx

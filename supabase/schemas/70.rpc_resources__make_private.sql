@@ -2,8 +2,10 @@
  * Makes a resource private to its owner in one transaction: deletes every
  * non-owner share and sets `is_restricted`.
  *
- * SECURITY INVOKER, deliberately, unlike every other rpc_ function in this
- * schema. It never needs to touch a row the caller cannot already see: the
+ * SECURITY INVOKER, deliberately, unlike every other permissions rpc_ function
+ * (rpc_resources__transfer_ownership, rpc_workspaces__private_resource_counts
+ * and rpc_workspaces__transfer_all_owned_resources are all security definer).
+ * It never needs to touch a row the caller cannot already see: the
  * owner short-circuits to `admin` in util__resource_effective_role, which
  * satisfies both the resource_shares DELETE policy and the resource UPDATE
  * policy. Running as the caller keeps existing RLS as the backstop and adds no

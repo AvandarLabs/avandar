@@ -52,6 +52,10 @@ msgstr "Uko nje ya mtandao. Pakua modeli ya gumzo ya nje ya mtandao ukitumia "
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Hakuna safu zilizogundulika kwa dataset hii. Kurudi kwenye safu zote."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "1 group"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "Panga kwa"
@@ -448,6 +452,10 @@ msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
 "zaidi."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "1 person"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← Nyuma"
@@ -588,6 +596,10 @@ msgstr "Jedwali"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Tafuta kwenye katalogi ya data ili kuongeza seti za data za wazi kwenye "
 "eneo lako la kazi."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{shareClause} will lose access."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -959,6 +971,10 @@ msgstr "Thibitisha"
 msgid "is equal to..."
 msgstr "ni sawa na..."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{numGroups} groups"
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Data fulani inapaswa kuja kutoka kwa seti za data zilizopo"
@@ -1088,8 +1104,8 @@ msgstr "Muhtasari wa Data"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "This {resource} is currently only accessible to its owner."
-msgstr "Hii {resource} kwa sasa inapatikana tu kwa mmiliki wake."
+#~ msgid "This {resource} is currently only accessible to its owner."
+#~ msgstr "Hii {resource} kwa sasa inapatikana tu kwa mmiliki wake."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1218,6 +1234,10 @@ msgstr "Chagua dataset kutoka orodha ili kuona metadata yake."
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "Wastani"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Everyone in {app} will lose access."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1721,6 +1741,10 @@ msgstr "PDF imeshukuliwa."
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{numUsers} people"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "Buni query ili kuunda picha hii."
@@ -1862,6 +1886,7 @@ msgstr "seti yako ya data"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
@@ -2641,6 +2666,11 @@ msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. "
 "hayaonekani kwa wasimamizi wa nafasi ya kazi, kwa hivyo hamishia "
 "umiliki kutoka kwenye kumbukumbu ya faragha."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only you can access this {resource}. Everyone else loses access, "
+"including workspace admins."
+msgstr ""
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "Chagua mfano"
@@ -2839,6 +2869,10 @@ msgstr "URL"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY inatumia usemi ambao si safu."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Make private"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -4405,9 +4439,17 @@ msgstr "Ufafanuzi wa ugunduzi"
 msgid "Can't save dataset"
 msgstr "Haiwezi kuhifadhi seti ya data"
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only the owner can make this {resource} private."
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "Swali hilo limefeli. Tafadhali rekebisha SQL na ujaribu tena."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only me"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -4681,6 +4723,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
 "uunganishe tena ili kutumia mazungumzo ya wingu."
 
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Only you will be able to open it. You can share it again at any time."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "Imeongezwa kwenye \"{dashboardName}\""
@@ -4916,6 +4962,10 @@ msgstr "Imeshindikana kupakia data ya ramani"
 msgid "Nothing more to load"
 msgstr "Hakuna kitu kingine cha kupakia"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Could not make private"
+msgstr ""
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "Weka upya programu"
@@ -5023,6 +5073,10 @@ msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "Only you have access to this {resource}."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5256,6 +5310,10 @@ msgstr "Safu za seti za data"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "Make \"{resourceName}\" private?"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
@@ -6026,6 +6084,10 @@ msgstr "Uwazi wa ujazaji"
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
+
+#: src/components/permissions/ShareResourceModal/shareCopy.ts
+msgid "{peopleClause} and {groupClause}"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
