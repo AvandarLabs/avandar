@@ -5,9 +5,9 @@ import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { GeneralAccess } from "../GeneralAccess/GeneralAccess";
+import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import { appForResource, useShareCopy } from "../shareCopy";
-import type { GeneralAccessValue } from "../GeneralAccess/GeneralAccess";
+import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -40,7 +40,7 @@ export function ShareGeneralAccess({
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
-  const generalOptions = GeneralAccess.toOptions({
+  const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
     isOwner,
     labels: {
       private: shareCopy.privateOptionLabel,
@@ -78,7 +78,10 @@ export function ShareGeneralAccess({
             value={value}
             allowDeselect={false}
             onChange={(nextValue) => {
-              if (nextValue && GeneralAccess.isValid(nextValue)) {
+              if (
+                nextValue &&
+                GeneralAccessModule.isValidAccessValue(nextValue)
+              ) {
                 onChange(nextValue);
               }
             }}

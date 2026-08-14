@@ -5,7 +5,7 @@ const _GENERAL_ACCESS_VALUES = ["private", "restricted", "workspace"] as const;
 /** A value available in the General access dropdown. */
 export type GeneralAccessValue = (typeof _GENERAL_ACCESS_VALUES)[number];
 
-function _hasNonOwnerShare(
+function _doesNonOwnerHaveAccess(
   options: Readonly<{
     shares: readonly ResourceShareRow[];
     ownerId: string;
@@ -18,7 +18,7 @@ function _hasNonOwnerShare(
   });
 }
 
-function _sharingStateToValue(
+function _getGeneralAccessValueFromShareState(
   options: Readonly<{
     isRestricted: boolean;
     shares: readonly ResourceShareRow[];
@@ -26,13 +26,18 @@ function _sharingStateToValue(
   }>,
 ): GeneralAccessValue {
   const restrictedValue =
-    _hasNonOwnerShare({ shares: options.shares, ownerId: options.ownerId }) ?
+    (
+      _doesNonOwnerHaveAccess({
+        shares: options.shares,
+        ownerId: options.ownerId,
+      })
+    ) ?
       "restricted"
     : "private";
   return options.isRestricted ? restrictedValue : "workspace";
 }
 
-function _labelsToOptions(
+function _makeDropdownOptionsFromLabels(
   options: Readonly<{
     isOwner: boolean;
     labels: Record<GeneralAccessValue, string>;
@@ -53,24 +58,26 @@ function _labelsToOptions(
   ];
 }
 
-function _isValid(value: string): value is GeneralAccessValue {
+function _isValidGeneralAccessValue(
+  value: string,
+): value is GeneralAccessValue {
   return (_GENERAL_ACCESS_VALUES as readonly string[]).includes(value);
 }
 
 /** Stateless operations for General access values and sharing-state mapping. */
-export const GeneralAccess = {
+export const GeneralAccessModule = {
   /** Every supported General access value in display order. */
   values: _GENERAL_ACCESS_VALUES,
 
   /** Whether a string is a supported General access value. */
-  isValid: _isValid,
+  isValidAccessValue: _isValidGeneralAccessValue,
 
   /** Whether a share grants access to a principal other than the owner. */
-  hasNonOwnerShare: _hasNonOwnerShare,
+  doesNonOwnerHaveAccess: _doesNonOwnerHaveAccess,
 
   /** Maps persisted sharing state to its General access value. */
-  fromSharingState: _sharingStateToValue,
+  fromShareState: _getGeneralAccessValueFromShareState,
 
   /** Maps localized labels to dropdown options. */
-  toOptions: _labelsToOptions,
+  makeDropdownOptionsFromLabels: _makeDropdownOptionsFromLabels,
 } as const;

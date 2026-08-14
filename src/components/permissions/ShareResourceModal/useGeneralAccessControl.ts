@@ -5,10 +5,10 @@ import { useState } from "react";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
-import { GeneralAccess } from "./GeneralAccess/GeneralAccess";
+import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
 import { appForResource, useShareCopy } from "./shareCopy";
-import type { GeneralAccessValue } from "./GeneralAccess/GeneralAccess";
+import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type {
   ResourceShareRow,
   ResourceSharingState,
@@ -236,7 +236,7 @@ export function useGeneralAccessControl(
     });
   const derivedValue =
     options.sharingState ?
-      GeneralAccess.fromSharingState(options.sharingState)
+      GeneralAccessModule.fromShareState(options.sharingState)
     : "private";
   const displayedValue =
     derivedValue === "private" && wantsRestricted ? "restricted" : derivedValue;

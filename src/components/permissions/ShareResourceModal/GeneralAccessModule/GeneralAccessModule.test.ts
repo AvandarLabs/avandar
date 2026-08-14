@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import { GeneralAccess } from "./GeneralAccess";
+import { GeneralAccessModule } from "./GeneralAccessModule";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -31,13 +31,16 @@ function _buildShare(
 describe("GeneralAccess.hasNonOwnerShare", () => {
   it("is false with no shares", () => {
     expect(
-      GeneralAccess.hasNonOwnerShare({ shares: [], ownerId: OWNER_ID }),
+      GeneralAccessModule.doesNonOwnerHaveAccess({
+        shares: [],
+        ownerId: OWNER_ID,
+      }),
     ).toBe(false);
   });
 
   it("is false for the owner's own user share", () => {
     expect(
-      GeneralAccess.hasNonOwnerShare({
+      GeneralAccessModule.doesNonOwnerHaveAccess({
         shares: [_buildShare({ principalType: "user", principalId: OWNER_ID })],
         ownerId: OWNER_ID,
       }),
@@ -46,7 +49,7 @@ describe("GeneralAccess.hasNonOwnerShare", () => {
 
   it("is true for a user share to someone else", () => {
     expect(
-      GeneralAccess.hasNonOwnerShare({
+      GeneralAccessModule.doesNonOwnerHaveAccess({
         shares: [
           _buildShare({ principalType: "user", principalId: "other-1" }),
         ],
@@ -57,7 +60,7 @@ describe("GeneralAccess.hasNonOwnerShare", () => {
 
   it("is true for a group share", () => {
     expect(
-      GeneralAccess.hasNonOwnerShare({
+      GeneralAccessModule.doesNonOwnerHaveAccess({
         shares: [
           _buildShare({
             principalType: "user_group",
@@ -71,7 +74,7 @@ describe("GeneralAccess.hasNonOwnerShare", () => {
 
   it("is true for a workspace share with a null principalId", () => {
     expect(
-      GeneralAccess.hasNonOwnerShare({
+      GeneralAccessModule.doesNonOwnerHaveAccess({
         shares: [
           _buildShare({ principalType: "workspace", principalId: null }),
         ],
@@ -84,7 +87,7 @@ describe("GeneralAccess.hasNonOwnerShare", () => {
 describe("GeneralAccess.fromSharingState", () => {
   it("is workspace when not restricted", () => {
     expect(
-      GeneralAccess.fromSharingState({
+      GeneralAccessModule.fromShareState({
         isRestricted: false,
         shares: [],
         ownerId: OWNER_ID,
@@ -94,7 +97,7 @@ describe("GeneralAccess.fromSharingState", () => {
 
   it("is private when restricted with only the owner's own share", () => {
     expect(
-      GeneralAccess.fromSharingState({
+      GeneralAccessModule.fromShareState({
         isRestricted: true,
         shares: [_buildShare({ principalType: "user", principalId: OWNER_ID })],
         ownerId: OWNER_ID,
@@ -104,7 +107,7 @@ describe("GeneralAccess.fromSharingState", () => {
 
   it("is restricted when restricted with a non-owner share", () => {
     expect(
-      GeneralAccess.fromSharingState({
+      GeneralAccessModule.fromShareState({
         isRestricted: true,
         shares: [
           _buildShare({ principalType: "user", principalId: "other-1" }),
@@ -117,15 +120,15 @@ describe("GeneralAccess.fromSharingState", () => {
 
 describe("GeneralAccess.toOptions", () => {
   it("lists the values in display order", () => {
-    const options = GeneralAccess.toOptions({
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: true,
       labels: LABELS,
     });
-    expect(options.map(prop("value"))).toEqual(GeneralAccess.values);
+    expect(options.map(prop("value"))).toEqual(GeneralAccessModule.values);
   });
 
   it("enables Only me for the owner", () => {
-    const options = GeneralAccess.toOptions({
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: true,
       labels: LABELS,
     });
@@ -133,7 +136,7 @@ describe("GeneralAccess.toOptions", () => {
   });
 
   it("disables Only me for a non-owner", () => {
-    const options = GeneralAccess.toOptions({
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: false,
       labels: LABELS,
     });
@@ -141,7 +144,7 @@ describe("GeneralAccess.toOptions", () => {
   });
 
   it("never disables the other two options", () => {
-    const options = GeneralAccess.toOptions({
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: false,
       labels: LABELS,
     });
@@ -152,10 +155,12 @@ describe("GeneralAccess.toOptions", () => {
 
 describe("GeneralAccess.isValid", () => {
   it("accepts every supported value", () => {
-    expect(GeneralAccess.values.every(GeneralAccess.isValid)).toBe(true);
+    expect(
+      GeneralAccessModule.values.every(GeneralAccessModule.isValidAccessValue),
+    ).toBe(true);
   });
 
   it("rejects unsupported values", () => {
-    expect(GeneralAccess.isValid("organization")).toBe(false);
+    expect(GeneralAccessModule.isValidAccessValue("organization")).toBe(false);
   });
 });
