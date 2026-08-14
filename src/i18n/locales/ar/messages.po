@@ -367,7 +367,6 @@ msgstr "قائمة"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "مصادر البيانات"
 
@@ -648,7 +647,7 @@ msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 msgid "Password reset requires an internet connection."
 msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً بالإنترنت."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size"
 msgstr "حجم الرمز"
 
@@ -1158,7 +1157,7 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
 "الافتراضي لمعظم المستخدمين)."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
 msgstr "تم تخطي {droppedRowCount} من أصل {totalRowCount} صفًا لأن إحداثياتها "
@@ -1478,7 +1477,7 @@ msgstr "تسجيل الخروج"
 msgid "Section"
 msgstr "قسم"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "No rows could be mapped"
 msgstr "تعذّر تحديد مواقع أي صفوف على الخريطة"
 
@@ -1728,7 +1727,7 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "نموذج الاستعلام"
 
@@ -1873,7 +1872,7 @@ msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 msgid "Fields to be manually entered"
 msgstr "حقول يجب إدخالها يدويًا"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
 msgid "Loading map data"
 msgstr "جارٍ تحميل بيانات الخريطة"
 
@@ -1978,8 +1977,8 @@ msgstr "لم تختار محور X"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
-msgstr "يؤدي النشر إلى جعل لوحة المعلومات هذه مرئية لأي شخص لديه الرابط، ولا "
-"يتطلب ذلك حساب Avandar."
+msgstr "يؤدي النشر إلى جعل لوحة المعلومات هذه متاحة لأي شخص لديه الرابط، ولا "
+"يتطلب ذلك حسابًا على Avandar."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2045,7 +2044,7 @@ msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيا�
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
-msgstr "أعِد تعيين ملكية الموارد الخاصة أولًا"
+msgstr "أعد تعيين ملكية الموارد الخاصة أولًا"
 
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -2156,8 +2155,8 @@ msgstr "ميزة"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
-msgstr "اختر من يجب أن يملك لوحات المعلومات ومجموعات البيانات الخاصة بهذا "
-"العضو. لن تحصل على صلاحية الوصول إليها."
+msgstr "اختر مالكًا للّوحات الخاصة ومجموعات البيانات الخاصة لهذا العضو. لن تحصل "
+"على صلاحية الوصول إليها."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2459,7 +2458,7 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{columnName}\" مع قائمة "
 "غير حرفية."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
 msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ عددها {totalRowCount} على الخريطة "
@@ -2663,7 +2662,7 @@ msgstr "خطوط الشبكة العمودية"
 msgid "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
-msgstr "يمتلك هذا العضو {privateTotal} من الموارد الخاصة. لا يمكن إزالته حتى "
+msgstr "يمتلك هذا العضو {privateTotal} من الموارد الخاصة. ولا يمكن إزالته حتى "
 "يمتلكها شخص آخر. لا يظهر المحتوى الخاص لمسؤولي مساحة العمل، لذا أعد "
 "تعيين الملكية من سجل الخصوصية."
 
@@ -2737,7 +2736,7 @@ msgstr "غير متاح دون اتصال"
 msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "اختر مصدر بيانات وعمودي خط العرض وخط الطول لرسم بياناته."
 
@@ -2846,7 +2845,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا "
 "الإجراء."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size column must be numeric."
 msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
 
@@ -3399,7 +3398,7 @@ msgstr "اختر الأعمدة"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Latitude column"
 msgstr "عمود خط العرض"
 
@@ -3497,7 +3496,7 @@ msgstr "تمت إضافة مجموعة البيانات"
 msgid "Optional"
 msgstr "اختياري"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "Some rows could not be mapped"
 msgstr "تعذّر تحديد مواقع بعض الصفوف على الخريطة"
 
@@ -3533,7 +3532,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select longitude column"
 msgstr "اختر عمود خط الطول"
 
@@ -3657,7 +3656,7 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيان
 msgid "Reassign failed"
 msgstr "فشلت إعادة التعيين"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "اختر عمود حجم الرمز"
 
@@ -4075,7 +4074,7 @@ msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Filter"
 msgstr "تصفية"
 
@@ -4148,7 +4147,7 @@ msgstr "متراص"
 msgid "Share this {resourceLabel}"
 msgstr "شارك هذا {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select latitude column"
 msgstr "حدد عمود خط العرض"
 
@@ -4165,7 +4164,7 @@ msgstr "لوحات المعلومات الخاصة"
 msgid "Upload"
 msgstr "رفع"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
 msgstr "حدث خطأ ما أثناء تحميل بيانات هذه الطبقة."
 
@@ -4254,7 +4253,6 @@ msgstr "تحرير الاستعلام"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "مستكشف البيانات"
 
@@ -4441,6 +4439,10 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
 msgstr "حدث خطأ أثناء حفظ مجموعة البيانات"
+
+#: shared/copy/appLabel.ts
+msgid "Maps"
+msgstr "الخرائط"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -4934,7 +4936,7 @@ msgstr "لا توجد أعمدة رقمية"
 msgid "Service"
 msgstr "الخدمة"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Could not load map data"
 msgstr "تعذّر تحميل بيانات الخريطة"
 
@@ -5119,7 +5121,6 @@ msgid "Permanent link (use for QR codes)"
 msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: shared/copy/appLabel.ts
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "الإعدادات"
@@ -5369,8 +5370,8 @@ msgstr "الملف الشخصي"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
-msgstr "الأعداد فقط. لا يظهر المحتوى الخاص مطلقًا لمسؤولي مساحة العمل. يمكنك "
-"إعادة تعيين الملكية دون الحصول على صلاحية الوصول."
+msgstr "الأعداد فقط. لا يظهر المحتوى الخاص لمسؤولي مساحة العمل مطلقًا. يمكنك "
+"إعادة تعيين الملكية من دون الحصول على صلاحية الوصول."
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -5545,7 +5546,6 @@ msgstr "إزالة {0}"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "لوحات المعلومات"
 
@@ -5553,7 +5553,7 @@ msgstr "لوحات المعلومات"
 msgid "integer"
 msgstr "عدد صحيح"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
 msgid "Symbol color"
 msgstr "لون الرمز"
 
@@ -5665,7 +5665,7 @@ msgstr "أنت مشترك حاليًا في هذه الخطة."
 msgid "Upload a dataset"
 msgstr "تحميل مجموعة بيانات"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "نوع العمود غير صالح"
 
@@ -6000,7 +6000,7 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
 msgid "No mappable rows in this data source."
 msgstr "لا توجد صفوف قابلة للتحديد على الخريطة في مصدر البيانات هذا."
 
@@ -6098,7 +6098,7 @@ msgstr "لقد استخدم مساحة العمل الخاصة بك كل {curren
 msgid "Shared with you"
 msgstr "مشارك معك"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Longitude column"
 msgstr "عمود الطول"
 
@@ -6150,7 +6150,7 @@ msgstr "تاريخ غير صالح"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr "النماذج الرائدة"
+msgstr "نماذج Frontier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"

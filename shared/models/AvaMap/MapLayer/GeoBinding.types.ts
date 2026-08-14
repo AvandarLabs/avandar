@@ -1,4 +1,4 @@
-import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /**
  * How a layer's rows become geometry.
@@ -15,8 +15,8 @@ import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.typ
  */
 export type GeoBinding = {
   type: "latLngColumns";
-  latitude: QueryColumnId | undefined;
-  longitude: QueryColumnId | undefined;
+  latitude: QueryColumn.Id | undefined;
+  longitude: QueryColumn.Id | undefined;
 };
 
 /**

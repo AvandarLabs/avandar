@@ -7,18 +7,26 @@ import type {
 } from "$/models/Permissions/Permissions.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
+/** Validates one app-role override stored on a workspace invite. */
+export const WorkspaceInviteRoleOverrideSchema = z.object({
+  app: z.enum([
+    "data_sources",
+    "data_explorer",
+    "dashboards",
+    "gis",
+    "settings",
+  ]),
+  role: z.enum(["viewer", "editor", "admin"]),
+});
+
 const RoleOverridesSchema = z
   .unknown()
   .transform((raw): Array<{ app: AppType; role: RoleLevel }> => {
     if (!Array.isArray(raw)) {
       return [];
     }
-    const entry = z.object({
-      app: z.enum(["data_sources", "data_explorer", "dashboards", "settings"]),
-      role: z.enum(["viewer", "editor", "admin"]),
-    });
     return raw.flatMap((row) => {
-      const parsed = entry.safeParse(row);
+      const parsed = WorkspaceInviteRoleOverrideSchema.safeParse(row);
       return parsed.success ? [parsed.data] : [];
     });
   });

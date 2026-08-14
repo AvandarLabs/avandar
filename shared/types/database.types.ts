@@ -1817,7 +1817,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"
+      app_type:
+        | "data_sources"
+        | "data_explorer"
+        | "dashboards"
+        | "settings"
+        | "gis"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -2043,7 +2048,13 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_type: ["data_sources", "data_explorer", "dashboards", "settings"],
+      app_type: [
+        "data_sources",
+        "data_explorer",
+        "dashboards",
+        "settings",
+        "gis",
+      ],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -2132,4 +2143,3 @@ export const Constants = {
     },
   },
 } as const
-

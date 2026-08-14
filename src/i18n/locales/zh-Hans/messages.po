@@ -360,7 +360,6 @@ msgstr "列表"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "数据源"
 
@@ -634,7 +633,7 @@ msgstr "此数据集没有描述。"
 msgid "Password reset requires an internet connection."
 msgstr "密码重置需要互联网连接。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size"
 msgstr "符号大小"
 
@@ -1130,7 +1129,7 @@ msgstr "撤销"
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "如果您的设备有约 8 GB 内存，建议使用此选项（大多数用户的默认选项）。"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
 msgstr "由于坐标缺失或超出范围，已跳过 {droppedRowCount} / {totalRowCount} 行。"
@@ -1440,7 +1439,7 @@ msgstr "注销"
 msgid "Section"
 msgstr "分区"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "No rows could be mapped"
 msgstr "无法映射任何行"
 
@@ -1679,7 +1678,7 @@ msgstr "删除"
 msgid "Failed to save dataset: {0}"
 msgstr "保存数据集失败：{0}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "查询表单"
 
@@ -1821,7 +1820,7 @@ msgstr "输入此数据集的描述"
 msgid "Fields to be manually entered"
 msgstr "需要手动输入的字段"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
 msgid "Loading map data"
 msgstr "正在加载地图数据"
 
@@ -1924,7 +1923,7 @@ msgstr "您尚未选择 X 轴"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
-msgstr "发布后，任何拥有链接的人都可以查看此仪表板，无需 Avandar 账号。"
+msgstr "发布后，任何拥有链接的人都可以查看此仪表板，无需 Avandar 账户。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2097,7 +2096,7 @@ msgstr "要素"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
-msgstr "选择谁应拥有此成员的私有仪表板和数据集。您不会因此获得访问权限。"
+msgstr "选择由谁拥有此成员的私有仪表板和数据集。您不会因此获得访问权限。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2395,7 +2394,7 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "WHERE 子句对“{columnName}”使用了“{operator}”，但列表不是字面量。"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
 msgstr "由于坐标缺失或超出范围，{totalRowCount} 行均无法映射。"
@@ -2595,7 +2594,7 @@ msgid "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
 msgstr "此成员拥有 {privateTotal} "
-"个私有资源。在其他人接管所有权之前，无法移除该成员。工作区管理员始终无法查看私有内容，因此请从隐私日志中重新分配所有权。"
+"个私有资源。在其他人接管所有权之前，无法移除此成员。工作区管理员无法查看私有内容，因此请从隐私日志中重新分配所有权。"
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -2666,7 +2665,7 @@ msgstr "离线不可用"
 msgid "Back to the login page"
 msgstr "返回登录页面"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "选择数据源及其纬度和经度列，以便在地图上绘制数据。"
 
@@ -2771,7 +2770,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 "undone."
 msgstr "您确定要删除此数据集吗？此操作无法撤销。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size column must be numeric."
 msgstr "符号大小列必须为数字。"
 
@@ -3317,7 +3316,7 @@ msgstr "选择列"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在存在未保存更改时无法发布。请先保存。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Latitude column"
 msgstr "纬度列"
 
@@ -3414,7 +3413,7 @@ msgstr "数据集已添加"
 msgid "Optional"
 msgstr "可选"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "Some rows could not be mapped"
 msgstr "部分行无法映射"
 
@@ -3449,7 +3448,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每个系列是一个绘制在径向值上的数值列。值按类别轴（\"{axisKeyValue}\"）分组。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select longitude column"
 msgstr "选择经度列"
 
@@ -3570,7 +3569,7 @@ msgstr "这是您数据集的前 {0} 行。"
 msgid "Reassign failed"
 msgstr "重新分配失败"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "选择符号大小列"
 
@@ -3982,7 +3981,7 @@ msgid "Export as PDF"
 msgstr "导出为 PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Filter"
 msgstr "过滤"
 
@@ -4053,7 +4052,7 @@ msgstr "堆叠"
 msgid "Share this {resourceLabel}"
 msgstr "分享此 {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select latitude column"
 msgstr "选择纬度列"
 
@@ -4070,7 +4069,7 @@ msgstr "私有仪表板"
 msgid "Upload"
 msgstr "上传"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
 msgstr "加载此图层的数据时出错。"
 
@@ -4159,7 +4158,6 @@ msgstr "编辑查询"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "数据探索器"
 
@@ -4345,6 +4343,10 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
 msgstr "保存数据集时发生错误"
+
+#: shared/copy/appLabel.ts
+msgid "Maps"
+msgstr "地图"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -4823,7 +4825,7 @@ msgstr "没有数值列"
 msgid "Service"
 msgstr "服务"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Could not load map data"
 msgstr "无法加载地图数据"
 
@@ -5005,7 +5007,6 @@ msgid "Permanent link (use for QR codes)"
 msgstr "永久链接（用于二维码）"
 
 #: shared/copy/appLabel.ts
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "设置"
@@ -5250,7 +5251,7 @@ msgstr "个人资料"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
-msgstr "仅显示数量。工作区管理员始终无法查看私有内容。您可以重新分配所有权，但不会因此获得访问权限。"
+msgstr "仅显示数量。工作区管理员永远无法查看私有内容。您可以重新分配所有权，而不会因此获得访问权限。"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -5424,7 +5425,6 @@ msgstr "移除 {0}"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "仪表板"
 
@@ -5432,7 +5432,7 @@ msgstr "仪表板"
 msgid "integer"
 msgstr "整数"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
 msgid "Symbol color"
 msgstr "符号颜色"
 
@@ -5539,7 +5539,7 @@ msgstr "您当前已订阅此计划。"
 msgid "Upload a dataset"
 msgstr "上传数据集"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "无效的列类型"
 
@@ -5864,7 +5864,7 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信息并可能记录请求。"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
 msgid "No mappable rows in this data source."
 msgstr "此数据源中没有可映射的行。"
 
@@ -5959,7 +5959,7 @@ msgstr "您的工作区已使用 {currentSeatUsage} 个座位中的全部 {total
 msgid "Shared with you"
 msgstr "与您共享"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Longitude column"
 msgstr "经度列"
 
@@ -6011,7 +6011,7 @@ msgstr "无效日期"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
-msgstr "前沿模型"
+msgstr "Frontier 模型"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"

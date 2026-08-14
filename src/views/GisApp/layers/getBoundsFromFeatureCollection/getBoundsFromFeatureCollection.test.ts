@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
-function createPoint(longitude: number, latitude: number): GeoJSON.Feature {
+function _createPoint(longitude: number, latitude: number): GeoJSON.Feature {
   return {
     type: "Feature",
     geometry: { type: "Point", coordinates: [longitude, latitude] },
@@ -23,7 +23,7 @@ describe("getBoundsFromFeatureCollection", () => {
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [createPoint(15, -4), createPoint(30, 10)],
+        features: [_createPoint(15, -4), _createPoint(30, 10)],
       }),
     ).toEqual([
       [15, -4],
@@ -35,7 +35,7 @@ describe("getBoundsFromFeatureCollection", () => {
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [createPoint(15, -4)],
+        features: [_createPoint(15, -4)],
       }),
     ).toEqual([
       [15, -4],
@@ -126,7 +126,7 @@ describe("getBoundsFromFeatureCollection", () => {
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [withoutGeometry, createPoint(7, 7)],
+        features: [withoutGeometry, _createPoint(7, 7)],
       }),
     ).toEqual([
       [7, 7],

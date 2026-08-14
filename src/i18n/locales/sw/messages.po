@@ -371,7 +371,6 @@ msgstr "Orodha"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "Vyanzo vya Data"
 
@@ -654,7 +653,7 @@ msgstr "Seti hii ya data haina maelezo."
 msgid "Password reset requires an internet connection."
 msgstr "Kurekebisha nenosiri kunahitaji muunganisho wa intaneti."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size"
 msgstr "Ukubwa wa alama"
 
@@ -1170,7 +1169,7 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
 "watumiaji wengi)."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
 msgstr "Safu {droppedRowCount} kati ya safu {totalRowCount} zilirukwa kwa "
@@ -1492,7 +1491,7 @@ msgstr "Toka"
 msgid "Section"
 msgstr "Sehemu"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "No rows could be mapped"
 msgstr "Hakuna safu iliyoweza kuwekwa kwenye ramani"
 
@@ -1748,7 +1747,7 @@ msgstr "Futa"
 msgid "Failed to save dataset: {0}"
 msgstr "Imeshindikana kuhifadhi dataset: {0}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "Fomu ya uchunguzi"
 
@@ -1896,7 +1895,7 @@ msgstr "Ingiza maelezo ya dataset hii"
 msgid "Fields to be manually entered"
 msgstr "Sehemu za kuingizwa kwa mikono"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
 msgid "Loading map data"
 msgstr "Inapakia data ya ramani"
 
@@ -2002,7 +2001,7 @@ msgstr "Hujachagua mhimili wa X"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
-msgstr "Kuchapisha hufanya dashibodi hii ionekane kwa mtu yeyote aliye na "
+msgstr "Kuchapisha kunafanya dashibodi hii ionekane kwa mtu yeyote aliye na "
 "kiungo, bila kuhitaji akaunti ya Avandar."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
@@ -2184,7 +2183,7 @@ msgstr "Kipengele"
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
 msgstr "Chagua anayepaswa kumiliki dashibodi na seti za data za faragha za "
-"mwanachama huyu. Hutapata ufikiaji wa rasilimali hizo."
+"mwanachama huyu. Hutapata ufikiaji wa hizo."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2492,7 +2491,7 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 "chenye orodha isiyo ya literal."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
 msgstr "Hakuna hata safu moja kati ya safu {totalRowCount} iliyoweza kuwekwa "
@@ -2535,7 +2534,7 @@ msgstr "ni tupu"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
-msgstr "Miundo huria"
+msgstr "Miundo ya Open"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -2699,10 +2698,10 @@ msgstr "Mistari wima ya gridi"
 msgid "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
-msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. "
-"Hawawezi kuondolewa hadi mtu mwingine azimiliki. Maudhui ya faragha "
-"hayaonekani kwa wasimamizi wa nafasi ya kazi, kwa hivyo hamishia "
-"umiliki kutoka kwenye kumbukumbu ya faragha."
+msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. Hawezi "
+"kuondolewa hadi mtu mwingine azimiliki. Maudhui ya faragha hayaonekani "
+"kwa wasimamizi wa nafasi ya kazi, kwa hivyo hamishia umiliki kutoka "
+"kwenye kumbukumbu ya faragha."
 
 #: src/components/permissions/ShareResourceModal/shareCopy.ts
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -2774,7 +2773,7 @@ msgstr "Haipatikani bila mtandao"
 msgid "Back to the login page"
 msgstr "Rudi kwenye ukurasa wa kuingia"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "Chagua chanzo cha data na safu zake za latitudo na longitudo ili "
 "kuichora kwenye ramani."
@@ -2884,7 +2883,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "Je, una uhakika unataka kufuta seti hii ya data? Kitendo hiki hakiwezi "
 "kubadilishwa."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size column must be numeric."
 msgstr "Safu ya ukubwa wa alama lazima iwe ya nambari."
 
@@ -3445,7 +3444,7 @@ msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Latitude column"
 msgstr "Safu ya latitudo"
 
@@ -3543,7 +3542,7 @@ msgstr "Dataset imeongezwa"
 msgid "Optional"
 msgstr "Hiari"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "Some rows could not be mapped"
 msgstr "Baadhi ya safu hazikuweza kuwekwa kwenye ramani"
 
@@ -3579,7 +3578,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 "Thamani zimepangwa kwa axis ya kategoria (\"{axisKeyValue}\")."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select longitude column"
 msgstr "Chagua safu ya longitudo"
 
@@ -3705,7 +3704,7 @@ msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 msgid "Reassign failed"
 msgstr "Uhamishaji wa umiliki umeshindikana"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "Chagua safu ya ukubwa wa alama"
 
@@ -4127,7 +4126,7 @@ msgid "Export as PDF"
 msgstr "Export as PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Filter"
 msgstr "Filter"
 
@@ -4201,7 +4200,7 @@ msgstr "Zilizopangwa kwa tabaka"
 msgid "Share this {resourceLabel}"
 msgstr "Shiriki hii {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select latitude column"
 msgstr "Chagua safu ya latitudo"
 
@@ -4218,7 +4217,7 @@ msgstr "Dashibodi za faragha"
 msgid "Upload"
 msgstr "Pakia"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
 msgstr "Hitilafu imetokea wakati wa kupakia data ya tabaka hili."
 
@@ -4307,7 +4306,6 @@ msgstr "Hariri kuuliza"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "Mchambuzi wa Data"
 
@@ -4497,6 +4495,10 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
 msgstr "Kukutana na hitilafu wakati wa kuhifadhi seti ya data"
+
+#: shared/copy/appLabel.ts
+msgid "Maps"
+msgstr "Ramani"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -4997,7 +4999,7 @@ msgstr "Hakuna safu za nambari"
 msgid "Service"
 msgstr "Huduma"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Could not load map data"
 msgstr "Imeshindikana kupakia data ya ramani"
 
@@ -5183,7 +5185,6 @@ msgid "Permanent link (use for QR codes)"
 msgstr "Kiungo cha kudumu (tumia kwa QR codes)"
 
 #: shared/copy/appLabel.ts
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Mipangilio"
@@ -5435,7 +5436,7 @@ msgstr "Profaili"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
-msgstr "Ni hesabu pekee. Maudhui ya faragha hayaonekani kamwe kwa wasimamizi wa "
+msgstr "Hesabu pekee. Maudhui ya faragha hayaonekani kamwe kwa wasimamizi wa "
 "nafasi ya kazi. Unaweza kuhamisha umiliki bila kupata ufikiaji."
 
 #. placeholder {0}: dataset.name
@@ -5613,7 +5614,6 @@ msgstr "Ondoa {0}"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "Dashibodi"
 
@@ -5621,7 +5621,7 @@ msgstr "Dashibodi"
 msgid "integer"
 msgstr "nambari kamili"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
 msgid "Symbol color"
 msgstr "Rangi ya alama"
 
@@ -5734,7 +5734,7 @@ msgstr "Kwa sasa umejiandikisha kwa mpango huu."
 msgid "Upload a dataset"
 msgstr "Pakia seti ya data"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "Aina ya safu isiyo sahihi"
 
@@ -6072,7 +6072,7 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 "wa AI atazipokea na anaweza kuandika ombi hilo."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
 msgid "No mappable rows in this data source."
 msgstr "Hakuna safu inayoweza kuwekwa kwenye ramani katika chanzo hiki cha "
 "data."
@@ -6172,7 +6172,7 @@ msgstr "Mahali pako pa kazi umekamilisha {currentSeatUsage} ya {totalSeats} "
 msgid "Shared with you"
 msgstr "Imeshirikiwa nawe"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Longitude column"
 msgstr "Safu ya longitude"
 

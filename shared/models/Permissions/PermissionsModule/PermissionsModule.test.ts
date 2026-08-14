@@ -13,6 +13,7 @@ const PERMISSIONS_THAT_DEFINE_ROUTE_ACCESS = {
   data_sources: "data_sources__can_list_sources",
   data_explorer: "data_explorer__can_run_query",
   dashboards: "dashboards__can_view_dashboard",
+  gis: "gis__can_view_map",
   settings: "settings__can_manage_workspace_users",
 } as const satisfies Record<AppType, PermissionKey>;
 
@@ -32,6 +33,7 @@ function rolesMatrixWithAppRole(
     data_sources: app === "data_sources" ? role : undefined,
     data_explorer: app === "data_explorer" ? role : undefined,
     dashboards: app === "dashboards" ? role : undefined,
+    gis: app === "gis" ? role : undefined,
     settings: app === "settings" ? role : undefined,
   };
 }
@@ -150,6 +152,45 @@ describe("Permissions.PermissionCatalog", () => {
     expect(Permissions.PermissionCatalog.settings.admin.length).toBeGreaterThan(
       0,
     );
+  });
+});
+
+describe("gis app permissions", () => {
+  it("evaluates viewer, editor, and admin access through the public API", () => {
+    const viewerRoles = rolesMatrixWithAppRole("gis", "viewer");
+    const editorRoles = rolesMatrixWithAppRole("gis", "editor");
+    const adminRoles = rolesMatrixWithAppRole("gis", "admin");
+
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: viewerRoles,
+        permissionKey: "gis__can_view_map",
+      }),
+    ).toBe(true);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: viewerRoles,
+        permissionKey: "gis__can_edit_map",
+      }),
+    ).toBe(false);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: editorRoles,
+        permissionKey: "gis__can_edit_map",
+      }),
+    ).toBe(true);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: editorRoles,
+        permissionKey: "gis__can_manage_maps",
+      }),
+    ).toBe(false);
+    expect(
+      Permissions.rolesMatrixHasPermission({
+        roles: adminRoles,
+        permissionKey: "gis__can_manage_maps",
+      }),
+    ).toBe(true);
   });
 });
 
