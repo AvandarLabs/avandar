@@ -1,5 +1,6 @@
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
+import { Constants } from "$/types/database.types.ts";
 import { z } from "zod";
 import type {
   AppType,
@@ -9,14 +10,8 @@ import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 /** Validates one app-role override stored on a workspace invite. */
 export const WorkspaceInviteRoleOverrideSchema = z.object({
-  app: z.enum([
-    "data_sources",
-    "data_explorer",
-    "dashboards",
-    "gis",
-    "settings",
-  ]),
-  role: z.enum(["viewer", "editor", "admin"]),
+  app: z.enum(Permissions.RestrictableApps),
+  role: z.enum(Constants.public.Enums.role_level),
 });
 
 const RoleOverridesSchema = z
@@ -37,14 +32,16 @@ const RoleOverridesSchema = z
  * group id when unchanged, otherwise inserts a new custom group (does not
  * re-point to a different built-in even if the merged matrix matches one).
  */
-export async function resolveRoleGroupIdForAcceptedInvite(options: {
-  supabaseAdminClient: AvaSupabaseDBClient;
-  workspaceId: string;
-  invite: {
-    role_group_id: string | null;
-    role_overrides: unknown;
-  };
-}): Promise<string> {
+export async function resolveRoleGroupIdForAcceptedInvite(
+  options: Readonly<{
+    supabaseAdminClient: AvaSupabaseDBClient;
+    workspaceId: string;
+    invite: {
+      role_group_id: string | null;
+      role_overrides: unknown;
+    };
+  }>,
+): Promise<string> {
   const { supabaseAdminClient, workspaceId, invite } = options;
   const baseGroupId = invite.role_group_id;
 

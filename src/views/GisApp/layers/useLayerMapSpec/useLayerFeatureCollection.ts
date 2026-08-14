@@ -10,30 +10,31 @@ const EMPTY_FEATURE_COLLECTION: GeoJSON.FeatureCollection = {
   features: [],
 };
 
+type UseLayerFeatureCollectionOptions = {
+  binding: MapLayer.GeoBindingColumnNames | undefined;
+  layerId: string;
+  queryResult: QueryResult.T<UnknownRow> | undefined;
+  sensitivity: MapLayer.Sensitivity;
+};
+
 /** Memoizes the GeoJSON conversion for one layer's current query rows. */
 export function useLayerFeatureCollection({
   binding,
   layerId,
   queryResult,
   sensitivity,
-}: {
-  binding: MapLayer.GeoBindingColumnNames | undefined;
-  layerId: string;
-  queryResult: QueryResult.T<UnknownRow> | undefined;
-  sensitivity: MapLayer.Sensitivity;
-}): {
+}: Readonly<UseLayerFeatureCollectionOptions>): {
   featureCollection: GeoJSON.FeatureCollection;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 } {
   return useMemo(() => {
-    if (!binding || !queryResult) {
-      return { featureCollection: EMPTY_FEATURE_COLLECTION, drops: [] };
-    }
-    return makeFeatureCollectionFromRows({
-      rows: queryResult.data,
-      binding,
-      sensitivity,
-      layerId,
-    });
+    return !binding || !queryResult ?
+        { featureCollection: EMPTY_FEATURE_COLLECTION, drops: [] }
+      : makeFeatureCollectionFromRows({
+          rows: queryResult.data,
+          binding,
+          sensitivity,
+          layerId,
+        });
   }, [binding, queryResult, sensitivity, layerId]);
 }

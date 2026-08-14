@@ -8,7 +8,7 @@ type Props = { featureCount: number; droppedRowCount: number };
 export function DroppedRowsAlert({
   featureCount,
   droppedRowCount,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const totalRowCount = featureCount + droppedRowCount;
   const isEverythingDropped = featureCount === 0;

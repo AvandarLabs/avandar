@@ -1,4 +1,4 @@
-import { propEq } from "@avandar/utils";
+import { isFunction, propEq } from "@avandar/utils";
 import { redirect } from "@tanstack/react-router";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { UserId } from "$/models/User/User.types";
@@ -128,7 +128,7 @@ export const RouteMiddleware = {
           to: "/$workspaceSlug/access-denied",
           params: { workspaceSlug: workspaceSlug },
           search: {
-            app: typeof appLabel === "function" ? appLabel() : appLabel,
+            app: isFunction(appLabel) ? appLabel() : appLabel,
           },
         });
       };

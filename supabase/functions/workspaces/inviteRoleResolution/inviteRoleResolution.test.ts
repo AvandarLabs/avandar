@@ -1,4 +1,4 @@
-import { WorkspaceInviteRoleOverrideSchema } from "@sbfn/workspaces/inviteRoleResolution.ts";
+import { WorkspaceInviteRoleOverrideSchema } from "@sbfn/workspaces/inviteRoleResolution/inviteRoleResolution.ts";
 import { describe, expect, it } from "vitest";
 
 describe("WorkspaceInviteRoleOverrideSchema", () => {

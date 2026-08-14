@@ -21,11 +21,13 @@ type DatasetImportAnalyticsSource =
   | GoogleSheetsImportAnalyticsSource;
 
 /** Derives privacy-safe analytics dimensions from a successful dataset save. */
-export function makeDatasetImportedPayloadFromSaveResult(options: {
-  datasetId: string;
-  source: DatasetImportAnalyticsSource;
-  isFirstInWorkspace: boolean;
-}): AnalyticsEventPayloads["dataset.imported"] {
+export function makeDatasetImportedPayloadFromSaveResult(
+  options: Readonly<{
+    datasetId: string;
+    source: DatasetImportAnalyticsSource;
+    isFirstInWorkspace: boolean;
+  }>,
+): AnalyticsEventPayloads["dataset.imported"] {
   const { source } = options;
   const columnCount =
     source.sourceType === "google_sheets" ?

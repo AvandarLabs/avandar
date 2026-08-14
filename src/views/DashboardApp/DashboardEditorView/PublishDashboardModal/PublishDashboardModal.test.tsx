@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -33,15 +34,18 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
   };
 });
 
-vi.mock("@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder", () => {
-  return {
-    DashboardSliceBuilder: {
-      readDashboardPublishConfig: (): { slices: Record<string, unknown> } => {
-        return { slices: {} };
+vi.mock(
+  "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder",
+  () => {
+    return {
+      DashboardSliceBuilder: {
+        readDashboardPublishConfig: (): { slices: Record<string, unknown> } => {
+          return { slices: {} };
+        },
       },
-    },
-  };
-});
+    };
+  },
+);
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
@@ -97,16 +101,14 @@ function _makeDashboard(options: {
   slug: string | undefined;
   blockCount: number;
 }): Dashboard.T {
-  return {
-    __type: "Dashboard",
+  return Model.make("Dashboard", {
     id: "00000000-0000-4000-8000-000000000001" as Dashboard.Id,
     name: "Sales overview",
     slug: options.slug,
     description: undefined,
     isPublic: options.isPublic,
     isRestricted: false,
-    ownerId:
-      "00000000-0000-4000-8000-000000000002" as Dashboard.T["ownerId"],
+    ownerId: "00000000-0000-4000-8000-000000000002" as Dashboard.T["ownerId"],
     ownerProfileId:
       "00000000-0000-4000-8000-000000000003" as Dashboard.T["ownerProfileId"],
     workspaceId:
@@ -119,7 +121,7 @@ function _makeDashboard(options: {
     } as Dashboard.T["config"],
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
-  };
+  });
 }
 
 describe("PublishDashboardModal", () => {

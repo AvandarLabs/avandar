@@ -76,6 +76,36 @@ export type ServerAnalyticsEventName =
 export type DbAnalyticsEventName = (typeof DB_ANALYTICS_EVENT_NAMES)[number];
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
 
+type DatasetImportedPayload = {
+  datasetId: string;
+  sourceType: "csv_file" | "google_sheets" | "xlsx_file";
+  columnCount: number;
+  rowCount: number;
+  isFirstInWorkspace: boolean;
+};
+
+type DashboardBlockAddedViaChatPayload = {
+  blockKind: string;
+  vizType?: string;
+  dashboardId?: string;
+  blockCountAfter?: number;
+};
+
+type DashboardFilterChangedPayload = {
+  dashboardId: string;
+  filterId: string;
+  mode: "select_single" | "select_multi" | "contains";
+  wasCleared: boolean;
+};
+
+type ChatMessageSentPayload = {
+  promptChars: number;
+  pageApp: ChatPageContext.ChatApp;
+  modelId?: string;
+  runtimeMode: "cloud" | "local";
+  hasOpenDataset: boolean;
+};
+
 /**
  * Payload shape per event. Written as a mapped type over
  * `AnalyticsEventName`, so adding a name to a list above without giving it a
@@ -89,40 +119,16 @@ export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
  */
 export type AnalyticsEventPayloads = {
   [K in AnalyticsEventName]: K extends "dataset.imported" ?
-    {
-      datasetId: string;
-      sourceType: "csv_file" | "google_sheets" | "xlsx_file";
-      columnCount: number;
-      rowCount: number;
-      isFirstInWorkspace: boolean;
-    }
+    DatasetImportedPayload
   : K extends "dashboard.published" ?
     { dashboardId: string; blockCount: number; hasVanitySlug: boolean }
   : K extends "dashboard.share_settings_updated" ?
     { dashboardId: string; slugAction: "set" | "clear" | "unchanged" }
   : K extends "dashboard.block_added_via_chat" ?
-    {
-      blockKind: string;
-      vizType?: string;
-      dashboardId?: string;
-      blockCountAfter?: number;
-    }
-  : K extends "dashboard.filter_changed" ?
-    {
-      dashboardId: string;
-      filterId: string;
-      mode: "select_single" | "select_multi" | "contains";
-      wasCleared: boolean;
-    }
+    DashboardBlockAddedViaChatPayload
+  : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload
   : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
-  : K extends "chat.message_sent" ?
-    {
-      promptChars: number;
-      pageApp: ChatPageContext.ChatApp;
-      modelId?: string;
-      runtimeMode: "cloud" | "local";
-      hasOpenDataset: boolean;
-    }
+  : K extends "chat.message_sent" ? ChatMessageSentPayload
   : K extends "chat.sql_generated" ? { sqlChars: number }
   : undefined;
 };

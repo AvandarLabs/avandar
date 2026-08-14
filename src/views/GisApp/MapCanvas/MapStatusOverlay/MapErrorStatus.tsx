@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 type Props = { error: Error };
 
 /** Reports a layer-data error without exposing engine details in production. */
-export function MapErrorStatus({ error }: Props): ReactNode {
+export function MapErrorStatus({ error }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   // The raw engine message is intentionally limited to development builds.
   const developmentDetails =
@@ -14,7 +14,7 @@ export function MapErrorStatus({ error }: Props): ReactNode {
       <Text size="xs" c="dimmed" mt="xs">
         {error.message}
       </Text>
-    : null;
+    : undefined;
   return (
     <StatusShell>
       <Alert color="danger" title={t`Could not load map data`}>

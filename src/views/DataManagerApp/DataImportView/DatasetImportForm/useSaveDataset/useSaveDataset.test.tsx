@@ -1,29 +1,25 @@
+import { Model } from "@avandar/models";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook } from "@/test-utils";
+import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSaveDataset } from "./useSaveDataset";
-import type { UseMutationOptions } from "@avandar/query-hooks";
-import type { MutationFunctionContext } from "@tanstack/react-query";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type {
-  CsvFileLoadResult,
-} from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
+import type { CsvFileLoadResult } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   CsvDataSourceMetadata,
   DatasetImportFormValues,
-  DataSourceMetadata,
 } from "../DatasetImportForm";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactElement, ReactNode } from "react";
 
 const TEST_WORKSPACE = {
   id: "00000000-0000-4000-8000-000000000001" as Workspace.Id,
   slug: "test-workspace",
 };
 
-const MUTATION_FUNCTION_CONTEXT = {} as MutationFunctionContext;
-
-const SAVED_DATASET: Dataset.T = {
-  __type: "Dataset",
+const SAVED_DATASET = Model.make("Dataset", {
   id: "00000000-0000-4000-8000-000000000002" as Dataset.Id,
   name: "Saved dataset",
   sourceType: "csv_file",
@@ -36,7 +32,7 @@ const SAVED_DATASET: Dataset.T = {
   dateOfLastSync: undefined,
   description: undefined,
   isRestricted: false,
-};
+});
 
 const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
   name: "Imported CSV",
@@ -74,36 +70,22 @@ const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
   },
 };
 
-type SaveDatasetMutationContext = { isFirstInWorkspace?: boolean };
-type SaveDatasetMutationOptions = UseMutationOptions<
-  Dataset.T,
-  DatasetImportFormValues & DataSourceMetadata,
-  Error,
-  SaveDatasetMutationContext
->;
-
-let capturedMutationOptions: SaveDatasetMutationOptions;
-
 const {
+  insertCsvFileDatasetMock,
   logEventMock,
-  useMutationMock,
   workspaceDatasetsMock,
   notifyErrorMock,
   notifySuccessMock,
   navigateMock,
 } = vi.hoisted(() => {
   return {
+    insertCsvFileDatasetMock: vi.fn(),
     logEventMock: vi.fn(),
-    useMutationMock: vi.fn(),
     workspaceDatasetsMock: vi.fn(),
     notifyErrorMock: vi.fn(),
     notifySuccessMock: vi.fn(),
     navigateMock: vi.fn(),
   };
-});
-
-vi.mock("@avandar/query-hooks", () => {
-  return { useMutation: useMutationMock };
 });
 
 vi.mock("@/clients/datasets/DatasetClient", () => {
@@ -115,7 +97,7 @@ vi.mock("@/clients/datasets/DatasetClient", () => {
         }),
       },
       useGetAll: workspaceDatasetsMock,
-      insertCsvFileDataset: vi.fn(),
+      insertCsvFileDataset: insertCsvFileDatasetMock,
       insertGoogleSheetsDataset: vi.fn(),
       insertXlsxFileDataset: vi.fn(),
     },
@@ -139,7 +121,8 @@ vi.mock("@/utils/notifications/notify", () => {
 });
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  const actual =
+    await importOriginal<typeof import("@tanstack/react-router")>();
   return {
     ...actual,
     useNavigate: () => {
@@ -160,8 +143,10 @@ vi.mock("@lingui/react/macro", () => {
   };
 });
 
-vi.mock("@lingui/react", () => {
+vi.mock("@lingui/react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@lingui/react")>();
   return {
+    ...actual,
     useLingui: () => {
       return {
         _: () => {
@@ -172,9 +157,12 @@ vi.mock("@lingui/react", () => {
   };
 });
 
-vi.mock("@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient", () => {
-  return { DatasetParquetStorageClient: { startDatasetUpload: vi.fn() } };
-});
+vi.mock(
+  "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient",
+  () => {
+    return { DatasetParquetStorageClient: { startDatasetUpload: vi.fn() } };
+  },
+);
 
 function _duckDbColumn(columnName: string): DuckDbColumnSchema {
   return {
@@ -187,104 +175,98 @@ function _duckDbColumn(columnName: string): DuckDbColumnSchema {
   };
 }
 
+function _wrapper({ children }: { children: ReactNode }): ReactElement {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      mutations: { retry: false },
+      queries: { retry: false },
+    },
+  });
+  return createElement(
+    TestProviders,
+    null,
+    createElement(QueryClientProvider, { client: queryClient }, children),
+  );
+}
+
 describe("useSaveDataset", () => {
   beforeEach(() => {
+    insertCsvFileDatasetMock.mockReset();
+    insertCsvFileDatasetMock.mockResolvedValue(SAVED_DATASET);
     logEventMock.mockReset();
     navigateMock.mockReset();
     notifyErrorMock.mockReset();
     notifySuccessMock.mockReset();
     workspaceDatasetsMock.mockReset();
-    useMutationMock.mockReset();
-    useMutationMock.mockImplementation((options) => {
-      capturedMutationOptions = options;
-      return [vi.fn(), false, {}];
-    });
   });
 
   it("emits first-import metadata from the pre-save snapshot", async () => {
     workspaceDatasetsMock.mockReturnValue([[], false]);
-    renderHook(() => {
-      return useSaveDataset();
-    });
-
-    const context = await capturedMutationOptions.onMutate?.(
-      CSV_PARAMS,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-    if (!context) {
-      throw new Error("Expected the mutation to capture analytics metadata");
-    }
-    await capturedMutationOptions.onSuccess?.(
-      SAVED_DATASET,
-      CSV_PARAMS,
-      context,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-
-    expect(logEventMock).toHaveBeenCalledOnce();
-    expect(logEventMock).toHaveBeenCalledWith({
-      event: "dataset.imported",
-      workspaceId: TEST_WORKSPACE.id,
-      app: "data_sources",
-      payload: {
-        datasetId: SAVED_DATASET.id,
-        sourceType: "csv_file",
-        columnCount: CSV_PARAMS.datasetLoadResult.columns.length,
-        rowCount: CSV_PARAMS.datasetLoadResult.numRows,
-        isFirstInWorkspace: true,
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
       },
+      { wrapper: _wrapper },
+    );
+    await act(async () => {
+      await result.current[0].async(CSV_PARAMS);
     });
+
+    await waitFor(() => {
+      expect(logEventMock).toHaveBeenCalledOnce();
+      expect(logEventMock).toHaveBeenCalledWith({
+        event: "dataset.imported",
+        workspaceId: TEST_WORKSPACE.id,
+        app: "data_sources",
+        payload: {
+          datasetId: SAVED_DATASET.id,
+          sourceType: "csv_file",
+          columnCount: CSV_PARAMS.datasetLoadResult.columns.length,
+          rowCount: CSV_PARAMS.datasetLoadResult.numRows,
+          isFirstInWorkspace: true,
+        },
+      });
+    });
+    expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
   });
 
   it("marks a later import as non-first", async () => {
     workspaceDatasetsMock.mockReturnValue([[SAVED_DATASET], false]);
-    renderHook(() => {
-      return useSaveDataset();
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+    await act(async () => {
+      await result.current[0].async(CSV_PARAMS);
     });
 
-    const context = await capturedMutationOptions.onMutate?.(
-      CSV_PARAMS,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-    if (!context) {
-      throw new Error("Expected the mutation to capture analytics metadata");
-    }
-    await capturedMutationOptions.onSuccess?.(
-      SAVED_DATASET,
-      CSV_PARAMS,
-      context,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-
-    expect(logEventMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        payload: expect.objectContaining({ isFirstInWorkspace: false }),
-      }),
-    );
+    await waitFor(() => {
+      expect(logEventMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ isFirstInWorkspace: false }),
+        }),
+      );
+    });
   });
 
   it("does not block save success when the analytics snapshot is unavailable", async () => {
     workspaceDatasetsMock.mockReturnValue([undefined, false]);
     const onAfterSave = vi.fn();
-    renderHook(() => {
-      return useSaveDataset({ onAfterSave });
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset({ onAfterSave });
+      },
+      { wrapper: _wrapper },
+    );
+    await act(async () => {
+      await result.current[0].async(CSV_PARAMS);
     });
 
-    const context = await capturedMutationOptions.onMutate?.(
-      CSV_PARAMS,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-    if (!context) {
-      throw new Error("Expected the mutation to capture analytics metadata");
-    }
-    await capturedMutationOptions.onSuccess?.(
-      SAVED_DATASET,
-      CSV_PARAMS,
-      context,
-      MUTATION_FUNCTION_CONTEXT,
-    );
-
     expect(logEventMock).not.toHaveBeenCalled();
-    expect(onAfterSave).toHaveBeenCalledWith(SAVED_DATASET);
+    await waitFor(() => {
+      expect(onAfterSave).toHaveBeenCalledWith(SAVED_DATASET);
+    });
   });
 });

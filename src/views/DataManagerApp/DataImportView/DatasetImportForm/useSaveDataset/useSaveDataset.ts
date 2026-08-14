@@ -107,9 +107,9 @@ export function useSaveDataset(
     onMutate: () => {
       return {
         isFirstInWorkspace:
-          workspaceDatasets === undefined ?
-            undefined
-          : workspaceDatasets.length === 0,
+          workspaceDatasets === undefined ? undefined : (
+            workspaceDatasets.length === 0
+          ),
       };
     },
     mutationFn: (values: DatasetImportFormValues & DataSourceMetadata) => {

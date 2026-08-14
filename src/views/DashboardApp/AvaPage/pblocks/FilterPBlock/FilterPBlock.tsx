@@ -1,9 +1,8 @@
 import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
-import { useEffect, useMemo, useRef } from "react";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import { useEffect, useMemo } from "react";
+import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
@@ -65,46 +64,10 @@ export function FilterPBlock({
   puck,
 }: WithPuckProps<Props>): ReactElement {
   const { t } = useLingui();
-  const metadata = useAvaPageMetadata(puck);
-
   const dispatch = DashboardFilterStateManager.useDispatch();
   const { filtersById } = DashboardFilterStateManager.useState();
-  const containsAnalyticsTimeoutIdRef = useRef<number | undefined>(undefined);
-
-  const logFilterChanged = (wasCleared: boolean): void => {
-    if (metadata.auth !== "workspace") {
-      return;
-    }
-    void AnalyticsClient.logEvent({
-      event: "dashboard.filter_changed",
-      workspaceId: metadata.workspaceId,
-      app: "dashboards",
-      payload: {
-        dashboardId: metadata.dashboardId,
-        filterId,
-        mode,
-        wasCleared,
-      },
-    });
-  };
-
-  const scheduleContainsAnalytics = (value: string): void => {
-    if (containsAnalyticsTimeoutIdRef.current !== undefined) {
-      window.clearTimeout(containsAnalyticsTimeoutIdRef.current);
-    }
-    containsAnalyticsTimeoutIdRef.current = window.setTimeout(() => {
-      logFilterChanged(value.length === 0);
-      containsAnalyticsTimeoutIdRef.current = undefined;
-    }, 500);
-  };
-
-  useEffect(function cancelContainsAnalyticsOnUnmount() {
-    return () => {
-      if (containsAnalyticsTimeoutIdRef.current !== undefined) {
-        window.clearTimeout(containsAnalyticsTimeoutIdRef.current);
-      }
-    };
-  }, []);
+  const { logFilterChanged, scheduleContainsAnalytics } =
+    useFilterPBlockAnalytics({ filterId, mode, puck });
 
   const operator: "equals" | "in" | "contains" =
     mode === "select_multi" ? "in"

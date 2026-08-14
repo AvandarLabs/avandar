@@ -11,10 +11,10 @@ import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 export function useRenderedLayerSpec({
   featureCollection,
   layer,
-}: {
+}: Readonly<{
   featureCollection: GeoJSON.FeatureCollection;
   layer: MapLayer.T;
-}): MapSpec {
+}>): MapSpec {
   const { queryColumns } = layer.source;
   const valueColumn =
     layer.symbology.type === "proportionalSymbol" ?

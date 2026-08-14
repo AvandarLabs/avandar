@@ -7,7 +7,7 @@ import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubsc
 import {
   resolveRoleGroupIdForAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
-} from "@sbfn/workspaces/inviteRoleResolution.ts";
+} from "@sbfn/workspaces/inviteRoleResolution/inviteRoleResolution.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";

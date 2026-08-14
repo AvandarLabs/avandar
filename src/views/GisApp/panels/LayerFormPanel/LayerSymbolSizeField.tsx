@@ -5,10 +5,11 @@ import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSing
 import { MapLayerUpdates } from "@/views/GisApp/panels/LayerFormPanel/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerFormPanel/LayerFormPanel.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { ReactNode } from "react";
 
 type Props = {
-  dataSourceId: string | undefined;
+  dataSourceId: QueryDataSource.TypedId | undefined;
   layer: MapLayer.T;
   onLayerChange: LayerChangeHandler;
 };
@@ -18,7 +19,7 @@ export function LayerSymbolSizeField({
   dataSourceId,
   layer,
   onLayerChange,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const selectedColumn =
     layer.symbology.type === "proportionalSymbol" ?

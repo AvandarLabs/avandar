@@ -1,10 +1,19 @@
 import { useEffect, useRef } from "react";
-import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/useMapInstance/MapInstanceHelpers";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
-import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstance/MapInstanceHelpers";
+import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useMapInstance/useLatestMapValues";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dispatch, RefObject, SetStateAction } from "react";
+
+type UseAttachMapInstanceOptions = {
+  containerRef: RefObject<HTMLDivElement | null>;
+  emptySpec: MapSpec;
+  initialView: AvaMap.ViewState;
+  instanceRefs: MapInstanceRefs;
+  latestValues: LatestMapValues;
+  setStyleLoadCount: Dispatch<SetStateAction<number>>;
+};
 
 /** Creates the MapLibre instance once and tears it down with the canvas. */
 export function useAttachMapInstance({
@@ -14,14 +23,7 @@ export function useAttachMapInstance({
   instanceRefs,
   latestValues,
   setStyleLoadCount,
-}: {
-  containerRef: RefObject<HTMLDivElement | null>;
-  emptySpec: MapSpec;
-  initialView: AvaMap.ViewState;
-  instanceRefs: MapInstanceRefs;
-  latestValues: LatestMapValues;
-  setStyleLoadCount: Dispatch<SetStateAction<number>>;
-}): void {
+}: Readonly<UseAttachMapInstanceOptions>): void {
   const initialViewRef = useRef(initialView);
   useEffect(function constructMapInstance() {
     const container = containerRef.current;
