@@ -284,6 +284,15 @@ export function ShareResourceModal({
       return;
     }
 
+    // Already private, so the resource needs no write: this can only be the
+    // intent-restricted state, where "Restricted" was selected but nothing was
+    // ever stored. Dropping the intent flag is the whole change, and it has to
+    // happen here because the mutation that normally clears it never runs.
+    if (derivedGeneralAccess === "private") {
+      setWantsRestricted(false);
+      return;
+    }
+
     const numUsers = userShares.length;
     const numGroups = groupShares.length;
     // Keyed off `isRestricted` first, NOT off the presence of a
@@ -364,7 +373,11 @@ export function ShareResourceModal({
       return;
     }
     if (nextAccess === "private") {
-      setWantsRestricted(false);
+      // Deliberately does NOT clear `wantsRestricted` here. Clearing it before
+      // the confirmation resolves would snap the dropdown to "Only me" and grey
+      // out the add-people row even when the user cancels, so the cancel would
+      // not cancel. `useMakeResourcePrivate`'s `onSuccess` clears it, and only
+      // once the write has actually landed.
       requestMakePrivate();
       return;
     }

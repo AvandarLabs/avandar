@@ -5,7 +5,9 @@ import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient
  *
  * `private` is not a stored column. It is derived: restricted, with no share
  * granting anyone but the owner. It is the same condition
- * `util__is_resource_private_to_owner` evaluates in Postgres.
+ * `util__is_resource_private_to_owner` evaluates in Postgres. Neither accounts
+ * for publication, so a published (`is_public`) dashboard reads as "Only me"
+ * here while staying world-readable.
  */
 export type GeneralAccessValue = "private" | "restricted" | "workspace";
 
