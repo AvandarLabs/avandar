@@ -10,6 +10,7 @@ import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnRespo
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
+import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
@@ -118,6 +119,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const pageContext = useChatPageContext();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
+  const dashboardEditorState = DashboardEditorStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const { parseSql } = useSqlToStructuredQuery();
   const { t } = useLingui();
@@ -127,6 +129,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   // changes, which thrashes assistant-ui's local runtime and drops side
   // effects such as `setRawSql` (CHECKPOINTS bug #29).
   const pageContextRef = useRef(pageContext);
+  const dashboardEditorStateRef = useRef(dashboardEditorState);
   const parseSqlRef = useRef(parseSql);
   const userRef = useRef(user);
   const workspaceIdRef = useRef(workspace.id);
@@ -151,6 +154,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   useEffect(
     function synchronizeChatRuntimeDependencies() {
       pageContextRef.current = pageContext;
+      dashboardEditorStateRef.current = dashboardEditorState;
       parseSqlRef.current = parseSql;
       userRef.current = user;
       workspaceIdRef.current = workspace.id;
@@ -172,7 +176,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         metadataQuery: t`Here is a query based on your workspace metadata.`,
       };
     },
-    [pageContext, parseSql, t, user, workspace],
+    [dashboardEditorState, pageContext, parseSql, t, user, workspace],
   );
 
   // Tracks the last completed turn so we can detect "Try Again". When the
@@ -291,6 +295,17 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           return consentAck !== undefined;
         });
 
+        const initialRuntimeMode = resolveChatRuntimeMode({
+          navigatorOnLine: navigator.onLine,
+          selectedChatModelId: model,
+        });
+        devLogOfflineChat("useAvandarChatRuntime:mode", {
+          mode: initialRuntimeMode,
+          navigatorOnLine: navigator.onLine,
+          selectedChatModelId: model,
+          pageContext: currentPageContext,
+        });
+
         if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
           void AnalyticsClient.logEvent({
             event: "chat.message_sent",
@@ -300,7 +315,12 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               : currentPageContext.app === "dashboards" ? "dashboards"
               : currentPageContext.app === "data-sources" ? "data_sources"
               : undefined,
-            payload: { app: currentPageContext.app },
+            payload: ChatAnalyticsPayloads.fromMessage({
+              content: lastUserMsg.content,
+              pageContext: currentPageContext,
+              selectedModelId: model,
+              runtimeMode: initialRuntimeMode,
+            }),
           });
         }
 
@@ -346,6 +366,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             event: "chat.sql_generated",
             workspaceId,
             app: "data_explorer",
+            payload: ChatAnalyticsPayloads.fromSql(sql),
           });
           return true;
         };
@@ -383,6 +404,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             sqlApplied,
             handlers: {
               queueDashboardBlock: (block) => {
+                const payload = ChatAnalyticsPayloads.fromDashboardBlock({
+                  block,
+                  pageContext: currentPageContext,
+                  editorState: dashboardEditorStateRef.current,
+                });
                 dashboardEditorDispatch.queuePendingBlock({
                   pendingId: crypto.randomUUID(),
                   block: buildPendingDashboardBlock(block),
@@ -392,13 +418,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
                   event: "dashboard.block_added_via_chat",
                   workspaceId,
                   app: "dashboards",
-                  payload: {
-                    blockKind: block.kind,
-                    ...(block.kind === "DataViz" ?
-                      { vizType: block.vizType }
-                    : {}),
-                    dashboardId: currentPageContext.dashboardId,
-                  },
+                  payload,
                 });
               },
               setPendingClarification:
@@ -458,18 +478,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           );
         };
 
-        const mode = resolveChatRuntimeMode({
-          navigatorOnLine: navigator.onLine,
-          selectedChatModelId: model,
-        });
-        devLogOfflineChat("useAvandarChatRuntime:mode", {
-          mode,
-          navigatorOnLine: navigator.onLine,
-          selectedChatModelId: model,
-          pageContext: currentPageContext,
-        });
-        if (mode.kind === "local") {
-          return runOfflineTurn(mode.localChatModelId);
+        if (initialRuntimeMode.kind === "local") {
+          return runOfflineTurn(initialRuntimeMode.localChatModelId);
         }
 
         const cloudModelId =

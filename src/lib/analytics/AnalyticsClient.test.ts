@@ -1,6 +1,26 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 
+const CHAT_MESSAGE_SENT_EVENT = {
+  event: "chat.message_sent" as const,
+  payload: {
+    promptChars: 5,
+    pageApp: "other" as const,
+    runtimeMode: "cloud" as const,
+    hasOpenDataset: false,
+  },
+};
+
+const FILTER_CHANGED_EVENT = {
+  event: "dashboard.filter_changed" as const,
+  payload: {
+    dashboardId: "dashboard-1",
+    filterId: "filter-1",
+    mode: "select_multi" as const,
+    wasCleared: false,
+  },
+};
+
 const throwOnErrorMock = vi.fn(async () => {
   return { error: null };
 });
@@ -60,10 +80,7 @@ describe("AnalyticsClient.logEvent", () => {
   });
 
   it("stamps the row with the web client and the build version", async () => {
-    await AnalyticsClient.logEvent({
-      event: "dashboard.filter_changed",
-      payload: { filterId: "f1", mode: "select_multi" },
-    });
+    await AnalyticsClient.logEvent(FILTER_CHANGED_EVENT);
 
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -78,9 +95,7 @@ describe("AnalyticsClient.logEvent", () => {
   it("stamps the row as desktop when running in the desktop shell", async () => {
     isDesktopMock.mockReturnValue(true);
 
-    await AnalyticsClient.logEvent({
-      event: "chat.message_sent",
-    });
+    await AnalyticsClient.logEvent(CHAT_MESSAGE_SENT_EVENT);
 
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({ client: "desktop" }),
@@ -90,6 +105,7 @@ describe("AnalyticsClient.logEvent", () => {
   it("does not send an event_category, because the database owns it", async () => {
     await AnalyticsClient.logEvent({
       event: "chat.sql_generated",
+      payload: { sqlChars: 8 },
     });
 
     expect(insertMock).toHaveBeenCalledOnce();
@@ -103,7 +119,7 @@ describe("AnalyticsClient.logEvent", () => {
       error: null,
     });
 
-    await AnalyticsClient.logEvent({ event: "chat.message_sent" });
+    await AnalyticsClient.logEvent(CHAT_MESSAGE_SENT_EVENT);
 
     expect(insertMock).not.toHaveBeenCalled();
   });
@@ -112,7 +128,7 @@ describe("AnalyticsClient.logEvent", () => {
     throwOnErrorMock.mockRejectedValueOnce(new Error("insert exploded"));
 
     await expect(
-      AnalyticsClient.logEvent({ event: "chat.message_sent" }),
+      AnalyticsClient.logEvent(CHAT_MESSAGE_SENT_EVENT),
     ).resolves.toBeUndefined();
   });
 
@@ -121,13 +137,13 @@ describe("AnalyticsClient.logEvent", () => {
     throwOnErrorMock.mockRejectedValueOnce(insertError);
 
     await expect(
-      AnalyticsClient.logEvent({ event: "chat.message_sent" }),
+      AnalyticsClient.logEvent(CHAT_MESSAGE_SENT_EVENT),
     ).resolves.toBeUndefined();
 
     expect(throwOnErrorMock).toHaveBeenCalledOnce();
     expect(console.warn).toHaveBeenCalledWith(
       "[analytics] failed to log event",
-      { event: "chat.message_sent" },
+      CHAT_MESSAGE_SENT_EVENT,
       insertError,
     );
   });
@@ -140,13 +156,13 @@ describe("AnalyticsClient.logEvent", () => {
     });
 
     await expect(
-      AnalyticsClient.logEvent({ event: "chat.message_sent" }),
+      AnalyticsClient.logEvent(CHAT_MESSAGE_SENT_EVENT),
     ).resolves.toBeUndefined();
 
     expect(insertMock).not.toHaveBeenCalled();
     expect(console.warn).toHaveBeenCalledWith(
       "[analytics] failed to log event",
-      { event: "chat.message_sent" },
+      CHAT_MESSAGE_SENT_EVENT,
       sessionError,
     );
   });

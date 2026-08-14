@@ -89,16 +89,48 @@ export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
  */
 export type AnalyticsEventPayloads = {
   [K in AnalyticsEventName]: K extends "dataset.imported" ?
-    { datasetId: string; sourceType: string }
+    {
+      datasetId: string;
+      sourceType: "csv_file" | "google_sheets" | "xlsx_file";
+      columnCount: number;
+      rowCount: number;
+      isFirstInWorkspace: boolean;
+    }
   : K extends "dashboard.published" ?
-    { dashboardId: string; wasPreviouslyPublic: boolean }
+    { dashboardId: string; blockCount: number; hasVanitySlug: boolean }
+  : K extends "dashboard.share_settings_updated" ?
+    { dashboardId: string; slugAction: "set" | "clear" | "unchanged" }
   : K extends "dashboard.block_added_via_chat" ?
-    { blockKind: string; vizType?: string; dashboardId?: string }
-  : K extends "dashboard.filter_changed" ? { filterId: string; mode: string }
+    {
+      blockKind: string;
+      vizType?: string;
+      dashboardId?: string;
+      blockCountAfter?: number;
+    }
+  : K extends "dashboard.filter_changed" ?
+    {
+      dashboardId: string;
+      filterId: string;
+      mode: "select_single" | "select_multi" | "contains";
+      wasCleared: boolean;
+    }
   : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
-  : K extends "chat.message_sent" ? { app: ChatPageContext.ChatApp }
+  : K extends "chat.message_sent" ?
+    {
+      promptChars: number;
+      pageApp: ChatPageContext.ChatApp;
+      modelId?: string;
+      runtimeMode: "cloud" | "local";
+      hasOpenDataset: boolean;
+    }
+  : K extends "chat.sql_generated" ? { sqlChars: number }
   : undefined;
 };
+
+type AnalyticsEventWithPayload<K extends AnalyticsEventName> =
+  AnalyticsEventPayloads[K] extends undefined ?
+    { event: K; payload?: undefined }
+  : { event: K; payload: AnalyticsEventPayloads[K] };
 
 /**
  * Discriminated union pairing each client-emitted event with its own payload,
@@ -107,16 +139,10 @@ export type AnalyticsEventPayloads = {
  * their signatures.
  */
 export type ClientAnalyticsEvent = {
-  [K in ClientAnalyticsEventName]: {
-    event: K;
-    payload?: AnalyticsEventPayloads[K];
-  };
+  [K in ClientAnalyticsEventName]: AnalyticsEventWithPayload<K>;
 }[ClientAnalyticsEventName];
 
 /** The same pairing for edge-function emitted events. */
 export type ServerAnalyticsEvent = {
-  [K in ServerAnalyticsEventName]: {
-    event: K;
-    payload?: AnalyticsEventPayloads[K];
-  };
+  [K in ServerAnalyticsEventName]: AnalyticsEventWithPayload<K>;
 }[ServerAnalyticsEventName];

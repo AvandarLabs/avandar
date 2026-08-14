@@ -1,9 +1,11 @@
 import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
 export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
@@ -60,11 +62,49 @@ export function FilterPBlock({
   mode,
   optionsRaw,
   defaultValue,
-}: Props): ReactElement {
+  puck,
+}: WithPuckProps<Props>): ReactElement {
   const { t } = useLingui();
+  const metadata = useAvaPageMetadata(puck);
 
   const dispatch = DashboardFilterStateManager.useDispatch();
   const { filtersById } = DashboardFilterStateManager.useState();
+  const containsAnalyticsTimeoutIdRef = useRef<number | undefined>(undefined);
+
+  const logFilterChanged = (wasCleared: boolean): void => {
+    if (metadata.auth !== "workspace") {
+      return;
+    }
+    void AnalyticsClient.logEvent({
+      event: "dashboard.filter_changed",
+      workspaceId: metadata.workspaceId,
+      app: "dashboards",
+      payload: {
+        dashboardId: metadata.dashboardId,
+        filterId,
+        mode,
+        wasCleared,
+      },
+    });
+  };
+
+  const scheduleContainsAnalytics = (value: string): void => {
+    if (containsAnalyticsTimeoutIdRef.current !== undefined) {
+      window.clearTimeout(containsAnalyticsTimeoutIdRef.current);
+    }
+    containsAnalyticsTimeoutIdRef.current = window.setTimeout(() => {
+      logFilterChanged(value.length === 0);
+      containsAnalyticsTimeoutIdRef.current = undefined;
+    }, 500);
+  };
+
+  useEffect(function cancelContainsAnalyticsOnUnmount() {
+    return () => {
+      if (containsAnalyticsTimeoutIdRef.current !== undefined) {
+        window.clearTimeout(containsAnalyticsTimeoutIdRef.current);
+      }
+    };
+  }, []);
 
   const operator: "equals" | "in" | "contains" =
     mode === "select_multi" ? "in"
@@ -130,24 +170,21 @@ export function FilterPBlock({
             clearable
             searchable
             value={[...((filterState?.value as readonly string[]) ?? [])]}
-            onChange={(v) => {
-              dispatch.setFilterValue({ filterId, value: v });
-              void AnalyticsClient.logEvent({
-                event: "dashboard.filter_changed",
-                app: "dashboards",
-                payload: { filterId, mode },
-              });
+            onChange={(value) => {
+              dispatch.setFilterValue({ filterId, value });
+              logFilterChanged(value.length === 0);
             }}
           />
         : mode === "contains" ?
           <TextInput
             placeholder={t`Contains…`}
             value={(filterState?.value as string) ?? ""}
-            onChange={(e) => {
+            onChange={(event) => {
               dispatch.setFilterValue({
                 filterId,
-                value: e.currentTarget.value,
+                value: event.currentTarget.value,
               });
+              scheduleContainsAnalytics(event.currentTarget.value);
             }}
           />
         : <Select
@@ -156,16 +193,12 @@ export function FilterPBlock({
             clearable
             searchable
             value={(filterState?.value as string) ?? null}
-            onChange={(v) => {
+            onChange={(value) => {
               dispatch.setFilterValue({
                 filterId,
-                value: v ?? undefined,
+                value: value ?? undefined,
               });
-              void AnalyticsClient.logEvent({
-                event: "dashboard.filter_changed",
-                app: "dashboards",
-                payload: { filterId, mode },
-              });
+              logFilterChanged(value === null);
             }}
           />
         }
