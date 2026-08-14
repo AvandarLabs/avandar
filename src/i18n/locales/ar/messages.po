@@ -2436,7 +2436,7 @@ msgstr "الدور"
 msgid "is null"
 msgstr "فارغ"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
 msgstr "النماذج المفتوحة"
 
@@ -5244,7 +5244,7 @@ msgstr "المؤلف"
 msgid "Add filter"
 msgstr "إضافة فلتر"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "النماذج دون اتصال"
 
@@ -6034,7 +6034,7 @@ msgstr "مخطط مساحي"
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
 msgstr "النماذج الرائدة"
 

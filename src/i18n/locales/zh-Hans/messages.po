@@ -2370,7 +2370,7 @@ msgstr "角色"
 msgid "is null"
 msgstr "为空"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
 msgstr "开放模型"
 
@@ -5125,7 +5125,7 @@ msgstr "作者"
 msgid "Add filter"
 msgstr "添加过滤器"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "离线模型"
 
@@ -5895,7 +5895,7 @@ msgstr "面积图"
 msgid "Invalid date"
 msgstr "无效日期"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
 msgstr "前沿模型"
 

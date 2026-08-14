@@ -2500,7 +2500,7 @@ msgstr "Rôle"
 msgid "is null"
 msgstr "est nul"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
 msgstr "Modèles ouverts"
 
@@ -5371,7 +5371,7 @@ msgstr "Auteur"
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "Modèles hors ligne"
 
@@ -6180,7 +6180,7 @@ msgstr "Graphique en aires"
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
 msgstr "Modèles de pointe"
 

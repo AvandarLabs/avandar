@@ -2470,7 +2470,7 @@ msgstr "Jukumu"
 msgid "is null"
 msgstr "ni tupu"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
 msgstr "Miundo huria"
 
@@ -5310,7 +5310,7 @@ msgstr "Mwandishi"
 msgid "Add filter"
 msgstr "Ongeza chujio"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "Miundo ya nje ya mtandao"
 
@@ -6108,7 +6108,7 @@ msgstr "Chati ya Eneo"
 msgid "Invalid date"
 msgstr "Tarehe isiyo sahihi"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
 msgstr "Miundo ya Frontier"
 
