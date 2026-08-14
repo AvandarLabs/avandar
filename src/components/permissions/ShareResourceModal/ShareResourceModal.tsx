@@ -2,21 +2,27 @@ import { makeObject, propEq, propNotEq } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
-import { useMemo } from "react";
+import { appLabel } from "$/copy/appLabel";
+import { useMemo, useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
 import {
   buildShareSummary,
   hasPrincipalId,
 } from "./buildShareSummary/buildShareSummary";
+import { deriveGeneralAccessValue } from "./deriveGeneralAccess/deriveGeneralAccess";
+import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
 import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
+import { appForResource, useShareCopy } from "./shareCopy";
 import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
+import type { GeneralAccessValue } from "./deriveGeneralAccess/deriveGeneralAccess";
 import type { DisplayShare } from "./SharePrincipalList";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
@@ -68,6 +74,14 @@ export function ShareResourceModal({
   const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const workspaceId = workspace.id as WorkspaceId;
+  const currentUser = useCurrentUser();
+  const shareCopy = useShareCopy();
+
+  // "I intend to add people", not a stored state. Selecting `Restricted` while
+  // private writes nothing, so without this the dropdown would snap straight
+  // back to "Only me". Lost on unmount, which is why reopening the modal on a
+  // still-empty resource correctly shows "Only me" again.
+  const [wantsRestricted, setWantsRestricted] = useState(false);
 
   const queryKey = ResourceShareClient.QueryKeys.getResourceSharingState({
     workspaceId,
@@ -118,6 +132,20 @@ export function ShareResourceModal({
     },
   });
 
+  const [makeResourcePrivate, isMakingPrivate] =
+    ResourceShareClient.useMakeResourcePrivate({
+      queriesToInvalidate: invalidateKeys,
+      onError: (error: Error) => {
+        notifyError({
+          title: t`Could not make private`,
+          message: error.message,
+        });
+      },
+      onSuccess: () => {
+        setWantsRestricted(false);
+      },
+    });
+
   const userById = useMemo((): Record<string, string> => {
     return makeObject(members ?? [], {
       key: "userId",
@@ -155,6 +183,23 @@ export function ShareResourceModal({
   const directShares = sharingState.shares.filter(
     propNotEq("principalType", "workspace"),
   );
+
+  // Fails closed. useCurrentUser reads the _auth route context and this modal
+  // only ever mounts inside it, so undefined is unreachable in practice;
+  // treating it as "not the owner" is still the right default for a control
+  // that deletes shares.
+  const isOwner = sharingState.ownerId === currentUser?.id;
+
+  const derivedGeneralAccess = deriveGeneralAccessValue({
+    isRestricted: sharingState.isRestricted,
+    shares: sharingState.shares,
+    ownerId: sharingState.ownerId,
+  });
+
+  const displayedGeneralAccess: GeneralAccessValue =
+    derivedGeneralAccess === "private" && wantsRestricted ?
+      "restricted"
+    : derivedGeneralAccess;
 
   // Build an in-memory Owner row for display only. The owner is the
   // resource row's `owner_id`, not a `resource_shares` row, so we never
@@ -231,37 +276,98 @@ export function ShareResourceModal({
     groupById,
   });
 
-  const onGeneralAccessChange = (next: {
-    isRestricted: boolean;
-    role: RoleLevel | null;
-  }): void => {
-    // Skip no-op writes: bail when nothing meaningful changed.
-    const restrictedUnchanged = next.isRestricted === sharingState.isRestricted;
-    const roleUnchanged = next.role === (workspaceShare?.role ?? null);
-    if (restrictedUnchanged && roleUnchanged) {
+  const onGeneralAccessChange = (nextAccess: GeneralAccessValue): void => {
+    if (nextAccess === displayedGeneralAccess) {
       return;
     }
 
-    if (next.isRestricted !== sharingState.isRestricted) {
+    if (nextAccess === "private") {
+      setWantsRestricted(false);
+      const numUsers = userShares.length;
+      const numGroups = groupShares.length;
+      // Keyed off `isRestricted` first, NOT off the presence of a
+      // workspace-principal share row alone. An unrestricted resource with no
+      // such row still grants access through workspace app roles, so keying
+      // off the row would drop the warning in the case that matters most. The
+      // row is then ORed in so a restricted resource shared workspace-wide
+      // still warns instead of silently dropping that share.
+      const losesWorkspaceAccess =
+        !sharingState.isRestricted || workspaceShare !== undefined;
+
+      if (numUsers + numGroups === 0 && !losesWorkspaceAccess) {
+        makeResourcePrivate({ resourceType, resourceId });
+        return;
+      }
+
+      openMakePrivateConfirmModal({
+        shareCopy,
+        resourceName,
+        app: appLabel(appForResource(resourceType)),
+        numUsers,
+        numGroups,
+        losesWorkspaceAccess,
+        onConfirm: () => {
+          makeResourcePrivate({ resourceType, resourceId });
+        },
+      });
+      return;
+    }
+
+    if (nextAccess === "restricted") {
+      // Always record the intent, even when a write follows. Coming from
+      // private this is the whole change (the resource is already restricted
+      // with no shares, so there is nothing to write); coming from workspace
+      // with no other share the write lands on the same derived `private`
+      // state, so without the flag the dropdown would snap to "Only me". When
+      // shares already exist the flag is inert, since the derived value is
+      // `restricted` on its own.
+      setWantsRestricted(true);
+      if (!sharingState.isRestricted) {
+        setRestricted({
+          workspaceId,
+          resourceType,
+          resourceId,
+          isRestricted: true,
+        });
+        if (workspaceShare) {
+          deleteShare({ shareId: workspaceShare.id });
+        }
+      }
+      return;
+    }
+
+    // nextAccess === "workspace"
+    setWantsRestricted(false);
+    if (sharingState.isRestricted) {
       setRestricted({
         workspaceId,
         resourceType,
         resourceId,
-        isRestricted: next.isRestricted,
+        isRestricted: false,
       });
     }
-    if (!next.isRestricted && next.role) {
-      upsertShare({
-        workspaceId,
-        resourceType,
-        resourceId,
-        principalType: "workspace",
-        principalId: null,
-        role: next.role,
-      });
-    } else if (next.isRestricted && workspaceShare) {
-      deleteShare({ shareId: workspaceShare.id });
+    upsertShare({
+      workspaceId,
+      resourceType,
+      resourceId,
+      principalType: "workspace",
+      principalId: null,
+      role: workspaceShare?.role ?? "viewer",
+    });
+  };
+
+  const onWorkspaceRoleChange = (role: RoleLevel): void => {
+    if (role === (workspaceShare?.role ?? null)) {
+      return;
     }
+    upsertShare({
+      workspaceId,
+      resourceType,
+      resourceId,
+      principalType: "workspace",
+      principalId: null,
+      role,
+    });
   };
 
   return (
@@ -281,6 +387,7 @@ export function ShareResourceModal({
           return { value: group.id, label: group.name };
         })}
         isAdding={isUpserting}
+        isDisabled={displayedGeneralAccess === "private"}
         onAdd={({ principalType, principalId, role }) => {
           upsertShare({
             workspaceId,
@@ -335,9 +442,12 @@ export function ShareResourceModal({
 
       <ShareGeneralAccess
         resourceType={resourceType}
-        isRestricted={sharingState.isRestricted}
+        value={displayedGeneralAccess}
+        isOwner={isOwner}
+        isBusy={isMakingPrivate}
         workspaceShareRole={workspaceShare?.role ?? null}
         onChange={onGeneralAccessChange}
+        onWorkspaceRoleChange={onWorkspaceRoleChange}
       />
 
       <ShareSummaryLine spans={spans} />

@@ -18,12 +18,19 @@ const MEMBERS = [
 ];
 
 /**
- * Mutable member-query result so a test can put the lookup back into its
- * loading state. Hoisted because the `vi.mock` factories below read it.
+ * Mutable query results so a test can put the member lookup back into its
+ * loading state or vary the stored sharing state. Hoisted because the
+ * `vi.mock` factories below read it.
  */
 const mocks = vi.hoisted(() => {
   return {
     membersResult: [undefined, true] as readonly [unknown, boolean],
+    sharingState: {
+      isRestricted: false,
+      ownerId: "user-owner",
+      shares: [] as unknown[],
+    },
+    makeResourcePrivate: vi.fn(),
   };
 });
 
@@ -49,14 +56,10 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
         }),
       },
       useGetResourceSharingState: () => {
-        return [
-          {
-            isRestricted: false,
-            ownerId: "user-owner",
-            shares: [],
-          },
-          false,
-        ] as const;
+        return [mocks.sharingState, false] as const;
+      },
+      useMakeResourcePrivate: () => {
+        return [mocks.makeResourcePrivate, false] as const;
       },
       useUpsertResourceShare: () => {
         return [vi.fn(), false] as const;
@@ -81,6 +84,14 @@ vi.mock("@/clients/WorkspaceClient", () => {
   };
 });
 
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-owner", email: "john@example.com" };
+    },
+  };
+});
+
 vi.mock("@/clients/permissions/PermissionsClient", () => {
   return {
     PermissionsClient: {
@@ -91,9 +102,26 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
   };
 });
 
+/**
+ * Finds a rendered Mantine `Select` by its `aria-label`. Every select in the
+ * modal renders as a `combobox`, so the label is the only way to tell them
+ * apart.
+ */
+function findComboboxByLabel(label: string): HTMLElement | undefined {
+  return screen.getAllByRole("combobox").find((element) => {
+    return element.getAttribute("aria-label") === label;
+  });
+}
+
 describe("ShareResourceModal", () => {
   beforeEach(() => {
     mocks.membersResult = [MEMBERS, false];
+    mocks.sharingState = {
+      isRestricted: false,
+      ownerId: "user-owner",
+      shares: [],
+    };
+    mocks.makeResourcePrivate.mockClear();
   });
 
   it("renders the Drive-style layout with general access and owner row", async () => {
@@ -120,12 +148,7 @@ describe("ShareResourceModal", () => {
       ),
     ).toBeInTheDocument();
     // The Add combobox is present and reachable by aria-label.
-    const comboboxes = screen.getAllByRole("combobox");
-    expect(
-      comboboxes.some((el) => {
-        return el.getAttribute("aria-label") === "Add people or user groups";
-      }),
-    ).toBe(true);
+    expect(findComboboxByLabel("Add people or user groups")).toBeDefined();
     // Owner row shows the owner's name plus a single non-removable badge.
     // Scoped to the row's `Text`: the name also appears as a combobox option.
     expect(
@@ -156,5 +179,82 @@ describe("ShareResourceModal", () => {
     });
     expect(screen.queryByText("People with access")).toBeNull();
     expect(screen.queryByText("Owner")).toBeNull();
+  });
+
+  it("shows Only me when restricted with no non-owner share", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(findComboboxByLabel("General access")).toHaveValue("Only me");
+    });
+  });
+
+  // The workspace principal is the row a naive derivation drops. If this case
+  // reads "Only me", the modal is calling a resource private that the entire
+  // workspace can open.
+  it("shows Restricted when restricted with a workspace share", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [
+        {
+          id: "s-1",
+          workspaceId: "workspace-id-1",
+          resourceType: "dashboard",
+          resourceId: "dash-1",
+          principalType: "workspace",
+          principalId: null,
+          role: "viewer",
+          requiresAppAccess: false,
+        },
+      ],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(findComboboxByLabel("General access")).toHaveValue("Restricted");
+    });
+  });
+
+  it("disables the add-principal row when the resource is private", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(findComboboxByLabel("Add people or user groups")).toBeDisabled();
+    });
   });
 });

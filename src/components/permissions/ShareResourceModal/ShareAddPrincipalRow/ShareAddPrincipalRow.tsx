@@ -16,6 +16,11 @@ type Props = {
   members: readonly Option[];
   groups: readonly Option[];
   isAdding: boolean;
+  /**
+   * Greys out the whole row. Set when the resource is private, where adding a
+   * principal is not an available action.
+   */
+  isDisabled?: boolean;
   onAdd: (selection: Selection) => void;
 };
 
@@ -28,6 +33,7 @@ export function ShareAddPrincipalRow({
   members,
   groups,
   isAdding,
+  isDisabled = false,
   onAdd,
 }: Props): JSX.Element {
   const { t } = useLingui();
@@ -77,6 +83,7 @@ export function ShareAddPrincipalRow({
     <Group align="flex-end" wrap="nowrap" gap="sm">
       <Select
         flex={1}
+        disabled={isDisabled}
         placeholder={shareCopy.addPlaceholder}
         description={shareCopy.addHelper}
         data={groupedOptions}
@@ -92,6 +99,7 @@ export function ShareAddPrincipalRow({
       />
       <Select
         w={120}
+        disabled={isDisabled}
         label={t`Role`}
         data={roleOptions}
         value={role}
@@ -103,7 +111,11 @@ export function ShareAddPrincipalRow({
         }}
         aria-label={t`Role for new share`}
       />
-      <Button loading={isAdding} disabled={!target} onClick={onClick}>
+      <Button
+        loading={isAdding}
+        disabled={isDisabled || !target}
+        onClick={onClick}
+      >
         <Trans>Share</Trans>
       </Button>
     </Group>
