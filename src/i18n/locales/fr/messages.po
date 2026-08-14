@@ -1789,10 +1789,6 @@ msgstr "Afficher SQL"
 msgid "Grid"
 msgstr "Grille"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "Rechercher des modèles"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Impossible de synchroniser cette entité"
@@ -2503,6 +2499,10 @@ msgstr "Rôle"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "est nul"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "Modèles ouverts"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -4004,10 +4004,6 @@ msgstr "Demander une fonctionnalité"
 msgid "Description"
 msgstr "Description"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "Chargement des modèles..."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
 msgstr "Fréquence de mise à jour"
@@ -5375,7 +5371,7 @@ msgstr "Auteur"
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "Modèles hors ligne"
 
@@ -6184,6 +6180,10 @@ msgstr "Graphique en aires"
 msgid "Invalid date"
 msgstr "Date invalide"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "Modèles de pointe"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Titre de la page"
@@ -6245,10 +6245,6 @@ msgstr "Mise à niveau du plan vers {newPlanName} ({newPlanSubType})"
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "L’expression SELECT de type « {exprType} » n’est pas prise en charge "
 "par le formulaire."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "Aucun modèle ne correspond à votre recherche"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
