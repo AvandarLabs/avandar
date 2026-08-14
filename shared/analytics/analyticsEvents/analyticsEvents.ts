@@ -52,6 +52,8 @@ export const DB_ANALYTICS_EVENT_NAMES = [
   "workspace.invite_sent",
   "workspace.invite_accepted",
   "member.removed",
+  "dataset.deleted",
+  "dashboard.deleted",
   "subscription.created",
   "subscription.plan_changed",
   "subscription.status_changed",
@@ -82,6 +84,23 @@ type DatasetImportedPayload = {
   columnCount: number;
   rowCount: number;
   isFirstInWorkspace: boolean;
+};
+
+/**
+ * Written by the `datasets` delete trigger, not by a TypeScript emitter. Named
+ * here so reporting has one place to look up the shape.
+ */
+type DatasetDeletedPayload = {
+  datasetId: string;
+  sourceType: Database["public"]["Enums"]["datasets__source_type"];
+  ageDays: number;
+};
+
+/** Written by the `dashboards` delete trigger. See `DatasetDeletedPayload`. */
+type DashboardDeletedPayload = {
+  dashboardId: string;
+  wasPublic: boolean;
+  ageDays: number;
 };
 
 type DashboardBlockAddedViaChatPayload = {
@@ -128,6 +147,8 @@ export type AnalyticsEventPayloads = {
     DashboardBlockAddedViaChatPayload
   : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload
   : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
+  : K extends "dataset.deleted" ? DatasetDeletedPayload
+  : K extends "dashboard.deleted" ? DashboardDeletedPayload
   : K extends "chat.message_sent" ? ChatMessageSentPayload
   : K extends "chat.sql_generated" ? { sqlChars: number }
   : undefined;
