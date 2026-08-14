@@ -642,17 +642,26 @@ loader, RLS, or storage policy.
   `null` for a wrong prefix, a wrong third segment, a non-UUID second segment,
   and an empty string.
 
-**Integration**
+**pgTAP, storage boundary**
 
-Storage policies cannot be reached from pgTAP, so these run against a live
-stack:
+`storage.objects` is an ordinary RLS-protected table, so the storage policies
+are testable in the same place as everything else. P1 already established the
+pattern in
+`supabase/tests/database/permissions/storage_private_dataset_guard.test.sql`,
+which seeds `storage.objects` rows directly and asserts visibility per role.
+The same file shape covers:
 
-- A workspace member with no share cannot read a `published-private` object.
-- An anonymous request cannot read one.
+- A workspace member with no share cannot see a `published-private` object row.
 - A member with a viewer share can.
-- A non-editor cannot upload, overwrite, or delete an object in **either**
-  bucket (D1).
-- A `public -> workspace` downgrade leaves no object behind in `published`.
+- Anonymous cannot.
+- A non-editor cannot insert or update an object in **either** bucket (D1).
+- An editor can delete from both, which is what makes cleanup possible at all.
+
+Umbrella §9 asserted that this boundary "cannot be covered by pgTAP" and called
+for an integration test instead. That was written before P1 landed the pattern
+above; the pgTAP route is hermetic, transactional, and faster, so P2 uses it.
+The one thing pgTAP cannot cover is the client's own cleanup sequencing, which
+is covered by vitest against a mocked storage client.
 
 **Vitest**
 
@@ -669,8 +678,13 @@ stack:
 **Playwright**
 
 The viewer-role redirect from editor to preview, which is P2's one
-user-reachable behavior change. The private publishing flows wait for P3's UI,
-per umbrella §9.
+user-reachable behavior change, plus one end-to-end assertion that a
+`published-private` object seeded for a workspace dashboard is unreadable by a
+member with no share, through the real HTTP storage API rather than through
+Postgres. That last one exists because the pgTAP tests prove the *policy* is
+right while proving nothing about the bucket actually being private: a bucket
+created with `public: true` serves objects through a path that never consults
+`storage.objects` RLS at all.
 
 ---
 
