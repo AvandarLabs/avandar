@@ -37,9 +37,9 @@ if [ "$has_updates" -eq 0 ]; then
 fi
 
 # Stage 1: i18n catalogs.
-echo "pre-push hook: running i18n:update-translations..." >&2
+echo "pre-push hook: running i18n:translations..." >&2
 if ! ./scripts/i18n/update-translations.sh all >&2; then
-  echo "pre-push hook: i18n:update-translations failed." >&2
+  echo "pre-push hook: i18n:translations failed." >&2
   exit 1
 fi
 if ! git diff --quiet -- src/i18n/locales 2>/dev/null; then

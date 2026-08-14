@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { objectKeys, prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
@@ -27,7 +27,7 @@ describe("makeMapSpecFromLayerSpecs", () => {
       "layer-bottom",
       "layer-top",
     ]);
-    expect(Object.keys(merged.sources).sort()).toEqual([
+    expect(objectKeys(merged.sources).sort()).toEqual([
       "source-bottom",
       "source-top",
     ]);

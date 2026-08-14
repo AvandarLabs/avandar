@@ -1,83 +1,98 @@
 import { Tooltip } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
+import { matchLiteral } from "@avandar/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource, useShareCopy } from "../shareCopy";
+import { appForResource } from "../copy/appForResource";
+import { roleSelectTooltip } from "../copy/roleSelectTooltip";
+import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Props = {
   resourceType: ResourceType;
-  isRestricted: boolean;
+  value: GeneralAccessValue;
+  isOwner: boolean;
+  isBusy: boolean;
   workspaceShareRole: RoleLevel | null;
-  onChange: (next: { isRestricted: boolean; role: RoleLevel | null }) => void;
+  onChange: (nextValue: GeneralAccessValue) => void;
+  onWorkspaceRoleChange: (role: RoleLevel) => void;
 };
 
 /**
- * "General access" section: a single dropdown that toggles between
- * `Restricted` (no workspace-wide share, hides the role picker) and
- * `Anyone in {AppLabel}` (a `workspace`-principal share at the chosen
- * role). The orchestrator decides how to persist the change.
+ * "General access" section: a single dropdown over the three access shapes
+ * (`Only me`, `Restricted`, and `Anyone in {AppLabel}`), plus a role picker
+ * that only appears for the workspace-wide option.
  */
 export function ShareGeneralAccess({
   resourceType,
-  isRestricted,
+  value,
+  isOwner,
+  isBusy,
   workspaceShareRole,
   onChange,
+  onWorkspaceRoleChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const shareCopy = useShareCopy();
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
-  const generalValue: "restricted" | "workspace" =
-    isRestricted ? "restricted" : "workspace";
+  const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
+    isOwner,
+    labels: {
+      private: t`Only me`,
+      restricted: t`Restricted`,
+      workspace: t`Anyone in ${app}`,
+    },
+  });
 
-  const generalOptions = [
-    { value: "restricted", label: t`Restricted` },
-    { value: "workspace", label: t`Anyone in ${app}` },
-  ];
+  const generalAccessTooltip = matchLiteral(value, {
+    private: () => {
+      return isOwner ?
+          t`Only you can access this ${resource}. Everyone else loses access, including workspace admins.`
+        : t`Only the owner can make this ${resource} private.`;
+    },
+    restricted: () => {
+      return t`Only the people and groups listed below can access this ${resource}.`;
+    },
+    workspace: () => {
+      return t`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed below.`;
+    },
+  });
 
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {shareCopy.generalAccessHeading}
+        <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        <Tooltip
-          label={
-            generalValue === "restricted" ?
-              shareCopy.restrictedOptionTooltip(resource)
-            : shareCopy.workspaceOptionTooltip(resource, app)
-          }
-          multiline
-          w={320}
-        >
+        <Tooltip label={generalAccessTooltip} multiline w={320}>
           <Select
             flex={1}
+            disabled={isBusy}
             leftSection={<IconBuilding size={16} aria-hidden />}
             data={generalOptions}
-            value={generalValue}
+            value={value}
             allowDeselect={false}
-            onChange={(value) => {
-              if (value === "restricted") {
-                onChange({ isRestricted: true, role: null });
-              } else if (value === "workspace") {
-                onChange({
-                  isRestricted: false,
-                  role: workspaceShareRole ?? "viewer",
-                });
+            onChange={(nextValue) => {
+              if (
+                nextValue &&
+                GeneralAccessModule.isValidAccessValue(nextValue)
+              ) {
+                onChange(nextValue);
               }
             }}
             aria-label={t`General access`}
           />
         </Tooltip>
-        {generalValue === "workspace" ?
-          <Tooltip label={shareCopy.roleSelectTooltip}>
+        {value === "workspace" ?
+          <Tooltip label={roleSelectTooltip()}>
             <Select
               w={120}
+              disabled={isBusy}
               data={[
                 { value: "viewer", label: t`Viewer` },
                 { value: "editor", label: t`Editor` },
@@ -85,12 +100,9 @@ export function ShareGeneralAccess({
               ]}
               value={workspaceShareRole ?? "viewer"}
               allowDeselect={false}
-              onChange={(value) => {
-                if (value) {
-                  onChange({
-                    isRestricted: false,
-                    role: value as RoleLevel,
-                  });
+              onChange={(role) => {
+                if (role) {
+                  onWorkspaceRoleChange(role as RoleLevel);
                 }
               }}
               aria-label={t`Role for everyone in the workspace`}
@@ -99,7 +111,10 @@ export function ShareGeneralAccess({
         : null}
       </Group>
       <Text size="xs" c="dimmed">
-        {shareCopy.generalAccessHelper}
+        <Trans>
+          Controls the default for the rest of the workspace. People without app
+          access still need a direct share below.
+        </Trans>
       </Text>
     </Stack>
   );

@@ -11,7 +11,8 @@ import {
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource, useShareCopy } from "../shareCopy";
+import { appForResource } from "../copy/appForResource";
+import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -43,7 +44,9 @@ export function SharePrincipalRow({
   onRemove,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const shareCopy = useShareCopy();
+  // Aliased so the Lingui placeholder stays `{name}`, matching the msgid
+  // these tooltips already had before the copy moved inline.
+  const name = displayName;
   const isGroup = share.principalType === "user_group";
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
@@ -64,12 +67,14 @@ export function SharePrincipalRow({
       </Text>
 
       {isOwnerRow ?
-        <Tooltip label={shareCopy.ownerBadgeTooltip(resource)}>
+        <Tooltip
+          label={t`The owner always has admin access. To change owner, use the ${resource} settings.`}
+        >
           <Badge variant="light" color="gray" tabIndex={0}>
             <Trans>Owner</Trans>
           </Badge>
         </Tooltip>
-      : <Tooltip label={shareCopy.roleSelectTooltip}>
+      : <Tooltip label={roleSelectTooltip()}>
           <Select
             w={120}
             data={roleOptions}
@@ -87,7 +92,7 @@ export function SharePrincipalRow({
 
       {isGroup && !isOwnerRow && onToggleRequiresAppAccess ?
         <Tooltip
-          label={shareCopy.limitToAppAccessTooltip(app)}
+          label={t`When on, members of this group only get access if they already have ${app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open ${app}.`}
           multiline
           w={320}
         >
@@ -104,7 +109,7 @@ export function SharePrincipalRow({
       : null}
 
       {!isOwnerRow ?
-        <Tooltip label={shareCopy.removeTooltip(displayName)}>
+        <Tooltip label={t`Remove access for ${name}.`}>
           <ActionIcon
             variant="subtle"
             color="gray"

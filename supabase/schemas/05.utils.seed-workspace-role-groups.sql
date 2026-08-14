@@ -57,6 +57,10 @@ begin
           'admin'::public.role_level
         ),
         (
+          'gis'::public.app_type,
+          'admin'::public.role_level
+        ),
+        (
           'settings'::public.app_type,
           'admin'::public.role_level
         )
@@ -98,6 +102,10 @@ begin
         (
           'dashboards'::public.app_type,
           'editor'::public.role_level
+        ),
+        (
+          'gis'::public.app_type,
+          'editor'::public.role_level
         )
     ) as a (
       app,
@@ -136,6 +144,10 @@ begin
         ),
         (
           'dashboards'::public.app_type,
+          'viewer'::public.role_level
+        ),
+        (
+          'gis'::public.app_type,
           'viewer'::public.role_level
         )
     ) as a (

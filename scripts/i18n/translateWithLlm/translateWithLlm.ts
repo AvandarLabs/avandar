@@ -10,7 +10,7 @@
  * can write each translation back into the catalog without re-ordering
  * or losing comments.
  *
- * Most callers should use the higher-level `pnpm i18n:update-translations`
+ * Most callers should use the higher-level `pnpm i18n:translations`
  * orchestrator (extract → translate → compile). Run this script directly via
  * `pnpm vite-script scripts/i18n/translateWithLlm/translateWithLlm.ts --help`
  * for scoped runs without re-extracting or recompiling.

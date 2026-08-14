@@ -52,6 +52,10 @@ msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى "
 "جميع الأعمدة."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "1 group"
+msgstr "مجموعة واحدة"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "ترتيب حسب"
@@ -91,7 +95,7 @@ msgstr "عمود القيمة"
 msgid "Monthly"
 msgstr "شهري"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {name}."
 msgstr "إزالة الوصول لـ {name}."
 
@@ -188,7 +192,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "لا يتم دعم UNION/INTERSECT/EXCEPT بهذا الشكل في النموذج."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "إعدادات الرسم البياني"
 
@@ -363,7 +367,6 @@ msgstr "قائمة"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Sources"
 msgstr "مصادر البيانات"
 
@@ -442,6 +445,10 @@ msgstr "عناوين أحادية المسافة"
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 4 جيجابايت أو كنت تحتاج إلى أخف "
 "تنزيل."
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "1 person"
+msgstr "شخص واحد"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -583,6 +590,10 @@ msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة "
 "العمل الخاصة بك."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{shareClause} will lose access."
+msgstr "سيفقد {shareClause} إمكانية الوصول."
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 msgstr "تستخدم عبارة JOIN ON العامل \"{operator}\": تتم مطابقة عمليات الربط "
@@ -606,7 +617,7 @@ msgstr "صغير"
 msgid "Go to Privacy log"
 msgstr "الانتقال إلى سجل الخصوصية"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No matches"
 msgstr "لا توجد تطابقات"
 
@@ -636,9 +647,13 @@ msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 msgid "Password reset requires an internet connection."
 msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً بالإنترنت."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size"
 msgstr "حجم الرمز"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "الحد الأدنى للمحور Y"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -677,6 +692,10 @@ msgstr "لا تتم مطابقة الجداول المرتبطة بفواصل؛ 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only the people and groups listed below can access this {resource}."
+msgstr "يمكن للأشخاص والمجموعات المدرجين أدناه فقط الوصول إلى هذا {resource}."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -815,6 +834,10 @@ msgstr "النطاق"
 msgid "Enter email"
 msgstr "أدخل البريد الإلكتروني"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "الحد الأدنى للمحور X"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -845,12 +868,6 @@ msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة �
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "تم النسخ"
-
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below "
-"to share more broadly."
-msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أدناه "
-"للمشاركة بشكل أوسع."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -949,6 +966,10 @@ msgstr "تأكيد"
 msgid "is equal to..."
 msgstr "يساوي..."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{numGroups} groups"
+msgstr "{numGroups} مجموعات"
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "يجب أن تأتي بعض البيانات من مجموعات البيانات الموجودة"
@@ -1021,6 +1042,10 @@ msgstr "مخصص"
 msgid "Timestamp"
 msgstr "الطابع الزمني"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "الفاصل بين تدريجات المحور Y"
+
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -1075,10 +1100,11 @@ msgstr "جميع الأعمدة"
 msgid "Data Summary"
 msgstr "ملخص البيانات"
 
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "This {resource} is currently only accessible to its owner."
-msgstr "هذه {resource} متاحة حاليًا فقط لمالكها."
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+msgid "Add a member or a user group to grant access. Use General access above "
+"to share more broadly."
+msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أعلاه "
+"للمشاركة على نطاق أوسع."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1121,7 +1147,7 @@ msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
 "الافتراضي لمعظم المستخدمين)."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
 "coordinates were missing or out of range."
 msgstr "تم تخطي {droppedRowCount} من أصل {totalRowCount} صفًا لأن إحداثياتها "
@@ -1205,6 +1231,10 @@ msgstr "اختر مجموعة بيانات من القائمة لعرض بيان
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "متوسط"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Everyone in {app} will lose access."
+msgstr "سيفقد جميع أعضاء {app} إمكانية الوصول."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1313,6 +1343,10 @@ msgstr "مزامنة البيانات!"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr "الذين لديهم أيضًا"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Give access to additional members"
+msgstr "منح الوصول إلى أعضاء إضافيين"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1433,7 +1467,7 @@ msgstr "تسجيل الخروج"
 msgid "Section"
 msgstr "قسم"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "No rows could be mapped"
 msgstr "تعذّر تحديد مواقع أي صفوف على الخريطة"
 
@@ -1683,7 +1717,7 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "نموذج الاستعلام"
 
@@ -1699,6 +1733,10 @@ msgstr "تم تنزيل PDF."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{numUsers} people"
+msgstr "{numUsers} أشخاص"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
@@ -1741,10 +1779,6 @@ msgstr "عرض SQL"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "شبكة"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "بحث عن النماذج"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
@@ -1828,7 +1862,7 @@ msgstr "أدخل وصفًا لهذه المجموعة من البيانات"
 msgid "Fields to be manually entered"
 msgstr "حقول يجب إدخالها يدويًا"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
 msgid "Loading map data"
 msgstr "جارٍ تحميل بيانات الخريطة"
 
@@ -1839,6 +1873,7 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
@@ -1933,8 +1968,8 @@ msgstr "لم تختار محور X"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
-msgstr "يؤدي النشر إلى جعل لوحة المعلومات هذه مرئية لأي شخص لديه الرابط، ولا "
-"يتطلب ذلك حساب Avandar."
+msgstr "يؤدي النشر إلى جعل لوحة المعلومات هذه متاحة لأي شخص لديه الرابط، ولا "
+"يتطلب ذلك حسابًا على Avandar."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2000,7 +2035,7 @@ msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيا�
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
-msgstr "أعِد تعيين ملكية الموارد الخاصة أولًا"
+msgstr "أعد تعيين ملكية الموارد الخاصة أولًا"
 
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
@@ -2115,8 +2150,8 @@ msgstr "ميزة"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
-msgstr "اختر من يجب أن يملك لوحات المعلومات ومجموعات البيانات الخاصة بهذا "
-"العضو. لن تحصل على صلاحية الوصول إليها."
+msgstr "اختر مالكًا للّوحات الخاصة ومجموعات البيانات الخاصة لهذا العضو. لن تحصل "
+"على صلاحية الوصول إليها."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2175,6 +2210,10 @@ msgstr "مرشحات محلية (يمكن للمشاهد تعديلها، هذه
 msgid "Invalid X axis selected"
 msgstr "تم اختيار محور X غير صالح"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "الحد الأقصى للمحور X"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
@@ -2229,6 +2268,10 @@ msgstr "تأكيد الإجراء"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "معاينة البيانات"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "الحد الأقصى للمحور Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2340,10 +2383,15 @@ msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتب�
 msgid "Capturing dashboard…"
 msgstr "جارٍ التقاط اللوحة…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "الفاصل بين تدريجات المحور X"
+
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
 msgstr "هذا رمز قائمة الانتظار غير صالح"
 
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
@@ -2405,7 +2453,7 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{columnName}\" مع قائمة "
 "غير حرفية."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "None of the {totalRowCount} rows could be mapped because their "
 "coordinates were missing or out of range."
 msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ عددها {totalRowCount} على الخريطة "
@@ -2444,6 +2492,10 @@ msgstr "الدور"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "فارغ"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "النماذج المفتوحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -2609,9 +2661,15 @@ msgstr "خطوط الشبكة العمودية"
 msgid "This member owns {privateTotal} private resources. They cannot be "
 "removed until someone else owns them. Private content is not visible to "
 "workspace admins, so reassign ownership from the Privacy log."
-msgstr "يمتلك هذا العضو {privateTotal} من الموارد الخاصة. لا يمكن إزالته حتى "
+msgstr "يمتلك هذا العضو {privateTotal} من الموارد الخاصة. ولا يمكن إزالته حتى "
 "يمتلكها شخص آخر. لا يظهر المحتوى الخاص لمسؤولي مساحة العمل، لذا أعد "
 "تعيين الملكية من سجل الخصوصية."
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only you can access this {resource}. Everyone else loses access, "
+"including workspace admins."
+msgstr "يمكنك وحدك الوصول إلى هذا {resource}. سيفقد الآخرون إمكانية الوصول، بما "
+"في ذلك مسؤولو مساحة العمل."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2678,15 +2736,9 @@ msgstr "غير متاح دون اتصال"
 msgid "Back to the login page"
 msgstr "العودة إلى صفحة تسجيل الدخول"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "اختر مصدر بيانات وعمودي خط العرض وخط الطول لرسم بياناته."
-
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app "
-"access still need a direct share above."
-msgstr "يتحكم في الإعداد الافتراضي لبقية مساحة العمل. الأشخاص الذين ليس لديهم "
-"وصول إلى التطبيق لا يزالون بحاجة إلى مشاركة مباشرة أعلاه."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2787,7 +2839,7 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيانات هذه؟ لا يمكن التراجع عن هذا "
 "الإجراء."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Symbol size column must be numeric."
 msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
 
@@ -2810,6 +2862,10 @@ msgstr "URL"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "يستخدم GROUP BY تعبيرًا غير معتمد على عمود."
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Make private"
+msgstr "جعله خاصًا"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -2938,6 +2994,10 @@ msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "جارٍ إنشاء SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "تدوير تسمية المحور X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3258,6 +3318,12 @@ msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخر�
 msgid "Purchase {seatsToAdd} seat"
 msgstr "شراء {seatsToAdd} مقعد"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share below."
+msgstr "يتحكم هذا في الإعداد الافتراضي لبقية مساحة العمل. لا يزال الأشخاص الذين "
+"لا يملكون إمكانية الوصول إلى التطبيق بحاجة إلى مشاركة مباشرة أدناه."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "عدّ الصفوف في {datasetName} حسب {groupByColumn}"
@@ -3336,7 +3402,7 @@ msgstr "لا يمكنك النشر أثناء وجود تغييرات غير م�
 msgid "Delete workspace"
 msgstr "حذف مساحة العمل"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Latitude column"
 msgstr "عمود خط العرض"
 
@@ -3434,7 +3500,7 @@ msgstr "تمت إضافة مجموعة البيانات"
 msgid "Optional"
 msgstr "اختياري"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
 msgid "Some rows could not be mapped"
 msgstr "تعذّر تحديد مواقع بعض الصفوف على الخريطة"
 
@@ -3470,7 +3536,7 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select longitude column"
 msgstr "اختر عمود خط الطول"
 
@@ -3594,7 +3660,7 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيان
 msgid "Reassign failed"
 msgstr "فشلت إعادة التعيين"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "اختر عمود حجم الرمز"
 
@@ -3678,12 +3744,6 @@ msgstr "تم حفظ مجموعة البيانات بنجاح!"
 msgid "No saved datasets found."
 msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this "
-"{resource}, in addition to whatever's listed above."
-msgstr "كل عضو في مساحة العمل يمكنه فتح تطبيق {app} يحصل على هذا الدور في "
-"{resource}، بالإضافة إلى ما هو مدرج أعلاه."
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
@@ -3721,7 +3781,7 @@ msgstr "متداخل"
 msgid "Download"
 msgstr "تنزيل"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No members or user groups yet. Invite members or create user groups in "
 "Workspace settings."
 msgstr "لا يوجد أعضاء أو مجموعات مستخدمين حتى الآن. قم بدعوة الأعضاء أو إنشاء "
@@ -3923,10 +3983,6 @@ msgstr "طلب ميزة"
 msgid "Description"
 msgstr "الوصف"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "جارٍ تحميل النماذج..."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
 msgstr "تكرار التحديث"
@@ -4016,7 +4072,7 @@ msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Filter"
 msgstr "تصفية"
 
@@ -4089,7 +4145,7 @@ msgstr "متراص"
 msgid "Share this {resourceLabel}"
 msgstr "شارك هذا {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Select latitude column"
 msgstr "حدد عمود خط العرض"
 
@@ -4106,7 +4162,7 @@ msgstr "لوحات المعلومات الخاصة"
 msgid "Upload"
 msgstr "رفع"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
 msgstr "حدث خطأ ما أثناء تحميل بيانات هذه الطبقة."
 
@@ -4195,7 +4251,6 @@ msgstr "تحرير الاستعلام"
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Data Explorer"
 msgstr "مستكشف البيانات"
 
@@ -4373,13 +4428,25 @@ msgstr "توضيح الاكتشاف"
 msgid "Can't save dataset"
 msgstr "لا يمكن حفظ مجموعة البيانات"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only the owner can make this {resource} private."
+msgstr "يمكن للمالك فقط جعل هذا {resource} خاصًا."
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "فشلت هذه الاستعلام. يرجى إصلاح SQL والمحاولة مرة أخرى."
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only me"
+msgstr "أنا فقط"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
 msgstr "حدث خطأ أثناء حفظ مجموعة البيانات"
+
+#: shared/copy/appLabel.ts
+msgid "Maps"
+msgstr "الخرائط"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -4494,7 +4561,7 @@ msgstr "حذف مجموعة البيانات"
 msgid "Warning"
 msgstr "تحذير"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "When on, members of this group only get access if they already have "
 "{app} access in the workspace. When off, every member of the group gets "
 "access here, even if they normally can't open {app}."
@@ -4645,6 +4712,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "تعذّر إنشاء SQL دون اتصال. حاول إعادة الصياغة أو أعد الاتصال لاستخدام "
 "الدردشة السحابية."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Only you will be able to open it. You can share it again at any time."
+msgstr "ستتمكن من فتحه وحدك. يمكنك مشاركته مرة أخرى في أي وقت."
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "تمت الإضافة إلى \"{dashboardName}\""
@@ -4657,7 +4728,7 @@ msgstr "مرحبًا بعودتك!"
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "حدث خطأ أثناء محاولة المصادقة مع جوجل شيتس."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
 "settings."
 msgstr "المالك لديه دائمًا وصول إداري. لتغيير المالك، استخدم إعدادات "
@@ -4869,13 +4940,17 @@ msgstr "لا توجد أعمدة رقمية"
 msgid "Service"
 msgstr "الخدمة"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Could not load map data"
 msgstr "تعذّر تحميل بيانات الخريطة"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
 msgstr "لا يوجد المزيد لتحميله"
+
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
+msgid "Could not make private"
+msgstr "تعذّر جعله خاصًا"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -4890,7 +4965,7 @@ msgstr "إدارة كيفية ظهورك في {0} والحساب الذي تست
 msgid "Extra small"
 msgstr "صغير جدًا"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalList.tsx
 msgid "People with access"
 msgstr "الأشخاص الذين لديهم وصول"
 
@@ -4987,8 +5062,12 @@ msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
-msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء صلاحية وصولك إليها. إذا كنت "
-"تعتقد أن هذا خطأ، فتواصل مع مالك مساحة العمل."
+msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء وصولك إليها. إذا كنت تعتقد أن "
+"هذا حدث عن طريق الخطأ، فتواصل مع مالك مساحة العمل."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "Only you have access to this {resource}."
+msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5052,7 +5131,6 @@ msgid "Permanent link (use for QR codes)"
 msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: shared/copy/appLabel.ts
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "الإعدادات"
@@ -5132,10 +5210,6 @@ msgstr "النبرة"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
 msgstr "محرر"
-
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Only the people and groups listed above can access this {resource}."
-msgstr "يمكن فقط للأشخاص والمجموعات المذكورة أعلاه الوصول إلى هذا {resource}."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -5225,6 +5299,10 @@ msgstr "أعمدة مجموعة البيانات"
 msgid "Could not prepare the offline chat model."
 msgstr "لم يتمكن من إعداد نموذج الدردشة غير المتصل."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Make \"{resourceName}\" private?"
+msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
@@ -5282,7 +5360,7 @@ msgstr "المؤلف"
 msgid "Add filter"
 msgstr "إضافة فلتر"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "النماذج دون اتصال"
 
@@ -5302,8 +5380,8 @@ msgstr "الملف الشخصي"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesNotice.tsx
 msgid "Counts only. Private content is never visible to workspace admins. You "
 "can reassign ownership without gaining access."
-msgstr "الأعداد فقط. لا يظهر المحتوى الخاص مطلقًا لمسؤولي مساحة العمل. يمكنك "
-"إعادة تعيين الملكية دون الحصول على صلاحية الوصول."
+msgstr "الأعداد فقط. لا يظهر المحتوى الخاص لمسؤولي مساحة العمل مطلقًا. يمكنك "
+"إعادة تعيين الملكية من دون الحصول على صلاحية الوصول."
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -5315,7 +5393,7 @@ msgstr "هل أنت متأكد أنك تريد حذف <0>{0}</0> بشكل دائ
 msgid "Column outline"
 msgstr "مخطط العمود"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/roleSelectTooltip.ts
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. المشاهد = قراءة فقط، المحرر = "
@@ -5478,7 +5556,6 @@ msgstr "إزالة {0}"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Dashboards"
 msgstr "لوحات المعلومات"
 
@@ -5486,7 +5563,7 @@ msgstr "لوحات المعلومات"
 msgid "integer"
 msgstr "عدد صحيح"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
 msgid "Symbol color"
 msgstr "لون الرمز"
 
@@ -5598,7 +5675,7 @@ msgstr "أنت مشترك حاليًا في هذه الخطة."
 msgid "Upload a dataset"
 msgstr "تحميل مجموعة بيانات"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "نوع العمود غير صالح"
 
@@ -5766,6 +5843,12 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مقاعدها {totalSeats}."
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed below."
+msgstr "يحصل كل عضو في مساحة العمل يمكنه فتح تطبيق {app} على هذا الدور في هذا "
+"{resource}، بالإضافة إلى كل ما هو مذكور أدناه."
+
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "
 "to your workspace."
@@ -5810,7 +5893,6 @@ msgstr "فشل محايد"
 msgid "Please try again or reach out to support."
 msgstr "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "الوصول العام"
@@ -5857,7 +5939,7 @@ msgstr "لم تقم بإنشاء أي لوحات معلومات"
 msgid "Beta"
 msgstr "بيتا"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "ابحث بالاسم أو مجموعة المستخدمين"
 
@@ -5928,7 +6010,7 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapStatusOverlay.tsx
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
 msgid "No mappable rows in this data source."
 msgstr "لا توجد صفوف قابلة للتحديد على الخريطة في مصدر البيانات هذا."
 
@@ -5987,6 +6069,10 @@ msgstr "عتامة التعبئة"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{peopleClause} and {groupClause}"
+msgstr "{peopleClause} و{groupClause}"
+
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
 msgid "Entity failed to load"
@@ -6022,7 +6108,7 @@ msgstr "لقد استخدم مساحة العمل الخاصة بك كل {curren
 msgid "Shared with you"
 msgstr "مشارك معك"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Longitude column"
 msgstr "عمود الطول"
 
@@ -6071,6 +6157,10 @@ msgstr "مخطط مساحي"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "نماذج Frontier"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -6130,10 +6220,6 @@ msgstr "ترقية الخطة إلى {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "تعبير SELECT من النوع \"{exprType}\" غير مدعوم من النموذج."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "لا توجد نماذج تطابق بحثك"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

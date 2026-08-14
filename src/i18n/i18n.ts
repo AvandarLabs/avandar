@@ -4,7 +4,7 @@ import type { SupportedLocale } from "./locales";
 
 /**
  * Dynamically import a compiled catalog and activate it on the shared i18n
- * instance. Catalogs are produced by `pnpm i18n:update-translations` and
+ * instance. Catalogs are produced by `pnpm i18n:translations` and
  * emitted to `src/i18n/locales/<locale>/messages.{ts,js}`.
  */
 export async function activateLocale(locale: SupportedLocale): Promise<void> {

@@ -1,9 +1,4 @@
-import {
-  makeBucketMap,
-  propPasses,
-  removeAtIndex,
-  setValue,
-} from "@avandar/utils";
+import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
@@ -14,9 +9,11 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting";
+import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
+import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
@@ -45,13 +42,16 @@ type Props<TConfig extends HostConfig> = {
 
 /**
  *
- * Renders the Series fieldset first (matching the natural user flow:
- * pick what to plot, then how to bucket it), followed by the axis
- * fieldset (X axis or Category axis), followed by one Mantine
- * `<Fieldset>` per chart-level descriptor group ("Y axis", "Legend",
- * "Layout", "Grid", etc.). Descriptors whose group matches the axis
- * legend merge into the axis fieldset alongside the column picker so
- * all X-axis settings live in one visual unit.
+ * Builds the Series group first (matching the natural user flow: pick
+ * what to plot, then how to bucket it), followed by the axis group (X
+ * axis or Category axis), followed by one group per chart-level
+ * descriptor group ("Y axis", "Legend", "Layout", "Grid", etc.).
+ * Descriptors whose group matches the axis group merge into it
+ * alongside the column picker so all X-axis settings live in one
+ * visual unit.
+ *
+ * All of them go to a single {@link SettingsColumns}, so `layout`
+ * either stacks them or reflows them as one grid.
  *
  * Single source of truth for the form layout. Each chart type only
  * differs by its descriptor registry; the surrounding structure
@@ -71,17 +71,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     return fields.filter(propPasses("dataType", AvaDataType.isNumeric));
   }, [fields]);
 
-  const updateChartPath = useCallback(
-    (path: string, value: unknown) => {
-      const nextConfig = setValue(
-        config as never,
-        path as never,
-        value as never,
-      ) as TConfig;
-      onConfigChange(nextConfig);
-    },
-    [config, onConfigChange],
-  );
+  const updateChartPath = useUpdateSettingPath({ config, onConfigChange });
 
   const updateAxisKey = useCallback(
     (nextKey: string | undefined) => {
@@ -160,19 +150,17 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
   const axisGroup: VizSettingGroup = isRadar ? "Category axis" : "X axis";
   const axisLegend = vizSettingGroupLabel(axisGroup);
 
-  const groupedChartDescriptors = useMemo(() => {
-    return makeBucketMap(chartDescriptors, {
-      keyFn: (descriptor) => {
-        return descriptor.group ?? "";
-      },
-    });
-  }, [chartDescriptors]);
+  // The axis group is rendered here, alongside the axis column picker, so that
+  // all of its settings live in one visual unit.
+  const axisGroupDescriptors = chartDescriptors.filter(
+    propEq("group", axisGroup),
+  );
 
-  const axisGroupDescriptors = groupedChartDescriptors.get(axisGroup) ?? [];
-  const otherGroupedDescriptors = Array.from(
-    groupedChartDescriptors.entries(),
-  ).filter(([group]) => {
-    return group !== axisGroup;
+  const otherChartSettingGroups = useChartSettingGroups({
+    descriptors: chartDescriptors,
+    config,
+    onSettingChange: updateChartPath,
+    excludeGroup: axisGroup,
   });
 
   const groups: SettingsColumnGroup[] = [
@@ -269,7 +257,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 spec={descriptor.control}
                 value={readSetting(config, descriptor.key)}
                 onChange={(nextValue) => {
-                  updateChartPath(descriptor.key, nextValue);
+                  updateChartPath({ path: descriptor.key, value: nextValue });
                 }}
               />
             );
@@ -277,31 +265,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
         </Stack>
       ),
     },
-    ...otherGroupedDescriptors.map(([group, groupDescriptors]) => {
-      return {
-        // The descriptor group is the stable identity; the title is display
-        // copy, so keying on it would remount every column on a locale change.
-        id: group === "" ? "chart-settings" : group,
-        title: group === "" ? t`Chart settings` : vizSettingGroupLabel(group),
-        content: (
-          <Stack gap="xs">
-            {groupDescriptors.map((descriptor) => {
-              return (
-                <Control
-                  key={descriptor.key}
-                  label={vizSettingControlLabel(descriptor.label)}
-                  spec={descriptor.control}
-                  value={readSetting(config, descriptor.key)}
-                  onChange={(nextValue) => {
-                    updateChartPath(descriptor.key, nextValue);
-                  }}
-                />
-              );
-            })}
-          </Stack>
-        ),
-      };
-    }),
+    ...otherChartSettingGroups,
   ];
 
   return <SettingsColumns groups={groups} layout={layout} />;

@@ -1,0 +1,16 @@
+.gisMapCanvasControlPanel {
+  backdrop-filter: blur(12px);
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-body) 70%,
+    transparent
+  );
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+  left: var(--mantine-spacing-xs);
+  padding: 0 var(--mantine-spacing-xs) var(--mantine-spacing-xs);
+  position: absolute;
+  top: var(--mantine-spacing-md);
+  z-index: 1;
+}

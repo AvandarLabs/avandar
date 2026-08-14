@@ -6,9 +6,9 @@
 #   3. Compile the .po catalogs into the runtime .ts modules the app loads.
 #
 # Usage:
-#   pnpm i18n:update-translations               # same as `all`
-#   pnpm i18n:update-translations all           # full scan / full translate
-#   pnpm i18n:update-translations <path> [...]  # narrow the LLM step to
+#   pnpm i18n:translations               # same as `all`
+#   pnpm i18n:translations all           # full scan / full translate
+#   pnpm i18n:translations <path> [...]  # narrow the LLM step to
 #                                               # entries referencing any of
 #                                               # the given path patterns
 #                                               # (substring match against

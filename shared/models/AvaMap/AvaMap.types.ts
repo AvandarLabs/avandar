@@ -1,6 +1,6 @@
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
-import type { MapLayerRead } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
 type ModelType = "AvaMap";
 type CurrentAvaMapVersion = 1;
@@ -44,6 +44,6 @@ export type AvaMapRead = Model.Versioned<
     view: MapViewState;
 
     /** Draw order, bottom to top. */
-    layers: readonly MapLayerRead[];
+    layers: readonly MapLayer.T[];
   }
 >;

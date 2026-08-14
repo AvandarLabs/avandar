@@ -1,5 +1,6 @@
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -17,10 +18,7 @@ import type {
   RadarSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
-import type {
-  AnyVizSettingDescriptors,
-  VizSettingDescriptors,
-} from "$/models/vizs/SettingDescriptor.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -56,54 +54,15 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       group: "Legend",
       control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
     },
-    {
-      key: "chartStyle.xAxis.label",
-      label: "X axis label",
-      group: "X axis",
-      control: { kind: "text" },
-    },
-    {
-      key: "chartStyle.xAxis.labelColor",
-      label: "X axis label color",
-      group: "X axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.xAxis.tickColor",
-      label: "X axis tick color",
-      group: "X axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.xAxis.hide",
-      label: "Hide X axis",
-      group: "X axis",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.yAxis.label",
-      label: "Y axis label",
-      group: "Y axis",
-      control: { kind: "text" },
-    },
-    {
-      key: "chartStyle.yAxis.labelColor",
-      label: "Y axis label color",
-      group: "Y axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.yAxis.tickColor",
-      label: "Y axis tick color",
-      group: "Y axis",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.yAxis.hide",
-      label: "Hide Y axis",
-      group: "Y axis",
-      control: { kind: "switch" },
-    },
+    ...makeAxisDescriptors<LineChartVizConfig>({
+      axis: "xAxis",
+      role: "category",
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<LineChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
     {
       key: "chartStyle.grid.color",
       label: "Gridline color",
@@ -170,7 +129,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
 export const LineChartVizConfigs = {
   vizType: "line",
   displayName: "Line Chart",
-  descriptors: descriptors as unknown as AnyVizSettingDescriptors,
+  descriptors,
 
   makeEmptyConfig: (): LineChartVizConfig => {
     return {
@@ -238,7 +197,7 @@ export const LineChartVizConfigs = {
           xAxisKey !== undefined && firstSeries !== undefined ?
             [{ xKey: xAxisKey, key: firstSeries.key }]
           : [];
-        return { vizType, series: scatterSeries };
+        return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -263,14 +222,14 @@ export const LineChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries };
+        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
           xAxisKey !== undefined && firstSeries !== undefined ?
             [{ xKey: xAxisKey, key: firstSeries.key, sizeKey: firstSeries.key }]
           : [];
-        return { vizType, series: bubbleSeries };
+        return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

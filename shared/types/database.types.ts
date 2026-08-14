@@ -1620,6 +1620,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_resources__make_private: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: undefined
+      }
       rpc_resources__transfer_ownership: {
         Args: {
           p_new_owner_id: string
@@ -1650,10 +1657,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      util__analytics_event_category: {
-        Args: { p_event_name: string }
-        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
-      }
       rpc_workspaces__private_resource_counts: {
         Args: { p_workspace_id: string }
         Returns: {
@@ -1669,6 +1672,10 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: number
+      }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
       }
       util__auth_user_can_access_resource: {
         Args: {
@@ -1810,7 +1817,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"
+      app_type:
+        | "data_sources"
+        | "data_explorer"
+        | "dashboards"
+        | "settings"
+        | "gis"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -2036,7 +2048,13 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_type: ["data_sources", "data_explorer", "dashboards", "settings"],
+      app_type: [
+        "data_sources",
+        "data_explorer",
+        "dashboards",
+        "settings",
+        "gis",
+      ],
       datasets__ava_data_type: [
         "boolean",
         "bigint",

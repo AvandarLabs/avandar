@@ -75,9 +75,7 @@ describe("buildShareSummary", () => {
       workspaceShareRole: null,
       ...baseLookups,
     });
-    expect(flat(spans)).toBe(
-      "This dataset is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dataset.");
   });
 
   it("describes general app access when unrestricted with no direct shares", () => {
@@ -89,6 +87,19 @@ describe("buildShareSummary", () => {
     });
     expect(flat(spans)).toBe(
       "This dataset is accessible to anyone with Data Sources Viewer permission.",
+    );
+  });
+
+  it("describes a surviving workspace share on a restricted resource", () => {
+    const spans = buildShareSummary({
+      shares: [],
+      isRestricted: true,
+      workspaceShareRole: "editor",
+      ...baseLookups,
+    });
+
+    expect(flat(spans)).toBe(
+      "This dataset is accessible to anyone with Data Sources Editor permission.",
     );
   });
 
@@ -149,6 +160,19 @@ describe("buildShareSummary", () => {
     expect(text).not.toContain("Avandar Labs");
   });
 
+  it("appends a surviving workspace share when restricted", () => {
+    const spans = buildShareSummary({
+      shares: [userShare("s-1", "u-1", "editor")],
+      isRestricted: true,
+      workspaceShareRole: "viewer",
+      ...baseLookups,
+    });
+
+    expect(flat(spans)).toBe(
+      "This dataset is shared with: William Farr, and anyone with Data Sources Viewer permission.",
+    );
+  });
+
   it("joins multiple user + group shares with comma-and (restricted)", () => {
     const spans = buildShareSummary({
       shares: [
@@ -183,9 +207,7 @@ describe("buildShareSummary", () => {
       userById: {},
       groupById: {},
     });
-    expect(flat(spans)).toBe(
-      "This dashboard is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dashboard.");
   });
 
   it("uses ', and' only before the very last fragment", () => {

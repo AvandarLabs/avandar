@@ -2,7 +2,7 @@ import { capitalize, propEq } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource } from "../shareCopy";
+import { appForResource } from "../copy/appForResource";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -61,17 +61,18 @@ export function buildShareSummary(
     .filter(propEq("principalType", "user_group"));
 
   const hasAnyShares = userShares.length + groupShares.length > 0;
+  const hasGeneralAccess =
+    !opts.isRestricted || opts.workspaceShareRole !== null;
   const generalAccessRole = opts.workspaceShareRole ?? "viewer";
 
   if (!hasAnyShares) {
-    if (!opts.isRestricted) {
+    if (hasGeneralAccess) {
       return buildGeneralAccessOnlySummary(resource, app, generalAccessRole);
     }
-
     return [
       {
         kind: "text",
-        text: t`This ${resource} is currently only accessible to its owner.`,
+        text: t`Only you have access to this ${resource}.`,
       },
     ];
   }
@@ -104,7 +105,7 @@ export function buildShareSummary(
   const fragments = [
     ...(userFragment.length > 0 ? [userFragment] : []),
     ...groupFragments,
-    ...(!opts.isRestricted ?
+    ...(hasGeneralAccess ?
       [buildGeneralAccessFragment(app, generalAccessRole)]
     : []),
   ];

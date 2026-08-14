@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { objectKeys, prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
@@ -31,7 +31,7 @@ describe("makeLayerSpecFromMapLayer", () => {
       featureCollection,
       stats: { valueDomain: undefined },
     });
-    expect(Object.keys(spec.sources)).toEqual([`ava-map-source-${layer.id}`]);
+    expect(objectKeys(spec.sources)).toEqual([`ava-map-source-${layer.id}`]);
     expect(spec.layers.map(prop("id"))).toEqual([`ava-map-layer-${layer.id}`]);
   });
 

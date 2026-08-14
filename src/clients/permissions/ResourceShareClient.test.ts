@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 vi.mock("$/env/getSupabaseApiUrl.ts", () => {
@@ -13,6 +13,19 @@ vi.mock("$/env/getSupabaseApiKey.ts", () => {
   return {
     getSupabaseApiKey: () => {
       return "test-anon-key";
+    },
+  };
+});
+
+const rpcMock = vi.fn();
+const throwOnErrorMock = vi.fn();
+
+vi.mock("$/db/supabase/AvaSupabase", () => {
+  return {
+    AvaSupabase: {
+      db: () => {
+        return { rpc: rpcMock };
+      },
     },
   };
 });
@@ -46,5 +59,38 @@ describe("ResourceShareClient.upsertResourceShare", () => {
         requiresAppAccess: true,
       }),
     ).rejects.toThrow(/requiresAppAccess applies only to user_group/);
+  });
+});
+
+describe("ResourceShareClient.makeResourcePrivate", () => {
+  beforeEach(() => {
+    rpcMock.mockReset();
+    throwOnErrorMock.mockReset();
+    rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
+  });
+
+  it("passes arguments through with p_ prefixes", async () => {
+    throwOnErrorMock.mockResolvedValueOnce({ data: null, error: null });
+
+    await ResourceShareClient.makeResourcePrivate({
+      resourceType: "dashboard",
+      resourceId: "dash-1",
+    });
+
+    expect(rpcMock).toHaveBeenCalledWith("rpc_resources__make_private", {
+      p_resource_type: "dashboard",
+      p_resource_id: "dash-1",
+    });
+  });
+
+  it("throws the supabase error message on failure", async () => {
+    throwOnErrorMock.mockRejectedValueOnce(new Error("insufficient_privilege"));
+
+    await expect(
+      ResourceShareClient.makeResourcePrivate({
+        resourceType: "dataset",
+        resourceId: "ds-1",
+      }),
+    ).rejects.toThrow("insufficient_privilege");
   });
 });

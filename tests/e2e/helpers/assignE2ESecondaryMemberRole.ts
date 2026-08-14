@@ -202,6 +202,7 @@ export function createSingleAppViewerRolesMatrix(
     data_sources: app === "data_sources" ? "viewer" : undefined,
     data_explorer: app === "data_explorer" ? "viewer" : undefined,
     dashboards: app === "dashboards" ? "viewer" : undefined,
+    gis: app === "gis" ? "viewer" : undefined,
     settings: app === "settings" ? "viewer" : undefined,
   };
 }
@@ -217,6 +218,7 @@ export function createSingleAppEditorRolesMatrix(
     data_sources: app === "data_sources" ? role : undefined,
     data_explorer: app === "data_explorer" ? role : undefined,
     dashboards: app === "dashboards" ? role : undefined,
+    gis: app === "gis" ? role : undefined,
     settings: undefined,
   };
 }
@@ -231,6 +233,7 @@ export function createSingleAppAdminRolesMatrix(
     data_sources: app === "data_sources" ? "admin" : undefined,
     data_explorer: app === "data_explorer" ? "admin" : undefined,
     dashboards: app === "dashboards" ? "admin" : undefined,
+    gis: app === "gis" ? "admin" : undefined,
     settings: app === "settings" ? "admin" : undefined,
   };
 }

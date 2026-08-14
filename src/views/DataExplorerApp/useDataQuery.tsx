@@ -1,11 +1,11 @@
 import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
-import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
@@ -23,7 +23,7 @@ type UseDataQueryOptions = {
     }
   | {
       auth: "public";
-      publicAvaPageId: DashboardId;
+      publicAvaPageId: Dashboard.Id;
     }
 );
 
@@ -41,7 +41,7 @@ type UseDataQueryOptions = {
  */
 export function useDataQuery(
   options: UseDataQueryOptions,
-): UseQueryResultTuple<QueryResult<UnknownRow>> {
+): UseQueryResultTuple<QueryResult.T<UnknownRow>> {
   const { auth, query, rawSql, isStructuredQueryInSync = true } = options;
   const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
@@ -65,7 +65,7 @@ export function useDataQuery(
       "structuredInSync",
       isStructuredQueryInSync,
     ],
-    queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+    queryFn: async (): Promise<QueryResult.T<UnknownRow>> => {
       // Branching rather than spreading a precomputed params object: the
       // queryKey lint rule tracks the identifiers this callback reads, and
       // only the if/else form lets it see the two ids as mutually exclusive.

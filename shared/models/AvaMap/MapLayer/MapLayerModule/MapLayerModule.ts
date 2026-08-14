@@ -8,7 +8,6 @@ import type {
   MapLayerId,
   MapLayerRead,
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
-import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 
 /** Fallback symbol color when the author has not picked one. */
 const DEFAULT_SYMBOL_COLOR = "#3b82f6";
@@ -22,6 +21,7 @@ const DEFAULT_MIN_SYMBOL_RADIUS = 4;
 /** Fallback largest radius of a proportional symbol, in pixels. */
 const DEFAULT_MAX_SYMBOL_RADIUS = 24;
 
+/** Constructors, defaults, and binding helpers for map layers. */
 export const MapLayerModule = {
   /** Fallback symbol color when the author has not picked one. */
   defaultSymbolColor: DEFAULT_SYMBOL_COLOR,
@@ -77,7 +77,7 @@ export const MapLayerModule = {
     if (!geoBinding || !geoBinding.latitude || !geoBinding.longitude) {
       return undefined;
     }
-    const findColumnName = (columnId: QueryColumnId): string | undefined => {
+    const findColumnName = (columnId: QueryColumn.Id): string | undefined => {
       const column = source.queryColumns.find(propEq("id", columnId));
       return column ? QueryColumn.getDerivedColumnName(column) : undefined;
     };

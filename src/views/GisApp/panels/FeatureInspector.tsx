@@ -1,3 +1,4 @@
+import { objectEntries } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Drawer, Flex, Stack, Text } from "@mantine/core";
 import type { ReactNode } from "react";
@@ -44,7 +45,7 @@ export function FeatureInspector({
       }}
     >
       <Stack gap="md">
-        {Object.entries(properties).map(([key, value]) => {
+        {objectEntries(properties).map(([key, value]) => {
           if (key === "_featureId") {
             return null;
           }

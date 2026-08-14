@@ -1,14 +1,13 @@
-import maplibregl from "maplibre-gl";
-import { useEffect, useRef, useState } from "react";
-import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
-import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
+import { useState } from "react";
+import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useAttachMapInstance";
+import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";
+import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
-
-/** The baseline a freshly loaded style starts from: nothing applied yet. */
-export const EMPTY_MAP_SPEC: MapSpec = { sources: {}, layers: [] };
 
 /** The live MapLibre instance plus the state the sync hooks need to read. */
 export type MapInstance = {
@@ -31,6 +30,23 @@ export type MapInstance = {
   appliedStyleKeyRef: RefObject<string | undefined>;
 };
 
+/** Presents the mutable refs and style counter as the hook's public result. */
+function _createMapInstanceResult({
+  appliedSpecRef,
+  appliedStyleKeyRef,
+  isStyleSwapPendingRef,
+  mapRef,
+  styleLoadCount,
+}: MapInstance): MapInstance {
+  return {
+    mapRef,
+    styleLoadCount,
+    isStyleSwapPendingRef,
+    appliedSpecRef,
+    appliedStyleKeyRef,
+  };
+}
+
 /**
  * Constructs the MapLibre instance exactly once and keeps it alive for the
  * canvas's lifetime.
@@ -51,119 +67,31 @@ export function useMapInstance({
   interactiveLayerIds: readonly string[];
   onFeatureClick: (feature: GeoJSON.Feature) => void;
 }): MapInstance {
-  const mapRef = useRef<MapLibreMap | undefined>(undefined);
-  const appliedSpecRef = useRef<MapSpec>(EMPTY_MAP_SPEC);
-  const appliedStyleKeyRef = useRef<string | undefined>(undefined);
-  const isStyleSwapPendingRef = useRef(false);
+  const instanceRefs = useMapInstanceRefs();
+  const { mapRef, appliedSpecRef, appliedStyleKeyRef, isStyleSwapPendingRef } =
+    instanceRefs;
   const [styleLoadCount, setStyleLoadCount] = useState(0);
 
-  // Latest-value refs, declared before the one-shot construction effect that
-  // reads them, so its handlers stay current without re-registering.
-  const interactiveLayerIdsRef = useRef(interactiveLayerIds);
-  const onFeatureClickRef = useRef(onFeatureClick);
-  const basemapRef = useRef(basemap);
-  // `view` is an initial-value-only prop: it seeds the camera at construction
-  // and is deliberately not synced afterwards, so the user's pan and zoom are
-  // never yanked back by a re-render.
-  const viewRef = useRef(view);
-  useEffect(
-    function syncLatestValueRefs() {
-      interactiveLayerIdsRef.current = interactiveLayerIds;
-      onFeatureClickRef.current = onFeatureClick;
-      basemapRef.current = basemap;
-    },
-    [interactiveLayerIds, onFeatureClick, basemap],
-  );
+  const latestValues = useLatestMapValues({
+    basemap,
+    interactiveLayerIds,
+    onFeatureClick,
+  });
+  useAttachMapInstance({
+    containerRef,
+    emptySpec: EMPTY_MAP_SPEC,
+    initialView: view,
+    instanceRefs,
+    latestValues,
+    setStyleLoadCount,
+  });
+  useMapWindowResize(mapRef);
 
-  useEffect(function constructMapInstance() {
-    const container = containerRef.current;
-    if (!container || mapRef.current) {
-      return undefined;
-    }
-    const initialBasemap = basemapRef.current;
-    const initialView = viewRef.current;
-    const map = new maplibregl.Map({
-      container,
-      style: BasemapStyle.fromBasemap(initialBasemap),
-      center: initialView.center,
-      zoom: initialView.zoom,
-    });
-    appliedStyleKeyRef.current = BasemapStyle.toKey(initialBasemap);
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
-    map.addControl(
-      new maplibregl.ScaleControl({ unit: "metric" }),
-      "bottom-right",
-    );
-    mapRef.current = map;
-
-    // One map-level click handler covers every layer, present or future, so
-    // adding and removing layers cannot accumulate listeners.
-    const onMapClick = (event: maplibregl.MapMouseEvent): void => {
-      const existingLayerIds = interactiveLayerIdsRef.current.filter(
-        (layerId) => {
-          return map.getLayer(layerId);
-        },
-      );
-      if (existingLayerIds.length === 0) {
-        return;
-      }
-      const [feature] = map.queryRenderedFeatures(event.point, {
-        layers: existingLayerIds,
-      });
-      if (feature) {
-        onFeatureClickRef.current(feature as GeoJSON.Feature);
-      }
-    };
-    map.on("click", onMapClick);
-
-    const onStyleLoad = (): void => {
-      // A style swap discards sources and layers, so the next sync must start
-      // from an empty baseline.
-      appliedSpecRef.current = EMPTY_MAP_SPEC;
-      isStyleSwapPendingRef.current = false;
-      const currentBasemap = basemapRef.current;
-      if (
-        currentBasemap.type === "builtIn" &&
-        currentBasemap.style === "avandar"
-      ) {
-        applyMapStyles(map);
-      }
-      setStyleLoadCount((current) => {
-        return current + 1;
-      });
-    };
-    map.on("style.load", onStyleLoad);
-
-    return () => {
-      map.off("click", onMapClick);
-      map.off("style.load", onStyleLoad);
-      map.remove();
-      mapRef.current = undefined;
-      appliedSpecRef.current = EMPTY_MAP_SPEC;
-      appliedStyleKeyRef.current = undefined;
-      isStyleSwapPendingRef.current = false;
-      setStyleLoadCount(0);
-    };
-    // Construction is intentionally one-shot: later prop changes are applied
-    // by the sync hooks rather than by rebuilding the map.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(function resizeMapWithWindow() {
-    const onWindowResize = (): void => {
-      mapRef.current?.resize();
-    };
-    window.addEventListener("resize", onWindowResize);
-    return () => {
-      window.removeEventListener("resize", onWindowResize);
-    };
-  }, []);
-
-  return {
+  return _createMapInstanceResult({
     mapRef,
     styleLoadCount,
     isStyleSwapPendingRef,
     appliedSpecRef,
     appliedStyleKeyRef,
-  };
+  });
 }

@@ -1,6 +1,6 @@
 import { hydrateBubbleSeriesFromQuery } from "$/models/vizs/hydrateBubbleSeriesFromQuery.ts";
 import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult/hydrateBubbleSeriesFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -13,10 +13,12 @@ import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChart
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type {
+  BubbleSeries,
   RadarSeries,
   ScatterSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -24,10 +26,25 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const DESCRIPTORS = {
+  chart: [
+    ...makeAxisDescriptors<BubbleChartVizConfig>({
+      axis: "xAxis",
+      role: "value",
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<BubbleChartVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
+  ],
+  series: [],
+} as const satisfies VizSettingDescriptors<BubbleChartVizConfig, BubbleSeries>;
+
 export const BubbleChartVizConfigs = {
   vizType: "bubble",
   displayName: "Bubble Chart",
-  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
+  descriptors: DESCRIPTORS,
 
   /** Create an empty bubble chart config. */
   makeEmptyConfig: (): BubbleChartVizConfig => {
@@ -68,6 +85,7 @@ export const BubbleChartVizConfigs = {
     const firstSeries = vizConfig.series[0];
     const xAxisKey = firstSeries?.xKey;
     const yAxisKey = firstSeries?.key;
+    const { chartStyle } = vizConfig;
 
     const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
       if (yAxisKey === undefined) {
@@ -90,6 +108,7 @@ export const BubbleChartVizConfigs = {
           series: xySeries("bar"),
           layout: "group",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("line", (vizType): LineChartVizConfig => {
@@ -98,6 +117,7 @@ export const BubbleChartVizConfigs = {
           xAxisKey,
           series: xySeries("line"),
           withLegend: true,
+          chartStyle,
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
@@ -107,6 +127,7 @@ export const BubbleChartVizConfigs = {
           series: xySeries("area"),
           layout: "default",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
@@ -114,7 +135,7 @@ export const BubbleChartVizConfigs = {
         const scatterSeries: ScatterSeries[] = vizConfig.series.map((s) => {
           return { xKey: s.xKey, key: s.key, label: s.label, color: s.color };
         });
-        return { vizType, series: scatterSeries };
+        return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
@@ -137,6 +158,7 @@ export const BubbleChartVizConfigs = {
           nameKey: xAxisKey,
           series: radarSeries,
           withLegend: true,
+          chartStyle,
         };
       })
       .with("bubble", (): BubbleChartVizConfig => {

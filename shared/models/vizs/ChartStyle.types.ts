@@ -21,6 +21,32 @@ export type AxisStyle = {
 
   /** Hide the axis line, ticks, and labels entirely. */
   hide?: boolean;
+
+  /**
+   * Lower bound of a value axis. Unset means derive it from the data
+   * (zero-anchored when the data is non-negative). Ignored on a
+   * category axis.
+   */
+  min?: number;
+
+  /**
+   * Upper bound of a value axis. Unset means derive it from the data.
+   * Ignored on a category axis.
+   */
+  max?: number;
+
+  /**
+   * Step between ticks on a value axis, in data units (Excel's "major
+   * unit"). Recharts has no step prop, so this generates an explicit
+   * tick array. Ignored on a category axis.
+   */
+  tickInterval?: number;
+
+  /**
+   * Tick label rotation in degrees, -90 to 90. Unset or `0` means
+   * horizontal. The X axis uses this field; other axes ignore it.
+   */
+  tickAngle?: number;
 };
 
 export type GridStyle = {

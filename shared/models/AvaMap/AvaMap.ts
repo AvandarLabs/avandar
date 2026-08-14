@@ -7,6 +7,7 @@ import type {
   MapViewState,
 } from "$/models/AvaMap/AvaMap.types.ts";
 
+/** Public model namespace for saved map configuration and constructors. */
 export { AvaMapModule as AvaMap } from "$/models/AvaMap/AvaMapModule/AvaMapModule.ts";
 
 export namespace AvaMap {

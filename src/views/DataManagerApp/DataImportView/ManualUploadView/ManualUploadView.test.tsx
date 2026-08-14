@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
@@ -199,7 +199,7 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
   const result = Papa.parse<UnknownObject>(text, {
     dynamicTyping: true,
     header: true,
-    preview: AppConfig.dataManagerApp.maxPreviewRows,
+    preview: GlobalAppConfig.dataManagerApp.maxPreviewRows,
     skipEmptyLines: true,
   });
 
