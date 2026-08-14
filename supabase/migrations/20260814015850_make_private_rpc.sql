@@ -29,7 +29,11 @@ begin
     raise exception 'unsupported resource type: %', p_resource_type;
   end if;
 
-  if v_owner_id is null or v_owner_id <> auth.uid () then
+  -- `is distinct from`, not `<>`. With a null auth.uid() (an unauthenticated or
+  -- service-role caller) `v_owner_id <> auth.uid()` evaluates to null, the `if`
+  -- would not fire, and execution would fall through to the DELETE with no gate
+  -- at all. `is distinct from` is null-safe and refuses.
+  if v_owner_id is null or v_owner_id is distinct from auth.uid () then
     raise exception 'insufficient_privilege'
       using errcode = '42501';
   end if;

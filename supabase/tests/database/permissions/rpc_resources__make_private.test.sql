@@ -77,7 +77,7 @@ values
   ('b1006005-0000-4000-8000-000000000005'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dataset', 'b1007001-0000-4000-8000-000000000001'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer'),
   ('b1006006-0000-4000-8000-000000000006'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005003-0000-4000-8000-000000000003'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer');
 
-select plan(14);
+select plan(16);
 
 -- === A Settings Admin who is not the owner must be refused. ===
 set local role authenticated;
@@ -133,6 +133,33 @@ select throws_ok(
   '42501',
   'insufficient_privilege',
   'a nonexistent id raises the identical error'
+);
+
+-- === An unauthenticated caller must be refused, even from a role that
+-- bypasses RLS. `service_role` has BYPASSRLS, so the lookup finds the row and
+-- v_owner_id comes back non-null while auth.uid() is null. That is the exact
+-- shape the null-safe owner gate exists for: with `<>` instead of
+-- `is distinct from`, `v_owner_id <> null` is null, the `if` never fires, and
+-- the call falls through to the DELETE with no gate at all. ===
+set local role service_role;
+select set_config('request.jwt.claims', '', true);
+
+select throws_ok(
+  $$select public.rpc_resources__make_private (
+      'dashboard', 'b1005001-0000-4000-8000-000000000001'::uuid
+    )$$,
+  '42501',
+  'insufficient_privilege',
+  'an unauthenticated caller is refused even when RLS is bypassed'
+);
+
+set local role postgres;
+
+select is(
+  (select count(*)::int from public.resource_shares
+    where resource_id = 'b1005001-0000-4000-8000-000000000001'::uuid),
+  4,
+  'the refused unauthenticated call deleted nothing'
 );
 
 -- === The owner succeeds. ===
