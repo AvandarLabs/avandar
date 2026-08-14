@@ -275,6 +275,46 @@ undefined`. New code that wraps a Supabase session call should follow
   }
   ```
 
+### Phase: Supabase migration chronology
+
+- **Gate:** the diff adds, renames, or modifies any file under
+  `supabase/migrations/`. Skip otherwise.
+- **Rule:** every newly added migration must sort after the latest migration
+  already present in the review base's `supabase/migrations/` directory, and
+  new migrations must sort after one another in their dependency order.
+  Compare the 14-digit timestamp prefix, not the descriptive suffix. Supabase
+  applies pending migrations in timestamp order and tracks those timestamps in
+  `supabase_migrations.schema_migrations`; inserting a branch migration before
+  an already-applied migration can leave staging history out of sync or run a
+  migration before the objects it depends on. This most often happens after a
+  rebase with `develop`.
+
+  **Find candidates:**
+
+  ```bash
+  git diff --name-status <base>...HEAD -- supabase/migrations/
+  git ls-tree -r --name-only <base> supabase/migrations/ \
+    | sed 's#supabase/migrations/##' | sort
+  ```
+
+  **Exceptions:** none for a new migration. Never rename or edit a migration
+  that may already be applied remotely to make room in the timeline; create a
+  new migration with a later timestamp instead.
+
+  This is bad:
+
+  ```text
+  develop: 20260813214231_restore_storage_policies.sql
+  branch:  20260813175930_backfill_gis_roles.sql
+  ```
+
+  This is good:
+
+  ```text
+  develop: 20260813214231_restore_storage_policies.sql
+  branch:  20260814010032_backfill_gis_roles.sql
+  ```
+
 ### Phase: E2E tests (Playwright)
 
 - **Gate:** the diff includes any file under `tests/e2e/` (specs,
