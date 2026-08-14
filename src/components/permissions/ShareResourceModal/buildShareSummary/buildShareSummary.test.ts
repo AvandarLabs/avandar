@@ -75,9 +75,7 @@ describe("buildShareSummary", () => {
       workspaceShareRole: null,
       ...baseLookups,
     });
-    expect(flat(spans)).toBe(
-      "This dataset is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dataset.");
   });
 
   it("describes general app access when unrestricted with no direct shares", () => {
@@ -183,9 +181,7 @@ describe("buildShareSummary", () => {
       userById: {},
       groupById: {},
     });
-    expect(flat(spans)).toBe(
-      "This dashboard is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dashboard.");
   });
 
   it("uses ', and' only before the very last fragment", () => {
