@@ -4,41 +4,62 @@ import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { buildGeneralAccessOptions } from "../deriveGeneralAccess/deriveGeneralAccess";
 import { appForResource, useShareCopy } from "../shareCopy";
+import type { GeneralAccessValue } from "../deriveGeneralAccess/deriveGeneralAccess";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Props = {
   resourceType: ResourceType;
-  isRestricted: boolean;
+  value: GeneralAccessValue;
+  isOwner: boolean;
+  isBusy: boolean;
   workspaceShareRole: RoleLevel | null;
-  onChange: (next: { isRestricted: boolean; role: RoleLevel | null }) => void;
+  onChange: (nextValue: GeneralAccessValue) => void;
+  onWorkspaceRoleChange: (role: RoleLevel) => void;
 };
 
 /**
- * "General access" section: a single dropdown that toggles between
- * `Restricted` (no workspace-wide share, hides the role picker) and
- * `Anyone in {AppLabel}` (a `workspace`-principal share at the chosen
- * role). The orchestrator decides how to persist the change.
+ * "General access" section: a single dropdown over the three access shapes
+ * (`Only me`, `Restricted`, and `Anyone in {AppLabel}`), plus a role picker
+ * that only appears for the workspace-wide option.
+ *
+ * Purely presentational. The orchestrator derives `value` (see
+ * `deriveGeneralAccessValue`), decides what a change means, and persists it.
+ * The option list comes from `buildGeneralAccessOptions` rather than being
+ * built inline so that its contents and its owner gate stay unit-testable: a
+ * Mantine dropdown cannot be opened in jsdom.
  */
 export function ShareGeneralAccess({
   resourceType,
-  isRestricted,
+  value,
+  isOwner,
+  isBusy,
   workspaceShareRole,
   onChange,
+  onWorkspaceRoleChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const shareCopy = useShareCopy();
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
-  const generalValue: "restricted" | "workspace" =
-    isRestricted ? "restricted" : "workspace";
+  const generalOptions = buildGeneralAccessOptions({
+    isOwner,
+    labels: {
+      private: shareCopy.privateOptionLabel,
+      restricted: t`Restricted`,
+      workspace: t`Anyone in ${app}`,
+    },
+  });
 
-  const generalOptions = [
-    { value: "restricted", label: t`Restricted` },
-    { value: "workspace", label: t`Anyone in ${app}` },
-  ];
+  const generalAccessTooltip =
+    value === "private" ?
+      isOwner ? shareCopy.privateOptionTooltip(resource)
+      : shareCopy.privateOptionDisabledTooltip(resource)
+    : value === "restricted" ? shareCopy.restrictedOptionTooltip(resource)
+    : shareCopy.workspaceOptionTooltip(resource, app);
 
   return (
     <Stack gap="xs">
@@ -46,38 +67,32 @@ export function ShareGeneralAccess({
         {shareCopy.generalAccessHeading}
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        <Tooltip
-          label={
-            generalValue === "restricted" ?
-              shareCopy.restrictedOptionTooltip(resource)
-            : shareCopy.workspaceOptionTooltip(resource, app)
-          }
-          multiline
-          w={320}
-        >
+        <Tooltip label={generalAccessTooltip} multiline w={320}>
           <Select
             flex={1}
+            disabled={isBusy}
             leftSection={<IconBuilding size={16} aria-hidden />}
             data={generalOptions}
-            value={generalValue}
+            value={value}
             allowDeselect={false}
-            onChange={(value) => {
-              if (value === "restricted") {
-                onChange({ isRestricted: true, role: null });
-              } else if (value === "workspace") {
-                onChange({
-                  isRestricted: false,
-                  role: workspaceShareRole ?? "viewer",
-                });
+            onChange={(nextValue) => {
+              // Mantine hands back a plain string, so narrow it through the
+              // option list rather than casting it.
+              const selectedOption = generalOptions.find((option) => {
+                return option.value === nextValue;
+              });
+              if (selectedOption) {
+                onChange(selectedOption.value);
               }
             }}
             aria-label={t`General access`}
           />
         </Tooltip>
-        {generalValue === "workspace" ?
+        {value === "workspace" ?
           <Tooltip label={shareCopy.roleSelectTooltip}>
             <Select
               w={120}
+              disabled={isBusy}
               data={[
                 { value: "viewer", label: t`Viewer` },
                 { value: "editor", label: t`Editor` },
@@ -85,12 +100,9 @@ export function ShareGeneralAccess({
               ]}
               value={workspaceShareRole ?? "viewer"}
               allowDeselect={false}
-              onChange={(value) => {
-                if (value) {
-                  onChange({
-                    isRestricted: false,
-                    role: value as RoleLevel,
-                  });
+              onChange={(role) => {
+                if (role) {
+                  onWorkspaceRoleChange(role as RoleLevel);
                 }
               }}
               aria-label={t`Role for everyone in the workspace`}

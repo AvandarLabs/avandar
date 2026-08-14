@@ -8,14 +8,21 @@ function findComboboxByAriaLabel(label: string): HTMLElement | undefined {
   });
 }
 
+// Nothing here opens the dropdown: a Mantine `Select` dropdown cannot be
+// opened in jsdom, so which options exist and which are disabled are asserted
+// in `deriveGeneralAccess.test.ts` (the pure builder) and end to end in a real
+// browser instead.
 describe("ShareGeneralAccess", () => {
   it("hides the workspace-role picker when restricted", () => {
     render(
       <ShareGeneralAccess
         resourceType="dataset"
-        isRestricted
+        value="restricted"
+        isOwner
+        isBusy={false}
         workspaceShareRole={null}
         onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
       />,
     );
     // Only the general-access combobox is rendered.
@@ -32,9 +39,12 @@ describe("ShareGeneralAccess", () => {
     render(
       <ShareGeneralAccess
         resourceType="dataset"
-        isRestricted={false}
+        value="workspace"
+        isOwner
+        isBusy={false}
         workspaceShareRole="viewer"
         onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
       />,
     );
     expect(
@@ -46,9 +56,12 @@ describe("ShareGeneralAccess", () => {
     render(
       <ShareGeneralAccess
         resourceType="dataset"
-        isRestricted={false}
+        value="workspace"
+        isOwner
+        isBusy={false}
         workspaceShareRole="viewer"
         onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
       />,
     );
     // Mantine renders the selected option's label inside the input;
@@ -62,13 +75,50 @@ describe("ShareGeneralAccess", () => {
     render(
       <ShareGeneralAccess
         resourceType="dashboard"
-        isRestricted={false}
+        value="workspace"
+        isOwner
+        isBusy={false}
         workspaceShareRole="viewer"
         onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
       />,
     );
     const generalCombobox = findComboboxByAriaLabel("General access");
     expect(generalCombobox).toBeDefined();
     expect(generalCombobox).toHaveValue("Anyone in Dashboards");
+  });
+
+  it("selects Only me when the value is private", () => {
+    render(
+      <ShareGeneralAccess
+        resourceType="dataset"
+        value="private"
+        isOwner
+        isBusy={false}
+        workspaceShareRole={null}
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(findComboboxByAriaLabel("General access")).toHaveValue("Only me");
+    // Private is a restricted state, so the workspace-role picker stays hidden.
+    expect(
+      findComboboxByAriaLabel("Role for everyone in the workspace"),
+    ).toBeUndefined();
+  });
+
+  it("disables the dropdown while the mutation is in flight", () => {
+    render(
+      <ShareGeneralAccess
+        resourceType="dataset"
+        value="restricted"
+        isOwner
+        isBusy
+        workspaceShareRole={null}
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(findComboboxByAriaLabel("General access")).toBeDisabled();
   });
 });
