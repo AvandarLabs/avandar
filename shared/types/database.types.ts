@@ -1650,10 +1650,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      util__analytics_event_category: {
-        Args: { p_event_name: string }
-        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
-      }
       rpc_workspaces__private_resource_counts: {
         Args: { p_workspace_id: string }
         Returns: {
@@ -1669,6 +1665,10 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: number
+      }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
       }
       util__auth_user_can_access_resource: {
         Args: {
@@ -2125,3 +2125,4 @@ export const Constants = {
     },
   },
 } as const
+
