@@ -276,67 +276,70 @@ export function ShareResourceModal({
     groupById,
   });
 
-  const onGeneralAccessChange = (nextAccess: GeneralAccessValue): void => {
-    if (nextAccess === displayedGeneralAccess) {
+  // Makes the resource private, confirming first whenever someone would lose
+  // access. Owner-only: the RPC rejects a non-owner server-side, and the
+  // dropdown disables the option for them, so this gate is defense in depth.
+  const requestMakePrivate = (): void => {
+    if (!isOwner) {
       return;
     }
 
-    if (nextAccess === "private") {
-      setWantsRestricted(false);
-      const numUsers = userShares.length;
-      const numGroups = groupShares.length;
-      // Keyed off `isRestricted` first, NOT off the presence of a
-      // workspace-principal share row alone. An unrestricted resource with no
-      // such row still grants access through workspace app roles, so keying
-      // off the row would drop the warning in the case that matters most. The
-      // row is then ORed in so a restricted resource shared workspace-wide
-      // still warns instead of silently dropping that share.
-      const losesWorkspaceAccess =
-        !sharingState.isRestricted || workspaceShare !== undefined;
+    const numUsers = userShares.length;
+    const numGroups = groupShares.length;
+    // Keyed off `isRestricted` first, NOT off the presence of a
+    // workspace-principal share row alone. An unrestricted resource with no
+    // such row still grants access through workspace app roles, so keying
+    // off the row would drop the warning in the case that matters most. The
+    // row is then ORed in so a restricted resource shared workspace-wide
+    // still warns instead of silently dropping that share.
+    const losesWorkspaceAccess =
+      !sharingState.isRestricted || workspaceShare !== undefined;
 
-      if (numUsers + numGroups === 0 && !losesWorkspaceAccess) {
+    if (numUsers + numGroups === 0 && !losesWorkspaceAccess) {
+      makeResourcePrivate({ resourceType, resourceId });
+      return;
+    }
+
+    openMakePrivateConfirmModal({
+      shareCopy,
+      resourceName,
+      app: appLabel(appForResource(resourceType)),
+      numUsers,
+      numGroups,
+      losesWorkspaceAccess,
+      onConfirm: () => {
         makeResourcePrivate({ resourceType, resourceId });
-        return;
-      }
+      },
+    });
+  };
 
-      openMakePrivateConfirmModal({
-        shareCopy,
-        resourceName,
-        app: appLabel(appForResource(resourceType)),
-        numUsers,
-        numGroups,
-        losesWorkspaceAccess,
-        onConfirm: () => {
-          makeResourcePrivate({ resourceType, resourceId });
-        },
-      });
+  // Restricts the resource, so only the owner plus explicitly shared
+  // principals can reach it. Writes nothing when the resource is already
+  // restricted, which is the case when coming from private.
+  const applyRestrictedAccess = (): void => {
+    // Always record the intent, even when a write follows. Coming from private
+    // this is the whole change; coming from workspace with no other share the
+    // write lands on the same derived `private` state, so without the flag the
+    // dropdown would snap to "Only me". When shares already exist the flag is
+    // inert, since the derived value is `restricted` on its own.
+    setWantsRestricted(true);
+    if (sharingState.isRestricted) {
       return;
     }
-
-    if (nextAccess === "restricted") {
-      // Always record the intent, even when a write follows. Coming from
-      // private this is the whole change (the resource is already restricted
-      // with no shares, so there is nothing to write); coming from workspace
-      // with no other share the write lands on the same derived `private`
-      // state, so without the flag the dropdown would snap to "Only me". When
-      // shares already exist the flag is inert, since the derived value is
-      // `restricted` on its own.
-      setWantsRestricted(true);
-      if (!sharingState.isRestricted) {
-        setRestricted({
-          workspaceId,
-          resourceType,
-          resourceId,
-          isRestricted: true,
-        });
-        if (workspaceShare) {
-          deleteShare({ shareId: workspaceShare.id });
-        }
-      }
-      return;
+    setRestricted({
+      workspaceId,
+      resourceType,
+      resourceId,
+      isRestricted: true,
+    });
+    if (workspaceShare) {
+      deleteShare({ shareId: workspaceShare.id });
     }
+  };
 
-    // nextAccess === "workspace"
+  // Opens the resource to the whole workspace, keeping whatever role the
+  // existing workspace share already carried.
+  const applyWorkspaceAccess = (): void => {
     setWantsRestricted(false);
     if (sharingState.isRestricted) {
       setRestricted({
@@ -354,6 +357,22 @@ export function ShareResourceModal({
       principalId: null,
       role: workspaceShare?.role ?? "viewer",
     });
+  };
+
+  const onGeneralAccessChange = (nextAccess: GeneralAccessValue): void => {
+    if (nextAccess === displayedGeneralAccess) {
+      return;
+    }
+    if (nextAccess === "private") {
+      setWantsRestricted(false);
+      requestMakePrivate();
+      return;
+    }
+    if (nextAccess === "restricted") {
+      applyRestrictedAccess();
+      return;
+    }
+    applyWorkspaceAccess();
   };
 
   const onWorkspaceRoleChange = (role: RoleLevel): void => {

@@ -253,8 +253,12 @@ describe("ShareResourceModal", () => {
       />,
     );
 
+    // All three controls hang off the single `isDisabled` prop, so assert the
+    // whole row rather than just the principal picker.
     await waitFor(() => {
       expect(findComboboxByLabel("Add people or user groups")).toBeDisabled();
     });
+    expect(findComboboxByLabel("Role for new share")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Share" })).toBeDisabled();
   });
 });
