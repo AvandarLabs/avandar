@@ -298,7 +298,12 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
           supabaseAdminClient,
         }) => {
           // Neither lookup depends on the other, so they run together.
-          const [{ data: workspace }, { data: { user } }] = await Promise.all([
+          const [
+            { data: workspace },
+            {
+              data: { user },
+            },
+          ] = await Promise.all([
             supabaseAdminClient
               .from("workspaces")
               .select("id")
