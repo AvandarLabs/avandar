@@ -200,7 +200,9 @@ test.describe("DataViz PBlock - every visualization", () => {
       const formattedRowCount =
         SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
       await expect(
-        page.getByText(`Parsed ${formattedRowCount} rows successfully`),
+        page.getByText(`These are the first ${formattedRowCount} rows`, {
+          exact: false,
+        }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
       await ensureCloudStorageCheckedAndSaveDataset({

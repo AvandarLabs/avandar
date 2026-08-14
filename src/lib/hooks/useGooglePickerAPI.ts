@@ -1,5 +1,6 @@
 import { useBoolean } from "@avandar/hooks";
 import { useQuery } from "@avandar/query-hooks";
+import { t } from "@lingui/core/macro";
 import { useEffect } from "react";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
@@ -17,8 +18,8 @@ export type GoogleToken = APIReturnType<
 
 function notifyErrorLoadingGoogleAPI() {
   notifyError(
-    "There was an error loading Google services.",
-    "Please refresh and try again. If it still does not work, please contact support",
+    t`There was an error loading Google services.`,
+    t`Please refresh and try again. If it still does not work, please contact support`,
   );
 }
 

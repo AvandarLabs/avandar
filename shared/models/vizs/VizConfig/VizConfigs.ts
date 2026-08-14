@@ -53,10 +53,6 @@ function _getVizTypeModule<VType extends VizType>(
 }
 
 export const VizConfigs = {
-  getDisplayName: <VType extends VizType>(type: VType): string => {
-    return _getVizTypeModule(type).displayName;
-  },
-
   /**
    * Get the descriptor registry for a viz type. Used by the
    * settings form to render chart-level controls and to look up

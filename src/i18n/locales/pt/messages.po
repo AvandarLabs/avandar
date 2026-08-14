@@ -42,6 +42,10 @@ msgstr "Pelo menos uma consulta neste conjunto de dados usa <0>SELECT *</0> ou "
 msgid "Return online to view or make the page available offline."
 msgstr "Retorne online para visualizar ou tornar a página disponível offline."
 
+#: src/config/AppLinks.tsx
+msgid "Create new entity"
+msgstr "Criar nova entidade"
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -113,6 +117,10 @@ msgstr "Convidar membro"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "A entrada JOIN na posição {index} não é uma referência simples de "
 "tabela."
+
+#: src/config/AppLinks.tsx
+msgid "Geo Explorer"
+msgstr "Explorador geográfico"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -373,6 +381,8 @@ msgstr "Lista"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
+#: src/config/NavbarLinks.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "Fontes de Dados"
@@ -444,6 +454,10 @@ msgstr "A visualização da tabela não possui configurações extras."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "Sobre você"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Unable to sync dataset online"
+msgstr "Não foi possível sincronizar o conjunto de dados online"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -531,6 +545,10 @@ msgstr "Gráfico de pizza"
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "Média"
+
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "There was an error loading Google services."
+msgstr "Ocorreu um erro ao carregar os serviços do Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -729,6 +747,7 @@ msgstr "Remover modelo de chat offline?"
 msgid "Share “{resourceName}”"
 msgstr "Compartilhar “{resourceName}”"
 
+#: src/config/AppLinks.tsx
 #: src/routes/signin.tsx
 msgid "Sign in"
 msgstr "Entrar"
@@ -936,6 +955,11 @@ msgstr "Excluir grupo de funções"
 msgid "Hide title"
 msgstr "Ocultar título"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "{0} data truncated"
+msgstr "Dados de {0} truncados"
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "Digite seu e-mail para receber um link de redefinição"
@@ -980,6 +1004,10 @@ msgstr "Confirmar"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "is equal to..."
 msgstr "é igual a..."
+
+#: src/config/AppLinks.tsx
+msgid "Profile Designer"
+msgstr "Designer de perfil"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1683,6 +1711,12 @@ msgstr "Nenhuma entidade selecionada"
 msgid "Tell us which open dataset you want via feedback"
 msgstr "Nos diga qual conjunto de dados aberto você deseja através do feedback"
 
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "Please refresh and try again. If it still does not work, please contact "
+"support"
+msgstr "Atualize a página e tente novamente. Se ainda assim não funcionar, "
+"entre em contato com o suporte"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
@@ -1690,6 +1724,10 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Exporte este painel como um PDF ou faça um esboço primeiro. Anotações "
 "suportam texto, setas e desenho à mão livre com rugosidade ajustável "
 "(RoughJS)."
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "Update available"
+msgstr "Atualização disponível"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1706,6 +1744,7 @@ msgid "Max"
 msgstr "Máx"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "Importar dados"
@@ -1828,6 +1867,10 @@ msgstr "O nome do conjunto de dados é obrigatório"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
 msgstr "Principal"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Unable to publish dashboard"
+msgstr "Não foi possível publicar o dashboard"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -1993,6 +2036,10 @@ msgstr "Adicionar Campo"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "Texto da anotação:"
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "A new version is available. Refresh to update."
+msgstr "Uma nova versão está disponível. Atualize a página para atualizar."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2865,6 +2912,10 @@ msgid "Create your first dashboard to track key metrics and insights."
 msgstr "Crie seu primeiro painel para acompanhar métricas e insights "
 "importantes."
 
+#: src/config/AppLinks.tsx
+msgid "Home"
+msgstr "Início"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
 msgstr "Barra vertical (|)"
@@ -3045,10 +3096,6 @@ msgstr "Rotação dos rótulos do eixo X"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "Falha ao baixar o modelo offline"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {formattedNumRows} rows successfully"
-msgstr "Analisadas {formattedNumRows} linhas com sucesso"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -3286,6 +3333,10 @@ msgstr "Nome da coluna"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "Grande"
+
+#: src/config/AppLinks.tsx
+msgid "Invalid workspace"
+msgstr "Workspace inválido"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3842,6 +3893,11 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "Sem filtros de linha. A fatia incluirá todas as linhas no conjunto de "
 "dados (para as colunas selecionadas)."
 
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish."
+msgstr "Alguns conjuntos de dados ainda não foram sincronizados online ou não "
+"puderam ser publicados."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "Virar"
@@ -4296,6 +4352,7 @@ msgstr "Editar consulta"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Data Explorer"
 msgstr "Explorador de Dados"
@@ -4427,6 +4484,7 @@ msgstr "Por favor, faça login novamente para continuar."
 msgid "Mean"
 msgstr "Média"
 
+#: src/config/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
 msgstr "Atualizar senha"
@@ -4438,6 +4496,15 @@ msgstr "Captura de tela do painel"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "Fazendo login novamente…"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: limit.max
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
+msgstr "O {0} só pode renderizar até {1} {2}; portanto, exibindo apenas os "
+"primeiros {3}."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -5117,6 +5184,10 @@ msgstr "Se houver múltiplos valores de {fieldName} para um {0}, então..."
 msgid "Only you have access to this {resource}."
 msgstr "Somente você tem acesso a este {resource}."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "File parsed successfully"
+msgstr "Arquivo analisado com sucesso"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "Grupo de empilhamento"
@@ -5179,6 +5250,7 @@ msgid "Permanent link (use for QR codes)"
 msgstr "Link permanente (use para códigos QR)"
 
 #: shared/copy/appLabel.ts
+#: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Configurações"
@@ -5418,6 +5490,7 @@ msgid "Query editor mode"
 msgstr "Modo do editor de consultas"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
+#: src/config/AppLinks.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "Perfil"
@@ -5603,6 +5676,7 @@ msgstr "Remover {0}"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Dashboards"
