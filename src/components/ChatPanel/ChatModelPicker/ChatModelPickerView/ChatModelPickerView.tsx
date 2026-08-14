@@ -1,10 +1,10 @@
 import { Tooltip } from "@avandar/ui";
 import { Button, Combobox, Group, Text } from "@mantine/core";
-import type { ComboboxStore } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-import type { ReactNode } from "react";
-import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import css from "./ChatModelPickerView.module.css";
+import type { ComboboxStore } from "@mantine/core";
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
+import type { ReactNode } from "react";
 
 type Props = {
   buttonLabel: string;

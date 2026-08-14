@@ -1,10 +1,10 @@
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { prop, propEq } from "@avandar/utils";
-import type { RenderHookResult } from "@testing-library/react";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { afterEach, describe, expect, it } from "vitest";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog/useChatModelCatalog";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { renderHook, TestProviders } from "@/test-utils";
+import type { RenderHookResult } from "@testing-library/react";
 
 function _renderCatalog(): RenderHookResult<
   ReturnType<typeof useChatModelCatalog>,
@@ -26,9 +26,10 @@ describe("useChatModelCatalog", () => {
   it("returns frontier models before open models", () => {
     const { result } = _renderCatalog();
 
-    expect(
-      result.current.groups.map(prop("group")),
-    ).toEqual(["Frontier models", "Open models"]);
+    expect(result.current.groups.map(prop("group"))).toEqual([
+      "Frontier models",
+      "Open models",
+    ]);
   });
 
   it("exposes every catalog model exactly once", () => {

@@ -5,6 +5,14 @@ import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpe
 import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/useChatModelCatalog/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 
+function _modelsInTier(
+  licenseTier: ChatModelOption.LicenseTier,
+): ChatModelOption.T[] {
+  return ChatModelOption.Catalog.values.filter(
+    propEq("licenseTier", licenseTier),
+  );
+}
+
 /** Returns translated cloud and downloaded offline models as picker groups. */
 export function useChatModelCatalog(): {
   groups: ChatModelOption.OptionGroup[];
@@ -14,16 +22,9 @@ export function useChatModelCatalog(): {
   const getLocalChatModelCopy = useLocalChatModelCopy();
   const downloadedOfflineIds = useDownloadedLocalChatModelIds();
 
-  const modelsInTier = (
-    licenseTier: ChatModelOption.LicenseTier,
-  ): ChatModelOption.T[] => {
-    return ChatModelOption.Catalog.values.filter(
-      propEq("licenseTier", licenseTier),
-    );
-  };
   const cloudGroups = [
-    { group: t`Frontier models`, models: modelsInTier("proprietary") },
-    { group: t`Open models`, models: modelsInTier("open") },
+    { group: t`Frontier models`, models: _modelsInTier("proprietary") },
+    { group: t`Open models`, models: _modelsInTier("open") },
   ].filter(
     propPasses("models", (models) => {
       return isNonEmptyArray(models);
