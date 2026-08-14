@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
 import { AvaMap } from "$/models/AvaMap/AvaMap";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { useCallback, useState } from "react";
 
 const DEFAULT_MAP_NAME = "Untitled map";
 const DEFAULT_LAYER_NAME = "Layer 1";

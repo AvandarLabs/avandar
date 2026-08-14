@@ -1,8 +1,8 @@
 import maplibregl from "maplibre-gl";
 import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
-import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { Dispatch, RefObject, SetStateAction } from "react";
@@ -35,7 +35,10 @@ function _createMapLibreInstance({
     zoom: view.zoom,
   });
   map.addControl(new maplibregl.NavigationControl(), "top-right");
-  map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
+  map.addControl(
+    new maplibregl.ScaleControl({ unit: "metric" }),
+    "bottom-right",
+  );
   return map;
 }
 

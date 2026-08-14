@@ -1,8 +1,8 @@
 import { useLayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec";
 import { useMapLayerData } from "@/views/GisApp/layers/useMapLayerData/useMapLayerData";
+import type { LayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { LayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec";
 
 /** Loads one map layer and derives the stable render state for its canvas. */
 export function useGisLayerView({

@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { useMemo } from "react";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { useMemo } from "react";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";

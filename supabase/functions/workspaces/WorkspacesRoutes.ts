@@ -96,9 +96,7 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
         z.object({
           emailToInvite: z.string(),
           roleGroupId: z.uuid(),
-          roleOverrides: z
-            .array(WorkspaceInviteRoleOverrideSchema)
-            .optional(),
+          roleOverrides: z.array(WorkspaceInviteRoleOverrideSchema).optional(),
           userGroupIds: z.array(z.uuid()).optional(),
         }),
       )

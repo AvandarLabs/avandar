@@ -6,13 +6,16 @@ import type { RefObject } from "react";
 export function useMapWindowResize(
   mapRef: RefObject<MapLibreMap | undefined>,
 ): void {
-  useEffect(function resizeMapWithWindow() {
-    const onWindowResize = (): void => {
-      mapRef.current?.resize();
-    };
-    window.addEventListener("resize", onWindowResize);
-    return () => {
-      window.removeEventListener("resize", onWindowResize);
-    };
-  }, [mapRef]);
+  useEffect(
+    function resizeMapWithWindow() {
+      const onWindowResize = (): void => {
+        mapRef.current?.resize();
+      };
+      window.addEventListener("resize", onWindowResize);
+      return () => {
+        window.removeEventListener("resize", onWindowResize);
+      };
+    },
+    [mapRef],
+  );
 }

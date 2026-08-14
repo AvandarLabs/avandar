@@ -22,7 +22,10 @@ export function LayerCoordinateField({
 }: Props): ReactNode {
   const { t } = useLingui();
   const copy = matchLiteral(axis, {
-    latitude: { label: t`Latitude column`, placeholder: t`Select latitude column` },
+    latitude: {
+      label: t`Latitude column`,
+      placeholder: t`Select latitude column`,
+    },
     longitude: {
       label: t`Longitude column`,
       placeholder: t`Select longitude column`,

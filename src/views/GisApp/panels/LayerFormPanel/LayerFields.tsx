@@ -11,10 +11,7 @@ import type { ReactNode } from "react";
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
 /** The active layer's source, coordinate, size, and color fields. */
-export function LayerFields({
-  layer,
-  onLayerChange,
-}: Props): ReactNode {
+export function LayerFields({ layer, onLayerChange }: Props): ReactNode {
   const dataSourceId =
     layer.source.dataSource ?
       Model.getTypedId(layer.source.dataSource)

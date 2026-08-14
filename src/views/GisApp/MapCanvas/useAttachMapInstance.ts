@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
 import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 

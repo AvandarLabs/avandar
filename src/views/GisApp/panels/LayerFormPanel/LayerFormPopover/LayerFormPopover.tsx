@@ -3,8 +3,8 @@ import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Flex, Popover } from "@mantine/core";
 import { IconFilter } from "@tabler/icons-react";
-import css from "@/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.module.css";
 import { LayerFields } from "@/views/GisApp/panels/LayerFormPanel/LayerFields";
+import css from "@/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.module.css";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerFormPanel/LayerFormPanel.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
@@ -22,10 +22,7 @@ type Props = {
 };
 
 /** Popover control that opens the active layer's query and style fields. */
-export function LayerFormPopover({
-  layer,
-  onLayerChange,
-}: Props): ReactNode {
+export function LayerFormPopover({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
   return (
