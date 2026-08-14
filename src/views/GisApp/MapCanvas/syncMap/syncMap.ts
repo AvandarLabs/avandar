@@ -1,10 +1,4 @@
-import {
-  objectEntries,
-  objectKeys,
-  prop,
-  propEq,
-  propPasses,
-} from "@avandar/utils";
+import { objectEntries, objectKeys, prop, propEq } from "@avandar/utils";
 import type {
   MapLayerSpec,
   MapSpec,
@@ -124,12 +118,13 @@ function _needsReorder(
   nextLayerIds: ReadonlySet<string>,
 ): boolean {
   const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
+  // Plain predicate rather than `propPasses`: `Set.has` is not a type guard,
+  // and `propPasses` only exposes its type-guard overload, so it rejects a
+  // predicate that merely returns boolean.
   const survivingIds = previousSpec.layers
-    .filter(
-      propPasses("id", (layerId) => {
-        return nextLayerIds.has(layerId);
-      }),
-    )
+    .filter((layer) => {
+      return nextLayerIds.has(layer.id);
+    })
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {
     return !previousLayerIds.has(layerId);

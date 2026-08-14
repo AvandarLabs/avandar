@@ -49,6 +49,10 @@ msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "1 group"
+msgstr "1 個群組"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
 msgstr "排序依據"
@@ -87,7 +91,7 @@ msgstr "值欄"
 msgid "Monthly"
 msgstr "每月"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {name}."
 msgstr "移除 {name} 的訪問權限。"
 
@@ -434,6 +438,10 @@ msgstr "等寬標題"
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "如果您有 4 GB RAM，或需要最精簡的下載內容，建議使用此選項。"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "1 person"
+msgstr "1 人"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
 msgstr "← 返回"
@@ -570,6 +578,10 @@ msgstr "表格"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{shareClause} will lose access."
+msgstr "{shareClause} 將失去存取權限。"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
 msgstr "JOIN ON 子句使用「{operator}」：目前僅能對應等值 JOIN。"
@@ -591,7 +603,7 @@ msgstr "小"
 msgid "Go to Privacy log"
 msgstr "前往隱私記錄"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No matches"
 msgstr "沒有匹配項"
 
@@ -663,6 +675,10 @@ msgstr "逗號連接的資料表無法對應；請將其視為 ON true 的 INNER
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
 msgstr "已保存的數據集"
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only the people and groups listed below can access this {resource}."
+msgstr "只有下方列出的人員和群組可以存取此 {resource}。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -829,11 +845,6 @@ msgstr "歡迎來到您的第一個工作區"
 msgid "Copied"
 msgstr "已複製"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Add a member or a user group to grant access. Use General access below "
-"to share more broadly."
-msgstr "添加成員或用戶組以授予訪問權限。使用下方的一般訪問來更廣泛地分享。"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "添加到工作區"
@@ -929,6 +940,10 @@ msgstr "確認"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "is equal to..."
 msgstr "等於..."
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{numGroups} groups"
+msgstr "{numGroups} 個群組"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1059,10 +1074,10 @@ msgstr "所有列"
 msgid "Data Summary"
 msgstr "數據摘要"
 
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "This {resource} is currently only accessible to its owner."
-msgstr "此 {resource} 目前僅可由其擁有者訪問。"
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
+msgid "Add a member or a user group to grant access. Use General access above "
+"to share more broadly."
+msgstr "新增成員或使用者群組以授予存取權限。使用上方的「一般存取權限」即可更廣泛地分享。"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1188,6 +1203,10 @@ msgstr "從列表中選擇一個資料集以查看其元資料。"
 msgid "Medium"
 msgstr "中"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Everyone in {app} will lose access."
+msgstr "{app} 中的所有人都將失去存取權限。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
 msgstr "選擇最適合您工作區的計劃。"
@@ -1293,6 +1312,10 @@ msgstr "同步數據！"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
 msgstr "也有"
+
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Give access to additional members"
+msgstr "授予其他成員存取權限"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1664,6 +1687,10 @@ msgstr "PDF 已下載。"
 msgid "Workspace ID"
 msgstr "工作區 ID"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{numUsers} people"
+msgstr "{numUsers} 人"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "生成查詢以配置此可視化。"
@@ -1796,6 +1823,7 @@ msgstr "您的數據集"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
@@ -2297,6 +2325,7 @@ msgstr "X 軸刻度間隔"
 msgid "This is an invalid waitlist code"
 msgstr "這是一個無效的候補名單代碼"
 
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
@@ -2559,6 +2588,11 @@ msgid "This member owns {privateTotal} private resources. They cannot be "
 msgstr "此成員擁有 {privateTotal} "
 "個私人資源。在其他人取得這些資源的擁有權之前，無法移除該成員。工作區管理員永遠無法查看私人內容，因此請從隱私記錄重新指派擁有權。"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only you can access this {resource}. Everyone else loses access, "
+"including workspace admins."
+msgstr "只有您可以存取此 {resource}。包括工作區管理員在內的其他所有人都將失去存取權限。"
+
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
 msgstr "選擇模型"
@@ -2626,11 +2660,6 @@ msgstr "返回登錄頁面"
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
 msgid "Pick a data source and its latitude and longitude columns to plot it."
 msgstr "選取資料來源及其緯度與經度欄，將資料繪製於地圖上。"
-
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Controls the default for the rest of the workspace. People without app "
-"access still need a direct share above."
-msgstr "控制工作區其餘部分的預設。沒有應用訪問權限的人仍然需要直接共享以上內容。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -2751,6 +2780,10 @@ msgstr "URL"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY 使用非欄位運算式。"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Make private"
+msgstr "設為私人"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -3200,6 +3233,11 @@ msgstr "實體加載失敗。請稍後再試或聯繫支持。"
 msgid "Purchase {seatsToAdd} seat"
 msgstr "購買 {seatsToAdd} 個座位"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Controls the default for the rest of the workspace. People without app "
+"access still need a direct share below."
+msgstr "控制工作區其餘部分的預設設定。沒有應用程式存取權限的人員仍需要透過下方的直接分享取得存取權限。"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
@@ -3602,11 +3640,6 @@ msgstr "資料集已成功保存！"
 msgid "No saved datasets found."
 msgstr "未找到已保存的資料集。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Every workspace member who can open the {app} app gets this role on this "
-"{resource}, in addition to whatever's listed above."
-msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource} 上獲得此角色，此外還包括上述列出的內容。"
-
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
@@ -3644,7 +3677,7 @@ msgstr "重疊"
 msgid "Download"
 msgstr "下載"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "No members or user groups yet. Invite members or create user groups in "
 "Workspace settings."
 msgstr "尚無成員或用戶組。請在工作區設置中邀請成員或創建用戶組。"
@@ -4277,9 +4310,17 @@ msgstr "發現澄清"
 msgid "Can't save dataset"
 msgstr "無法儲存資料集"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only the owner can make this {resource} private."
+msgstr "只有擁有者可以將此 {resource} 設為私人。"
+
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "該查詢失敗。請修正 SQL 並重試。"
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Only me"
+msgstr "只有我"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -4400,7 +4441,7 @@ msgstr "刪除資料集"
 msgid "Warning"
 msgstr "警告"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "When on, members of this group only get access if they already have "
 "{app} access in the workspace. When off, every member of the group gets "
 "access here, even if they normally can't open {app}."
@@ -4545,6 +4586,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Only you will be able to open it. You can share it again at any time."
+msgstr "只有您能開啟此項目。您可以隨時再次分享。"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "已新增至「{dashboardName}」"
@@ -4557,7 +4602,7 @@ msgstr "歡迎回來！"
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "嘗試與 Google 表單驗證時發生錯誤。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "The owner always has admin access. To change owner, use the {resource} "
 "settings."
 msgstr "擁有者始終具有管理員訪問權限。要更改擁有者，請使用 {resource} 設定。"
@@ -4771,6 +4816,10 @@ msgstr "無法載入地圖資料"
 msgid "Nothing more to load"
 msgstr "沒有更多內容可加載"
 
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
+msgid "Could not make private"
+msgstr "無法設為私人"
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "重設應用程式"
@@ -4784,7 +4833,7 @@ msgstr "管理您在 {0} 的顯示方式及用於登入的帳戶。"
 msgid "Extra small"
 msgstr "特小"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/SharePrincipalList.tsx
 msgid "People with access"
 msgstr "有訪問權限的人"
 
@@ -4875,6 +4924,10 @@ msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid "Only you have access to this {resource}."
+msgstr "只有您可以存取此 {resource}。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5010,10 +5063,6 @@ msgstr "語氣"
 msgid "Editor"
 msgstr "編輯者"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
-msgid "Only the people and groups listed above can access this {resource}."
-msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "組織"
@@ -5100,6 +5149,10 @@ msgstr "數據集欄位"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Make \"{resourceName}\" private?"
+msgstr "要將「{resourceName}」設為私人嗎？"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
@@ -5189,7 +5242,7 @@ msgstr "您確定要永久刪除 <0>{0}</0> 嗎？此操作無法撤銷。"
 msgid "Column outline"
 msgstr "欄位大綱"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/roleSelectTooltip.ts
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯內容，管理員 = 完全控制，包括共享。"
@@ -5628,6 +5681,11 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座位。"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Every workspace member who can open the {app} app gets this role on this "
+"{resource}, in addition to whatever's listed below."
+msgstr "每位可以開啟 {app} 應用程式的工作區成員，都會在此 {resource} 上獲得此角色，此外還會擁有下方列出的任何權限。"
+
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "
 "to your workspace."
@@ -5670,7 +5728,6 @@ msgstr "中立失敗"
 msgid "Please try again or reach out to support."
 msgstr "請重試或聯繫支持。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
 msgstr "一般訪問"
@@ -5717,7 +5774,7 @@ msgstr "您尚未創建任何儀表板"
 msgid "Beta"
 msgstr "測試版"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "按名稱或用戶群組搜索"
 
@@ -5841,6 +5898,10 @@ msgstr "填色不透明度"
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "{peopleClause} and {groupClause}"
+msgstr "{peopleClause} 和 {groupClause}"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx

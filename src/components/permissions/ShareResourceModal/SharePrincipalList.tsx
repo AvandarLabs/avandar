@@ -1,5 +1,5 @@
+import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-import { useShareCopy } from "./shareCopy";
 import { SharePrincipalRow } from "./SharePrincipalRow/SharePrincipalRow";
 import type {
   ResourceShareRow,
@@ -36,11 +36,10 @@ export function SharePrincipalList({
   onToggleRequiresAppAccess,
   onRemove,
 }: Props): JSX.Element {
-  const shareCopy = useShareCopy();
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {shareCopy.peopleWithAccessHeading}
+        <Trans>People with access</Trans>
       </Text>
       {shares.map((share) => {
         return (

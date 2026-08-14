@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { useShareCopy } from "../shareCopy";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Option = { value: string; label: string };
@@ -16,6 +15,11 @@ type Props = {
   members: readonly Option[];
   groups: readonly Option[];
   isAdding: boolean;
+  /**
+   * Greys out the whole row. Set when the resource is private, where adding a
+   * principal is not an available action.
+   */
+  isDisabled?: boolean;
   onAdd: (selection: Selection) => void;
 };
 
@@ -28,10 +32,10 @@ export function ShareAddPrincipalRow({
   members,
   groups,
   isAdding,
+  isDisabled = false,
   onAdd,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const shareCopy = useShareCopy();
   const [target, setTarget] = useState<string | null>(null);
   const [role, setRole] = useState<RoleLevel>("viewer");
 
@@ -77,21 +81,23 @@ export function ShareAddPrincipalRow({
     <Group align="flex-end" wrap="nowrap" gap="sm">
       <Select
         flex={1}
-        placeholder={shareCopy.addPlaceholder}
-        description={shareCopy.addHelper}
+        disabled={isDisabled}
+        placeholder={t`Search by name or user group`}
+        description={t`Add a member or a user group to grant access. Use General access above to share more broadly.`}
         data={groupedOptions}
         value={target}
         onChange={setTarget}
         searchable
         nothingFoundMessage={
           isEmptySource ?
-            shareCopy.emptyState.noMembersOrTags
-          : shareCopy.noMatches
+            t`No members or user groups yet. Invite members or create user groups in Workspace settings.`
+          : t`No matches`
         }
         aria-label={t`Add people or user groups`}
       />
       <Select
         w={120}
+        disabled={isDisabled}
         label={t`Role`}
         data={roleOptions}
         value={role}
@@ -103,7 +109,11 @@ export function ShareAddPrincipalRow({
         }}
         aria-label={t`Role for new share`}
       />
-      <Button loading={isAdding} disabled={!target} onClick={onClick}>
+      <Button
+        loading={isAdding}
+        disabled={isDisabled || !target}
+        onClick={onClick}
+      >
         <Trans>Share</Trans>
       </Button>
     </Group>

@@ -1620,6 +1620,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_resources__make_private: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: undefined
+      }
       rpc_resources__transfer_ownership: {
         Args: {
           p_new_owner_id: string
