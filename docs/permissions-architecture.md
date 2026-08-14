@@ -310,6 +310,7 @@ unless noted)**
 | `rpc_workspaces__private_resource_counts`         | Per-member counts of private resources for a workspace, for Settings Admins (`supabase/schemas/70.rpc_workspaces__private_resource_counts.sql`). |
 | `rpc_resources__transfer_ownership`               | Reassigns one resource's `owner_id` (`supabase/schemas/70.rpc_resources__transfer_ownership.sql`).                       |
 | `rpc_workspaces__transfer_all_owned_resources`     | Bulk wrapper over the above, by owner (`supabase/schemas/71.rpc_workspaces__transfer_all_owned_resources.sql`).          |
+| `rpc_resources__make_private`                     | Clears every non-owner share and sets `is_restricted` in one transaction (`supabase/schemas/70.rpc_resources__make_private.sql`); see §5.1. |
 
 ```mermaid
 erDiagram
@@ -324,6 +325,42 @@ erDiagram
   auth_users ||--o{ workspace_memberships : member
   auth_users ||--o{ user_group_memberships : in
 ```
+
+### 5.1 `rpc_resources__make_private`
+
+Clears every non-owner share and sets `is_restricted`, atomically, producing
+the `util__is_resource_private_to_owner` state described in §2.1. It does not
+touch `is_public`: a published dashboard stays world-readable after this runs,
+because publishing is a separate axis (§2.1) and a separate control.
+
+Owner-only. A non-owner resource admin is refused rather than warned, because
+the call would delete their own share and lock them out on the spot.
+
+**The only permissions RPC that runs as the caller.** The three
+ownership/counting RPCs above are all `security definer`; this one is not, and
+it needs no bypass: the owner short-circuits to `admin` in
+`util__resource_effective_role`, which satisfies both the `resource_shares`
+DELETE policy and the resource UPDATE policy. (It is `security invoker` by
+Postgres default rather than by an explicit clause, so do not "tidy" a
+`security definer` onto it.) Running as the caller keeps RLS as the backstop
+and makes a hidden row indistinguishable from a missing one, so it needs none
+of the hand-written existence-oracle handling that
+`rpc_resources__transfer_ownership` carries. Note that other, non-permissions
+`rpc_*` functions (the `rpc_datasets__add_*` family,
+`rpc_workspaces__create_with_owner`) also run as the caller; the contrast here
+is with the permissions RPCs specifically.
+
+It ends with a post-condition check, because an RLS-filtered `DELETE` would
+otherwise report success on a still-shared resource, which is the exact failure
+this function exists to remove. The check raises `make_private_incomplete` so
+the whole transaction rolls back rather than half-landing; it is a tripwire,
+with no known configuration reaching it in production, and
+`rpc_resources__make_private_rollback.test.sql` provokes it with an injected
+restrictive DELETE policy to prove the rollback is real. The check inlines
+`util__has_non_owner_share`'s predicate rather than calling that helper:
+execute on it is revoked from `authenticated` so it cannot serve as a
+"does this resource have shares" probe, and a caller-privileged function could
+only call it if that revoke were undone.
 
 ---
 
@@ -465,7 +502,7 @@ rg 'useHasPermission|useUserAppRoles|useResourceRole|useIsGlobalAdmin' src
 rg 'ShareResourceModal|WorkspaceUserPermissions|workspace_invites' src
 rg "WorkspaceRole|'admin'\\s*\\|\\s*'member'" shared/models src
 rg 'util__(has_non_owner_share|is_resource_private_to_owner)' supabase/schemas src
-rg 'rpc_(workspaces__private_resource_counts|resources__transfer_ownership)' supabase src
+rg 'rpc_(workspaces__private_resource_counts|resources__transfer_ownership|resources__make_private)' supabase src
 ```
 
 ---

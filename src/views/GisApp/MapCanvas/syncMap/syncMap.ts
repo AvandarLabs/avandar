@@ -128,6 +128,9 @@ function _needsReorder(
   nextLayerIds: ReadonlySet<string>,
 ): boolean {
   const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
+  // Plain predicate rather than `propPasses`: `Set.has` is not a type guard,
+  // and `propPasses` only exposes its type-guard overload, so it rejects a
+  // predicate that merely returns boolean.
   const survivingIds = previousSpec.layers
     .filter((layerSpec) => {
       return nextLayerIds.has(layerSpec.id);
