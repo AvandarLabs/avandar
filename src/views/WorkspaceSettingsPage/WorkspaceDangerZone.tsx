@@ -1,24 +1,24 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AppLinks } from "@/config/AppLinks";
+import { notifyError } from "@/utils/notifications/notify";
 import { propNotEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  Box,
-  Button,
-  Card,
-  Divider,
-  Group,
-  Modal,
-  Stack,
-  Text,
-  TextInput,
+    Box,
+    Button,
+    Card,
+    Divider,
+    Group,
+    Modal,
+    Stack,
+    Text,
+    TextInput,
 } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLinks } from "@/config/AppLinks";
-import { notifyError } from "@/utils/notifications/notify";
 import styles from "./WorkspaceSettingsPage.module.css";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   workspace: Workspace.WithSubscription;
@@ -31,7 +31,7 @@ type Props = {
  * modal state, and confirmation input that the workspace-name form does
  * not care about.
  */
-export function WorkspaceDangerZone({ workspace }: Props): JSX.Element {
+export function WorkspaceDangerZone({ workspace }: Props): React.ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
