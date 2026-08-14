@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
+import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import {
@@ -19,7 +20,6 @@ import {
 } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
-import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { z } from "zod";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -30,16 +30,6 @@ if (!openRouterApiKey) {
 }
 
 const openRouterReferer = getAppURL();
-
-/** Matches OpenRouter model ids such as `openai/gpt-4o-mini`. */
-const OPENROUTER_MODEL_ID_PATTERN = /^[a-z0-9-]+\/[a-z0-9._-]+$/i;
-
-function _resolveChatModel(model: string | undefined): string {
-  if (model && OPENROUTER_MODEL_ID_PATTERN.test(model)) {
-    return model;
-  }
-  return AppConfig.chat.defaultModelId;
-}
 
 // Cheap heuristic for "this prompt is a refinement of the previous turn."
 // When it matches AND the client gave us a `lastSql`, we attach the prior
@@ -113,7 +103,7 @@ export const PostChatMessages = POST({
       consentAcks,
       retryContext,
     } = body;
-    const model = _resolveChatModel(requestedModel);
+    const model = enforceChatModelAllowlist(requestedModel);
 
     await verifyChatConsentAcks({
       consentAcks,

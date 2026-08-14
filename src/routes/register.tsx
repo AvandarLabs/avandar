@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { INFO_EMAIL } from "$/config/AppConfig";
+import { INFO_EMAIL, WAITLIST_URL } from "$/config/GlobalAppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
@@ -27,7 +27,6 @@ import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
-import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";

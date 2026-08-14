@@ -23,7 +23,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { APP_NAME } from "$/config/AppConfig";
+import { APP_NAME } from "$/config/GlobalAppConfig";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";

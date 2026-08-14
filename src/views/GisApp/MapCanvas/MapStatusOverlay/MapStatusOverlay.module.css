@@ -1,0 +1,18 @@
+.mapStatusOverlay {
+  bottom: var(--mantine-spacing-lg);
+  display: flex;
+  justify-content: center;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  z-index: 2;
+}
+
+/*
+ * The container is click-through so it never blocks the map, but the message
+ * itself stays interactive so its text can be selected and copied.
+ */
+.mapStatusOverlay > * {
+  pointer-events: auto;
+}

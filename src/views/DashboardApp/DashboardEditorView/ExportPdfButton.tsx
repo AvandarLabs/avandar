@@ -5,7 +5,7 @@ import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError } from "@/utils/notifications/notify";
-import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/dashboardToolbarButtonSize";
+import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";

@@ -3,7 +3,7 @@ name: supabase-declarative-schema
 description: "MANDATORY for ALL Supabase schema changes. Use for any `create table`, `alter table`, column change, datatype, RLS policy, trigger, index, constraint, function, RPC, migration, or `supabase/schemas/` change. This skill overrides the base Supabase schema workflow."
 metadata:
   author: jpsyx
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Supabase Declarative Database Schema Management
@@ -13,7 +13,7 @@ metadata:
 ## Non-Negotiables
 
 1. Put all declarative schema SQL files in `supabase/schemas/`.
-2. Never create or edit `supabase/migrations/*.sql` directly for schema changes. Generate migrations from the declarative schema.
+2. Never create or edit `supabase/migrations/*.sql` directly for schema changes. Generate migrations from the declarative schema. The one exception is `storage.objects` and `storage.buckets`, which must be hand-written; see the Storage section.
 3. Every schema file must be named `NN.<descriptive_name>.sql` where `NN` is a zero-padded two-digit index such as `00`, `01`, `10`, or `70`.
 4. Use descriptive names based on the entity in the file: `00.util_fns.sql`, `01.user_role_type.sql`, `10.workspaces.sql`, `20.user_profiles.sql`, `70.rpc_create_workspace.sql`.
 5. Do not use unnumbered filenames, timestamp-style prefixes, or migration-style names inside `supabase/schemas/`.
@@ -134,6 +134,129 @@ To revert a schema change:
 1. Update the relevant files in `supabase/schemas/` back to the intended state.
 2. Generate a new migration with `supabase db diff -f <rollback_migration_name>`.
 3. Review the generated migration carefully for unintended destructive changes.
+
+## Storage (`storage.objects` and `storage.buckets`)
+
+Storage is the one place where the "never write migrations by hand" rule is
+inverted. `supabase db diff` cannot author storage changes correctly, and left
+alone it actively destroys them. Follow all five rules below or policies get
+silently dropped.
+
+### Why storage is special
+
+`db diff` compares the live database against `supabase/schemas/`. Storage
+policies live in the `storage` schema, which nothing under `supabase/schemas/`
+described. So every unrelated `db diff` run saw a set of policies present in
+the database and absent from the desired state, and dutifully wrote a migration
+to drop them.
+
+In this repo that happened four separate times, removing 14 policies and
+recreating none. The end state on any database built from migrations alone,
+which is every remote environment, was a private `workspaces` bucket with no
+policies on it at all. Local databases masked the damage because
+`[db.seed] sql_paths` replayed the storage migrations afterwards.
+
+### Rule 1: storage migrations are hand-written, and storage-only
+
+Create the bucket and its policies in a migration you write yourself. Never
+generate one for storage with `db diff -f`, except as a starting point you then
+edit.
+
+The file must contain storage statements and nothing else. No `public` tables,
+no helper functions, no grants. A helper that a storage policy calls goes in
+its own separate, non-storage migration ordered before it.
+
+This is a hard requirement rather than tidiness: the file is re-executed
+wholesale by the seed pass on an already-migrated database, so any non-storage
+statement would run a second time, out of order.
+
+### Rule 2: name it `{timestamp}_STORAGE-<description>.sql`
+
+The `_STORAGE` prefix is the marker that the file is exclusively storage and is
+therefore safe to replay. Anything without it must never appear in
+`[db.seed] sql_paths`.
+
+A migration that merely mentions storage in passing, such as one adding a
+`public` helper used by a storage policy, does **not** get the prefix.
+
+### Rule 3: every statement must be idempotent
+
+```sql
+insert into storage.buckets (id, name, public)
+values ('my_bucket', 'my_bucket', false)
+on conflict (id) do nothing;
+
+drop policy if exists "Users can SELECT my_bucket" on storage.objects;
+
+create policy "Users can SELECT my_bucket" on storage.objects for
+select
+  to authenticated using (bucket_id = 'my_bucket');
+```
+
+Required, not stylistic. Files listed in `sql_paths` run a second time against
+a database that already applied them as a migration. A bare `create policy`
+there aborts `supabase db reset` with `SQLSTATE 42710`.
+
+### Rule 4: list it in `[db.seed] sql_paths` in `supabase/config.toml`
+
+The seed pass runs after the migration pass, making it the last word on storage
+for a local database.
+
+Two traps:
+
+- **Order is significant, and it is not timestamp order.** Later entries
+  overwrite policies created by earlier ones. A file that narrows an earlier
+  file's policies must come after it.
+- **A path matching no file is a WARNING, not an error.** A typo leaves a
+  bucket with zero policies and the reset still reports success. This repo
+  shipped exactly that bug: a hyphen where the filename had an underscore, so
+  the `opendata` bucket had no policies for months.
+
+Verify after any change:
+
+```bash
+psql "$DATABASE_URL" -c "select policyname from pg_policies
+  where schemaname = 'storage' and tablename = 'objects' order by policyname;"
+```
+
+Only list files that satisfy Rule 3. A non-idempotent legacy migration stays
+out of the list; supersede it with a later idempotent one instead of editing a
+migration that production has already applied.
+
+### Rule 5: mirror every policy into `supabase/schemas/99.storage.sql`
+
+This is the rule that stops the bleeding. Declaring the policies in the
+declarative schema makes `db diff` see them as intended, so it stops generating
+drops.
+
+The mirror holds `create policy` statements only:
+
+- No `drop policy if exists`. Declarative files describe desired state.
+- No bucket inserts. That is DML, which diff does not track anyway.
+
+Number it `99`, not `100`. Schema files are applied in **lexicographic** order,
+where `100.` sorts between `10.` and `15.` and would place the policies ahead
+of the utility files defining the functions they call. Two digits also keeps it
+consistent with the `NN.` rule above.
+
+After adding the mirror, confirm the loop is closed:
+
+```bash
+supabase stop && PGSSLMODE=disable supabase db diff
+```
+
+Empty output means the schema matches and no future diff will drop the
+policies. Any `drop policy` in that output means the mirror is out of sync with
+the migrations.
+
+### Checklist for a new bucket
+
+1. Hand-write `{timestamp}_STORAGE-<name>-bucket.sql` with the bucket insert
+   and its policies, every statement idempotent.
+2. Add it to `[db.seed] sql_paths`, in the right position.
+3. Add the same policies to `supabase/schemas/99.storage.sql`.
+4. Run `supabase db reset`, then confirm the policy list in `pg_policies`.
+5. Run `supabase db diff` and confirm it is empty.
 
 ## Known Caveats
 

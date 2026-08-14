@@ -31,6 +31,24 @@ create table public.dashboards (
 -- (after `16.utils__permissions.sql` defines resource helper functions).
 alter table public.dashboards enable row level security;
 
+/** Prevents a dashboard from being reassigned to another workspace. */
+create or replace function public.dashboards__prevent_workspace_id_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if new.workspace_id is distinct from old.workspace_id then
+    raise exception 'dashboard workspace_id cannot be changed'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger tr__dashboards__prevent_workspace_id_change before
+update of workspace_id on public.dashboards for each row
+execute function public.dashboards__prevent_workspace_id_change ();
+
 -- Trigger the `updated_at` update
 create trigger tr_dashboards__set_updated_at before
 update on public.dashboards for each row
@@ -38,6 +56,11 @@ execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
 create index idx_dashboards__slug on public.dashboards (slug);
+
+create index idx_dashboards__workspace_owner on public.dashboards (
+  workspace_id,
+  owner_id
+);
 
 -- Globally unique vanity slug for public dashboards. Non-public dashboards
 -- can hold any slug (or repeat one) freely; the constraint only kicks in

@@ -1023,7 +1023,10 @@ export type Database = {
       usage_analytics_events: {
         Row: {
           app: Database["public"]["Enums"]["app_type"] | null
+          app_version: string | null
+          client: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at: string
+          event_category: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id: string
           payload: Json | null
@@ -1032,7 +1035,10 @@ export type Database = {
         }
         Insert: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id?: string
           payload?: Json | null
@@ -1041,7 +1047,10 @@ export type Database = {
         }
         Update: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name?: string
           id?: string
           payload?: Json | null
@@ -1611,6 +1620,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_resources__transfer_ownership: {
+        Args: {
+          p_new_owner_id: string
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: undefined
+      }
       rpc_workspaces__create_with_owner: {
         Args: {
           p_display_name: string
@@ -1633,11 +1650,40 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
+      }
+      rpc_workspaces__private_resource_counts: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          private_dashboard_count: number
+          private_dataset_count: number
+          user_id: string
+        }[]
+      }
+      rpc_workspaces__transfer_all_owned_resources: {
+        Args: {
+          p_from_user_id: string
+          p_new_owner_id: string
+          p_workspace_id: string
+        }
+        Returns: number
+      }
       util__auth_user_can_access_resource: {
         Args: {
           p_min_role: Database["public"]["Enums"]["role_level"]
           p_resource_id: string
           p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_access_resource_in_workspace: {
+        Args: {
+          p_required_role: Database["public"]["Enums"]["role_level"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
         }
         Returns: boolean
       }
@@ -1701,9 +1747,35 @@ export type Database = {
         Args: { workspace_id: string }
         Returns: string[]
       }
+      util__has_non_owner_share: {
+        Args: {
+          p_owner_id: string
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__is_resource_private_to_owner: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
       util__is_settings_admin: {
         Args: { p_workspace_id: string }
         Returns: boolean
+      }
+      util__log_analytics_event: {
+        Args: {
+          p_app?: Database["public"]["Enums"]["app_type"]
+          p_event_name: string
+          p_payload?: Json
+          p_user_id?: string
+          p_workspace_id?: string
+        }
+        Returns: undefined
       }
       util__rank_to_role_level: {
         Args: { p_rank: number }
@@ -1727,6 +1799,14 @@ export type Database = {
       util__seed_builtin_role_groups_for_workspace: {
         Args: { p_workspace_id: string }
         Returns: undefined
+      }
+      util__storage_object_dataset_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
+      util__storage_object_workspace_id: {
+        Args: { p_object_name: string }
+        Returns: string
       }
     }
     Enums: {
@@ -1797,6 +1877,14 @@ export type Database = {
         | "canceled"
         | "unpaid"
       subscriptions__update_status: "pending" | "completed"
+      usage_analytics_events__category:
+        | "acquisition"
+        | "activation"
+        | "engagement"
+        | "expansion"
+        | "revenue"
+        | "other"
+      usage_analytics_events__client: "web" | "desktop" | "server" | "db"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -2026,6 +2114,15 @@ export const Constants = {
         "unpaid",
       ],
       subscriptions__update_status: ["pending", "completed"],
+      usage_analytics_events__category: [
+        "acquisition",
+        "activation",
+        "engagement",
+        "expansion",
+        "revenue",
+        "other",
+      ],
+      usage_analytics_events__client: ["web", "desktop", "server", "db"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",
@@ -2039,4 +2136,3 @@ export const Constants = {
     },
   },
 } as const
-

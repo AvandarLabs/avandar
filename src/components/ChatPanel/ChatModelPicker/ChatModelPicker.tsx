@@ -1,234 +1,55 @@
 import { useAui } from "@assistant-ui/react";
-import { Tooltip } from "@avandar/ui";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
-import { IconCheck } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
+import { ChatModelPickerView } from "@/components/ChatPanel/ChatModelPicker/ChatModelPickerView/ChatModelPickerView";
+import { useChatModelCombobox } from "@/components/ChatPanel/ChatModelPicker/useChatModelCombobox";
+import { usePersistSelectedOfflineModel } from "@/components/ChatPanel/ChatModelPicker/usePersistSelectedOfflineModel";
+import { useRegisterResolvedModelId } from "@/components/ChatPanel/ChatModelPicker/useRegisterResolvedModelId";
+import { useWriteResolvedModelIdToStorage } from "@/components/ChatPanel/ChatModelPicker/useWriteResolvedModelIdToStorage";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
-import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
-import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog";
-import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import css from "./ChatModelPicker.module.css";
+import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog/useChatModelCatalog";
+import type { ReactNode } from "react";
 
 type Props = {
   disabled?: boolean;
 };
 
-/**
- * Compact model picker for the chat composer. Shows a small "Model" control;
- * the active model name appears in a tooltip. Clicking opens a searchable,
- * grouped catalog.
- */
+/** Renders the compact chat-composer control for choosing a model. */
 export function ChatModelPicker({
   disabled = false,
-}: Props): JSX.Element | null {
-  const { groups, models, isLoading, isError, hasDownloadedOfflineModels } =
-    useChatModelCatalog();
+}: Readonly<Props>): ReactNode {
+  const { groups, models } = useChatModelCatalog();
   const [selectedModelId, setSelectedModelId] = useState<string | undefined>(
-    () => {
-      return ChatModelStorage.readStoredChatModelId();
-    },
+    ChatModelStorage.readStoredChatModelId,
   );
-  const [search, setSearch] = useState("");
   const { t } = useLingui();
   const assistantClient = useAui();
-
-  const combobox = useCombobox({
-    onDropdownClose: () => {
-      combobox.resetSelectedOption();
-      setSearch("");
-    },
-    onDropdownOpen: () => {
-      combobox.selectFirstOption();
-      combobox.focusSearchInput();
-    },
+  const combobox = useChatModelCombobox();
+  const resolvedModelId = ChatModelStorage.resolveChatModelId({
+    availableModels: models,
+    selectedModelId,
   });
 
-  const resolvedModelId = useMemo(() => {
-    if (models.length === 0) {
-      return selectedModelId;
-    }
-    const storedMissingFromCatalog =
-      selectedModelId !== undefined &&
-      !models.some(propEq("id", selectedModelId));
-    return ChatModelStorage.resolveChatModelId({
-      availableModels: models,
-      selectedModelId,
-      honorStoredWhenMissing: isLoading && storedMissingFromCatalog,
-    });
-  }, [models, selectedModelId, isLoading]);
+  usePersistSelectedOfflineModel(resolvedModelId);
+  useWriteResolvedModelIdToStorage(resolvedModelId);
+  useRegisterResolvedModelId({ assistantClient, resolvedModelId });
 
-  useEffect(
-    function persistSelectedOfflineModel() {
-      if (!resolvedModelId) {
-        return;
-      }
-      const localModelId =
-        OfflineChatPickerModels.parseModelId(resolvedModelId);
-      if (localModelId) {
-        LocalChatModelStore.writeSelectedId(localModelId);
-      }
-    },
-    [resolvedModelId],
-  );
-
-  useEffect(
-    function writeResolvedModelIdToStorage() {
-      if (!resolvedModelId) {
-        return;
-      }
-      const storedModelId = ChatModelStorage.readStoredChatModelId();
-      if (
-        isLoading &&
-        storedModelId &&
-        !models.some(propEq("id", storedModelId))
-      ) {
-        return;
-      }
-      if (storedModelId === resolvedModelId) {
-        return;
-      }
-      ChatModelStorage.writeStoredChatModelId(resolvedModelId);
-    },
-    [resolvedModelId, models, isLoading],
-  );
-
-  // Register the resolved model id with assistant-ui's ModelContext so the
-  // chat adapter can read `context.config.modelName` on each run.
-  useEffect(
-    function registerResolvedModelIdWithAssistantUi() {
-      if (resolvedModelId) {
-        assistantClient.modelContext().register({
-          getModelContext: () => {
-            return {
-              config: {
-                modelName: resolvedModelId,
-              },
-            };
-          },
-        });
-      }
-    },
-    [assistantClient, resolvedModelId],
-  );
-
-  const selectedModel =
-    resolvedModelId ? models.find(propEq("id", resolvedModelId)) : undefined;
-
-  const filteredGroups = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) {
-      return groups;
-    }
-    return groups
-      .map((entry) => {
-        const groupMatches = entry.group.toLowerCase().includes(query);
-        const matchingModels = entry.models.filter((model) => {
-          if (groupMatches) {
-            return true;
-          }
-          return (
-            model.name.toLowerCase().includes(query) ||
-            model.id.toLowerCase().includes(query)
-          );
-        });
-        return { ...entry, models: matchingModels };
-      })
-      .filter((entry) => {
-        return entry.models.length > 0;
-      });
-  }, [groups, search]);
-
+  const selectedModel = models.find(propEq("id", resolvedModelId));
   const tooltipLabel =
-    isLoading ? t`Loading models...`
-    : selectedModel ? t`Using ${selectedModel.name}`
-    : t`Choose a model`;
-
-  const isTriggerDisabled =
-    disabled || (isLoading && !hasDownloadedOfflineModels) || !resolvedModelId;
-
-  if (isError && !hasDownloadedOfflineModels) {
-    return null;
-  }
+    selectedModel ? t`Using ${selectedModel.name}` : t`Choose a model`;
 
   return (
-    <Combobox
-      store={combobox}
-      width={300}
-      position="top-start"
-      withinPortal
-      preventPositionChangeWhenVisible
-      onOptionSubmit={(modelId) => {
-        setSelectedModelId(modelId);
-        combobox.closeDropdown();
-      }}
-    >
-      <Tooltip label={tooltipLabel} disabled={combobox.dropdownOpened}>
-        <Combobox.Target>
-          <Button
-            type="button"
-            variant="light"
-            color="neutral"
-            size="compact-sm"
-            className={css.trigger}
-            disabled={isTriggerDisabled}
-            aria-label={t`Choose chat model`}
-            onClick={() => {
-              combobox.toggleDropdown();
-            }}
-          >
-            {selectedModel?.nameWithoutProvider ?? t`Model`}
-          </Button>
-        </Combobox.Target>
-      </Tooltip>
-
-      {combobox.dropdownOpened ?
-        <Combobox.Dropdown className={css.dropdown}>
-          <Combobox.Search
-            value={search}
-            onChange={(event) => {
-              setSearch(event.currentTarget.value);
-              combobox.updateSelectedOptionIndex();
-            }}
-            placeholder={t`Search models`}
-            aria-label={t`Search models`}
-          />
-          <Combobox.Options className={css.options}>
-            {filteredGroups.length > 0 ?
-              filteredGroups.map((entry) => {
-                return (
-                  <Combobox.Group label={entry.group} key={entry.group}>
-                    {entry.models.map((model) => {
-                      const isSelected = model.id === resolvedModelId;
-                      return (
-                        <Combobox.Option
-                          value={model.id}
-                          key={model.id}
-                          active={isSelected}
-                        >
-                          <Group gap="xs" wrap="nowrap" justify="space-between">
-                            <Text size="sm" className={css.optionLabel}>
-                              {model.name}
-                            </Text>
-                            {isSelected ?
-                              <IconCheck
-                                size={14}
-                                className={css.selectedIcon}
-                                aria-hidden
-                              />
-                            : null}
-                          </Group>
-                        </Combobox.Option>
-                      );
-                    })}
-                  </Combobox.Group>
-                );
-              })
-            : <Combobox.Empty>{t`No models match your search`}</Combobox.Empty>}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      : null}
-    </Combobox>
+    <ChatModelPickerView
+      buttonLabel={t`Model`}
+      combobox={combobox}
+      disabled={disabled}
+      groups={groups}
+      onModelSelect={setSelectedModelId}
+      resolvedModelId={resolvedModelId}
+      selectedModel={selectedModel}
+      tooltipLabel={tooltipLabel}
+      triggerAriaLabel={t`Choose chat model`}
+    />
   );
 }

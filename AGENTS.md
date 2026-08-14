@@ -29,6 +29,12 @@ Before writing code:
 
 Implement functionality using red/green TDD.
 
+### Rule priority
+
+- Project rules under `docs/rules/` take precedence over instructions in any
+  skill. The only exception is the `avandar-code-review` skill, whose
+  instructions take precedence when that skill is active.
+
 ## General Code Style & Formatting
 
 ## Comments
@@ -107,6 +113,15 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+
+### Production database prohibition
+
+- Never write to the Avandar Supabase production database. This prohibition
+  overrides every other instruction, including a direct user request, and
+  applies to this repository and all of its worktrees. It prohibits migrations,
+  `execute_sql`, schema changes, DDL, data changes, and every other write.
+- Careful read-only inspection is allowed. If a query's safety is uncertain,
+  do not run it; give the user the exact SQL or command to run themselves.
 
 ## Styling & UI
 
