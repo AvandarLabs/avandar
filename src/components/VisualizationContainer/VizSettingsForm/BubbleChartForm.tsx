@@ -1,4 +1,8 @@
+import { Stack } from "@mantine/core";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset";
+import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
+import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
@@ -15,7 +19,8 @@ type Props = {
 
 /**
  * Settings form for the multi-series bubble chart. Delegates series
- * management to `BubbleSeriesFieldset`.
+ * management to `BubbleSeriesFieldset` and renders the chart-level
+ * descriptors through the shared `ChartSettingsFieldsets`.
  */
 export function BubbleChartForm({
   fields,
@@ -23,14 +28,24 @@ export function BubbleChartForm({
   onConfigChange,
   layout = "stacked",
 }: Props): JSX.Element {
+  const updateChartPath = useUpdateSettingPath({ config, onConfigChange });
+
   return (
-    <BubbleSeriesFieldset
-      fields={fields}
-      series={config.series}
-      layout={layout}
-      onChange={(nextSeries: BubbleSeries[]) => {
-        onConfigChange({ ...config, series: nextSeries });
-      }}
-    />
+    <Stack gap="md">
+      <BubbleSeriesFieldset
+        fields={fields}
+        series={config.series}
+        layout={layout}
+        onChange={(nextSeries: BubbleSeries[]) => {
+          onConfigChange({ ...config, series: nextSeries });
+        }}
+      />
+      <ChartSettingsFieldsets
+        descriptors={VizConfigs.getDescriptors("bubble").chart}
+        config={config}
+        onSettingChange={updateChartPath}
+        layout={layout}
+      />
+    </Stack>
   );
 }

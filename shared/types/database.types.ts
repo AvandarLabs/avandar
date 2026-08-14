@@ -1023,7 +1023,10 @@ export type Database = {
       usage_analytics_events: {
         Row: {
           app: Database["public"]["Enums"]["app_type"] | null
+          app_version: string | null
+          client: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at: string
+          event_category: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id: string
           payload: Json | null
@@ -1032,7 +1035,10 @@ export type Database = {
         }
         Insert: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id?: string
           payload?: Json | null
@@ -1041,7 +1047,10 @@ export type Database = {
         }
         Update: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name?: string
           id?: string
           payload?: Json | null
@@ -1664,6 +1673,10 @@ export type Database = {
         }
         Returns: number
       }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
+      }
       util__auth_user_can_access_resource: {
         Args: {
           p_min_role: Database["public"]["Enums"]["role_level"]
@@ -1761,6 +1774,16 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: boolean
       }
+      util__log_analytics_event: {
+        Args: {
+          p_app?: Database["public"]["Enums"]["app_type"]
+          p_event_name: string
+          p_payload?: Json
+          p_user_id?: string
+          p_workspace_id?: string
+        }
+        Returns: undefined
+      }
       util__rank_to_role_level: {
         Args: { p_rank: number }
         Returns: Database["public"]["Enums"]["role_level"]
@@ -1856,6 +1879,14 @@ export type Database = {
         | "canceled"
         | "unpaid"
       subscriptions__update_status: "pending" | "completed"
+      usage_analytics_events__category:
+        | "acquisition"
+        | "activation"
+        | "engagement"
+        | "expansion"
+        | "revenue"
+        | "other"
+      usage_analytics_events__client: "web" | "desktop" | "server" | "db"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -2079,6 +2110,15 @@ export const Constants = {
         "unpaid",
       ],
       subscriptions__update_status: ["pending", "completed"],
+      usage_analytics_events__category: [
+        "acquisition",
+        "activation",
+        "engagement",
+        "expansion",
+        "revenue",
+        "other",
+      ],
+      usage_analytics_events__client: ["web", "desktop", "server", "db"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",

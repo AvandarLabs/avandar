@@ -187,7 +187,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "表單不支援 UNION／INTERSECT／EXCEPT。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "圖表設定"
 
@@ -638,6 +638,10 @@ msgstr "重設密碼需要連接到互聯網。"
 msgid "Symbol size"
 msgstr "符號大小"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "Y 軸最小值"
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -804,6 +808,10 @@ msgstr "範圍"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "輸入電子郵件"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "X 軸最小值"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1010,6 +1018,10 @@ msgstr "自定義"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "時間戳"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "Y 軸刻度間隔"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1718,10 +1730,6 @@ msgstr "顯示 SQL"
 msgid "Grid"
 msgstr "網格"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "搜尋模型"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "無法同步此實體"
@@ -2135,6 +2143,10 @@ msgstr "本地過濾器（可由查看者編輯，僅此圖表）"
 msgid "Invalid X axis selected"
 msgstr "選擇了無效的 X 軸"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "X 軸最大值"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
@@ -2189,6 +2201,10 @@ msgstr "確認操作"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "數據預覽"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "Y 軸最大值"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2299,6 +2315,10 @@ msgstr "離線聊天模型已準備好。點擊以切換或重新下載。"
 msgid "Capturing dashboard…"
 msgstr "捕捉儀表板中…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "X 軸刻度間隔"
+
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
 msgstr "這是一個無效的候補名單代碼"
@@ -2401,6 +2421,10 @@ msgstr "角色"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "為空"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "開放模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -2896,6 +2920,10 @@ msgstr "計算 {datasetName} 中有多少行"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "X 軸標籤旋轉"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3849,10 +3877,6 @@ msgstr "請求功能"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "描述"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "加載模型中..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5191,7 +5215,7 @@ msgstr "作者"
 msgid "Add filter"
 msgstr "新增篩選器"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "離線模型"
 
@@ -5965,6 +5989,10 @@ msgstr "面積圖"
 msgid "Invalid date"
 msgstr "無效的日期"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "前沿模型"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "頁面標題"
@@ -6023,10 +6051,6 @@ msgstr "升級計劃至 {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "沒有模型符合您的搜尋"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

@@ -1,6 +1,6 @@
 import { hydrateScatterSeriesFromQuery } from "$/models/vizs/hydrateScatterSeriesFromQuery.ts";
 import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -15,8 +15,10 @@ import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/Sc
 import type {
   BubbleSeries,
   RadarSeries,
+  ScatterSeries,
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
+import type { VizSettingDescriptors } from "$/models/vizs/SettingDescriptor.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -24,10 +26,25 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
+const DESCRIPTORS = {
+  chart: [
+    ...makeAxisDescriptors<ScatterPlotVizConfig>({
+      axis: "xAxis",
+      role: "value",
+      rotation: true,
+    }),
+    ...makeAxisDescriptors<ScatterPlotVizConfig>({
+      axis: "yAxis",
+      role: "value",
+    }),
+  ],
+  series: [],
+} as const satisfies VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries>;
+
 export const ScatterPlotVizConfigs = {
   vizType: "scatter",
   displayName: "Scatter Plot",
-  descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS,
+  descriptors: DESCRIPTORS,
 
   /** Create an empty scatter plot config. */
   makeEmptyConfig: (): ScatterPlotVizConfig => {
@@ -68,6 +85,7 @@ export const ScatterPlotVizConfigs = {
     const firstSeries = vizConfig.series[0];
     const xAxisKey = firstSeries?.xKey;
     const yAxisKey = firstSeries?.key;
+    const { chartStyle } = vizConfig;
 
     const xySeries = (renderAs: "bar" | "line" | "area"): XYSeries[] => {
       if (yAxisKey === undefined) {
@@ -90,6 +108,7 @@ export const ScatterPlotVizConfigs = {
           series: xySeries("bar"),
           layout: "group",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("line", (vizType): LineChartVizConfig => {
@@ -98,6 +117,7 @@ export const ScatterPlotVizConfigs = {
           xAxisKey,
           series: xySeries("line"),
           withLegend: true,
+          chartStyle,
         };
       })
       .with("area", (vizType): AreaChartVizConfig => {
@@ -107,6 +127,7 @@ export const ScatterPlotVizConfigs = {
           series: xySeries("area"),
           layout: "default",
           withLegend: true,
+          chartStyle,
         };
       })
       .with("scatter", (): ScatterPlotVizConfig => {
@@ -133,6 +154,7 @@ export const ScatterPlotVizConfigs = {
           nameKey: xAxisKey,
           series: radarSeries,
           withLegend: true,
+          chartStyle,
         };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
@@ -145,7 +167,7 @@ export const ScatterPlotVizConfigs = {
             color: s.color,
           };
         });
-        return { vizType, series: bubbleSeries };
+        return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);

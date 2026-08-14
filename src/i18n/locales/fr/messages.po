@@ -197,7 +197,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT n’est pas pris en charge sous cette forme."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Paramètres du graphique"
 
@@ -667,6 +667,10 @@ msgstr "La réinitialisation du mot de passe nécessite une connexion Internet."
 msgid "Symbol size"
 msgstr "Taille du symbole"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "Minimum de l’axe Y"
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -848,6 +852,10 @@ msgstr "Plage"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Entrez l'email"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "Minimum de l’axe X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1059,6 +1067,10 @@ msgstr "Personnalisé"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Horodatage"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "Intervalle des graduations de l’axe Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1813,10 +1825,6 @@ msgstr "Afficher SQL"
 msgid "Grid"
 msgstr "Grille"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "Rechercher des modèles"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Impossible de synchroniser cette entité"
@@ -2250,6 +2258,10 @@ msgstr "Filtres locaux (modifiable par le visualiseur, ce graphique uniquement)"
 msgid "Invalid X axis selected"
 msgstr "Axe X invalide sélectionné"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "Maximum de l’axe X"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "par exemple cholera-outbreak-2024"
@@ -2306,6 +2318,10 @@ msgstr "Confirmer l'action"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "Aperçu des données"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "Maximum de l’axe Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2422,6 +2438,10 @@ msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger 
 msgid "Capturing dashboard…"
 msgstr "Capture du tableau de bord…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "Intervalle des graduations de l’axe X"
+
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
 msgstr "Ceci est un code de liste d'attente invalide"
@@ -2529,6 +2549,10 @@ msgstr "Rôle"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "est nul"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "Modèles ouverts"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3046,6 +3070,10 @@ msgstr "Comptez combien de lignes il y a dans {datasetName}"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "Génération de SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "Rotation des libellés de l’axe X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -4038,10 +4066,6 @@ msgstr "Demander une fonctionnalité"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Description"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "Chargement des modèles..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5434,7 +5458,7 @@ msgstr "Auteur"
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "Modèles hors ligne"
 
@@ -6247,6 +6271,10 @@ msgstr "Graphique en aires"
 msgid "Invalid date"
 msgstr "Date invalide"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "Modèles de pointe"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Titre de la page"
@@ -6308,10 +6336,6 @@ msgstr "Mise à niveau du plan vers {newPlanName} ({newPlanSubType})"
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "L’expression SELECT de type « {exprType} » n’est pas prise en charge "
 "par le formulaire."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "Aucun modèle ne correspond à votre recherche"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

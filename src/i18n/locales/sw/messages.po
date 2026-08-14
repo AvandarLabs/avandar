@@ -193,7 +193,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT haitumiki katika fomu hii."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
 
@@ -658,6 +658,10 @@ msgstr "Kurekebisha nenosiri kunahitaji muunganisho wa intaneti."
 msgid "Symbol size"
 msgstr "Ukubwa wa alama"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "Kima cha chini cha mhimili wa Y"
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -837,6 +841,10 @@ msgstr "Muktadha"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Ingiza barua pepe"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "Kima cha chini cha mhimili wa X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1046,6 +1054,10 @@ msgstr "Kawaida"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Wakati"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "Muda wa alama za mhimili wa Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1787,10 +1799,6 @@ msgstr "Onyesha SQL"
 msgid "Grid"
 msgstr "Gridi"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "Tafuta mifano"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Haiwezi kusawazisha hii kitu"
@@ -2222,6 +2230,10 @@ msgstr "Filita za ndani (zinazoweza kuhaririwa na mtazamaji, chati hii pekee)"
 msgid "Invalid X axis selected"
 msgstr "X axis isiyo sahihi imechaguliwa"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "Kima cha juu cha mhimili wa X"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "mfano. cholera-outbreak-2024"
@@ -2278,6 +2290,10 @@ msgstr "Thibitisha Kitendo"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "Mapitio ya Data"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "Kima cha juu cha mhimili wa Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2392,6 +2408,10 @@ msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
 msgid "Capturing dashboard…"
 msgstr "Inanasa dashibodi…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "Muda wa alama za mhimili wa X"
+
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
 msgstr "Hii ni nambari isiyo sahihi ya orodha ya kusubiri"
@@ -2499,6 +2519,10 @@ msgstr "Jukumu"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "ni tupu"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "Miundo huria"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3008,6 +3032,10 @@ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "Inazalisha SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "Mzunguko wa lebo ya mhimili wa X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3991,10 +4019,6 @@ msgstr "Omba kipengele"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Maelezo"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "Inapakia mifano..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5373,7 +5397,7 @@ msgstr "Mwandishi"
 msgid "Add filter"
 msgstr "Ongeza chujio"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "Miundo ya nje ya mtandao"
 
@@ -6175,6 +6199,10 @@ msgstr "Chati ya Eneo"
 msgid "Invalid date"
 msgstr "Tarehe isiyo sahihi"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "Miundo ya Frontier"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Kichwa cha ukurasa"
@@ -6234,10 +6262,6 @@ msgstr "Kuinua mpango hadi {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "Usemi wa SELECT wa aina \"{exprType}\" hautumiki na fomu."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "Hakuna mifano inayolingana na utafutaji wako"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

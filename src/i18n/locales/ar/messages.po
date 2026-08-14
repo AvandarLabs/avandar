@@ -192,7 +192,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "لا يتم دعم UNION/INTERSECT/EXCEPT بهذا الشكل في النموذج."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "إعدادات الرسم البياني"
 
@@ -652,6 +652,10 @@ msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً ب
 msgid "Symbol size"
 msgstr "حجم الرمز"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "الحد الأدنى للمحور Y"
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -826,6 +830,10 @@ msgstr "النطاق"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "أدخل البريد الإلكتروني"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "الحد الأدنى للمحور X"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1036,6 +1044,10 @@ msgstr "مخصص"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "الطابع الزمني"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "الفاصل بين تدريجات المحور Y"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -1766,10 +1778,6 @@ msgstr "عرض SQL"
 msgid "Grid"
 msgstr "شبكة"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "بحث عن النماذج"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "لا يمكن مزامنة هذا الكيان"
@@ -2195,6 +2203,10 @@ msgstr "مرشحات محلية (يمكن للمشاهد تعديلها، هذه
 msgid "Invalid X axis selected"
 msgstr "تم اختيار محور X غير صالح"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "الحد الأقصى للمحور X"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
@@ -2249,6 +2261,10 @@ msgstr "تأكيد الإجراء"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "معاينة البيانات"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "الحد الأقصى للمحور Y"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2360,6 +2376,10 @@ msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتب�
 msgid "Capturing dashboard…"
 msgstr "جارٍ التقاط اللوحة…"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "الفاصل بين تدريجات المحور X"
+
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
 msgstr "هذا رمز قائمة الانتظار غير صالح"
@@ -2465,6 +2485,10 @@ msgstr "الدور"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "فارغ"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "النماذج المفتوحة"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -2970,6 +2994,10 @@ msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "جارٍ إنشاء SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "تدوير تسمية المحور X"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3939,10 +3967,6 @@ msgstr "طلب ميزة"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "الوصف"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "جارٍ تحميل النماذج..."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5307,7 +5331,7 @@ msgstr "المؤلف"
 msgid "Add filter"
 msgstr "إضافة فلتر"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "النماذج دون اتصال"
 
@@ -6101,6 +6125,10 @@ msgstr "مخطط مساحي"
 msgid "Invalid date"
 msgstr "تاريخ غير صالح"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "النماذج الرائدة"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "عنوان الصفحة"
@@ -6159,10 +6187,6 @@ msgstr "ترقية الخطة إلى {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "تعبير SELECT من النوع \"{exprType}\" غير مدعوم من النموذج."
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "لا توجد نماذج تطابق بحثك"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

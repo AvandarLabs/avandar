@@ -37,7 +37,7 @@ function buildOptions(
     return Model.make("ChatModelOption", {
       id: buildModelId(localModelId),
       name: copy.pickerName,
-      nameWithoutProvider: copy.pickerName,
+      pickerLabel: copy.pickerName,
       description: ModelPickerCopy.formatDescription({
         description: copy.description,
         recommendedIf: copy.recommendedIf,
