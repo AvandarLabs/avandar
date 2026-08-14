@@ -54,7 +54,7 @@ msgstr "Hakuna safu zilizogundulika kwa dataset hii. Kurudi kwenye safu zote."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 group"
-msgstr ""
+msgstr "Kikundi 1"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
@@ -453,7 +453,7 @@ msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 person"
-msgstr ""
+msgstr "Mtu 1"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -598,7 +598,7 @@ msgstr "Tafuta kwenye katalogi ya data ili kuongeza seti za data za wazi kwenye 
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
-msgstr ""
+msgstr "{shareClause} hatapata tena idhini ya kufikia."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -702,7 +702,8 @@ msgstr "Seti za data zilizohifadhiwa"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
-msgstr ""
+msgstr "Ni watu na vikundi vilivyoorodheshwa hapa chini pekee vinavyoweza "
+"kufikia {resource} hii."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -978,7 +979,7 @@ msgstr "ni sawa na..."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
-msgstr ""
+msgstr "Vikundi {numGroups}"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1114,7 +1115,9 @@ msgstr "Muhtasari wa Data"
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
-msgstr ""
+msgstr "Ongeza mwanachama au kikundi cha watumiaji ili kutoa idhini ya kufikia. "
+"Tumia sehemu ya Ufikiaji wa jumla hapo juu ili kushiriki kwa upana "
+"zaidi."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1246,7 +1249,7 @@ msgstr "Wastani"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
-msgstr ""
+msgstr "Kila mtu katika {app} hatapata tena idhini ya kufikia."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1358,7 +1361,7 @@ msgstr " ambaye pia ana "
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Give access to additional members"
-msgstr ""
+msgstr "Wape wanachama wa ziada idhini ya kufikia"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1756,7 +1759,7 @@ msgstr "Kitambulisho cha eneo la kazi"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
-msgstr ""
+msgstr "Watu {numUsers}"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
@@ -2695,7 +2698,8 @@ msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. Hawezi "
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
 "including workspace admins."
-msgstr ""
+msgstr "Ni wewe pekee unayeweza kufikia {resource} hii. Wengine wote watapoteza "
+"idhini ya kufikia, wakiwemo wasimamizi wa nafasi ya kazi."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2892,7 +2896,7 @@ msgstr "GROUP BY inatumia usemi ambao si safu."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make private"
-msgstr ""
+msgstr "Weka kuwa ya faragha"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -3354,7 +3358,9 @@ msgstr "Nunua kiti {seatsToAdd}"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Controls the default for the rest of the workspace. People without app "
 "access still need a direct share below."
-msgstr ""
+msgstr "Hudhibiti mipangilio chaguomsingi ya nafasi yote ya kazi. Watu wasio na "
+"idhini ya kufikia programu bado wanahitaji kushirikiwa moja kwa moja "
+"hapa chini."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
@@ -4458,7 +4464,7 @@ msgstr "Haiwezi kuhifadhi seti ya data"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the owner can make this {resource} private."
-msgstr ""
+msgstr "Mmiliki pekee ndiye anayeweza kuweka {resource} hii kuwa ya faragha."
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
@@ -4466,7 +4472,7 @@ msgstr "Swali hilo limefeli. Tafadhali rekebisha SQL na ujaribu tena."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only me"
-msgstr ""
+msgstr "Mimi pekee"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -4746,7 +4752,8 @@ msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
-msgstr ""
+msgstr "Ni wewe pekee utakayeweza kuifungua. Unaweza kuishiriki tena wakati "
+"wowote."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4985,7 +4992,7 @@ msgstr "Hakuna kitu kingine cha kupakia"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
-msgstr ""
+msgstr "Imeshindikana kuweka kuwa ya faragha"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5097,7 +5104,7 @@ msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
-msgstr ""
+msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5328,7 +5335,7 @@ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
-msgstr ""
+msgstr "Uweke \"{resourceName}\" kuwa ya faragha?"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
@@ -5879,7 +5886,9 @@ msgstr "Eneo lako la kazi limetumia {currentSeatUsage} ya viti vyake "
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
 "{resource}, in addition to whatever's listed below."
-msgstr ""
+msgstr "Kila mwanachama wa nafasi ya kazi anayeweza kufungua programu ya {app} "
+"anapewa jukumu hili kwenye {resource} hii, pamoja na yale "
+"yaliyoorodheshwa hapa chini."
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "
@@ -6105,7 +6114,7 @@ msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
-msgstr ""
+msgstr "{peopleClause} na {groupClause}"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx

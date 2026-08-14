@@ -54,7 +54,7 @@ msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة م
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 group"
-msgstr ""
+msgstr "مجموعة واحدة"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
@@ -448,7 +448,7 @@ msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 4 جيج�
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "1 person"
-msgstr ""
+msgstr "شخص واحد"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -592,7 +592,7 @@ msgstr "ابحث في كتالوج البيانات لإضافة مجموعات 
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
-msgstr ""
+msgstr "سيفقد {shareClause} إمكانية الوصول."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -695,7 +695,7 @@ msgstr "مجموعات البيانات المحفوظة"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
-msgstr ""
+msgstr "يمكن للأشخاص والمجموعات المدرجين أدناه فقط الوصول إلى هذا {resource}."
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -968,7 +968,7 @@ msgstr "يساوي..."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
-msgstr ""
+msgstr "{numGroups} مجموعات"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1103,7 +1103,8 @@ msgstr "ملخص البيانات"
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
-msgstr ""
+msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أعلاه "
+"للمشاركة على نطاق أوسع."
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1233,7 +1234,7 @@ msgstr "متوسط"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
-msgstr ""
+msgstr "سيفقد جميع أعضاء {app} إمكانية الوصول."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -1345,7 +1346,7 @@ msgstr "الذين لديهم أيضًا"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Give access to additional members"
-msgstr ""
+msgstr "منح الوصول إلى أعضاء إضافيين"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1735,7 +1736,7 @@ msgstr "معرّف مساحة العمل"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
-msgstr ""
+msgstr "{numUsers} أشخاص"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
 msgid "Generate a query to configure this visualization."
@@ -2658,7 +2659,8 @@ msgstr "يمتلك هذا العضو {privateTotal} من الموارد الخا
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
 "including workspace admins."
-msgstr ""
+msgstr "يمكنك وحدك الوصول إلى هذا {resource}. سيفقد الآخرون إمكانية الوصول، بما "
+"في ذلك مسؤولو مساحة العمل."
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose a model"
@@ -2854,7 +2856,7 @@ msgstr "يستخدم GROUP BY تعبيرًا غير معتمد على عمود."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make private"
-msgstr ""
+msgstr "جعله خاصًا"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
@@ -3312,7 +3314,8 @@ msgstr "شراء {seatsToAdd} مقعد"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Controls the default for the rest of the workspace. People without app "
 "access still need a direct share below."
-msgstr ""
+msgstr "يتحكم هذا في الإعداد الافتراضي لبقية مساحة العمل. لا يزال الأشخاص الذين "
+"لا يملكون إمكانية الوصول إلى التطبيق بحاجة إلى مشاركة مباشرة أدناه."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {groupByColumn}"
@@ -4403,7 +4406,7 @@ msgstr "لا يمكن حفظ مجموعة البيانات"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the owner can make this {resource} private."
-msgstr ""
+msgstr "يمكن للمالك فقط جعل هذا {resource} خاصًا."
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
@@ -4411,7 +4414,7 @@ msgstr "فشلت هذه الاستعلام. يرجى إصلاح SQL والمحا
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only me"
-msgstr ""
+msgstr "أنا فقط"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "An error occurred while saving the dataset"
@@ -4687,7 +4690,7 @@ msgstr "تعذّر إنشاء SQL دون اتصال. حاول إعادة الص�
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
-msgstr ""
+msgstr "ستتمكن من فتحه وحدك. يمكنك مشاركته مرة أخرى في أي وقت."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -4923,7 +4926,7 @@ msgstr "لا يوجد المزيد لتحميله"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
-msgstr ""
+msgstr "تعذّر جعله خاصًا"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5034,7 +5037,7 @@ msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
-msgstr ""
+msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5264,7 +5267,7 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
-msgstr ""
+msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "This custom URL is already taken"
@@ -5809,7 +5812,8 @@ msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مق
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
 "{resource}, in addition to whatever's listed below."
-msgstr ""
+msgstr "يحصل كل عضو في مساحة العمل يمكنه فتح تطبيق {app} على هذا الدور في هذا "
+"{resource}، بالإضافة إلى كل ما هو مذكور أدناه."
 
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Upload files, connect external sources, or browse open datasets to add "
@@ -6033,7 +6037,7 @@ msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
-msgstr ""
+msgstr "{peopleClause} و{groupClause}"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
