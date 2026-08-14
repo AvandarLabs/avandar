@@ -21,9 +21,11 @@ import {
   addShare,
   closeShareModal,
   expectOwnerRowReadOnly,
+  expectRestrictedIsIntentOnly,
   expectShareSummaryText,
   openShareModal,
   setGeneralAccess,
+  setGeneralAccessToOnlyMe,
   toggleRequiresAppAccess,
 } from "./helpers/shareModalFlow";
 import {
@@ -411,6 +413,82 @@ test.describe("Share modal", () => {
         workspaceId,
         tagName: groupName,
       });
+    }
+  });
+
+  test("Only me revokes every share in one action", async ({
+    page,
+    e2eWorkerDb,
+    e2eViewerMembership,
+  }) => {
+    const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
+    const { admin } = e2eViewerMembership;
+    const datasetName = "E2E only me";
+
+    let datasetId = "";
+    try {
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+
+      ({ datasetId } = await uploadCaliforniaCsvDataset({
+        page,
+        workspaceSlug,
+        datasetName,
+      }));
+
+      await openShareModal(page);
+      await setGeneralAccess(page, "Restricted");
+      await addShare({
+        page,
+        principalLabel: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
+        role: "editor",
+      });
+      await closeShareModal(page);
+
+      // Prove the share works before taking it away, so the assertion at the
+      // end reflects a change rather than a permanent absence.
+      await switchToWorkspaceUser(page, {
+        email: secondaryUser.email,
+        password: secondaryUser.password,
+        workspaceSlug,
+      });
+      await expectDatasetVisibleInDataManager(page, {
+        workspaceSlug,
+        datasetName,
+      });
+
+      await switchToWorkspaceUser(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
+      await openShareModal(page);
+      await setGeneralAccessToOnlyMe(page);
+      await expectShareSummaryText(page, ["Only you have access"]);
+      await expectRestrictedIsIntentOnly(page);
+      await closeShareModal(page);
+
+      await switchToWorkspaceUser(page, {
+        email: secondaryUser.email,
+        password: secondaryUser.password,
+        workspaceSlug,
+      });
+      await expectDatasetHiddenInDataManager(page, {
+        workspaceSlug,
+        datasetName,
+      });
+      await expectDatasetMetaPageDenied(page, { workspaceSlug, datasetId });
+    } finally {
+      if (datasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId,
+        });
+      }
     }
   });
 

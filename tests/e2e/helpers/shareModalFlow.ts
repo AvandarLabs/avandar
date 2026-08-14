@@ -68,6 +68,83 @@ export async function setGeneralAccess(
 }
 
 /**
+ * Selects "Only me" and confirms the stacked warning dialog. Waits for the
+ * dropdown to settle on the new value so callers do not race the mutation.
+ */
+export async function setGeneralAccessToOnlyMe(page: Page): Promise<void> {
+  const dialog = shareDialog(page);
+  await dialog.getByRole("combobox", { name: "General access" }).click();
+  await page.getByRole("option", { name: "Only me" }).click();
+
+  // Mantine derives the confirm dialog's accessible name from its title,
+  // which renders as `Make "<resourceName>" private?`.
+  const confirmDialog = page.getByRole("dialog", { name: /private\?$/ });
+  await expect(confirmDialog).toBeVisible({ timeout: MEDIUM_WAIT });
+  await confirmDialog.getByRole("button", { name: "Make private" }).click();
+  await expect(confirmDialog).toBeHidden({ timeout: MEDIUM_WAIT });
+
+  await expect(
+    dialog.getByRole("combobox", { name: "General access" }),
+  ).toHaveValue("Only me", { timeout: MEDIUM_WAIT });
+}
+
+/**
+ * Matches the PostgREST calls that would persist a General access change:
+ * share rows, the `is_restricted` column on either resource table, and the
+ * make-private RPC. Reads are GETs, so anything else is a write.
+ */
+function isSharingWrite(request: {
+  method: () => string;
+  url: () => string;
+}): boolean {
+  if (request.method() === "GET") {
+    return false;
+  }
+  return /\/rest\/v1\/(resource_shares|datasets|dashboards|rpc\/rpc_resources__)/.test(
+    request.url(),
+  );
+}
+
+/**
+ * Selects "Restricted" from the private state and asserts the intent-only
+ * behaviour: the dropdown moves, and the add-people row unlocks, with no
+ * write behind it.
+ */
+export async function expectRestrictedIsIntentOnly(page: Page): Promise<void> {
+  const dialog = shareDialog(page);
+
+  const writes: string[] = [];
+  const recordWrite = (request: {
+    method: () => string;
+    url: () => string;
+  }): void => {
+    if (isSharingWrite(request)) {
+      writes.push(`${request.method()} ${request.url()}`);
+    }
+  };
+  page.on("request", recordWrite);
+
+  try {
+    await dialog.getByRole("combobox", { name: "General access" }).click();
+    await page.getByRole("option", { name: "Restricted" }).click();
+
+    await expect(
+      dialog.getByRole("combobox", { name: "General access" }),
+    ).toHaveValue("Restricted", { timeout: MEDIUM_WAIT });
+    await expect(
+      dialog.getByRole("combobox", { name: "Add people or user groups" }),
+    ).toBeEnabled({ timeout: MEDIUM_WAIT });
+
+    expect(
+      writes,
+      "Restricted from private must not write to the server",
+    ).toEqual([]);
+  } finally {
+    page.off("request", recordWrite);
+  }
+}
+
+/**
  * Adds a share via the Add combobox, sets role when not viewer, and waits
  * for the principal row to appear.
  */
