@@ -62,7 +62,10 @@ begin
   -- would return success on a still-shared resource, which is the exact
   -- failure mode the function exists to remove. Raise so the whole transaction
   -- rolls back rather than half-landing. Purely a tripwire: no known
-  -- configuration reaches it, so no test provokes it.
+  -- configuration reaches it in production.
+  -- rpc_resources__make_private_rollback.test.sql provokes it by injecting a
+  -- restrictive DELETE policy, which proves the raise really does undo both
+  -- the surviving DELETE and the is_restricted UPDATE.
   --
   -- Repeats util__has_non_owner_share's predicate rather than calling it.
   -- Execute on that helper is revoked from `authenticated` precisely so it
