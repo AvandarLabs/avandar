@@ -254,6 +254,37 @@
 ## Types
 
 - **Never** use `any`.
+- **Never use `as unknown as T` unless the compiler genuinely cannot resolve
+  the relationship.** Routing a value through `unknown` disables every
+  assignability check between the two types, so the cast keeps compiling after
+  the shapes drift apart and the mismatch surfaces at runtime instead.
+
+  When you encounter an `as unknown as T`, remove it and see what the compiler
+  says:
+  - No error: leave it removed. The cast was noise.
+  - An error: fix the underlying type _without_ casting. Usually the real
+    problem is upstream, such as a parameter or field typed `unknown` that
+    should carry a real type.
+  - Only when no fix is possible because the code is already well-structured,
+    fall back to a cast, and prefer the narrowest one that compiles (a single
+    `as T` over `as unknown as T`). Add a comment saying why it is needed.
+
+  The legitimate case is a type too complex for TypeScript to resolve safely,
+  which in practice means complicated generics: a typed dotted path such as
+  `Paths<TConfig>` cannot be satisfied by a runtime `string`.
+
+  ```ts
+  // Bad - the prop is typed `unknown`, so every use needs a cast
+  type Props = { tooltipProps?: unknown };
+  <Chart tooltipProps={tooltipProps as never} />;
+
+  // Good - type the prop, and no cast is needed anywhere
+  type Props = {
+    tooltipProps?: ComponentProps<typeof Chart>["tooltipProps"];
+  };
+  <Chart tooltipProps={tooltipProps} />;
+  ```
+
 - Use `as const` for literals that never change.
 - Use `type` instead of `interface`. **Only** use `interface` for OOP-style
   interfaces implemented by a class.
@@ -495,6 +526,46 @@
     | SubComponent.tsx
   ```
 
+- **Never give a module its own directory until it has a second file.** A
+  directory exists to bundle a unit's colocated siblings into one logical
+  unit, so a `<Name>/` directory holding only `<Name>.<ext>` groups nothing
+  while costing a redundant segment on every import
+  (`.../useDrawerResize/useDrawerResize`). A standalone module stays flat
+  beside its peers; create the directory at the moment a second co-named file
+  (a `.test`, a `.module.css`, a `.types`, a sub-component) actually appears,
+  and collapse the directory again if that sibling goes away. This applies to
+  components, hooks, and plain `.ts` modules alike.
+
+  Exceptions: 1) the directory also contains subdirectories, so it is a real
+  grouping node; 2) a framework assigns the directory meaning, such as a route
+  segment, so the path is not free to change. A category directory that groups
+  by topic rather than by unit (`auth/useAuth.ts`) is not affected: its single
+  child is not named after it.
+
+  This is bad (each nested directory holds exactly one file):
+
+  ```plaintext
+  DataExplorerDrawer
+    | DataExplorerDrawer.tsx
+    | useDrawerResize
+      | useDrawerResize.ts
+    | QueryTabPanel
+      | QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that really
+  has siblings keeps a directory):
+
+  ```plaintext
+  DataExplorerDrawer
+    | DataExplorerDrawer.tsx
+    | useDrawerResize.ts
+    | QueryTabPanel.tsx
+    | DrawerHeight
+      | DrawerHeight.ts
+      | DrawerHeight.test.ts
+  ```
+
 - **Never colocate route components with a `-` prefix under `src/routes/`.**
   TanStack Router drops any file or directory whose name starts with `-` from
   the route tree (`routeFileIgnorePrefix: "-"`), so a `-DisplayNameSection.tsx`
@@ -531,40 +602,9 @@
   files exporting the contents of our libraries in `packages/`.
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
-  couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
-- The converse also holds: a module with no co-named sibling must NOT get a
-  directory of its own. A directory exists to group siblings, so
-  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
-  nothing, and it costs a redundant path segment on every import
-  (`.../MyFile/MyFile`). Leave the lone file next to its parent
-  (`.../MyFile.tsx`) and create the directory at the moment a second
-  co-named file appears. This applies to every kind of module: components,
-  hooks, and plain `.ts` modules alike.
-
-  This is bad (each directory holds exactly one file):
-
-  ```text
-  DataExplorerDrawer/
-    DataExplorerDrawer.tsx
-    useDrawerResize/
-      useDrawerResize.ts
-    QueryTabPanel/
-      QueryTabPanel.tsx
-  ```
-
-  This is good (the lone files sit with their parent; only the unit that
-  really has siblings keeps a directory):
-
-  ```text
-  DataExplorerDrawer/
-    DataExplorerDrawer.tsx
-    useDrawerResize.ts
-    QueryTabPanel.tsx
-    DrawerHeight/
-      DrawerHeight.ts
-      DrawerHeight.test.ts
-  ```
-
+  couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`. The
+  converse is the single-file directory rule above: remove the directory again
+  once a unit is back to one file.
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.

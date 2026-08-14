@@ -183,7 +183,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "表单不支持 UNION/INTERSECT/EXCEPT。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "图表设置"
 
@@ -625,6 +625,10 @@ msgstr "密码重置需要互联网连接。"
 msgid "Symbol size"
 msgstr "符号大小"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis minimum"
+msgstr "Y 轴最小值"
+
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
@@ -791,6 +795,10 @@ msgstr "范围"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "输入电子邮件"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis minimum"
+msgstr "X 轴最小值"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -993,6 +1001,10 @@ msgstr "自定义"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "时间戳"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis tick interval"
+msgstr "Y 轴刻度间隔"
 
 #: src/routes/register.tsx
 #: src/routes/signin.tsx
@@ -2107,6 +2119,10 @@ msgstr "本地过滤器（可由查看者编辑，仅此图表）"
 msgid "Invalid X axis selected"
 msgstr "选择了无效的 X 轴"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis maximum"
+msgstr "X 轴最大值"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
@@ -2161,6 +2177,10 @@ msgstr "确认操作"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "数据预览"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Y axis maximum"
+msgstr "Y 轴最大值"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is not null"
@@ -2270,6 +2290,10 @@ msgstr "离线聊天模型已准备好。点击切换或重新下载。"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "正在捕获仪表板…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis tick interval"
+msgstr "X 轴刻度间隔"
 
 #: src/routes/register.tsx
 msgid "This is an invalid waitlist code"
@@ -2861,6 +2885,10 @@ msgstr "计算 {datasetName} 中有多少行"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在生成 SQL…"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "X axis label rotation"
+msgstr "X 轴标签旋转角度"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
