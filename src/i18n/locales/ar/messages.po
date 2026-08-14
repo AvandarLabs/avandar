@@ -43,7 +43,7 @@ msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها مت�
 
 #: src/config/AppLinks.tsx
 msgid "Create new entity"
-msgstr ""
+msgstr "إنشاء كيان جديد"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -117,7 +117,7 @@ msgstr "إدخال JOIN في الموضع {index} ليس مرجعًا لجدول
 
 #: src/config/AppLinks.tsx
 msgid "Geo Explorer"
-msgstr ""
+msgstr "Geo Explorer"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -449,7 +449,7 @@ msgstr "حولك"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
-msgstr ""
+msgstr "تعذّر مزامنة مجموعة البيانات عبر الإنترنت"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -538,7 +538,7 @@ msgstr "متوسط"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "There was an error loading Google services."
-msgstr ""
+msgstr "حدث خطأ أثناء تحميل خدمات Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -943,7 +943,7 @@ msgstr "إخفاء العنوان"
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
-msgstr ""
+msgstr "تم اقتطاع بيانات {0}"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -992,7 +992,7 @@ msgstr "يساوي..."
 
 #: src/config/AppLinks.tsx
 msgid "Profile Designer"
-msgstr ""
+msgstr "مصمم الملف الشخصي"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1685,7 +1685,8 @@ msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها ع
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
-msgstr ""
+msgstr "يرجى التحديث والمحاولة مرة أخرى. إذا استمرت المشكلة، يرجى التواصل مع "
+"الدعم"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
@@ -1696,7 +1697,7 @@ msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عل�
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
-msgstr ""
+msgstr "يتوفر تحديث"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1838,7 +1839,7 @@ msgstr "رئيسي"
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Unable to publish dashboard"
-msgstr ""
+msgstr "تعذّر نشر لوحة المعلومات"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -2004,7 +2005,7 @@ msgstr "نص التعليق:"
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "A new version is available. Refresh to update."
-msgstr ""
+msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2868,7 +2869,7 @@ msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع
 
 #: src/config/AppLinks.tsx
 msgid "Home"
-msgstr ""
+msgstr "الصفحة الرئيسية"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -3287,7 +3288,7 @@ msgstr "كبير"
 
 #: src/config/AppLinks.tsx
 msgid "Invalid workspace"
-msgstr ""
+msgstr "مساحة عمل غير صالحة"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3835,7 +3836,7 @@ msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Some datasets are not synced online yet or failed to publish."
-msgstr ""
+msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو تعذّر نشرها."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -4433,7 +4434,7 @@ msgstr "جارٍ تسجيل دخولك مرة أخرى…"
 #. placeholder {3}: limit.max
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
-msgstr ""
+msgstr "يمكن لـ {0} عرض ما يصل إلى {1} {2} فقط، لذا يتم عرض أول {3} فقط."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -5105,7 +5106,7 @@ msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "File parsed successfully"
-msgstr ""
+msgstr "تم تحليل الملف بنجاح"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"

@@ -43,7 +43,7 @@ msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
 
 #: src/config/AppLinks.tsx
 msgid "Create new entity"
-msgstr ""
+msgstr "Unda huluki mpya"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -118,7 +118,7 @@ msgstr "Ingizo la JOIN katika nafasi ya {index} si rejeleo la jedwali "
 
 #: src/config/AppLinks.tsx
 msgid "Geo Explorer"
-msgstr ""
+msgstr "Kichunguzi cha Geo"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -454,7 +454,7 @@ msgstr "Kuhusu wewe"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
-msgstr ""
+msgstr "Imeshindikana kusawazisha mkusanyiko wa data mtandaoni"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -544,7 +544,7 @@ msgstr "Kiwango cha wastani"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "There was an error loading Google services."
-msgstr ""
+msgstr "Kulikuwa na hitilafu wakati wa kupakia huduma za Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -954,7 +954,7 @@ msgstr "Ficha kichwa"
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
-msgstr ""
+msgstr "Data ya {0} imekatwa"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1003,7 +1003,7 @@ msgstr "ni sawa na..."
 
 #: src/config/AppLinks.tsx
 msgid "Profile Designer"
-msgstr ""
+msgstr "Mbuni wa Wasifu"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1706,7 +1706,8 @@ msgstr "Tuambie ni dataset gani ya wazi unayotaka kupitia maoni"
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
-msgstr ""
+msgstr "Tafadhali onyesha upya na ujaribu tena. Ikiwa bado haifanyi kazi, "
+"tafadhali wasiliana na usaidizi"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
@@ -1718,7 +1719,7 @@ msgstr "Export dashboard hii kama PDF, au chora kwanza. Maelezo yanasaidia "
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
-msgstr ""
+msgstr "Sasisho linapatikana"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1861,7 +1862,7 @@ msgstr "Kuu"
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Unable to publish dashboard"
-msgstr ""
+msgstr "Imeshindikana kuchapisha dashibodi"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -2030,7 +2031,7 @@ msgstr "Maandishi ya maelezo:"
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "A new version is available. Refresh to update."
-msgstr ""
+msgstr "Toleo jipya linapatikana. Onyesha upya ili kusasisha."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2908,7 +2909,7 @@ msgstr "Unda dashibodi yako ya kwanza kufuatilia vipimo na maarifa muhimu."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
-msgstr ""
+msgstr "Nyumbani"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -3330,7 +3331,7 @@ msgstr "Kubwa"
 
 #: src/config/AppLinks.tsx
 msgid "Invalid workspace"
-msgstr ""
+msgstr "Nafasi ya kazi si sahihi"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3886,7 +3887,8 @@ msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Some datasets are not synced online yet or failed to publish."
-msgstr ""
+msgstr "Baadhi ya mikusanyiko ya data bado haijasawazishwa mtandaoni au "
+"imeshindwa kuchapishwa."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -4491,7 +4493,8 @@ msgstr "Inakuingiza tena…"
 #. placeholder {3}: limit.max
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
-msgstr ""
+msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo inaonyesha {3} za "
+"kwanza pekee."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -5172,7 +5175,7 @@ msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "File parsed successfully"
-msgstr ""
+msgstr "Faili imechanganuliwa kwa mafanikio"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"

@@ -42,7 +42,7 @@ msgstr "返回線上以查看或使頁面可離線使用。"
 
 #: src/config/AppLinks.tsx
 msgid "Create new entity"
-msgstr ""
+msgstr "建立新實體"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -113,7 +113,7 @@ msgstr "位置 {index} 的 JOIN 項目不是純資料表參照。"
 
 #: src/config/AppLinks.tsx
 msgid "Geo Explorer"
-msgstr ""
+msgstr "地理探索器"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -442,7 +442,7 @@ msgstr "關於您"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
-msgstr ""
+msgstr "無法在線上同步資料集"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -527,7 +527,7 @@ msgstr "平均值"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "There was an error loading Google services."
-msgstr ""
+msgstr "載入 Google 服務時發生錯誤。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -918,7 +918,7 @@ msgstr "隱藏標題"
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
-msgstr ""
+msgstr "{0} 筆資料已截斷"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -967,7 +967,7 @@ msgstr "等於..."
 
 #: src/config/AppLinks.tsx
 msgid "Profile Designer"
-msgstr ""
+msgstr "設定檔設計器"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1641,7 +1641,7 @@ msgstr "通過反饋告訴我們您想要的開放資料集"
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
-msgstr ""
+msgstr "請重新整理後再試一次。如果仍無法運作，請聯絡支援服務"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
@@ -1651,7 +1651,7 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
-msgstr ""
+msgstr "有可用的更新"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1790,7 +1790,7 @@ msgstr "主要"
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Unable to publish dashboard"
-msgstr ""
+msgstr "無法發佈儀表板"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -1952,7 +1952,7 @@ msgstr "標註文本："
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "A new version is available. Refresh to update."
-msgstr ""
+msgstr "有新版本可用。請重新整理以更新。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2796,7 +2796,7 @@ msgstr "建立您的第一個儀表板以追蹤關鍵指標和洞察。"
 
 #: src/config/AppLinks.tsx
 msgid "Home"
-msgstr ""
+msgstr "首頁"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -3209,7 +3209,7 @@ msgstr "大"
 
 #: src/config/AppLinks.tsx
 msgid "Invalid workspace"
-msgstr ""
+msgstr "無效的工作區"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3747,7 +3747,7 @@ msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Some datasets are not synced online yet or failed to publish."
-msgstr ""
+msgstr "部分資料集尚未在線上同步，或發佈失敗。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -4339,7 +4339,7 @@ msgstr "正在重新登入…"
 #. placeholder {3}: limit.max
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
-msgstr ""
+msgstr "{0} 最多只能呈現 {1} 個 {2}，因此僅顯示前 {3} 個。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4995,7 +4995,7 @@ msgstr "只有您可以存取此 {resource}。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "File parsed successfully"
-msgstr ""
+msgstr "檔案剖析成功"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"

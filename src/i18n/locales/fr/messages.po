@@ -46,7 +46,7 @@ msgstr "Retour en ligne pour visualiser ou rendre la page disponible hors "
 
 #: src/config/AppLinks.tsx
 msgid "Create new entity"
-msgstr ""
+msgstr "Créer une nouvelle entité"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -122,7 +122,7 @@ msgstr "L’entrée JOIN à la position {index} n’est pas une référence de t
 
 #: src/config/AppLinks.tsx
 msgid "Geo Explorer"
-msgstr ""
+msgstr "Explorateur géographique"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -460,7 +460,7 @@ msgstr "À propos de vous"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
-msgstr ""
+msgstr "Impossible de synchroniser le jeu de données en ligne"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -553,7 +553,7 @@ msgstr "Moyenne"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "There was an error loading Google services."
-msgstr ""
+msgstr "Une erreur s’est produite lors du chargement des services Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -966,7 +966,7 @@ msgstr "Masquer le titre"
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
-msgstr ""
+msgstr "Données {0} tronquées"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1015,7 +1015,7 @@ msgstr "est égal à..."
 
 #: src/config/AppLinks.tsx
 msgid "Profile Designer"
-msgstr ""
+msgstr "Concepteur de profil"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1730,7 +1730,8 @@ msgstr "Dites-nous quel jeu de données ouvert vous souhaitez via vos retours"
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
-msgstr ""
+msgstr "Veuillez actualiser la page, puis réessayer. Si le problème persiste, "
+"veuillez contacter le support."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
@@ -1742,7 +1743,7 @@ msgstr "Exportez ce tableau de bord en tant que PDF, ou esquissez-le d'abord. "
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
-msgstr ""
+msgstr "Mise à jour disponible"
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1885,7 +1886,7 @@ msgstr "Principal"
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Unable to publish dashboard"
-msgstr ""
+msgstr "Impossible de publier le tableau de bord"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -2054,7 +2055,8 @@ msgstr "Texte de l'annotation :"
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "A new version is available. Refresh to update."
-msgstr ""
+msgstr "Une nouvelle version est disponible. Actualisez la page pour effectuer "
+"la mise à jour."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2941,7 +2943,7 @@ msgstr "Créez votre premier tableau de bord pour suivre les indicateurs clés e
 
 #: src/config/AppLinks.tsx
 msgid "Home"
-msgstr ""
+msgstr "Accueil"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -3365,7 +3367,7 @@ msgstr "Grand"
 
 #: src/config/AppLinks.tsx
 msgid "Invalid workspace"
-msgstr ""
+msgstr "Espace de travail non valide"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3929,7 +3931,8 @@ msgstr "Aucun filtre de ligne. La tranche inclura chaque ligne du jeu de "
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Some datasets are not synced online yet or failed to publish."
-msgstr ""
+msgstr "Certains jeux de données ne sont pas encore synchronisés en ligne ou "
+"n’ont pas pu être publiés."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -4539,7 +4542,8 @@ msgstr "Reconnexion en cours…"
 #. placeholder {3}: limit.max
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
-msgstr ""
+msgstr "Le {0} ne peut afficher que {1} {2} au maximum. Seuls les {3} premiers "
+"sont donc affichés."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -5228,7 +5232,7 @@ msgstr "Vous seul avez accès à ce {resource}."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "File parsed successfully"
-msgstr ""
+msgstr "Fichier analysé avec succès"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
