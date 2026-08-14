@@ -52,6 +52,8 @@ export const DB_ANALYTICS_EVENT_NAMES = [
   "workspace.invite_sent",
   "workspace.invite_accepted",
   "member.removed",
+  "dataset.deleted",
+  "dashboard.deleted",
   "subscription.created",
   "subscription.plan_changed",
   "subscription.status_changed",
@@ -76,6 +78,53 @@ export type ServerAnalyticsEventName =
 export type DbAnalyticsEventName = (typeof DB_ANALYTICS_EVENT_NAMES)[number];
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
 
+type DatasetImportedPayload = {
+  datasetId: string;
+  sourceType: "csv_file" | "google_sheets" | "xlsx_file";
+  columnCount: number;
+  rowCount: number;
+  isFirstInWorkspace: boolean;
+};
+
+/**
+ * Written by the `datasets` delete trigger, not by a TypeScript emitter. Named
+ * here so reporting has one place to look up the shape.
+ */
+type DatasetDeletedPayload = {
+  datasetId: string;
+  sourceType: Database["public"]["Enums"]["datasets__source_type"];
+  ageDays: number;
+};
+
+/** Written by the `dashboards` delete trigger. See `DatasetDeletedPayload`. */
+type DashboardDeletedPayload = {
+  dashboardId: string;
+  wasPublic: boolean;
+  ageDays: number;
+};
+
+type DashboardBlockAddedViaChatPayload = {
+  blockKind: string;
+  vizType?: string;
+  dashboardId?: string;
+  blockCountAfter?: number;
+};
+
+type DashboardFilterChangedPayload = {
+  dashboardId: string;
+  filterId: string;
+  mode: "select_single" | "select_multi" | "contains";
+  wasCleared: boolean;
+};
+
+type ChatMessageSentPayload = {
+  promptChars: number;
+  pageApp: ChatPageContext.ChatApp;
+  modelId?: string;
+  runtimeMode: "cloud" | "local";
+  hasOpenDataset: boolean;
+};
+
 /**
  * Payload shape per event. Written as a mapped type over
  * `AnalyticsEventName`, so adding a name to a list above without giving it a
@@ -89,16 +138,26 @@ export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
  */
 export type AnalyticsEventPayloads = {
   [K in AnalyticsEventName]: K extends "dataset.imported" ?
-    { datasetId: string; sourceType: string }
+    DatasetImportedPayload
   : K extends "dashboard.published" ?
-    { dashboardId: string; wasPreviouslyPublic: boolean }
+    { dashboardId: string; blockCount: number; hasVanitySlug: boolean }
+  : K extends "dashboard.share_settings_updated" ?
+    { dashboardId: string; slugAction: "set" | "clear" | "unchanged" }
   : K extends "dashboard.block_added_via_chat" ?
-    { blockKind: string; vizType?: string; dashboardId?: string }
-  : K extends "dashboard.filter_changed" ? { filterId: string; mode: string }
+    DashboardBlockAddedViaChatPayload
+  : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload
   : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
-  : K extends "chat.message_sent" ? { app: ChatPageContext.ChatApp }
+  : K extends "dataset.deleted" ? DatasetDeletedPayload
+  : K extends "dashboard.deleted" ? DashboardDeletedPayload
+  : K extends "chat.message_sent" ? ChatMessageSentPayload
+  : K extends "chat.sql_generated" ? { sqlChars: number }
   : undefined;
 };
+
+type AnalyticsEventWithPayload<K extends AnalyticsEventName> =
+  AnalyticsEventPayloads[K] extends undefined ?
+    { event: K; payload?: undefined }
+  : { event: K; payload: AnalyticsEventPayloads[K] };
 
 /**
  * Discriminated union pairing each client-emitted event with its own payload,
@@ -107,16 +166,10 @@ export type AnalyticsEventPayloads = {
  * their signatures.
  */
 export type ClientAnalyticsEvent = {
-  [K in ClientAnalyticsEventName]: {
-    event: K;
-    payload?: AnalyticsEventPayloads[K];
-  };
+  [K in ClientAnalyticsEventName]: AnalyticsEventWithPayload<K>;
 }[ClientAnalyticsEventName];
 
 /** The same pairing for edge-function emitted events. */
 export type ServerAnalyticsEvent = {
-  [K in ServerAnalyticsEventName]: {
-    event: K;
-    payload?: AnalyticsEventPayloads[K];
-  };
+  [K in ServerAnalyticsEventName]: AnalyticsEventWithPayload<K>;
 }[ServerAnalyticsEventName];

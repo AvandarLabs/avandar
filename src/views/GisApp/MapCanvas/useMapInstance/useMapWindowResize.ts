@@ -4,7 +4,7 @@ import type { RefObject } from "react";
 
 /** Resizes a live MapLibre map when its browser viewport changes. */
 export function useMapWindowResize(
-  mapRef: RefObject<MapLibreMap | undefined>,
+  mapRef: Readonly<RefObject<MapLibreMap | undefined>>,
 ): void {
   useEffect(
     function resizeMapWithWindow() {

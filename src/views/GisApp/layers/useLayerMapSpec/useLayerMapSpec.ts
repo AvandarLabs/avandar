@@ -2,8 +2,8 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { useMemo } from "react";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { useLayerFeatureCollection } from "@/views/GisApp/layers/useLayerFeatureCollection";
-import { useRenderedLayerSpec } from "@/views/GisApp/layers/useRenderedLayerSpec";
+import { useLayerFeatureCollection } from "@/views/GisApp/layers/useLayerMapSpec/useLayerFeatureCollection";
+import { useRenderedLayerSpec } from "@/views/GisApp/layers/useLayerMapSpec/useRenderedLayerSpec";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
@@ -14,10 +14,10 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 export type LayerMapSpec = {
   spec: MapSpec;
   fitBounds: MapBounds | undefined;
-  interactiveLayerIds: readonly string[];
+  interactiveLayerIds: string[];
   featureCount: number;
   hasBinding: boolean;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 };
 
 /**
@@ -46,10 +46,10 @@ export type LayerMapSpec = {
 export function useLayerMapSpec({
   layer,
   queryResult,
-}: {
+}: Readonly<{
   layer: MapLayer.T;
   queryResult: QueryResult.T<UnknownRow> | undefined;
-}): LayerMapSpec {
+}>): LayerMapSpec {
   const { geoBinding, id: layerId, sensitivity } = layer;
   const { queryColumns } = layer.source;
 

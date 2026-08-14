@@ -2,13 +2,13 @@ import maplibregl from "maplibre-gl";
 import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useMapInstance/useLatestMapValues";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
 /** The baseline a freshly loaded style starts from: nothing applied yet. */
-export const EMPTY_MAP_SPEC: MapSpec = { sources: {}, layers: [] };
+const EMPTY_MAP_SPEC: MapSpec = { sources: {}, layers: [] };
 
 /** Mutable state owned by a single MapLibre instance. */
 export type MapInstanceRefs = {
@@ -16,6 +16,24 @@ export type MapInstanceRefs = {
   appliedSpecRef: RefObject<MapSpec>;
   appliedStyleKeyRef: RefObject<string | undefined>;
   isStyleSwapPendingRef: RefObject<boolean>;
+};
+
+type CreateStyleLoadHandlerOptions = {
+  emptySpec: MapSpec;
+  instanceRefs: MapInstanceRefs;
+  latestValues: LatestMapValues;
+  map: MapLibreMap;
+  setStyleLoadCount: Dispatch<SetStateAction<number>>;
+};
+
+type AttachMapInstanceOptions = {
+  basemap: AvaMap.Basemap;
+  container: HTMLDivElement;
+  emptySpec: MapSpec;
+  instanceRefs: MapInstanceRefs;
+  latestValues: LatestMapValues;
+  setStyleLoadCount: Dispatch<SetStateAction<number>>;
+  view: AvaMap.ViewState;
 };
 
 /** Creates a MapLibre map with the controls used by the GIS canvas. */
@@ -43,10 +61,13 @@ function _createMapLibreInstance({
 }
 
 /** Creates the single map-level click handler used by every rendered layer. */
-function _createMapClickHandler(
-  map: MapLibreMap,
-  latestValues: LatestMapValues,
-): (event: maplibregl.MapMouseEvent) => void {
+function _createMapClickHandler({
+  latestValues,
+  map,
+}: {
+  latestValues: LatestMapValues;
+  map: MapLibreMap;
+}): (event: maplibregl.MapMouseEvent) => void {
   return (event) => {
     const layerIds = latestValues.interactiveLayerIdsRef.current.filter(
       (layerId) => {
@@ -72,13 +93,7 @@ function _createStyleLoadHandler({
   latestValues,
   map,
   setStyleLoadCount,
-}: {
-  emptySpec: MapSpec;
-  instanceRefs: MapInstanceRefs;
-  latestValues: LatestMapValues;
-  map: MapLibreMap;
-  setStyleLoadCount: Dispatch<SetStateAction<number>>;
-}): () => void {
+}: CreateStyleLoadHandlerOptions): () => void {
   return () => {
     instanceRefs.appliedSpecRef.current = emptySpec;
     instanceRefs.isStyleSwapPendingRef.current = false;
@@ -92,7 +107,6 @@ function _createStyleLoadHandler({
   };
 }
 
-/** Creates, wires, and returns cleanup for one MapLibre instance. */
 function _attachMapInstance({
   basemap,
   container,
@@ -101,19 +115,11 @@ function _attachMapInstance({
   latestValues,
   setStyleLoadCount,
   view,
-}: {
-  basemap: AvaMap.Basemap;
-  container: HTMLDivElement;
-  emptySpec: MapSpec;
-  instanceRefs: MapInstanceRefs;
-  latestValues: LatestMapValues;
-  setStyleLoadCount: Dispatch<SetStateAction<number>>;
-  view: AvaMap.ViewState;
-}): () => void {
+}: Readonly<AttachMapInstanceOptions>): () => void {
   const map = _createMapLibreInstance({ basemap, container, view });
   instanceRefs.mapRef.current = map;
   instanceRefs.appliedStyleKeyRef.current = BasemapStyle.toKey(basemap);
-  const onMapClick = _createMapClickHandler(map, latestValues);
+  const onMapClick = _createMapClickHandler({ map, latestValues });
   const onStyleLoad = _createStyleLoadHandler({
     emptySpec,
     instanceRefs,
@@ -137,5 +143,12 @@ function _attachMapInstance({
 
 /** Lifecycle helpers for constructing and wiring a MapLibre instance. */
 export const MapInstanceHelpers = {
+  /** The baseline a freshly loaded style starts from: nothing applied yet. */
+  emptySpec: EMPTY_MAP_SPEC,
+
+  /** Creates, wires, and returns cleanup for one MapLibre instance. */
   attach: _attachMapInstance,
+} satisfies {
+  emptySpec: MapSpec;
+  attach: typeof _attachMapInstance;
 };

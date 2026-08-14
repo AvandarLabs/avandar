@@ -23,7 +23,7 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 export function LayerSymbolColorField({
   layer,
   onLayerChange,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   return (
     <ColorInput
