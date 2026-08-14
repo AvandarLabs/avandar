@@ -1706,10 +1706,6 @@ msgstr "顯示 SQL"
 msgid "Grid"
 msgstr "網格"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Search models"
-msgstr "搜尋模型"
-
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "無法同步此實體"
@@ -2399,6 +2395,10 @@ msgstr "角色"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "is null"
 msgstr "為空"
+
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Open models"
+msgstr "開放模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -3843,10 +3843,6 @@ msgstr "請求功能"
 msgid "Description"
 msgstr "描述"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Loading models..."
-msgstr "加載模型中..."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
 msgstr "更新頻率"
@@ -5160,7 +5156,7 @@ msgstr "作者"
 msgid "Add filter"
 msgstr "新增篩選器"
 
-#: src/components/ChatPanel/useChatModelCatalog.ts
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Offline models"
 msgstr "離線模型"
 
@@ -5930,6 +5926,10 @@ msgstr "面積圖"
 msgid "Invalid date"
 msgstr "無效的日期"
 
+#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
+msgid "Frontier models"
+msgstr "前沿模型"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "頁面標題"
@@ -5988,10 +5988,6 @@ msgstr "升級計劃至 {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "No models match your search"
-msgstr "沒有模型符合您的搜尋"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

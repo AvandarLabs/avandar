@@ -2,13 +2,13 @@ import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { AppConfig } from "@/config/AppConfig";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { notifyError } from "@/utils/notifications/notify";
 import {
@@ -95,7 +95,7 @@ export type DataSourceMetadata =
   | GoogleSheetsDataSourceMetadata;
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
-  AppConfig.dataManagerApp;
+  GlobalAppConfig.dataManagerApp;
 
 const VALIDATION_FIELD_ORDER = ["name", "description"] as const;
 
@@ -122,7 +122,7 @@ function useErrorMessageForField(): (
 type Props = {
   /**
    * Regardless of how many rows are passed in, only the first
-   * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
+   * `GlobalAppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
   rows: UnknownObject[];
   initialDatasetName: string;
@@ -212,7 +212,7 @@ export function DatasetImportForm({
   const offline = useOfflineGate();
 
   const previewRows = useMemo(() => {
-    return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
+    return rows.slice(0, GlobalAppConfig.dataManagerApp.maxPreviewRows);
   }, [rows]);
 
   const onValidationFailure = (
