@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 vi.mock("$/env/getSupabaseApiUrl.ts", () => {
@@ -62,6 +62,10 @@ describe("ResourceShareClient.upsertResourceShare", () => {
 });
 
 describe("ResourceShareClient.makeResourcePrivate", () => {
+  beforeEach(() => {
+    rpcMock.mockReset();
+  });
+
   it("passes arguments through with p_ prefixes", async () => {
     rpcMock.mockResolvedValueOnce({ data: null, error: null });
 

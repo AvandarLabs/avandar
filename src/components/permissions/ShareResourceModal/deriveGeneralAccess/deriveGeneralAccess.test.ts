@@ -33,33 +33,35 @@ function share(
 
 describe("hasNonOwnerShare", () => {
   it("is false with no shares", () => {
-    expect(hasNonOwnerShare([], OWNER_ID)).toBe(false);
+    expect(hasNonOwnerShare({ shares: [], ownerId: OWNER_ID })).toBe(false);
   });
 
   it("is false for the owner's own user share", () => {
     expect(
-      hasNonOwnerShare(
-        [share({ principalType: "user", principalId: OWNER_ID })],
-        OWNER_ID,
-      ),
+      hasNonOwnerShare({
+        shares: [share({ principalType: "user", principalId: OWNER_ID })],
+        ownerId: OWNER_ID,
+      }),
     ).toBe(false);
   });
 
   it("is true for a user share to someone else", () => {
     expect(
-      hasNonOwnerShare(
-        [share({ principalType: "user", principalId: "other-1" })],
-        OWNER_ID,
-      ),
+      hasNonOwnerShare({
+        shares: [share({ principalType: "user", principalId: "other-1" })],
+        ownerId: OWNER_ID,
+      }),
     ).toBe(true);
   });
 
   it("is true for a group share", () => {
     expect(
-      hasNonOwnerShare(
-        [share({ principalType: "user_group", principalId: "group-1" })],
-        OWNER_ID,
-      ),
+      hasNonOwnerShare({
+        shares: [
+          share({ principalType: "user_group", principalId: "group-1" }),
+        ],
+        ownerId: OWNER_ID,
+      }),
     ).toBe(true);
   });
 
@@ -68,10 +70,10 @@ describe("hasNonOwnerShare", () => {
   // would report a workspace-shared resource as private.
   it("is true for a workspace share with a null principalId", () => {
     expect(
-      hasNonOwnerShare(
-        [share({ principalType: "workspace", principalId: null })],
-        OWNER_ID,
-      ),
+      hasNonOwnerShare({
+        shares: [share({ principalType: "workspace", principalId: null })],
+        ownerId: OWNER_ID,
+      }),
     ).toBe(true);
   });
 });

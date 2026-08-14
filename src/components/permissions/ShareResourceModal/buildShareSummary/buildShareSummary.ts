@@ -72,15 +72,27 @@ export function buildShareSummary(
     // practice only the owner reaches this branch: the owner short-circuits to
     // `admin` in `util__resource_effective_role`, while a non-owner resolves to
     // `null` on a resource that is restricted with no non-owner shares (a
-    // Settings Admin included, which P1 narrowed deliberately), so they cannot
-    // read the row at all. Any non-owner share would have populated `shares`
-    // and routed us to the "is shared with" sentence instead.
+    // Settings Admin included, which the settings-admin narrowing did
+    // deliberately), so they cannot read the row at all. Any non-owner share
+    // would have populated `shares` and routed us to the "is shared with"
+    // sentence instead.
     //
-    // The known exception is a public dashboard: it stays world-readable
+    // One known exception is a public dashboard: it stays world-readable
     // however `is_restricted` is set, and a Settings Admin keeps `admin` on it,
     // so they could see this line. This modal has no publication state to key
     // off, so that is left to the publication UI. If the settings-admin
     // narrowing is ever widened further, this copy starts lying.
+    //
+    // The other is a restricted resource that still carries a live
+    // workspace-principal share row: `hasAnyShares` counts only `user` and
+    // `user_group` rows, so that state reaches this branch even though every
+    // workspace member holds the share's role via the share-rank merge in
+    // `util__resource_effective_role`, making this copy wrong. It is reachable
+    // because the restricted transition writes `setResourceRestricted` and
+    // `deleteShare` as separate mutations, so a failed delete persists it.
+    // `deriveGeneralAccessValue` classifies that same state as "restricted",
+    // not "private", so the two modules disagree there. Fixing it needs a new
+    // user-facing sentence, which is out of scope here.
     return [
       {
         kind: "text",

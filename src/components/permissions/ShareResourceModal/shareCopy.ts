@@ -1,3 +1,4 @@
+import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { AppType } from "$/models/Permissions/Permissions.types";
@@ -9,6 +10,13 @@ import type { AppType } from "$/models/Permissions/Permissions.types";
 export function appForResource(type: ResourceType): AppType {
   return type === "dashboard" ? "dashboards" : "data_sources";
 }
+
+/** The rendered strings for the "Make private" confirmation dialog. */
+export type MakePrivateConfirmCopy = {
+  title: string;
+  body: string;
+  confirmLabel: string;
+};
 
 export type ShareCopy = {
   addPlaceholder: string;
@@ -26,7 +34,7 @@ export type ShareCopy = {
     numGroups: number;
     losesWorkspaceAccess: boolean;
     app: string;
-  }) => { title: string; body: string; confirmLabel: string };
+  }) => MakePrivateConfirmCopy;
   limitToAppAccessTooltip: (app: string) => string;
   roleSelectTooltip: string;
   removeTooltip: (name: string) => string;
@@ -69,28 +77,32 @@ export function useShareCopy(): ShareCopy {
       numGroups,
       losesWorkspaceAccess,
       app,
-    }): { title: string; body: string; confirmLabel: string } => {
+    }): MakePrivateConfirmCopy => {
       // Both count branches are written out with `t` instead of Lingui's
       // `plural` macro, which binds to a different i18n instance than the
       // runtime `t` returned by `useLingui()`.
       const peopleClause =
-        numUsers === 0 ? ""
+        numUsers === 0 ? undefined
         : numUsers === 1 ? t`1 person`
         : t`${numUsers} people`;
       const groupClause =
-        numGroups === 0 ? ""
+        numGroups === 0 ? undefined
         : numGroups === 1 ? t`1 group`
         : t`${numGroups} groups`;
       const shareClause =
-        peopleClause && groupClause ?
+        peopleClause !== undefined && groupClause !== undefined ?
           t`${peopleClause} and ${groupClause}`
-        : peopleClause || groupClause;
+        : (peopleClause ?? groupClause);
 
       const sentences = [
-        shareClause ? t`${shareClause} will lose access.` : "",
-        losesWorkspaceAccess ? t`Everyone in ${app} will lose access.` : "",
+        shareClause !== undefined ?
+          t`${shareClause} will lose access.`
+        : undefined,
+        losesWorkspaceAccess ?
+          t`Everyone in ${app} will lose access.`
+        : undefined,
         t`Only you will be able to open it. You can share it again at any time.`,
-      ].filter(Boolean);
+      ].filter(isDefined);
 
       return {
         title: t`Make "${resourceName}" private?`,

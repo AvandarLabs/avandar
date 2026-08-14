@@ -25,11 +25,15 @@ export type GeneralAccessOption = {
  * and group rows and reports a shared resource as private.
  */
 export function hasNonOwnerShare(
-  shares: readonly ResourceShareRow[],
-  ownerId: string,
+  options: Readonly<{
+    shares: readonly ResourceShareRow[];
+    ownerId: string;
+  }>,
 ): boolean {
-  return shares.some((share) => {
-    return share.principalType !== "user" || share.principalId !== ownerId;
+  return options.shares.some((share) => {
+    return (
+      share.principalType !== "user" || share.principalId !== options.ownerId
+    );
   });
 }
 
@@ -46,7 +50,10 @@ export function deriveGeneralAccessValue(
   if (!options.isRestricted) {
     return "workspace";
   }
-  const isSharedWithOthers = hasNonOwnerShare(options.shares, options.ownerId);
+  const isSharedWithOthers = hasNonOwnerShare({
+    shares: options.shares,
+    ownerId: options.ownerId,
+  });
   return isSharedWithOthers ? "restricted" : "private";
 }
 
