@@ -22,7 +22,10 @@ type Props = {
 };
 
 /** Popover control that opens the active layer's query and style fields. */
-export function LayerFormPopover({ layer, onLayerChange }: Props): ReactNode {
+export function LayerFormPopover({
+  layer,
+  onLayerChange,
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
   return (

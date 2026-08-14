@@ -22,7 +22,7 @@ export function NavbarLinkItem({
     <>
       <Box mr="xs">{icon}</Box>
       <Text span fw={500} className={css.collapsibleText}>
-        {link.label}
+        {link.label()}
       </Text>
     </>
   );

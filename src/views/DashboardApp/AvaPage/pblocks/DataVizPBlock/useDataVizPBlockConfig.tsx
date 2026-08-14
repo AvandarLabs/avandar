@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
+import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { useMemo } from "react";
@@ -67,7 +68,7 @@ export function useDataVizPBlockConfig(options: {
           type: "select",
           options: VizTypes.map((vizType) => {
             return {
-              label: VizConfigs.getDisplayName(vizType),
+              label: vizTypeLabel(vizType),
               value: vizType,
             };
           }),

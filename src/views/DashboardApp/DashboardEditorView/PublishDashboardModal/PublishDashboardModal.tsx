@@ -10,6 +10,7 @@ import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
+import { makeDashboardPublishAnalyticsEventFromDashboards } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards";
 import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/toVanitySlug/toVanitySlug";
 import type { I18n } from "@lingui/core";
@@ -88,14 +89,14 @@ export function PublishDashboardModal({
           t`Dashboard share settings updated.`
         : t`Dashboard published!`,
       );
+      const analyticsEvent = makeDashboardPublishAnalyticsEventFromDashboards({
+        previousDashboard: currentDashboard,
+        updatedDashboard,
+      });
       void AnalyticsClient.logEvent({
-        event: "dashboard.published",
+        ...analyticsEvent,
         workspaceId: updatedDashboard.workspaceId,
         app: "dashboards",
-        payload: {
-          dashboardId: updatedDashboard.id,
-          wasPreviouslyPublic: currentDashboard.isPublic,
-        },
       });
       setCurrentDashboard(updatedDashboard);
       // Sync the input to whatever ended up persisted (e.g. cleared

@@ -26,7 +26,7 @@ export function GisMapCanvas({
   onFeatureClick,
   onLayerChange,
   workspaceId,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const layerView = useGisLayerView({ layer, workspaceId });
   return (
     <MapCanvas

@@ -16,6 +16,7 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import { useReducer } from "react";
+import { match } from "ts-pattern";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { partition } from "@/lib/utils/arrays/partition/partition";
@@ -29,7 +30,7 @@ import type {
 
 type EditorState = {
   editorOpen: boolean;
-  editingGroup: RoleGroupWithMatrix | null;
+  editingGroup: RoleGroupWithMatrix | undefined;
   nameDraft: string;
   matrixDraft: UserAppRolesMatrix;
   builtinPresetType: BuiltinPresetType;
@@ -53,7 +54,7 @@ type EditorAction =
 
 const INITIAL_EDITOR_STATE: EditorState = {
   editorOpen: false,
-  editingGroup: null,
+  editingGroup: undefined,
   nameDraft: "",
   matrixDraft: {
     data_sources: undefined,
@@ -65,40 +66,49 @@ const INITIAL_EDITOR_STATE: EditorState = {
   builtinPresetType: "custom",
 };
 
-function editorReducer(state: EditorState, action: EditorAction): EditorState {
-  switch (action.type) {
-    case "openCreate":
+function _editorReducer(state: EditorState, action: EditorAction): EditorState {
+  return match(action)
+    .with({ type: "openCreate" }, ({ matrixDraft, builtinPresetType }) => {
       return {
         editorOpen: true,
-        editingGroup: null,
+        editingGroup: undefined,
         nameDraft: "",
-        matrixDraft: action.matrixDraft,
-        builtinPresetType: action.builtinPresetType,
+        matrixDraft,
+        builtinPresetType,
       };
-    case "openEdit":
+    })
+    .with({ type: "openEdit" }, ({ group }) => {
       return {
         editorOpen: true,
-        editingGroup: action.group,
-        nameDraft: action.group.name,
-        matrixDraft: action.group.roleMatrix,
+        editingGroup: group,
+        nameDraft: group.name,
+        matrixDraft: group.roleMatrix,
         builtinPresetType:
           Permissions.RolesMatrix.roleGroupPresetTypeFromRoleMatrix(
-            action.group.roleMatrix,
+            group.roleMatrix,
           ),
       };
-    case "close":
+    })
+    .with({ type: "close" }, () => {
       return { ...state, editorOpen: false };
-    case "nameChanged":
-      return { ...state, nameDraft: action.nameDraft };
-    case "matrixChanged":
+    })
+    .with({ type: "nameChanged" }, ({ nameDraft }) => {
+      return { ...state, nameDraft };
+    })
+    .with({ type: "matrixChanged" }, ({ matrixDraft, builtinPresetType }) => {
       return {
         ...state,
-        matrixDraft: action.matrixDraft,
-        builtinPresetType: action.builtinPresetType,
+        matrixDraft,
+        builtinPresetType,
       };
-    case "builtinPresetTypeChanged":
-      return { ...state, builtinPresetType: action.builtinPresetType };
-  }
+    })
+    .with({ type: "builtinPresetTypeChanged" }, ({ builtinPresetType }) => {
+      return {
+        ...state,
+        builtinPresetType,
+      };
+    })
+    .exhaustive();
 }
 
 /**
@@ -108,7 +118,7 @@ export function WorkspaceRolesTab(): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [editorState, dispatchEditor] = useReducer(
-    editorReducer,
+    _editorReducer,
     INITIAL_EDITOR_STATE,
   );
   const {

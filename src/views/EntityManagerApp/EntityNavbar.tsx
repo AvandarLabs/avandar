@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useMemo, useRef } from "react";
+import { ReactNode, useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -22,10 +22,7 @@ type Props = {
 } & BoxProps;
 
 // TODO(jpsyx): generalize these navbars
-export function EntityNavbar({
-  entityConfig,
-  ...boxProps
-}: Props): JSX.Element {
+export function EntityNavbar({ entityConfig, ...boxProps }: Props): ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
@@ -119,13 +116,15 @@ export function EntityNavbar({
         return undefined;
       }
 
+      const appLink = AppLinks.entityManagerEntityView({
+        workspaceSlug: workspace.slug,
+        entityConfigId: entityConfig.id,
+        entityId: entity.id,
+        entityName: entity.name,
+      });
       return {
-        ...AppLinks.entityManagerEntityView({
-          workspaceSlug: workspace.slug,
-          entityConfigId: entityConfig.id,
-          entityId: entity.id,
-          entityName: entity.name,
-        }),
+        ...appLink,
+        label: appLink.label(),
         style,
       };
     });

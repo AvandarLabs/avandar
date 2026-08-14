@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useRef } from "react";
 import css from "@/views/GisApp/MapCanvas/MapCanvas.module.css";
 import { useFitMapBounds } from "@/views/GisApp/MapCanvas/useFitMapBounds";
-import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance/useMapInstance";
 import { useMapSpecSync } from "@/views/GisApp/MapCanvas/useMapSpecSync";
 import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";

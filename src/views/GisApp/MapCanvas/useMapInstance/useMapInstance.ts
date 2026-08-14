@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
-import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useAttachMapInstance";
-import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
-import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";
-import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize";
+import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/useMapInstance/MapInstanceHelpers";
+import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance/useAttachMapInstance";
+import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useMapInstance/useLatestMapValues";
+import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstance/useMapInstanceRefs";
+import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapInstance/useMapWindowResize";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Map as MapLibreMap } from "maplibre-gl";
@@ -28,6 +28,14 @@ export type MapInstance = {
 
   /** Identity of the style currently applied, to skip redundant swaps. */
   appliedStyleKeyRef: RefObject<string | undefined>;
+};
+
+type UseMapInstanceOptions = {
+  containerRef: RefObject<HTMLDivElement | null>;
+  basemap: AvaMap.Basemap;
+  view: AvaMap.ViewState;
+  interactiveLayerIds: readonly string[];
+  onFeatureClick: (feature: GeoJSON.Feature) => void;
 };
 
 /** Presents the mutable refs and style counter as the hook's public result. */
@@ -60,13 +68,7 @@ export function useMapInstance({
   view,
   interactiveLayerIds,
   onFeatureClick,
-}: {
-  containerRef: RefObject<HTMLDivElement | null>;
-  basemap: AvaMap.Basemap;
-  view: AvaMap.ViewState;
-  interactiveLayerIds: readonly string[];
-  onFeatureClick: (feature: GeoJSON.Feature) => void;
-}): MapInstance {
+}: Readonly<UseMapInstanceOptions>): MapInstance {
   const instanceRefs = useMapInstanceRefs();
   const { mapRef, appliedSpecRef, appliedStyleKeyRef, isStyleSwapPendingRef } =
     instanceRefs;
@@ -79,7 +81,7 @@ export function useMapInstance({
   });
   useAttachMapInstance({
     containerRef,
-    emptySpec: EMPTY_MAP_SPEC,
+    emptySpec: MapInstanceHelpers.emptySpec,
     initialView: view,
     instanceRefs,
     latestValues,

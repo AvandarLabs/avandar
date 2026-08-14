@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance/useMapInstance";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
 /**
