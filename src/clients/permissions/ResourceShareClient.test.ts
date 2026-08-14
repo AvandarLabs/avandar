@@ -17,6 +17,18 @@ vi.mock("$/env/getSupabaseApiKey.ts", () => {
   };
 });
 
+const rpcMock = vi.fn();
+
+vi.mock("$/db/supabase/AvaSupabase", () => {
+  return {
+    AvaSupabase: {
+      db: () => {
+        return { rpc: rpcMock };
+      },
+    },
+  };
+});
+
 const { ResourceShareClient } = await import("./ResourceShareClient");
 
 describe("ResourceShareClient.upsertResourceShare", () => {
@@ -46,5 +58,35 @@ describe("ResourceShareClient.upsertResourceShare", () => {
         requiresAppAccess: true,
       }),
     ).rejects.toThrow(/requiresAppAccess applies only to user_group/);
+  });
+});
+
+describe("ResourceShareClient.makeResourcePrivate", () => {
+  it("passes arguments through with p_ prefixes", async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: null });
+
+    await ResourceShareClient.makeResourcePrivate({
+      resourceType: "dashboard",
+      resourceId: "dash-1",
+    });
+
+    expect(rpcMock).toHaveBeenCalledWith("rpc_resources__make_private", {
+      p_resource_type: "dashboard",
+      p_resource_id: "dash-1",
+    });
+  });
+
+  it("throws the supabase error message on failure", async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: "insufficient_privilege" },
+    });
+
+    await expect(
+      ResourceShareClient.makeResourcePrivate({
+        resourceType: "dataset",
+        resourceId: "ds-1",
+      }),
+    ).rejects.toThrow("insufficient_privilege");
   });
 });
