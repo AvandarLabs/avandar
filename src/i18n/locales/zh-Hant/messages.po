@@ -2007,7 +2007,7 @@ msgstr "告訴我們 {singularEntityConfigName} 數據應該來自哪裡..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
-msgstr ""
+msgstr "刪除工作區失敗"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2415,7 +2415,7 @@ msgstr "您確定要刪除 {0} 嗎？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
-msgstr ""
+msgstr "輸入工作區名稱以確認"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -2777,11 +2777,6 @@ msgstr "自訂 URL 不得包含空格"
 msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-#~ msgstr "您嘗試訪問的工作區不存在或您沒有訪問權限。"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "每年支付"
@@ -2889,7 +2884,7 @@ msgstr "選擇檔案"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
-msgstr ""
+msgstr "刪除此工作區"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3207,7 +3202,7 @@ msgstr "工作區 ID 僅能包含字母、數字和連字號"
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "這將永久刪除 <0>{0}</0> 及其所有資料。此動作無法復原。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
@@ -3259,7 +3254,7 @@ msgstr "在有未保存的更改時無法發布。請先保存。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
-msgstr ""
+msgstr "刪除工作區"
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
@@ -4192,7 +4187,7 @@ msgstr "中性"
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "永久刪除此工作區及其所有資料。此動作無法復原。"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -4881,7 +4876,7 @@ msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
-msgstr ""
+msgstr "此工作區已不存在，或您已失去存取權限。若您認為這是錯誤，請聯絡工作區擁有者。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -4951,7 +4946,7 @@ msgstr "設置"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
-msgstr ""
+msgstr "前往首頁"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

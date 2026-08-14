@@ -2118,7 +2118,7 @@ msgstr "Parlez-nous de l'origine des données de {singularEntityConfigName}..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
-msgstr ""
+msgstr "Échec de la suppression de l’espace de travail"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2543,7 +2543,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer {0} ?"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
-msgstr ""
+msgstr "Saisissez le nom de l’espace de travail pour confirmer"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -2925,12 +2925,6 @@ msgstr "L’URL personnalisée ne peut pas contenir d’espaces"
 msgid "Choose the maximum value"
 msgstr "Choisissez la valeur maximale"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-#~ msgstr "L'espace de travail auquel vous essayez d'accéder n'existe pas ou vous "
-#~ "n'y avez pas accès."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Payer annuellement"
@@ -3039,7 +3033,7 @@ msgstr "Sélectionner un fichier"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
-msgstr ""
+msgstr "Supprimer cet espace de travail"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3369,7 +3363,8 @@ msgstr "L’identifiant de l’espace de travail peut uniquement contenir des "
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "Cette action supprimera définitivement <0>{0}</0> ainsi que toutes ses "
+"données. Cette action est irréversible."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
@@ -3426,7 +3421,7 @@ msgstr "Vous ne pouvez pas publier tant qu'il y a des modifications non "
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
-msgstr ""
+msgstr "Supprimer l’espace de travail"
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
@@ -4389,7 +4384,8 @@ msgstr "Neutre"
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "Supprime définitivement cet espace de travail ainsi que toutes ses "
+"données. Cette action est irréversible."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -5114,7 +5110,9 @@ msgstr "S'il y a plusieurs valeurs {fieldName} pour un {0}, alors..."
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
-msgstr ""
+msgstr "Cet espace de travail n’existe plus ou votre accès a été révoqué. Si "
+"vous pensez qu’il s’agit d’une erreur, contactez le propriétaire de "
+"votre espace de travail."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5185,7 +5183,7 @@ msgstr "Paramètres"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
-msgstr ""
+msgstr "Accéder à l’accueil"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

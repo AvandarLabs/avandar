@@ -2064,7 +2064,7 @@ msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
-msgstr ""
+msgstr "تعذّر حذف مساحة العمل"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2479,7 +2479,7 @@ msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
-msgstr ""
+msgstr "اكتب اسم مساحة العمل للتأكيد"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -2850,12 +2850,6 @@ msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسا�
 msgid "Choose the maximum value"
 msgstr "اختر القيمة القصوى"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-#~ msgstr "المساحة التي تحاول الوصول إليها إما غير موجودة أو ليس لديك حق الوصول "
-#~ "إليها."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "ادفع سنويًا"
@@ -2963,7 +2957,7 @@ msgstr "اختر ملف"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
-msgstr ""
+msgstr "حذف مساحة العمل هذه"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3286,7 +3280,8 @@ msgstr "يمكن أن يحتوي معرّف مساحة العمل على أحر�
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "سيؤدي هذا إلى حذف <0>{0}</0> وجميع بياناتها نهائيًا. لا يمكن التراجع عن "
+"هذا الإجراء."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
@@ -3339,7 +3334,7 @@ msgstr "لا يمكنك النشر أثناء وجود تغييرات غير م�
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
-msgstr ""
+msgstr "حذف مساحة العمل"
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPanel.tsx
 msgid "Latitude column"
@@ -4285,7 +4280,8 @@ msgstr "محايد"
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
-msgstr ""
+msgstr "يحذف مساحة العمل هذه وجميع بياناتها نهائيًا. لا يمكن التراجع عن هذا "
+"الإجراء."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -4991,7 +4987,8 @@ msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
-msgstr ""
+msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء صلاحية وصولك إليها. إذا كنت "
+"تعتقد أن هذا خطأ، فتواصل مع مالك مساحة العمل."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5062,7 +5059,7 @@ msgstr "الإعدادات"
 
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "Go to home"
-msgstr ""
+msgstr "الانتقال إلى الصفحة الرئيسية"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

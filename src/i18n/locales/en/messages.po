@@ -2855,12 +2855,6 @@ msgstr "The custom URL cannot contain spaces"
 msgid "Choose the maximum value"
 msgstr "Choose the maximum value"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-#~ msgid "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-#~ msgstr "The workspace you are trying to access either does not exist or you do "
-#~ "not have access to it."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Pay yearly"
