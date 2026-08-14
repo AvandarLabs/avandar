@@ -27,12 +27,12 @@ const RoleOverridesSchema = z
   });
 
 /**
- * Resolves the `role_group_id` to store on a new membership when an invite is
+ * Returns the `role_group_id` to store on a new membership when an invite is
  * accepted. Merges overrides into the invite base matrix; returns the same
  * group id when unchanged, otherwise inserts a new custom group (does not
  * re-point to a different built-in even if the merged matrix matches one).
  */
-export async function resolveRoleGroupIdForAcceptedInvite(
+export async function makeRoleGroupIdFromAcceptedInvite(
   options: Readonly<{
     supabaseAdminClient: AvaSupabaseDBClient;
     workspaceId: string;

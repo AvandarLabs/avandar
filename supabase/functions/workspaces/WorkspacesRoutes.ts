@@ -5,9 +5,9 @@ import {
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import {
-  resolveRoleGroupIdForAcceptedInvite,
+  makeRoleGroupIdFromAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
-} from "@sbfn/workspaces/inviteRoleResolution/inviteRoleResolution.ts";
+} from "@sbfn/workspaces/makeRoleGroupIdFromAcceptedInvite/makeRoleGroupIdFromAcceptedInvite.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
@@ -343,7 +343,7 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
             .throwOnError();
 
           const membershipRoleGroupId =
-            await resolveRoleGroupIdForAcceptedInvite({
+            await makeRoleGroupIdFromAcceptedInvite({
               supabaseAdminClient: supabaseAdminClient,
               workspaceId: workspace.id,
               invite,
