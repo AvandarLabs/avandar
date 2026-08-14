@@ -56,7 +56,7 @@ msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Aucune colonne détectée pour cet ensemble de données. Retour à toutes "
 "les colonnes."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr ""
 
@@ -458,7 +458,7 @@ msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
 "téléchargement le plus léger."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr ""
 
@@ -606,7 +606,7 @@ msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "Recherchez dans le catalogue de données pour ajouter des ensembles de "
 "données ouverts à votre espace de travail."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr ""
 
@@ -983,7 +983,7 @@ msgstr "Confirmer"
 msgid "is equal to..."
 msgstr "est égal à..."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr "Sélectionnez un jeu de données dans la liste pour voir ses métadonné
 msgid "Medium"
 msgstr "Moyen"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr ""
 
@@ -1767,7 +1767,7 @@ msgstr "PDF téléchargé."
 msgid "Workspace ID"
 msgstr "ID de l'espace de travail"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr ""
 
@@ -2426,6 +2426,7 @@ msgstr "Capture du tableau de bord…"
 msgid "This is an invalid waitlist code"
 msgstr "Ceci est un code de liste d'attente invalide"
 
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
@@ -2906,7 +2907,7 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY utilise une expression qui n’est pas une colonne."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr ""
 
@@ -4778,7 +4779,7 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "Je n’ai pas pu générer de SQL hors ligne. Reformulez votre demande ou "
 "reconnectez-vous pour utiliser le chat cloud."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr ""
 
@@ -5018,7 +5019,7 @@ msgstr "Impossible de charger les données cartographiques"
 msgid "Nothing more to load"
 msgstr "Rien de plus à charger"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr ""
 
@@ -5371,7 +5372,7 @@ msgstr "Colonnes de l'ensemble de données"
 msgid "Could not prepare the offline chat model."
 msgstr "Impossible de préparer le modèle de chat hors ligne."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr ""
 
@@ -6157,7 +6158,7 @@ msgstr "Opacité du remplissage"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "Pour confirmer, tapez <0>{confirmationTarget}</0> ci-dessous :"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr ""
 

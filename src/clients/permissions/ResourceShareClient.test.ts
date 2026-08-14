@@ -18,6 +18,7 @@ vi.mock("$/env/getSupabaseApiKey.ts", () => {
 });
 
 const rpcMock = vi.fn();
+const throwOnErrorMock = vi.fn();
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
   return {
@@ -64,10 +65,12 @@ describe("ResourceShareClient.upsertResourceShare", () => {
 describe("ResourceShareClient.makeResourcePrivate", () => {
   beforeEach(() => {
     rpcMock.mockReset();
+    throwOnErrorMock.mockReset();
+    rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
   });
 
   it("passes arguments through with p_ prefixes", async () => {
-    rpcMock.mockResolvedValueOnce({ data: null, error: null });
+    throwOnErrorMock.mockResolvedValueOnce({ data: null, error: null });
 
     await ResourceShareClient.makeResourcePrivate({
       resourceType: "dashboard",
@@ -81,10 +84,7 @@ describe("ResourceShareClient.makeResourcePrivate", () => {
   });
 
   it("throws the supabase error message on failure", async () => {
-    rpcMock.mockResolvedValueOnce({
-      data: null,
-      error: { message: "insufficient_privilege" },
-    });
+    throwOnErrorMock.mockRejectedValueOnce(new Error("insufficient_privilege"));
 
     await expect(
       ResourceShareClient.makeResourcePrivate({

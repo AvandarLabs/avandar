@@ -276,20 +276,21 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
          * parameter: the function derives it from the resource row, and a
          * second client-supplied copy could disagree with it.
          */
-        makeResourcePrivate: async (options: {
-          resourceType: ResourceType;
-          resourceId: string;
-        }): Promise<void> => {
+        makeResourcePrivate: async (
+          options: Readonly<{
+            resourceType: ResourceType;
+            resourceId: string;
+          }>,
+        ): Promise<void> => {
           const logger = baseLogger.appendName("makeResourcePrivate");
           logger.log("make resource private", options);
 
-          const { error } = await dbClient.rpc("rpc_resources__make_private", {
-            p_resource_type: options.resourceType,
-            p_resource_id: options.resourceId,
-          });
-          if (error) {
-            throw new Error(error.message);
-          }
+          await dbClient
+            .rpc("rpc_resources__make_private", {
+              p_resource_type: options.resourceType,
+              p_resource_id: options.resourceId,
+            })
+            .throwOnError();
         },
       }),
     );

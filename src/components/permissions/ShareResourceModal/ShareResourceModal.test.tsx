@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { render, screen, waitFor } from "@/test-utils";
 
 const MEMBERS = [
@@ -30,6 +31,8 @@ const mocks = vi.hoisted(() => {
       ownerId: "user-owner",
       shares: [] as unknown[],
     },
+    isSharingStateFetching: false,
+    getResourceSharingStateOptions: vi.fn(),
     makeResourcePrivate: vi.fn(),
   };
 });
@@ -55,8 +58,13 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
           return ["share-state-key"];
         }),
       },
-      useGetResourceSharingState: () => {
-        return [mocks.sharingState, false] as const;
+      useGetResourceSharingState: (options: unknown) => {
+        mocks.getResourceSharingStateOptions(options);
+        return [
+          mocks.sharingState,
+          false,
+          { isFetching: mocks.isSharingStateFetching },
+        ] as const;
       },
       useMakeResourcePrivate: () => {
         return [mocks.makeResourcePrivate, false] as const;
@@ -102,17 +110,6 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
   };
 });
 
-/**
- * Finds a rendered Mantine `Select` by its `aria-label`. Every select in the
- * modal renders as a `combobox`, so the label is the only way to tell them
- * apart.
- */
-function findComboboxByLabel(label: string): HTMLElement | undefined {
-  return screen.getAllByRole("combobox").find((element) => {
-    return element.getAttribute("aria-label") === label;
-  });
-}
-
 describe("ShareResourceModal", () => {
   beforeEach(() => {
     mocks.membersResult = [MEMBERS, false];
@@ -121,6 +118,8 @@ describe("ShareResourceModal", () => {
       ownerId: "user-owner",
       shares: [],
     };
+    mocks.isSharingStateFetching = false;
+    mocks.getResourceSharingStateOptions.mockClear();
     mocks.makeResourcePrivate.mockClear();
   });
 
@@ -148,7 +147,9 @@ describe("ShareResourceModal", () => {
       ),
     ).toBeInTheDocument();
     // The Add combobox is present and reachable by aria-label.
-    expect(findComboboxByLabel("Add people or user groups")).toBeDefined();
+    expect(
+      screen.getByRole("combobox", { name: "Add people or user groups" }),
+    ).toBeInTheDocument();
     // Owner row shows the owner's name plus a single non-removable badge.
     // Scoped to the row's `Text`: the name also appears as a combobox option.
     expect(
@@ -158,6 +159,31 @@ describe("ShareResourceModal", () => {
     expect(
       screen.queryByRole("button", { name: /Remove access for John Snow/ }),
     ).toBeNull();
+  });
+
+  it("refreshes sharing state and blocks access changes while fetching", async () => {
+    mocks.isSharingStateFetching = true;
+
+    render(
+      <ShareResourceModal
+        resourceName="California COVID"
+        resourceType="dataset"
+        resourceId="dataset-id-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toBeDisabled();
+    });
+    expect(mocks.getResourceSharingStateOptions).toHaveBeenCalledWith({
+      workspaceId: "workspace-id-1",
+      resourceType: "dataset",
+      resourceId: "dataset-id-1",
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   });
 
   it("waits for the member lookup before rendering the owner row", async () => {
@@ -198,7 +224,9 @@ describe("ShareResourceModal", () => {
     );
 
     await waitFor(() => {
-      expect(findComboboxByLabel("General access")).toHaveValue("Only me");
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toHaveValue("Only me");
     });
   });
 
@@ -233,7 +261,9 @@ describe("ShareResourceModal", () => {
     );
 
     await waitFor(() => {
-      expect(findComboboxByLabel("General access")).toHaveValue("Restricted");
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toHaveValue("Restricted");
     });
   });
 
@@ -256,9 +286,13 @@ describe("ShareResourceModal", () => {
     // All three controls hang off the single `isDisabled` prop, so assert the
     // whole row rather than just the principal picker.
     await waitFor(() => {
-      expect(findComboboxByLabel("Add people or user groups")).toBeDisabled();
+      expect(
+        screen.getByRole("combobox", { name: "Add people or user groups" }),
+      ).toBeDisabled();
     });
-    expect(findComboboxByLabel("Role for new share")).toBeDisabled();
+    expect(
+      screen.getByRole("combobox", { name: "Role for new share" }),
+    ).toBeDisabled();
     expect(screen.getByRole("button", { name: "Share" })).toBeDisabled();
   });
 });

@@ -21,13 +21,12 @@ import {
   addShare,
   closeShareModal,
   expectOwnerRowReadOnly,
-  expectRestrictedIsIntentOnly,
   expectShareSummaryText,
   openShareModal,
   setGeneralAccess,
-  setGeneralAccessToOnlyMe,
   toggleRequiresAppAccess,
 } from "./helpers/shareModalFlow";
+import { ShareModalPrivateAccess } from "./helpers/ShareModalPrivateAccess";
 import {
   assignWorkspaceTagToMember,
   createWorkspaceTagViaSettings,
@@ -439,49 +438,15 @@ test.describe("Share modal", () => {
         datasetName,
       }));
 
-      await openShareModal(page);
-      await setGeneralAccess(page, "Restricted");
-      await addShare({
+      await ShareModalPrivateAccess.runOnlyMeRevocationFlow({
         page,
-        principalLabel: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
-        role: "editor",
-      });
-      await closeShareModal(page);
-
-      // Prove the share works before taking it away, so the assertion at the
-      // end reflects a change rather than a permanent absence.
-      await switchToWorkspaceUser(page, {
-        email: secondaryUser.email,
-        password: secondaryUser.password,
         workspaceSlug,
-      });
-      await expectDatasetVisibleInDataManager(page, {
-        workspaceSlug,
+        datasetId,
         datasetName,
+        primaryUser,
+        secondaryUser,
+        secondaryUserDisplayName: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
       });
-
-      await switchToWorkspaceUser(page, {
-        email: primaryUser.email,
-        password: primaryUser.password,
-        workspaceSlug,
-      });
-      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-      await openShareModal(page);
-      await setGeneralAccessToOnlyMe(page);
-      await expectShareSummaryText(page, ["Only you have access"]);
-      await expectRestrictedIsIntentOnly(page);
-      await closeShareModal(page);
-
-      await switchToWorkspaceUser(page, {
-        email: secondaryUser.email,
-        password: secondaryUser.password,
-        workspaceSlug,
-      });
-      await expectDatasetHiddenInDataManager(page, {
-        workspaceSlug,
-        datasetName,
-      });
-      await expectDatasetMetaPageDenied(page, { workspaceSlug, datasetId });
     } finally {
       if (datasetId) {
         await deleteDatasetAndShares({

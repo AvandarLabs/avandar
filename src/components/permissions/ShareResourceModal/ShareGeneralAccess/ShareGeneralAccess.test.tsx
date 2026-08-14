@@ -10,7 +10,7 @@ function findComboboxByAriaLabel(label: string): HTMLElement | undefined {
 
 // Nothing here opens the dropdown: a Mantine `Select` dropdown cannot be
 // opened in jsdom, so which options exist and which are disabled are asserted
-// in `deriveGeneralAccess.test.ts` (the pure builder) and end to end in a real
+// in `GeneralAccess.test.ts` (the pure module) and end to end in a real
 // browser instead.
 describe("ShareGeneralAccess", () => {
   it("hides the workspace-role picker when restricted", () => {

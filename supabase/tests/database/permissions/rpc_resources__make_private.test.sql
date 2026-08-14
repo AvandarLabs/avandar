@@ -77,7 +77,34 @@ values
   ('b1006005-0000-4000-8000-000000000005'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dataset', 'b1007001-0000-4000-8000-000000000001'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer'),
   ('b1006006-0000-4000-8000-000000000006'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005003-0000-4000-8000-000000000003'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer');
 
-select plan(16);
+select plan(20);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.rpc_resources__make_private(public.resource_type,uuid)',
+    'EXECUTE'
+  ),
+  'authenticated can execute the make-private RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.rpc_resources__make_private(public.resource_type,uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the make-private RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.rpc_resources__make_private(public.resource_type,uuid)',
+    'EXECUTE'
+  ),
+  'service_role cannot execute the make-private RPC'
+);
 
 -- === A Settings Admin who is not the owner must be refused. ===
 set local role authenticated;
@@ -135,12 +162,7 @@ select throws_ok(
   'a nonexistent id raises the identical error'
 );
 
--- === An unauthenticated caller must be refused, even from a role that
--- bypasses RLS. `service_role` has BYPASSRLS, so the lookup finds the row and
--- v_owner_id comes back non-null while auth.uid() is null. That is the exact
--- shape the null-safe owner gate exists for: with `<>` instead of
--- `is distinct from`, `v_owner_id <> null` is null, the `if` never fires, and
--- the call falls through to the DELETE with no gate at all. ===
+-- === Roles outside the authenticated client surface cannot invoke the RPC. ===
 set local role service_role;
 select set_config('request.jwt.claims', '', true);
 
@@ -149,8 +171,8 @@ select throws_ok(
       'dashboard', 'b1005001-0000-4000-8000-000000000001'::uuid
     )$$,
   '42501',
-  'insufficient_privilege',
-  'an unauthenticated caller is refused even when RLS is bypassed'
+  'permission denied for function rpc_resources__make_private',
+  'service_role cannot invoke the owner-only RPC'
 );
 
 set local role postgres;
@@ -160,6 +182,17 @@ select is(
     where resource_id = 'b1005001-0000-4000-8000-000000000001'::uuid),
   4,
   'the refused unauthenticated call deleted nothing'
+);
+
+-- The internal gate remains null-safe for the function owner, which retains
+-- EXECUTE independently of explicit grants.
+select throws_ok(
+  $$select public.rpc_resources__make_private (
+      'dashboard', 'b1005001-0000-4000-8000-000000000001'::uuid
+    )$$,
+  '42501',
+  'insufficient_privilege',
+  'a null authenticated identity is refused inside the RPC'
 );
 
 -- === The owner succeeds. ===

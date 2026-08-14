@@ -1,11 +1,8 @@
+import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import {
-  buildGeneralAccessOptions,
-  deriveGeneralAccessValue,
-  hasNonOwnerShare,
-} from "./deriveGeneralAccess";
+import { GeneralAccess } from "./GeneralAccess";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const OWNER_ID = "owner-1";
 
@@ -13,15 +10,15 @@ const LABELS = {
   private: "Only me",
   restricted: "Restricted",
   workspace: "Anyone in Dashboards",
-};
+} as const;
 
-function share(
+function _buildShare(
   overrides: Partial<ResourceShareRow> &
     Pick<ResourceShareRow, "principalType">,
 ): ResourceShareRow {
   return {
     id: "share-1",
-    workspaceId: "ws-1" as WorkspaceId,
+    workspaceId: "ws-1" as Workspace.Id,
     resourceType: "dashboard",
     resourceId: "res-1",
     principalId: null,
@@ -31,15 +28,17 @@ function share(
   };
 }
 
-describe("hasNonOwnerShare", () => {
+describe("GeneralAccess.hasNonOwnerShare", () => {
   it("is false with no shares", () => {
-    expect(hasNonOwnerShare({ shares: [], ownerId: OWNER_ID })).toBe(false);
+    expect(
+      GeneralAccess.hasNonOwnerShare({ shares: [], ownerId: OWNER_ID }),
+    ).toBe(false);
   });
 
   it("is false for the owner's own user share", () => {
     expect(
-      hasNonOwnerShare({
-        shares: [share({ principalType: "user", principalId: OWNER_ID })],
+      GeneralAccess.hasNonOwnerShare({
+        shares: [_buildShare({ principalType: "user", principalId: OWNER_ID })],
         ownerId: OWNER_ID,
       }),
     ).toBe(false);
@@ -47,8 +46,10 @@ describe("hasNonOwnerShare", () => {
 
   it("is true for a user share to someone else", () => {
     expect(
-      hasNonOwnerShare({
-        shares: [share({ principalType: "user", principalId: "other-1" })],
+      GeneralAccess.hasNonOwnerShare({
+        shares: [
+          _buildShare({ principalType: "user", principalId: "other-1" }),
+        ],
         ownerId: OWNER_ID,
       }),
     ).toBe(true);
@@ -56,32 +57,34 @@ describe("hasNonOwnerShare", () => {
 
   it("is true for a group share", () => {
     expect(
-      hasNonOwnerShare({
+      GeneralAccess.hasNonOwnerShare({
         shares: [
-          share({ principalType: "user_group", principalId: "group-1" }),
+          _buildShare({
+            principalType: "user_group",
+            principalId: "group-1",
+          }),
         ],
         ownerId: OWNER_ID,
       }),
     ).toBe(true);
   });
 
-  // The workspace principal carries a null principalId by convention. This is
-  // the row a `filter(principalType === "user")` implementation drops, which
-  // would report a workspace-shared resource as private.
   it("is true for a workspace share with a null principalId", () => {
     expect(
-      hasNonOwnerShare({
-        shares: [share({ principalType: "workspace", principalId: null })],
+      GeneralAccess.hasNonOwnerShare({
+        shares: [
+          _buildShare({ principalType: "workspace", principalId: null }),
+        ],
         ownerId: OWNER_ID,
       }),
     ).toBe(true);
   });
 });
 
-describe("deriveGeneralAccessValue", () => {
+describe("GeneralAccess.fromSharingState", () => {
   it("is workspace when not restricted", () => {
     expect(
-      deriveGeneralAccessValue({
+      GeneralAccess.fromSharingState({
         isRestricted: false,
         shares: [],
         ownerId: OWNER_ID,
@@ -91,9 +94,9 @@ describe("deriveGeneralAccessValue", () => {
 
   it("is private when restricted with only the owner's own share", () => {
     expect(
-      deriveGeneralAccessValue({
+      GeneralAccess.fromSharingState({
         isRestricted: true,
-        shares: [share({ principalType: "user", principalId: OWNER_ID })],
+        shares: [_buildShare({ principalType: "user", principalId: OWNER_ID })],
         ownerId: OWNER_ID,
       }),
     ).toBe("private");
@@ -101,30 +104,28 @@ describe("deriveGeneralAccessValue", () => {
 
   it("is restricted when restricted with a non-owner share", () => {
     expect(
-      deriveGeneralAccessValue({
+      GeneralAccess.fromSharingState({
         isRestricted: true,
-        shares: [share({ principalType: "user", principalId: "other-1" })],
+        shares: [
+          _buildShare({ principalType: "user", principalId: "other-1" }),
+        ],
         ownerId: OWNER_ID,
       }),
     ).toBe("restricted");
   });
 });
 
-describe("buildGeneralAccessOptions", () => {
-  it("lists Only me first, then Restricted, then the workspace option", () => {
-    const options = buildGeneralAccessOptions({
+describe("GeneralAccess.toOptions", () => {
+  it("lists the values in display order", () => {
+    const options = GeneralAccess.toOptions({
       isOwner: true,
       labels: LABELS,
     });
-    expect(
-      options.map((option) => {
-        return option.value;
-      }),
-    ).toEqual(["private", "restricted", "workspace"]);
+    expect(options.map(prop("value"))).toEqual(GeneralAccess.values);
   });
 
   it("enables Only me for the owner", () => {
-    const options = buildGeneralAccessOptions({
+    const options = GeneralAccess.toOptions({
       isOwner: true,
       labels: LABELS,
     });
@@ -132,7 +133,7 @@ describe("buildGeneralAccessOptions", () => {
   });
 
   it("disables Only me for a non-owner", () => {
-    const options = buildGeneralAccessOptions({
+    const options = GeneralAccess.toOptions({
       isOwner: false,
       labels: LABELS,
     });
@@ -140,11 +141,21 @@ describe("buildGeneralAccessOptions", () => {
   });
 
   it("never disables the other two options", () => {
-    const options = buildGeneralAccessOptions({
+    const options = GeneralAccess.toOptions({
       isOwner: false,
       labels: LABELS,
     });
     expect(options[1]?.disabled).toBe(false);
     expect(options[2]?.disabled).toBe(false);
+  });
+});
+
+describe("GeneralAccess.isValid", () => {
+  it("accepts every supported value", () => {
+    expect(GeneralAccess.values.every(GeneralAccess.isValid)).toBe(true);
+  });
+
+  it("rejects unsupported values", () => {
+    expect(GeneralAccess.isValid("organization")).toBe(false);
   });
 });

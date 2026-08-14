@@ -49,7 +49,7 @@ msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgstr "等寬標題"
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "如果您有 4 GB RAM，或需要最精簡的下載內容，建議使用此選項。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr ""
 
@@ -579,7 +579,7 @@ msgstr "表格"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr ""
 
@@ -935,7 +935,7 @@ msgstr "確認"
 msgid "is equal to..."
 msgstr "等於..."
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr ""
 
@@ -1193,7 +1193,7 @@ msgstr "從列表中選擇一個資料集以查看其元資料。"
 msgid "Medium"
 msgstr "中"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr ""
 
@@ -1673,7 +1673,7 @@ msgstr "PDF 已下載。"
 msgid "Workspace ID"
 msgstr "工作區 ID"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr ""
 
@@ -2303,6 +2303,7 @@ msgstr "捕捉儀表板中…"
 msgid "This is an invalid waitlist code"
 msgstr "這是一個無效的候補名單代碼"
 
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
 msgid "Please try again."
@@ -2759,7 +2760,7 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY 使用非欄位運算式。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr ""
 
@@ -4561,7 +4562,7 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr ""
 
@@ -4791,7 +4792,7 @@ msgstr "無法載入地圖資料"
 msgid "Nothing more to load"
 msgstr "沒有更多內容可加載"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr ""
 
@@ -5130,7 +5131,7 @@ msgstr "數據集欄位"
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr ""
 
@@ -5876,7 +5877,7 @@ msgstr "填色不透明度"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
 
-#: src/components/permissions/ShareResourceModal/shareCopy.ts
+#: src/components/permissions/ShareResourceModal/usePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr ""
 
