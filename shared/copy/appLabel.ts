@@ -18,6 +18,9 @@ export function appLabel(app: AppType): string {
     data_explorer: () => {
       return t`Data Explorer`;
     },
+    gis: () => {
+      return t`Maps`;
+    },
     settings: () => {
       return t`Settings`;
     },

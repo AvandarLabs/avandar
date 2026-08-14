@@ -12,6 +12,7 @@ const DEFAULT_MAP_VIEW_STATE: MapViewState = {
   zoom: 10,
 };
 
+/** Constructors and defaults for saved map configurations. */
 export const AvaMapModule = {
   /** Opening camera position when a map has no data to fit yet. */
   defaultViewState: DEFAULT_MAP_VIEW_STATE,

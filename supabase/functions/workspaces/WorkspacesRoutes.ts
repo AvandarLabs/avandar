@@ -4,7 +4,10 @@ import {
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
-import { resolveRoleGroupIdForAcceptedInvite } from "@sbfn/workspaces/inviteRoleResolution.ts";
+import {
+  makeRoleGroupIdFromAcceptedInvite,
+  WorkspaceInviteRoleOverrideSchema,
+} from "@sbfn/workspaces/makeRoleGroupIdFromAcceptedInvite/makeRoleGroupIdFromAcceptedInvite.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
@@ -93,19 +96,7 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
         z.object({
           emailToInvite: z.string(),
           roleGroupId: z.uuid(),
-          roleOverrides: z
-            .array(
-              z.object({
-                app: z.enum([
-                  "data_sources",
-                  "data_explorer",
-                  "dashboards",
-                  "settings",
-                ]),
-                role: z.enum(["viewer", "editor", "admin"]),
-              }),
-            )
-            .optional(),
+          roleOverrides: z.array(WorkspaceInviteRoleOverrideSchema).optional(),
           userGroupIds: z.array(z.uuid()).optional(),
         }),
       )
@@ -306,15 +297,21 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
           body: { userId, workspaceSlug },
           supabaseAdminClient,
         }) => {
-          const { data: workspace } = await supabaseAdminClient
-            .from("workspaces")
-            .select("id")
-            .eq("slug", workspaceSlug)
-            .single()
-            .throwOnError();
-          const {
-            data: { user },
-          } = await supabaseAdminClient.auth.admin.getUserById(userId);
+          // Neither lookup depends on the other, so they run together.
+          const [
+            { data: workspace },
+            {
+              data: { user },
+            },
+          ] = await Promise.all([
+            supabaseAdminClient
+              .from("workspaces")
+              .select("id")
+              .eq("slug", workspaceSlug)
+              .single()
+              .throwOnError(),
+            supabaseAdminClient.auth.admin.getUserById(userId),
+          ]);
 
           if (!user || !user.email) {
             throw new Error("User not found");
@@ -339,24 +336,28 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
             throw new Error("This invite has already been accepted.");
           }
 
-          // now mark it as accepted and link it to the user's account
-          const { data: updatedInvite } = await supabaseAdminClient
-            .from("workspace_invites")
-            .update({
-              invite_status: "accepted",
-              user_id: user.id,
-            })
-            .eq("id", invite.id)
-            .select()
-            .single()
-            .throwOnError();
-
-          const membershipRoleGroupId =
-            await resolveRoleGroupIdForAcceptedInvite({
-              supabaseAdminClient: supabaseAdminClient,
-              workspaceId: workspace.id,
-              invite,
-            });
+          // Mark the invite accepted and link it to the user's account, while
+          // deriving the membership's role group. The role group is built from
+          // `invite`, not from the update's result, so the two are independent
+          // and run together.
+          const [{ data: updatedInvite }, membershipRoleGroupId] =
+            await Promise.all([
+              supabaseAdminClient
+                .from("workspace_invites")
+                .update({
+                  invite_status: "accepted",
+                  user_id: user.id,
+                })
+                .eq("id", invite.id)
+                .select()
+                .single()
+                .throwOnError(),
+              makeRoleGroupIdFromAcceptedInvite({
+                supabaseAdminClient: supabaseAdminClient,
+                workspaceId: workspace.id,
+                invite,
+              }),
+            ]);
 
           // create the workspace membership
           const { data: membership } = await supabaseAdminClient

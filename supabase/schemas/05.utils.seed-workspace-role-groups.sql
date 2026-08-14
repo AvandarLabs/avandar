@@ -6,7 +6,7 @@ create or replace function public.util__seed_builtin_role_groups_for_workspace (
   p_workspace_id uuid
 ) returns void language plpgsql security definer
 set
-  search_path = public as $$
+  search_path = '' as $$
 begin
   insert into
     public.role_groups (
@@ -57,6 +57,10 @@ begin
           'admin'::public.role_level
         ),
         (
+          'gis'::public.app_type,
+          'admin'::public.role_level
+        ),
+        (
           'settings'::public.app_type,
           'admin'::public.role_level
         )
@@ -98,6 +102,10 @@ begin
         (
           'dashboards'::public.app_type,
           'editor'::public.role_level
+        ),
+        (
+          'gis'::public.app_type,
+          'editor'::public.role_level
         )
     ) as a (
       app,
@@ -137,6 +145,10 @@ begin
         (
           'dashboards'::public.app_type,
           'viewer'::public.role_level
+        ),
+        (
+          'gis'::public.app_type,
+          'viewer'::public.role_level
         )
     ) as a (
       app,
@@ -152,6 +164,16 @@ begin
   ) do nothing;
 end;
 $$;
+
+revoke
+execute on function public.util__seed_builtin_role_groups_for_workspace (uuid)
+from
+  public,
+  anon,
+  authenticated;
+
+grant
+execute on function public.util__seed_builtin_role_groups_for_workspace (uuid) to service_role;
 
 /**
  * After each workspace row is created, seed built-in role groups for it.

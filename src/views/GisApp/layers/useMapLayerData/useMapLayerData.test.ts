@@ -3,16 +3,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type {
-  QueryResult,
-  QueryResultId,
-} from "$/models/queries/QueryResult/QueryResult.types";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -26,8 +23,10 @@ vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
   return { runStructuredQuery: runStructuredQueryMock };
 });
 
-const { useMapLayerData, makeQueryKeyFromMapLayer, isMapLayerQueryable } =
+const { useMapLayerData } =
   await import("@/views/GisApp/layers/useMapLayerData/useMapLayerData");
+const { MapLayerData } =
+  await import("@/views/GisApp/layers/useMapLayerData/MapLayerData");
 
 /**
  * An honest `DatasetColumn`, built through `Model.make` with no cast. Mirrors
@@ -111,8 +110,8 @@ describe("useMapLayerData", () => {
 
   it("queries with the layer's source when the layer is queryable", async () => {
     const layer = _createQueryableLayer();
-    const queryResult: QueryResult<UnknownRow> = {
-      id: uuid<QueryResultId>(),
+    const queryResult: QueryResult.T<UnknownRow> = {
+      id: uuid<QueryResult.Id>(),
       data: [{ cases: 1 }],
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 1,
@@ -176,13 +175,13 @@ describe("useMapLayerData", () => {
   });
 });
 
-describe("isMapLayerQueryable", () => {
+describe("MapLayerData.isQueryable", () => {
   it("is true for a layer with a source and a resolvable binding", () => {
-    expect(isMapLayerQueryable(_createQueryableLayer())).toBe(true);
+    expect(MapLayerData.isQueryable(_createQueryableLayer())).toBe(true);
   });
 
   it("is false until the layer has a data source", () => {
-    expect(isMapLayerQueryable(MapLayer.makeEmpty("Cases"))).toBe(false);
+    expect(MapLayerData.isQueryable(MapLayer.makeEmpty("Cases"))).toBe(false);
   });
 
   it("is false when the layer has a source but no resolvable geo binding", () => {
@@ -191,16 +190,16 @@ describe("isMapLayerQueryable", () => {
       ...layer,
       source: { ...layer.source, dataSource: _createDataset() },
     };
-    expect(isMapLayerQueryable(withSource)).toBe(false);
+    expect(MapLayerData.isQueryable(withSource)).toBe(false);
   });
 });
 
-describe("makeQueryKeyFromMapLayer", () => {
+describe("MapLayerData.toQueryKey", () => {
   it("changes when the source changes", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(makeQueryKeyFromMapLayer(layer)).not.toEqual(
-      makeQueryKeyFromMapLayer(withLimit),
+    expect(MapLayerData.toQueryKey(layer)).not.toEqual(
+      MapLayerData.toQueryKey(withLimit),
     );
   });
 
@@ -213,8 +212,8 @@ describe("makeQueryKeyFromMapLayer", () => {
         color: { type: "single" as const, color: "#ef4444" },
       },
     };
-    expect(makeQueryKeyFromMapLayer(layer)).toEqual(
-      makeQueryKeyFromMapLayer(recolored),
+    expect(MapLayerData.toQueryKey(layer)).toEqual(
+      MapLayerData.toQueryKey(recolored),
     );
   });
 });

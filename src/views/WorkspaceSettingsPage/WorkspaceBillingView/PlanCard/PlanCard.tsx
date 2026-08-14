@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
-import { SUPPORT_EMAIL } from "$/config/AppConfig";
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";

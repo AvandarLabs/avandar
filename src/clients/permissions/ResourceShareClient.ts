@@ -267,6 +267,31 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
             .eq("workspace_id", options.workspaceId)
             .throwOnError();
         },
+
+        /**
+         * Makes a resource private to its owner: clears every non-owner share
+         * and sets `is_restricted`, atomically.
+         *
+         * Owner-only, enforced by the RPC. `workspaceId` is deliberately not a
+         * parameter: the function derives it from the resource row, and a
+         * second client-supplied copy could disagree with it.
+         */
+        makeResourcePrivate: async (
+          options: Readonly<{
+            resourceType: ResourceType;
+            resourceId: string;
+          }>,
+        ): Promise<void> => {
+          const logger = baseLogger.appendName("makeResourcePrivate");
+          logger.log("make resource private", options);
+
+          await dbClient
+            .rpc("rpc_resources__make_private", {
+              p_resource_type: options.resourceType,
+              p_resource_id: options.resourceId,
+            })
+            .throwOnError();
+        },
       }),
     );
 
@@ -276,6 +301,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         "upsertResourceShare",
         "deleteResourceShare",
         "setResourceRestricted",
+        "makeResourcePrivate",
       ],
     });
   });

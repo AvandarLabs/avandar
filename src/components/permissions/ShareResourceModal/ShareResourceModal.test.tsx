@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { render, screen, waitFor } from "@/test-utils";
 
 const MEMBERS = [
@@ -18,12 +19,21 @@ const MEMBERS = [
 ];
 
 /**
- * Mutable member-query result so a test can put the lookup back into its
- * loading state. Hoisted because the `vi.mock` factories below read it.
+ * Mutable query results so a test can put the member lookup back into its
+ * loading state or vary the stored sharing state. Hoisted because the
+ * `vi.mock` factories below read it.
  */
 const mocks = vi.hoisted(() => {
   return {
     membersResult: [undefined, true] as readonly [unknown, boolean],
+    sharingState: {
+      isRestricted: false,
+      ownerId: "user-owner",
+      shares: [] as unknown[],
+    },
+    isSharingStateFetching: false,
+    getResourceSharingStateOptions: vi.fn(),
+    makeResourcePrivate: vi.fn(),
   };
 });
 
@@ -48,15 +58,16 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
           return ["share-state-key"];
         }),
       },
-      useGetResourceSharingState: () => {
+      useGetResourceSharingState: (options: unknown) => {
+        mocks.getResourceSharingStateOptions(options);
         return [
-          {
-            isRestricted: false,
-            ownerId: "user-owner",
-            shares: [],
-          },
+          mocks.sharingState,
           false,
+          { isFetching: mocks.isSharingStateFetching },
         ] as const;
+      },
+      useMakeResourcePrivate: () => {
+        return [mocks.makeResourcePrivate, false] as const;
       },
       useUpsertResourceShare: () => {
         return [vi.fn(), false] as const;
@@ -81,6 +92,14 @@ vi.mock("@/clients/WorkspaceClient", () => {
   };
 });
 
+vi.mock("@/hooks/users/useCurrentUser", () => {
+  return {
+    useCurrentUser: () => {
+      return { id: "user-owner", email: "john@example.com" };
+    },
+  };
+});
+
 vi.mock("@/clients/permissions/PermissionsClient", () => {
   return {
     PermissionsClient: {
@@ -94,6 +113,14 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
 describe("ShareResourceModal", () => {
   beforeEach(() => {
     mocks.membersResult = [MEMBERS, false];
+    mocks.sharingState = {
+      isRestricted: false,
+      ownerId: "user-owner",
+      shares: [],
+    };
+    mocks.isSharingStateFetching = false;
+    mocks.getResourceSharingStateOptions.mockClear();
+    mocks.makeResourcePrivate.mockClear();
   });
 
   it("renders the Drive-style layout with general access and owner row", async () => {
@@ -120,12 +147,9 @@ describe("ShareResourceModal", () => {
       ),
     ).toBeInTheDocument();
     // The Add combobox is present and reachable by aria-label.
-    const comboboxes = screen.getAllByRole("combobox");
     expect(
-      comboboxes.some((el) => {
-        return el.getAttribute("aria-label") === "Add people or user groups";
-      }),
-    ).toBe(true);
+      screen.getByRole("combobox", { name: "Add people or user groups" }),
+    ).toBeInTheDocument();
     // Owner row shows the owner's name plus a single non-removable badge.
     // Scoped to the row's `Text`: the name also appears as a combobox option.
     expect(
@@ -135,6 +159,31 @@ describe("ShareResourceModal", () => {
     expect(
       screen.queryByRole("button", { name: /Remove access for John Snow/ }),
     ).toBeNull();
+  });
+
+  it("refreshes sharing state and blocks access changes while fetching", async () => {
+    mocks.isSharingStateFetching = true;
+
+    render(
+      <ShareResourceModal
+        resourceName="California COVID"
+        resourceType="dataset"
+        resourceId="dataset-id-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toBeDisabled();
+    });
+    expect(mocks.getResourceSharingStateOptions).toHaveBeenCalledWith({
+      workspaceId: "workspace-id-1",
+      resourceType: "dataset",
+      resourceId: "dataset-id-1",
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   });
 
   it("waits for the member lookup before rendering the owner row", async () => {
@@ -156,5 +205,94 @@ describe("ShareResourceModal", () => {
     });
     expect(screen.queryByText("People with access")).toBeNull();
     expect(screen.queryByText("Owner")).toBeNull();
+  });
+
+  it("shows Only me when restricted with no non-owner share", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toHaveValue("Only me");
+    });
+  });
+
+  // The workspace principal is the row a naive derivation drops. If this case
+  // reads "Only me", the modal is calling a resource private that the entire
+  // workspace can open.
+  it("shows Restricted when restricted with a workspace share", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [
+        {
+          id: "s-1",
+          workspaceId: "workspace-id-1",
+          resourceType: "dashboard",
+          resourceId: "dash-1",
+          principalType: "workspace",
+          principalId: null,
+          role: "viewer",
+          requiresAppAccess: false,
+        },
+      ],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", { name: "General access" }),
+      ).toHaveValue("Restricted");
+    });
+  });
+
+  it("disables the add-principal row when the resource is private", async () => {
+    mocks.sharingState = {
+      isRestricted: true,
+      ownerId: "user-owner",
+      shares: [],
+    };
+
+    render(
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+      />,
+    );
+
+    // All three controls hang off the single `isDisabled` prop, so assert the
+    // whole row rather than just the principal picker.
+    await waitFor(() => {
+      expect(
+        screen.getByRole("combobox", { name: "Add people or user groups" }),
+      ).toBeDisabled();
+    });
+    expect(
+      screen.getByRole("combobox", { name: "Role for new share" }),
+    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Share" })).toBeDisabled();
   });
 });

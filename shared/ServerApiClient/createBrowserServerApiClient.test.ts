@@ -65,7 +65,7 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     const result = await client.invokeFunction({
-      route: "chat/models",
+      route: "fake/route",
       method: "GET",
     });
 
@@ -81,7 +81,7 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     const result = await client.invokeFunction({
-      route: "chat/models",
+      route: "fake/route",
       method: "GET",
     });
 
@@ -116,7 +116,7 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     await expect(
-      client.invokeFunction({ route: "chat/models", method: "GET" }),
+      client.invokeFunction({ route: "fake/route", method: "GET" }),
     ).rejects.toBeInstanceOf(SessionExpiredError);
     // Retried exactly once; did not loop.
     expect(fakeDbClient.functions.invoke).toHaveBeenCalledTimes(2);
@@ -131,7 +131,7 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     const client = createBrowserServerApiClient();
 
     await expect(
-      client.invokeFunction({ route: "chat/models", method: "GET" }),
+      client.invokeFunction({ route: "fake/route", method: "GET" }),
     ).rejects.toThrow(/failed/);
     expect(fakeDbClient.auth.refreshSession).not.toHaveBeenCalled();
   });
@@ -153,7 +153,7 @@ describe("createBrowserServerApiClient invokeFunction 401 handling", () => {
     );
     const client = createBrowserServerApiClient();
 
-    const p1 = client.invokeFunction({ route: "chat/models", method: "GET" });
+    const p1 = client.invokeFunction({ route: "fake/route", method: "GET" });
     const p2 = client.invokeFunction({
       route: "support/featurebase-jwt",
       method: "GET",

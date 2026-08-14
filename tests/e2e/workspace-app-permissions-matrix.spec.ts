@@ -20,13 +20,17 @@ import {
   WORKSPACE_APP_ROUTES,
 } from "./helpers/workspaceAppRouteExpectations";
 import type { WorkspaceAppRouteCase } from "./helpers/workspaceAppRouteExpectations";
-import type { AppType } from "$/models/Permissions/Permissions.types";
+import type {
+  AppType,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types";
 
 function _appRouteForType(app: AppType): WorkspaceAppRouteCase | undefined {
   const routes: Record<AppType, WorkspaceAppRouteCase | undefined> = {
     data_sources: WORKSPACE_APP_ROUTES.dataSources,
     data_explorer: WORKSPACE_APP_ROUTES.dataExplorer,
     dashboards: WORKSPACE_APP_ROUTES.dashboards,
+    gis: undefined,
     settings: undefined,
   };
   return routes[app];
@@ -234,6 +238,75 @@ test.describe("workspace app route permission matrix", () => {
         ...assignResult,
       });
     }
+  });
+});
+
+type GisRouteCase = {
+  title: string;
+  matrix: UserAppRolesMatrix;
+  isAllowed: boolean;
+};
+
+const GIS_ROUTE_CASES: GisRouteCase[] = [
+  {
+    title: "denies GIS when member lacks gis viewer",
+    matrix: createRolesMatrixWithoutApp("gis"),
+    isAllowed: false,
+  },
+  {
+    title: "allows GIS for gis viewer only",
+    matrix: createSingleAppViewerRolesMatrix("gis"),
+    isAllowed: true,
+  },
+  {
+    title: "allows GIS for gis editor",
+    matrix: createSingleAppEditorRolesMatrix("gis"),
+    isAllowed: true,
+  },
+  {
+    title: "allows GIS for gis admin",
+    matrix: createSingleAppAdminRolesMatrix("gis"),
+    isAllowed: true,
+  },
+];
+
+test.describe("GIS route permission matrix", () => {
+  GIS_ROUTE_CASES.forEach(({ title, matrix, isAllowed }) => {
+    test(title, async ({ page, e2eWorkerDb, e2eViewerMembership }) => {
+      const assignResult = await assignE2ESecondaryMemberCustomMatrix({
+        supabaseAdminClient: e2eViewerMembership.admin,
+        workspaceId: e2eViewerMembership.workspaceId,
+        viewerUserId: e2eViewerMembership.viewerUserId,
+        matrix,
+      });
+
+      try {
+        await signInWithEmailPassword(page, {
+          email: e2eWorkerDb.secondaryUser.email,
+          password: e2eWorkerDb.secondaryUser.password,
+          workspaceSlug: e2eWorkerDb.workspaceSlug,
+        });
+        const expectationOptions = {
+          workspaceSlug: e2eWorkerDb.workspaceSlug,
+          appPath: WORKSPACE_APP_ROUTES.gis.path,
+        };
+        if (isAllowed) {
+          await expectWorkspaceAppAccessAllowed(page, {
+            ...expectationOptions,
+            allowedUrlPattern: WORKSPACE_APP_ROUTES.gis.allowedUrlPattern,
+          });
+        } else {
+          await expectWorkspaceAppAccessDenied(page, expectationOptions);
+        }
+      } finally {
+        await restoreE2ESecondaryMemberRoleGroup({
+          supabaseAdminClient: e2eViewerMembership.admin,
+          workspaceId: e2eViewerMembership.workspaceId,
+          viewerUserId: e2eViewerMembership.viewerUserId,
+          ...assignResult,
+        });
+      }
+    });
   });
 });
 

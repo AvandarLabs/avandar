@@ -1,0 +1,31 @@
+.chatModelPickerViewTrigger {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.chatModelPickerViewDropdown {
+  padding: var(--mantine-spacing-xs);
+}
+
+.chatModelPickerViewOptions {
+  max-height: 280px;
+
+  /*
+   * `auto` avoids an inert scrollbar when the compact catalog fits within the
+   * maximum height.
+   */
+  overflow: auto;
+}
+
+.chatModelPickerViewOptionLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatModelPickerViewSelectedIcon {
+  color: var(--mantine-color-primary-6);
+  flex-shrink: 0;
+}

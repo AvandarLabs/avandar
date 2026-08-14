@@ -1,4 +1,5 @@
 import path from "node:path";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 
 /** Navbar workspace menu button shows the workspace display name. */
 export const SEEDED_WORKSPACE_MENU_BUTTON_NAME = /E2E Test Workspace/i;
@@ -11,10 +12,11 @@ export const CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 14700;
 
 /**
  * Rows shown in the import preview success callout
- * (`AppConfig.dataManagerApp.maxPreviewRows`). Large files cap here even
+ * (`GlobalAppConfig.dataManagerApp.maxPreviewRows`). Large files cap here even
  * when the saved dataset contains more rows.
  */
-export const DATA_IMPORT_MAX_PREVIEW_ROWS = 200;
+export const DATA_IMPORT_MAX_PREVIEW_ROWS =
+  GlobalAppConfig.dataManagerApp.maxPreviewRows;
 
 export const CALIFORNIA_CSV_PATH = path.join(
   process.cwd(),

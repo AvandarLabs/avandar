@@ -227,6 +227,7 @@ export function VisualizationContainer({
               data={limitedData}
               height="100%"
               series={validConfig.series}
+              chartStyle={config.chartStyle}
             />
           </Box>
         );
@@ -310,6 +311,7 @@ export function VisualizationContainer({
               data={limitedData}
               height="100%"
               series={validConfig.series}
+              chartStyle={config.chartStyle}
             />
           </Box>
         );

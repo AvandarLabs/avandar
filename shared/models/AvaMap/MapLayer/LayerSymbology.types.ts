@@ -1,4 +1,4 @@
-import type { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /** Outline applied to a rendered symbol. */
 export type StrokeSpec = { width: number; color: string };
@@ -23,7 +23,7 @@ export type LayerSymbology =
     }
   | {
       type: "proportionalSymbol";
-      value: QueryColumnId;
+      value: QueryColumn.Id;
       minRadius: number;
       maxRadius: number;
       scale: "sqrt" | "linear";

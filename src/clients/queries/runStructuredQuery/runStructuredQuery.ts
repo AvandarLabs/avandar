@@ -8,7 +8,7 @@ import {
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { uuid } from "$/lib/uuid";
-import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
+import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient";
@@ -16,15 +16,10 @@ import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type {
-  QueryResult,
-  QueryResultColumn,
-  QueryResultId,
-} from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** A structured query's columns, in the stable order execution expects. */
@@ -35,7 +30,7 @@ type SortedQueryColumns = ReadonlyArray<
 /** Who is asking, which decides which QETL client answers. */
 export type StructuredQueryAuth =
   | { auth: "workspace"; workspaceId: Workspace.Id }
-  | { auth: "public"; publicAvaPageId: DashboardId };
+  | { auth: "public"; publicAvaPageId: Dashboard.Id };
 
 /**
  * Inputs to {@link runStructuredQuery}: the query to execute, optional
@@ -87,7 +82,7 @@ async function _selectSqlForExecution(
 async function _runRawSql(
   params: RunStructuredQueryParams,
   sqlToRun: string,
-): Promise<QueryResult<UnknownRow>> {
+): Promise<QueryResult.T<UnknownRow>> {
   return params.auth === "public" ?
       await PublicQetlClient.runQuery({
         rawSql: sqlToRun,
@@ -107,12 +102,12 @@ async function _runSourceQuery({
   sortedQueryColumns,
 }: {
   workspaceId: Workspace.Id;
-  dataSource: QueryDataSource | undefined;
+  dataSource: QueryDataSource.T | undefined;
   executionQuery: StructuredQuery.Partial;
   sortedQueryColumns: SortedQueryColumns;
-}): Promise<QueryResult<UnknownRow>> {
+}): Promise<QueryResult.T<UnknownRow>> {
   if (!dataSource || sortedQueryColumns.length === 0) {
-    return QueryResultFns.makeEmpty();
+    return QueryResult.makeEmpty();
   }
 
   const executionQueryWithSource = {
@@ -121,7 +116,7 @@ async function _runSourceQuery({
   } as StructuredQuery.T;
 
   return await Model.match(dataSource, {
-    Dataset: async (): Promise<QueryResult<UnknownRow>> => {
+    Dataset: async (): Promise<QueryResult.T<UnknownRow>> => {
       return await WorkspaceQetlClient.runQuery({
         rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
         workspaceId,
@@ -130,7 +125,7 @@ async function _runSourceQuery({
 
     // Entity sources resolve through EntityFieldValueClient, which may in
     // turn query many datasets.
-    EntityConfig: async (entityConfig): Promise<QueryResult<UnknownRow>> => {
+    EntityConfig: async (entityConfig): Promise<QueryResult.T<UnknownRow>> => {
       return await _runEntityConfigQuery({
         entityConfig,
         sortedQueryColumns,
@@ -153,7 +148,7 @@ async function _runEntityConfigQuery({
   entityConfig: EntityConfig.T;
   sortedQueryColumns: SortedQueryColumns;
   workspaceId: Workspace.Id;
-}): Promise<QueryResult<UnknownRow>> {
+}): Promise<QueryResult.T<UnknownRow>> {
   // TODO(jpsyx): optimize this by using a progressive
   // table-materialization approach
   const fields = sortedQueryColumns
@@ -180,13 +175,13 @@ async function _runEntityConfigQuery({
 function _buildEntityConfigResult(
   fields: readonly EntityFieldConfig.T[],
   rows: ReadonlyArray<Record<EntityFieldConfig.Id, unknown>>,
-): QueryResult<UnknownRow> {
-  const queryResultColumns: QueryResultColumn[] = fields.map(
+): QueryResult.T<UnknownRow> {
+  const queryResultColumns: QueryResult.Column[] = fields.map(
     pickProps(["name", "dataType"]),
   );
 
   return {
-    id: uuid<QueryResultId>(),
+    id: uuid<QueryResult.Id>(),
     // Mapping over `fields` rather than over the derived columns keeps each
     // field's id in hand, so no per-row lookup back into `fields` is needed.
     data: rows.map((row) => {
@@ -211,7 +206,7 @@ function _buildEntityConfigResult(
  */
 export async function runStructuredQuery(
   params: RunStructuredQueryParams,
-): Promise<QueryResult<UnknownRow>> {
+): Promise<QueryResult.T<UnknownRow>> {
   const { query } = params;
   const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });

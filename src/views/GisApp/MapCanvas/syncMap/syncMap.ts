@@ -1,4 +1,10 @@
-import { prop, propEq } from "@avandar/utils";
+import {
+  isDefined,
+  objectEntries,
+  objectKeys,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import type {
   MapLayerSpec,
   MapSpec,
@@ -19,14 +25,16 @@ function _syncPaint(
   layerSpec: MapLayerSpec,
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
-  Object.entries(layerSpec.paint).forEach(([property, value]) => {
-    const previousValue =
-      previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
-    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-      return;
-    }
-    map.setPaintProperty(layerSpec.id, property, value);
-  });
+  objectEntries(layerSpec.paint)
+    .filter(isDefined)
+    .forEach(([property, value]) => {
+      const previousValue =
+        previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
+      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+        return;
+      }
+      map.setPaintProperty(layerSpec.id, property, value);
+    });
 }
 
 /** Applies only the layout properties whose values differ. */
@@ -39,14 +47,16 @@ function _syncLayout(
   const previousLayout = previousLayerSpec?.layout ?? {
     visibility: "visible",
   };
-  Object.entries(nextLayout).forEach(([property, value]) => {
-    const previousValue =
-      previousLayout[property as keyof typeof previousLayout];
-    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-      return;
-    }
-    map.setLayoutProperty(layerSpec.id, property, value);
-  });
+  objectEntries(nextLayout)
+    .filter(isDefined)
+    .forEach(([property, value]) => {
+      const previousValue =
+        previousLayout[property as keyof typeof previousLayout];
+      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+        return;
+      }
+      map.setLayoutProperty(layerSpec.id, property, value);
+    });
 }
 
 /**
@@ -66,7 +76,7 @@ function _removeStaleLayersAndSources(
       map.removeLayer(layerSpec.id);
     }
   });
-  Object.keys(previousSpec.sources).forEach((sourceId) => {
+  objectKeys(previousSpec.sources).forEach((sourceId) => {
     if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
       map.removeSource(sourceId);
     }
@@ -89,7 +99,7 @@ function _syncSources(
   previousSpec: MapSpec,
   nextSpec: MapSpec,
 ): void {
-  Object.entries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
+  objectEntries(nextSpec.sources).forEach(([sourceId, sourceSpec]) => {
     const existingSource = map.getSource(sourceId) as GeoJSONSource | undefined;
     if (existingSource) {
       if (previousSpec.sources[sourceId]?.data !== sourceSpec.data) {
@@ -118,9 +128,12 @@ function _needsReorder(
   nextLayerIds: ReadonlySet<string>,
 ): boolean {
   const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
+  // Plain predicate rather than `propPasses`: `Set.has` is not a type guard,
+  // and `propPasses` only exposes its type-guard overload, so it rejects a
+  // predicate that merely returns boolean.
   const survivingIds = previousSpec.layers
-    .filter((layer) => {
-      return nextLayerIds.has(layer.id);
+    .filter((layerSpec) => {
+      return nextLayerIds.has(layerSpec.id);
     })
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {
@@ -128,8 +141,8 @@ function _needsReorder(
   });
   const effectiveOrder = [...survivingIds, ...newIds];
   const targetOrder = nextSpec.layers.map(prop("id"));
-  return effectiveOrder.some((layerId, idx) => {
-    return layerId !== targetOrder[idx];
+  return effectiveOrder.some((layerId, layerIndex) => {
+    return layerId !== targetOrder[layerIndex];
   });
 }
 

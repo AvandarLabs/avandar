@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
@@ -6,6 +7,14 @@ import { loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { VitePWA } from "vite-plugin-pwa";
 import { defaultExclude, defineConfig } from "vitest/config";
+
+// Read rather than import package.json so this does not depend on
+// `resolveJsonModule` being enabled in the Node-side tsconfig. Exposed to the
+// app as `import.meta.env.VITE_APP_VERSION` and recorded on every analytics
+// event, so a regression can be correlated with the release that shipped it.
+const { version: appVersion } = JSON.parse(
+  readFileSync("./package.json", "utf-8"),
+) as { version: string };
 
 // Wraps `react()` with the Lingui macro babel plugin. This is required:
 // Lingui macros (<Trans>, t``, msg``, plural()) are compile-time transforms
@@ -42,6 +51,9 @@ export default defineConfig(({ mode }) => {
     : undefined;
 
   return {
+    define: {
+      "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
+    },
     worker: {
       format: "es",
     },

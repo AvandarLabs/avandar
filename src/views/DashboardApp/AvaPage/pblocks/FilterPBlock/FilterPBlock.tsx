@@ -2,8 +2,9 @@ import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useEffect, useMemo } from "react";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
 export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
@@ -60,11 +61,13 @@ export function FilterPBlock({
   mode,
   optionsRaw,
   defaultValue,
-}: Props): ReactElement {
+  puck,
+}: WithPuckProps<Props>): ReactElement {
   const { t } = useLingui();
-
   const dispatch = DashboardFilterStateManager.useDispatch();
   const { filtersById } = DashboardFilterStateManager.useState();
+  const { logFilterChanged, scheduleContainsAnalytics } =
+    useFilterPBlockAnalytics({ filterId, mode, puck });
 
   const operator: "equals" | "in" | "contains" =
     mode === "select_multi" ? "in"
@@ -130,24 +133,21 @@ export function FilterPBlock({
             clearable
             searchable
             value={[...((filterState?.value as readonly string[]) ?? [])]}
-            onChange={(v) => {
-              dispatch.setFilterValue({ filterId, value: v });
-              void AnalyticsClient.logEvent({
-                event: "dashboard.filter_changed",
-                app: "dashboards",
-                payload: { filterId, mode },
-              });
+            onChange={(value) => {
+              dispatch.setFilterValue({ filterId, value });
+              logFilterChanged(value.length === 0);
             }}
           />
         : mode === "contains" ?
           <TextInput
             placeholder={t`Contains…`}
             value={(filterState?.value as string) ?? ""}
-            onChange={(e) => {
+            onChange={(event) => {
               dispatch.setFilterValue({
                 filterId,
-                value: e.currentTarget.value,
+                value: event.currentTarget.value,
               });
+              scheduleContainsAnalytics(event.currentTarget.value);
             }}
           />
         : <Select
@@ -156,16 +156,12 @@ export function FilterPBlock({
             clearable
             searchable
             value={(filterState?.value as string) ?? null}
-            onChange={(v) => {
+            onChange={(value) => {
               dispatch.setFilterValue({
                 filterId,
-                value: v ?? undefined,
+                value: value ?? undefined,
               });
-              void AnalyticsClient.logEvent({
-                event: "dashboard.filter_changed",
-                app: "dashboards",
-                payload: { filterId, mode },
-              });
+              logFilterChanged(value === null);
             }}
           />
         }

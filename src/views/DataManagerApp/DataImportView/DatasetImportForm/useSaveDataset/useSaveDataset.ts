@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { snakeCaseKeysShallow } from "@avandar/utils";
+import { snakeCaseKeysShallow, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -16,6 +16,7 @@ import {
   DatasetImportFormValues,
   DataSourceMetadata,
 } from "../DatasetImportForm";
+import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -76,19 +77,41 @@ type UseSaveDatasetOptions = {
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
+type SaveDatasetMutationContext = {
+  isFirstInWorkspace?: boolean;
+};
+
 export function useSaveDataset(
   options: UseSaveDatasetOptions = {},
 ): UseMutationResultTuple<
   Dataset.T,
-  DatasetImportFormValues & DataSourceMetadata
+  DatasetImportFormValues & DataSourceMetadata,
+  Error,
+  SaveDatasetMutationContext
 > {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const { onSaveSuccess } = options;
+  const [workspaceDatasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
 
-  return useMutation({
+  return useMutation<
+    Dataset.T,
+    DatasetImportFormValues & DataSourceMetadata,
+    Error,
+    SaveDatasetMutationContext
+  >({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    onMutate: () => {
+      return {
+        isFirstInWorkspace:
+          workspaceDatasets === undefined ? undefined : (
+            workspaceDatasets.length === 0
+          ),
+      };
+    },
     mutationFn: (values: DatasetImportFormValues & DataSourceMetadata) => {
       const { name, description, ...dataSourceMetadata } = values;
       return match(dataSourceMetadata)
@@ -176,7 +199,7 @@ export function useSaveDataset(
           );
         });
     },
-    onSuccess: async (savedDataset, params) => {
+    onSuccess: async (savedDataset, params, mutationContext) => {
       notifySuccess({
         title: t`Dataset saved`,
         message: t`Dataset "${savedDataset.name}" saved successfully`,
@@ -209,15 +232,18 @@ export function useSaveDataset(
           );
         });
 
-      void AnalyticsClient.logEvent({
-        event: "dataset.imported",
-        workspaceId: workspace.id,
-        app: "data_sources",
-        payload: {
-          datasetId: savedDataset.id,
-          sourceType: params.sourceType,
-        },
-      });
+      if (mutationContext?.isFirstInWorkspace !== undefined) {
+        void AnalyticsClient.logEvent({
+          event: "dataset.imported",
+          workspaceId: workspace.id,
+          app: "data_sources",
+          payload: makeDatasetImportedPayloadFromSaveResult({
+            datasetId: savedDataset.id,
+            source: params,
+            isFirstInWorkspace: mutationContext.isFirstInWorkspace,
+          }),
+        });
+      }
 
       options.onAfterSave?.(savedDataset);
 

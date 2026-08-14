@@ -17,10 +17,10 @@ import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRo
 import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
+import { useGeneralAccessControl } from "./useGeneralAccessControl";
 import type { DisplayShare } from "./SharePrincipalList";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
@@ -76,12 +76,16 @@ export function ShareResourceModal({
   });
   const invalidateKeys = [queryKey];
 
-  const [sharingState, isLoadingState] =
+  const [sharingState, isLoadingState, sharingStateQuery] =
     ResourceShareClient.useGetResourceSharingState({
       workspaceId,
       resourceType,
       resourceId,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
+  const workspaceShare = sharingState?.shares.find(
+    propEq("principalType", "workspace"),
+  );
 
   const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace({
     workspaceId,
@@ -118,6 +122,20 @@ export function ShareResourceModal({
     },
   });
 
+  const generalAccess = useGeneralAccessControl({
+    resourceName,
+    resourceType,
+    resourceId,
+    workspaceId,
+    sharingState,
+    workspaceShare,
+    queryKey,
+    isSharingStateFetching: sharingStateQuery.isFetching,
+    upsertShare,
+    deleteShare,
+    setRestricted,
+  });
+
   const userById = useMemo((): Record<string, string> => {
     return makeObject(members ?? [], {
       key: "userId",
@@ -149,9 +167,6 @@ export function ShareResourceModal({
     );
   }
 
-  const workspaceShare = sharingState.shares.find(
-    propEq("principalType", "workspace"),
-  );
   const directShares = sharingState.shares.filter(
     propNotEq("principalType", "workspace"),
   );
@@ -231,68 +246,54 @@ export function ShareResourceModal({
     groupById,
   });
 
-  const onGeneralAccessChange = (next: {
-    isRestricted: boolean;
-    role: RoleLevel | null;
-  }): void => {
-    // Skip no-op writes: bail when nothing meaningful changed.
-    const restrictedUnchanged = next.isRestricted === sharingState.isRestricted;
-    const roleUnchanged = next.role === (workspaceShare?.role ?? null);
-    if (restrictedUnchanged && roleUnchanged) {
-      return;
-    }
-
-    if (next.isRestricted !== sharingState.isRestricted) {
-      setRestricted({
-        workspaceId,
-        resourceType,
-        resourceId,
-        isRestricted: next.isRestricted,
-      });
-    }
-    if (!next.isRestricted && next.role) {
-      upsertShare({
-        workspaceId,
-        resourceType,
-        resourceId,
-        principalType: "workspace",
-        principalId: null,
-        role: next.role,
-      });
-    } else if (next.isRestricted && workspaceShare) {
-      deleteShare({ shareId: workspaceShare.id });
-    }
-  };
-
   return (
     <Stack gap="md">
       <Text size="sm" c="dimmed">
         <Trans>Share &ldquo;{resourceName}&rdquo;</Trans>
       </Text>
 
-      <ShareAddPrincipalRow
-        members={(members ?? []).map((member) => {
-          return {
-            value: member.userId,
-            label: member.displayName || member.fullName,
-          };
-        })}
-        groups={(userGroups ?? []).map((group) => {
-          return { value: group.id, label: group.name };
-        })}
-        isAdding={isUpserting}
-        onAdd={({ principalType, principalId, role }) => {
-          upsertShare({
-            workspaceId,
-            resourceType,
-            resourceId,
-            principalType,
-            principalId,
-            role,
-            requiresAppAccess: false,
-          });
-        }}
+      <ShareGeneralAccess
+        resourceType={resourceType}
+        value={generalAccess.displayedValue}
+        isOwner={generalAccess.isOwner}
+        isBusy={generalAccess.isBusy}
+        workspaceShareRole={workspaceShare?.role ?? null}
+        onChange={generalAccess.onChange}
+        onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
       />
+
+      <Stack gap="xs">
+        <Text fw={600} size="sm">
+          <Trans>Give access to additional members</Trans>
+        </Text>
+
+        <ShareAddPrincipalRow
+          members={(members ?? []).map((member) => {
+            return {
+              value: member.userId,
+              label: member.displayName || member.fullName,
+            };
+          })}
+          groups={(userGroups ?? []).map((group) => {
+            return { value: group.id, label: group.name };
+          })}
+          isAdding={isUpserting}
+          isDisabled={
+            generalAccess.displayedValue === "private" || generalAccess.isBusy
+          }
+          onAdd={({ principalType, principalId, role }) => {
+            upsertShare({
+              workspaceId,
+              resourceType,
+              resourceId,
+              principalType,
+              principalId,
+              role,
+              requiresAppAccess: false,
+            });
+          }}
+        />
+      </Stack>
 
       <SharePrincipalList
         shares={displayShares}
@@ -331,13 +332,6 @@ export function ShareResourceModal({
           }
           deleteShare({ shareId: share.id });
         }}
-      />
-
-      <ShareGeneralAccess
-        resourceType={resourceType}
-        isRestricted={sharingState.isRestricted}
-        workspaceShareRole={workspaceShare?.role ?? null}
-        onChange={onGeneralAccessChange}
       />
 
       <ShareSummaryLine spans={spans} />

@@ -1,7 +1,9 @@
 import {
   getFiniteNumberFromValue,
   isDefined,
+  isNullish,
   makeBucketMap,
+  omit,
   prop,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
@@ -28,11 +30,22 @@ export type GeometryDropReport = {
 /** How many row indexes a single drop report keeps as a sample. */
 const MAX_SAMPLE_ROW_INDEXES = 10;
 
+/** Error text for point rendering under an aggregate-only policy. */
+const AGGREGATE_ONLY_ERROR_MESSAGE =
+  "Aggregate-only layers cannot be drawn from individual coordinates.";
+
 /** One row's outcome: either a feature, or the reason it produced none. */
 type RowPlacement = { rowIndex: number } & (
   | { feature: GeoJSON.Feature }
   | { dropReason: DropReason }
 );
+
+type CreatePointFeatureOptions = {
+  binding: MapLayer.GeoBindingColumnNames;
+  coordinate: { longitude: number; latitude: number };
+  row: UnknownRow;
+  rowIndex: number;
+};
 
 function _classifyCoordinate(
   latitude: number,
@@ -94,12 +107,57 @@ function _placeCoordinate({
       });
     })
     .with({ mode: "aggregateOnly" }, () => {
-      throw new SensitivityViolationError(
-        "This layer is aggregate-only, so it cannot be drawn from individual " +
-          "coordinates. Bind it to boundaries or bins instead.",
-      );
+      throw new SensitivityViolationError(AGGREGATE_ONLY_ERROR_MESSAGE);
     })
     .exhaustive();
+}
+
+/** Builds a point feature without repeating its coordinate source columns. */
+function _createPointFeature({
+  binding,
+  coordinate,
+  row,
+  rowIndex,
+}: CreatePointFeatureOptions): GeoJSON.Feature {
+  const properties: GeoJSON.GeoJsonProperties = omit(row, [
+    binding.latitudeColumnName,
+    binding.longitudeColumnName,
+  ]);
+  return {
+    type: "Feature",
+    id: rowIndex,
+    geometry: {
+      type: "Point",
+      coordinates: [coordinate.longitude, coordinate.latitude],
+    },
+    properties,
+  };
+}
+
+/** Reads and validates the coordinate columns of one source row. */
+function _readCoordinate({
+  binding,
+  row,
+}: {
+  binding: MapLayer.GeoBindingColumnNames;
+  row: UnknownRow;
+}):
+  | { coordinate: { longitude: number; latitude: number } }
+  | { dropReason: DropReason } {
+  const rawLatitude = row[binding.latitudeColumnName];
+  const rawLongitude = row[binding.longitudeColumnName];
+  if (isNullish(rawLatitude) || isNullish(rawLongitude)) {
+    return { dropReason: "nullCoordinate" };
+  }
+  const latitude = getFiniteNumberFromValue(rawLatitude);
+  const longitude = getFiniteNumberFromValue(rawLongitude);
+  if (latitude === undefined || longitude === undefined) {
+    return { dropReason: "nonNumericCoordinate" };
+  }
+  const invalidReason = _classifyCoordinate(latitude, longitude);
+  return invalidReason ?
+      { dropReason: invalidReason }
+    : { coordinate: { longitude, latitude } };
 }
 
 /**
@@ -119,45 +177,25 @@ function _placeRow({
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
 }): RowPlacement {
-  const { latitudeColumnName, longitudeColumnName } = binding;
-  const rawLatitude = row[latitudeColumnName];
-  const rawLongitude = row[longitudeColumnName];
-  if (rawLatitude == null || rawLongitude == null) {
-    return { rowIndex, dropReason: "nullCoordinate" };
+  const coordinateRead = _readCoordinate({ row, binding });
+  if ("dropReason" in coordinateRead) {
+    return { rowIndex, dropReason: coordinateRead.dropReason };
   }
-  const latitude = getFiniteNumberFromValue(rawLatitude);
-  const longitude = getFiniteNumberFromValue(rawLongitude);
-  if (latitude === undefined || longitude === undefined) {
-    return { rowIndex, dropReason: "nonNumericCoordinate" };
-  }
-  const invalidReason = _classifyCoordinate(latitude, longitude);
-  if (invalidReason) {
-    return { rowIndex, dropReason: invalidReason };
-  }
-
-  const placed = _placeCoordinate({
-    latitude,
-    longitude,
+  const placedCoordinate = _placeCoordinate({
+    ...coordinateRead.coordinate,
     sensitivity,
     layerId,
     rowIndex,
   });
 
-  const properties: GeoJSON.GeoJsonProperties = { ...row };
-  delete properties[latitudeColumnName];
-  delete properties[longitudeColumnName];
-
   return {
     rowIndex,
-    feature: {
-      type: "Feature",
-      id: rowIndex,
-      geometry: {
-        type: "Point",
-        coordinates: [placed.longitude, placed.latitude],
-      },
-      properties,
-    },
+    feature: _createPointFeature({
+      binding,
+      coordinate: placedCoordinate,
+      row,
+      rowIndex,
+    }),
   };
 }
 
@@ -175,6 +213,32 @@ function _buildDropReports(
       sampleRowIndexes: rowIndexes.slice(0, MAX_SAMPLE_ROW_INDEXES),
     };
   });
+}
+
+/** Separates successful placements from drops and builds their report. */
+function _buildConversionResult(placements: readonly RowPlacement[]): {
+  featureCollection: GeoJSON.FeatureCollection;
+  drops: GeometryDropReport[];
+} {
+  const features = placements
+    .map((placement) => {
+      return "feature" in placement ? placement.feature : undefined;
+    })
+    .filter(isDefined);
+  const droppedPlacements = placements.filter(
+    (placement): placement is { rowIndex: number; dropReason: DropReason } => {
+      return "dropReason" in placement;
+    },
+  );
+  return {
+    featureCollection: { type: "FeatureCollection", features },
+    drops: _buildDropReports(
+      makeBucketMap(droppedPlacements, {
+        keyFn: prop("dropReason"),
+        valueFn: prop("rowIndex"),
+      }),
+    ),
+  };
 }
 
 /**
@@ -205,38 +269,14 @@ export function makeFeatureCollectionFromRows({
   layerId: string;
 }): {
   featureCollection: GeoJSON.FeatureCollection;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 } {
   if (sensitivity.mode === "aggregateOnly") {
-    throw new SensitivityViolationError(
-      "This layer is aggregate-only, so it cannot be drawn from individual " +
-        "coordinates. Bind it to boundaries or bins instead.",
-    );
+    throw new SensitivityViolationError(AGGREGATE_ONLY_ERROR_MESSAGE);
   }
 
   const placements = rows.map((row, rowIndex) => {
     return _placeRow({ row, rowIndex, binding, sensitivity, layerId });
   });
-
-  const features = placements
-    .map((placement) => {
-      return "feature" in placement ? placement.feature : undefined;
-    })
-    .filter(isDefined);
-
-  const droppedPlacements = placements.filter(
-    (placement): placement is { rowIndex: number; dropReason: DropReason } => {
-      return "dropReason" in placement;
-    },
-  );
-
-  return {
-    featureCollection: { type: "FeatureCollection", features },
-    drops: _buildDropReports(
-      makeBucketMap(droppedPlacements, {
-        keyFn: prop("dropReason"),
-        valueFn: prop("rowIndex"),
-      }),
-    ),
-  };
+  return _buildConversionResult(placements);
 }

@@ -1023,7 +1023,10 @@ export type Database = {
       usage_analytics_events: {
         Row: {
           app: Database["public"]["Enums"]["app_type"] | null
+          app_version: string | null
+          client: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at: string
+          event_category: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id: string
           payload: Json | null
@@ -1032,7 +1035,10 @@ export type Database = {
         }
         Insert: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name: string
           id?: string
           payload?: Json | null
@@ -1041,7 +1047,10 @@ export type Database = {
         }
         Update: {
           app?: Database["public"]["Enums"]["app_type"] | null
+          app_version?: string | null
+          client?: Database["public"]["Enums"]["usage_analytics_events__client"]
           created_at?: string
+          event_category?: Database["public"]["Enums"]["usage_analytics_events__category"]
           event_name?: string
           id?: string
           payload?: Json | null
@@ -1611,6 +1620,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_resources__make_private: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: undefined
+      }
       rpc_resources__transfer_ownership: {
         Args: {
           p_new_owner_id: string
@@ -1656,6 +1672,10 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: number
+      }
+      util__analytics_event_category: {
+        Args: { p_event_name: string }
+        Returns: Database["public"]["Enums"]["usage_analytics_events__category"]
       }
       util__auth_user_can_access_resource: {
         Args: {
@@ -1754,6 +1774,16 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: boolean
       }
+      util__log_analytics_event: {
+        Args: {
+          p_app?: Database["public"]["Enums"]["app_type"]
+          p_event_name: string
+          p_payload?: Json
+          p_user_id?: string
+          p_workspace_id?: string
+        }
+        Returns: undefined
+      }
       util__rank_to_role_level: {
         Args: { p_rank: number }
         Returns: Database["public"]["Enums"]["role_level"]
@@ -1787,7 +1817,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"
+      app_type:
+        | "data_sources"
+        | "data_explorer"
+        | "dashboards"
+        | "settings"
+        | "gis"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -1849,6 +1884,14 @@ export type Database = {
         | "canceled"
         | "unpaid"
       subscriptions__update_status: "pending" | "completed"
+      usage_analytics_events__category:
+        | "acquisition"
+        | "activation"
+        | "engagement"
+        | "expansion"
+        | "revenue"
+        | "other"
+      usage_analytics_events__client: "web" | "desktop" | "server" | "db"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -2005,7 +2048,13 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_type: ["data_sources", "data_explorer", "dashboards", "settings"],
+      app_type: [
+        "data_sources",
+        "data_explorer",
+        "dashboards",
+        "settings",
+        "gis",
+      ],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -2072,6 +2121,15 @@ export const Constants = {
         "unpaid",
       ],
       subscriptions__update_status: ["pending", "completed"],
+      usage_analytics_events__category: [
+        "acquisition",
+        "activation",
+        "engagement",
+        "expansion",
+        "revenue",
+        "other",
+      ],
+      usage_analytics_events__client: ["web", "desktop", "server", "db"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",
@@ -2085,4 +2143,3 @@ export const Constants = {
     },
   },
 } as const
-

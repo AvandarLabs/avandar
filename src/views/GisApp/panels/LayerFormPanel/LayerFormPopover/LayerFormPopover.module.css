@@ -1,0 +1,14 @@
+.layerFormPopoverFilterButton {
+  border: 1px solid var(--mantine-color-neutral-3);
+  border-radius: 50%;
+  box-shadow: var(--mantine-shadow-md);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.layerFormPopoverFilterButton:hover,
+.layerFormPopoverFilterButton[data-active="true"] {
+  box-shadow: var(--mantine-shadow-lg);
+  transform: scale(1.2);
+}

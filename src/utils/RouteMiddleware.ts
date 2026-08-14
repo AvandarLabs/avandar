@@ -1,4 +1,4 @@
-import { propEq } from "@avandar/utils";
+import { isFunction, propEq } from "@avandar/utils";
 import { redirect } from "@tanstack/react-router";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { UserId } from "$/models/User/User.types";
@@ -48,7 +48,8 @@ export const RouteMiddleware = {
      * verbatim.
      *
      * @param options.permissionKey Minimum permission required for the route.
-     * @param options.appLabel Human-readable app name for access-denied UI.
+     * @param options.appLabel Human-readable app name for access-denied UI,
+     * or a thunk when resolving it requires initialized runtime state.
      * @param options.resourceFallback Optional per-resource fallback.
      */
     checkUserPermissions: ({
@@ -57,7 +58,7 @@ export const RouteMiddleware = {
       resourceFallback,
     }: {
       permissionKey: PermissionKey;
-      appLabel: string;
+      appLabel: string | (() => string);
       resourceFallback?: ResourceFallback;
     }) => {
       return async (loadContext: {
@@ -126,7 +127,9 @@ export const RouteMiddleware = {
         throw redirect({
           to: "/$workspaceSlug/access-denied",
           params: { workspaceSlug: workspaceSlug },
-          search: { app: appLabel },
+          search: {
+            app: isFunction(appLabel) ? appLabel() : appLabel,
+          },
         });
       };
     },

@@ -2,7 +2,7 @@ import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { SUPPORT_EMAIL } from "$/config/AppConfig";
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";

@@ -26,6 +26,7 @@ import {
   setGeneralAccess,
   toggleRequiresAppAccess,
 } from "./helpers/shareModalFlow";
+import { ShareModalPrivateAccess } from "./helpers/ShareModalPrivateAccess";
 import {
   assignWorkspaceTagToMember,
   createWorkspaceTagViaSettings,
@@ -411,6 +412,48 @@ test.describe("Share modal", () => {
         workspaceId,
         tagName: groupName,
       });
+    }
+  });
+
+  test("Only me revokes every share in one action", async ({
+    page,
+    e2eWorkerDb,
+    e2eViewerMembership,
+  }) => {
+    const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
+    const { admin } = e2eViewerMembership;
+    const datasetName = "E2E only me";
+
+    let datasetId = "";
+    try {
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+
+      ({ datasetId } = await uploadCaliforniaCsvDataset({
+        page,
+        workspaceSlug,
+        datasetName,
+      }));
+
+      await ShareModalPrivateAccess.runOnlyMeRevocationFlow({
+        page,
+        workspaceSlug,
+        datasetId,
+        datasetName,
+        primaryUser,
+        secondaryUser,
+        secondaryUserDisplayName: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
+      });
+    } finally {
+      if (datasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId,
+        });
+      }
     }
   });
 
