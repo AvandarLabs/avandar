@@ -326,8 +326,7 @@ the mapping once and pins it:
 > `util__auth_user_meets_min_app_role(workspace_id, 'dashboards', 'admin')`.
 
 Per D-P3-5 the enforcement is a `before update` trigger on `dashboards` that
-raises when `new.visibility = 'public'` and `old.visibility is distinct from
-'public'` and the caller does not meet that minimum. Three properties matter:
+raises when the caller does not meet that minimum. Three properties matter:
 
 - It fires on the transition only, so re-saving an already-public dashboard is
   untouched.
@@ -337,6 +336,30 @@ raises when `new.visibility = 'public'` and `old.visibility is distinct from
 - P4 adds its own triggers to this table for the plan limit. Both are
   `before update`, so the naming has to make the order legible; Postgres fires
   them alphabetically and neither depends on the other's outcome.
+
+**Two refinements found during implementation**, recorded here because both
+make the boundary stricter than this section originally specified:
+
+- **The trigger guards the claim as well as the settlement.** P2 moves
+  `visibility` through a durable two-step transition: a claim writes
+  `snapshot_transition_target_visibility`, and a later settle flips
+  `visibility` itself. Guarding only the settle would let an unauthorized
+  editor build and upload an entire public snapshot before failing on the last
+  statement. The trigger therefore fires on
+  `update of visibility, snapshot_transition_target_visibility` and rejects
+  either transition into `public`.
+- **The exemption keys on the connecting role, not only on `auth.uid()`.** The
+  intended exemption is "trusted server paths that already bypass RLS", and
+  `auth.uid() is null` turned out not to express it: a psql session that
+  switches to `postgres` can still carry a leftover `request.jwt.claims`, which
+  several storage pgTAP fixtures do, so they were rejected. The guard is
+  `current_user <> 'authenticated' or auth.uid() is null`, which asks how the
+  request actually arrived rather than trusting a claim that can linger. End
+  user traffic reaches Postgres as `authenticated` through PostgREST and is
+  always gated. This forces the function to be SECURITY INVOKER, since under
+  SECURITY DEFINER `current_user` is the function owner rather than the caller;
+  it needs no elevated privileges of its own, because the role check it
+  delegates to is already security definer.
 
 ### 5.3 The disabled option
 
