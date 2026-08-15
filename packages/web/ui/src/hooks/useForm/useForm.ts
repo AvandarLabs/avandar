@@ -1,18 +1,18 @@
+import type { ObjectPaths, UnknownObject  } from "@avandar/utils";
 import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
 import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
-import type { UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
 import type { FormType } from "@ui/hooks/useForm/useForm.types";
-import type { Merge, Paths } from "type-fest";
+import type { Merge } from "type-fest";
 
 // Improved type safety for `path` argument in a Rule function
 export type RuleFn<
   Value,
   FullFormValues,
-  FormPath extends Paths<FullFormValues>,
+  FormPath extends ObjectPaths<FullFormValues>,
 > = (value: Value, values: FullFormValues, path: FormPath) => React.ReactNode;
 
 // Improved type safety for form rules to better handle nullable values and
@@ -20,7 +20,7 @@ export type RuleFn<
 export type FormRule<
   Value,
   FullFormValues,
-  FormPath extends Paths<FullFormValues>,
+  FormPath extends ObjectPaths<FullFormValues>,
 > =
   NonNullable<Value> extends ReadonlyArray<infer ListElementType> ?
     | ({
@@ -51,7 +51,7 @@ export type FormRule<
 export type FormRulesRecord<
   FormValues,
   FullFormValues,
-  FormPath extends Paths<FullFormValues> = Paths<FullFormValues>,
+  FormPath extends ObjectPaths<FullFormValues> = ObjectPaths<FullFormValues>,
 > = {
   [Key in keyof NonNullable<FormValues>]?: FormRule<
     NonNullable<FormValues>[Key],
@@ -69,7 +69,7 @@ export type FormRulesRecord<
 export type UseFormInput<
   FormValues extends UnknownObject,
   TransformValues = FormValues,
-  FormPath extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 > = Merge<
   MantineUseFormInput<FormValues, TransformValues>,
   {
@@ -94,7 +94,7 @@ export type UseFormInput<
 export function useForm<
   FormValues extends UnknownObject,
   TransformValues = FormValues,
-  FormPath extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 >(
   formOptions: UseFormInput<FormValues, TransformValues, FormPath>,
 ): FormType<FormValues, TransformValues, FormPath> {

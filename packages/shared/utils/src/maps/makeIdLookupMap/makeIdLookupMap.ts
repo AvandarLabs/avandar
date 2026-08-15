@@ -1,6 +1,6 @@
+import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import { getValue } from "@utils/objects/getValue/getValue.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
-import type { Paths } from "type-fest";
 
 /**
  * Creates a lookup from a list of objects, indexed by an object's id field.
@@ -15,17 +15,17 @@ import type { Paths } from "type-fest";
  */
 export function makeIdLookupMap<
   T extends object,
-  IdKey extends [Paths<T>] extends [never] ? keyof T : Paths<T> = "id" extends (
-    [Paths<T>] extends [never] ?
+  IdKey extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T> = "id" extends (
+    [ObjectPaths<T>] extends [never] ?
       keyof T
-    : Paths<T>
+    : ObjectPaths<T>
   ) ?
     "id"
   : never,
   IdType extends IdKey extends keyof T ? T[IdKey]
-  : IdKey extends Paths<T> ? PathValue<T, IdKey>
+  : IdKey extends ObjectPaths<T> ? PathValue<T, IdKey>
   : never = IdKey extends keyof T ? T[IdKey]
-  : IdKey extends Paths<T> ? PathValue<T, IdKey>
+  : IdKey extends ObjectPaths<T> ? PathValue<T, IdKey>
   : never,
 >(
   list: readonly T[],

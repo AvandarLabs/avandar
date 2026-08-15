@@ -1,5 +1,5 @@
-import type { UnknownObject } from "@avandar/utils";
-import type { Paths, Simplify, UnknownArray } from "type-fest";
+import type { ObjectPaths, UnknownObject  } from "@avandar/utils";
+import type { Simplify, UnknownArray } from "type-fest";
 
 /**
  * Set the type of a property given a shallow key.
@@ -31,11 +31,11 @@ type SetFieldValueShallow<
  */
 export type SetFieldValueDeep<
   T extends UnknownObject | UnknownArray,
-  // We need to use this ternary expression on `K` because Paths<> returns
-  // `never` on a record. E.g. Paths<string, string> = never.
-  // So if `Paths<>` can't compute a set of paths, we can fall back
+  // We need to use this ternary expression on `K` because ObjectPaths<> returns
+  // `never` on a record. E.g. ObjectPaths<string, string> = never.
+  // So if `ObjectPaths<>` can't compute a set of paths, we can fall back
   // to using `keyof T` which works fine for records.
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V,
 > =
   T extends UnknownArray ?
@@ -46,7 +46,7 @@ export type SetFieldValueDeep<
     : K extends `${number}.${infer PathTail}` ?
       // dig in recursively
       T extends Array<infer Item extends UnknownObject | UnknownArray> ?
-        PathTail extends Paths<Item> ?
+        PathTail extends ObjectPaths<Item> ?
           Array<
             SetFieldValueDeep<
               Item,
@@ -58,7 +58,7 @@ export type SetFieldValueDeep<
       : T extends (
         ReadonlyArray<infer Item extends UnknownObject | UnknownArray>
       ) ?
-        PathTail extends Paths<Item> ?
+        PathTail extends ObjectPaths<Item> ?
           ReadonlyArray<
             SetFieldValueDeep<
               Item,
@@ -83,7 +83,7 @@ export type SetFieldValueDeep<
             // We need to dig in recursively, but we need to assert our types
             // are still valid for the recursive SetFieldValueDeep call
             T[Key] extends UnknownObject | UnknownArray ?
-              PathTail extends Paths<T[Key]> ?
+              PathTail extends ObjectPaths<T[Key]> ?
                 SetFieldValueDeep<
                   T[Key],
                   [PathTail] extends [never] ? keyof T[Key] : PathTail,
