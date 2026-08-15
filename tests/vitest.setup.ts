@@ -90,6 +90,16 @@ function setupVitest() {
       disconnect(): void {}
     };
   }
+
+  // jsdom implements no layout, so it ships no `scrollIntoView`. Mantine's
+  // Combobox calls it when the highlighted option changes, which any test that
+  // opens a `Select` and picks an option will do. The resulting TypeError is
+  // thrown from a listener rather than from the test body, so it surfaces as a
+  // vitest "unhandled error" that fails the RUN while every test still passes,
+  // which is a confusing way to break CI.
+  if (!window.HTMLElement.prototype.scrollIntoView) {
+    window.HTMLElement.prototype.scrollIntoView = noop;
+  }
 }
 
 setupVitest();
