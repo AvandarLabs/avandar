@@ -118,9 +118,7 @@ async function _processLocale(args: {
   try {
     raw = await fs.readFile(poPath, "utf8");
   } catch {
-    console.warn(
-      `  · no catalog at ${poPath}, run pnpm i18n:translations first`,
-    );
+    console.warn(`  · no catalog at ${poPath}, run pnpm translations first`);
     return { translated: 0, remaining: 0 };
   }
   const parsed = PoCatalog.parse(raw);
