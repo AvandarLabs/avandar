@@ -190,10 +190,13 @@ Implement functionality using red/green TDD.
 ## Browser usage with Playwright
 
 - If you need to control the browser, use the Playwright MCP.
+- Development can happen over SSH, so there is no guaranteed GUI session or
+  browser window that can be opened. Every browser run must be headless.
 - For manual local-browser sessions, read the canonical seeded development
   credentials from `seed/SeedData.ts`: `TEST_USER_EMAIL`,
   `TEST_USER_PASSWORD`, and `TEST_WORKSPACE_SLUG`.
 - Do not use the accounts in `tests/e2e/setup/e2e-credentials.ts` for manual
   browser sessions. Those accounts are dedicated to automated E2E tests.
-- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
-  which is gitignored so we don't commit by accident.
+- Take screenshots along the way, since they are the only record of what the
+  page looked like. Store them in `.temp/` directory at the repo root, which
+  is gitignored.
