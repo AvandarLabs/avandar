@@ -113,6 +113,8 @@ D-P3-1, is one optional prop:
 type ShareResourcePublishing = {
   /** Target the dropdown selects; applied by Publish or Unpublish. */
   targetVisibility: DashboardVisibility;
+  /** What is actually published right now. Added during implementation. */
+  currentVisibility: DashboardVisibility;
   /** Undefined when the public option is selectable. */
   publicOptionDisabledReason: string | undefined;
   /** Slug field, slice section, status line, and share links. */
@@ -124,9 +126,17 @@ type ShareResourcePublishing = {
 };
 ```
 
-The persisted visibility is deliberately **not** on this prop. The target is
-initialised from it, so on open the two agree and D-P3-3's display rule holds;
-after that any divergence is a pending change the status line reports.
+**Implementation correction.** This section originally said the persisted
+visibility was deliberately **not** on this prop: the target is initialised
+from it, so on open the two agree and D-P3-3's display rule holds, and after
+that any divergence is a pending change the status line reports. That held for
+the dropdown but not for the warning below it. The shipped
+`ShareResourcePublishing` therefore carries `currentVisibility` as well, and the
+modal reads it for exactly two things: whether the dashboard is publicly
+published today (the red "still public on the web" alert) and the publication
+span of the summary line. The rule the original sentence was protecting
+survives in a narrower form: the dropdown reads only `targetVisibility`, and
+nothing reasons about live exposure from it.
 
 **That refinement has a sharp edge, found in review, and the status line is
 what pays for it.** Because the dropdown reads the *target*, an owner who picks

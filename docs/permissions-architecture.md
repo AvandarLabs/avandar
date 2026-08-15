@@ -106,8 +106,9 @@ internal* rather than stretching "private" to cover the second one.
 
 **Public is a different axis from the other two, and callers must compose
 them.** Private and internal are decided by restriction and shares; public is
-decided by `dashboards.is_public`, which the publish flow sets and the `anon`
-RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two axes can
+decided by `dashboards.is_public`, which the publish flow sets indirectly
+through `dashboards.visibility` (`is_public` is generated from it) and which
+the `anon` RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two axes can
 disagree, and at the product level **public wins**: a world-readable dashboard
 is public, never private, whatever its share rows say.
 
@@ -130,16 +131,18 @@ will hide public dashboards from admins.
 Datasets have no public state at all. `datasets` has `is_restricted` but no
 `is_public`, so a dataset is only ever private or internal.
 
-**"Internal" is currently a sharing state, not a publishing state.** Publishing
-today has exactly one outcome, `is_public = true`, so there is no way to
-publish a dashboard to the workspace only. An internal dashboard is reached
-through the app, not through a published URL. Closing that gap is the point of
-the `dashboard_visibility` enum (`draft` | `workspace` | `public`) in
-`docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1, which is
-designed but not implemented. When it lands, "internal" gains a second meaning
-worth disambiguating in review: *internal shared* (reachable in-app, today's
-meaning) versus *internal published* (`visibility = 'workspace'`, a snapshot in
-the `published-private` bucket behind a real URL).
+**"Internal" is now both a sharing state and a publishing state.** The
+`dashboard_visibility` enum (`draft` | `workspace` | `public`) has shipped:
+`dashboards.visibility` is the stored column and `is_public` is a generated
+column that is true only for `visibility = 'public'`. Two meanings are
+therefore worth disambiguating in review: *internal shared* (reachable in-app
+through shares and app roles, the older meaning) versus *internal published*
+(`visibility = 'workspace'`, a snapshot in the `published-private` bucket
+behind a real URL). See
+`docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1 for the
+model and
+`docs/superpowers/specs/2026-08-14-private-dashboards-publishing-core-design.md`
+for what landed.
 
 The guarantee covers **object storage as well as the Postgres row**. The four
 `workspaces` bucket policies on `storage.objects` gate on
@@ -252,6 +255,42 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 membership so a “Health” group share on a dataset reaches only users who can
 already see `data_sources` at all. The flag has no effect on `user` or
 `workspace` principals.
+
+### 4.1 Known asymmetry: viewers see more than editors
+
+For a **non-restricted** dashboard, `util__auth_user_may_select_dashboard`
+returns true for any member whose Dashboards app role ranks below `editor`, and
+requires an explicit share for `editor` and `admin`. A workspace member with
+the viewer role can therefore select every non-restricted dashboard in the
+workspace, while an editor sees only the ones they own or hold a share on.
+Promoting someone from viewer to editor shrinks their dashboard list.
+
+Two qualifications, read off
+`supabase/schemas/16.utils.resource-permissions.sql`. The rank comparison is
+reached only after the function's own
+`util__auth_user_can_access_resource(..., 'viewer')` gate, so a member with **no**
+Dashboards app role at all is rejected earlier and does not benefit; the
+"ranks below editor" case is the viewer role in practice. And the owner,
+`util__can_manage_workspace_settings`, and share paths all return true before
+the rank comparison, so an editor who owns the row, is a Settings Admin or
+workspace owner, or holds any share still sees it.
+
+This predates the private-dashboards work and was unobservable while the
+dashboards index filtered on `owner_id`. P3 removed that filter, so it is now a
+visible product behavior. It is documented rather than changed because
+correcting it is a permission-model decision with its own pgTAP truth tables to
+update. See
+`docs/superpowers/specs/2026-08-15-private-dashboards-merged-share-surface-design.md`
+section 8.
+
+That function also has no `visibility` check at all. It reads `is_public` (the
+stored generated column that is true only for `visibility = 'public'`) and
+`is_restricted`, and nothing distinguishes `draft` from `workspace`. A `draft`
+dashboard shared with someone as a viewer is therefore SELECT-able by them, so
+it appears in their dashboards index, while the preview route denies it. The
+result is a card that renders and then refuses to open. P3 enforces the draft
+rule in the client only; moving it into this function would close both gaps at
+once.
 
 ```mermaid
 flowchart LR
