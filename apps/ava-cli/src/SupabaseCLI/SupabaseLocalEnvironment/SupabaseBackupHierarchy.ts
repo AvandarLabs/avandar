@@ -1,5 +1,6 @@
 import path from "node:path";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
+import { promiseMapSequential } from "@avandar/utils";
 import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type PrepareBackupHierarchyOptions = {
@@ -89,13 +90,13 @@ async function _prepareBackupHierarchy(
     worktreePath: options.worktreePath,
   });
   const parentDirectories = hierarchy.slice(0, -1);
-  for (const directoryPath of parentDirectories) {
-    await _reserveValidatedBackupDirectory({
+  await promiseMapSequential(parentDirectories, (directoryPath) => {
+    return _reserveValidatedBackupDirectory({
       io: options.io,
       canonicalRoot,
       directoryPath,
     });
-  }
+  });
   const hasAcquiredLeaf = await _reserveValidatedBackupDirectory({
     io: options.io,
     canonicalRoot,

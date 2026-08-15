@@ -85,16 +85,9 @@ async function _copyFileToBackup(
 async function _copyFilesToBackup(
   options: Readonly<CopyFilesToBackupOptions>,
 ): Promise<SupabaseBackupFile[]> {
-  const [sourcePath, ...remainingSourcePaths] = options.sourcePaths;
-  if (!sourcePath) {
-    return [];
-  }
-  const backupFile = await _copyFileToBackup({ ...options, sourcePath });
-  const remainingBackupFiles = await _copyFilesToBackup({
-    ...options,
-    sourcePaths: remainingSourcePaths,
+  return promiseMap(options.sourcePaths, (sourcePath) => {
+    return _copyFileToBackup({ ...options, sourcePath });
   });
-  return [backupFile, ...remainingBackupFiles];
 }
 
 async function _failBackupCreation(

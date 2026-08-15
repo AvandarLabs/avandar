@@ -236,8 +236,10 @@ async function _requireSafeManifestFile(
   if (!exists || !isFile) {
     throw new Error(`Invalid Supabase backup manifest at ${manifestPath}.`);
   }
-  const canonicalBackupDirectory = await io.realPath(backupDirectory);
-  const canonicalManifestPath = await io.realPath(manifestPath);
+  const [canonicalBackupDirectory, canonicalManifestPath] = await Promise.all([
+    io.realPath(backupDirectory),
+    io.realPath(manifestPath),
+  ]);
   if (
     !SupabaseBackupPaths.isPathInside({
       parentPath: canonicalBackupDirectory,

@@ -182,19 +182,20 @@ async function _requireCanonicalManifestPaths(
     paths: RestorePaths;
   }>,
 ): Promise<void> {
-  const canonicalWorktreePath = await options.io.realPath(
-    options.paths.worktreePath,
-  );
-  const canonicalBackupDirectory = await options.io.realPath(
-    options.paths.backupDirectory,
-  );
-  const canonicalFilesDirectory = await options.io.realPath(
-    options.paths.filesDirectory,
-  );
-  const canonicalFiles = await _canonicalFilesFromManifest({
-    io: options.io,
-    manifest: options.manifest,
-  });
+  const [
+    canonicalWorktreePath,
+    canonicalBackupDirectory,
+    canonicalFilesDirectory,
+    canonicalFiles,
+  ] = await Promise.all([
+    options.io.realPath(options.paths.worktreePath),
+    options.io.realPath(options.paths.backupDirectory),
+    options.io.realPath(options.paths.filesDirectory),
+    _canonicalFilesFromManifest({
+      io: options.io,
+      manifest: options.manifest,
+    }),
+  ]);
   _requireCanonicalRestoreRoots({
     worktreePath: canonicalWorktreePath,
     backupDirectory: canonicalBackupDirectory,

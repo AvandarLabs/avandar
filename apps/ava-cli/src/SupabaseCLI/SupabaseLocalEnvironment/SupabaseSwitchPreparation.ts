@@ -158,12 +158,14 @@ async function _prepareSwitch(
     temporaryProjectId,
     worktreePath: identity.worktreePath,
   });
-  const { basePort, derivedPorts } = await _selectSwitchPorts({
-    io,
-    source,
-    requestedBasePort,
-  });
-  const envFiles = await io.findDevelopmentEnvFiles();
+  const [{ basePort, derivedPorts }, envFiles] = await Promise.all([
+    _selectSwitchPorts({
+      io,
+      source,
+      requestedBasePort,
+    }),
+    io.findDevelopmentEnvFiles(),
+  ]);
   await _requireSwitchSourceFiles({
     io,
     sourcePaths: envFiles,

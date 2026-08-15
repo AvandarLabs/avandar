@@ -226,18 +226,20 @@ async function _restore(
 ): Promise<void> {
   const preparation =
     await SupabaseRestorePreparation.readRestorePreparation(io);
-  const cleanupError = await _restoreCleanupError({ io, preparation });
-  const restoreError = await (async (): Promise<unknown> => {
-    try {
-      await SupabaseBackupStore.restoreFiles({
-        io,
-        manifest: preparation.manifest,
-      });
-      return undefined;
-    } catch (error) {
-      return error;
-    }
-  })();
+  const [cleanupError, restoreError] = await Promise.all([
+    _restoreCleanupError({ io, preparation }),
+    (async (): Promise<unknown> => {
+      try {
+        await SupabaseBackupStore.restoreFiles({
+          io,
+          manifest: preparation.manifest,
+        });
+        return undefined;
+      } catch (error) {
+        return error;
+      }
+    })(),
+  ]);
   if (restoreError) {
     const errors = cleanupError ? [cleanupError, restoreError] : [restoreError];
     throw new AggregateError(

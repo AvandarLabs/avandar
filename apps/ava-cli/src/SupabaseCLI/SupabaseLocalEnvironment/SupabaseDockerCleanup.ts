@@ -1,5 +1,11 @@
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { constant, matchLiteral, prop, propEq } from "@avandar/utils";
+import {
+  constant,
+  matchLiteral,
+  promiseMapSequential,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import type {
   SupabaseDockerResource,
   SupabaseLocalEnvironmentIO,
@@ -99,18 +105,16 @@ async function _removeTemporaryResources(
     temporaryProjectId: string;
   }>,
 ): Promise<Array<{ resource: SupabaseDockerResource; error: Error }>> {
-  const [resource, ...remainingResources] = options.resources;
-  if (!resource) {
-    return [];
-  }
-  const error = await _removeTemporaryResource({ ...options, resource });
-  const remainingFailures = await _removeTemporaryResources({
-    ...options,
-    resources: remainingResources,
+  const failures = await promiseMapSequential(
+    options.resources,
+    async (resource) => {
+      const error = await _removeTemporaryResource({ ...options, resource });
+      return error ? { resource, error } : undefined;
+    },
+  );
+  return failures.flatMap((failure) => {
+    return failure ? [failure] : [];
   });
-  return error ?
-      [{ resource, error }, ...remainingFailures]
-    : remainingFailures;
 }
 
 function _makeCleanupError(
