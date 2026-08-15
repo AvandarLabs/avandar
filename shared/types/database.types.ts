@@ -787,6 +787,66 @@ export type Database = {
           },
         ]
       }
+      maps: {
+        Row: {
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          slug: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          is_restricted?: boolean
+          name: string
+          owner_id?: string
+          owner_profile_id: string
+          slug?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          is_restricted?: boolean
+          name?: string
+          owner_id?: string
+          owner_profile_id?: string
+          slug?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maps_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maps_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resource_shares: {
         Row: {
           created_at: string
@@ -1430,6 +1490,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      maps__owner_id_matches_stored: {
+        Args: { p_map_id: string; p_owner_id: string }
+        Returns: boolean
+      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1662,6 +1726,7 @@ export type Database = {
         Returns: {
           private_dashboard_count: number
           private_dataset_count: number
+          private_map_count: number
           user_id: string
         }[]
       }
@@ -1716,12 +1781,42 @@ export type Database = {
         }
         Returns: boolean
       }
+      util__auth_user_has_resource_share: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
       util__auth_user_may_select_dashboard: {
         Args: { p_dashboard_id: string }
         Returns: boolean
       }
       util__auth_user_may_select_dataset: {
         Args: { p_dataset_id: string }
+        Returns: boolean
+      }
+      util__auth_user_may_select_map: {
+        Args: { p_map_id: string }
+        Returns: boolean
+      }
+      util__auth_user_may_select_map_grant: {
+        Args: {
+          p_is_restricted: boolean
+          p_map_id: string
+          p_owner_id: string
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__auth_user_may_select_resource_base: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
         Returns: boolean
       }
       util__auth_user_meets_min_app_role: {
@@ -1871,7 +1966,7 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
-      resource_type: "dashboard" | "dataset"
+      resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
       subscriptions__feature_plan_type: "free" | "basic" | "premium"
@@ -2107,7 +2202,7 @@ export const Constants = {
         "dataset_column_value",
         "manual_entry",
       ],
-      resource_type: ["dashboard", "dataset"],
+      resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],
       subscriptions__feature_plan_type: ["free", "basic", "premium"],
@@ -2143,4 +2238,3 @@ export const Constants = {
     },
   },
 } as const
-

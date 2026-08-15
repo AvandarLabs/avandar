@@ -1,0 +1,18 @@
+.basemapControlActionLabel {
+  display: inline;
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .basemapControlActionLabel {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+}

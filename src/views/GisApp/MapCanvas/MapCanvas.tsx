@@ -1,31 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
-import { useRef } from "react";
-import css from "@/views/GisApp/MapCanvas/MapCanvas.module.css";
-import { useFitMapBounds } from "@/views/GisApp/MapCanvas/useFitMapBounds";
-import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance/useMapInstance";
-import { useMapSpecSync } from "@/views/GisApp/MapCanvas/useMapSpecSync";
-import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface";
+import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
+import type { MapCanvasOptions } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import type { ReactNode } from "react";
 
-type Props = {
-  basemap: AvaMap.Basemap;
-
-  /** Seeds the camera at construction; later changes are not applied. */
-  view: AvaMap.ViewState;
-
-  spec: MapSpec;
-
-  /** Bounds to fly to, or `undefined` to leave the camera alone. */
-  fitBounds: MapBounds | undefined;
-
-  /** Ids of layers whose features respond to clicks. */
-  interactiveLayerIds: readonly string[];
-  onFeatureClick: (feature: GeoJSON.Feature) => void;
-  children?: ReactNode;
-};
+type Props = MapCanvasOptions;
 
 /**
  * Owns the MapLibre instance: one construction, one style path, one click
@@ -35,34 +13,19 @@ export function MapCanvas({
   basemap,
   view,
   spec,
-  fitBounds,
+  fitBoundsRequest,
   interactiveLayerIds,
   onFeatureClick,
-  children,
+  onViewChange,
 }: Props): ReactNode {
-  const { t } = useLingui();
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const mapInstance = useMapInstance({
-    containerRef,
+  const { containerRef } = useMapCanvas({
     basemap,
     view,
+    spec,
+    fitBoundsRequest,
     interactiveLayerIds,
     onFeatureClick,
+    onViewChange,
   });
-  useMapStyleSync({ mapInstance, basemap });
-  useMapSpecSync({ mapInstance, spec });
-  useFitMapBounds({ mapInstance, fitBounds });
-
-  return (
-    <>
-      <div
-        ref={containerRef}
-        className={css.mapCanvas}
-        role="region"
-        aria-label={t`Map`}
-      />
-      {children}
-    </>
-  );
+  return <MapCanvasSurface containerRef={containerRef} />;
 }

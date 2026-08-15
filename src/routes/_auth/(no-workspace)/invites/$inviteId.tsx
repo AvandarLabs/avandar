@@ -4,7 +4,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
   {

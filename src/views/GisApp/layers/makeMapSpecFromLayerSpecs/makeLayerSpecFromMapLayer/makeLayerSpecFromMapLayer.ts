@@ -18,14 +18,25 @@ type ProportionalSymbol = Extract<
   { type: "proportionalSymbol" }
 >;
 
+type MakeLayerSpecFromMapLayerInput = {
+  layer: MapLayer.T;
+  featureCollection: GeoJSON.FeatureCollection;
+  stats: LayerStats;
+  valueColumnName?: string;
+};
+
+type CreateMapLayerSpecInput = {
+  layer: MapLayer.T;
+  stats: LayerStats;
+  valueColumnName: string | undefined;
+  sourceId: string;
+};
+
 /** Applies the selected scale to a numeric span. */
-function _getScaledSpan({
-  scale,
-  span,
-}: {
-  scale: ProportionalSymbol["scale"];
-  span: number;
-}): number {
+function _getScaledSpan(
+  scale: ProportionalSymbol["scale"],
+  span: number,
+): number {
   return matchLiteral(scale, {
     sqrt: () => {
       return Math.sqrt(span);
@@ -35,13 +46,6 @@ function _getScaledSpan({
     },
   });
 }
-
-type CreateMapLayerSpecOptions = {
-  layer: MapLayer.T;
-  stats: LayerStats;
-  valueColumnName: string | undefined;
-  sourceId: string;
-};
 
 /** Builds the MapLibre expression that scales a source value from zero. */
 function _buildScaledValueExpression({
@@ -102,7 +106,7 @@ function _buildCircleRadius({
     scaledValue,
     0,
     symbology.minRadius,
-    _getScaledSpan({ scale: symbology.scale, span: maximum - minimum }),
+    _getScaledSpan(symbology.scale, maximum - minimum),
     symbology.maxRadius,
   ];
 }
@@ -113,7 +117,7 @@ function _createMapLayerSpec({
   stats,
   valueColumnName,
   sourceId,
-}: CreateMapLayerSpecOptions): MapLayerSpec {
+}: Readonly<CreateMapLayerSpecInput>): MapLayerSpec {
   const { symbology } = layer;
   return {
     id: MapLayerIds.toLayerId(layer.id),
@@ -161,16 +165,9 @@ export function makeLayerSpecFromMapLayer({
   featureCollection,
   stats,
   valueColumnName,
-}: {
-  layer: MapLayer.T;
-  featureCollection: GeoJSON.FeatureCollection;
-  stats: LayerStats;
-  valueColumnName?: string;
-}): MapSpec {
+}: Readonly<MakeLayerSpecFromMapLayerInput>): MapSpec {
   if (layer.sensitivity.mode === "aggregateOnly") {
-    throw new SensitivityViolationError(
-      `Layer "${layer.name}" is aggregate-only and cannot be drawn as individual symbols.`,
-    );
+    throw new SensitivityViolationError("aggregateOnlyLayerSpec", layer.name);
   }
 
   const sourceId = MapLayerIds.toSourceId(layer.id);

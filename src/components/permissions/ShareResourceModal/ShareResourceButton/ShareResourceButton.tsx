@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
-import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel/resourceTypeLabel";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";

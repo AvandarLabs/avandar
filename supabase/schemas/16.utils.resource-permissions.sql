@@ -114,6 +114,15 @@ begin
     from public.datasets ds
     where
       ds.id = p_resource_id;
+  elsif p_resource_type = 'map' then
+    select
+      m.owner_id,
+      m.workspace_id,
+      coalesce(m.is_restricted, false)
+    into v_owner_id, v_workspace_id, v_is_restricted
+    from public.maps m
+    where
+      m.id = p_resource_id;
   else
     return false;
   end if;
@@ -146,7 +155,7 @@ from
   authenticated;
 
 /**
- * Effective role for auth.uid() on a dashboard or dataset row.
+ * Effective role for auth.uid() on a resource row.
  *
  * Most paths merge several independent grants (direct/group/workspace shares,
  * and optionally the user's app role on this resource's app). Each grant is
@@ -218,6 +227,16 @@ begin
     where
       ds.id = p_resource_id;
     v_app := 'data_sources';
+  elsif p_resource_type = 'map' then
+    select
+      m.workspace_id,
+      m.owner_id,
+      coalesce(m.is_restricted, false)
+    into v_workspace_id, v_owner_id, v_is_restricted
+    from public.maps m
+    where
+      m.id = p_resource_id;
+    v_app := 'gis';
   else
     return null;
   end if;
@@ -381,6 +400,10 @@ begin
     select ds.workspace_id into v_resource_workspace_id
     from public.datasets ds
     where ds.id = p_resource_id;
+  elsif p_resource_type = 'map' then
+    select m.workspace_id into v_resource_workspace_id
+    from public.maps m
+    where m.id = p_resource_id;
   else
     return false;
   end if;
@@ -396,7 +419,7 @@ end;
 $$;
 
 /**
- * App catalog entry for a dashboard or dataset resource type.
+ * App catalog entry for a resource type.
  */
 create or replace function public.util__resource_type_to_app_type (
   p_resource_type public.resource_type
@@ -406,6 +429,7 @@ set
   select case p_resource_type
     when 'dashboard'::public.resource_type then 'dashboards'::public.app_type
     when 'dataset'::public.resource_type then 'data_sources'::public.app_type
+    when 'map'::public.resource_type then 'gis'::public.app_type
   end;
 $$;
 
@@ -753,6 +777,184 @@ begin
   return false;
 end;
 $$;
+
+/** Whether the auth user has a share that applies to a resource row. */
+create or replace function public.util__auth_user_has_resource_share (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid,
+  p_app public.app_type
+) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select exists (
+    select 1
+    from public.resource_shares rs
+    where
+      rs.workspace_id = p_workspace_id and
+      rs.resource_type = p_resource_type and
+      rs.resource_id = p_resource_id and
+      (
+        rs.principal_type = 'workspace'::public.share_principal_type or
+        (
+          rs.principal_type = 'user'::public.share_principal_type and
+          rs.principal_id = (select auth.uid ())
+        ) or
+        (
+          rs.principal_type = 'user_group'::public.share_principal_type and
+          exists (
+            select 1
+            from public.user_group_memberships ugm
+            where
+              ugm.user_group_id = rs.principal_id and
+              ugm.user_id = (select auth.uid ())
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (p_workspace_id, p_app) is not null
+          )
+        )
+      )
+  );
+$$;
+
+revoke
+execute on function public.util__auth_user_has_resource_share (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.app_type
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/** Checks membership and viewer access before map row visibility checks. */
+create or replace function public.util__auth_user_may_select_resource_base (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select
+    p_workspace_id = any (
+      array(
+        select public.util__get_auth_user_workspaces ()
+      )
+    ) and
+    public.util__auth_user_can_access_resource (
+      p_resource_type,
+      p_resource_id,
+      'viewer'::public.role_level
+    );
+$$;
+
+revoke
+execute on function public.util__auth_user_may_select_resource_base (
+  public.resource_type,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/** Applies map-specific visibility grants after workspace checks. */
+create or replace function public.util__auth_user_may_select_map_grant (
+  p_map_id uuid,
+  p_workspace_id uuid,
+  p_owner_id uuid,
+  p_is_restricted boolean
+) returns boolean language plpgsql security definer stable
+set
+  search_path = '' as $$
+declare
+  v_app_role public.role_level;
+  v_has_share boolean;
+begin
+  if public.util__can_manage_workspace_settings (p_workspace_id) or
+    p_owner_id = auth.uid () then
+    return true;
+  end if;
+
+  v_has_share := public.util__auth_user_has_resource_share (
+    'map'::public.resource_type, p_map_id, p_workspace_id,
+    'gis'::public.app_type
+  );
+  if p_is_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    p_workspace_id, 'gis'::public.app_type
+  );
+  return coalesce(public.util__role_level_rank (v_app_role), 0) <
+    public.util__role_level_rank ('editor'::public.role_level) or v_has_share;
+end;
+$$;
+
+revoke
+execute on function public.util__auth_user_may_select_map_grant (
+  uuid,
+  uuid,
+  uuid,
+  boolean
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/**
+ * Whether the auth user may SELECT a map row under hardened RLS.
+ *
+ * Map visibility has no public-column shortcut. Workspace membership, viewer
+ * access, owner access, settings-manager access, shares, and GIS app roles are
+ * all evaluated by the composed helpers below.
+ */
+create or replace function public.util__auth_user_may_select_map (
+  p_map_id uuid
+) returns boolean language plpgsql security definer stable
+set
+  search_path = '' as $$
+declare
+  v_workspace_id uuid;
+  v_owner_id uuid;
+  v_is_restricted boolean;
+begin
+  select m.workspace_id, m.owner_id, coalesce(m.is_restricted, false)
+  into v_workspace_id, v_owner_id, v_is_restricted
+  from public.maps m
+  where m.id = p_map_id;
+
+  if v_workspace_id is null or not public.util__auth_user_may_select_resource_base (
+    'map'::public.resource_type, p_map_id, v_workspace_id
+  ) then
+    return false;
+  end if;
+
+  return public.util__auth_user_may_select_map_grant (
+    p_map_id, v_workspace_id, v_owner_id, v_is_restricted
+  );
+end;
+$$;
+
+revoke
+execute on function public.util__auth_user_may_select_map (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_may_select_map (uuid) to authenticated;
 
 /**
  * Dataset id encoded in a `workspaces` storage bucket object name, or null.

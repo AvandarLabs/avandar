@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
-import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel/resourceTypeLabel";
 import { appForResource } from "../copy/appForResource";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import type {

@@ -1,0 +1,62 @@
+.mapToolCluster {
+  align-items: center;
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-lg);
+  box-shadow: var(--mantine-shadow-md);
+  display: flex;
+  gap: var(--mantine-spacing-xxxs);
+  padding: var(--mantine-spacing-xxs);
+}
+
+.mapToolClusterSeparator {
+  background: var(--ava-border-default);
+  height: 20px;
+  margin: 0 var(--mantine-spacing-xxs);
+  width: 1px;
+}
+
+.mapToolClusterTool {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-dimmed);
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  transition:
+    background 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  width: 32px;
+}
+
+.mapToolClusterTool:hover:not([aria-disabled="true"]) {
+  background: var(--ava-surface-sunken);
+  color: var(--mantine-color-text);
+}
+
+.mapToolClusterTool[aria-pressed="true"] {
+  background: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-2);
+  color: var(--mantine-color-primary-7);
+}
+
+[data-mantine-color-scheme="dark"] .mapToolClusterTool[aria-pressed="true"] {
+  background: rgb(21 99 254 / 24%);
+  border-color: var(--mantine-color-primary-7);
+  color: var(--mantine-color-primary-2);
+}
+
+.mapToolClusterTool[aria-disabled="true"] {
+  color: var(--mantine-color-neutral-4);
+  cursor: not-allowed;
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .mapToolClusterTool {
+    height: 44px;
+    width: 44px;
+  }
+}

@@ -5,15 +5,17 @@
  * because owner-private resources are invisible to admins. Returns void
  * precisely so no private data can leak through a return value.
  *
- * Unblocks offboarding: `owner_id` on both resource tables is
+ * Unblocks offboarding: `owner_id` on every resource table is
  * ON DELETE NO ACTION, so a member who owns resources cannot otherwise be
  * removed from the workspace.
  *
  * Updates `owner_profile_id` as well as `owner_id`. Both tables declare
- * `owner_profile_id uuid not null` referencing `user_profiles` with
+ * Each resource table declares `owner_profile_id uuid not null` referencing
+ * `user_profiles` with
  * ON DELETE NO ACTION, so moving `owner_id` alone would leave that FK pointing
  * at the departing member and the removal would stay blocked while this
- * function appeared to succeed.
+ * function appeared to succeed. Dashboards, datasets, and maps all enforce
+ * this owner-profile relationship.
  *
  * @param p_new_owner_id Must already be a member of the resource's workspace.
  */
@@ -44,6 +46,13 @@ begin
     where ds.id = p_resource_id
     for update;
     v_app := 'data_sources';
+  elsif p_resource_type = 'map' then
+    select m.workspace_id, m.owner_id
+    into v_workspace_id, v_current_owner_id
+    from public.maps m
+    where m.id = p_resource_id
+    for update;
+    v_app := 'gis';
   else
     raise exception 'unsupported resource type: %', p_resource_type;
   end if;
@@ -102,8 +111,13 @@ begin
        set owner_id = p_new_owner_id,
            owner_profile_id = v_new_profile_id
      where id = p_resource_id;
-  else
+  elsif p_resource_type = 'dataset' then
     update public.datasets
+       set owner_id = p_new_owner_id,
+           owner_profile_id = v_new_profile_id
+     where id = p_resource_id;
+  else
+    update public.maps
        set owner_id = p_new_owner_id,
            owner_profile_id = v_new_profile_id
      where id = p_resource_id;

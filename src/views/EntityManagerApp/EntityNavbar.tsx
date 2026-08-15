@@ -13,7 +13,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ReactNode, useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 

@@ -53,7 +53,18 @@ values (
   true
 );
 
-select plan(6);
+insert into public.maps (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted)
+values (
+  'a9009001-0000-4000-8000-000000000001'::uuid,
+  'a9001001-0000-4000-8000-000000000001'::uuid,
+  'a9000001-0000-4000-8000-000000000001'::uuid,
+  'a9003001-0000-4000-8000-000000000001'::uuid,
+  'map1',
+  '{}'::jsonb,
+  true
+);
+
+select plan(8);
 
 set local role authenticated;
 
@@ -69,7 +80,7 @@ select is(
     'a9000001-0000-4000-8000-000000000001'::uuid,
     'a9000003-0000-4000-8000-000000000003'::uuid
   ),
-  3,
+  4,
   'returns the number of resources moved'
 );
 
@@ -100,10 +111,31 @@ select is(
 select is(
   (
     select count(*)::int
+    from public.maps
+    where workspace_id = 'a9001001-0000-4000-8000-000000000001'::uuid
+      and owner_id = 'a9000001-0000-4000-8000-000000000001'::uuid
+  ),
+  0,
+  'the leaver owns no maps afterwards'
+);
+
+select is(
+  (
+    select owner_profile_id
+    from public.maps
+    where id = 'a9009001-0000-4000-8000-000000000001'::uuid
+  ),
+  'a9003003-0000-4000-8000-000000000003'::uuid,
+  'bulk map transfer updates owner_profile_id too'
+);
+
+select is(
+  (
+    select count(*)::int
     from public.usage_analytics_events
     where event_name = 'resource.ownership_transferred'
   ),
-  3,
+  4,
   'one audit row per transferred resource'
 );
 

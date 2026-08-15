@@ -5,7 +5,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar";
 

@@ -17,20 +17,56 @@ vi.mock("$/env/getSupabaseApiKey.ts", () => {
   };
 });
 
-const rpcMock = vi.fn();
-const throwOnErrorMock = vi.fn();
+const { fromMock, rpcMock, throwOnErrorMock } = vi.hoisted(() => {
+  return {
+    fromMock: vi.fn(),
+    rpcMock: vi.fn(),
+    throwOnErrorMock: vi.fn(),
+  };
+});
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
   return {
     AvaSupabase: {
       db: () => {
-        return { rpc: rpcMock };
+        return { from: fromMock, rpc: rpcMock };
       },
     },
   };
 });
 
 const { ResourceShareClient } = await import("./ResourceShareClient");
+
+function _createQuery(result: unknown) {
+  const query = {
+    select: vi.fn(() => {
+      return query;
+    }),
+    eq: vi.fn(() => {
+      return query;
+    }),
+    is: vi.fn(() => {
+      return query;
+    }),
+    update: vi.fn(() => {
+      return query;
+    }),
+    single: vi.fn(() => {
+      return query;
+    }),
+    throwOnError: vi.fn(() => {
+      return Promise.resolve(result);
+    }),
+  };
+  return query;
+}
+
+beforeEach(() => {
+  fromMock.mockReset();
+  rpcMock.mockReset();
+  throwOnErrorMock.mockReset();
+  rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
+});
 
 describe("ResourceShareClient.upsertResourceShare", () => {
   it("rejects requiresAppAccess=true for non-group shares", async () => {
@@ -63,12 +99,6 @@ describe("ResourceShareClient.upsertResourceShare", () => {
 });
 
 describe("ResourceShareClient.makeResourcePrivate", () => {
-  beforeEach(() => {
-    rpcMock.mockReset();
-    throwOnErrorMock.mockReset();
-    rpcMock.mockReturnValue({ throwOnError: throwOnErrorMock });
-  });
-
   it("passes arguments through with p_ prefixes", async () => {
     throwOnErrorMock.mockResolvedValueOnce({ data: null, error: null });
 
@@ -92,5 +122,44 @@ describe("ResourceShareClient.makeResourcePrivate", () => {
         resourceId: "ds-1",
       }),
     ).rejects.toThrow("insufficient_privilege");
+  });
+});
+
+describe("ResourceShareClient map routing", () => {
+  it("reads map restriction state from the maps table", async () => {
+    const mapQuery = _createQuery({
+      data: { is_restricted: true, owner_id: "owner-1" },
+    });
+    const sharesQuery = _createQuery({ data: [] });
+    fromMock.mockImplementation((tableName: string) => {
+      return tableName === "maps" ? mapQuery : sharesQuery;
+    });
+
+    await expect(
+      ResourceShareClient.getResourceSharingState({
+        workspaceId: "ws-1" as WorkspaceId,
+        resourceType: "map",
+        resourceId: "map-1",
+      }),
+    ).resolves.toMatchObject({ isRestricted: true, ownerId: "owner-1" });
+
+    expect(fromMock).toHaveBeenCalledWith("maps");
+    expect(fromMock).not.toHaveBeenCalledWith("datasets");
+  });
+
+  it("updates map restriction state in the maps table", async () => {
+    const mapQuery = _createQuery({ data: null, error: null });
+    fromMock.mockReturnValue(mapQuery);
+
+    await ResourceShareClient.setResourceRestricted({
+      workspaceId: "ws-1" as WorkspaceId,
+      resourceType: "map",
+      resourceId: "map-1",
+      isRestricted: false,
+    });
+
+    expect(fromMock).toHaveBeenCalledWith("maps");
+    expect(fromMock).not.toHaveBeenCalledWith("datasets");
+    expect(mapQuery.update).toHaveBeenCalledWith({ is_restricted: false });
   });
 });

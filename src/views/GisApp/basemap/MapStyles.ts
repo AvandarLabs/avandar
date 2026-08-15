@@ -1,5 +1,5 @@
-import { registry } from "@avandar/utils";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** Basemap style URLs, keyed by the model's basemap style union. */
 export const MapStyles = {
@@ -27,16 +27,13 @@ export const MapStyles = {
     url: "https://tiles.openfreemap.org/styles/bright",
     name: "Avandar",
   },
-} as const satisfies Record<AvaMap.BasemapStyle, { url: string; name: string }>;
+} as const satisfies Record<
+  AvaMapConfig.BasemapStyle,
+  { url: string; name: string }
+>;
 
-/** The key of a built-in basemap style, aliased from the AvaMap model. */
-export type MapStyleKey = AvaMap.BasemapStyle;
+/** The key of a built-in basemap style, aliased from the AvaMapConfig model. */
+export type MapStyleKey = AvaMapConfig.BasemapStyle;
 
-export const MapStyleKeys = registry<MapStyleKey>().keys(
-  "avandar",
-  "positron",
-  "bright",
-  "liberty",
-  "dark",
-  "fiord",
-);
+export const MapStyleKeys: readonly MapStyleKey[] =
+  AvaMapConfigValues.basemapStyleKeys;

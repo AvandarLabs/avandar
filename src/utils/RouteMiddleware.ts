@@ -5,7 +5,7 @@ import { UserId } from "$/models/User/User.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import type { ResourceType } from "@/clients/UserClient";
 import type { QueryClient } from "@tanstack/react-query";
 import type {
@@ -19,7 +19,7 @@ import type {
  * permission key would otherwise deny them.
  */
 export type ResourceFallback = {
-  /** Resource kind to check (`dataset` or `dashboard`). */
+  /** Resource kind to check (`dataset`, `dashboard`, or `map`). */
   type: ResourceType;
   /** Param name on the route that carries the resource id. */
   idParam: string;

@@ -1,0 +1,178 @@
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import { describe, expect, it } from "vitest";
+// eslint-disable-next-line no-restricted-imports
+import { AvaMapConfigSchema } from "./AvaMapConfigSchema.ts";
+
+describe("AvaMapConfigSchema", () => {
+  it("round trips an empty config", () => {
+    const config = AvaMapConfig.makeEmpty();
+    const parsed = AvaMapConfigSchema.fromJson(
+      AvaMapConfigSchema.toJson(config),
+    );
+    expect(parsed).toEqual(config);
+  });
+
+  it("round trips a config carrying a layer and a bookmark", () => {
+    const config = AvaMapConfig.withBookmarkAdded(
+      AvaMapConfig.withLayerAdded(
+        AvaMapConfig.makeEmpty(),
+        MapLayer.makeEmpty("Cases"),
+      ),
+      AvaMapConfig.makeBookmark({
+        name: "Goma",
+        view: { center: [29.2, -1.7], zoom: 9 },
+      }),
+    );
+    expect(
+      AvaMapConfigSchema.fromJson(AvaMapConfigSchema.toJson(config)),
+    ).toEqual(config);
+  });
+
+  it("rejects a config written by a future version", () => {
+    const config = AvaMapConfig.makeEmpty();
+    const json = AvaMapConfigSchema.toJson(config) as Record<string, unknown>;
+    const future = { ...json, version: 2 };
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(future);
+    }).toThrow();
+  });
+
+  it("rejects a layer whose symbology is not a known kind", () => {
+    const config = AvaMapConfig.withLayerAdded(
+      AvaMapConfig.makeEmpty(),
+      MapLayer.makeEmpty("Cases"),
+    );
+    const json = AvaMapConfigSchema.toJson(config) as {
+      layers: Array<{ symbology: { type: string } }>;
+    };
+    json.layers[0]!.symbology.type = "hexbin";
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(json);
+    }).toThrow();
+  });
+
+  it("rejects unknown top-level config fields", () => {
+    const config = AvaMapConfig.makeEmpty();
+    const serializedJson = AvaMapConfigSchema.toJson(config) as Record<
+      string,
+      unknown
+    >;
+    const json = {
+      ...serializedJson,
+      unexpected: true,
+    };
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(json);
+    }).toThrow();
+  });
+
+  it("round trips a popup action in serialized config JSON", () => {
+    const config = AvaMapConfig.withLayerAdded(
+      AvaMapConfig.makeEmpty(),
+      MapLayer.makeEmpty("Cases"),
+    );
+    const serializedJson = AvaMapConfigSchema.toJson(config) as {
+      layers: Array<{ popup: Record<string, unknown> }>;
+    };
+    serializedJson.layers[0]!.popup.action = {
+      label: "Open case",
+      urlTemplate: "https://example.test/cases/{id}",
+    };
+
+    const parsed = AvaMapConfigSchema.fromJson(serializedJson);
+
+    expect(AvaMapConfigSchema.toJson(parsed)).toEqual(serializedJson);
+  });
+
+  it("rejects unknown fields inside a popup action", () => {
+    const config = AvaMapConfig.withLayerAdded(
+      AvaMapConfig.makeEmpty(),
+      MapLayer.makeEmpty("Cases"),
+    );
+    const serializedJson = AvaMapConfigSchema.toJson(config) as {
+      layers: Array<{ popup: Record<string, unknown> }>;
+    };
+    serializedJson.layers[0]!.popup.action = {
+      label: "Open case",
+      urlTemplate: "https://example.test/cases/{id}",
+      unexpected: true,
+    };
+
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(serializedJson);
+    }).toThrow();
+  });
+
+  it.each(["javascript:alert(1)", "data:text/html,<script>alert(1)</script>"])(
+    "rejects unsafe popup URL protocol %s",
+    (urlTemplate) => {
+      const config = AvaMapConfig.withLayerAdded(
+        AvaMapConfig.makeEmpty(),
+        MapLayer.makeEmpty("Cases"),
+      );
+      const serializedJson = AvaMapConfigSchema.toJson(config) as {
+        layers: Array<{ popup: Record<string, unknown> }>;
+      };
+      serializedJson.layers[0]!.popup.action = {
+        label: "Open case",
+        urlTemplate,
+      };
+
+      expect(() => {
+        return AvaMapConfigSchema.fromJson(serializedJson);
+      }).toThrow();
+    },
+  );
+
+  it("rejects unsafe popup URLs before serializing a config", () => {
+    const layer = MapLayer.makeEmpty("Cases");
+    const config = AvaMapConfig.withLayerAdded(AvaMapConfig.makeEmpty(), {
+      ...layer,
+      popup: {
+        ...layer.popup,
+        action: { label: "Open case", urlTemplate: "javascript:alert(1)" },
+      },
+    });
+
+    expect(() => {
+      return AvaMapConfigSchema.toJson(config);
+    }).toThrow();
+  });
+
+  it("rejects an array as a structured query source", () => {
+    const config = AvaMapConfig.withLayerAdded(
+      AvaMapConfig.makeEmpty(),
+      MapLayer.makeEmpty("Cases"),
+    );
+    const serializedJson = AvaMapConfigSchema.toJson(config) as {
+      layers: Array<{ source: unknown }>;
+    };
+    serializedJson.layers[0]!.source = [];
+
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(serializedJson);
+    }).toThrow();
+  });
+
+  it("rejects a non-plain object as a structured query source", () => {
+    const config = AvaMapConfig.withLayerAdded(
+      AvaMapConfig.makeEmpty(),
+      MapLayer.makeEmpty("Cases"),
+    );
+    const serializedJson = AvaMapConfigSchema.toJson(config) as {
+      layers: Array<{ source: unknown }>;
+    };
+    serializedJson.layers[0]!.source = new Date();
+
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(serializedJson);
+    }).toThrow();
+  });
+
+  it("rejects a config that is not an object at all", () => {
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(null);
+    }).toThrow();
+  });
+});

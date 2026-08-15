@@ -1,5 +1,5 @@
 /**
- * Moves every dashboard and dataset a workspace member owns to a new owner.
+ * Moves every dashboard, dataset, and map a workspace member owns to a new owner.
  *
  * Locks each selected resource before delegating so a concurrent transfer
  * cannot change its owner between selection and audit logging.
@@ -48,6 +48,22 @@ begin
   loop
     perform public.rpc_resources__transfer_ownership (
       'dataset'::public.resource_type,
+      v_resource_id,
+      p_new_owner_id
+    );
+    v_moved := v_moved + 1;
+  end loop;
+
+  for v_resource_id in
+    select m.id
+    from public.maps m
+    where
+      m.workspace_id = p_workspace_id and
+      m.owner_id = p_from_user_id
+    for update
+  loop
+    perform public.rpc_resources__transfer_ownership (
+      'map'::public.resource_type,
       v_resource_id,
       p_new_owner_id
     );

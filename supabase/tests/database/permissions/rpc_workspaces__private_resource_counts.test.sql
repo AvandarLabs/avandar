@@ -56,7 +56,19 @@ values (
   true
 );
 
-select plan(5);
+insert into public.maps (id, workspace_id, owner_id, owner_profile_id, name, config, is_public, is_restricted)
+values (
+  'a7009001-0000-4000-8000-000000000001'::uuid,
+  'a7001001-0000-4000-8000-000000000001'::uuid,
+  'a7000001-0000-4000-8000-000000000001'::uuid,
+  'a7003001-0000-4000-8000-000000000001'::uuid,
+  'private map',
+  '{}'::jsonb,
+  true,
+  true
+);
+
+select plan(6);
 
 set local role authenticated;
 
@@ -84,6 +96,16 @@ select is(
   ),
   1::bigint,
   'counts the one private dataset'
+);
+
+select is(
+  (
+    select private_map_count
+    from public.rpc_workspaces__private_resource_counts ('a7001001-0000-4000-8000-000000000001'::uuid)
+    where user_id = 'a7000001-0000-4000-8000-000000000001'::uuid
+  ),
+  1::bigint,
+  'counts a restricted map even when its inert public flag is true'
 );
 
 select is(

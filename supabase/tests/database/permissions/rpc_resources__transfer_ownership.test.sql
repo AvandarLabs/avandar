@@ -60,7 +60,18 @@ values (
   true
 );
 
-select plan(13);
+insert into public.maps (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted)
+values (
+  'a8009001-0000-4000-8000-000000000001'::uuid,
+  'a8001001-0000-4000-8000-000000000001'::uuid,
+  'a8000001-0000-4000-8000-000000000001'::uuid,
+  'a8003001-0000-4000-8000-000000000001'::uuid,
+  'private map',
+  '{}'::jsonb,
+  true
+);
+
+select plan(16);
 
 set local role authenticated;
 
@@ -133,6 +144,37 @@ select is(
   (select owner_profile_id from public.datasets where id = 'a8007001-0000-4000-8000-000000000001'::uuid),
   'a8003003-0000-4000-8000-000000000003'::uuid,
   'dataset owner_profile_id moved too'
+);
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"a8000002-0000-4000-8000-000000000002"}',
+  true
+);
+
+select lives_ok(
+  $$select public.rpc_resources__transfer_ownership (
+      'map',
+      'a8009001-0000-4000-8000-000000000001'::uuid,
+      'a8000003-0000-4000-8000-000000000003'::uuid
+    )$$,
+  'settings admin can transfer a map they cannot read'
+);
+
+set local role postgres;
+
+select is(
+  (select owner_id from public.maps where id = 'a8009001-0000-4000-8000-000000000001'::uuid),
+  'a8000003-0000-4000-8000-000000000003'::uuid,
+  'map owner_id moved'
+);
+
+select is(
+  (select owner_profile_id from public.maps where id = 'a8009001-0000-4000-8000-000000000001'::uuid),
+  'a8003003-0000-4000-8000-000000000003'::uuid,
+  'map owner_profile_id moved too, or removal stays blocked'
 );
 
 set local role authenticated;

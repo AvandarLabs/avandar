@@ -1,0 +1,51 @@
+.styleSectionSegmented {
+  background: var(--ava-surface-sunken);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: grid;
+  gap: 2px;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  padding: 2px;
+}
+
+.styleSectionSegmentedItem {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 4px;
+  height: 26px;
+  justify-content: center;
+  transition:
+    background 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.styleSectionSegmentedItem[aria-pressed="true"] {
+  background: var(--ava-surface-raised);
+  box-shadow: var(--mantine-shadow-xs);
+  color: var(--mantine-color-text);
+}
+
+/* Keep unavailable controls focusable so their explanation remains reachable. */
+.styleSectionSegmentedItem[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .styleSectionSegmented {
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+  }
+
+  .styleSectionSegmentedItem {
+    height: 40px;
+  }
+}

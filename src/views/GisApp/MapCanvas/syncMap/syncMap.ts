@@ -1,9 +1,10 @@
 import {
-  isDefined,
+  makeSet,
   objectEntries,
   objectKeys,
   prop,
   propEq,
+  propPasses,
 } from "@avandar/utils";
 import type {
   MapLayerSpec,
@@ -25,16 +26,18 @@ function _syncPaint(
   layerSpec: MapLayerSpec,
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
-  objectEntries(layerSpec.paint)
-    .filter(isDefined)
-    .forEach(([property, value]) => {
-      const previousValue =
-        previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
-      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-        return;
-      }
-      map.setPaintProperty(layerSpec.id, property, value);
-    });
+  objectEntries(layerSpec.paint).forEach((paintEntry) => {
+    if (!paintEntry) {
+      return;
+    }
+    const [property, value] = paintEntry;
+    const previousValue =
+      previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
+    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+      return;
+    }
+    map.setPaintProperty(layerSpec.id, property, value);
+  });
 }
 
 /** Applies only the layout properties whose values differ. */
@@ -47,16 +50,18 @@ function _syncLayout(
   const previousLayout = previousLayerSpec?.layout ?? {
     visibility: "visible",
   };
-  objectEntries(nextLayout)
-    .filter(isDefined)
-    .forEach(([property, value]) => {
-      const previousValue =
-        previousLayout[property as keyof typeof previousLayout];
-      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-        return;
-      }
-      map.setLayoutProperty(layerSpec.id, property, value);
-    });
+  objectEntries(nextLayout).forEach((layoutEntry) => {
+    if (!layoutEntry) {
+      return;
+    }
+    const [property, value] = layoutEntry;
+    const previousValue =
+      previousLayout[property as keyof typeof previousLayout];
+    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+      return;
+    }
+    map.setLayoutProperty(layerSpec.id, property, value);
+  });
 }
 
 /**
@@ -127,14 +132,16 @@ function _needsReorder(
   nextSpec: MapSpec,
   nextLayerIds: ReadonlySet<string>,
 ): boolean {
-  const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
-  // Plain predicate rather than `propPasses`: `Set.has` is not a type guard,
-  // and `propPasses` only exposes its type-guard overload, so it rejects a
-  // predicate that merely returns boolean.
+  const previousLayerIds = makeSet(previousSpec.layers, { key: "id" });
   const survivingIds = previousSpec.layers
-    .filter((layerSpec) => {
-      return nextLayerIds.has(layerSpec.id);
-    })
+    .filter(
+      propPasses<MapLayerSpec, "id", string>(
+        "id",
+        (layerId): layerId is string => {
+          return nextLayerIds.has(layerId);
+        },
+      ),
+    )
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {
     return !previousLayerIds.has(layerId);
@@ -200,7 +207,7 @@ export function syncMap({
   previousSpec: MapSpec;
   nextSpec: MapSpec;
 }): void {
-  const nextLayerIds = new Set(nextSpec.layers.map(prop("id")));
+  const nextLayerIds = makeSet(nextSpec.layers, { key: "id" });
 
   _removeStaleLayersAndSources(map, previousSpec, nextSpec, nextLayerIds);
   _syncSources(map, previousSpec, nextSpec);
