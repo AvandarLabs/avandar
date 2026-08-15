@@ -378,6 +378,7 @@ msgstr "導出註解 PDF"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "自訂 URL 不得超過 {0} 個字元"
 
@@ -804,6 +805,10 @@ msgstr "已達到座位限制"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "管道"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Could not unpublish dashboard"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1310,6 +1315,7 @@ msgid "Parsed {0} rows"
 msgstr "解析了 {0} 行"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
 
@@ -1762,6 +1768,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Dashboard unpublished."
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "顯示 SQL"
@@ -2102,6 +2112,7 @@ msgstr "手動表單顯示近似值"
 
 #. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "自訂 URL 至少必須包含 {0} 個字元"
 
@@ -2872,6 +2883,7 @@ msgid "Continue to your workspace"
 msgstr "繼續進入您的工作區"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
 
@@ -3038,8 +3050,8 @@ msgstr "啟動中…"
 msgid "Number range"
 msgstr "數字範圍"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "列"
 
@@ -3791,6 +3803,7 @@ msgid "X axis label"
 msgstr "X 軸標籤"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "此自訂 URL 已被保留。請嘗試在其中加入一個字詞。"
 
@@ -3881,6 +3894,7 @@ msgid "you@example.com"
 msgstr "you@example.com"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "儀表板分享設定已更新。"
 
@@ -4008,6 +4022,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努力的近似值；上面的 SQL 是實際執行的內容。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
@@ -4372,6 +4387,7 @@ msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} 最多只能呈現 {1} 個 {2}，因此僅顯示前 {3} 個。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "自訂 URL 不得為空白"
 
@@ -4676,6 +4692,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 msgstr "WHERE 子句包含表單不支援的「{nodeType}」節點。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "儀表板已發佈！"
 
@@ -4870,6 +4887,7 @@ msgid "User group saved"
 msgstr "使用者群組已儲存"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "無法發布儀表板"
 
@@ -5271,6 +5289,7 @@ msgid "Make \"{resourceName}\" private?"
 msgstr "要將「{resourceName}」設為私人嗎？"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "此自訂 URL 已被使用"
 
@@ -5639,6 +5658,10 @@ msgstr "上傳數據集"
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "無效的欄位類型"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Please try again. Your dashboard is still published."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."

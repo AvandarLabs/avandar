@@ -386,6 +386,7 @@ msgstr "Export annotated PDF"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "The custom URL cannot exceed {0} characters"
 
@@ -826,6 +827,10 @@ msgstr "Seat limit reached"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "Pipeline"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Could not unpublish dashboard"
+msgstr "Could not unpublish dashboard"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1340,6 +1345,7 @@ msgid "Parsed {0} rows"
 msgstr "Parsed {0} rows"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "The custom URL can only contain lowercase letters, numbers, and hyphens"
 
@@ -1809,6 +1815,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Dashboard unpublished."
+msgstr "Dashboard unpublished."
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "Show SQL"
@@ -2161,6 +2171,7 @@ msgstr "Manual form shows an approximation"
 
 #. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "The custom URL must be at least {0} characters"
 
@@ -2949,6 +2960,7 @@ msgid "Continue to your workspace"
 msgstr "Continue to your workspace"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "The custom URL cannot contain spaces"
 
@@ -3117,8 +3129,8 @@ msgstr "Starting…"
 msgid "Number range"
 msgstr "Number range"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "Columns"
 
@@ -3889,6 +3901,7 @@ msgid "X axis label"
 msgstr "X axis label"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "This custom URL is reserved. Try adding a word to it."
 
@@ -3980,6 +3993,7 @@ msgid "you@example.com"
 msgstr "you@example.com"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "Dashboard share settings updated."
 
@@ -4110,6 +4124,7 @@ msgstr "Parts of this SQL could not be represented in the Manual form. The form 
 "shows a best-effort approximation; the SQL above is what actually runs."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Please try again. Your dashboard has not been published."
 
@@ -4483,6 +4498,7 @@ msgstr "The {0} can only render up to {1} {2}, so only displaying the first "
 "{3}."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "The custom URL cannot be empty"
 
@@ -4794,6 +4810,7 @@ msgstr "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "Dashboard published!"
 
@@ -4993,6 +5010,7 @@ msgid "User group saved"
 msgstr "User group saved"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "Could not publish dashboard"
 
@@ -5405,6 +5423,7 @@ msgid "Make \"{resourceName}\" private?"
 msgstr "Make \"{resourceName}\" private?"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "This custom URL is already taken"
 
@@ -5781,6 +5800,10 @@ msgstr "Upload a dataset"
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "Invalid column type"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Please try again. Your dashboard is still published."
+msgstr "Please try again. Your dashboard is still published."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."

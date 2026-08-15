@@ -389,6 +389,7 @@ msgstr "Export PDF iliyo na maelezo"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "URL maalum haiwezi kuzidi herufi {0}"
 
@@ -834,6 +835,10 @@ msgstr "Kikomo cha viti kimefikiwa"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "Pipeline"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Could not unpublish dashboard"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1356,6 +1361,7 @@ msgid "Parsed {0} rows"
 msgstr "Imepangwa {0} safu"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
 
@@ -1830,6 +1836,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 "Thamani zimegawanywa kwa mhimili wa X (\"{axisKeyValue}\")."
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Dashboard unpublished."
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "Onyesha SQL"
@@ -2185,6 +2195,7 @@ msgstr "Fomu ya Manual inaonyesha makadirio"
 
 #. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "URL maalum lazima iwe na angalau herufi {0}"
 
@@ -2982,6 +2993,7 @@ msgid "Continue to your workspace"
 msgstr "Endelea kwenye ofisi yako"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
 
@@ -3152,8 +3164,8 @@ msgstr "Kuanza…"
 msgid "Number range"
 msgstr "Muda wa nambari"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Columns"
 msgstr "Safu"
 
@@ -3929,6 +3941,7 @@ msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
 
@@ -4020,6 +4033,7 @@ msgid "you@example.com"
 msgstr "you@example.com"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "Mipangilio ya kushiriki dashibodi imeboreshwa."
 
@@ -4151,6 +4165,7 @@ msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 "inaonyesha makadirio bora; SQL iliyo juu ndiyo inayoendesha."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
 
@@ -4524,6 +4539,7 @@ msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo inaonyesha {3} za "
 "kwanza pekee."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "URL maalum haiwezi kuwa tupu"
 
@@ -4839,6 +4855,7 @@ msgstr "Kifungu cha WHERE kina nodi ya \"{nodeType}\" ambayo fomu haiungi "
 "mkono."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "Dashibodi imechapishwa!"
 
@@ -5042,6 +5059,7 @@ msgid "User group saved"
 msgstr "Kikundi cha mtumiaji kimehifadhiwa"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "Haiwezekani kuchapisha dashibodi"
 
@@ -5455,6 +5473,7 @@ msgid "Make \"{resourceName}\" private?"
 msgstr "Uweke \"{resourceName}\" kuwa ya faragha?"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "URL hii maalum tayari inatumika"
 
@@ -5834,6 +5853,10 @@ msgstr "Pakia seti ya data"
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Invalid column type"
 msgstr "Aina ya safu isiyo sahihi"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+msgid "Please try again. Your dashboard is still published."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
