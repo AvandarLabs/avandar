@@ -1924,6 +1924,7 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -2127,6 +2128,10 @@ msgstr "تم استلام قيمة غير نصية لحقل نصي"
 msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "أخبرنا عن مصدر بيانات {singularEntityConfigName}..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Failed to delete workspace"
+msgstr "تعذّر حذف مساحة العمل"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2551,6 +2556,10 @@ msgstr "وردة"
 msgid "Are you sure you want to delete {0}?"
 msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Type the workspace name to confirm"
+msgstr "اكتب اسم مساحة العمل للتأكيد"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save failed"
@@ -2932,12 +2941,6 @@ msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسا�
 msgid "Choose the maximum value"
 msgstr "اختر القيمة القصوى"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "المساحة التي تحاول الوصول إليها إما غير موجودة أو ليس لديك حق الوصول "
-"إليها."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "ادفع سنويًا"
@@ -3048,6 +3051,10 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "اختر ملف"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete this workspace"
+msgstr "حذف مساحة العمل هذه"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3381,6 +3388,13 @@ msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى 
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "يمكن أن يحتوي معرّف مساحة العمل على أحرف وأرقام وواصلات فقط"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "سيؤدي هذا إلى حذف <0>{0}</0> وجميع بياناتها نهائيًا. لا يمكن التراجع عن "
+"هذا الإجراء."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "تعذّر فتح بوابة الفوترة. يُرجى المحاولة مرة أخرى لاحقًا."
@@ -3433,6 +3447,10 @@ msgstr "اختر الأعمدة"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete workspace"
+msgstr "حذف مساحة العمل"
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
 msgid "Latitude column"
@@ -4352,6 +4370,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "محايد"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "يحذف مساحة العمل هذه وجميع بياناتها نهائيًا. لا يمكن التراجع عن هذا "
+"الإجراء."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "عدّ الصفوف في {datasetName} حسب {secondGroupByColumn}"
@@ -5082,6 +5106,12 @@ msgstr "تحتاج إلى وصول إداري على هذا المورد لإد�
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد {0}، فـ..."
 
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء وصولك إليها. إذا كنت تعتقد أن "
+"هذا حدث عن طريق الخطأ، فتواصل مع مالك مساحة العمل."
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
 msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
@@ -5160,6 +5190,10 @@ msgstr "رابط دائم (استخدمه لرموز الاستجابة السر
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "الإعدادات"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "الانتقال إلى الصفحة الرئيسية"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

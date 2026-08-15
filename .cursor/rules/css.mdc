@@ -1,0 +1,7 @@
+---
+description: CSS style
+globs: "**/*.css"
+alwaysApply: false
+---
+
+@docs/rules/css.md

@@ -1,4 +1,4 @@
-# React Doctor — finds security, performance, correctness, accessibility,
+# React Doctor: finds security, performance, correctness, accessibility,
 # bundle-size, and architecture issues in React codebases.
 #
 # Docs: https://www.react.doctor/ci
@@ -43,20 +43,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Pinned to 0.7.1. The 0.9.x line still reproduces the upstream "exited
-      # with status 0 before producing a JSON report" bug (stdout-flush race,
-      # millionco/react-doctor#1242) on this repo's PRs, so we pin back to the
-      # last release verified green in our CI instead of tracking "latest".
+      # Pinned to 0.7.1 because the 0.9.x line can exit successfully before
+      # producing a JSON report (millionco/react-doctor#1242). This version is
+      # the last one verified to produce the report reliably in this CI.
       - uses: millionco/react-doctor@v1
         with:
           version: "0.7.1"
-        # Common configuration knobs — uncomment any to override the default.
+          # Common configuration knobs. Uncomment any to override the default.
         # Full reference: https://www.react.doctor/ci
-        # with:
-        #   non-blocking: true       # Report findings but always exit 0 (won't fail the PR check)
-        #   fail-on: warning         # Gate level: "error" (default) | "warning" | "none"
-        #   comment: false           # Disable the sticky PR summary comment
-        #   annotations: false       # Disable inline GitHub Actions annotations on changed files
-        #   version: "0.2.18"        # Pin to a specific react-doctor version instead of "latest"
-        #   directory: apps/web      # Scan a sub-directory (default: ".")
-        #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
+        # non-blocking: true       # Report findings but always exit 0
+        # fail-on: warning         # Gate level: error, warning, or none
+        # comment: false           # Disable the sticky PR summary comment
+        # annotations: false       # Disable inline annotations on changed files
+        # directory: apps/web      # Scan a sub-directory (default: ".")
+        # project: "web,admin"     # Scan selected monorepo projects

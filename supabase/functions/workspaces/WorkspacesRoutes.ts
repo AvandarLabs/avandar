@@ -4,6 +4,7 @@ import {
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
+import { DeleteWorkspace } from "@sbfn/workspaces/[workspaceId].delete.ts";
 import {
   makeRoleGroupIdFromAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
@@ -400,5 +401,9 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
           return { invite: updatedInvite, membership, profile };
         },
       ),
+  },
+
+  "/:workspaceId/delete": {
+    POST: DeleteWorkspace,
   },
 });

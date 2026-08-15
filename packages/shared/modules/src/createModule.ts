@@ -6,8 +6,13 @@ import {
   objectValuesMap,
   setValue,
 } from "@avandar/utils";
-import type { EmptyObject, PathValue, UnknownObject } from "@avandar/utils";
-import type { Paths, Simplify } from "type-fest";
+import type {
+  EmptyObject,
+  ObjectPaths,
+  PathValue,
+  UnknownObject,
+} from "@avandar/utils";
+import type { Simplify } from "type-fest";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyModule = Module<any, any, any>;
@@ -91,9 +96,10 @@ export type Accessors<
      * value.
      */
     set<
-      P extends [Paths<State>] extends [never] ? keyof State : Paths<State>,
+      P extends [ObjectPaths<State>] extends [never] ? keyof State
+      : ObjectPaths<State>,
       V extends P extends keyof State ? State[P]
-      : P extends Paths<State> ? PathValue<State, P>
+      : P extends ObjectPaths<State> ? PathValue<State, P>
       : never,
     >(
       keyPath: P,
@@ -214,9 +220,10 @@ export function createModule<
       });
     },
     set: <
-      P extends [Paths<State>] extends [never] ? keyof State : Paths<State>,
+      P extends [ObjectPaths<State>] extends [never] ? keyof State
+      : ObjectPaths<State>,
       V extends P extends keyof State ? State[P]
-      : P extends Paths<State> ? PathValue<State, P>
+      : P extends ObjectPaths<State> ? PathValue<State, P>
       : never,
     >(
       keyPath: P,
