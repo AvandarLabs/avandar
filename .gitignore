@@ -46,6 +46,7 @@ deno.lock
 
 # Cursor
 .cursor/plans
+.cursor/.cursor/
 
 # Playwright
 /playwright/

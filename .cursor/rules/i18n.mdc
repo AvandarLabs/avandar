@@ -1,0 +1,7 @@
+---
+description: Internationalization (Lingui)
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+@docs/rules/i18n.md

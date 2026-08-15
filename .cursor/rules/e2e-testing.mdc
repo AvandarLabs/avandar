@@ -1,0 +1,7 @@
+---
+description: E2E testing style
+globs: "tests/e2e/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+@docs/rules/e2e-testing.md

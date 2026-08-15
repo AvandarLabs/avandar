@@ -38,3 +38,15 @@ Libraries:
   any library listed here.
 - Use the library versions referenced in this document. Do not look up
   documentation from older versions.
+
+## Style guides
+
+Canonical copies live in `docs/rules/`. Sibling rules in this directory load
+them when matching files are in context:
+
+- TypeScript: `docs/rules/typescript.md`
+- SQL: `docs/rules/sql.md`
+- Unit/integration tests: `docs/rules/testing.md`
+- E2E tests: `docs/rules/e2e-testing.md`
+- CSS: `docs/rules/css.md`
+- Internationalization: `docs/rules/i18n.md`

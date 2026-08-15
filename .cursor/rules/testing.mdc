@@ -1,6 +1,6 @@
 ---
 description: Testing style
-globs: "**/*.{test,spec}.{ts,tsx}"
+globs: "**/*.test.{ts,tsx}"
 alwaysApply: false
 ---
 
