@@ -126,9 +126,28 @@ type ShareResourcePublishing = {
 
 The persisted visibility is deliberately **not** on this prop. The target is
 initialised from it, so on open the two agree and D-P3-3's display rule holds;
-after that any divergence is a pending change the status line reports. One
-field carries both facts, and the modal cannot render a state where they
-contradict each other.
+after that any divergence is a pending change the status line reports.
+
+**That refinement has a sharp edge, found in review, and the status line is
+what pays for it.** Because the dropdown reads the *target*, an owner who picks
+"Restricted" on a live public dashboard sees "Restricted" immediately while
+`is_public` is still true and the anon policy still serves the whole internet.
+Left neutral, that is precisely the false reassurance §4.2 and
+`fromResourceState` exist to prevent, one layer up. Two things resolve it, and
+neither is optional:
+
+- The dropdown keeps showing the pending choice, because a control that snaps
+  back while a request is in flight is its own usability defect.
+- The divergence alert for `visibility = 'public'` with a narrower target is
+  **red and names the live exposure** ("still public on the web, anyone with
+  the link can view it until you press the button below"), rather than the
+  neutral yellow used for every other pending change. The dangerous direction
+  gets the loud treatment; the safe ones do not.
+
+The divergence copy also branches on whether anything is published at all. On a
+`draft` dashboard there is no published copy to describe, and the "your access
+change is saved" phrasing is false for the public option, whose whole point
+(§4.2) is that it writes no share rows.
 
 The dropdown handler takes a `GeneralAccessValue` rather than a visibility
 because the mapping in §4.2's table is dashboard knowledge. Handing the modal a
@@ -152,7 +171,18 @@ New and moved files:
 `ShareResourceButton` hardcodes `<ShareResourceModal>` in its `onClick`. Its
 gate (the `useResourceRole` call, the disabled state, and the two tooltip
 strings) is extracted into `useShareButtonState` so `DashboardShareButton`
-reuses the rule rather than restating it. The two buttons stay separate
+reuses the rule rather than restating it.
+
+**The two buttons do not share a threshold, and that is the point.** Managing
+shares requires `admin` on the resource, which is what `ShareResourceButton`
+has always enforced. Publishing to your own workspace is ordinary editor work
+(§5.1), and the deleted `PublishDashboardButton` carried no role gate at all.
+Reusing the admin threshold for the merged button would therefore silently
+revoke publishing from every editor, which review caught. `DashboardShareButton`
+opens at `editor`; `ShareResourceModal` takes a `canManageShares` flag,
+defaulting to `true` so the dataset caller is untouched, and renders the
+share-writing controls disabled when it is false. An editor gets the publishing
+half of the modal and a read-only view of the sharing half. The two buttons stay separate
 components because their `modals.open` payloads differ, and that is the only
 thing that differs.
 
