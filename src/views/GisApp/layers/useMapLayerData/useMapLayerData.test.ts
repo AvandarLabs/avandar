@@ -194,12 +194,12 @@ describe("MapLayerData.isQueryable", () => {
   });
 });
 
-describe("MapLayerData.makeQueryKey", () => {
+describe("MapLayerData.makeQueryKeyFromLayer", () => {
   it("changes when the source changes", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(MapLayerData.makeQueryKey(layer)).not.toEqual(
-      MapLayerData.makeQueryKey(withLimit),
+    expect(MapLayerData.makeQueryKeyFromLayer(layer)).not.toEqual(
+      MapLayerData.makeQueryKeyFromLayer(withLimit),
     );
   });
 
@@ -212,8 +212,8 @@ describe("MapLayerData.makeQueryKey", () => {
         color: { type: "single" as const, color: "#ef4444" },
       },
     };
-    expect(MapLayerData.makeQueryKey(layer)).toEqual(
-      MapLayerData.makeQueryKey(recolored),
+    expect(MapLayerData.makeQueryKeyFromLayer(layer)).toEqual(
+      MapLayerData.makeQueryKeyFromLayer(recolored),
     );
   });
 });

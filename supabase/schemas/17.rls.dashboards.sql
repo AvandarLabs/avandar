@@ -38,7 +38,8 @@ with
       public.dashboards.workspace_id,
       'dashboard'::public.resource_type,
       public.dashboards.owner_id
-    )
+    ) and
+    public.dashboards.snapshot_transition_kind is null
   );
 
 create policy "Users with editor access can update dashboards" on public.dashboards
@@ -47,6 +48,13 @@ for update
     public.util__auth_user_can_update_resource (
       'dashboard'::public.resource_type,
       public.dashboards.id
+    ) and
+    (
+      public.dashboards.snapshot_transition_kind is distinct from 'delete' or
+      public.util__auth_user_can_delete_resource (
+        'dashboard'::public.resource_type,
+        public.dashboards.id
+      )
     )
   )
 with
@@ -54,6 +62,13 @@ with
     public.util__auth_user_can_update_resource (
       'dashboard'::public.resource_type,
       public.dashboards.id
+    ) and
+    (
+      public.dashboards.snapshot_transition_kind is distinct from 'delete' or
+      public.util__auth_user_can_delete_resource (
+        'dashboard'::public.resource_type,
+        public.dashboards.id
+      )
     ) and
     public.dashboards.owner_id = any (
       array(
@@ -69,5 +84,13 @@ create policy "Users with admin access can delete dashboards" on public.dashboar
   public.util__auth_user_can_delete_resource (
     'dashboard'::public.resource_type,
     public.dashboards.id
-  )
+  ) and
+  public.dashboards.snapshot_transition_kind = 'delete' and
+  public.dashboards.snapshot_transition_revision is not null and
+  public.dashboards.snapshot_transition_revision <> '00000000-0000-0000-0000-000000000000'::uuid and
+  public.dashboards.snapshot_transition_revision is distinct from public.dashboards.snapshot_revision and
+  public.dashboards.snapshot_transition_target_visibility is null and
+  public.dashboards.snapshot_transition_prior_visibility is not null and
+  public.dashboards.visibility = 'draft' and
+  public.dashboards.snapshot_revision is not distinct from public.dashboards.snapshot_transition_prior_revision
 );

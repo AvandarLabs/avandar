@@ -20,7 +20,7 @@ import {
   WORKSPACE_APP_ROUTES,
 } from "./helpers/workspaceAppRouteExpectations";
 import type { WorkspaceAppRouteCase } from "./helpers/workspaceAppRouteExpectations";
-import type { AppType } from "$/models/Permissions/Permissions.types";
+import type { AppType } from "$/models/Permissions/Permissions";
 
 function _appRouteForType(app: AppType): WorkspaceAppRouteCase | undefined {
   const routes: Record<AppType, WorkspaceAppRouteCase | undefined> = {

@@ -18,31 +18,10 @@ import type {
   LocalDatasetCsvParseOptions,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
+import type { ILogger } from "@avandar/logger";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-
-/**
- * A client for managing datasets in local storage and in local memory.
- *
- * Datasets cached locally as parquet are tracked here. The CSV / XLSX
- * import runs in two named phases:
- *
- *   - The sniff phase (`startCsvImport` / `startXlsxImport`) runs the fast
- *     sniff + 200-row preview so the import form can render immediately,
- *     inserts a LocalDataset row with `parseStatus="parsing"`, optionally
- *     caches the source bytes for resume-after-refresh, and kicks off the
- *     background parquet transcoding.
- *
- *   - The background parquet transcoding (`runBackgroundParquetTranscoding`)
- *     is the heavy `read_csv` / `read_xlsx` → parquet step that runs after
- *     the sniff phase. Completion writes the parquet bytes into the row,
- *     drops the cached source bytes, flips `parseStatus="ready"`, and
- *     reconciles column types against the Supabase Dataset record.
- *
- * "Local storage" = browser IndexedDB. "Local memory" = the loaded view in
- * the in-browser DuckDB worker.
- */
 
 /**
  * Per-file ceiling for the source-bytes cache. Files above this don't
@@ -107,280 +86,279 @@ async function _maybeCacheSourceBytes(file: File): Promise<Blob | undefined> {
   return file;
 }
 
+type LocalImportParams<ParseOptions> = {
+  datasetId: DatasetId;
+  workspaceId: Workspace.Id;
+  userId: UserId;
+  file: File;
+  parseOptions: ParseOptions;
+};
+
+type XlsxSniffResult = {
+  sheets: string[];
+  defaultSheet: string;
+  columns: string[];
+  previewRows: Array<Record<string, unknown>>;
+};
+
+type LocalDatasetMutationContext = {
+  logger: ILogger;
+  downloads: Map<DatasetId, Promise<LocalDataset | undefined>>;
+};
+
+type PutParsingDatasetOptions = LocalImportParams<
+  LocalDatasetCsvParseOptions | LocalDatasetXlsxParseOptions
+> & { sourceFileType: "csv" | "xlsx" };
+
+type LocalDatasetMutationRecord = {
+  startCsvImport: (
+    params: Readonly<
+      LocalImportParams<Omit<LocalDatasetCsvParseOptions, "type">>
+    >,
+  ) => Promise<{
+    csvSniff: DuckDbCsvSniffResult;
+    columns: DuckDbColumnSchema[];
+    previewRows: UnknownRow[];
+  }>;
+  startXlsxImport: (
+    params: Readonly<
+      LocalImportParams<Omit<LocalDatasetXlsxParseOptions, "type">>
+    >,
+  ) => Promise<XlsxSniffResult>;
+  resumeImport: (
+    params: Readonly<{ datasetId: DatasetId }>,
+  ) => Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult | undefined>;
+  dropLocalDataset: (
+    params: Readonly<{ datasetId: DatasetId }>,
+  ) => Promise<void>;
+  fetchCloudDatasetToLocalStorage: (
+    params: Readonly<{
+      datasetId: DatasetId;
+      workspaceId: Workspace.Id;
+      userId: UserId;
+    }>,
+  ) => Promise<LocalDataset | undefined>;
+};
+
+async function _putParsingDataset(
+  options: Readonly<PutParsingDatasetOptions>,
+): Promise<void> {
+  const cachedBytes = await _maybeCacheSourceBytes(options.file);
+  await AvaDexie.DB.LocalDataset.put({
+    datasetId: options.datasetId,
+    workspaceId: options.workspaceId,
+    userId: options.userId,
+    parquetData: undefined,
+    parseStatus: "parsing",
+    parseStartedAt: Date.now(),
+    parseFailedReason: undefined,
+    sourceBytes: cachedBytes,
+    sourceFileName: options.file.name,
+    sourceFileType: options.sourceFileType,
+    sourceFileSize: options.file.size,
+    lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
+    parseOptions: options.parseOptions,
+  });
+}
+
+async function _downloadCloudDataset(
+  options: Readonly<{
+    logger: ILogger;
+    datasetId: DatasetId;
+    workspaceId: Workspace.Id;
+    userId: UserId;
+  }>,
+): Promise<LocalDataset | undefined> {
+  const { logger: baseLogger, ...params } = options;
+  const logger = baseLogger.appendName("fetchCloudDatasetToLocalStorage");
+  logger.log("Fetching cloud dataset to local storage", params);
+  const parquetData = await DatasetParquetStorageClient.downloadDataset(params);
+  return parquetData ?
+      LocalDatasetClient.insert({
+        data: {
+          ...params,
+          parquetData,
+          parseStatus: "ready",
+          parseStartedAt: undefined,
+          parseFailedReason: undefined,
+          sourceBytes: undefined,
+          sourceFileName: undefined,
+          sourceFileType: undefined,
+          sourceFileSize: undefined,
+          lastSourceAccessedAt: undefined,
+          parseOptions: undefined,
+        },
+      })
+    : undefined;
+}
+
+function _makeStartCsvImport(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["startCsvImport"] {
+  return async (params) => {
+    const logger = context.logger.appendName("startCsvImport");
+    logger.log("Starting CSV import (sniff phase)", {
+      datasetId: params.datasetId,
+      size: params.file.size,
+    });
+    const sniff = await DuckDbClient.sniffCsv({
+      file: params.file,
+      numRowsToSkip: params.parseOptions.numRowsToSkip,
+      delimiter: params.parseOptions.delimiter,
+      maxPreviewRows: PREVIEW_ROW_COUNT,
+    });
+    await _putParsingDataset({
+      ...params,
+      sourceFileType: "csv",
+      parseOptions: { type: "csv", ...params.parseOptions },
+    });
+    void runBackgroundParquetTranscoding({
+      datasetId: params.datasetId,
+      workspaceId: params.workspaceId,
+      userId: params.userId,
+      source: {
+        kind: "csv",
+        file: params.file,
+        options: { type: "csv", ...params.parseOptions },
+      },
+    });
+    return sniff;
+  };
+}
+
+function _makeStartXlsxImport(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["startXlsxImport"] {
+  return async (params) => {
+    const logger = context.logger.appendName("startXlsxImport");
+    logger.log("Starting XLSX import (sniff phase)", {
+      datasetId: params.datasetId,
+      size: params.file.size,
+    });
+    const sniff = await sniffXlsxFile({
+      file: params.file,
+      sheet: params.parseOptions.sheet,
+      hasHeader: params.parseOptions.hasHeader,
+      maxPreviewRows: PREVIEW_ROW_COUNT,
+    });
+    const parseOptions = {
+      type: "xlsx" as const,
+      sheet: params.parseOptions.sheet ?? sniff.defaultSheet,
+      hasHeader: params.parseOptions.hasHeader,
+    };
+    await _putParsingDataset({
+      ...params,
+      sourceFileType: "xlsx",
+      parseOptions,
+    });
+    void runBackgroundParquetTranscoding({
+      datasetId: params.datasetId,
+      workspaceId: params.workspaceId,
+      userId: params.userId,
+      source: { kind: "xlsx", file: params.file, options: parseOptions },
+    });
+    return sniff;
+  };
+}
+
+function _makeResumeImport(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["resumeImport"] {
+  return async (params) => {
+    const row = await AvaDexie.DB.LocalDataset.get(params.datasetId);
+    if (!row?.sourceBytes || !row.sourceFileType || !row.parseOptions) {
+      context.logger
+        .appendName("resumeImport")
+        .log("Cannot resume: no cached source bytes", params);
+      return undefined;
+    }
+    await AvaDexie.DB.LocalDataset.update(params.datasetId, {
+      lastSourceAccessedAt: Date.now(),
+    });
+    const file = new File(
+      [row.sourceBytes],
+      row.sourceFileName ?? `${row.datasetId}.${row.sourceFileType}`,
+      { type: row.sourceBytes.type },
+    );
+    const source =
+      row.sourceFileType === "csv" ?
+        {
+          kind: "csv" as const,
+          file,
+          options: row.parseOptions as LocalDatasetCsvParseOptions,
+        }
+      : {
+          kind: "xlsx" as const,
+          file,
+          options: row.parseOptions as LocalDatasetXlsxParseOptions,
+        };
+    return runBackgroundParquetTranscoding({
+      datasetId: row.datasetId,
+      workspaceId: row.workspaceId,
+      userId: row.userId,
+      source,
+    });
+  };
+}
+
+function _makeDropLocalDataset(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["dropLocalDataset"] {
+  return async (params) => {
+    context.logger
+      .appendName("dropLocalDataset")
+      .log("Dropping local dataset", params);
+    await LocalDatasetClient.delete({ id: params.datasetId });
+    await DuckDbClient.dropTableViewAndFile({
+      tableOrViewName: params.datasetId,
+    });
+  };
+}
+
+function _makeFetchCloudDatasetToLocalStorage(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["fetchCloudDatasetToLocalStorage"] {
+  return async (params) => {
+    const existingDownload = context.downloads.get(params.datasetId);
+    if (existingDownload) {
+      return existingDownload;
+    }
+    const download = _downloadCloudDataset({
+      logger: context.logger,
+      ...params,
+    }).finally(() => {
+      context.downloads.delete(params.datasetId);
+    });
+    context.downloads.set(params.datasetId, download);
+    return download;
+  };
+}
+
+function _createLocalDatasetMutations(
+  logger: ILogger,
+): LocalDatasetMutationRecord {
+  const context = {
+    logger,
+    downloads: new Map<DatasetId, Promise<LocalDataset | undefined>>(),
+  };
+  return {
+    startCsvImport: _makeStartCsvImport(context),
+    startXlsxImport: _makeStartXlsxImport(context),
+    resumeImport: _makeResumeImport(context),
+    dropLocalDataset: _makeDropLocalDataset(context),
+    fetchCloudDatasetToLocalStorage:
+      _makeFetchCloudDatasetToLocalStorage(context),
+  };
+}
+
+/** Manages datasets persisted in browser storage and loaded into DuckDB. */
 export const LocalDatasetClient = createUsableServiceClient(
   createDexieCrudClient({
     db: AvaDexie.DB,
     modelName: "LocalDataset",
     parsers: LocalDatasetParsers,
-    mutations: (config) => {
-      const downloadsInProgressByDatasetId: Map<
-        DatasetId,
-        Promise<LocalDataset | undefined>
-      > = new Map();
-
-      return {
-        /**
-         * The sniff phase for CSV imports. Synchronously runs the DuckDB
-         * sniff + 200-row preview so the caller can render the import form,
-         * then fires the background parquet transcoding. Promise resolves as
-         * soon as the sniff phase is done; callers do not need to await the
-         * background parquet transcoding.
-         */
-        startCsvImport: async (params: {
-          datasetId: DatasetId;
-          workspaceId: Workspace.Id;
-          userId: UserId;
-          file: File;
-          parseOptions: Omit<LocalDatasetCsvParseOptions, "type">;
-        }): Promise<{
-          csvSniff: DuckDbCsvSniffResult;
-          columns: DuckDbColumnSchema[];
-          previewRows: UnknownRow[];
-        }> => {
-          const logger = config.logger.appendName("startCsvImport");
-          const { datasetId, workspaceId, userId, file, parseOptions } = params;
-          logger.log("Starting CSV import (sniff phase)", {
-            datasetId,
-            size: file.size,
-          });
-
-          const sniff = await DuckDbClient.sniffCsv({
-            file,
-            numRowsToSkip: parseOptions.numRowsToSkip,
-            delimiter: parseOptions.delimiter,
-            maxPreviewRows: PREVIEW_ROW_COUNT,
-          });
-
-          const cachedBytes = await _maybeCacheSourceBytes(file);
-          await AvaDexie.DB.LocalDataset.put({
-            datasetId,
-            workspaceId,
-            userId,
-            parquetData: undefined,
-            parseStatus: "parsing",
-            parseStartedAt: Date.now(),
-            parseFailedReason: undefined,
-            sourceBytes: cachedBytes,
-            sourceFileName: file.name,
-            sourceFileType: "csv",
-            sourceFileSize: file.size,
-            lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
-            parseOptions: { type: "csv", ...parseOptions },
-          });
-
-          // Kick off the background parquet transcoding. We deliberately
-          // don't await; the sniff phase already returned everything the
-          // import form needs. The promise's rejection is handled inside
-          // `runBackgroundParquetTranscoding`, so the unhandled-promise
-          // hazard doesn't apply here.
-          void runBackgroundParquetTranscoding({
-            datasetId,
-            workspaceId,
-            userId,
-            source: {
-              kind: "csv",
-              file,
-              options: { type: "csv", ...parseOptions },
-            },
-          });
-
-          return sniff;
-        },
-
-        /**
-         * The sniff phase for XLSX imports. Mirrors `startCsvImport` but
-         * uses a SheetJS-backed sniff worker (off-main-thread) since DuckDB
-         * `read_xlsx` does not support partial / streaming sniffs.
-         */
-        startXlsxImport: async (params: {
-          datasetId: DatasetId;
-          workspaceId: Workspace.Id;
-          userId: UserId;
-          file: File;
-          parseOptions: Omit<LocalDatasetXlsxParseOptions, "type">;
-        }): Promise<{
-          sheets: string[];
-          defaultSheet: string;
-          columns: string[];
-          previewRows: Array<Record<string, unknown>>;
-        }> => {
-          const logger = config.logger.appendName("startXlsxImport");
-          const { datasetId, workspaceId, userId, file, parseOptions } = params;
-          logger.log("Starting XLSX import (sniff phase)", {
-            datasetId,
-            size: file.size,
-          });
-
-          const sniff = await sniffXlsxFile({
-            file,
-            sheet: parseOptions.sheet,
-            hasHeader: parseOptions.hasHeader,
-            maxPreviewRows: PREVIEW_ROW_COUNT,
-          });
-
-          const cachedBytes = await _maybeCacheSourceBytes(file);
-          await AvaDexie.DB.LocalDataset.put({
-            datasetId,
-            workspaceId,
-            userId,
-            parquetData: undefined,
-            parseStatus: "parsing",
-            parseStartedAt: Date.now(),
-            parseFailedReason: undefined,
-            sourceBytes: cachedBytes,
-            sourceFileName: file.name,
-            sourceFileType: "xlsx",
-            sourceFileSize: file.size,
-            lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
-            parseOptions: {
-              type: "xlsx",
-              sheet: parseOptions.sheet ?? sniff.defaultSheet,
-              hasHeader: parseOptions.hasHeader,
-            },
-          });
-
-          void runBackgroundParquetTranscoding({
-            datasetId,
-            workspaceId,
-            userId,
-            source: {
-              kind: "xlsx",
-              file,
-              options: {
-                type: "xlsx",
-                sheet: parseOptions.sheet ?? sniff.defaultSheet,
-                hasHeader: parseOptions.hasHeader,
-              },
-            },
-          });
-
-          return sniff;
-        },
-
-        /**
-         * Resume a previously-stalled background parquet transcoding from
-         * the row's cached source bytes. Returns the load result if resume is
-         * possible; resolves with `undefined` if the source bytes were
-         * evicted / never cached (the UI should then prompt the user to
-         * re-upload).
-         */
-        resumeImport: async (params: {
-          datasetId: DatasetId;
-        }): Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult | undefined> => {
-          const logger = config.logger.appendName("resumeImport");
-          const row = await AvaDexie.DB.LocalDataset.get(params.datasetId);
-          if (!row) {
-            return undefined;
-          }
-          if (!row.sourceBytes || !row.sourceFileType || !row.parseOptions) {
-            logger.log("Cannot resume: no cached source bytes", {
-              datasetId: params.datasetId,
-            });
-            return undefined;
-          }
-          await AvaDexie.DB.LocalDataset.update(params.datasetId, {
-            lastSourceAccessedAt: Date.now(),
-          });
-
-          // Re-construct a File from the cached Blob so the rest of the
-          // pipeline (which expects a File for the `.name` etc.) works
-          // unchanged.
-          const file = new File(
-            [row.sourceBytes],
-            row.sourceFileName ?? `${row.datasetId}.${row.sourceFileType}`,
-            { type: row.sourceBytes.type },
-          );
-
-          if (row.sourceFileType === "csv") {
-            const options = row.parseOptions as LocalDatasetCsvParseOptions;
-            return runBackgroundParquetTranscoding({
-              datasetId: row.datasetId,
-              workspaceId: row.workspaceId,
-              userId: row.userId,
-              source: { kind: "csv", file, options },
-            });
-          }
-          const options = row.parseOptions as LocalDatasetXlsxParseOptions;
-          return runBackgroundParquetTranscoding({
-            datasetId: row.datasetId,
-            workspaceId: row.workspaceId,
-            userId: row.userId,
-            source: { kind: "xlsx", file, options },
-          });
-        },
-
-        /**
-         * Drops the local dataset from both local storage (IndexedDb) and
-         * memory (DuckDb).
-         */
-        dropLocalDataset: async (params: {
-          datasetId: DatasetId;
-        }): Promise<void> => {
-          const logger = config.logger.appendName("dropLocalDataset");
-          logger.log("Dropping local dataset", params);
-          const { datasetId } = params;
-          await LocalDatasetClient.delete({ id: datasetId });
-          await DuckDbClient.dropTableViewAndFile(datasetId);
-        },
-
-        /**
-         * Fetch a parquet dataset from cloud object storage and store it
-         * locally. Always lands in `parseStatus="ready"` (the cloud copy
-         * is already a parquet).
-         */
-        fetchCloudDatasetToLocalStorage: async (params: {
-          datasetId: DatasetId;
-          workspaceId: Workspace.Id;
-          userId: UserId;
-        }): Promise<LocalDataset | undefined> => {
-          const existingPromise = downloadsInProgressByDatasetId.get(
-            params.datasetId,
-          );
-          if (existingPromise) {
-            return await existingPromise;
-          }
-
-          const downloadPromise = (async () => {
-            const { datasetId, workspaceId, userId } = params;
-            const logger = config.logger.appendName(
-              "fetchCloudDatasetToLocalStorage",
-            );
-            logger.log("Fetching cloud dataset to local storage", params);
-            const parquetBlob =
-              await DatasetParquetStorageClient.downloadDataset({
-                datasetId,
-                workspaceId,
-              });
-
-            if (!parquetBlob) {
-              return undefined;
-            }
-
-            return await LocalDatasetClient.insert({
-              data: {
-                datasetId,
-                workspaceId,
-                userId,
-                parquetData: parquetBlob,
-                parseStatus: "ready",
-                parseStartedAt: undefined,
-                parseFailedReason: undefined,
-                sourceBytes: undefined,
-                sourceFileName: undefined,
-                sourceFileType: undefined,
-                sourceFileSize: undefined,
-                lastSourceAccessedAt: undefined,
-                parseOptions: undefined,
-              },
-            });
-          })().finally(() => {
-            downloadsInProgressByDatasetId.delete(params.datasetId);
-          });
-
-          downloadsInProgressByDatasetId.set(params.datasetId, downloadPromise);
-          return await downloadPromise;
-        },
-      };
+    mutations: ({ logger }) => {
+      return _createLocalDatasetMutations(logger);
     },
   }),
   {

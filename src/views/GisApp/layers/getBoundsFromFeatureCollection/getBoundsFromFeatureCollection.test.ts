@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
-function _createPoint(longitude: number, latitude: number): GeoJSON.Feature {
+function _createPoint(
+  options: Readonly<{ longitude: number; latitude: number }>,
+): GeoJSON.Feature {
   return {
     type: "Feature",
-    geometry: { type: "Point", coordinates: [longitude, latitude] },
+    geometry: {
+      type: "Point",
+      coordinates: [options.longitude, options.latitude],
+    },
     properties: {},
   };
 }
@@ -23,7 +28,10 @@ describe("getBoundsFromFeatureCollection", () => {
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [_createPoint(15, -4), _createPoint(30, 10)],
+        features: [
+          _createPoint({ longitude: 15, latitude: -4 }),
+          _createPoint({ longitude: 30, latitude: 10 }),
+        ],
       }),
     ).toEqual([
       [15, -4],
@@ -35,7 +43,7 @@ describe("getBoundsFromFeatureCollection", () => {
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [_createPoint(15, -4)],
+        features: [_createPoint({ longitude: 15, latitude: -4 })],
       }),
     ).toEqual([
       [15, -4],
@@ -118,15 +126,18 @@ describe("getBoundsFromFeatureCollection", () => {
   });
 
   it("ignores features with no geometry", () => {
-    const withoutGeometry: GeoJSON.Feature = {
+    const withoutGeometry: GeoJSON.Feature<GeoJSON.Geometry | null> = {
       type: "Feature",
-      geometry: null as unknown as GeoJSON.Geometry,
+      geometry: null,
       properties: {},
     };
     expect(
       getBoundsFromFeatureCollection({
         type: "FeatureCollection",
-        features: [withoutGeometry, _createPoint(7, 7)],
+        features: [
+          withoutGeometry,
+          _createPoint({ longitude: 7, latitude: 7 }),
+        ],
       }),
     ).toEqual([
       [7, 7],

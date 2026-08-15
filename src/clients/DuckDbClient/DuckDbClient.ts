@@ -12,7 +12,6 @@ import * as duckdb from "@duckdb/duckdb-wasm";
 import { uuid } from "$/lib/uuid";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
@@ -40,6 +39,7 @@ import {
   buildDuckDbCsvSniffResultFromResolved,
   buildDuckDbCsvSniffResultFromSniffRow,
 } from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
+import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import {
   DuckDbColumnSchema,
   DuckDbCsvSniffResult,
@@ -54,13 +54,21 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { buildManualDuckDbBundles } from "@/clients/DuckDbClient/duckDbManualBundles";
 import { shouldLoadDuckDbNetworkExtensions } from "@/clients/DuckDbClient/shouldLoadDuckDbNetworkExtensions";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
 import type {
+  CsvParseResolvedOptions,
   CsvParseUserHints,
   DuckDbSniffCsvRow,
 } from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
+import type {
+  DatasetDuckDbLease,
+  PublicSnapshotDuckDbOwner,
+} from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { Knex } from "knex";
 
 const sql = knex({
   client: "sqlite3",
@@ -69,9 +77,257 @@ const sql = knex({
   },
   useNullAsDefault: true,
 });
+const TRUSTED_INTERNAL_SQL: unique symbol = Symbol("TRUSTED_INTERNAL_SQL");
+
+type CreateParquetViewOptions = {
+  conn: duckdb.AsyncDuckDBConnection;
+  datasetDuckDbLease: DatasetDuckDbLease;
+  excludeClause: string;
+  replaceClause: string;
+  tableName: string;
+};
+
+type TranscodeXlsxOptions = {
+  conn: duckdb.AsyncDuckDBConnection;
+  datasetDuckDbLease: DatasetDuckDbLease;
+  hasHeader: boolean;
+  parquetStagingFile: string;
+  sheet: string | undefined;
+  xlsxStagingFile: string;
+};
+
+type XlsxLoadResultOptions = {
+  datasetDuckDbLease: DatasetDuckDbLease;
+  parquetData: Blob;
+  sheet: string | undefined;
+  tableName: string;
+};
+
+type CsvParseAttemptState = {
+  lastSniffRow: DuckDbSniffCsvRow | undefined;
+  parseOptions: CsvParseResolvedOptions;
+  rejectedRows: DuckDbRejectedRow[];
+  rejectedScans: DuckDbScan[];
+};
+
+type WriteCsvAttemptOptions = {
+  attemptIndex: number;
+  conn: duckdb.AsyncDuckDBConnection;
+  csvStagingFile: string;
+  file: File | undefined;
+  parquetStagingFile: string;
+  parseOptions: CsvParseResolvedOptions;
+  userHints: CsvParseUserHints;
+};
+
+type CsvLoadResultOptions = CsvParseAttemptState & {
+  datasetDuckDbLease: DatasetDuckDbLease;
+  parquetData: Blob;
+  tableName: string;
+};
+
+type CsvPreviewOptions = {
+  conn: duckdb.AsyncDuckDBConnection;
+  stagingFile: string;
+  parseOptions: CsvParseResolvedOptions;
+  maxPreviewRows: number;
+};
+
+type CsvPreviewSniffOptions = {
+  stagingFile: string;
+  sniffRow: DuckDbSniffCsvRow | undefined;
+  parseOptions: CsvParseResolvedOptions;
+  preview: CsvPreviewData;
+};
+
+type CopyCsvAttemptOptions = {
+  conn: duckdb.AsyncDuckDBConnection;
+  csvStagingFile: string;
+  parquetStagingFile: string;
+  parseOptions: CsvParseResolvedOptions;
+};
+
+type RunCsvParseAttemptsOptions = Omit<
+  WriteCsvAttemptOptions,
+  "attemptIndex" | "parseOptions"
+>;
+
+type EvaluateCsvParseAttemptOptions = Omit<
+  RunCsvParseAttemptsOptions,
+  "file" | "userHints"
+> & {
+  attemptIndex: number;
+  state: CsvParseAttemptState;
+};
+
+type PageTotalRowsOptions = {
+  tableName: string;
+  pageSize: number;
+  pageNum: number;
+  totalRows: number | undefined;
+  pageData: QueryResult.T<UnknownRow>;
+};
+
+type RemainingQueryPagesOptions<T extends UnknownRow> = {
+  callback: (page: QueryResult.Page<T>) => void | Promise<void>;
+  firstPage: QueryResult.Page<T>;
+  query: Omit<DuckDbStructuredQuery, "limit" | "offset"> & {
+    pageSize: number;
+    selectColumnNames: DuckDbStructuredQuery["selectColumnNames"];
+    groupByColumnNames: DuckDbStructuredQuery["groupByColumnNames"];
+    aggregations: DuckDbStructuredQuery["aggregations"];
+  };
+};
+
+type RawQueryOptions = {
+  params?: Record<string, string | number | bigint | undefined>;
+  returnType?: "parquet" | "js";
+  conn?: duckdb.AsyncDuckDBConnection;
+  datasetDuckDbLease?: DatasetDuckDbLease;
+  datasetTableReadMode?: "public" | "workspace";
+  publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+  [TRUSTED_INTERNAL_SQL]?: true;
+};
+
+type RawQueryExecutionPlan = {
+  datasetIds: string[];
+  mutatedDatasetIds: string[];
+  publicSnapshotDuckDbOwner: PublicSnapshotDuckDbOwner | undefined;
+  readDatasetIds: string[];
+};
+
+type SniffCsvOptions = {
+  file: File;
+  numRowsToSkip?: number;
+  delimiter?: string;
+  quoteChar?: string;
+  escapeChar?: string;
+  newlineDelimiter?: string;
+  commentChar?: string;
+  hasHeader?: boolean;
+  dateFormat?: string;
+  timestampFormat?: string;
+  maxPreviewRows: number;
+};
+
+type CsvPreviewData = {
+  columns: DuckDbColumnSchema[];
+  previewRows: UnknownRow[];
+  readCsvArgs: string;
+};
+
+type CsvPreviewResultOptions = {
+  parseOptions: CsvParseResolvedOptions;
+  preview: CsvPreviewData;
+  sniffRow: DuckDbSniffCsvRow | undefined;
+  stagingFile: string;
+};
+
+function _getCsvParseUserHintsFromSniffOptions(
+  options: Readonly<SniffCsvOptions>,
+): CsvParseUserHints {
+  return {
+    numRowsToSkip: options.numRowsToSkip,
+    delimiter: options.delimiter,
+    quoteChar: options.quoteChar,
+    escapeChar: options.escapeChar,
+    newlineDelimiter: options.newlineDelimiter,
+    commentChar: options.commentChar,
+    hasHeader: options.hasHeader,
+    dateFormat: options.dateFormat,
+    timestampFormat: options.timestampFormat,
+  };
+}
 
 function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
+}
+
+function _getParquetProjectionClauses(
+  columnReplacements: DuckDbLoadParquetOptions["columnReplacements"],
+): { excludeClause: string; replaceClause: string } {
+  const projections = objectEntries(columnReplacements ?? {}).map(
+    ([columnName, { alias, dataType }]) => {
+      const outputName = alias ?? columnName;
+      const valueExpression =
+        dataType ?
+          `TRY_CAST("${columnName}" AS ${dataType})`
+        : `"${columnName}"`;
+      return {
+        exclusion: `"${columnName}"`,
+        replacement: `${valueExpression} AS "${outputName}"`,
+      };
+    },
+  );
+  return {
+    excludeClause:
+      projections.length > 0 ?
+        `EXCLUDE (${projections.map(prop("exclusion")).join(", ")})`
+      : "",
+    replaceClause:
+      projections.length > 0 ?
+        `, ${projections.map(prop("replacement")).join(", ")}`
+      : "",
+  };
+}
+
+function _getAggregationSelectExpression(
+  options: Readonly<{
+    aggregationType: QueryAggregationType.DuckDbQueryAggregationType;
+    columnName: string;
+  }>,
+): Knex.Raw {
+  const aggregationColumnName =
+    DuckDbQueryAggregations.getAggregationColumnName(
+      options.aggregationType,
+      options.columnName,
+    );
+  const quotedColumnName = quoteSqlIdentifier(options.columnName);
+  const quotedAggregationColumnName = quoteSqlIdentifier(aggregationColumnName);
+  const functionName = match(options.aggregationType)
+    .with("sum", () => {
+      return "sum";
+    })
+    .with("avg", () => {
+      return "avg";
+    })
+    .with("count", () => {
+      return "count";
+    })
+    .with("max", () => {
+      return "max";
+    })
+    .with("min", () => {
+      return "min";
+    })
+    .exhaustive();
+  return sql.raw(
+    `${functionName}(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+  );
+}
+
+function _mergeDuckDbDatasetIds(
+  ...datasetIdGroups: readonly string[][]
+): string[] {
+  return Array.from(new Set(datasetIdGroups.flat()));
+}
+
+function _getQueryStringFromParams(
+  options: Readonly<{
+    params: Record<string, string | number | bigint | undefined>;
+    queryString: string;
+  }>,
+): string {
+  return objectKeys(options.params).reduce((currentQuery, parameterName) => {
+    const argumentValue = options.params[parameterName];
+    if (argumentValue === undefined) {
+      return currentQuery;
+    }
+    return currentQuery.replace(
+      new RegExp(`\\$${parameterName}\\$`, "g"),
+      String(argumentValue),
+    );
+  }, options.queryString);
 }
 
 function _formatDuckDbWorkerError(event: ErrorEvent): string {
@@ -147,6 +403,7 @@ function _assertXlsxFileReadable(file: File): void {
 
 type BaseDuckDbLoadCsvOptions = {
   tableName: string;
+  datasetDuckDbLease?: DatasetDuckDbLease;
   numRowsToSkip?: number;
   delimiter?: string;
   quoteChar?: string;
@@ -165,6 +422,7 @@ export type DuckDbLoadCsvOptions =
 
 type BaseDuckDbLoadXlsxOptions = {
   tableName: string;
+  datasetDuckDbLease?: DatasetDuckDbLease;
   /**
    * Worksheet name for `read_xlsx`. Omit to load the first sheet (DuckDb
    * default).
@@ -191,6 +449,19 @@ export type DuckDbLoadXlsxOptions =
  */
 export type UnknownRow = Record<string, unknown>;
 
+type DuckDbLoadParquetOptions = {
+  tableName: string;
+  blob: Blob;
+  columnReplacements?: Record<
+    string,
+    {
+      alias?: string;
+      dataType?: DuckDbDataType;
+    }
+  >;
+  datasetDuckDbLease?: DatasetDuckDbLease;
+};
+
 function _csvParseUserHintsFromLoadOptions(
   options: BaseDuckDbLoadCsvOptions,
 ): CsvParseUserHints {
@@ -208,7 +479,44 @@ function _csvParseUserHintsFromLoadOptions(
   };
 }
 
-async function _sniffCsvWithDuckDb(options: {
+function _getCsvSniffResult(
+  options: Readonly<
+    CsvParseAttemptState & {
+      tableColumns: DuckDbColumnSchema[];
+      tableName: string;
+    }
+  >,
+): DuckDbCsvSniffResult {
+  const { lastSniffRow, parseOptions, rejectedScans, tableColumns, tableName } =
+    options;
+  const scan = rejectedScans[0];
+  if (scan) {
+    return buildDuckDbCsvSniffResultFromRejectScan({
+      tableName,
+      scan,
+      commentChar: parseOptions.commentChar,
+    });
+  }
+  if (lastSniffRow) {
+    return buildDuckDbCsvSniffResultFromSniffRow({
+      tableName,
+      sniffRow: lastSniffRow,
+      parseOptions,
+    });
+  }
+  return buildDuckDbCsvSniffResultFromResolved({
+    tableName,
+    parseOptions,
+    columns: tableColumns.map((column) => {
+      return { name: column.column_name, type: column.column_type };
+    }),
+    userArguments: buildReadCsvArgList({ parseOptions, mode: "load" }).join(
+      ", ",
+    ),
+  });
+}
+
+type SniffCsvWithDuckDbOptions = {
   runRawQuery: DuckDbClientImpl["runRawQuery"];
   conn: duckdb.AsyncDuckDBConnection;
   stagingFile: string;
@@ -216,7 +524,11 @@ async function _sniffCsvWithDuckDb(options: {
   parseOptions: ReturnType<typeof createCsvParseOptionsFromUserHints>;
   /** When set, probes the file for `"` if sniff reports no quote char. */
   file?: File;
-}): Promise<{
+};
+
+async function _sniffCsvWithDuckDb(
+  options: Readonly<SniffCsvWithDuckDbOptions>,
+): Promise<{
   parseOptions: ReturnType<typeof mergeSniffCsvRowIntoParseOptions>;
   sniffRow: DuckDbSniffCsvRow | undefined;
 }> {
@@ -229,74 +541,63 @@ async function _sniffCsvWithDuckDb(options: {
 
   const sniffResult = await runRawQuery<DuckDbSniffCsvRow>(
     `SELECT * FROM sniff_csv('$file$', ${sniffArgs})`,
-    { conn, params: { file: stagingFile } },
+    {
+      conn,
+      params: { file: stagingFile },
+      [TRUSTED_INTERNAL_SQL]: true,
+    },
   );
   const sniffRow = sniffResult.data[0];
   if (!sniffRow) {
     return { parseOptions, sniffRow: undefined };
   }
 
-  let mergedParseOptions = mergeSniffCsvRowIntoParseOptions({
+  const mergedParseOptions = mergeSniffCsvRowIntoParseOptions({
     base: parseOptions,
     sniffRow,
     userHints,
   });
-
-  if (file) {
-    mergedParseOptions = await applyQuoteProbeToParseOptions({
-      file,
-      sniffQuoteToken: sniffRow.Quote,
-      parseOptions: mergedParseOptions,
-    });
-  }
-
   return {
-    parseOptions: mergedParseOptions,
+    parseOptions:
+      file ?
+        await applyQuoteProbeToParseOptions({
+          file,
+          sniffQuoteToken: sniffRow.Quote,
+          parseOptions: mergedParseOptions,
+        })
+      : mergedParseOptions,
     sniffRow,
   };
+}
+
+function _toJsValueFromArrowValue(value: unknown): unknown {
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+  if (value instanceof arrow.Vector) {
+    return value.toArray().map((item: Readonly<{ toJSON: () => unknown }>) => {
+      return item.toJSON();
+    });
+  }
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+  const constructorName = (value as { constructor?: { name?: string } })
+    .constructor?.name;
+  if (constructorName !== "DecimalBigNum" && constructorName !== "BigNum") {
+    return value;
+  }
+  const primitive = (value as { valueOf: () => unknown }).valueOf();
+  return typeof primitive === "bigint" ? Number(primitive) : primitive;
 }
 
 function arrowTableToJS<RowObject extends UnknownRow>(
   arrowTable: arrow.Table<Record<string, arrow.DataType>>,
   { logger = Logger }: { logger?: ILogger } = {},
-): QueryResult<RowObject> {
-  const jsDataRows = arrowTable.toArray().map((row) => {
+): QueryResult.T<RowObject> {
+  const jsDataRows = arrowTable.toArray().map((row): RowObject => {
     const jsRow = row.toJSON();
-    return objectValuesMap(jsRow, (v) => {
-      if (typeof v === "bigint") {
-        // beware that `v` might be bigger than Number.MAX_SAFE_INTEGER
-        return Number(v);
-      }
-
-      if (v instanceof arrow.Vector) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return v.toArray().map((x: any) => {
-          return x.toJSON();
-        });
-      }
-
-      // Apache Arrow wraps DECIMAL / HUGEINT cells in DecimalBigNum objects
-      // (4-limb Int128 representations). Recharts / ag-grid see these as plain
-      // objects and can't compare, sort, or scale them, so unwrap to a JS
-      // number here. Precision loss beyond 2^53 is acceptable for charts;
-      // call sites that need exact decimal arithmetic should round-trip
-      // through a string explicitly.
-      if (v !== null && typeof v === "object") {
-        const ctorName = (v as { constructor?: { name?: string } }).constructor
-          ?.name;
-        if (ctorName === "DecimalBigNum" || ctorName === "BigNum") {
-          const primitive = (v as { valueOf: () => unknown }).valueOf();
-          if (typeof primitive === "bigint") {
-            return Number(primitive);
-          }
-          if (typeof primitive === "number") {
-            return primitive;
-          }
-        }
-      }
-
-      return v;
-    });
+    return objectValuesMap(jsRow, _toJsValueFromArrowValue) as RowObject;
   });
   return {
     id: uuid(),
@@ -442,10 +743,19 @@ class DuckDbClientImpl {
    * @param tableName
    * @returns The number of rows.
    */
-  async getTableRowCount(tableName: string): Promise<number> {
+  async getTableRowCount(
+    options: Readonly<{
+      tableName: string;
+      datasetDuckDbLease?: DatasetDuckDbLease;
+    }>,
+  ): Promise<number> {
+    const { datasetDuckDbLease, tableName } = options;
     const result = await this.runRawQuery<{ count: bigint }>(
       `SELECT count(*) as count FROM "$tableName$"`,
-      { params: { tableName } },
+      {
+        params: { tableName },
+        datasetDuckDbLease,
+      },
     );
     return Number(result.data[0]?.count ?? 0);
   }
@@ -456,10 +766,19 @@ class DuckDbClientImpl {
    * @returns The schema of the table as an array of
    * DuckDbColumnSchema objects.
    */
-  async getTableSchema(tableName: string): Promise<DuckDbColumnSchema[]> {
+  async getTableSchema(
+    options: Readonly<{
+      tableName: string;
+      datasetDuckDbLease?: DatasetDuckDbLease;
+    }>,
+  ): Promise<DuckDbColumnSchema[]> {
+    const { datasetDuckDbLease, tableName } = options;
     const { data } = await this.runRawQuery<DuckDbColumnSchema>(
       `DESCRIBE "$tableName$"`,
-      { params: { tableName } },
+      {
+        params: { tableName },
+        datasetDuckDbLease,
+      },
     );
     return data;
   }
@@ -630,25 +949,48 @@ class DuckDbClientImpl {
    * @param tableOrViewName The table or view name to drop. This will also be
    * used as the file name to drop.
    */
-  async dropTableViewAndFile(tableOrViewName: string): Promise<void> {
-    const db = await this.#getDB();
+  async dropTableViewAndFile(
+    options: Readonly<{
+      tableOrViewName: string;
+      datasetDuckDbLease?: DatasetDuckDbLease;
+    }>,
+  ): Promise<void> {
+    const { datasetDuckDbLease: providedLease, tableOrViewName } = options;
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: [tableOrViewName],
+      lease: providedLease,
+      operation: async (datasetDuckDbLease) => {
+        DatasetDuckDbCoordinator.clearPublicSnapshotDatasetOwner(
+          tableOrViewName,
+        );
+        try {
+          const db = await this.#getDB();
 
-    const hasView = await this.hasView(tableOrViewName);
-    if (hasView) {
-      await this.runRawQuery('DROP VIEW "$tableName$"', {
-        params: { tableName: tableOrViewName },
-      });
-    } else {
-      const hasTable = await this.hasTable(tableOrViewName);
-      if (hasTable) {
-        await this.runRawQuery('DROP TABLE "$tableName$"', {
-          params: { tableName: tableOrViewName },
-        });
-      }
-    }
+          const hasView = await this.hasView(tableOrViewName);
+          if (hasView) {
+            await this.runRawQuery('DROP VIEW "$tableName$"', {
+              params: { tableName: tableOrViewName },
+              datasetDuckDbLease,
+            });
+          } else {
+            const hasTable = await this.hasTable(tableOrViewName);
+            if (hasTable) {
+              await this.runRawQuery('DROP TABLE "$tableName$"', {
+                params: { tableName: tableOrViewName },
+                datasetDuckDbLease,
+              });
+            }
+          }
 
-    // finally, drop the file from DuckDB's internal file system
-    await db.dropFile(tableOrViewName);
+          await db.dropFile(tableOrViewName);
+        } catch (error: unknown) {
+          DatasetDuckDbCoordinator.markDatasetDuckDbTableInvalid(
+            tableOrViewName,
+          );
+          throw error;
+        }
+      },
+    });
   }
 
   /**
@@ -694,45 +1036,12 @@ class DuckDbClientImpl {
    * stays cheap for multi-GB files when the source is registered via
    * `BROWSER_FILEREADER`.
    */
-  async sniffCsv(options: {
-    file: File;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    numRowsToSkip?: number;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    delimiter?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    quoteChar?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    escapeChar?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    newlineDelimiter?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    commentChar?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    hasHeader?: boolean;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    dateFormat?: string;
-    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
-    timestampFormat?: string;
-    /** Number of preview rows to return (typically 200). */
-    maxPreviewRows: number;
-  }): Promise<{
+  async sniffCsv(options: Readonly<SniffCsvOptions>): Promise<{
     csvSniff: DuckDbCsvSniffResult;
     columns: DuckDbColumnSchema[];
     previewRows: UnknownRow[];
   }> {
-    const userHints: CsvParseUserHints = {
-      numRowsToSkip: options.numRowsToSkip,
-      delimiter: options.delimiter,
-      quoteChar: options.quoteChar,
-      escapeChar: options.escapeChar,
-      newlineDelimiter: options.newlineDelimiter,
-      commentChar: options.commentChar,
-      hasHeader: options.hasHeader,
-      dateFormat: options.dateFormat,
-      timestampFormat: options.timestampFormat,
-    };
-
+    const userHints = _getCsvParseUserHintsFromSniffOptions(options);
     const stagingFile = `sniff__${uuid()}.csv`;
     const conn = await this.#connect();
     try {
@@ -754,256 +1063,465 @@ class DuckDbClientImpl {
         file: options.file,
       });
 
-      const readCsvArgs = buildReadCsvArgList({
+      const preview = await this.#getCsvPreviewData({
+        conn,
+        stagingFile,
         parseOptions,
-        mode: "preview",
-      }).join(", ");
-
-      const describeResult = await this.runRawQuery<DuckDbColumnSchema>(
-        `DESCRIBE SELECT * FROM read_csv('$file$', ${readCsvArgs})`,
-        { conn, params: { file: stagingFile } },
-      );
-
-      const previewResult = await this.runRawQuery<UnknownRow>(
-        `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${options.maxPreviewRows}`,
-        { conn, params: { file: stagingFile } },
-      );
-
-      const csvSniff =
-        sniffRow ?
-          buildDuckDbCsvSniffResultFromSniffRow({
-            tableName: stagingFile,
-            sniffRow,
-            parseOptions,
-          })
-        : buildDuckDbCsvSniffResultFromResolved({
-            tableName: stagingFile,
-            parseOptions,
-            columns: describeResult.data.map((col) => {
-              return { name: col.column_name, type: col.column_type };
-            }),
-            userArguments: readCsvArgs,
-          });
-
+        maxPreviewRows: options.maxPreviewRows,
+      });
       const db = await this.#getDB();
       await db.dropFile(stagingFile);
-
-      return {
-        csvSniff,
-        columns: describeResult.data,
-        previewRows: previewResult.data,
-      };
+      return this.#getCsvPreviewResult({
+        stagingFile,
+        sniffRow,
+        parseOptions,
+        preview,
+      });
     } finally {
       await this.#closeConnection(conn);
     }
   }
 
-  async loadCsv(options: DuckDbLoadCsvOptions): Promise<DuckDbLoadCsvResult> {
-    const { tableName } = options;
-    const userHints = _csvParseUserHintsFromLoadOptions(options);
+  #getCsvPreviewResult(options: Readonly<CsvPreviewResultOptions>): {
+    csvSniff: DuckDbCsvSniffResult;
+    columns: DuckDbColumnSchema[];
+    previewRows: UnknownRow[];
+  } {
+    return {
+      csvSniff: this.#getCsvPreviewSniff(options),
+      columns: options.preview.columns,
+      previewRows: options.preview.previewRows,
+    };
+  }
 
-    const csvStagingFile = `${tableName}__loadCsv_src`;
-    const parquetStagingFile = `${tableName}__loadCsv_pq`;
+  async #getCsvPreviewData(
+    options: Readonly<CsvPreviewOptions>,
+  ): Promise<CsvPreviewData> {
+    const readCsvArgs = buildReadCsvArgList({
+      parseOptions: options.parseOptions,
+      mode: "preview",
+    }).join(", ");
+    const queryOptions = {
+      conn: options.conn,
+      params: { file: options.stagingFile },
+      [TRUSTED_INTERNAL_SQL]: true as const,
+    };
+    const columnsResult = await this.runRawQuery<DuckDbColumnSchema>(
+      `DESCRIBE SELECT * FROM read_csv('$file$', ${readCsvArgs})`,
+      queryOptions,
+    );
+    const previewResult = await this.runRawQuery<UnknownRow>(
+      `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${options.maxPreviewRows}`,
+      queryOptions,
+    );
+    return {
+      columns: columnsResult.data,
+      previewRows: previewResult.data,
+      readCsvArgs,
+    };
+  }
 
-    const conn = await this.#connect();
-    let loadResults: DuckDbLoadCsvResult;
+  #getCsvPreviewSniff(
+    options: Readonly<CsvPreviewSniffOptions>,
+  ): DuckDbCsvSniffResult {
+    return options.sniffRow ?
+        buildDuckDbCsvSniffResultFromSniffRow({
+          tableName: options.stagingFile,
+          sniffRow: options.sniffRow,
+          parseOptions: options.parseOptions,
+        })
+      : buildDuckDbCsvSniffResultFromResolved({
+          tableName: options.stagingFile,
+          parseOptions: options.parseOptions,
+          columns: options.preview.columns.map((column) => {
+            return {
+              name: column.column_name,
+              type: column.column_type,
+            };
+          }),
+          userArguments: options.preview.readCsvArgs,
+        });
+  }
+
+  async #writeCsvAttemptToParquet(
+    options: Readonly<WriteCsvAttemptOptions>,
+  ): Promise<{
+    lastSniffRow: DuckDbSniffCsvRow | undefined;
+    parseOptions: CsvParseResolvedOptions;
+    shouldRetry: boolean;
+  }> {
+    const { conn, csvStagingFile, file, userHints } = options;
+    await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
+    await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
+    const sniffed = await _sniffCsvWithDuckDb({
+      runRawQuery: this.runRawQuery.bind(this),
+      conn,
+      stagingFile: csvStagingFile,
+      userHints,
+      parseOptions: options.parseOptions,
+      file,
+    });
     try {
-      await this.dropTableViewAndFile(tableName);
+      await this.#copyCsvAttemptToParquet({
+        conn,
+        csvStagingFile,
+        parquetStagingFile: options.parquetStagingFile,
+        parseOptions: sniffed.parseOptions,
+      });
+      return { ...sniffed, lastSniffRow: sniffed.sniffRow, shouldRetry: false };
+    } catch (error) {
+      return this.#getCsvRetryResultFromError({
+        attemptIndex: options.attemptIndex,
+        error,
+        sniffed,
+      });
+    }
+  }
 
+  #getCsvRetryResultFromError(
+    options: Readonly<{
+      attemptIndex: number;
+      error: unknown;
+      sniffed: Awaited<ReturnType<typeof _sniffCsvWithDuckDb>>;
+    }>,
+  ): {
+    lastSniffRow: DuckDbSniffCsvRow | undefined;
+    parseOptions: CsvParseResolvedOptions;
+    shouldRetry: true;
+  } {
+    if (
+      options.attemptIndex >= MAX_CSV_PARSE_ATTEMPTS - 1 ||
+      !isRecoverableCsvParseError(options.error)
+    ) {
+      throw options.error;
+    }
+    const { parseOptions, sniffRow } = options.sniffed;
+    return {
+      parseOptions:
+        parseOptions.quoteChar == null ?
+          {
+            ...parseOptions,
+            quoteChar: DEFAULT_CSV_QUOTE_CHAR,
+            escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
+          }
+        : parseOptions,
+      lastSniffRow: sniffRow,
+      shouldRetry: true,
+    };
+  }
+
+  async #copyCsvAttemptToParquet(
+    options: Readonly<CopyCsvAttemptOptions>,
+  ): Promise<void> {
+    const readCsvArgs = buildReadCsvArgList({
+      parseOptions: options.parseOptions,
+      mode: "load",
+    }).join(", ");
+    await this.runRawQuery(
+      `COPY (SELECT * FROM read_csv('$csvFile$', ${readCsvArgs}))
+       TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
+      {
+        conn: options.conn,
+        params: {
+          csvFile: options.csvStagingFile,
+          pqFile: options.parquetStagingFile,
+        },
+        [TRUSTED_INTERNAL_SQL]: true,
+      },
+    );
+  }
+
+  async #getParquetStagingRowCount(
+    options: Readonly<{
+      conn: duckdb.AsyncDuckDBConnection;
+      parquetStagingFile: string;
+    }>,
+  ): Promise<number> {
+    const result = await this.runRawQuery<{ c: bigint }>(
+      `SELECT count(*)::BIGINT as c FROM read_parquet('$pqFile$')`,
+      {
+        conn: options.conn,
+        params: { pqFile: options.parquetStagingFile },
+        [TRUSTED_INTERNAL_SQL]: true,
+      },
+    );
+    return Number(result.data[0]?.c ?? 0);
+  }
+
+  async #getCsvRejectedData(
+    options: Readonly<{
+      conn: duckdb.AsyncDuckDBConnection;
+      csvStagingFile: string;
+    }>,
+  ): Promise<{
+    rejectedRows: DuckDbRejectedRow[];
+    rejectedScans: DuckDbScan[];
+  }> {
+    const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
+      `SELECT * FROM reject_scans WHERE file_path='$csvFile$'`,
+      { conn: options.conn, params: { csvFile: options.csvStagingFile } },
+    );
+    const rejectedScans = rejectedScansResult.data;
+    if (!isNonEmptyArray(rejectedScans)) {
+      return { rejectedRows: [], rejectedScans };
+    }
+    const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
+      `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
+      { conn: options.conn, params: { fileId: rejectedScans[0].file_id } },
+    );
+    return { rejectedRows: rejectedRowsResult.data, rejectedScans };
+  }
+
+  async #runCsvParseAttempts(
+    options: Readonly<RunCsvParseAttemptsOptions>,
+  ): Promise<CsvParseAttemptState> {
+    let state: CsvParseAttemptState = {
+      lastSniffRow: undefined,
+      parseOptions: createCsvParseOptionsFromUserHints(options.userHints),
+      rejectedRows: [],
+      rejectedScans: [],
+    };
+    Logger.log("columns specified", { columns: state.parseOptions.columns });
+    for (
+      let attemptIndex = 0;
+      attemptIndex < MAX_CSV_PARSE_ATTEMPTS;
+      attemptIndex++
+    ) {
+      const writeResult = await this.#writeCsvAttemptToParquet({
+        ...options,
+        attemptIndex,
+        parseOptions: state.parseOptions,
+      });
+      state = { ...state, ...writeResult };
+      if (writeResult.shouldRetry) {
+        continue;
+      }
+      const evaluated = await this.#evaluateCsvParseAttempt({
+        ...options,
+        attemptIndex,
+        state,
+      });
+      state = evaluated.state;
+      if (!evaluated.shouldRetry) {
+        break;
+      }
+    }
+    return state;
+  }
+
+  async #evaluateCsvParseAttempt(
+    options: Readonly<EvaluateCsvParseAttemptOptions>,
+  ): Promise<{ shouldRetry: boolean; state: CsvParseAttemptState }> {
+    const stagingRowCount = await this.#getParquetStagingRowCount(options);
+    const emptyOptions = resolveParseOptionsAfterEmptyStagingLoad({
+      parseOptions: options.state.parseOptions,
+      stagingRowCount,
+    });
+    if (emptyOptions && options.attemptIndex < MAX_CSV_PARSE_ATTEMPTS - 1) {
+      await (await this.#getDB()).dropFile(options.parquetStagingFile);
+      return {
+        shouldRetry: true,
+        state: { ...options.state, parseOptions: emptyOptions },
+      };
+    }
+    const rejectedData = await this.#getCsvRejectedData(options);
+    const refinedOptions = refineCsvParseOptionsAfterFailure({
+      parseOptions: options.state.parseOptions,
+      rejectedRows: rejectedData.rejectedRows,
+    });
+    const shouldRetry = shouldRetryCsvParse({
+      attemptIndex: options.attemptIndex,
+      maxAttempts: MAX_CSV_PARSE_ATTEMPTS,
+      rejectedRows: rejectedData.rejectedRows,
+      parseOptions: options.state.parseOptions,
+      refinedOptions,
+    });
+    return {
+      shouldRetry,
+      state: {
+        ...options.state,
+        ...rejectedData,
+        ...(shouldRetry ? { parseOptions: refinedOptions } : {}),
+      },
+    };
+  }
+
+  async #getCsvLoadResult(
+    options: Readonly<CsvLoadResultOptions>,
+  ): Promise<DuckDbLoadCsvResult> {
+    await this.loadParquet({
+      tableName: options.tableName,
+      blob: options.parquetData,
+      datasetDuckDbLease: options.datasetDuckDbLease,
+    });
+    const [tableColumns, csvRowCount] = await Promise.all([
+      this.getTableSchema({
+        tableName: options.tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      }),
+      this.getTableRowCount({
+        tableName: options.tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      }),
+    ]);
+    if (csvRowCount === 0) {
+      throw new Error(
+        "CSV load produced zero rows. The file may use quotes or column types that differ from the sniff sample.",
+      );
+    }
+    Logger.log("tableColumns", { tableColumns });
+    this.#logger.log("Successfully transcoded CSV into parquet!");
+    return {
+      id: uuid(),
+      type: "csv",
+      tableName: options.tableName,
+      csvName: options.tableName,
+      numRows: csvRowCount,
+      columns: tableColumns,
+      errors: {
+        rejectedScans: options.rejectedScans,
+        rejectedRows: options.rejectedRows,
+      },
+      numRejectedRows: options.rejectedRows.length,
+      csvSniff: _getCsvSniffResult({ ...options, tableColumns }),
+      parquetData: options.parquetData,
+    };
+  }
+
+  async #loadCsv(
+    options: DuckDbLoadCsvOptions & { datasetDuckDbLease: DatasetDuckDbLease },
+  ): Promise<DuckDbLoadCsvResult> {
+    const csvStagingFile = `${options.tableName}__loadCsv_src`;
+    const parquetStagingFile = `${options.tableName}__loadCsv_pq`;
+    const conn = await this.#connect();
+    try {
+      await this.dropTableViewAndFile({
+        tableOrViewName: options.tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      });
       await this.#registerCsvFile(
         "file" in options ?
           { tableName: csvStagingFile, file: options.file }
         : { tableName: csvStagingFile, fileText: options.fileText },
       );
-
-      let parseOptions = createCsvParseOptionsFromUserHints(userHints);
-      let rejectedScans: DuckDbScan[] = [];
-      let rejectedRows: DuckDbRejectedRow[] = [];
-      let lastSniffRow: DuckDbSniffCsvRow | undefined;
-
-      Logger.log("columns specified", { columns: parseOptions.columns });
-
-      for (let attempt = 0; attempt < MAX_CSV_PARSE_ATTEMPTS; attempt++) {
-        await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
-        await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
-
-        const sniffed = await _sniffCsvWithDuckDb({
-          runRawQuery: this.runRawQuery.bind(this),
-          conn,
-          stagingFile: csvStagingFile,
-          userHints,
-          parseOptions,
-          file: "file" in options ? options.file : undefined,
-        });
-        parseOptions = sniffed.parseOptions;
-        lastSniffRow = sniffed.sniffRow;
-
-        const readCsvArgs = buildReadCsvArgList({
-          parseOptions,
-          mode: "load",
-        }).join(", ");
-
-        try {
-          await this.runRawQuery(
-            `COPY (
-              SELECT *
-              FROM read_csv('$csvFile$', ${readCsvArgs})
-            ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
-            {
-              conn,
-              params: {
-                csvFile: csvStagingFile,
-                pqFile: parquetStagingFile,
-              },
-            },
-          );
-        } catch (error) {
-          if (
-            attempt < MAX_CSV_PARSE_ATTEMPTS - 1 &&
-            isRecoverableCsvParseError(error)
-          ) {
-            if (parseOptions.quoteChar == null) {
-              parseOptions = {
-                ...parseOptions,
-                quoteChar: DEFAULT_CSV_QUOTE_CHAR,
-                escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
-              };
-            }
-
-            continue;
-          }
-
-          throw error;
-        }
-
-        const stagingRowCountResult = await this.runRawQuery<{ c: bigint }>(
-          `SELECT count(*)::BIGINT as c FROM read_parquet('$pqFile$')`,
-          { conn, params: { pqFile: parquetStagingFile } },
-        );
-        const stagingRowCount = Number(stagingRowCountResult.data[0]?.c ?? 0);
-        const parseOptionsAfterEmptyStaging =
-          resolveParseOptionsAfterEmptyStagingLoad({
-            parseOptions,
-            stagingRowCount,
-          });
-
-        if (
-          parseOptionsAfterEmptyStaging &&
-          attempt < MAX_CSV_PARSE_ATTEMPTS - 1
-        ) {
-          parseOptions = parseOptionsAfterEmptyStaging;
-          const dbForRetry = await this.#getDB();
-          await dbForRetry.dropFile(parquetStagingFile);
-          continue;
-        }
-
-        const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
-          `SELECT * FROM reject_scans WHERE file_path='$csvFile$'`,
-          { conn, params: { csvFile: csvStagingFile } },
-        );
-        rejectedScans = rejectedScansResult.data;
-        rejectedRows = [];
-
-        if (isNonEmptyArray(rejectedScans)) {
-          const fileId = rejectedScans[0].file_id;
-          const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
-            `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
-            { conn, params: { fileId } },
-          );
-          rejectedRows = rejectedRowsResult.data;
-        }
-
-        const refinedOptions = refineCsvParseOptionsAfterFailure({
-          parseOptions,
-          rejectedRows,
-        });
-
-        if (
-          shouldRetryCsvParse({
-            attemptIndex: attempt,
-            maxAttempts: MAX_CSV_PARSE_ATTEMPTS,
-            rejectedRows,
-            parseOptions,
-            refinedOptions,
-          })
-        ) {
-          parseOptions = refinedOptions;
-          continue;
-        }
-
-        break;
-      }
-
-      const db = await this.#getDB();
-      const parquetBuffer = (await db.copyFileToBuffer(
+      const parseState = await this.#runCsvParseAttempts({
+        conn,
+        csvStagingFile,
         parquetStagingFile,
-      )) as Uint8Array<ArrayBuffer>;
-      const parquetData = new Blob([parquetBuffer], {
-        type: MIMEType.APPLICATION_PARQUET,
+        userHints: _csvParseUserHintsFromLoadOptions(options),
+        file: "file" in options ? options.file : undefined,
       });
-      await db.dropFile(csvStagingFile);
-      await db.dropFile(parquetStagingFile);
-
-      await this.loadParquet({ tableName, blob: parquetData });
-
-      const tableColumns = await this.getTableSchema(tableName);
-      Logger.log("tableColumns", { tableColumns });
-      const csvRowCount = await this.getTableRowCount(tableName);
-      if (csvRowCount === 0) {
-        throw new Error(
-          "CSV load produced zero rows. The file may use quotes or column types that differ from the sniff sample.",
-        );
-      }
-      const csvErrors = {
-        rejectedScans,
-        rejectedRows,
-      };
-
-      const scan = rejectedScans[0];
-      const csvSniffResult =
-        scan ?
-          buildDuckDbCsvSniffResultFromRejectScan({
-            tableName,
-            scan,
-            commentChar: parseOptions.commentChar,
-          })
-        : lastSniffRow ?
-          buildDuckDbCsvSniffResultFromSniffRow({
-            tableName,
-            sniffRow: lastSniffRow,
-            parseOptions,
-          })
-        : buildDuckDbCsvSniffResultFromResolved({
-            tableName,
-            parseOptions,
-            columns: tableColumns.map((col) => {
-              return { name: col.column_name, type: col.column_type };
-            }),
-            userArguments: buildReadCsvArgList({
-              parseOptions,
-              mode: "load",
-            }).join(", "),
-          });
-
-      this.#logger.log("Successfully transcoded CSV into parquet!");
-
-      loadResults = {
-        id: uuid(),
-        type: "csv",
-        tableName,
-        csvName: tableName,
-        numRows: csvRowCount,
-        columns: tableColumns,
-        errors: csvErrors,
-        numRejectedRows: csvErrors.rejectedRows.length,
-        csvSniff: csvSniffResult,
+      const parquetData = await this.#getParquetBlobFromStagingFiles({
+        sourceStagingFile: csvStagingFile,
+        parquetStagingFile,
+      });
+      return await this.#getCsvLoadResult({
+        ...parseState,
+        datasetDuckDbLease: options.datasetDuckDbLease,
         parquetData,
-      };
+        tableName: options.tableName,
+      });
     } finally {
       await this.#closeConnection(conn);
     }
+  }
 
-    return loadResults;
+  /** Loads a CSV while holding its bare table's dataset lease. */
+  async loadCsv(
+    options: Readonly<DuckDbLoadCsvOptions>,
+  ): Promise<DuckDbLoadCsvResult> {
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: [options.tableName],
+      lease: options.datasetDuckDbLease,
+      operation: async (datasetDuckDbLease) => {
+        return await this.#loadCsv({ ...options, datasetDuckDbLease });
+      },
+    });
+  }
+
+  async #registerXlsxStagingFile(
+    options: Readonly<DuckDbLoadXlsxOptions & { xlsxStagingFile: string }>,
+  ): Promise<void> {
+    if ("file" in options) {
+      _assertXlsxFileReadable(options.file);
+      await this.#registerXlsxFile({
+        tableName: options.xlsxStagingFile,
+        file: options.file,
+      });
+      return;
+    }
+    await this.#registerXlsxFile({
+      tableName: options.xlsxStagingFile,
+      fileBytes: options.fileBytes,
+    });
+  }
+
+  async #transcodeXlsxToParquet(
+    options: Readonly<TranscodeXlsxOptions>,
+  ): Promise<void> {
+    const sheetClause =
+      options.sheet ?
+        `, sheet = '${_escapeSqlSingleQuotedLiteral(options.sheet)}'`
+      : "";
+    await this.runRawQuery(
+      `COPY (
+        SELECT * FROM read_xlsx(
+          '$xlsxFile$', header = ${options.hasHeader} ${sheetClause}
+        )
+      ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
+      {
+        conn: options.conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        [TRUSTED_INTERNAL_SQL]: true,
+        params: {
+          xlsxFile: options.xlsxStagingFile,
+          pqFile: options.parquetStagingFile,
+        },
+      },
+    );
+  }
+
+  async #getParquetBlobFromStagingFiles(
+    options: Readonly<{
+      parquetStagingFile: string;
+      sourceStagingFile: string;
+    }>,
+  ): Promise<Blob> {
+    const db = await this.#getDB();
+    const parquetBuffer = (await db.copyFileToBuffer(
+      options.parquetStagingFile,
+    )) as Uint8Array<ArrayBuffer>;
+    const parquetData = new Blob([parquetBuffer], {
+      type: MIMEType.APPLICATION_PARQUET,
+    });
+    await db.dropFile(options.sourceStagingFile);
+    await db.dropFile(options.parquetStagingFile);
+    return parquetData;
+  }
+
+  async #getXlsxLoadResult(
+    options: Readonly<XlsxLoadResultOptions>,
+  ): Promise<DuckDbLoadXlsxResult> {
+    await this.loadParquet({
+      tableName: options.tableName,
+      blob: options.parquetData,
+      datasetDuckDbLease: options.datasetDuckDbLease,
+    });
+    this.#logger.log("Successfully transcoded XLSX into parquet!");
+    const [tableColumns, rowCount] = await Promise.all([
+      this.getTableSchema(options),
+      this.getTableRowCount(options),
+    ]);
+    return {
+      id: uuid(),
+      type: "xlsx",
+      tableName: options.tableName,
+      xlsxName: options.tableName,
+      numRows: rowCount,
+      columns: tableColumns,
+      sheet: options.sheet,
+      parquetData: options.parquetData,
+    };
   }
 
   /**
@@ -1017,98 +1535,102 @@ class DuckDbClientImpl {
    * @param options.file Browser file to load (takes precedence over bytes).
    * @param options.fileBytes Raw `.xlsx` bytes when no `File` is available.
    */
-  async loadXlsx(
-    options: DuckDbLoadXlsxOptions,
+  async #loadXlsx(
+    options: DuckDbLoadXlsxOptions & {
+      datasetDuckDbLease: DatasetDuckDbLease;
+    },
   ): Promise<DuckDbLoadXlsxResult> {
     const { tableName, sheet } = options;
     const hasHeader = options.hasHeader ?? true;
-
-    // Stage the XLSX under a distinct MEMFS name so the final VIEW can take
-    // `tableName`. The transcoded parquet lives under a temp name only as
-    // long as it takes to copy the bytes out into a JS Blob and re-register
-    // it via the parquet path.
     const xlsxStagingFile = `${tableName}__loadXlsx_src`;
     const parquetStagingFile = `${tableName}__loadXlsx_pq`;
-
     const conn = await this.#connect();
-    let loadResults: DuckDbLoadXlsxResult;
-
     try {
-      await this.dropTableViewAndFile(tableName);
-      if ("file" in options) {
-        _assertXlsxFileReadable(options.file);
-        await this.#registerXlsxFile({
-          tableName: xlsxStagingFile,
-          file: options.file,
-        });
-      } else {
-        await this.#registerXlsxFile({
-          tableName: xlsxStagingFile,
-          fileBytes: options.fileBytes,
-        });
-      }
-
-      // Stream the sheet directly to a parquet file in MEMFS. Same idea as
-      // `loadCsv`: no DuckDB TABLE is materialized; rows flow read_xlsx →
-      // row-group encoder → parquet writer. XLSX itself is less
-      // stream-friendly than CSV (the format requires a full sheet-XML
-      // parse), but we still avoid keeping the resulting table resident in
-      // the WASM heap, and the output parquet replaces the workbook as
-      // the source of truth for every subsequent query.
-      await this.runRawQuery(
-        `COPY (
-          SELECT * FROM read_xlsx(
-            '$xlsxFile$'
-            , header = ${hasHeader}
-            ${sheet ? `, sheet = '${_escapeSqlSingleQuotedLiteral(sheet)}'` : ""}
-          )
-        ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
-        {
-          conn,
-          params: {
-            xlsxFile: xlsxStagingFile,
-            pqFile: parquetStagingFile,
-          },
-        },
-      );
-
-      // Pull the parquet bytes out of MEMFS into a JS Blob, then drop the
-      // MEMFS-side files so the WASM heap reclaims them.
-      const db = await this.#getDB();
-      const parquetBuffer = (await db.copyFileToBuffer(
-        parquetStagingFile,
-      )) as Uint8Array<ArrayBuffer>;
-      const parquetData = new Blob([parquetBuffer], {
-        type: MIMEType.APPLICATION_PARQUET,
+      await this.dropTableViewAndFile({
+        tableOrViewName: tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
       });
-      await db.dropFile(xlsxStagingFile);
-      await db.dropFile(parquetStagingFile);
-
-      // Re-load from the freshly produced parquet. Creates a VIEW named
-      // `tableName` on top of the parquet bytes; future queries go through
-      // the columnar read path with projection / LIMIT pushdown.
-      await this.loadParquet({ tableName, blob: parquetData });
-
-      this.#logger.log("Successfully transcoded XLSX into parquet!");
-
-      const tableColumns = await this.getTableSchema(tableName);
-      const rowCount = await this.getTableRowCount(tableName);
-
-      loadResults = {
-        id: uuid(),
-        type: "xlsx",
-        tableName,
-        xlsxName: tableName,
-        numRows: rowCount,
-        columns: tableColumns,
+      await this.#registerXlsxStagingFile({ ...options, xlsxStagingFile });
+      await this.#transcodeXlsxToParquet({
+        conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        hasHeader,
+        parquetStagingFile,
         sheet,
+        xlsxStagingFile,
+      });
+      const parquetData = await this.#getParquetBlobFromStagingFiles({
+        parquetStagingFile,
+        sourceStagingFile: xlsxStagingFile,
+      });
+      return await this.#getXlsxLoadResult({
+        tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
         parquetData,
-      };
+        sheet,
+      });
     } finally {
       await this.#closeConnection(conn);
     }
+  }
 
-    return loadResults;
+  /** Loads an XLSX file while holding its bare table's dataset lease. */
+  async loadXlsx(
+    options: Readonly<DuckDbLoadXlsxOptions>,
+  ): Promise<DuckDbLoadXlsxResult> {
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: [options.tableName],
+      lease: options.datasetDuckDbLease,
+      operation: async (datasetDuckDbLease) => {
+        return await this.#loadXlsx({ ...options, datasetDuckDbLease });
+      },
+    });
+  }
+
+  async #createParquetView(
+    options: Readonly<CreateParquetViewOptions>,
+  ): Promise<void> {
+    await options.conn.query("SET enable_external_file_cache = false");
+    try {
+      await this.runRawQuery(
+        `CREATE VIEW IF NOT EXISTS "$tableName$" AS
+    SELECT * $excludeClause$ $replaceClause$
+    FROM read_parquet("$tableName$")`,
+        {
+          conn: options.conn,
+          datasetDuckDbLease: options.datasetDuckDbLease,
+          [TRUSTED_INTERNAL_SQL]: true,
+          params: {
+            tableName: options.tableName,
+            replaceClause: options.replaceClause,
+            excludeClause: options.excludeClause,
+          },
+        },
+      );
+    } finally {
+      await options.conn.query("SET enable_external_file_cache = true");
+    }
+  }
+
+  async #getParquetLoadResult(
+    options: Readonly<{
+      tableName: string;
+      datasetDuckDbLease: DatasetDuckDbLease;
+    }>,
+  ): Promise<DuckDbLoadParquetResult> {
+    DatasetDuckDbCoordinator.markDatasetDuckDbTableValidForWorkspace(
+      options.tableName,
+    );
+    const [columns, rowCount] = await Promise.all([
+      this.getTableSchema(options),
+      this.getTableRowCount(options),
+    ]);
+    return {
+      name: options.tableName,
+      columns,
+      id: uuid(),
+      numRows: rowCount,
+    };
   }
 
   /**
@@ -1119,73 +1641,49 @@ class DuckDbClientImpl {
    * @param options.blob The parquet file to load.
    * @returns A promise that resolves when the file is loaded.
    */
-  async loadParquet(options: {
-    tableName: string;
-    blob: Blob;
-    columnReplacements?: Record<
-      string,
-      {
-        alias?: string;
-        dataType?: DuckDbDataType;
-      }
-    >;
-  }): Promise<DuckDbLoadParquetResult> {
+  async #loadParquet(
+    options: DuckDbLoadParquetOptions & {
+      datasetDuckDbLease: DatasetDuckDbLease;
+    },
+  ): Promise<DuckDbLoadParquetResult> {
     const { tableName, blob, columnReplacements } = options;
-    let loadResults: DuckDbLoadParquetResult;
-
-    // Drop the dataset and recreate it. We are overwriting the data.
-    await this.dropTableViewAndFile(tableName);
+    await this.dropTableViewAndFile({
+      tableOrViewName: tableName,
+      datasetDuckDbLease: options.datasetDuckDbLease,
+    });
     await this.#registerParquetFile({ tableName, blob });
 
     const conn = await this.#connect();
     try {
-      const exclusions: string[] = [];
-      const replacements: string[] = [];
-
-      objectEntries(columnReplacements ?? {}).forEach(
-        ([colName, { alias, dataType }]) => {
-          const newColumnName = alias ?? colName;
-          const castPart =
-            dataType ? `TRY_CAST("${colName}" AS ${dataType})` : `"${colName}"`;
-          const newNamePart = ` AS "${newColumnName}"`;
-          replacements.push(`${castPart}${newNamePart}`);
-          exclusions.push(`"${colName}"`);
-        },
-      );
-
-      // Re-ingest the parquet data into a view (low-memory querying).
-      await this.runRawQuery(
-        `SET enable_external_file_cache = false;
-CREATE VIEW IF NOT EXISTS "$tableName$" AS
-    SELECT * $excludeClause$ $replaceClause$
-    FROM read_parquet("$tableName$");
-SET enable_external_file_cache = true;
-            `,
-        {
-          conn,
-          params: {
-            tableName,
-            replaceClause:
-              replacements.length > 0 ? `, ${replacements.join(", ")}` : "",
-            excludeClause:
-              exclusions.length > 0 ? `EXCLUDE (${exclusions.join(", ")})` : "",
-          },
-        },
-      );
-
-      // now let's collect all information we need to return
-      const columns = await this.getTableSchema(tableName);
-      const rowCount = await this.getTableRowCount(tableName);
-      loadResults = {
-        name: tableName,
-        columns,
-        id: uuid(),
-        numRows: rowCount,
-      };
+      await this.#createParquetView({
+        conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        tableName,
+        ..._getParquetProjectionClauses(columnReplacements),
+      });
+      return await this.#getParquetLoadResult({
+        tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      });
     } finally {
       await this.#closeConnection(conn);
     }
-    return loadResults;
+  }
+
+  /** Loads a parquet file while holding its bare table's dataset lease. */
+  async loadParquet(
+    options: Readonly<DuckDbLoadParquetOptions>,
+  ): Promise<DuckDbLoadParquetResult> {
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: [options.tableName],
+      lease: options.datasetDuckDbLease,
+      operation: async (datasetDuckDbLease) => {
+        return await this.#loadParquet({
+          ...options,
+          datasetDuckDbLease,
+        });
+      },
+    });
   }
 
   /**
@@ -1274,60 +1772,128 @@ SET enable_external_file_cache = true;
    */
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
-    options?: {
-      params?: Record<string, string | number | bigint | undefined>;
+    options?: RawQueryOptions & {
       returnType?: "js";
-      conn?: duckdb.AsyncDuckDBConnection;
     },
-  ): Promise<QueryResult<RowObject>>;
+  ): Promise<QueryResult.T<RowObject>>;
   async runRawQuery(
     queryString: string,
-    options?: {
-      params?: Record<string, string | number | bigint | undefined>;
+    options?: RawQueryOptions & {
       returnType: "parquet";
-      conn?: duckdb.AsyncDuckDBConnection;
     },
   ): Promise<Blob>;
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
-    options: {
-      params?: Record<string, string | number | bigint | undefined>;
-      returnType?: "parquet" | "js";
-      conn?: duckdb.AsyncDuckDBConnection;
-    } = {},
-  ): Promise<Blob | QueryResult<RowObject>> {
-    const { params = {}, returnType = "js" } = options;
-    const conn = options.conn ?? (await this.#connect());
-    let queryResults: QueryResult<RowObject> | Blob;
-    const paramNames = objectKeys(params);
-    const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
-      const argValue = params[paramName];
-      if (argValue === undefined) {
-        return currQueryStr;
-      }
-      return currQueryStr.replace(
-        new RegExp(`\\$${paramName}\\$`, "g"),
-        String(argValue),
-      );
-    }, queryString);
+    options: RawQueryOptions = {},
+  ): Promise<Blob | QueryResult.T<RowObject>> {
+    const queryStringToUse = _getQueryStringFromParams({
+      queryString,
+      params: options.params ?? {},
+    });
+    const plan = this.#getRawQueryExecutionPlan({ queryStringToUse, options });
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: plan.datasetIds,
+      lease: options.datasetDuckDbLease,
+      operation: async () => {
+        this.#prepareRawQueryDatasetTables({ options, plan });
+        return await this.#executeRawQuery<RowObject>({
+          options,
+          queryString,
+          queryStringToUse,
+        });
+      },
+    });
+  }
 
+  #getRawQueryExecutionPlan(
+    input: Readonly<{ options: RawQueryOptions; queryStringToUse: string }>,
+  ): RawQueryExecutionPlan {
+    const { options, queryStringToUse } = input;
+    const analysis =
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(queryStringToUse);
+    const isTrustedInternalSql =
+      options.datasetTableReadMode !== "public" &&
+      options[TRUSTED_INTERNAL_SQL] === true &&
+      analysis.kind === "unsafe" &&
+      analysis.reason === "uninspectable-source";
+    if (analysis.kind === "unsafe" && !isTrustedInternalSql) {
+      throw new Error(`Cannot safely execute DuckDB SQL: ${analysis.reason}`);
+    }
+    if (options.datasetTableReadMode === "public" && analysis.kind !== "read") {
+      throw new Error("Public DuckDB queries must be read-only");
+    }
+    const publicSnapshotDuckDbOwner = options.publicSnapshotDuckDbOwner;
+    if (
+      options.datasetTableReadMode === "public" &&
+      publicSnapshotDuckDbOwner === undefined
+    ) {
+      throw new Error(
+        "Public DuckDB queries require an expected snapshot owner",
+      );
+    }
+    const readDatasetIds =
+      analysis.kind === "mutating" ?
+        analysis.readDatasetIds
+      : analysis.datasetIds;
+    const mutatedDatasetIds =
+      analysis.kind === "mutating" ? analysis.mutatedDatasetIds : [];
+    const datasetIds = _mergeDuckDbDatasetIds(
+      readDatasetIds,
+      mutatedDatasetIds,
+    );
+    return {
+      datasetIds,
+      mutatedDatasetIds,
+      publicSnapshotDuckDbOwner,
+      readDatasetIds,
+    };
+  }
+
+  #prepareRawQueryDatasetTables(
+    input: Readonly<{ options: RawQueryOptions; plan: RawQueryExecutionPlan }>,
+  ): void {
+    const { options, plan } = input;
+    if (options.datasetTableReadMode === "public") {
+      if (plan.publicSnapshotDuckDbOwner === undefined) {
+        throw new Error(
+          "Public DuckDB queries require an expected snapshot owner",
+        );
+      }
+      DatasetDuckDbCoordinator.assertPublicSnapshotDatasetOwners({
+        datasetIds: plan.readDatasetIds,
+        owner: plan.publicSnapshotDuckDbOwner,
+      });
+    } else {
+      DatasetDuckDbCoordinator.assertWorkspaceDatasetTables(
+        plan.readDatasetIds,
+      );
+    }
+    plan.mutatedDatasetIds.forEach(
+      DatasetDuckDbCoordinator.markDatasetDuckDbTableInvalid,
+    );
+  }
+
+  async #executeRawQuery<RowObject extends UnknownRow>(
+    input: Readonly<{
+      options: RawQueryOptions;
+      queryString: string;
+      queryStringToUse: string;
+    }>,
+  ): Promise<Blob | QueryResult.T<RowObject>> {
+    const { options, queryString, queryStringToUse } = input;
+    const conn = options.conn ?? (await this.#connect());
     try {
       this.#logger.log("Executing query", { query: queryStringToUse });
-      // run the query
-      if (returnType === "js") {
+      if ((options.returnType ?? "js") === "js") {
         const arrowTable =
           await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
-        queryResults = arrowTableToJS<RowObject>(arrowTable, {
-          logger: this.#logger,
-        });
-      } else {
-        // return as parquet blob
-        const tempViewName = uuid();
-        await conn.query(
-          `CREATE TEMP VIEW "${tempViewName}" AS ${queryStringToUse}`,
-        );
-        queryResults = await this.exportTableAsParquet(tempViewName, conn);
+        return arrowTableToJS<RowObject>(arrowTable, { logger: this.#logger });
       }
+      const tempViewName = uuid();
+      await conn.query(
+        `CREATE TEMP VIEW "${tempViewName}" AS ${queryStringToUse}`,
+      );
+      return await this.exportTableAsParquet(tempViewName, conn);
     } catch (error) {
       this.#logger.error(error, {
         executedQueryString: queryStringToUse,
@@ -1335,15 +1901,10 @@ SET enable_external_file_cache = true;
       });
       throw error;
     } finally {
-      // If we created the connection in this function, then we can close it.
-      // Otherwise, if a connection was passed to us, we should do nothing. It
-      // should be up to the caller to close the connection.
       if (conn !== options.conn) {
         await this.#closeConnection(conn);
       }
     }
-
-    return queryResults;
   }
 
   async #getPageHelper<T extends UnknownRow>(
@@ -1355,7 +1916,7 @@ SET enable_external_file_cache = true;
       },
       "limit" | "offset"
     >,
-  ): Promise<QueryResultPage<T>> {
+  ): Promise<QueryResult.Page<T>> {
     const { tableName, pageSize, pageNum, totalRows } = queryParams;
     const pageData = await this.runStructuredQuery<T>({
       ...queryParams,
@@ -1363,35 +1924,59 @@ SET enable_external_file_cache = true;
       offset: pageSize * pageNum,
     });
 
-    // Now let's get the page metadata to add to the return result
-    let totalRowsInSource = totalRows;
-    if (totalRowsInSource === undefined) {
-      if (pageNum === 0 && pageData.data.length < pageSize) {
-        // if we're on the first page and the number of rows we received
-        // is less than the requested `pageSize`, then we can be 100% sure
-        // that we have all the rows. So there's no need to send a separate
-        // `getTableRowCount` query
-        totalRowsInSource = pageData.numRows;
-      } else {
-        // TODO(jpsyx): this should reuse the query params, in case a filter
-        // got sent
-        totalRowsInSource = await this.getTableRowCount(tableName);
-      }
-    }
-
-    // special case for when there's 0 rows, we still say there is 1 page
-    const totalPages =
-      totalRowsInSource === 0 ? 1 : Math.ceil(totalRowsInSource / pageSize);
-    const nextPage = pageNum + 1 === totalPages ? undefined : pageNum + 1;
-    const prevPage = pageNum === 0 ? undefined : pageNum - 1;
-
+    const totalRowsInSource = await this.#getPageTotalRows({
+      tableName,
+      pageSize,
+      pageNum,
+      totalRows,
+      pageData,
+    });
     return {
       ...pageData,
       totalRows: totalRowsInSource,
-      totalPages,
-      nextPage,
-      prevPage,
+      ...this.#getPageNavigation({
+        pageSize,
+        pageNum,
+        totalRows: totalRowsInSource,
+      }),
       pageNum,
+    };
+  }
+
+  async #getPageTotalRows(
+    options: Readonly<PageTotalRowsOptions>,
+  ): Promise<number> {
+    if (options.totalRows !== undefined) {
+      return options.totalRows;
+    }
+    if (
+      options.pageNum === 0 &&
+      options.pageData.data.length < options.pageSize
+    ) {
+      return options.pageData.numRows;
+    }
+    return this.getTableRowCount({ tableName: options.tableName });
+  }
+
+  #getPageNavigation(
+    options: Readonly<{
+      pageSize: number;
+      pageNum: number;
+      totalRows: number;
+    }>,
+  ): Pick<
+    QueryResult.Page<UnknownRow>,
+    "totalPages" | "nextPage" | "prevPage"
+  > {
+    const totalPages =
+      options.totalRows === 0 ?
+        1
+      : Math.ceil(options.totalRows / options.pageSize);
+    return {
+      totalPages,
+      nextPage:
+        options.pageNum + 1 === totalPages ? undefined : options.pageNum + 1,
+      prevPage: options.pageNum === 0 ? undefined : options.pageNum - 1,
     };
   }
 
@@ -1404,7 +1989,7 @@ SET enable_external_file_cache = true;
   }: Omit<
     DuckDbStructuredQuery & { pageSize: number; pageNum: number },
     "limit" | "offset"
-  >): Promise<QueryResultPage<T>> {
+  >): Promise<QueryResult.Page<T>> {
     const page = await this.#getPageHelper<T>({
       selectColumnNames: selectColumns,
       groupByColumnNames: groupByColumns,
@@ -1420,194 +2005,195 @@ SET enable_external_file_cache = true;
   }
 
   async forEachQueryPage<T extends UnknownRow>(
-    {
+    options: Readonly<{
+      query: Omit<DuckDbStructuredQuery, "limit" | "offset"> & {
+        pageSize?: number;
+      };
+      callback: (page: QueryResult.Page<T>) => void | Promise<void>;
+    }>,
+  ): Promise<{ numPages: number; numRows: number }> {
+    const {
       selectColumnNames = "*",
       groupByColumnNames = [],
       aggregations = {},
       pageSize = 1000,
       ...restOfStructuredQuery
-    }: Omit<DuckDbStructuredQuery, "limit" | "offset"> & {
-      pageSize?: number;
-    },
-    callback: (page: QueryResultPage<T>) => void | Promise<void>,
-  ): Promise<{ numPages: number; numRows: number }> {
-    const firstPage = await this.#getPageHelper<T>({
+    } = options.query;
+    const firstPage = await this.getPage<T>({
+      ...restOfStructuredQuery,
       selectColumnNames,
       groupByColumnNames,
       aggregations,
       pageSize,
       pageNum: 0,
-      // pass `undefined` to mean we don't know the total number of rows
-      // yet. We don't want to calculate this eagerly because there are cases
-      // where we won't need to send a separate `count` query.
-      totalRows: undefined,
-      ...restOfStructuredQuery,
     });
-    await callback(firstPage);
-
-    let numPages = 1;
-    let numRows = firstPage.numRows;
-
-    // Now iterate through pages until we get the last one
-    let nextPageNum = firstPage.nextPage;
-    while (nextPageNum !== undefined) {
-      const newPage = await this.#getPageHelper<T>({
+    await options.callback(firstPage);
+    return this.#iterateRemainingQueryPages({
+      callback: options.callback,
+      firstPage,
+      query: {
+        ...restOfStructuredQuery,
         selectColumnNames,
         groupByColumnNames,
         aggregations,
         pageSize,
+      },
+    });
+  }
+
+  async #iterateRemainingQueryPages<T extends UnknownRow>(
+    options: Readonly<RemainingQueryPagesOptions<T>>,
+  ): Promise<{ numPages: number; numRows: number }> {
+    let numPages = 1;
+    let numRows = options.firstPage.numRows;
+    let nextPageNum = options.firstPage.nextPage;
+    while (nextPageNum !== undefined) {
+      const queryPage = await this.#getPageHelper<T>({
+        ...options.query,
         pageNum: nextPageNum,
-        totalRows: firstPage.totalRows,
-        ...restOfStructuredQuery,
+        totalRows: options.firstPage.totalRows,
       });
-      await callback(newPage);
-      nextPageNum = newPage.nextPage;
+      await options.callback(queryPage);
+      nextPageNum = queryPage.nextPage;
       numPages += 1;
-      numRows += newPage.numRows;
+      numRows += queryPage.numRows;
     }
     return { numPages, numRows };
   }
 
-  async runStructuredQuery<RowObject extends UnknownRow>({
-    tableName,
-    selectColumnNames = "*",
-    groupByColumnNames = [],
-    aggregations = {},
-    orderByColumnName,
-    orderByDirection,
-    castTimestampsToISO,
-    limit,
-    offset,
-  }: DuckDbStructuredQuery): Promise<QueryResult<RowObject>> {
-    const conn = await this.#connect();
-    let queryResults: QueryResult<RowObject>;
-    const tableColumns = await this.getTableSchema(tableName);
-    const timestampColumnNames = tableColumns
-      .filter((col) => {
-        return DuckDbDataTypeUtils.isDateOrTimestamp(col.column_type);
-      })
-      .map(prop("column_name"));
-
+  #getStructuredSelectFields(
+    input: Readonly<{
+      structuredQuery: DuckDbStructuredQuery;
+      tableColumns: DuckDbColumnSchema[];
+    }>,
+  ): Knex.Raw[] {
+    const { structuredQuery, tableColumns } = input;
+    const { aggregations = {}, selectColumnNames = "*" } = structuredQuery;
+    const timestampColumnNames = new Set(
+      tableColumns
+        .filter((column) => {
+          return DuckDbDataTypeUtils.isDateOrTimestamp(column.column_type);
+        })
+        .map(prop("column_name")),
+    );
     const columnNames =
       selectColumnNames === "*" ?
         tableColumns.map(prop("column_name"))
       : selectColumnNames;
-
     const columnNamesWithoutAggregations = columnNames.filter((colName) => {
       return aggregations[colName] === undefined;
     });
-
-    // if requested, cast any timestamp columns that will go in the SELECT
-    // clause to ISO strings
-    const adjustedFieldNames =
-      castTimestampsToISO ?
-        columnNamesWithoutAggregations.map((colName) => {
-          const quotedColName = quoteSqlIdentifier(colName);
-          return timestampColumnNames.includes(colName) ?
-              sql.raw(
-                `strftime(${quotedColName}::TIMESTAMP, ` +
-                  "'%Y-%m-%dT%H:%M:%S.%fZ') as " +
-                  quotedColName,
-              )
-            : sql.raw(quotedColName);
-        })
-      : columnNamesWithoutAggregations.map((colName) => {
-          return sql.raw(quoteSqlIdentifier(colName));
-        });
-
-    let query = sql.select(...adjustedFieldNames).from(tableName);
-    if (groupByColumnNames.length > 0) {
-      const groupByClause = groupByColumnNames
-        .map((colName) => {
-          return quoteSqlIdentifier(colName);
-        })
-        .join(", ");
-      query = query.groupByRaw(groupByClause);
-    }
-
-    if (orderByColumnName && orderByDirection) {
-      const quotedOrderByColumn = quoteSqlIdentifier(orderByColumnName);
-      query = query.orderByRaw(`${quotedOrderByColumn} ${orderByDirection}`);
-    }
-
-    // apply aggregations
-    query = objectEntries(aggregations).reduce(
-      (newQuery, [columnName, aggType]) => {
-        const aggregationColumnName =
-          DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
-        const quotedColumnName = quoteSqlIdentifier(columnName);
-        const quotedAggregationColumnName = quoteSqlIdentifier(
-          aggregationColumnName,
+    return columnNamesWithoutAggregations.map((columnName) => {
+      const quotedColumnName = quoteSqlIdentifier(columnName);
+      if (
+        structuredQuery.castTimestampsToISO &&
+        timestampColumnNames.has(columnName)
+      ) {
+        return sql.raw(
+          `strftime(${quotedColumnName}::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as ${quotedColumnName}`,
         );
+      }
+      return sql.raw(quotedColumnName);
+    });
+  }
 
-        return match(aggType)
-          .with("sum", () => {
-            return newQuery.select(
-              sql.raw(
-                `sum(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-              ),
-            );
-          })
-          .with("avg", () => {
-            return newQuery.select(
-              sql.raw(
-                `avg(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-              ),
-            );
-          })
-          .with("count", () => {
-            return newQuery.select(
-              sql.raw(
-                `count(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-              ),
-            );
-          })
-          .with("max", () => {
-            return newQuery.select(
-              sql.raw(
-                `max(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-              ),
-            );
-          })
-          .with("min", () => {
-            return newQuery.select(
-              sql.raw(
-                `min(${quotedColumnName}) as ${quotedAggregationColumnName}`,
-              ),
-            );
-          })
-          .exhaustive(() => {
-            throw new Error(`Invalid DuckDbQueryAggregationType: "${aggType}"`);
-          });
+  #buildStructuredQuery(
+    input: Readonly<{
+      selectFields: Knex.Raw[];
+      structuredQuery: DuckDbStructuredQuery;
+    }>,
+  ): Knex.QueryBuilder {
+    const { selectFields, structuredQuery } = input;
+    const { aggregations = {}, groupByColumnNames = [] } = structuredQuery;
+    let query = sql.select(...selectFields).from(structuredQuery.tableName);
+    if (groupByColumnNames.length > 0) {
+      query = query.groupByRaw(
+        groupByColumnNames.map(quoteSqlIdentifier).join(", "),
+      );
+    }
+    if (structuredQuery.orderByColumnName && structuredQuery.orderByDirection) {
+      query = query.orderByRaw(
+        `${quoteSqlIdentifier(structuredQuery.orderByColumnName)} ${structuredQuery.orderByDirection}`,
+      );
+    }
+    query = objectEntries(aggregations).reduce(
+      (currentQuery, [columnName, aggregationType]) => {
+        return currentQuery.select(
+          _getAggregationSelectExpression({ columnName, aggregationType }),
+        );
       },
       query,
     );
-
-    // apply limits and offsets
-    if (limit) {
-      query = query.limit(limit);
+    if (structuredQuery.limit) {
+      query = query.limit(structuredQuery.limit);
     }
-    if (offset) {
-      query = query.offset(offset);
+    if (structuredQuery.offset) {
+      query = query.offset(structuredQuery.offset);
     }
+    return query;
+  }
 
-    // run the query
+  async #executeStructuredQuery<RowObject extends UnknownRow>(
+    input: Readonly<{
+      conn: duckdb.AsyncDuckDBConnection;
+      query: Knex.QueryBuilder;
+    }>,
+  ): Promise<QueryResult.T<RowObject>> {
     try {
-      const queryString = query.toString();
+      const queryString = input.query.toString();
       const arrowTable =
-        await conn.query<Record<string, arrow.DataType>>(queryString);
-
-      queryResults = arrowTableToJS<RowObject>(arrowTable, {
+        await input.conn.query<Record<string, arrow.DataType>>(queryString);
+      return arrowTableToJS<RowObject>(arrowTable, {
         logger: this.#logger,
       });
     } catch (error) {
-      this.#logger.error(error, { query: query.toString() });
+      this.#logger.error(error, { query: input.query.toString() });
       throw error;
+    }
+  }
+
+  async #runStructuredQuery<RowObject extends UnknownRow>(
+    options: Readonly<{
+      structuredQuery: DuckDbStructuredQuery;
+      datasetDuckDbLease: DatasetDuckDbLease;
+    }>,
+  ): Promise<QueryResult.T<RowObject>> {
+    const conn = await this.#connect();
+    try {
+      const tableColumns = await this.getTableSchema({
+        tableName: options.structuredQuery.tableName,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      });
+      const selectFields = this.#getStructuredSelectFields({
+        structuredQuery: options.structuredQuery,
+        tableColumns,
+      });
+      const query = this.#buildStructuredQuery({
+        selectFields,
+        structuredQuery: options.structuredQuery,
+      });
+      return await this.#executeStructuredQuery<RowObject>({ conn, query });
     } finally {
       await this.#closeConnection(conn);
     }
+  }
 
-    return queryResults;
+  /** Runs a structured query while holding its table's dataset lease. */
+  async runStructuredQuery<RowObject extends UnknownRow>(
+    options: Readonly<DuckDbStructuredQuery>,
+  ): Promise<QueryResult.T<RowObject>> {
+    return await DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+      datasetIds: [options.tableName],
+      operation: async (datasetDuckDbLease) => {
+        DatasetDuckDbCoordinator.assertWorkspaceDatasetTables([
+          options.tableName,
+        ]);
+        return await this.#runStructuredQuery<RowObject>({
+          structuredQuery: options,
+          datasetDuckDbLease,
+        });
+      },
+    });
   }
 }
 

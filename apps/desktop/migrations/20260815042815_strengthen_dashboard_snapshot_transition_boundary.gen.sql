@@ -1,0 +1,9 @@
+-- Generated from supabase/migrations/20260815042815_strengthen_dashboard_snapshot_transition_boundary.sql by
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
+-- unless the matching `needs hand-edit` warning calls for it.
+-- Schema-shape statements emitted: 0
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 2
+-- FK constraints dropped (target not synced to SQLite): 0
+-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
+-- SQLite override. The desktop dashboard mirror is read-only, so the Postgres
+-- transition consistency CHECK has no SQLite write path to constrain.

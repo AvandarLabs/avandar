@@ -40,6 +40,10 @@ msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法�
 msgid "Return online to view or make the page available offline."
 msgstr "返回在线以查看或使页面可离线使用。"
 
+#: src/config/AppLinks.tsx
+msgid "Create new entity"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -106,6 +110,10 @@ msgstr "邀请成员"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "位置 {index} 的 JOIN 条目不是简单表引用。"
+
+#: src/config/AppLinks.tsx
+msgid "Geo Explorer"
+msgstr ""
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
@@ -359,6 +367,8 @@ msgstr "列表"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
+#: src/config/NavbarLinks.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "数据源"
@@ -371,7 +381,7 @@ msgstr "展开抽屉"
 msgid "Export annotated PDF"
 msgstr "导出带注释的 PDF"
 
-#. placeholder {0}: failure.limit ?? 64
+#. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "自定义 URL 不能超过 {0} 个字符"
@@ -429,6 +439,10 @@ msgstr "表格可视化没有额外设置。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "关于您"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Unable to sync dataset online"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -510,6 +524,10 @@ msgstr "饼图"
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "平均值"
+
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "There was an error loading Google services."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -698,6 +716,7 @@ msgstr "删除离线聊天模型？"
 msgid "Share “{resourceName}”"
 msgstr "分享 “{resourceName}”"
 
+#: src/config/AppLinks.tsx
 #: src/routes/signin.tsx
 msgid "Sign in"
 msgstr "登录"
@@ -718,7 +737,7 @@ msgstr "单选"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "但是，我们目前不允许新的注册。"
 
-#. placeholder {0}: previewRows.length
+#. placeholder {0}: options.numPreviewRows
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
@@ -896,6 +915,11 @@ msgstr "删除角色组"
 msgid "Hide title"
 msgstr "隐藏标题"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "{0} data truncated"
+msgstr ""
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "输入您的电子邮件以获取重置链接"
@@ -941,9 +965,17 @@ msgstr "确认"
 msgid "is equal to..."
 msgstr "等于..."
 
+#: src/config/AppLinks.tsx
+msgid "Profile Designer"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} 个群组"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Ask the dashboard's owner to share it with you."
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1409,6 +1441,10 @@ msgstr "{workspaceName} 中其他成员看到的名称。"
 msgid "Suggested:"
 msgstr "建议："
 
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+msgid "No tables found"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "用表单更改覆盖 SQL"
@@ -1608,11 +1644,20 @@ msgstr "未选择实体"
 msgid "Tell us which open dataset you want via feedback"
 msgstr "通过反馈告诉我们您想要哪个开放数据集"
 
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "Please refresh and try again. If it still does not work, please contact "
+"support"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
 msgstr "将此仪表板导出为 PDF，或先进行草图绘制。注释支持文本、箭头和可调粗糙度的手绘（RoughJS）。"
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "Update available"
+msgstr ""
 
 #: src/routes/register.tsx
 msgid "Please <0>email us</0> if you would like early access."
@@ -1628,6 +1673,7 @@ msgid "Max"
 msgstr "最大"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "导入数据"
@@ -1748,6 +1794,10 @@ msgstr "数据集名称是必需的"
 msgid "Main"
 msgstr "主要"
 
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Unable to publish dashboard"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
@@ -1849,8 +1899,8 @@ msgid "Cancel"
 msgstr "取消"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "You do not have access to this dashboard"
-msgstr "您没有访问此仪表板的权限"
+#~ msgid "You do not have access to this dashboard"
+#~ msgstr "您没有访问此仪表板的权限"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -1905,6 +1955,10 @@ msgstr "添加字段"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "注释文本："
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "A new version is available. Refresh to update."
+msgstr ""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2050,7 +2104,7 @@ msgstr "检测到个人数据 + 偏见框架"
 msgid "Manual form shows an approximation"
 msgstr "手动表单显示近似值"
 
-#. placeholder {0}: failure.limit ?? 3
+#. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
 msgstr "自定义 URL 必须至少包含 {0} 个字符"
@@ -2164,9 +2218,9 @@ msgid "Google authentication error"
 msgstr "Google 认证错误"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly "
-"viewable."
-msgstr "此仪表板是私有的。此仪表板尚未公开可见。"
+#~ msgid "This dashboard is private. This dashboard has not been made publicly "
+#~ "viewable."
+#~ msgstr "此仪表板是私有的。此仪表板尚未公开可见。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -2271,7 +2325,7 @@ msgstr "没有值"
 msgid "Clarification {turnNumber} of 3"
 msgstr "澄清 {turnNumber} / 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "返回编辑器"
 
@@ -2746,6 +2800,10 @@ msgstr "描边宽度"
 msgid "Create your first dashboard to track key metrics and insights."
 msgstr "创建您的第一个仪表板以跟踪关键指标和洞察。"
 
+#: src/config/AppLinks.tsx
+msgid "Home"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
 msgstr "管道符 (|)"
@@ -2845,6 +2903,10 @@ msgstr "澄清答案"
 msgid "Generated SQL"
 msgstr "生成的 SQL"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "You need access"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "最大返回行数"
@@ -2925,8 +2987,8 @@ msgid "Offline model download failed"
 msgstr "离线模型下载失败"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {formattedNumRows} rows successfully"
-msgstr "成功解析 {formattedNumRows} 行"
+#~ msgid "Parsed {formattedNumRows} rows successfully"
+#~ msgstr "成功解析 {formattedNumRows} 行"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -3001,6 +3063,11 @@ msgstr "WHERE 子句将“{columnName}”与非字面量表达式进行比较。
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
 msgstr "添加到您的工作区"
+
+#. placeholder {0}: options.numRows.toLocaleString()
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Parsed {0} rows successfully"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
@@ -3147,6 +3214,10 @@ msgstr "完成同步 {0} 数据"
 msgid "Select column"
 msgstr "选择列"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Not yet published. Viewers will not see this."
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "选择一个或多个"
@@ -3158,6 +3229,10 @@ msgstr "列名称"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "大"
+
+#: src/config/AppLinks.tsx
+msgid "Invalid workspace"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3218,8 +3293,8 @@ msgid "Series"
 msgstr "系列"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "Not yet published. Public viewers will not see this."
-msgstr "尚未发布。公众查看者将无法看到此内容。"
+#~ msgid "Not yet published. Public viewers will not see this."
+#~ msgstr "尚未发布。公众查看者将无法看到此内容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -3701,6 +3776,10 @@ msgstr "转动"
 msgid "X axis label"
 msgstr "X 轴标签"
 
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "This custom URL is reserved. Try adding a word to it."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
 msgstr "无序"
@@ -3822,8 +3901,8 @@ msgstr "复制代码"
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{0}\" saved successfully"
-msgstr "数据集 \"{0}\" 保存成功"
+#~ msgid "Dataset \"{0}\" saved successfully"
+#~ msgstr "数据集 \"{0}\" 保存成功"
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -3872,6 +3951,11 @@ msgstr "请求功能"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "描述"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish. "
+"{errorMessage}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -4137,6 +4221,7 @@ msgstr "编辑查询"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Data Explorer"
 msgstr "数据探索器"
@@ -4263,6 +4348,7 @@ msgstr "请重新登录以继续。"
 msgid "Mean"
 msgstr "均值"
 
+#: src/config/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
 msgstr "更新密码"
@@ -4274,6 +4360,14 @@ msgstr "仪表板快照"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "正在重新登录…"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: limit.max
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4962,6 +5056,10 @@ msgstr "覆盖 <0>{0}</0>，从 <1>{1}</1> 到 <2>{2}</2>。"
 msgid "Loading more..."
 msgstr "加载更多..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{datasetName}\" saved successfully"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "自定义 URL（可选）"
@@ -4978,6 +5076,10 @@ msgstr "数据集名称"
 msgid "Email address updated"
 msgstr "电子邮件地址已更新"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Sign in with a different account"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
 msgstr "手绘"
@@ -4987,6 +5089,7 @@ msgid "Permanent link (use for QR codes)"
 msgstr "永久链接（用于二维码）"
 
 #: shared/copy/appLabel.ts
+#: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "设置"
@@ -5220,6 +5323,7 @@ msgid "Query editor mode"
 msgstr "查询编辑器模式"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
+#: src/config/AppLinks.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "个人资料"
@@ -5399,6 +5503,7 @@ msgstr "移除 {0}"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Dashboards"
@@ -5481,7 +5586,7 @@ msgstr "应使用哪个字段作为 {singularEntityConfigName} 的名称？"
 msgid "Untitled"
 msgstr "无标题"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "正在预览此仪表板"
 
@@ -5662,7 +5767,7 @@ msgstr "（消息未发送。）"
 msgid "No workspace was found"
 msgstr "未找到工作区"
 
-#. placeholder {0}: importedColumns.length
+#. placeholder {0}: options.numColumns
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
@@ -5779,6 +5884,10 @@ msgstr "按名称或用户组搜索"
 msgid "Failed to update email"
 msgstr "更新电子邮件失败"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Published to your workspace."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
 msgstr "最早"
@@ -5851,6 +5960,7 @@ msgstr "CSV 或 Excel 文件"
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT 引用了数据集中不存在的列“{columnName}”。"
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "仪表板尚未加载。"
@@ -5859,6 +5969,7 @@ msgstr "仪表板尚未加载。"
 msgid "Editorial serif"
 msgstr "编辑 serif"
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -5958,7 +6069,7 @@ msgstr "最大宽度"
 msgid "Not offline"
 msgstr "不离线"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "此仪表板已公开发布。"
 

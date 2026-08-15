@@ -1,8 +1,4 @@
-import {
-  createModelCrudClient,
-  ModelCrudParserRegistry,
-  UpsertOptions,
-} from "@avandar/clients";
+import { createModelCrudClient } from "@avandar/clients";
 import {
   assertIsDefined,
   isDefined,
@@ -11,15 +7,17 @@ import {
   promiseReduce,
 } from "@avandar/utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
-import { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import {
   buildFilteredDexieCollection,
   findFirstConflictingRowByIndexedColumns,
 } from "@/clients/dexie/dexieFilteredCollection";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,
   ModelCrudClient,
+  ModelCrudParserRegistry,
+  UpsertOptions,
 } from "@avandar/clients";
 import type { ILogger } from "@avandar/logger";
 import type { EmptyObject, FiltersByColumn } from "@avandar/utils";
@@ -113,46 +111,700 @@ type CreateDexieCrudClientOptions<
   /** The dexie database that backs this client */
   db: DB;
 
-  /**
-   * The name of the model, which is also the name of the Dexie table,
-   * that this client will interact with.
-   */
+  /** The name of the model and its Dexie table. */
   modelName: M["modelName"];
 
-  /**
-   * A registry of parsers for converting between model variants and
-   * database variants.
-   */
+  /** A registry that converts between model and database variants. */
   parsers: ModelCrudParserRegistry<M>;
 
-  /**
-   * Additional query functions to add to the client. These functions
-   * will get wrapped in `useQuery` hooks.
-   * @param config
-   * @param config.logger - A logger for the client.
-   * @returns An object of additional mutation functions. Each function must
-   * return a promise.
-   */
+  /** Additional query functions to add to the client. */
   queries?: (config: {
     logger: ILogger;
     db: DB;
     dbTable: DB[M["modelName"]];
   }) => ExtendedQueriesClient;
 
-  /**
-   * Additional mutation functions to add to the client. These functions
-   * will get wrapped in `useMutation` hooks.
-   * @param config
-   * @param config.logger - A logger for the client.
-   * @returns An object of additional mutation functions. Each function must
-   * return a promise.
-   */
+  /** Additional mutation functions to add to the client. */
   mutations?: (config: {
     logger: ILogger;
     db: DB;
     dbTable: DB[M["modelName"]];
   }) => ExtendedMutationsClient;
 };
+
+type DexieKey<M extends DexieCrudModelSpec> = IDType<
+  M["DBRead"],
+  M["modelPrimaryKeyType"]
+> &
+  M["modelPrimaryKeyType"] &
+  IndexableType;
+
+type InsertParams<M extends DexieCrudModelSpec> = UpsertOptions & {
+  data: M["DBInsert"];
+  logger: ILogger;
+};
+
+type BulkInsertParams<M extends DexieCrudModelSpec> = UpsertOptions & {
+  data: ReadonlyArray<M["DBInsert"]>;
+  logger: ILogger;
+};
+
+type GetPageParams<M extends DexieCrudModelSpec> = {
+  where?: FiltersByColumn<M["DBRead"]>;
+  pageSize: number;
+  pageNum: number;
+  logger: ILogger;
+};
+
+type BulkAccumulator<M extends DexieCrudModelSpec> = {
+  working: Array<M["DBRead"]>;
+  output: Array<M["DBRead"]>;
+};
+
+type UpsertIndexedBatchRowOptions<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+> = {
+  context: DexieCrudOperationContext<M, DB>;
+  accumulator: BulkAccumulator<M>;
+  item: M["DBInsert"];
+  columnNames: readonly string[];
+  ignoreDuplicates: boolean;
+};
+
+type DexieCrudOperationContext<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+> = {
+  db: DB;
+  modelName: M["modelName"];
+  table: DB[M["modelName"]];
+};
+
+type UpsertRowOptions<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+> = {
+  context: DexieCrudOperationContext<M, DB>;
+  data: M["DBInsert"];
+  columnNames: readonly string[];
+  ignoreDuplicates: boolean;
+};
+
+type UpsertRowsOptions<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+> = {
+  context: DexieCrudOperationContext<M, DB>;
+  data: ReadonlyArray<M["DBInsert"]>;
+  columnNames: readonly string[];
+  ignoreDuplicates: boolean;
+};
+
+function _getFilteredDexieCollection<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    where: FiltersByColumn<M["DBRead"]>;
+  }>,
+) {
+  return buildFilteredDexieCollection(
+    String(options.context.modelName),
+    options.context.table as unknown as Table<M["DBRead"], IndexableType>,
+    options.where,
+  );
+}
+
+async function _getRequiredRow<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    key: DexieKey<M>;
+    message: string;
+  }>,
+): Promise<M["DBRead"]> {
+  const row = await options.context.table.get(options.key);
+  if (!row) {
+    throw new Error(options.message);
+  }
+  return row;
+}
+
+function _getPrimaryKey<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    row: M["DBInsert"];
+    message: string;
+  }>,
+): DexieKey<M> {
+  const key = _extractPrimaryKeyFromRow(
+    options.row as Record<string, unknown>,
+    options.context.table.schema.primKey,
+  );
+  if (key === undefined) {
+    throw new Error(options.message);
+  }
+  return key as DexieKey<M>;
+}
+
+async function _addAndGet<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    data: M["DBInsert"];
+  }>,
+): Promise<M["DBRead"]> {
+  const key = await options.context.table.add(options.data);
+  return _getRequiredRow({
+    context: options.context,
+    key: key as DexieKey<M>,
+    message: "Could not find the model that should have just been inserted.",
+  });
+}
+
+async function _putAndGet<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    data: M["DBInsert"];
+    action: string;
+  }>,
+): Promise<M["DBRead"]> {
+  await options.context.table.put(options.data);
+  const key = _getPrimaryKey({
+    context: options.context,
+    row: options.data,
+    message: `Could not extract primary key after ${options.action}.`,
+  });
+  return _getRequiredRow({
+    context: options.context,
+    key,
+    message: `Could not find the model after ${options.action}.`,
+  });
+}
+
+async function _findIndexedConflict<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    data: M["DBInsert"];
+    columnNames: readonly string[];
+  }>,
+): Promise<M["DBRead"] | undefined> {
+  const row = await findFirstConflictingRowByIndexedColumns(
+    String(options.context.modelName),
+    options.context.table as Table<Record<string, unknown>, IndexableType>,
+    options.data as Record<string, unknown>,
+    options.columnNames,
+  );
+  return row as M["DBRead"] | undefined;
+}
+
+async function _upsertRowByPrimaryKey<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<UpsertRowOptions<M, DB>>): Promise<M["DBRead"]> {
+  const key = _getPrimaryKey({
+    context: options.context,
+    row: options.data,
+    message: "Could not extract primary key for upsert.",
+  });
+  const existing = await options.context.table.get(key);
+  if (options.ignoreDuplicates && existing) {
+    return existing;
+  }
+  return _putAndGet({
+    context: options.context,
+    data: options.data,
+    action: "upsert put",
+  });
+}
+
+async function _upsertRowByIndexedConflict<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<UpsertRowOptions<M, DB>>): Promise<M["DBRead"]> {
+  return options.context.db.transaction(
+    "rw",
+    options.context.table,
+    async () => {
+      const conflict = await _findIndexedConflict(options);
+      if (!conflict) {
+        return _addAndGet({ context: options.context, data: options.data });
+      }
+      if (options.ignoreDuplicates) {
+        return conflict;
+      }
+      return _putAndGet({
+        context: options.context,
+        data: { ...conflict, ...options.data } as M["DBInsert"],
+        action: "upsert merge",
+      });
+    },
+  );
+}
+
+function _bulkAddAndGet<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    data: ReadonlyArray<M["DBInsert"]>;
+  }>,
+): Promise<Array<M["DBRead"]>> {
+  return options.context.table
+    .bulkAdd(options.data, { allKeys: true })
+    .then(async (keys) => {
+      return (await options.context.table.bulkGet(keys)).filter(isDefined);
+    });
+}
+
+function _bulkPutAndGet<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<{
+    context: DexieCrudOperationContext<M, DB>;
+    data: ReadonlyArray<M["DBInsert"]>;
+  }>,
+): Promise<Array<M["DBRead"]>> {
+  return options.context.table
+    .bulkPut(options.data, { allKeys: true })
+    .then(async (keys) => {
+      return (await options.context.table.bulkGet(keys)).filter(isDefined);
+    });
+}
+
+async function _upsertRowsByPrimaryKey<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<UpsertRowsOptions<M, DB>>): Promise<Array<M["DBRead"]>> {
+  const keys = options.data.map((row) => {
+    return _getPrimaryKey({
+      context: options.context,
+      row,
+      message: "Could not extract primary key for every bulk upsert row.",
+    });
+  });
+  const existingRows = await options.context.table.bulkGet(keys);
+  if (!options.ignoreDuplicates) {
+    const mergedRows = options.data.map((row, index) => {
+      return existingRows[index] ?
+          ({ ...existingRows[index], ...row } as M["DBInsert"])
+        : row;
+    });
+    return _bulkPutAndGet({ context: options.context, data: mergedRows });
+  }
+  return promiseMapSequential(
+    options.data.map((row, index) => {
+      return { row, index };
+    }),
+    ({ row, index }) => {
+      return (
+        existingRows[index] ??
+        _putAndGet({
+          context: options.context,
+          data: row,
+          action: "bulk upsert put",
+        })
+      );
+    },
+  );
+}
+
+async function _getBatchConflict<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<
+    Pick<
+      UpsertIndexedBatchRowOptions<M, DB>,
+      "context" | "accumulator" | "item" | "columnNames"
+    >
+  >,
+): Promise<M["DBRead"] | undefined> {
+  const batchConflict = _findConflictingRow(
+    options.accumulator.working as Array<Record<string, unknown>>,
+    options.item as Record<string, unknown>,
+    options.columnNames,
+  );
+  return (
+    (batchConflict as M["DBRead"] | undefined) ??
+    _findIndexedConflict({
+      context: options.context,
+      data: options.item,
+      columnNames: options.columnNames,
+    })
+  );
+}
+
+async function _upsertIndexedBatchRow<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<UpsertIndexedBatchRowOptions<M, DB>>,
+): Promise<BulkAccumulator<M>> {
+  const conflict = await _getBatchConflict(options);
+  if (!conflict) {
+    const added = await _addAndGet({
+      context: options.context,
+      data: options.item,
+    });
+    return {
+      working: [...options.accumulator.working, added],
+      output: [...options.accumulator.output, added],
+    };
+  }
+  if (options.ignoreDuplicates) {
+    return {
+      ...options.accumulator,
+      output: [...options.accumulator.output, conflict],
+    };
+  }
+  const finalRow = await _putAndGet({
+    context: options.context,
+    data: { ...conflict, ...options.item } as M["DBInsert"],
+    action: "bulk upsert merge",
+  });
+  const working = options.accumulator.working.filter((row) => {
+    return !_rowsMatchOnConflictColumns(
+      row as Record<string, unknown>,
+      conflict as Record<string, unknown>,
+      options.columnNames,
+    );
+  });
+  return {
+    working: [...working, finalRow],
+    output: [...options.accumulator.output, finalRow],
+  };
+}
+
+async function _upsertRowsByIndexedConflict<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<UpsertRowsOptions<M, DB>>): Promise<Array<M["DBRead"]>> {
+  return options.context.db.transaction(
+    "rw",
+    options.context.table,
+    async () => {
+      const accumulator = await promiseReduce(
+        options.data,
+        (currentAccumulator, item) => {
+          return _upsertIndexedBatchRow({
+            ...options,
+            accumulator: currentAccumulator,
+            item,
+          });
+        },
+        { working: [], output: [] } as BulkAccumulator<M>,
+      );
+      return accumulator.output;
+    },
+  );
+}
+
+function _createDexieCrudReadOperations<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return {
+    getById: _createGetByIdOperation(options),
+    getCount: _createGetCountOperation(options),
+    getPage: _createGetPageOperation(options),
+  };
+}
+
+function _createGetByIdOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<{
+      id: M["modelPrimaryKeyType"] | null | undefined;
+      logger: ILogger;
+    }>,
+  ): Promise<M["DBRead"] | undefined> => {
+    if (params.id === undefined || params.id === null) {
+      return undefined;
+    }
+    return (
+      (await options.context.table.get(params.id as DexieKey<M>)) ?? undefined
+    );
+  };
+}
+
+function _createGetCountOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<{
+      where?: FiltersByColumn<M["DBRead"]>;
+      logger: ILogger;
+    }>,
+  ): Promise<number> => {
+    if (!params.where || isEmptyFiltersObject(params.where)) {
+      return options.context.table.count();
+    }
+    return _getFilteredDexieCollection({
+      context: options.context,
+      where: params.where,
+    }).count();
+  };
+}
+
+function _createGetPageOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<GetPageParams<M>>,
+  ): Promise<Array<M["DBRead"]>> => {
+    const startIndex = params.pageNum * params.pageSize;
+    const collection =
+      !params.where || isEmptyFiltersObject(params.where) ?
+        options.context.table.toCollection()
+      : _getFilteredDexieCollection({
+          context: options.context,
+          where: params.where,
+        });
+    return collection.offset(startIndex).limit(params.pageSize).toArray();
+  };
+}
+
+function _createDexieCrudMutationOperations<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return {
+    insert: _createInsertOperation(options),
+    bulkInsert: _createBulkInsertOperation(options),
+    update: _createUpdateOperation(options),
+    delete: _createDeleteOperation(options),
+    bulkDelete: _createBulkDeleteOperation(options),
+  };
+}
+
+function _createInsertOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (params: Readonly<InsertParams<M>>): Promise<M["DBRead"]> => {
+    if (!params.upsert) {
+      return _addAndGet({ context: options.context, data: params.data });
+    }
+    const onConflict = params.onConflict;
+    const columnNames = onConflict?.columnNames;
+    if (!columnNames?.length) {
+      return _putAndGet({
+        context: options.context,
+        data: params.data,
+        action: "upsert put",
+      });
+    }
+    assertDexieColumnsAreIndexed(
+      String(options.context.modelName),
+      options.context.table,
+      columnNames,
+    );
+    const upsertOptions = {
+      context: options.context,
+      data: params.data,
+      columnNames,
+      ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
+    };
+    return (
+        _isPrimaryKeyConflictColumns(
+          columnNames,
+          options.context.table.schema.primKey,
+        )
+      ) ?
+        _upsertRowByPrimaryKey(upsertOptions)
+      : _upsertRowByIndexedConflict(upsertOptions);
+  };
+}
+
+function _createBulkInsertOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<BulkInsertParams<M>>,
+  ): Promise<Array<M["DBRead"]>> => {
+    if (!params.upsert) {
+      return _bulkAddAndGet({ context: options.context, data: params.data });
+    }
+    const onConflict = params.onConflict;
+    const columnNames = onConflict?.columnNames;
+    if (!columnNames?.length) {
+      return _bulkPutAndGet({ context: options.context, data: params.data });
+    }
+    assertDexieColumnsAreIndexed(
+      String(options.context.modelName),
+      options.context.table,
+      columnNames,
+    );
+    const upsertOptions = {
+      context: options.context,
+      data: params.data,
+      columnNames,
+      ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
+    };
+    return (
+        _isPrimaryKeyConflictColumns(
+          columnNames,
+          options.context.table.schema.primKey,
+        )
+      ) ?
+        _upsertRowsByPrimaryKey(upsertOptions)
+      : _upsertRowsByIndexedConflict(upsertOptions);
+  };
+}
+
+function _createUpdateOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<{
+      id: M["modelPrimaryKeyType"];
+      data: M["DBUpdate"];
+      logger: ILogger;
+    }>,
+  ): Promise<M["DBRead"]> => {
+    const key = params.id as DexieKey<M>;
+    await options.context.table.update(
+      key,
+      params.data as UpdateSpec<M["DBRead"]>,
+    );
+    return _getRequiredRow({
+      context: options.context,
+      key,
+      message: `Could not retrieve updated record with id ${params.id}`,
+    });
+  };
+}
+
+function _createDeleteOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<{ id: M["modelPrimaryKeyType"]; logger: ILogger }>,
+  ): Promise<void> => {
+    return options.context.table.delete(params.id as DexieKey<M>);
+  };
+}
+
+function _createBulkDeleteOperation<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ context: DexieCrudOperationContext<M, DB> }>) {
+  return async (
+    params: Readonly<{
+      ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+      logger: ILogger;
+    }>,
+  ): Promise<void> => {
+    return options.context.table.bulkDelete(params.ids as Array<DexieKey<M>>);
+  };
+}
+
+function _createDexieCrudOperations<
+  M extends DexieCrudModelSpec,
+  DB extends DexieDBType<M>,
+>(options: Readonly<{ db: DB; modelName: M["modelName"] }>) {
+  const table = options.db[options.modelName];
+  assertIsDefined(
+    table,
+    `Could not find Dexie table for model ${options.modelName}`,
+  );
+  const context = { db: options.db, modelName: options.modelName, table };
+  return {
+    table,
+    ..._createDexieCrudReadOperations({ context }),
+    ..._createDexieCrudMutationOperations({ context }),
+  };
+}
+
+type ConfiguredDexieCrudClientOptions<
+  M extends DexieCrudModelSpec,
+  ExtendedQueriesClient extends ClientReturningOnlyPromises,
+  ExtendedMutationsClient extends ClientReturningOnlyPromises,
+  DB extends DexieDBType<M>,
+> = CreateDexieCrudClientOptions<
+  M,
+  ExtendedQueriesClient,
+  ExtendedMutationsClient,
+  DB
+>;
+
+function _createConfiguredDexieCrudClient<
+  M extends DexieCrudModelSpec,
+  ExtendedQueriesClient extends ClientReturningOnlyPromises,
+  ExtendedMutationsClient extends ClientReturningOnlyPromises,
+  DB extends DexieDBType<M>,
+>(
+  options: Readonly<
+    ConfiguredDexieCrudClientOptions<
+      M,
+      ExtendedQueriesClient,
+      ExtendedMutationsClient,
+      DB
+    >
+  >,
+): DexieCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+  const { db, modelName, parsers, queries, mutations } = options;
+  const operations = _createDexieCrudOperations<M, DB>({ db, modelName });
+  return createModelCrudClient({
+    modelName,
+    parsers,
+    additionalQueries:
+      queries ?
+        ({ clientLogger }) => {
+          return queries({
+            logger: clientLogger,
+            db,
+            dbTable: operations.table,
+          });
+        }
+      : undefined,
+    additionalMutations:
+      mutations ?
+        ({ clientLogger }) => {
+          return mutations({
+            logger: clientLogger,
+            db,
+            dbTable: operations.table,
+          });
+        }
+      : undefined,
+    crudFunctions: {
+      getById: operations.getById,
+      getCount: operations.getCount,
+      getPage: operations.getPage,
+      insert: operations.insert,
+      bulkInsert: operations.bulkInsert,
+      update: operations.update,
+      delete: operations.delete,
+      bulkDelete: operations.bulkDelete,
+    },
+  });
+}
 
 /**
  * Creates a client for a model that maps to a Dexie table.
@@ -162,467 +814,15 @@ export function createDexieCrudClient<
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
   DB extends DexieDBType<M> = DexieDBType<M>,
->({
-  db,
-  modelName,
-  parsers,
-  queries,
-  mutations,
-}: CreateDexieCrudClientOptions<
-  M,
-  ExtendedQueriesClient,
-  ExtendedMutationsClient,
-  DB
->): DexieCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
-  const dbTable = db[modelName];
-  assertIsDefined(dbTable, `Could not find Dexie table for model ${modelName}`);
-
-  const modelClient = createModelCrudClient({
-    modelName,
-    parsers,
-    additionalQueries:
-      queries ?
-        ({ clientLogger }) => {
-          return queries({ logger: clientLogger, db, dbTable });
-        }
-      : undefined,
-
-    additionalMutations:
-      mutations ?
-        ({ clientLogger }) => {
-          return mutations({ logger: clientLogger, db, dbTable });
-        }
-      : undefined,
-
-    crudFunctions: {
-      getById: async (params: {
-        id: M["modelPrimaryKeyType"] | null | undefined;
-        logger: ILogger;
-      }): Promise<M["DBRead"] | undefined> => {
-        if (params.id === undefined || params.id === null) {
-          return undefined;
-        }
-        const data = await dbTable.get(
-          params.id as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-        );
-        return data ?? undefined;
-      },
-
-      getCount: async (params: {
-        where?: FiltersByColumn<M["DBRead"]>;
-        logger: ILogger;
-      }): Promise<number> => {
-        const { where } = params;
-        if (!where || isEmptyFiltersObject(where)) {
-          return dbTable.count();
-        }
-        const collection = buildFilteredDexieCollection(
-          String(modelName),
-          dbTable as unknown as Table<M["DBRead"], IndexableType>,
-          where,
-        );
-        return collection.count();
-      },
-
-      getPage: async (params: {
-        where?: FiltersByColumn<M["DBRead"]>;
-        pageSize: number;
-        pageNum: number;
-        logger: ILogger;
-      }) => {
-        const { where, pageSize, pageNum } = params;
-        const startIndex = pageNum * pageSize;
-        if (!where || isEmptyFiltersObject(where)) {
-          return dbTable
-            .toCollection()
-            .offset(startIndex)
-            .limit(pageSize)
-            .toArray();
-        }
-        const collection = buildFilteredDexieCollection(
-          String(modelName),
-          dbTable as unknown as Table<M["DBRead"], IndexableType>,
-          where,
-        );
-        return collection.offset(startIndex).limit(pageSize).toArray();
-      },
-
-      insert: async (
-        params: UpsertOptions & { data: M["DBInsert"]; logger: ILogger },
-      ) => {
-        const { data, upsert, onConflict } = params;
-        const primKey = dbTable.schema.primKey;
-
-        if (!upsert) {
-          const insertedRowId = await dbTable.add(data);
-          const insertedData = await dbTable.get(insertedRowId);
-          if (!insertedData) {
-            throw new Error(
-              "Could not find the model that should have just been inserted.",
-            );
-          }
-          return insertedData;
-        }
-
-        const columnNames = onConflict?.columnNames;
-        const hasConflictSpec =
-          onConflict !== undefined &&
-          columnNames !== undefined &&
-          columnNames.length > 0;
-
-        // Upsert with no `onConflict`: replace or insert by primary key via
-        // `put` only.
-        if (!hasConflictSpec) {
-          await dbTable.put(data);
-          const pk = _extractPrimaryKeyFromRow(
-            data as Record<string, unknown>,
-            primKey,
-          );
-          if (pk === undefined) {
-            throw new Error("Could not extract primary key after upsert put.");
-          }
-          const insertedData = await dbTable.get(
-            pk as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-          );
-          if (!insertedData) {
-            throw new Error(
-              "Could not find the model that should have been upserted.",
-            );
-          }
-          return insertedData;
-        }
-
-        assertIsDefined(columnNames);
-        assertDexieColumnsAreIndexed(String(modelName), dbTable, columnNames);
-        const ignoreDuplicates = onConflict.ignoreDuplicates;
-
-        // `onConflict.columnNames` equals the PK path: detect duplicates with
-        // keyed `get` / `put` (no full-table read).
-        if (_isPrimaryKeyConflictColumns(columnNames, primKey)) {
-          const pk = _extractPrimaryKeyFromRow(
-            data as Record<string, unknown>,
-            primKey,
-          );
-          if (pk === undefined) {
-            throw new Error("Could not extract primary key for upsert.");
-          }
-          const typedPk = pk as IDType<M["DBRead"], M["modelPrimaryKey"]>;
-          if (ignoreDuplicates) {
-            const existing = await dbTable.get(typedPk);
-            if (existing) {
-              return existing;
-            }
-            await dbTable.put(data);
-            const insertedData = await dbTable.get(typedPk);
-            if (!insertedData) {
-              throw new Error("Could not find the model after upsert put.");
-            }
-            return insertedData;
-          }
-          await dbTable.put(data);
-          const insertedData = await dbTable.get(typedPk);
-          if (!insertedData) {
-            throw new Error("Could not find the model after upsert put.");
-          }
-          return insertedData;
-        }
-
-        // `onConflict` on non-PK columns: indexed lookup, then merge+`put` or
-        // `add`.
-        return await db.transaction("rw", dbTable, async () => {
-          const conflict = await findFirstConflictingRowByIndexedColumns(
-            String(modelName),
-            dbTable as Table<Record<string, unknown>, IndexableType>,
-            data as Record<string, unknown>,
-            columnNames,
-          );
-          if (conflict) {
-            if (ignoreDuplicates) {
-              return conflict as M["DBRead"];
-            }
-            const merged = {
-              ...conflict,
-              ...data,
-            } as M["DBInsert"];
-            await dbTable.put(merged);
-            const mergedPk = _extractPrimaryKeyFromRow(
-              merged as Record<string, unknown>,
-              primKey,
-            );
-            if (mergedPk === undefined) {
-              throw new Error(
-                "Could not extract primary key after conflict merge.",
-              );
-            }
-            const updated = await dbTable.get(
-              mergedPk as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-            );
-            if (!updated) {
-              throw new Error("Could not find the model after upsert merge.");
-            }
-            return updated;
-          }
-          const insertedRowId = await dbTable.add(data);
-          const insertedData = await dbTable.get(insertedRowId);
-          if (!insertedData) {
-            throw new Error(
-              "Could not find the model that should have just been inserted.",
-            );
-          }
-          return insertedData;
-        });
-      },
-
-      bulkInsert: async (
-        params: UpsertOptions & {
-          data: ReadonlyArray<M["DBInsert"]>;
-          logger: ILogger;
-        },
-      ) => {
-        const { data, upsert, onConflict } = params;
-        const primKey = dbTable.schema.primKey;
-
-        if (!upsert) {
-          const insertedRowIds = await dbTable.bulkAdd(data, {
-            allKeys: true,
-          });
-          const insertedData = await dbTable.bulkGet(insertedRowIds);
-          if (!insertedData) {
-            throw new Error(
-              "Could not find the models that should have just been inserted.",
-            );
-          }
-          return insertedData.filter(isDefined);
-        }
-
-        const columnNames = onConflict?.columnNames;
-        const hasConflictSpec =
-          onConflict !== undefined &&
-          columnNames !== undefined &&
-          columnNames.length > 0;
-
-        // Bulk upsert with no `onConflict`: keyed `bulkPut` by primary key.
-        if (!hasConflictSpec) {
-          const putKeys = await dbTable.bulkPut(data, { allKeys: true });
-          const insertedData = await dbTable.bulkGet(putKeys);
-          if (!insertedData) {
-            throw new Error(
-              "Could not find the models that should have been upserted.",
-            );
-          }
-          return insertedData.filter(isDefined);
-        }
-
-        assertIsDefined(columnNames);
-        assertDexieColumnsAreIndexed(String(modelName), dbTable, columnNames);
-        const ignoreDuplicates = onConflict.ignoreDuplicates;
-
-        // PK conflict path: `bulkGet` existing rows by key, then `bulkPut`
-        // merges or sequential `put` when ignoring duplicates.
-        if (_isPrimaryKeyConflictColumns(columnNames, primKey)) {
-          const keys = data.map((row) => {
-            return _extractPrimaryKeyFromRow(
-              row as Record<string, unknown>,
-              primKey,
-            );
-          });
-          if (
-            keys.some((key) => {
-              return key === undefined;
-            })
-          ) {
-            throw new Error(
-              "Could not extract primary key for every bulk upsert row.",
-            );
-          }
-          const typedKeys = keys as Array<
-            IDType<M["DBRead"], M["modelPrimaryKey"]>
-          >;
-          const existingRows = await dbTable.bulkGet(typedKeys);
-
-          // Merge incoming rows with any existing row that shares the same PK.
-          if (!ignoreDuplicates) {
-            const merged = data.map((row, index) => {
-              const existing = existingRows[index];
-              if (existing) {
-                return { ...existing, ...row } as M["DBInsert"];
-              }
-              return row;
-            });
-            const putKeys = await dbTable.bulkPut(merged, { allKeys: true });
-            const insertedData = await dbTable.bulkGet(putKeys);
-            if (!insertedData) {
-              throw new Error(
-                "Could not find the models after bulk upsert put.",
-              );
-            }
-            return insertedData.filter(isDefined);
-          }
-
-          // Skip duplicates: return stored row when the PK exists; otherwise
-          // insert with `put`.
-          return await promiseMapSequential(
-            data.map((row, index) => {
-              return { index, row };
-            }),
-            async ({ index, row }) => {
-              const existing = existingRows[index];
-              if (existing) {
-                return existing;
-              }
-              await dbTable.put(row);
-              const pk = typedKeys[index];
-              const inserted = await dbTable.get(pk);
-              if (!inserted) {
-                throw new Error(
-                  "Could not find the model after bulk upsert put.",
-                );
-              }
-              return inserted;
-            },
-          );
-        }
-
-        // Non-PK `onConflict`: indexed lookups + `working` rows from this batch
-        // only (no full-table `toArray`).
-        return await db.transaction("rw", dbTable, async () => {
-          type Acc = {
-            working: Array<M["DBRead"]>;
-            output: Array<M["DBRead"]>;
-          };
-          const reduced = await promiseReduce(
-            data,
-            async (acc: Acc, item: M["DBInsert"]) => {
-              const batchConflict = _findConflictingRow(
-                acc.working as Array<Record<string, unknown>>,
-                item as Record<string, unknown>,
-                columnNames,
-              );
-              let conflict: M["DBRead"] | undefined = batchConflict as
-                | M["DBRead"]
-                | undefined;
-
-              if (!conflict) {
-                const dbConflict =
-                  await findFirstConflictingRowByIndexedColumns(
-                    String(modelName),
-                    dbTable as Table<Record<string, unknown>, IndexableType>,
-                    item as Record<string, unknown>,
-                    columnNames,
-                  );
-                conflict = dbConflict as M["DBRead"] | undefined;
-              }
-
-              if (conflict) {
-                if (ignoreDuplicates) {
-                  return {
-                    working: acc.working,
-                    output: [...acc.output, conflict],
-                  };
-                }
-                const merged = {
-                  ...conflict,
-                  ...item,
-                } as M["DBInsert"];
-                await dbTable.put(merged);
-                const mergedPk = _extractPrimaryKeyFromRow(
-                  merged as Record<string, unknown>,
-                  primKey,
-                );
-                if (mergedPk === undefined) {
-                  throw new Error(
-                    "Could not extract primary key after bulk merge.",
-                  );
-                }
-                const finalRow = await dbTable.get(
-                  mergedPk as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-                );
-                if (!finalRow) {
-                  throw new Error(
-                    "Could not find the model after bulk upsert merge.",
-                  );
-                }
-                const withoutOld = acc.working.filter((row) => {
-                  return !_rowsMatchOnConflictColumns(
-                    row as Record<string, unknown>,
-                    conflict as Record<string, unknown>,
-                    columnNames,
-                  );
-                });
-                return {
-                  working: [...withoutOld, finalRow],
-                  output: [...acc.output, finalRow],
-                };
-              }
-
-              await dbTable.add(item);
-              const pk = _extractPrimaryKeyFromRow(
-                item as Record<string, unknown>,
-                primKey,
-              );
-              if (pk === undefined) {
-                throw new Error(
-                  "Could not extract primary key after bulk add.",
-                );
-              }
-              const added = await dbTable.get(
-                pk as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-              );
-              if (!added) {
-                throw new Error(
-                  "Could not find the model that should have been added.",
-                );
-              }
-              return {
-                working: [...acc.working, added],
-                output: [...acc.output, added],
-              };
-            },
-            {
-              working: [] as Array<M["DBRead"]>,
-              output: [] as Array<M["DBRead"]>,
-            },
-          );
-          return reduced.output;
-        });
-      },
-
-      update: async (params: {
-        id: M["modelPrimaryKeyType"];
-        data: M["DBUpdate"];
-        logger: ILogger;
-      }): Promise<M["DBRead"]> => {
-        const { id, data } = params;
-        const typedId = id as IDType<M["DBRead"], M["modelPrimaryKey"]>;
-        const updateData = data as UpdateSpec<M["DBRead"]>;
-
-        await dbTable.update(typedId, updateData);
-        const updated = await dbTable.get(typedId);
-        if (!updated) {
-          throw new Error(`Could not retrieve updated record with id ${id}`);
-        }
-        return updated;
-      },
-
-      delete: async (params: {
-        id: M["modelPrimaryKeyType"];
-        logger: ILogger;
-      }): Promise<void> => {
-        await dbTable.delete(
-          params.id as IDType<M["DBRead"], M["modelPrimaryKey"]>,
-        );
-      },
-
-      bulkDelete: async (params: {
-        ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
-        logger: ILogger;
-      }): Promise<void> => {
-        await dbTable.bulkDelete(
-          params.ids as Array<IDType<M["DBRead"], M["modelPrimaryKey"]>>,
-        );
-      },
-    },
-  });
-
-  return modelClient;
+>(
+  options: Readonly<
+    CreateDexieCrudClientOptions<
+      M,
+      ExtendedQueriesClient,
+      ExtendedMutationsClient,
+      DB
+    >
+  >,
+): DexieCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+  return _createConfiguredDexieCrudClient(options);
 }

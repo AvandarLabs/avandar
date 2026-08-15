@@ -5,15 +5,22 @@ import { useMemo } from "react";
 import z from "zod";
 import type { PuckContext } from "@puckeditor/core";
 
+/** Where a page's dashboard data comes from. */
 export type AvaPageMetadata = {
   dashboardId: Dashboard.Id;
 } & (
   | {
       auth: "public";
+      snapshotRevision: string;
       workspaceId?: undefined;
     }
   | {
       auth: "workspace";
+      workspaceId: Workspace.Id;
+    }
+  | {
+      auth: "workspace_published";
+      snapshotRevision: string;
       workspaceId: Workspace.Id;
     }
 );
@@ -26,9 +33,15 @@ const AvaPageMetadataSchema = z
     z.discriminatedUnion("auth", [
       z.object({
         auth: z.literal("public"),
+        snapshotRevision: z.string(),
       }),
       z.object({
         auth: z.literal("workspace"),
+        workspaceId: uuidType<Workspace.Id>(),
+      }),
+      z.object({
+        auth: z.literal("workspace_published"),
+        snapshotRevision: z.string(),
         workspaceId: uuidType<Workspace.Id>(),
       }),
     ]),

@@ -20,32 +20,53 @@ import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFile
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
-import { DuckDbClient, UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
+import type {
+  DatasetDuckDbLease,
+  PublicSnapshotDuckDbOwner,
+} from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Module } from "@avandar/modules";
 import type { UnknownObject } from "@avandar/utils";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 export type IQetlClient = Module<
   "QetlClient",
   {
     /** Get the necessary dice to answer the given SQL query. */
-    getDiceFromSql: (rawSql: string) => Promise<readonly Dataset.Id[]>;
+    getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+    /** Expand direct dependencies to every dataset lease the query may need. */
+    getDuckDbLeaseDatasetIds?: (
+      queryDependencies: readonly Dataset.Id[],
+    ) => Promise<Dataset.Id[]>;
+    /** Selects the ownership policy for final DuckDB reads. */
+    duckDbReadMode?: "public" | "workspace";
+    /** Identifies the public snapshot expected to own final read tables. */
+    publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
 
     /** Insert the given facts into the local storage cache. */
-    insertToStorageCache: (params: {
-      facts: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
-    }) => Promise<void>;
+    insertToStorageCache: (
+      facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
+    ) => Promise<void>;
+    /** Prepares ownership state after the query's dataset leases are held. */
+    prepareDuckDbDatasets?: (
+      params: Readonly<{
+        datasetIds: readonly Dataset.Id[];
+        datasetDuckDbLease: DatasetDuckDbLease;
+      }>,
+    ) => Promise<void>;
   },
   {
     /**
@@ -56,7 +77,7 @@ export type IQetlClient = Module<
       <RowObject extends UnknownRow = UnknownRow>(params: {
         rawSql: string;
         returnType?: "js";
-      }): Promise<QueryResult<RowObject>>;
+      }): Promise<QueryResult.T<RowObject>>;
       (params: { rawSql: string; returnType: "parquet" }): Promise<Blob>;
     };
   }
@@ -98,6 +119,417 @@ type DiceExtractor =
       sourceDataset: XlsxFileDataset.T;
     };
 
+type ExtractedFact = { datasetId: Dataset.Id; parquetBlob: Blob };
+
+function _getColumnReplacements(
+  columns: readonly DatasetColumn.T[],
+): ColumnReplacement[] {
+  return columns
+    .map((column) => {
+      const hasChangedName = column.name !== column.originalName;
+      const hasChangedDataType =
+        column.dataType !==
+        DuckDbDataTypeUtils.toAvaDataType(column.detectedDataType);
+      return hasChangedName || hasChangedDataType ?
+          {
+            originalName: column.originalName,
+            alias: hasChangedName ? column.name : undefined,
+            dataType:
+              hasChangedDataType ?
+                DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
+              : undefined,
+          }
+        : undefined;
+    })
+    .filter(isDefined);
+}
+
+async function _getCachedFact(
+  extractor: Readonly<DiceExtractor>,
+): Promise<ExtractedFact | undefined> {
+  const localDataset = await LocalDatasetClient.getById({
+    id: extractor.dataset.id,
+  });
+  return localDataset?.parseStatus === "ready" && localDataset.parquetData ?
+      { datasetId: extractor.dataset.id, parquetBlob: localDataset.parquetData }
+    : undefined;
+}
+
+async function _downloadStoredDatasetFact(
+  extractor: Readonly<
+    Extract<DiceExtractor, { sourceType: "csv_file" | "xlsx_file" }>
+  >,
+): Promise<ExtractedFact> {
+  const parquetBlob = await DatasetParquetStorageClient.downloadDataset({
+    datasetId: extractor.dataset.id,
+    workspaceId: extractor.dataset.workspaceId,
+  });
+  if (!parquetBlob) {
+    throw new Error(
+      `Failed to download data for ${extractor.sourceType} dataset '${extractor.dataset.id}' (${extractor.dataset.name})`,
+    );
+  }
+  return { datasetId: extractor.dataset.id, parquetBlob };
+}
+
+async function _downloadOpenDataFact(
+  extractor: Readonly<Extract<DiceExtractor, { sourceType: "open_data" }>>,
+): Promise<ExtractedFact> {
+  const catalogEntry = await OpenDataCatalogEntryClient.getOne(
+    where("id", "eq", extractor.sourceDataset.catalogEntryId),
+  );
+  const parquetUrl = catalogEntry?.canonicalUrls?.find((url) => {
+    return url.toLowerCase().endsWith(".parquet");
+  });
+  if (!parquetUrl) {
+    throw new Error(
+      `No Parquet URL in catalog for dataset '${extractor.dataset.name}'`,
+    );
+  }
+  const response = await fetch(parquetUrl);
+  if (!response.ok) {
+    throw new Error(
+      `Open data Parquet download failed: ${response.statusText}`,
+    );
+  }
+  return {
+    datasetId: extractor.dataset.id,
+    parquetBlob: await response.blob(),
+  };
+}
+
+type QetlRunnerOptions = {
+  getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+  getDuckDbLeaseDatasetIds?: (
+    queryDependencies: readonly Dataset.Id[],
+  ) => Promise<Dataset.Id[]>;
+  duckDbReadMode?: "public" | "workspace";
+  publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+  insertToStorageCache: (
+    facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
+  ) => Promise<void>;
+  prepareDuckDbDatasets?: (
+    params: Readonly<{
+      datasetIds: readonly Dataset.Id[];
+      datasetDuckDbLease: DatasetDuckDbLease;
+    }>,
+  ) => Promise<void>;
+};
+
+type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
+type DatasetsById = Record<Dataset.Id, Dataset.T | undefined>;
+
+type RunQetlQueryOptions = {
+  rawSql: string;
+  returnType?: "parquet" | "js";
+  datasetDuckDbLease?: DatasetDuckDbLease;
+};
+
+type QetlRunQuery = {
+  (
+    options: Readonly<RunQetlQueryOptions & { returnType: "parquet" }>,
+  ): Promise<Blob>;
+  <RowObject extends UnknownObject = UnknownRow>(
+    options: Readonly<RunQetlQueryOptions & { returnType?: "js" }>,
+  ): Promise<QueryResult.T<RowObject>>;
+};
+
+type RunLeasedQueryOptions = {
+  datasetDuckDbLease: DatasetDuckDbLease;
+  queryDependencies: readonly Dataset.Id[];
+  rawSql: string;
+  returnType: "parquet" | "js";
+};
+
+async function _getMissingDice(
+  queryDependencies: readonly Dataset.Id[],
+): Promise<Dataset.Id[]> {
+  if (queryDependencies.length === 0) {
+    return [];
+  }
+  const inMemoryDice = await DuckDbClient.getTableOrViewNames();
+  const inMemoryDiceSet = new Set(inMemoryDice);
+  return difference(
+    queryDependencies,
+    queryDependencies.filter((datasetId) => {
+      return inMemoryDiceSet.has(datasetId);
+    }),
+  );
+}
+
+async function _getCsvExtractors(
+  options: Readonly<{ ids: readonly Dataset.Id[]; datasetsById: DatasetsById }>,
+): Promise<DiceExtractor[]> {
+  const sources = await CsvFileDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "csv_file",
+      sourceDataset,
+    };
+  });
+}
+
+async function _getXlsxExtractors(
+  options: Readonly<{ ids: readonly Dataset.Id[]; datasetsById: DatasetsById }>,
+): Promise<DiceExtractor[]> {
+  const sources = await XlsxFileDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "xlsx_file",
+      sourceDataset,
+    };
+  });
+}
+
+async function _getVirtualExtractors(
+  options: Readonly<{ ids: readonly Dataset.Id[]; datasetsById: DatasetsById }>,
+): Promise<DiceExtractor[]> {
+  const sources = await VirtualDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "virtual",
+      sourceDataset,
+    };
+  });
+}
+
+async function _getOpenDataExtractors(
+  options: Readonly<{ ids: readonly Dataset.Id[]; datasetsById: DatasetsById }>,
+): Promise<DiceExtractor[]> {
+  const sources = await OpenDataDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "open_data",
+      sourceDataset,
+    };
+  });
+}
+
+async function _getExtractorsForSourceType(
+  options: Readonly<{
+    sourceType: Dataset.T["sourceType"];
+    datasetsBySourceType: DatasetsBySourceType;
+    datasetsById: DatasetsById;
+  }>,
+): Promise<DiceExtractor[]> {
+  const extractorOptions = {
+    ids: options.datasetsBySourceType[options.sourceType].map(prop("id")),
+    datasetsById: options.datasetsById,
+  };
+  return match(options.sourceType)
+    .with("csv_file", () => {
+      return _getCsvExtractors(extractorOptions);
+    })
+    .with("xlsx_file", () => {
+      return _getXlsxExtractors(extractorOptions);
+    })
+    .with("virtual", () => {
+      return _getVirtualExtractors(extractorOptions);
+    })
+    .with("open_data", () => {
+      return _getOpenDataExtractors(extractorOptions);
+    })
+    .with("google_sheets", () => {
+      throw new Error("Google Sheets extraction is not supported yet");
+    })
+    .exhaustive();
+}
+
+async function _getDiceExtractors(
+  dice: readonly Dataset.Id[],
+): Promise<DiceExtractor[]> {
+  const datasets = await DatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("id", "in", dice));
+  const datasetsById = makeIdLookupRecord(datasets);
+  const datasetsBySourceType = makeBucketRecord(datasets, {
+    key: "sourceType",
+  });
+  return promiseFlatMap(objectKeys(datasetsBySourceType), (sourceType) => {
+    return _getExtractorsForSourceType({
+      sourceType,
+      datasetsBySourceType,
+      datasetsById,
+    });
+  });
+}
+
+type FetchExtractorOptions = {
+  extractor: DiceExtractor;
+  datasetDuckDbLease: DatasetDuckDbLease;
+  runQuery: QetlRunQuery;
+};
+
+async function _fetchExtractor(
+  options: Readonly<FetchExtractorOptions>,
+): Promise<ExtractedFact> {
+  const cachedFact = await _getCachedFact(options.extractor);
+  if (cachedFact) {
+    return cachedFact;
+  }
+  return match(options.extractor)
+    .with({ sourceType: "csv_file" }, _downloadStoredDatasetFact)
+    .with({ sourceType: "xlsx_file" }, _downloadStoredDatasetFact)
+    .with({ sourceType: "open_data" }, _downloadOpenDataFact)
+    .with({ sourceType: "virtual" }, async (extractor) => {
+      return {
+        datasetId: extractor.dataset.id,
+        parquetBlob: await options.runQuery({
+          rawSql: extractor.sourceDataset.rawSql,
+          returnType: "parquet",
+          datasetDuckDbLease: options.datasetDuckDbLease,
+        }),
+      };
+    })
+    .with({ sourceType: "google_sheets" }, () => {
+      throw new Error("Google Sheets data fetching is not supported yet");
+    })
+    .exhaustive();
+}
+
+async function _fetchData(
+  options: Readonly<{
+    extractors: readonly DiceExtractor[];
+    datasetDuckDbLease: DatasetDuckDbLease;
+    runQuery: QetlRunQuery;
+  }>,
+): Promise<ExtractedFact[]> {
+  return options.extractors.reduce<Promise<ExtractedFact[]>>(
+    async (priorFactsPromise, extractor) => {
+      const priorFacts = await priorFactsPromise;
+      const extractedFact = await _fetchExtractor({ ...options, extractor });
+      return priorFacts.concat(extractedFact);
+    },
+    Promise.resolve([]),
+  );
+}
+
+async function _loadFacts(
+  options: Readonly<{
+    facts: readonly ExtractedFact[];
+    datasetDuckDbLease: DatasetDuckDbLease;
+    insertToStorageCache: QetlRunnerOptions["insertToStorageCache"];
+  }>,
+): Promise<void> {
+  const storedFacts = await LocalDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("datasetId", "in", options.facts.map(prop("datasetId"))));
+  const factsToCache = options.facts.filter((fact) => {
+    return !storedFacts.some(propEq("datasetId", fact.datasetId));
+  });
+  await options.insertToStorageCache(factsToCache);
+  const columns = await DatasetColumnClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.facts.map(prop("datasetId"))));
+  const columnsByDatasetId = makeBucketRecord(columns, { key: "datasetId" });
+  await promiseMap(options.facts, (fact) => {
+    return DuckDbClient.loadParquet({
+      tableName: fact.datasetId,
+      blob: fact.parquetBlob,
+      datasetDuckDbLease: options.datasetDuckDbLease,
+      columnReplacements: makeIdLookupRecord(
+        _getColumnReplacements(columnsByDatasetId[fact.datasetId] ?? []),
+        { key: "originalName" },
+      ),
+    });
+  });
+}
+
+async function _runLeasedQuery<RowObject extends UnknownObject>(
+  options: Readonly<{
+    runnerOptions: QetlRunnerOptions;
+    queryOptions: RunLeasedQueryOptions;
+    runQuery: QetlRunQuery;
+  }>,
+): Promise<Blob | QueryResult.T<RowObject>> {
+  const { runnerOptions, queryOptions } = options;
+  await runnerOptions.prepareDuckDbDatasets?.({
+    datasetIds: queryOptions.queryDependencies,
+    datasetDuckDbLease: queryOptions.datasetDuckDbLease,
+  });
+  const missingDice = await _getMissingDice(queryOptions.queryDependencies);
+  const extractors = await _getDiceExtractors(missingDice);
+  const fetchedFacts = await _fetchData({
+    extractors,
+    datasetDuckDbLease: queryOptions.datasetDuckDbLease,
+    runQuery: options.runQuery,
+  });
+  await _loadFacts({
+    facts: fetchedFacts,
+    datasetDuckDbLease: queryOptions.datasetDuckDbLease,
+    insertToStorageCache: runnerOptions.insertToStorageCache,
+  });
+  const duckDbQueryOptions = {
+    datasetDuckDbLease: queryOptions.datasetDuckDbLease,
+    datasetTableReadMode: runnerOptions.duckDbReadMode,
+    publicSnapshotDuckDbOwner: runnerOptions.publicSnapshotDuckDbOwner,
+  };
+  return queryOptions.returnType === "parquet" ?
+      DuckDbClient.runRawQuery(queryOptions.rawSql, {
+        ...duckDbQueryOptions,
+        returnType: "parquet",
+      })
+    : DuckDbClient.runRawQuery<RowObject>(
+        queryOptions.rawSql,
+        duckDbQueryOptions,
+      );
+}
+
+async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
+  options: Readonly<{
+    runnerOptions: QetlRunnerOptions;
+    queryOptions: RunQetlQueryOptions;
+    runQuery: QetlRunQuery;
+  }>,
+): Promise<Blob | QueryResult.T<RowObject>> {
+  const queryDependencies = await options.runnerOptions.getDiceFromSql(
+    options.queryOptions.rawSql,
+  );
+  const leaseDatasetIds =
+    options.queryOptions.datasetDuckDbLease ?
+      queryDependencies
+    : ((await options.runnerOptions.getDuckDbLeaseDatasetIds?.(
+        queryDependencies,
+      )) ?? queryDependencies);
+  return DatasetDuckDbCoordinator.runCoordinatedDatasetDuckDbOperation({
+    datasetIds: leaseDatasetIds,
+    lease: options.queryOptions.datasetDuckDbLease,
+    operation: (datasetDuckDbLease) => {
+      return _runLeasedQuery<RowObject>({
+        runnerOptions: options.runnerOptions,
+        runQuery: options.runQuery,
+        queryOptions: {
+          datasetDuckDbLease,
+          queryDependencies,
+          rawSql: options.queryOptions.rawSql,
+          returnType: options.queryOptions.returnType ?? "js",
+        },
+      });
+    },
+  });
+}
+
+function _createQetlQueryRunner(
+  runnerOptions: Readonly<QetlRunnerOptions>,
+): QetlRunQuery {
+  const runQuery = (queryOptions: Readonly<RunQetlQueryOptions>) => {
+    return _runQuery({ runnerOptions, queryOptions, runQuery });
+  };
+  return runQuery as QetlRunQuery;
+}
+
 /**
  * This is the powerhouse of Avandar. It powers our Qetl architecture for
  * on-demand ETL queries.
@@ -124,483 +556,8 @@ type DiceExtractor =
 export const QetlClientFactory = createModuleFactory<IQetlClient>(
   "QetlClient",
   {
-    childBuilder(module) {
-      const { getDiceFromSql, insertToStorageCache } = module.getState();
-
-      // The Memory Cube is an in-memory DuckDB instance.
-      const MemoryCube = {
-        getAllDice: async (): Promise<readonly string[]> => {
-          const inMemoryDice = await DuckDbClient.getTableOrViewNames();
-          return inMemoryDice;
-        },
-
-        dropDice: async ({
-          datasetId,
-        }: {
-          datasetId: Dataset.Id;
-        }): Promise<void> => {
-          return DuckDbClient.dropTableViewAndFile(datasetId);
-        },
-
-        /**
-         * Loads data into the MemoryCube.
-         * No other side effects - this does not handle any fetching or other
-         * data management operations. Just straight up loads a parquet blob
-         * into the memory cube.
-         * @param datasetId The id of the dataset to load.
-         * @param parquetBlob The parquet blob to load.
-         * @param columnReplacements An optional record of column replacements
-         *   to adjust the schema when loading the data into memory.
-         * @returns
-         */
-        loadData: async ({
-          datasetId,
-          parquetBlob,
-          columnReplacements,
-        }: {
-          datasetId: Dataset.Id;
-          parquetBlob: Blob;
-          columnReplacements?: readonly ColumnReplacement[];
-        }): Promise<DuckDbLoadParquetResult> => {
-          return DuckDbClient.loadParquet({
-            tableName: datasetId,
-            blob: parquetBlob,
-            columnReplacements:
-              columnReplacements ?
-                makeIdLookupRecord(columnReplacements, {
-                  key: "originalName",
-                })
-              : undefined,
-          });
-        },
-      };
-
-      const DiceManager = {
-        determineMissingDice: async ({
-          rawSql,
-        }: {
-          rawSql: string;
-        }): Promise<{ missingDice: Dataset.Id[] }> => {
-          const queryDependencies = await getDiceFromSql(rawSql);
-
-          if (queryDependencies.length === 0) {
-            // there are no dependencies, so there is nothing to load
-            return { missingDice: [] };
-          }
-
-          // check which dependencies are in the MemoryCube
-          // TODO(jpsyx): This is an insufficient check. It is possible the
-          //   dataset in the memory cube is outdated. This can be the case for
-          //   live connections to external data sources. We need to figure out
-          //   if the dataset is outdated by checking some dirty flag or
-          //   last modified timestamp.
-          const allDatasetsInMemoryCube = await MemoryCube.getAllDice();
-          const depsInMemoryCube = queryDependencies.filter((datasetId) => {
-            return allDatasetsInMemoryCube.includes(datasetId);
-          });
-          const depsNotInMemory = difference(
-            queryDependencies,
-            depsInMemoryCube,
-          );
-          return { missingDice: depsNotInMemory };
-        },
-      };
-
-      const OptimizationEngine = {
-        /**
-         * For all given dice, we build the necessary queries to fetch them.
-         *
-         * TODO(jpsyx): for now, we are not building any optimized queries. We
-         * are simply fetching the entire datasets. This will necessarily change
-         * once we have to start querying 3rd party data sources, where it is
-         * simply not an option to fetch the entire dataset. We want to
-         * construct queries or API calls specific to what we need.
-         *
-         * @param dice The dice to determine the optimal extractions for.
-         * @returns The extractors for the given dice. For now, since
-         * each dice is just a dataset id. We return the full dataset object as
-         * the extraction instructions.
-         */
-        determineExtractions: async ({
-          dice,
-        }: {
-          dice: readonly Dataset.Id[];
-        }): Promise<{
-          diceExtractors: DiceExtractor[];
-        }> => {
-          const datasets = await DatasetClient.withCache(AvaQueryClient)
-            .withEnsureQueryData()
-            .getAll(where("id", "in", dice));
-          const datasetsById = makeIdLookupRecord(datasets);
-          const datasetsBySourceType = makeBucketRecord(datasets, {
-            key: "sourceType",
-          });
-
-          const diceExtractors = await promiseFlatMap(
-            objectKeys(datasetsBySourceType),
-            async (sourceType) => {
-              const extractors: DiceExtractor[] = await match(sourceType)
-                .with("csv_file", async (type) => {
-                  const ids = datasetsBySourceType[type].map(prop("id"));
-                  const csvDatasets = await CsvFileDatasetClient.withCache(
-                    AvaQueryClient,
-                  )
-                    .withEnsureQueryData()
-                    .getAll(where("dataset_id", "in", ids));
-                  return csvDatasets.map((csvDataset) => {
-                    return {
-                      dataset: datasetsById[csvDataset.datasetId]!,
-                      sourceType: "csv_file",
-                      sourceDataset: csvDataset,
-                    } as const;
-                  });
-                })
-                .with("xlsx_file", async (type) => {
-                  const ids = datasetsBySourceType[type].map(prop("id"));
-                  const xlsxDatasets = await XlsxFileDatasetClient.withCache(
-                    AvaQueryClient,
-                  )
-                    .withEnsureQueryData()
-                    .getAll(where("dataset_id", "in", ids));
-                  return xlsxDatasets.map((xlsxDataset) => {
-                    return {
-                      dataset: datasetsById[xlsxDataset.datasetId]!,
-                      sourceType: "xlsx_file" as const,
-                      sourceDataset: xlsxDataset,
-                    } as const;
-                  });
-                })
-                .with("virtual", async (type) => {
-                  const ids = datasetsBySourceType[type].map(prop("id"));
-                  const virtualDatasets = await VirtualDatasetClient.withCache(
-                    AvaQueryClient,
-                  )
-                    .withEnsureQueryData()
-                    .getAll(where("dataset_id", "in", ids));
-                  return virtualDatasets.map((virtualDataset) => {
-                    return {
-                      dataset: datasetsById[virtualDataset.datasetId]!,
-                      sourceType: "virtual",
-                      sourceDataset: virtualDataset,
-                    } as const;
-                  });
-                })
-                .with("google_sheets", async () => {
-                  throw new Error(
-                    "Google Sheets extraction is not supported yet",
-                  );
-                })
-                .with("open_data", async (type) => {
-                  const ids = datasetsBySourceType[type].map(prop("id"));
-                  const openDataDatasets =
-                    await OpenDataDatasetClient.withCache(AvaQueryClient)
-                      .withEnsureQueryData()
-                      .getAll(where("dataset_id", "in", ids));
-                  return openDataDatasets.map((openDataDataset) => {
-                    return {
-                      dataset: datasetsById[openDataDataset.datasetId]!,
-                      sourceType: "open_data" as const,
-                      sourceDataset: openDataDataset,
-                    } as const;
-                  });
-                })
-                .exhaustive();
-              return extractors;
-            },
-          );
-
-          return { diceExtractors };
-        },
-      };
-
-      const EtlService = {
-        prepareFacts: ({
-          data,
-        }: {
-          data: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
-        }): Promise<Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>> => {
-          // TODO(jpsyx): identity function for now but this should be replaced
-          // with a real implementation of Baldacci et. al. (2017).
-          return Promise.resolve(data);
-        },
-        fetchData: async ({
-          extractors,
-        }: {
-          extractors: readonly DiceExtractor[];
-        }): Promise<Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>> => {
-          const blobs = await promiseMap(extractors, async (extractor) => {
-            // first check if the dataset is in the local storage cache
-            const localDataset = await LocalDatasetClient.getById({
-              id: extractor.dataset.id,
-            });
-
-            // Cache hit with a ready parquet: return it directly. Rows whose
-            // background parquet transcoding is still running
-            // (parseStatus !== "ready") have an undefined `parquetData`; fall
-            // through to the cloud download (or fail) in that case.
-            if (
-              localDataset?.parseStatus === "ready" &&
-              localDataset.parquetData
-            ) {
-              return {
-                datasetId: extractor.dataset.id,
-                parquetBlob: localDataset.parquetData,
-              };
-            }
-
-            return match(extractor)
-              .with({ sourceType: "csv_file" }, async (ex) => {
-                const parquetBlob =
-                  await DatasetParquetStorageClient.downloadDataset({
-                    datasetId: ex.dataset.id,
-                    workspaceId: ex.dataset.workspaceId,
-                  });
-
-                if (!parquetBlob) {
-                  throw new Error(
-                    `Failed to download data for CSV file dataset '${ex.dataset.id}' (${ex.dataset.name})`,
-                  );
-                }
-                return { datasetId: ex.dataset.id, parquetBlob };
-              })
-              .with({ sourceType: "xlsx_file" }, async (ex) => {
-                const parquetBlob =
-                  await DatasetParquetStorageClient.downloadDataset({
-                    datasetId: ex.dataset.id,
-                    workspaceId: ex.dataset.workspaceId,
-                  });
-
-                if (!parquetBlob) {
-                  throw new Error(
-                    `Failed to download data for Excel file dataset ` +
-                      `'${ex.dataset.id}' (${ex.dataset.name})`,
-                  );
-                }
-                return { datasetId: ex.dataset.id, parquetBlob };
-              })
-              .with({ sourceType: "virtual" }, async (ex) => {
-                // virtual datasets result in a recursive Qetl call, where we
-                // evaluate the virtual dataset's raw SQL query in order to
-                // materialize it into a parquet blob.
-                // This blob is a dice we can use to answer the original query.
-                const evaluatedBlob = await runQuery({
-                  rawSql: ex.sourceDataset.rawSql,
-                  returnType: "parquet",
-                });
-
-                return {
-                  datasetId: ex.dataset.id,
-                  parquetBlob: evaluatedBlob,
-                };
-              })
-              .with({ sourceType: "google_sheets" }, () => {
-                throw new Error(
-                  "Google Sheets data fetching is not supported yet",
-                );
-              })
-              .with({ sourceType: "open_data" }, async (ex) => {
-                const catalogEntry = await OpenDataCatalogEntryClient.getOne(
-                  where("id", "eq", ex.sourceDataset.catalogEntryId),
-                );
-                if (!catalogEntry) {
-                  throw new Error(
-                    `Missing catalog entry for open data dataset ` +
-                      `'${ex.dataset.id}' (${ex.dataset.name})`,
-                  );
-                }
-                const parquetUrl = catalogEntry.canonicalUrls?.find((url) => {
-                  return url.toLowerCase().endsWith(".parquet");
-                });
-                if (!parquetUrl) {
-                  throw new Error(
-                    `No Parquet URL in catalog for dataset '${ex.dataset.name}'`,
-                  );
-                }
-                const response = await fetch(parquetUrl);
-                if (!response.ok) {
-                  throw new Error(
-                    `Open data Parquet download failed: ${response.statusText}`,
-                  );
-                }
-                const parquetBlob = await response.blob();
-                return { datasetId: ex.dataset.id, parquetBlob };
-              })
-              .exhaustive(() => {
-                throw new Error(
-                  `Invalid extractor type to fetch data: ${extractor.sourceType}`,
-                );
-              });
-          });
-          return blobs;
-        },
-      };
-
-      const FilteringEngine = {
-        loadFacts: async ({
-          facts,
-        }: {
-          facts: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
-        }): Promise<void> => {
-          // first, we figure out which facts are not in our local storage
-          // cache, so we can store them
-          const factsInLocalStorage = await LocalDatasetClient.withCache(
-            AvaQueryClient,
-          )
-            .withEnsureQueryData()
-            .getAll(where("datasetId", "in", facts.map(prop("datasetId"))));
-          const factsToCache = facts.filter((fact) => {
-            return !factsInLocalStorage.some(
-              propEq("datasetId", fact.datasetId),
-            );
-          });
-
-          // add new facts to the local storage cache
-          await insertToStorageCache({
-            facts: factsToCache,
-          });
-
-          const columns = await DatasetColumnClient.withCache(AvaQueryClient)
-            .withEnsureQueryData()
-            .getAll(where("dataset_id", "in", facts.map(prop("datasetId"))));
-
-          const columnsByDatasetId = makeBucketRecord(columns, {
-            key: "datasetId",
-          });
-
-          // iterate through each fact and load it into the MemoryCube. We know
-          // for a fact they are not in the MemoryCube otherwise they would not
-          // have been sent to the FilteringEngine.
-          await promiseMap(facts, ({ datasetId, parquetBlob }) => {
-            const cols = columnsByDatasetId[datasetId] ?? [];
-            const schemaChanges = cols
-              .map((col) => {
-                const changedName = col.name !== col.originalName;
-                const changedDataType =
-                  col.dataType !==
-                  DuckDbDataTypeUtils.toAvaDataType(col.detectedDataType);
-                if (changedName || changedDataType) {
-                  return {
-                    originalName: col.originalName,
-                    alias: changedName ? col.name : undefined,
-                    dataType:
-                      changedDataType ?
-                        DuckDbDataTypeUtils.fromDatasetColumnType(col.dataType)
-                      : undefined,
-                  };
-                }
-                return undefined;
-              })
-              .filter(isDefined);
-
-            return MemoryCube.loadData({
-              datasetId,
-              parquetBlob,
-              columnReplacements: schemaChanges,
-            });
-          });
-        },
-      };
-
-      async function runQuery(options: {
-        rawSql: string;
-        returnType: "parquet";
-      }): Promise<Blob>;
-      async function runQuery<
-        RowObject extends UnknownObject = UnknownRow,
-      >(options: {
-        rawSql: string;
-        returnType?: "js";
-      }): Promise<QueryResult<RowObject>>;
-      async function runQuery<RowObject extends UnknownObject = UnknownRow>({
-        rawSql,
-        returnType = "js",
-      }: {
-        rawSql: string;
-        returnType?: "parquet" | "js";
-      }): Promise<Blob | QueryResult<RowObject>> {
-        // From Baldacci et. al. (2017) p.6:
-        // 1. Dice management determines the set of missing dice and transmits
-        //    them to optimization and filtering.
-        // 2. Optimization determines a set of optimal extractions and calls the
-        //    ETL service accordingly.
-        // 3. ETL sends a fetching query to the source data provider.
-        // 4. The source data provider returns the required data.
-        // 5. ETL puts the data in multidimensional form and sends the resulting
-        //    facts to filtering.
-        //    If there is not enough room in the cube:
-        //    5.1. Dice management chooses the dice to be dropped from the cube.
-        // 6. Filtering loads the filtered facts into the cube.
-
-        // For our purposes, the "cube" will be two-layered: the local DuckDB
-        // database for in-memory querying, and IndexedDB for local storage.
-
-        // For now, our dice management will be naive. We will not actually use
-        // any ranges, intervals, or dice. We will simply use the dataset IDs as
-        // the dice. This is far from optimized and will need to be changed
-        // packaging this as its own library.
-
-        // 1. Determine the set of missing dice
-        // First, we inspect the query to determine which datasets are needed
-        // TODO(jpsyx): In a real Qetl implementation, we would use a more
-        //   sophisticated algorithm to determine the 'facts' and 'dice' that
-        //   are needed to answer the query. For now, we will just take all
-        //   dataset ids and see which are in memory and local storage. We are
-        //   not using anything more sophisticated for v0.
-        const { missingDice } = await DiceManager.determineMissingDice({
-          rawSql,
-        });
-
-        // 2. Optimization engine determines set of optimal extractions
-        const { diceExtractors: extractors } =
-          await OptimizationEngine.determineExtractions({
-            dice: missingDice,
-          });
-
-        // 3. Call the ETL service to fetch the data, which will in turn
-        //   send a fetching query to the appropriate source data providers.
-        const fetchedData = await EtlService.fetchData({
-          extractors,
-        });
-
-        // 4. ETL puts the data in multidimensional form and sends the resulting
-        //    facts to filtering.
-        //    TODO(jpsyx): For now, this is just an identity function that
-        //    returns the data. It is a noop with no side-effects, we are not
-        //    doing any of what Baldacci et. al. (2017) describes for this step.
-        //    We will implement this when we have a real Qetl implementation
-        //    with proper data cubes and dice management.
-        //    Also, is this even necessary for non-OLAP queries? Perhaps we can
-        //    have a flag in this client for OLAP and non-OLAP (transactional)
-        //    queries.
-        const preparedData = await EtlService.prepareFacts({
-          data: fetchedData,
-        });
-
-        // 5. Dice management chooses the dice to be dropped from the cube (and
-        //    from local storage cache), before we load new data.
-        //    TODO(jpsyx): also not implementing this for now, but it's a
-        //    crucial bit of performance optimization that we need to implement.
-        //    We should decide based on memory and storage usage in the browser.
-        //    The MemoryCube and StorageCubes have to both be managed. The
-        //    MemoryCube will require more swapping.
-
-        // 6. Filtering loads the filtered facts into the MemoryCube
-        await FilteringEngine.loadFacts({
-          facts: preparedData,
-        });
-
-        // now run the actual query against the memory cube, because we can be
-        // confident that all the data is in the memory cube.
-        if (returnType === "js") {
-          return await DuckDbClient.runRawQuery<RowObject>(rawSql);
-        } else {
-          return await DuckDbClient.runRawQuery(rawSql, {
-            returnType: "parquet",
-          });
-        }
-      }
-
-      return { runQuery };
+    childBuilder: (module) => {
+      return { runQuery: _createQetlQueryRunner(module.getState()) };
     },
   },
 );

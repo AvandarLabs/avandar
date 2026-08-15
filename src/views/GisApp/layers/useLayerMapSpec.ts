@@ -14,10 +14,10 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 export type LayerMapSpec = {
   spec: MapSpec;
   fitBounds: MapBounds | undefined;
-  interactiveLayerIds: readonly string[];
+  interactiveLayerIds: string[];
   featureCount: number;
   hasBinding: boolean;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 };
 
 /**
@@ -46,10 +46,10 @@ export type LayerMapSpec = {
 export function useLayerMapSpec({
   layer,
   queryResult,
-}: {
+}: Readonly<{
   layer: MapLayer.T;
   queryResult: QueryResult.T<UnknownRow> | undefined;
-}): LayerMapSpec {
+}>): LayerMapSpec {
   const { geoBinding, id: layerId, sensitivity } = layer;
   const { queryColumns } = layer.source;
 

@@ -150,6 +150,12 @@ create or replace function public.util__analytics_event_category (
       when 'workspace.invite_accepted' then 'expansion'
       when 'member.removed' then 'expansion'
       when 'dashboard.public_viewed' then 'expansion'
+      -- Deletions are shrink signals, and `expansion` is the only category
+      -- that models the account shrinking (see the enum's own comment, and
+      -- `member.removed` above). Filing them under `engagement` would inflate
+      -- engagement with churn.
+      when 'dataset.deleted' then 'expansion'
+      when 'dashboard.deleted' then 'expansion'
       -- revenue
       when 'subscription.created' then 'revenue'
       when 'subscription.plan_changed' then 'revenue'

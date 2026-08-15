@@ -159,7 +159,20 @@ export type Database = {
           owner_id: string
           owner_profile_id: string
           slug: string | null
+          snapshot_revision: string | null
+          snapshot_transition_kind:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision: string | null
+          snapshot_transition_prior_visibility:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision: string | null
+          snapshot_transition_target_visibility:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at: string
+          visibility: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id: string
         }
         Insert: {
@@ -173,7 +186,20 @@ export type Database = {
           owner_id?: string
           owner_profile_id: string
           slug?: string | null
+          snapshot_revision?: string | null
+          snapshot_transition_kind?:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision?: string | null
+          snapshot_transition_prior_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision?: string | null
+          snapshot_transition_target_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at?: string
+          visibility?: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id: string
         }
         Update: {
@@ -187,7 +213,20 @@ export type Database = {
           owner_id?: string
           owner_profile_id?: string
           slug?: string | null
+          snapshot_revision?: string | null
+          snapshot_transition_kind?:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision?: string | null
+          snapshot_transition_prior_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision?: string | null
+          snapshot_transition_target_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at?: string
+          visibility?: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id?: string
         }
         Relationships: [
@@ -1807,7 +1846,15 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
+      util__storage_object_dashboard_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
       util__storage_object_dataset_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
+      util__storage_object_snapshot_revision: {
         Args: { p_object_name: string }
         Returns: string
       }
@@ -1823,6 +1870,12 @@ export type Database = {
         | "dashboards"
         | "settings"
         | "gis"
+      dashboard_snapshot_transition_kind:
+        | "publish"
+        | "abort_publish"
+        | "unpublish"
+        | "delete"
+      dashboard_visibility: "draft" | "workspace" | "public"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -2055,6 +2108,13 @@ export const Constants = {
         "settings",
         "gis",
       ],
+      dashboard_snapshot_transition_kind: [
+        "publish",
+        "abort_publish",
+        "unpublish",
+        "delete",
+      ],
+      dashboard_visibility: ["draft", "workspace", "public"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -2143,3 +2203,4 @@ export const Constants = {
     },
   },
 } as const
+

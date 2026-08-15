@@ -8,9 +8,7 @@ export async function tryExecuteOfflineSql(
   sql: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
-    await DuckDbClient.withConnection(async (connection) => {
-      await connection.query(sql);
-    });
+    await DuckDbClient.runRawQuery(sql);
     return { ok: true };
   } catch (error) {
     const message =

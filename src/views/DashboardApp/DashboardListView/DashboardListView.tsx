@@ -109,7 +109,6 @@ export function DashboardListView({
         name: t`Untitled dashboard`,
         description: undefined,
         slug: undefined,
-        isPublic: false,
         // TODO(jpsyx): avoid coercing the type here
         config:
           DashboardConfigs.makeEmpty() as unknown as Dashboard.T["config"],

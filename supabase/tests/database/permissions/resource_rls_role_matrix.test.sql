@@ -172,7 +172,7 @@ insert into public.dashboards (
   owner_profile_id,
   name,
   description,
-  is_public,
+  visibility,
   config,
   is_restricted
 )
@@ -184,7 +184,7 @@ values
     'e2003001-0000-4000-8000-000000000001'::uuid,
     'shared dashboard',
     '',
-    false,
+    'draft',
     '{}'::jsonb,
     true
   ),
@@ -195,7 +195,7 @@ values
     'e2003001-0000-4000-8000-000000000001'::uuid,
     'admin delete dashboard',
     '',
-    false,
+    'draft',
     '{}'::jsonb,
     true
   )
@@ -665,6 +665,16 @@ select
     declare
       v_deleted int;
     begin
+      update public.dashboards
+      set
+        snapshot_transition_kind = 'delete',
+        snapshot_transition_revision = 'e2009002-0000-4000-8000-000000000002'::uuid,
+        snapshot_transition_prior_revision = snapshot_revision,
+        snapshot_transition_prior_visibility = visibility,
+        snapshot_transition_target_visibility = null
+      where
+        id = 'e200b002-0000-4000-8000-000000000002'::uuid;
+
       delete from public.dashboards
       where
         id = 'e200b002-0000-4000-8000-000000000002'::uuid;
@@ -763,7 +773,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'e200b099-0000-4000-8000-000000000099'::uuid,
@@ -772,7 +782,7 @@ select
       'e2003002-0000-4000-8000-000000000002'::uuid,
       'viewer insert dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_viewer_dash$,
@@ -798,7 +808,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'e200b098-0000-4000-8000-000000000098'::uuid,
@@ -807,7 +817,7 @@ select
       'e2003003-0000-4000-8000-000000000003'::uuid,
       'editor insert dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_editor_dash$

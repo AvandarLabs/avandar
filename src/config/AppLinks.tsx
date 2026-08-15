@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Key } from "react";
 import type { LinkProps } from "@avandar/ui";
 
@@ -13,7 +14,7 @@ export type AppLink<
   key: Key;
   to: NonNullable<To>;
   params?: Params;
-  label: string;
+  label: () => string;
   /**
    * Whether this destination is usable when the browser is offline.
    * Drive `<OfflineGated>` and similar offline-aware UI from this flag.
@@ -35,25 +36,25 @@ export const AppLinks = {
   home: {
     key: "home",
     to: "/",
-    label: "Home",
+    label: () => {return t`Home`},
     isAvailableOffline: false,
   },
   signin: {
     key: "signin",
     to: "/signin",
-    label: "Sign in",
+    label: () => {return t`Sign in`},
     isAvailableOffline: false,
   },
   invalidWorkspace: {
     key: "invalid-workspace",
     to: "/invalid-workspace",
-    label: "Invalid workspace",
+    label: () => {return t`Invalid workspace`},
     isAvailableOffline: false,
   },
   updatePassword: {
     key: "update-password",
     to: "/update-password",
-    label: "Update password",
+    label: () => {return t`Update password`},
     isAvailableOffline: false,
   },
 
@@ -63,7 +64,7 @@ export const AppLinks = {
       key: "workspace-home",
       to: "/$workspaceSlug",
       params: { workspaceSlug },
-      label: "Home",
+      label: () => {return t`Home`},
       isAvailableOffline: true,
     };
   },
@@ -74,7 +75,7 @@ export const AppLinks = {
       key: "profile",
       to: "/$workspaceSlug/profile",
       params: { workspaceSlug },
-      label: "Profile",
+      label: () => {return t`Profile`},
       isAvailableOffline: false,
     };
   },
@@ -85,7 +86,7 @@ export const AppLinks = {
       key: "data-manager",
       to: "/$workspaceSlug/data-manager",
       params: { workspaceSlug },
-      label: "Data Sources",
+      label: () => {return t`Data Sources`},
       isAvailableOffline: true,
     };
   },
@@ -105,7 +106,7 @@ export const AppLinks = {
         workspaceSlug,
         datasetId,
       },
-      label: datasetName,
+      label: () => {return datasetName},
       isAvailableOffline: true,
     };
   },
@@ -116,7 +117,7 @@ export const AppLinks = {
       params: {
         workspaceSlug: workspaceSlug,
       },
-      label: "Import data",
+      label: () => {return t`Import data`},
       isAvailableOffline: true,
     };
   },
@@ -127,7 +128,7 @@ export const AppLinks = {
       key: "data-explorer",
       to: "/$workspaceSlug/data-explorer",
       params: { workspaceSlug },
-      label: "Data Explorer",
+      label: () => {return t`Data Explorer`},
       isAvailableOffline: true,
     };
   },
@@ -138,7 +139,7 @@ export const AppLinks = {
       key: "dashboards",
       to: "/$workspaceSlug/dashboards",
       params: { workspaceSlug },
-      label: "Dashboards",
+      label: () => {return t`Dashboards`},
       isAvailableOffline: true,
     };
   },
@@ -149,7 +150,7 @@ export const AppLinks = {
       key: "map",
       to: "/$workspaceSlug/map",
       params: { workspaceSlug },
-      label: "Geo Explorer",
+      label: () => {return t`Geo Explorer`},
       isAvailableOffline: false,
     };
   },
@@ -160,7 +161,7 @@ export const AppLinks = {
       key: "entity-designer",
       to: "/$workspaceSlug/entity-designer",
       params: { workspaceSlug },
-      label: "Profile Designer",
+      label: () => {return t`Profile Designer`},
       isAvailableOffline: false,
     };
   },
@@ -180,7 +181,7 @@ export const AppLinks = {
         workspaceSlug,
         entityConfigId,
       },
-      label: entityConfigName,
+      label: () => {return entityConfigName},
       isAvailableOffline: false,
     };
   },
@@ -189,7 +190,7 @@ export const AppLinks = {
       key: "entity-creator",
       to: "/$workspaceSlug/entity-designer/entity-creator",
       params: { workspaceSlug },
-      label: "Create new entity",
+      label: () => {return t`Create new entity`},
       isAvailableOffline: false,
     };
   },
@@ -211,7 +212,7 @@ export const AppLinks = {
         workspaceSlug,
         entityConfigId,
       },
-      label: entityConfigName,
+      label: () => {return entityConfigName},
       isAvailableOffline: false,
     };
   },
@@ -234,7 +235,7 @@ export const AppLinks = {
         entityConfigId,
         entityId,
       },
-      label: entityName,
+      label: () => {return entityName},
       isAvailableOffline: false,
     };
   },
@@ -245,7 +246,7 @@ export const AppLinks = {
       key: "workspace-settings",
       to: "/$workspaceSlug/settings",
       params: { workspaceSlug },
-      label: "Settings",
+      label: () => {return t`Settings`},
       isAvailableOffline: true,
     };
   },

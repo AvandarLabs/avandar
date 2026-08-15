@@ -24,7 +24,7 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { runGenerator } from "./runGenerator";
+import { runGenerator } from "./runGenerator/runGenerator";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "..", "..", "..", "..");
@@ -32,8 +32,8 @@ const PG_MIGRATIONS_DIR = join(REPO_ROOT, "supabase", "migrations");
 const SQLITE_MIGRATIONS_DIR = join(REPO_ROOT, "apps", "desktop", "migrations");
 
 const summary = runGenerator({
-  sourceDir: PG_MIGRATIONS_DIR,
-  outDir: SQLITE_MIGRATIONS_DIR,
+  sourceDirectory: PG_MIGRATIONS_DIR,
+  outputDirectory: SQLITE_MIGRATIONS_DIR,
 });
 
 console.log(

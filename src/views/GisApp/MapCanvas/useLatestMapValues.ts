@@ -14,11 +14,11 @@ export function useLatestMapValues({
   basemap,
   interactiveLayerIds,
   onFeatureClick,
-}: {
+}: Readonly<{
   basemap: AvaMap.Basemap;
   interactiveLayerIds: readonly string[];
   onFeatureClick: (feature: GeoJSON.Feature) => void;
-}): LatestMapValues {
+}>): LatestMapValues {
   const basemapRef = useRef(basemap);
   const interactiveLayerIdsRef = useRef(interactiveLayerIds);
   const onFeatureClickRef = useRef(onFeatureClick);

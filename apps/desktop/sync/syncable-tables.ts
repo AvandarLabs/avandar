@@ -116,6 +116,7 @@ export const EXCLUDED_TABLES = [
   "dexie_dbs",
   "subscriptions",
   "tokens__google",
+  "usage_analytics_events",
   "user_roles",
   "waitlist_signups",
   "workspace_invites",

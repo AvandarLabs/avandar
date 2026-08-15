@@ -135,7 +135,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard",
+  "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard",
   () => {
     return {
       getAvaPageMetadataFromDashboard: (): Record<string, unknown> => {
@@ -178,7 +178,7 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
       usePublishDashboard: (): [typeof publishDashboardMock, boolean] => {
         return [publishDashboardMock, false];
       },
-      useDelete: (): [ReturnType<typeof vi.fn>, boolean] => {
+      useFullDelete: (): [ReturnType<typeof vi.fn>, boolean] => {
         return [vi.fn(), false];
       },
       QueryKeys: {
@@ -233,6 +233,7 @@ function _makeDashboard(): Dashboard.T {
     slug: "test-dashboard",
     description: undefined,
     isPublic: false,
+    visibility: "draft",
     isRestricted: false,
     ownerId: "00000000-0000-4000-8000-000000000002" as User.Id,
     ownerProfileId: "00000000-0000-4000-8000-000000000003" as UserProfile.Id,

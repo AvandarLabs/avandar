@@ -6,16 +6,20 @@ type DefaultModelTypes = {
   modelName: string;
 
   /**
-   * The name of the string literal primary key of *both* the db
-   * and frontend model. They should both have the same key.
+   * The name of the primary key of *both* the db and frontend model. They
+   * should both have the same key.
+   *
+   * An array declares a Dexie compound primary key over those columns, in
+   * order. The columns stay separate fields on the row; nothing is
+   * concatenated.
    */
-  primaryKey: string;
+  primaryKey: string | readonly [string, string, ...string[]];
 
   /**
    * The primary key type of *both* the db and frontend model.
    * They should both have the same primary key type.
    */
-  primaryKeyType: string;
+  primaryKeyType: CrudModelSpec["modelPrimaryKeyType"];
 
   dbTypes: {
     DBRead: UnknownObject;
@@ -27,6 +31,53 @@ type DefaultModelTypes = {
     Update: UnknownObject;
   };
 };
+
+/** A string field name from one model's database read shape. */
+type DexieModelPrimaryKeyName<ModelTypes extends DefaultModelTypes> = Extract<
+  keyof ModelTypes["dbTypes"]["DBRead"],
+  string
+>;
+
+/** A compound model key containing at least two database read field names. */
+type DexieCompoundModelPrimaryKey<ModelTypes extends DefaultModelTypes> =
+  readonly [
+    DexieModelPrimaryKeyName<ModelTypes>,
+    DexieModelPrimaryKeyName<ModelTypes>,
+    ...Array<DexieModelPrimaryKeyName<ModelTypes>>,
+  ];
+
+/** A scalar or compound model primary key that names database read fields. */
+type DexieModelPrimaryKey<ModelTypes extends DefaultModelTypes> =
+  | DexieModelPrimaryKeyName<ModelTypes>
+  | DexieCompoundModelPrimaryKey<ModelTypes>;
+
+/** Key values from the database fields named by one compound key path. */
+type DexieCompoundModelPrimaryKeyType<
+  ModelTypes extends DefaultModelTypes,
+  PrimaryKey extends DexieCompoundModelPrimaryKey<ModelTypes>,
+> = {
+  [Index in keyof PrimaryKey]: PrimaryKey[Index] extends (
+    keyof ModelTypes["dbTypes"]["DBRead"]
+  ) ?
+    ModelTypes["dbTypes"]["DBRead"][PrimaryKey[Index]]
+  : never;
+};
+
+/**
+ * The value accepted by Dexie for one model primary key.
+ *
+ * Scalar key paths use their selected database field type. Compound paths use
+ * a tuple in the same order as the selected database fields.
+ */
+type DexieModelPrimaryKeyType<
+  ModelTypes extends DefaultModelTypes,
+  PrimaryKey extends ModelTypes["primaryKey"] = ModelTypes["primaryKey"],
+> =
+  PrimaryKey extends DexieCompoundModelPrimaryKey<ModelTypes> ?
+    DexieCompoundModelPrimaryKeyType<ModelTypes, PrimaryKey>
+  : PrimaryKey extends DexieModelPrimaryKeyName<ModelTypes> ?
+    ModelTypes["dbTypes"]["DBRead"][PrimaryKey]
+  : never;
 
 /**
  * A wrapper type to create the Dexie CRUD types for a model.
@@ -45,7 +96,10 @@ type DefaultModelTypes = {
  * values.
  */
 export type DexieCrudModelSpec<
-  ModelTypes extends DefaultModelTypes = DefaultModelTypes,
+  ModelTypes extends DefaultModelTypes & {
+    primaryKey: DexieModelPrimaryKey<ModelTypes>;
+    primaryKeyType: DexieModelPrimaryKeyType<ModelTypes>;
+  } = DefaultModelTypes,
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<

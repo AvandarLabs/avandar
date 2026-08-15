@@ -22,7 +22,7 @@ export function useMapLayerData({
 }): UseQueryResultTuple<QueryResult.T<UnknownRow>> {
   return useQuery({
     enabled: MapLayerData.isQueryable(layer),
-    queryKey: [workspaceId, ...MapLayerData.makeQueryKey(layer)],
+    queryKey: [workspaceId, ...MapLayerData.makeQueryKeyFromLayer(layer)],
     queryFn: async (): Promise<QueryResult.T<UnknownRow>> => {
       return await runStructuredQuery({
         auth: "workspace",

@@ -6,10 +6,14 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
 
 const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
   vi.hoisted(() => {
@@ -23,7 +27,7 @@ const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
 vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
   return { WorkspaceQetlClient: { runQuery: runQueryMock } };
 });
-vi.mock("@/clients/qetl/PublicQetlClient", () => {
+vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
   return { PublicQetlClient: { runQuery: publicRunQueryMock } };
 });
 vi.mock(
@@ -75,6 +79,24 @@ function _createEntityFieldConfig(
   });
 }
 
+/** An honest `Dataset`, used to ensure structured SQL is generated. */
+function _createDataset(): Dataset.T {
+  const now = new Date().toISOString();
+  return Model.make("Dataset", {
+    id: uuid<Dataset.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    dateOfLastSync: undefined,
+    description: undefined,
+    isRestricted: false,
+    name: "Cases",
+    sourceType: "csv_file",
+    ownerId: uuid<User.Id>(),
+    ownerProfileId: uuid<UserProfile.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+  });
+}
+
 describe("runStructuredQuery", () => {
   const workspaceId = uuid<Workspace.Id>();
 
@@ -103,6 +125,32 @@ describe("runStructuredQuery", () => {
     });
   });
 
+  it("runs workspace-published raw SQL against the private snapshot client", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+    publicRunQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace_published",
+      publicAvaPageId: dashboardId,
+      snapshotRevision: SNAPSHOT_REVISION,
+      query: StructuredQuery.makeEmpty(),
+      rawSql: "SELECT 1 AS one",
+    });
+
+    expect(publicRunQueryMock).toHaveBeenCalledWith({
+      rawSql: "SELECT 1 AS one",
+      dashboardId,
+      visibility: "workspace",
+      snapshotRevision: SNAPSHOT_REVISION,
+    });
+    expect(runQueryMock).not.toHaveBeenCalled();
+  });
+
   it("returns an empty result when there is nothing to run", async () => {
     const result = await runStructuredQuery({
       auth: "workspace",
@@ -115,15 +163,58 @@ describe("runStructuredQuery", () => {
     expect(result.data).toEqual([]);
   });
 
-  it("rejects a structured query on the public path", async () => {
+  it("rejects structured queries on snapshot routes", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+
     await expect(
       runStructuredQuery({
         auth: "public",
-        publicAvaPageId: uuid<Dashboard.Id>(),
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
         query: StructuredQuery.makeEmpty(),
         rawSql: undefined,
       }),
     ).rejects.toThrow(/raw SQL/i);
+
+    await expect(
+      runStructuredQuery({
+        auth: "workspace_published",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query: StructuredQuery.makeEmpty(),
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+  });
+
+  it("rejects generated structured SQL on every snapshot route", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+    const query = {
+      ...StructuredQuery.makeEmpty(),
+      dataSource: _createDataset(),
+    };
+
+    await expect(
+      runStructuredQuery({
+        auth: "public",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query,
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+
+    await expect(
+      runStructuredQuery({
+        auth: "workspace_published",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query,
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+
+    expect(publicRunQueryMock).not.toHaveBeenCalled();
   });
 
   it("remaps entity field values from field ids to field names", async () => {

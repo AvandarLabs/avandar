@@ -112,7 +112,7 @@ insert into public.dashboards (
   name,
   config,
   is_restricted,
-  is_public
+  visibility
 )
 values
   (
@@ -123,7 +123,7 @@ values
     'open dash',
     '{}'::jsonb,
     false,
-    false
+    'draft'
   ),
   (
     'a7004002-0000-4000-8000-000000000002'::uuid,
@@ -133,7 +133,7 @@ values
     'restricted dash',
     '{}'::jsonb,
     true,
-    false
+    'draft'
   )
 on conflict (id) do nothing;
 

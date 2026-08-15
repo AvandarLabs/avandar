@@ -221,7 +221,6 @@ export function SaveToDashboardModal({
         name: trimmedName,
         description: undefined,
         slug: undefined,
-        isPublic: false,
         config: seededConfig,
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),

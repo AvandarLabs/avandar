@@ -18,17 +18,26 @@ type ProportionalSymbol = Extract<
   { type: "proportionalSymbol" }
 >;
 
+type CreateMapLayerSpecOptions = {
+  layer: MapLayer.T;
+  stats: LayerStats;
+  valueColumnName: string | undefined;
+  sourceId: string;
+};
+
 /** Applies the selected scale to a numeric span. */
 function _getScaledSpan(
-  scale: ProportionalSymbol["scale"],
-  span: number,
+  options: Readonly<{
+    scale: ProportionalSymbol["scale"];
+    span: number;
+  }>,
 ): number {
-  return matchLiteral(scale, {
+  return matchLiteral(options.scale, {
     sqrt: () => {
-      return Math.sqrt(span);
+      return Math.sqrt(options.span);
     },
     linear: () => {
-      return span;
+      return options.span;
     },
   });
 }
@@ -92,7 +101,7 @@ function _buildCircleRadius({
     scaledValue,
     0,
     symbology.minRadius,
-    _getScaledSpan(symbology.scale, maximum - minimum),
+    _getScaledSpan({ scale: symbology.scale, span: maximum - minimum }),
     symbology.maxRadius,
   ];
 }
@@ -103,12 +112,7 @@ function _createMapLayerSpec({
   stats,
   valueColumnName,
   sourceId,
-}: {
-  layer: MapLayer.T;
-  stats: LayerStats;
-  valueColumnName: string | undefined;
-  sourceId: string;
-}): MapLayerSpec {
+}: Readonly<CreateMapLayerSpecOptions>): MapLayerSpec {
   const { symbology } = layer;
   return {
     id: MapLayerIds.toLayerId(layer.id),

@@ -10,8 +10,9 @@ import { msg } from "@lingui/core/macro";
 import { uuid } from "$/lib/uuid";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { match } from "ts-pattern";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient";
+import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient/PublicQetlClient";
 import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
@@ -30,7 +31,16 @@ type SortedQueryColumns = ReadonlyArray<
 /** Who is asking, which decides which QETL client answers. */
 export type StructuredQueryAuth =
   | { auth: "workspace"; workspaceId: Workspace.Id }
-  | { auth: "public"; publicAvaPageId: Dashboard.Id };
+  | {
+      auth: "public";
+      publicAvaPageId: Dashboard.Id;
+      snapshotRevision: string;
+    }
+  | {
+      auth: "workspace_published";
+      publicAvaPageId: Dashboard.Id;
+      snapshotRevision: string;
+    };
 
 /**
  * Inputs to {@link runStructuredQuery}: the query to execute, optional
@@ -62,11 +72,18 @@ async function _selectSqlForExecution(
   const { query, rawSql, isStructuredQueryInSync = true } = params;
 
   const resolved =
-    rawSql === undefined && params.auth === "workspace" ?
-      await resolveManualQueryForExecution({
-        query,
-        workspaceId: params.workspaceId,
-      })
+    rawSql === undefined ?
+      await match(params)
+        .with({ auth: "workspace" }, async ({ workspaceId }) => {
+          return await resolveManualQueryForExecution({ query, workspaceId });
+        })
+        .with({ auth: "public" }, () => {
+          return { query, didAutoLimit: false as const };
+        })
+        .with({ auth: "workspace_published" }, () => {
+          return { query, didAutoLimit: false as const };
+        })
+        .exhaustive()
     : { query, didAutoLimit: false as const };
 
   const sqlToRun = selectSqlToExecute({
@@ -83,15 +100,59 @@ async function _runRawSql(
   params: RunStructuredQueryParams,
   sqlToRun: string,
 ): Promise<QueryResult.T<UnknownRow>> {
-  return params.auth === "public" ?
-      await PublicQetlClient.runQuery({
+  return await match(params)
+    .with({ auth: "workspace" }, async ({ workspaceId }) => {
+      return await WorkspaceQetlClient.runQuery({
         rawSql: sqlToRun,
-        dashboardId: params.publicAvaPageId,
-      })
-    : await WorkspaceQetlClient.runQuery({
-        rawSql: sqlToRun,
-        workspaceId: params.workspaceId,
+        workspaceId,
       });
+    })
+    .with({ auth: "public" }, async ({ publicAvaPageId, snapshotRevision }) => {
+      return await PublicQetlClient.runQuery({
+        rawSql: sqlToRun,
+        dashboardId: publicAvaPageId,
+        visibility: "public",
+        snapshotRevision,
+      });
+    })
+    .with(
+      { auth: "workspace_published" },
+      async ({ publicAvaPageId, snapshotRevision }) => {
+        return await PublicQetlClient.runQuery({
+          rawSql: sqlToRun,
+          dashboardId: publicAvaPageId,
+          visibility: "workspace",
+          snapshotRevision,
+        });
+      },
+    )
+    .exhaustive();
+}
+
+/** Builds the translated error shown when a snapshot receives a form query. */
+function _createStructuredSnapshotQueryError(): Error {
+  return new Error(
+    i18n._(
+      msg`Public queries are not supported for structured queries. Use raw SQL instead.`,
+    ),
+  );
+}
+
+/** Returns workspace auth or rejects a snapshot's structured query. */
+function _getWorkspaceAuthFromStructuredQuery(
+  params: Readonly<RunStructuredQueryParams>,
+): Extract<StructuredQueryAuth, { auth: "workspace" }> {
+  return match(params)
+    .with({ auth: "workspace" }, (workspaceParams) => {
+      return workspaceParams;
+    })
+    .with({ auth: "public" }, () => {
+      throw _createStructuredSnapshotQueryError();
+    })
+    .with({ auth: "workspace_published" }, () => {
+      throw _createStructuredSnapshotQueryError();
+    })
+    .exhaustive();
 }
 
 /** Runs a structured query against its data source. */
@@ -207,6 +268,10 @@ function _buildEntityConfigResult(
 export async function runStructuredQuery(
   params: RunStructuredQueryParams,
 ): Promise<QueryResult.T<UnknownRow>> {
+  if (params.rawSql === undefined) {
+    _getWorkspaceAuthFromStructuredQuery(params);
+  }
+
   const { query } = params;
   const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
@@ -217,19 +282,8 @@ export async function runStructuredQuery(
     return await _runRawSql(params, sqlToRun);
   }
 
-  if (params.auth === "public") {
-    // This message reaches the user through the Data Explorer's error banner
-    // and the map's status overlay, so it is translated here rather than left
-    // as an English literal.
-    throw new Error(
-      i18n._(
-        msg`Public queries are not supported for structured queries. Use raw SQL instead.`,
-      ),
-    );
-  }
-
   return await _runSourceQuery({
-    workspaceId: params.workspaceId,
+    workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
     dataSource,
     executionQuery,
     sortedQueryColumns,

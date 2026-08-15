@@ -69,6 +69,9 @@ vi.mock("@/clients/datasets/DatasetClient", () => {
   return {
     DatasetClient: {
       insertCsvFileDataset: vi.fn(),
+      useGetAll: (): [[], boolean] => {
+        return [[], false];
+      },
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];

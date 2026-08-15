@@ -43,11 +43,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Unpinned: tracks the action's default ("latest"). The old 0.7.1 pin was
-      # a probe for the upstream "exited with status 0 before producing a JSON
-      # report" bug (millionco/react-doctor#1242); the 0.9.x line no longer
-      # reproduces it, so CI follows the same major line as the `react-doctor`
-      # devDependency in package.json rather than lagging behind it.
+      # @v1 tracks the action major and keeps CI aligned with the
+      # `react-doctor` devDependency in package.json.
       - uses: millionco/react-doctor@v1
         # Common configuration knobs — uncomment any to override the default.
         # Full reference: https://www.react.doctor/ci

@@ -6,6 +6,15 @@ import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValue
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
+type AttachMapInstanceOptions = {
+  containerRef: RefObject<HTMLDivElement | null>;
+  emptySpec: MapSpec;
+  initialView: AvaMap.ViewState;
+  instanceRefs: MapInstanceRefs;
+  latestValues: LatestMapValues;
+  setStyleLoadCount: Dispatch<SetStateAction<number>>;
+};
+
 /** Creates the MapLibre instance once and tears it down with the canvas. */
 export function useAttachMapInstance({
   containerRef,
@@ -14,14 +23,7 @@ export function useAttachMapInstance({
   instanceRefs,
   latestValues,
   setStyleLoadCount,
-}: {
-  containerRef: RefObject<HTMLDivElement | null>;
-  emptySpec: MapSpec;
-  initialView: AvaMap.ViewState;
-  instanceRefs: MapInstanceRefs;
-  latestValues: LatestMapValues;
-  setStyleLoadCount: Dispatch<SetStateAction<number>>;
-}): void {
+}: Readonly<AttachMapInstanceOptions>): void {
   const initialViewRef = useRef(initialView);
   useEffect(function constructMapInstance() {
     const container = containerRef.current;

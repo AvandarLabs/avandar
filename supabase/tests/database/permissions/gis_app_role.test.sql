@@ -4,7 +4,34 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(5);
+select plan(8);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.util__seed_builtin_role_groups_for_workspace(uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the built-in role group seeder'
+);
+
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'public.util__seed_builtin_role_groups_for_workspace(uuid)',
+    'EXECUTE'
+  ),
+  'authenticated cannot execute the built-in role group seeder'
+);
+
+select ok(
+  has_function_privilege(
+    'service_role',
+    'public.util__seed_builtin_role_groups_for_workspace(uuid)',
+    'EXECUTE'
+  ),
+  'service_role can execute the built-in role group seeder'
+);
 
 -- The enum label exists.
 select ok(

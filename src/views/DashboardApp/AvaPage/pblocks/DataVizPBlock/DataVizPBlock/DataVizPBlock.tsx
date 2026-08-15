@@ -5,6 +5,7 @@ import { WithPuckProps } from "@puckeditor/core";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { useMemo } from "react";
+import { match } from "ts-pattern";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
@@ -14,7 +15,11 @@ import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQu
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
 
@@ -36,6 +41,184 @@ export type Props = {
   vizConfig: VizConfig.T;
 } & DataVizFilterProps;
 
+type DataVizQueryState = {
+  columns: QueryResult.Column[];
+  data: UnknownDataFrame;
+  emptyStructuredQuery: ReturnType<typeof StructuredQuery.makeEmpty>;
+  isLoading: boolean;
+};
+
+function _getDataVizQueryAuth(
+  metadata: Readonly<AvaPageMetadata>,
+): StructuredQueryAuth {
+  return match(metadata)
+    .with({ auth: "workspace" }, ({ workspaceId }) => {
+      return { auth: "workspace" as const, workspaceId };
+    })
+    .with({ auth: "public" }, ({ dashboardId, snapshotRevision }) => {
+      return {
+        auth: "public" as const,
+        publicAvaPageId: dashboardId,
+        snapshotRevision,
+      };
+    })
+    .with(
+      { auth: "workspace_published" },
+      ({ dashboardId, snapshotRevision }) => {
+        return {
+          auth: "workspace_published" as const,
+          publicAvaPageId: dashboardId,
+          snapshotRevision,
+        };
+      },
+    )
+    .exhaustive();
+}
+
+function useDataVizQuery(
+  options: Readonly<{
+    filteredSql: string;
+    puck: WithPuckProps<Props>["puck"];
+  }>,
+): DataVizQueryState {
+  const metadata = useAvaPageMetadata(options.puck);
+  const emptyStructuredQuery = useMemo(() => {
+    return StructuredQuery.makeEmpty();
+  }, []);
+  const queryAuth = _getDataVizQueryAuth(metadata);
+  const [queryResults, isLoading] = useDataQuery({
+    query: emptyStructuredQuery,
+    rawSql: options.filteredSql,
+    ...queryAuth,
+  });
+  return {
+    columns: queryResults?.columns ?? [],
+    data: queryResults?.data ?? [],
+    emptyStructuredQuery,
+    isLoading,
+  };
+}
+
+type RenderDataVizContentOptions = {
+  prompt: string;
+  rawSql: string;
+  isLoading: boolean;
+  columns: QueryResult.Column[];
+  data: UnknownDataFrame;
+  dateColumns: ReadonlySet<string>;
+  displayVizConfig: VizConfig.T;
+  filterProps: DataVizFilterProps;
+  localFilterState: ReturnType<typeof useLocalFilterState>;
+};
+
+function _DataVizEmptyState(
+  options: Readonly<{ prompt: string; rawSql: string }>,
+): ReactElement | undefined {
+  const message =
+    options.prompt.length === 0 ?
+      <Trans>
+        Add a prompt and generate SQL to configure this visualization.
+      </Trans>
+    : options.rawSql.trim().length === 0 ?
+      <Trans>Run a query to see results.</Trans>
+    : undefined;
+  return message === undefined ? undefined : (
+      <Paper withBorder p="md">
+        <Text c="dimmed" fz="sm">
+          {message}
+        </Text>
+      </Paper>
+    );
+}
+
+function _renderDataVizContent(
+  options: Readonly<RenderDataVizContentOptions>,
+): ReactElement {
+  const emptyState = _DataVizEmptyState(options);
+  if (emptyState) {
+    return emptyState;
+  }
+  return (
+    <Paper
+      withBorder
+      p="lg"
+      radius="md"
+      style={{
+        boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+        backgroundColor: "var(--mantine-color-white)",
+      }}
+    >
+      <Stack gap="sm">
+        <DataVizLocalFilters
+          localFilters={options.filterProps.localFilters}
+          state={options.localFilterState}
+        />
+        <Box pos="relative" w="100%" h={420}>
+          <LoadingOverlay visible={options.isLoading} zIndex={10} />
+          <VisualizationContainer
+            columns={options.columns}
+            data={options.data}
+            dateColumns={options.dateColumns}
+            vizConfig={options.displayVizConfig}
+          />
+        </Box>
+      </Stack>
+    </Paper>
+  );
+}
+
+type DataVizDisplayState = DataVizQueryState & {
+  dateColumns: ReadonlySet<string>;
+  displayVizConfig: VizConfig.T;
+};
+
+type DataVizDisplayOptions = {
+  filteredSql: string;
+  puck: WithPuckProps<Props>["puck"];
+  rawSql: string;
+  vizConfig: VizConfig.T;
+};
+
+function useDataVizDisplayState(
+  options: Readonly<DataVizDisplayOptions>,
+): DataVizDisplayState {
+  const queryState = useDataVizQuery({
+    filteredSql: options.filteredSql,
+    puck: options.puck,
+  });
+  const dateColumns = getDateColumns(queryState.columns, queryState.data);
+  const displayVizConfig = useMemo(() => {
+    if (queryState.columns.length === 0) {
+      return options.vizConfig;
+    }
+    return applyVizConfigFromQueryResult({
+      vizConfig: options.vizConfig,
+      rawSql: options.rawSql,
+      query: queryState.emptyStructuredQuery,
+      columns: queryState.columns,
+    });
+  }, [options.rawSql, options.vizConfig, queryState]);
+  return { ...queryState, dateColumns, displayVizConfig };
+}
+
+function useDataVizFilterProps(
+  options: Readonly<{
+    globalFilterSubscription: Props["globalFilterSubscription"];
+    localFilters: Props["localFilters"];
+  }>,
+): DataVizFilterProps {
+  return useMemo(() => {
+    return {
+      globalFilterSubscription:
+        options.globalFilterSubscription ??
+        DataVizFilters.defaultGlobalFilterSubscription,
+      localFilters:
+        options.localFilters ??
+        DataVizFilters.defaultDataVizFilterProps.localFilters,
+    };
+  }, [options.globalFilterSubscription, options.localFilters]);
+}
+
 /**
  * Dashboard Puck block that renders any visualization supported by the shared
  * `VisualizationContainer` (table, bar, line, area, scatter, pie, funnel,
@@ -51,19 +234,12 @@ export function DataVizPBlock({
   globalFilterSubscription,
   localFilters,
   puck,
-}: WithPuckProps<Props>): ReactElement {
+}: Readonly<WithPuckProps<Props>>): ReactElement {
   const { prompt, rawSql } = nlQuery;
-  const metadata = useAvaPageMetadata(puck);
-
-  const filterProps: DataVizFilterProps = useMemo(() => {
-    return {
-      globalFilterSubscription:
-        globalFilterSubscription ??
-        DataVizFilters.defaultGlobalFilterSubscription,
-      localFilters:
-        localFilters ?? DataVizFilters.defaultDataVizFilterProps.localFilters,
-    };
-  }, [globalFilterSubscription, localFilters]);
+  const filterProps = useDataVizFilterProps({
+    globalFilterSubscription,
+    localFilters,
+  });
 
   const localFilterState = useLocalFilterState(filterProps.localFilters);
 
@@ -74,91 +250,23 @@ export function DataVizPBlock({
     localFilterState,
   });
 
-  const emptyStructuredQuery = useMemo(() => {
-    return StructuredQuery.makeEmpty();
-  }, []);
-
-  const [queryResults, isLoadingResults] = useDataQuery({
-    query: emptyStructuredQuery,
-    rawSql: filteredSql,
-    ...(metadata.auth === "workspace" ?
-      {
-        auth: "workspace" as const,
-        workspaceId: metadata.workspaceId,
-      }
-    : {
-        auth: "public" as const,
-        publicAvaPageId: metadata.dashboardId,
-      }),
-  });
-
-  const columns = useMemo(() => {
-    return queryResults?.columns ?? [];
-  }, [queryResults?.columns]);
-  const data = useMemo(() => {
-    return queryResults?.data ?? [];
-  }, [queryResults?.data]);
-  const dateColumns = getDateColumns(columns, data);
-
-  const displayVizConfig = useMemo(() => {
-    if (columns.length === 0) {
-      return vizConfig;
-    }
-    return applyVizConfigFromQueryResult({
+  const { columns, data, dateColumns, displayVizConfig, isLoading } =
+    useDataVizDisplayState({
+      filteredSql,
+      puck,
       vizConfig,
-      rawSql: rawSql,
-      query: emptyStructuredQuery,
-      columns,
+      rawSql,
     });
-  }, [vizConfig, rawSql, emptyStructuredQuery, columns]);
 
-  if (prompt.length === 0) {
-    return (
-      <Paper withBorder p="md">
-        <Text c="dimmed" fz="sm">
-          <Trans>
-            Add a prompt and generate SQL to configure this visualization.
-          </Trans>
-        </Text>
-      </Paper>
-    );
-  }
-
-  if (rawSql.trim().length === 0) {
-    return (
-      <Paper withBorder p="md">
-        <Text c="dimmed" fz="sm">
-          <Trans>Run a query to see results.</Trans>
-        </Text>
-      </Paper>
-    );
-  }
-
-  return (
-    <Paper
-      withBorder
-      p="lg"
-      radius="md"
-      style={{
-        boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
-        backgroundColor: "var(--mantine-color-white)",
-      }}
-    >
-      <Stack gap="sm">
-        <DataVizLocalFilters
-          localFilters={filterProps.localFilters}
-          state={localFilterState}
-        />
-        <Box pos="relative" w="100%" h={420}>
-          <LoadingOverlay visible={isLoadingResults} zIndex={10} />
-          <VisualizationContainer
-            columns={columns}
-            data={data}
-            dateColumns={dateColumns}
-            vizConfig={displayVizConfig}
-          />
-        </Box>
-      </Stack>
-    </Paper>
-  );
+  return _renderDataVizContent({
+    prompt,
+    rawSql,
+    isLoading,
+    columns,
+    data,
+    dateColumns,
+    displayVizConfig,
+    filterProps,
+    localFilterState,
+  });
 }

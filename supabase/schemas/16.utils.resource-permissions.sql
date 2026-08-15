@@ -800,3 +800,205 @@ set
     else null
   end;
 $$;
+
+/**
+ * Extracts a dashboard UUID from a published snapshot object path.
+ *
+ * Versioned snapshot objects are named
+ * `dashboards/<dashboardId>/revisions/<revision>/datasets/<datasetId>.parquet`.
+ * Legacy objects use `dashboards/<dashboardId>/datasets/<datasetId>.parquet`.
+ *
+ * Returns NULL for any name that does not match that shape, including a
+ * non-UUID id segment. NULL is DENY in the storage policies that call this:
+ * an object whose dashboard cannot be identified is not one we can prove the
+ * caller may read. Returning NULL rather than casting blindly also keeps a
+ * malformed upload a policy denial instead of a storage error.
+ *
+ * @param p_object_name The `storage.objects.name` value.
+ * @returns The dashboard UUID, or NULL when the path is not a snapshot path.
+ */
+create or replace function public.util__storage_object_dashboard_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+      or p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then split_part(p_object_name, '/', 2)::uuid
+    else null
+  end;
+$$;
+
+/**
+ * Extracts a revision UUID from an exact published snapshot object path.
+ *
+ * Exact legacy paths map to the all-zero UUID reserved for the legacy
+ * generation. Returns NULL for malformed or extended paths so storage policies
+ * fail closed instead of authorizing an object whose generation is ambiguous.
+ *
+ * @param p_object_name The `storage.objects.name` value.
+ * @returns The snapshot revision, or NULL when the path is not exact.
+ */
+create or replace function public.util__storage_object_snapshot_revision (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then split_part(p_object_name, '/', 4)::uuid
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then '00000000-0000-0000-0000-000000000000'::uuid
+    else null
+  end;
+$$;
+
+/**
+ * Whether the auth user may mutate an uncommitted dashboard snapshot object.
+ *
+ * The security-definer lookup is required because dashboard SELECT RLS can
+ * hide draft dashboards from workspace editors who still have update access.
+ * The authorization check prevents callers from using this helper to probe or
+ * mutate dashboards they cannot edit.
+ *
+ * @param p_bucket_id The `storage.objects.bucket_id` value.
+ * @param p_object_name The exact `storage.objects.name` value.
+ * @returns True only for an editor, the active staged revision, and its bucket.
+ */
+create or replace function private.util__auth_user_can_write_dashboard_snapshot_object (
+  p_bucket_id text,
+  p_object_name text
+) returns boolean language plpgsql security definer volatile
+set
+  search_path = '' as $$
+declare
+  can_write boolean;
+begin
+  select
+    public.util__auth_user_can_update_resource (
+      'dashboard'::public.resource_type,
+      dashboards.id
+    ) and
+    dashboards.snapshot_transition_kind = 'publish' and
+    dashboards.snapshot_transition_revision =
+      public.util__storage_object_snapshot_revision (p_object_name) and
+    (
+      (
+        dashboards.snapshot_transition_target_visibility = 'public' and
+        p_bucket_id = 'published'
+      ) or (
+        dashboards.snapshot_transition_target_visibility = 'workspace' and
+        p_bucket_id = 'published-private'
+      )
+    )
+  into can_write
+  from public.dashboards
+  where
+    dashboards.id = public.util__storage_object_dashboard_id (p_object_name)
+  for share;
+
+  return coalesce(can_write, false);
+end;
+$$;
+
+revoke all on function private.util__auth_user_can_write_dashboard_snapshot_object (
+  text,
+  text
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function private.util__auth_user_can_write_dashboard_snapshot_object (
+  text,
+  text
+) to authenticated;
+
+/**
+ * Whether the auth user may delete a dashboard snapshot object.
+ *
+ * @param p_bucket_id The `storage.objects.bucket_id` value.
+ * @param p_object_name The exact `storage.objects.name` value.
+ * Delete transitions require admin access. Other cleanup paths require editor
+ * access because editors may unpublish or abort their own publication attempt.
+ *
+ * @returns True only with the required role and matching durable cleanup claim.
+ */
+create or replace function private.util__auth_user_can_delete_dashboard_snapshot_object (
+  p_bucket_id text,
+  p_object_name text
+) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select coalesce(
+    exists (
+      select 1
+      from public.dashboards
+      where
+        dashboards.id = public.util__storage_object_dashboard_id (
+          p_object_name
+        ) and
+        case dashboards.snapshot_transition_kind
+          when 'delete' then
+            public.util__auth_user_can_delete_resource (
+              'dashboard'::public.resource_type,
+              dashboards.id
+            )
+          else
+            public.util__auth_user_can_update_resource (
+              'dashboard'::public.resource_type,
+              dashboards.id
+            )
+        end and
+        case dashboards.snapshot_transition_kind
+          when 'unpublish' then true
+          when 'delete' then true
+          when 'abort_publish' then
+            dashboards.snapshot_transition_revision =
+              public.util__storage_object_snapshot_revision (p_object_name) and
+            (
+              (
+                dashboards.snapshot_transition_target_visibility = 'public' and
+                p_bucket_id = 'published'
+              ) or (
+                dashboards.snapshot_transition_target_visibility = 'workspace' and
+                p_bucket_id = 'published-private'
+              )
+            )
+          when 'publish' then
+            dashboards.snapshot_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name) and
+            dashboards.snapshot_transition_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name)
+          else
+            dashboards.snapshot_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name)
+        end
+    ),
+    false
+  );
+$$;
+
+revoke all on function private.util__auth_user_can_delete_dashboard_snapshot_object (
+  text,
+  text
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function private.util__auth_user_can_delete_dashboard_snapshot_object (
+  text,
+  text
+) to authenticated;

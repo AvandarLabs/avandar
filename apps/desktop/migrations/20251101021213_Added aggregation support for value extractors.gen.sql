@@ -5,25 +5,20 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 42
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 6
-drop index if exists "idx_value_extractors__aggregation__entity_field_config_id_works";
+DROP INDEX IF EXISTS "idx_value_extractors__aggregation__entity_field_config_id_works";
 
-drop index if exists "value_extractors__aggregation_entity_field_config_id_key";
+DROP INDEX IF EXISTS "value_extractors__aggregation_entity_field_config_id_key";
 
-drop index if exists "value_extractors__aggregation_pkey";
+DROP INDEX IF EXISTS "value_extractors__aggregation_pkey";
 
-drop table "value_extractors__aggregation";
+DROP TABLE "value_extractors__aggregation";
 
-alter table "entity_field_configs"
-drop column "base_data_type";
+ALTER TABLE "entity_field_configs" DROP COLUMN "base_data_type";
 
-alter table "entity_field_configs"
-drop column "class";
+ALTER TABLE "entity_field_configs" DROP COLUMN "class";
 
-alter table "entity_field_configs"
-add column "data_type" datasets__ava_data_type not null;
+ALTER TABLE "entity_field_configs" ADD COLUMN "data_type" datasets__ava_data_type NOT NULL;
 
-alter table "value_extractors__dataset_column_value"
-drop column "dataset_field_id";
+ALTER TABLE "value_extractors__dataset_column_value" DROP COLUMN "dataset_field_id";
 
-alter table "value_extractors__dataset_column_value"
-add column "dataset_column_id" uuid not null;
+ALTER TABLE "value_extractors__dataset_column_value" ADD COLUMN "dataset_column_id" UUID NOT NULL;

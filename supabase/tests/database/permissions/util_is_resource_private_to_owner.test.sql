@@ -30,12 +30,15 @@ values
 -- d1 restricted no shares (private), d2 restricted + share (not private),
 -- d3 unrestricted no shares (not private), d4 public + restricted no shares
 -- (generic predicate still says private; callers add the visibility term).
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
+)
 values
-  ('a2005001-0000-4000-8000-000000000001'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, false),
-  ('a2005002-0000-4000-8000-000000000002'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'shared', '{}'::jsonb, true, false),
-  ('a2005003-0000-4000-8000-000000000003'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'unrestricted', '{}'::jsonb, false, false),
-  ('a2005004-0000-4000-8000-000000000004'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'public restricted', '{}'::jsonb, true, true);
+  ('a2005001-0000-4000-8000-000000000001'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, 'draft', null),
+  ('a2005002-0000-4000-8000-000000000002'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'shared', '{}'::jsonb, true, 'draft', null),
+  ('a2005003-0000-4000-8000-000000000003'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'unrestricted', '{}'::jsonb, false, 'draft', null),
+  ('a2005004-0000-4000-8000-000000000004'::uuid, 'a2001001-0000-4000-8000-000000000001'::uuid, 'a2000001-0000-4000-8000-000000000001'::uuid, 'a2003001-0000-4000-8000-000000000001'::uuid, 'public restricted', '{}'::jsonb, true, 'public', 'a2005104-0000-4000-8000-000000000004'::uuid);
 
 insert into public.resource_shares (id, workspace_id, resource_type, resource_id, principal_type, principal_id, role)
 values (

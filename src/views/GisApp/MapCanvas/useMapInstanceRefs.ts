@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
 import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
 import type { Map as MapLibreMap } from "maplibre-gl";
 
@@ -7,7 +7,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 export function useMapInstanceRefs(): MapInstanceRefs {
   return {
     mapRef: useRef<MapLibreMap | undefined>(undefined),
-    appliedSpecRef: useRef(EMPTY_MAP_SPEC),
+    appliedSpecRef: useRef(MapInstanceHelpers.emptySpec),
     appliedStyleKeyRef: useRef<string | undefined>(undefined),
     isStyleSwapPendingRef: useRef(false),
   };

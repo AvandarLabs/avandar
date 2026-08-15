@@ -28,7 +28,50 @@ type Props = {
 
   /** Dashboard id used for public-page queries when `workspaceId` is unset. */
   dashboardId: Dashboard.Id;
+
+  /** Revision of the published snapshot used by public-page queries. */
+  snapshotRevision: string;
 };
+
+type RenderVizConfigContentOptions = Pick<Props, "value" | "onChange"> & {
+  rawSql: string;
+  columns: Parameters<typeof VizSettingsFormBody>[0]["columns"];
+  data: Parameters<typeof VizSettingsFormBody>[0]["data"];
+};
+
+function _renderVizConfigContent(
+  options: Readonly<RenderVizConfigContentOptions>,
+): ReactElement {
+  const { value, onChange, rawSql, columns, data } = options;
+  if (value.vizType === "table") {
+    return (
+      <Box>
+        <Text c="dimmed" fz="sm">
+          <Trans>The table visualization has no extra settings.</Trans>
+        </Text>
+      </Box>
+    );
+  }
+  if (rawSql.trim().length === 0) {
+    return (
+      <Box>
+        <Text c="dimmed" fz="sm">
+          <Trans>Generate a query to configure this visualization.</Trans>
+        </Text>
+      </Box>
+    );
+  }
+  return (
+    <Box>
+      <VizSettingsFormBody
+        columns={columns}
+        data={data}
+        vizConfig={value}
+        onVizConfigChange={onChange}
+      />
+    </Box>
+  );
+}
 
 /**
  * Puck custom field that renders the per-viz-type controls for a `VizConfig`.
@@ -45,7 +88,8 @@ export function VizConfigPField({
   onChange,
   workspaceId,
   dashboardId,
-}: Props): ReactElement {
+  snapshotRevision,
+}: Readonly<Props>): ReactElement {
   const selectedItem = usePuckSelector((state) => {
     return state.selectedItem;
   });
@@ -68,40 +112,15 @@ export function VizConfigPField({
     : {
         auth: "public" as const,
         publicAvaPageId: dashboardId,
+        snapshotRevision,
       }),
   });
 
-  const columns = queryResults?.columns ?? [];
-  const data = queryResults?.data ?? [];
-
-  if (value.vizType === "table") {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>The table visualization has no extra settings.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-
-  if (rawSql.trim().length === 0) {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>Generate a query to configure this visualization.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-
-  return (
-    <Box>
-      <VizSettingsFormBody
-        columns={columns}
-        data={data}
-        vizConfig={value}
-        onVizConfigChange={onChange}
-      />
-    </Box>
-  );
+  return _renderVizConfigContent({
+    value,
+    onChange,
+    rawSql,
+    columns: queryResults?.columns ?? [],
+    data: queryResults?.data ?? [],
+  });
 }

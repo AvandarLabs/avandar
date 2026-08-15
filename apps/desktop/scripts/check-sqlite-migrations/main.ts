@@ -26,7 +26,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { runGenerator } from "../gen-sqlite-migrations/runGenerator";
+import { runGenerator } from "../gen-sqlite-migrations/runGenerator/runGenerator";
 import { compare, formatDiff } from "./compare";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -48,11 +48,14 @@ function readGeneratedFiles(dir: string): Map<string, string> {
   return out;
 }
 
-const tempDir = mkdtempSync(join(tmpdir(), "ava-sqlite-mig-check-"));
+const temporaryDirectory = mkdtempSync(join(tmpdir(), "ava-sqlite-mig-check-"));
 try {
-  runGenerator({ sourceDir: PG_MIGRATIONS_DIR, outDir: tempDir });
+  runGenerator({
+    sourceDirectory: PG_MIGRATIONS_DIR,
+    outputDirectory: temporaryDirectory,
+  });
   const committed = readGeneratedFiles(COMMITTED_DIR);
-  const fresh = readGeneratedFiles(tempDir);
+  const fresh = readGeneratedFiles(temporaryDirectory);
   const diffs = compare({ committed, fresh });
 
   if (diffs.length === 0) {
@@ -68,5 +71,5 @@ try {
   });
   process.exit(1);
 } finally {
-  rmSync(tempDir, { recursive: true, force: true });
+  rmSync(temporaryDirectory, { recursive: true, force: true });
 }

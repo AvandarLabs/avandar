@@ -1,7 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { redirect } from "@tanstack/react-router";
 import { Permissions } from "$/models/Permissions/Permissions";
-import { UserId } from "$/models/User/User.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -12,6 +11,7 @@ import type {
   PermissionKey,
   RoleLevel,
 } from "$/models/Permissions/Permissions.types";
+import type { User } from "$/models/User/User";
 
 /**
  * Optional fallback for `checkUserPermissions` that lets a user reach a
@@ -26,6 +26,115 @@ export type ResourceFallback = {
   /** Minimum effective role on the resource to allow access. */
   minRole: RoleLevel;
 };
+
+type PermissionCheckOptions = {
+  permissionKey: PermissionKey;
+  appLabel: string | (() => string);
+  resourceFallback?: ResourceFallback;
+};
+
+type PermissionLoadContext = {
+  context: { queryClient: QueryClient };
+  params: { workspaceSlug: string };
+};
+
+type PermissionContext = {
+  extraParams: Record<string, string | undefined>;
+  queryClient: QueryClient;
+  rolesMatrix: Awaited<ReturnType<typeof UserClient.getUserAppRoles>>;
+  workspaceSlug: string;
+};
+
+async function _getPermissionContext(
+  loadContext: Readonly<PermissionLoadContext>,
+): Promise<PermissionContext> {
+  const { queryClient } = loadContext.context;
+  const { workspaceSlug } = loadContext.params;
+  const workspaces = await WorkspaceClient.withCache(queryClient)
+    .withFetchQuery()
+    .getWorkspacesOfCurrentUser();
+  const workspace = workspaces.find(propEq("slug", workspaceSlug));
+  if (!workspace) {
+    throw redirect({ to: AppLinks.invalidWorkspace.to });
+  }
+  const session = await AuthClient.getCurrentSession();
+  if (!session?.user?.id) {
+    throw redirect({ to: "/signin" });
+  }
+  const rolesMatrix = await UserClient.withCache(queryClient)
+    .withFetchQuery()
+    .getUserAppRoles({
+      workspaceId: workspace.id,
+      userId: session.user.id as User.Id,
+    });
+  return {
+    extraParams: loadContext.params as Record<string, string | undefined>,
+    queryClient,
+    rolesMatrix,
+    workspaceSlug,
+  };
+}
+
+async function _checkUserPermissions(
+  options: Readonly<{
+    permissionOptions: Readonly<PermissionCheckOptions>;
+    loadContext: Readonly<PermissionLoadContext>;
+  }>,
+): Promise<void> {
+  const { permissionOptions, loadContext } = options;
+  const context = await _getPermissionContext(loadContext);
+  if (
+    Permissions.rolesMatrixHasPermission({
+      roles: context.rolesMatrix,
+      permissionKey: permissionOptions.permissionKey,
+    })
+  ) {
+    return;
+  }
+  if (
+    await _canUseResourceFallback({
+      permissionOptions,
+      extraParams: context.extraParams,
+      queryClient: context.queryClient,
+    })
+  ) {
+    return;
+  }
+  throw redirect({
+    to: "/$workspaceSlug/access-denied",
+    params: { workspaceSlug: context.workspaceSlug },
+    search: {
+      app:
+        typeof permissionOptions.appLabel === "function" ?
+          permissionOptions.appLabel()
+        : permissionOptions.appLabel,
+    },
+  });
+}
+
+async function _canUseResourceFallback(
+  options: Readonly<{
+    permissionOptions: Readonly<PermissionCheckOptions>;
+    extraParams: Readonly<Record<string, string | undefined>>;
+    queryClient: QueryClient;
+  }>,
+): Promise<boolean> {
+  const { resourceFallback } = options.permissionOptions;
+  if (!resourceFallback) {
+    return false;
+  }
+  const resourceId = options.extraParams[resourceFallback.idParam];
+  if (!resourceId) {
+    return false;
+  }
+  return UserClient.withCache(options.queryClient)
+    .withFetchQuery()
+    .canAccessResource({
+      resourceType: resourceFallback.type,
+      resourceId,
+      minRole: resourceFallback.minRole,
+    });
+}
 
 export const RouteMiddleware = {
   BeforeLoad: {
@@ -56,81 +165,12 @@ export const RouteMiddleware = {
       permissionKey,
       appLabel,
       resourceFallback,
-    }: {
-      permissionKey: PermissionKey;
-      appLabel: string | (() => string);
-      resourceFallback?: ResourceFallback;
-    }) => {
-      return async (loadContext: {
-        context: { queryClient: QueryClient };
-        params: { workspaceSlug: string };
-      }): Promise<void> => {
-        const {
-          context: { queryClient },
-          params: { workspaceSlug },
-        } = loadContext;
-        // Resource fallback may reference dynamic child params (e.g.
-        // datasetId, dashboardId). Reading those requires loosening the
-        // typed-params view since the parent route only declares
-        // `workspaceSlug` in its contract.
-        const extraParams = loadContext.params as Record<
-          string,
-          string | undefined
-        >;
-        const workspaces = await WorkspaceClient.withCache(queryClient)
-          .withFetchQuery()
-          .getWorkspacesOfCurrentUser();
-        const workspace = workspaces.find(propEq("slug", workspaceSlug));
-
-        if (!workspace) {
-          throw redirect({ to: AppLinks.invalidWorkspace.to });
-        }
-
-        const session = await AuthClient.getCurrentSession();
-        const userId = session?.user?.id;
-        if (!userId) {
-          throw redirect({ to: "/signin" });
-        }
-
-        const rolesMatrix = await UserClient.withCache(queryClient)
-          .withFetchQuery()
-          .getUserAppRoles({
-            workspaceId: workspace.id,
-            userId: userId as UserId,
-          });
-
-        if (
-          Permissions.rolesMatrixHasPermission({
-            roles: rolesMatrix,
-            permissionKey: permissionKey,
-          })
-        ) {
-          return;
-        }
-
-        if (resourceFallback) {
-          const resourceId = extraParams[resourceFallback.idParam];
-          if (resourceId) {
-            const canAccess = await UserClient.withCache(queryClient)
-              .withFetchQuery()
-              .canAccessResource({
-                resourceType: resourceFallback.type,
-                resourceId: resourceId,
-                minRole: resourceFallback.minRole,
-              });
-            if (canAccess) {
-              return;
-            }
-          }
-        }
-
-        throw redirect({
-          to: "/$workspaceSlug/access-denied",
-          params: { workspaceSlug: workspaceSlug },
-          search: {
-            app: typeof appLabel === "function" ? appLabel() : appLabel,
-          },
-        });
+    }: Readonly<PermissionCheckOptions>) => {
+      const permissionOptions = { permissionKey, appLabel, resourceFallback };
+      return async (
+        loadContext: Readonly<PermissionLoadContext>,
+      ): Promise<void> => {
+        return _checkUserPermissions({ permissionOptions, loadContext });
       };
     },
   },

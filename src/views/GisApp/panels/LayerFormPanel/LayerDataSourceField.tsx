@@ -10,7 +10,7 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 export function LayerDataSourceField({
   layer,
   onLayerChange,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <QueryDataSourceSelect
       value={layer.source.dataSource ?? null}

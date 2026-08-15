@@ -1,12 +1,9 @@
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterAll, describe, expect, it, vi } from "vitest";
-import {
-  AvaDexieVersionManager,
-  CURRENT_AVA_DEXIE_VERSION,
-} from "./dexieVersions";
+import { AvaDexieVersionManager } from "./dexieVersions";
 
-const db = AvaDexieVersionManager.getVersion("v7");
+const db = AvaDexieVersionManager.getVersion("v8");
 
 const v5Schemas = {
   LocalDatasetEntry: {
@@ -32,25 +29,71 @@ const v5Schemas = {
 } as const;
 
 const v7Schemas = v5Schemas;
+const v8Schemas = {
+  ...v7Schemas,
+  LocalPublicDataset: {
+    primaryKey: "[dashboardId+datasetId]",
+    indexes: ["dashboardId"],
+  },
+} as const;
 
 afterAll(async () => {
   await db.delete();
 });
 
-describe("AvaDexie v7 schema", () => {
+async function _seedLegacyDatabase(): Promise<void> {
+  const legacyDatabase = new Dexie("AvandarDB");
+  legacyDatabase.version(6).stores({
+    meta: "&key",
+    LocalDataset: "&datasetId,userId,workspaceId",
+    LocalPublicDataset: "&datasetId,dashboardId",
+    ConsentAuditEntry: "&id,workspaceId,userId,timestamp,context,decision",
+    ClarificationAuditEntry: "&id,workspaceId,timestamp,outcome,turnNumber",
+    PlanAnnotation: "&id,planId,createdAt",
+    PlanStepBlob: "&id,planId,stepId,savedAt",
+  });
+  await legacyDatabase.open();
+  await legacyDatabase.table("ConsentAuditEntry").put({
+    id: "preserved-entry",
+  });
+  await legacyDatabase.table("LocalPublicDataset").put({
+    dashboardId: "old-dashboard",
+    datasetId: "old-dataset",
+  });
+  await legacyDatabase.table("PlanAnnotation").put({
+    id: "deleted-annotation",
+  });
+  await legacyDatabase.table("PlanStepBlob").put({ id: "deleted-step" });
+  legacyDatabase.close();
+}
+
+async function _assertLegacyMigrationResult(): Promise<void> {
+  await expect(
+    db.table("ConsentAuditEntry").get("preserved-entry"),
+  ).resolves.toMatchObject({ id: "preserved-entry" });
+  await expect(
+    db.table("LocalPublicDataset").get(["old-dashboard", "old-dataset"]),
+  ).resolves.toBeUndefined();
+  const tableNames = db.tables.map(({ name }) => {
+    return name;
+  });
+  expect(tableNames).not.toContain("PlanAnnotation");
+  expect(tableNames).not.toContain("PlanStepBlob");
+}
+
+describe("AvaDexie v8 schema", () => {
   it("is current and removes the planning tables", async () => {
     await db.open();
 
-    expect(CURRENT_AVA_DEXIE_VERSION).toBe("v7");
     expect(
       db.tables
         .map(({ name }) => {
           return name;
         })
         .sort(),
-    ).toEqual([...Object.keys(v7Schemas), "meta"].sort());
+    ).toEqual([...Object.keys(v8Schemas), "meta"].sort());
 
-    Object.entries(v7Schemas).forEach(
+    Object.entries(v8Schemas).forEach(
       ([tableName, { primaryKey, indexes }]) => {
         const table = db.table(tableName);
 
@@ -64,26 +107,20 @@ describe("AvaDexie v7 schema", () => {
     );
   });
 
-  it("drops planning rows while preserving existing privacy audit rows", async () => {
+  it("keys the public snapshot cache by dashboard and dataset together", () => {
+    // Two dashboards can publish the same dataset with different slices. Keyed
+    // by datasetId alone they overwrite each other, so a private snapshot can
+    // be served into a public dashboard's render.
+    expect(db.LocalPublicDataset.schema.primKey.keyPath).toEqual([
+      "dashboardId",
+      "datasetId",
+    ]);
+  });
+
+  it("clears public snapshot cache while preserving existing privacy audit rows", async () => {
     db.close();
     await Dexie.delete("AvandarDB");
-
-    const v6Database = new Dexie("AvandarDB");
-    v6Database.version(6).stores({
-      meta: "&key",
-      LocalDataset: "&datasetId,userId,workspaceId",
-      LocalPublicDataset: "&datasetId,dashboardId",
-      ConsentAuditEntry: "&id,workspaceId,userId,timestamp,context,decision",
-      ClarificationAuditEntry: "&id,workspaceId,timestamp,outcome,turnNumber",
-      PlanAnnotation: "&id,planId,createdAt",
-      PlanStepBlob: "&id,planId,stepId,savedAt",
-    });
-    await v6Database.open();
-    await v6Database.table("ConsentAuditEntry").put({ id: "preserved-entry" });
-    await v6Database.table("PlanAnnotation").put({ id: "deleted-annotation" });
-    await v6Database.table("PlanStepBlob").put({ id: "deleted-step" });
-    v6Database.close();
-
+    await _seedLegacyDatabase();
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
       // JSDOM does not implement the application reload triggered by upgrades.
     });
@@ -93,18 +130,6 @@ describe("AvaDexie v7 schema", () => {
       consoleError.mockRestore();
     }
 
-    await expect(
-      db.table("ConsentAuditEntry").get("preserved-entry"),
-    ).resolves.toMatchObject({ id: "preserved-entry" });
-    expect(
-      db.tables.map(({ name }) => {
-        return name;
-      }),
-    ).not.toContain("PlanAnnotation");
-    expect(
-      db.tables.map(({ name }) => {
-        return name;
-      }),
-    ).not.toContain("PlanStepBlob");
+    await _assertLegacyMigrationResult();
   });
 });

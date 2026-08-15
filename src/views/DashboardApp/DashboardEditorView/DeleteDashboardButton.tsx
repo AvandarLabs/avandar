@@ -14,27 +14,76 @@ type Props = {
   dashboardId: Dashboard.Id | undefined;
 };
 
-export function DeleteDashboardButton({
-  workspaceSlug,
-  dashboardId,
-}: Props): ReactElement {
-  const { t } = useLingui();
+type DeleteConfirmationCopy = {
+  notLoaded: string;
+  title: string;
+  body: string;
+  confirm: string;
+  cancel: string;
+};
+
+function useDeleteDashboard(
+  options: Readonly<Props & { successMessage: string }>,
+): {
+  deleteDashboard: (options: Readonly<{ id: Dashboard.Id }>) => void;
+  isDeleting: boolean;
+} {
   const navigate = useNavigate();
-  const [deleteDashboard, isDeleting] = DashboardClient.useDelete({
+  const [deleteDashboard, isDeleting] = DashboardClient.useFullDelete({
     queriesToInvalidate:
-      dashboardId ?
+      options.dashboardId ?
         [
           DashboardClient.QueryKeys.getAll(),
-          DashboardClient.QueryKeys.getById({ id: dashboardId }),
+          DashboardClient.QueryKeys.getById({ id: options.dashboardId }),
         ]
       : undefined,
     onSuccess: async () => {
-      notifySuccess(t`Dashboard deleted successfully!`);
+      notifySuccess(options.successMessage);
       await navigate({
         to: "/$workspaceSlug/dashboards",
-        params: { workspaceSlug },
+        params: { workspaceSlug: options.workspaceSlug },
       });
     },
+  });
+  return { deleteDashboard, isDeleting };
+}
+
+function _openDeleteConfirmation(
+  options: Readonly<{
+    dashboardId: Dashboard.Id | undefined;
+    deleteDashboard: (options: Readonly<{ id: Dashboard.Id }>) => void;
+    copy: DeleteConfirmationCopy;
+  }>,
+): void {
+  if (!options.dashboardId) {
+    notifyError({ message: options.copy.notLoaded });
+    return;
+  }
+  const dashboardId = options.dashboardId;
+  modals.openConfirmModal({
+    title: options.copy.title,
+    children: options.copy.body,
+    labels: {
+      confirm: options.copy.confirm,
+      cancel: options.copy.cancel,
+    },
+    confirmProps: { color: "danger" },
+    onConfirm: () => {
+      options.deleteDashboard({ id: dashboardId });
+    },
+  });
+}
+
+/** Deletes the active dashboard after an irreversible-action confirmation. */
+export function DeleteDashboardButton({
+  workspaceSlug,
+  dashboardId,
+}: Readonly<Props>): ReactElement {
+  const { t } = useLingui();
+  const { deleteDashboard, isDeleting } = useDeleteDashboard({
+    dashboardId,
+    workspaceSlug,
+    successMessage: t`Dashboard deleted successfully!`,
   });
 
   return (
@@ -46,18 +95,15 @@ export function DeleteDashboardButton({
       loading={isDeleting}
       disabled={!dashboardId}
       onClick={() => {
-        if (!dashboardId) {
-          notifyError({ message: "Dashboard is not loaded yet." });
-          return;
-        }
-
-        modals.openConfirmModal({
-          title: t`Delete dashboard?`,
-          children: t`This cannot be undone.`,
-          labels: { confirm: t`Delete`, cancel: t`Cancel` },
-          confirmProps: { color: "danger" },
-          onConfirm: () => {
-            deleteDashboard({ id: dashboardId });
+        _openDeleteConfirmation({
+          dashboardId,
+          deleteDashboard,
+          copy: {
+            notLoaded: t`Dashboard is not loaded yet.`,
+            title: t`Delete dashboard?`,
+            body: t`This cannot be undone.`,
+            confirm: t`Delete`,
+            cancel: t`Cancel`,
           },
         });
       }}

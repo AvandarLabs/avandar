@@ -177,6 +177,47 @@ describe("bootstrapSnapshotIfNeeded", () => {
     db.close();
   });
 
+  it("omits generated columns from dense Supabase rows", async () => {
+    const db = openSqliteDatabase(join(dir, "test.sqlite"));
+    runMigrations(db, [
+      {
+        name: "001.sql",
+        sql: `create table dashboards (
+          id text primary key,
+          visibility text not null,
+          is_public integer generated always as (
+            case when visibility = 'public' then 1 else 0 end
+          ) virtual
+        );`,
+      },
+    ]);
+    const { rest } = makeRest({
+      dashboards: [
+        { id: "public", visibility: "public", is_public: true },
+        { id: "draft", visibility: "draft", is_public: false },
+      ],
+    });
+
+    await bootstrapSnapshotIfNeeded({
+      db,
+      rest,
+      accessToken: "token",
+      tables: ["dashboards"],
+    });
+
+    const rows = db
+      .query<
+        { id: string; is_public: number; visibility: string },
+        []
+      >("select id, visibility, is_public from dashboards order by id")
+      .all();
+    expect(rows).toEqual([
+      { id: "draft", visibility: "draft", is_public: 0 },
+      { id: "public", visibility: "public", is_public: 1 },
+    ]);
+    db.close();
+  });
+
   it("rolls back a table's batch if any single insert fails", async () => {
     const db = openSqliteDatabase(join(dir, "test.sqlite"));
     runMigrations(db, [

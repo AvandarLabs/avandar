@@ -115,6 +115,9 @@ export function classifyStatement(sql: string): StatementKind {
   if (/^create\s+(or\s+replace\s+)?extension\b/.test(t)) {
     return "drop";
   }
+  if (/^create\s+schema\b/.test(t)) {
+    return "drop";
+  }
   if (/^comment\s+on\b/.test(t)) {
     return "drop";
   }
@@ -230,7 +233,7 @@ function _splitOnUnquotedSemicolons(raw: string): string[] {
  */
 const _PRIMARY_TABLE_PATTERNS: RegExp[] = [
   /^\s*(?:create|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
-  /^\s*create\s+(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\s+)?on\s+(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
+  /^\s*create\s+(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\s+)?on\s+(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
 ];
 
 function _findPrimaryTable(sql: string): string | undefined {

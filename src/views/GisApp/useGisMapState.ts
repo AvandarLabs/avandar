@@ -5,13 +5,15 @@ import { useCallback, useState } from "react";
 const DEFAULT_MAP_NAME = "Untitled map";
 const DEFAULT_LAYER_NAME = "Layer 1";
 
-/** Holds the editable in-memory map and applies immutable layer updates. */
-export function useGisMapState(): {
+type GisMapState = {
   avaMap: AvaMap.T;
   layer: MapLayer.T;
   updateLayer: (update: (current: MapLayer.T) => MapLayer.T) => void;
   updateBasemap: (basemap: AvaMap.Basemap) => void;
-} {
+};
+
+/** Holds the editable in-memory map and applies immutable layer updates. */
+export function useGisMapState(): GisMapState {
   const [avaMap, setAvaMap] = useState(() => {
     const emptyMap = AvaMap.makeEmpty(DEFAULT_MAP_NAME);
     return {
@@ -24,13 +26,12 @@ export function useGisMapState(): {
       setAvaMap((currentMap) => {
         const currentLayer = currentMap.layers[0]!;
         const updatedLayer = update(currentLayer);
-        if (updatedLayer === currentLayer) {
-          return currentMap;
-        }
-        return {
-          ...currentMap,
-          layers: [updatedLayer, ...currentMap.layers.slice(1)],
-        };
+        return updatedLayer === currentLayer ? currentMap : (
+            {
+              ...currentMap,
+              layers: [updatedLayer, ...currentMap.layers.slice(1)],
+            }
+          );
       });
     },
     [],

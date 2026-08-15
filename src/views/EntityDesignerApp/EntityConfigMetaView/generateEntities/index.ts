@@ -133,9 +133,9 @@ export async function generateEntities(
   // optimization that can be done to only upsert new rows or rows that have
   // a new name. There is no need to upsert rows that already exist and have
   // not changed.
-  const jobSummary = await DuckDbClient.forEachQueryPage<Entity.T<"DBRead">>(
-    { tableName: entityConfig.id, castTimestampsToISO: true },
-    async (page) => {
+  const jobSummary = await DuckDbClient.forEachQueryPage<Entity.T<"DBRead">>({
+    query: { tableName: entityConfig.id, castTimestampsToISO: true },
+    callback: async (page) => {
       await EntityClient.crudFunctions.bulkInsert({
         data: page.data,
         upsert: true,
@@ -146,7 +146,7 @@ export async function generateEntities(
         logger: Logger,
       });
     },
-  );
+  });
 
   Logger.log(`Finished upserting all pages`, jobSummary);
 }

@@ -57,6 +57,15 @@ type Schemas = {
       ClarificationAuditEntry.Model,
     ];
   };
+  v8: {
+    version: 8;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+    ];
+  };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -205,9 +214,46 @@ const DBDefinitions = [
       await deleteObsoleteIndexedDBs();
     },
   }),
+
+  // Keys the public snapshot cache on [dashboardId+datasetId]. A dataset ID
+  // cannot identify a dashboard snapshot because dashboards may publish
+  // different slices of the same dataset. The upgrader clears unattributable
+  // cache rows, which can be downloaded again safely.
+  AvaDexieVersionManager.defineVersion<8>({
+    db,
+    version: 8,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: ["dashboardId", "datasetId"],
+        columnsToIndex: ["dashboardId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
+    },
+
+    upgrader: async (tx) => {
+      await tx.table("LocalPublicDataset").clear();
+    },
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
 /** Registry key for the current AvaDexie schema version. */
-export const CURRENT_AVA_DEXIE_VERSION = "v7" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v8" as const satisfies keyof Schemas;
