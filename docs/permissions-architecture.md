@@ -256,7 +256,7 @@ membership so a “Health” group share on a dataset reaches only users who can
 already see `data_sources` at all. The flag has no effect on `user` or
 `workspace` principals.
 
-### 4.1 Known asymmetry: viewers see more than editors
+### 4.1 By design: a workspace-wide editor role grants less read than viewer
 
 For a **non-restricted** dashboard, `util__auth_user_may_select_dashboard`
 returns true for any member whose Dashboards app role ranks below `editor`, and
@@ -275,22 +275,30 @@ Dashboards app role at all is rejected earlier and does not benefit; the
 the rank comparison, so an editor who owns the row, is a Settings Admin or
 workspace owner, or holds any share still sees it.
 
-This predates the private-dashboards work and was unobservable while the
-dashboards index filtered on `owner_id`. P3 removed that filter, so it is now a
-visible product behavior. It is documented rather than changed because
-correcting it is a permission-model decision with its own pgTAP truth tables to
-update. See
-`docs/superpowers/specs/2026-08-15-private-dashboards-merged-share-surface-design.md`
-section 8.
+**This is deliberate, not a defect.** It arrived with the permissions UI in
+#209, and the docstring of `util__auth_user_may_select_dataset` states the
+intent directly: it "blocks workspace members whose only grant on an
+unrestricted row is a workspace-wide app role at editor+ (e.g. Global Editor)
+from reading another user's dataset, while keeping viewers, owners,
+settings/workspace managers, restricted-resource paths, and explicit
+`resource_shares` grants." A viewer role is read-only and therefore harmless to
+hand the workspace's unrestricted content; a blanket Global Editor role is not,
+because reading is the first step to editing something nobody gave you. The
+same shape exists in `util__auth_user_may_select_dashboard` for the same
+reason.
 
-That function also has no `visibility` check at all. It reads `is_public` (the
-stored generated column that is true only for `visibility = 'public'`) and
-`is_restricted`, and nothing distinguishes `draft` from `workspace`. A `draft`
-dashboard shared with someone as a viewer is therefore SELECT-able by them, so
-it appears in their dashboards index, while the preview route denies it. The
-result is a card that renders and then refuses to open. P3 enforces the draft
-rule in the client only; moving it into this function would close both gaps at
-once.
+It was unobservable while the dashboards index filtered on `owner_id`. P3
+removed that filter, so it is now visible in the product: promoting a member
+from viewer to editor shrinks their dashboard list until someone shares those
+dashboards with them explicitly. That is the intended trade, and it is recorded
+here so the next reader does not mistake it for a bug and "fix" it. Widening it
+would grant every Global Editor read access to every colleague's unrestricted
+dashboard and dataset.
+
+An earlier draft of this section called it an asymmetry to settle. That was
+wrong, and the review that prompted this paragraph reached the same wrong
+conclusion from the code alone; the rationale lives only in the dataset
+function's docstring, which is why it is repeated here.
 
 ```mermaid
 flowchart LR

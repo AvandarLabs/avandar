@@ -505,12 +505,24 @@ nobody can observe it. §6.1 removes that filter, and the inversion becomes a
 visible product behavior: promoting someone from viewer to editor shrinks their
 dashboard list.
 
-P3 does **not** change the predicate. It is the core resource-permission
-function P1 owns, it is pinned by the pgTAP truth tables P1 wrote, and changing
-it is a permission-model decision rather than a discovery one. What P3 owes is
-that the behavior is documented rather than discovered: the finding goes in
-`docs/permissions-architecture.md` and in §11 as the next permissions question
-to settle.
+P3 does **not** change the predicate.
+
+**Correction, added after implementation: this is not a defect, and calling it
+one here was wrong.** The behavior is deliberate. It arrived with the
+permissions UI in #209, and the docstring of `util__auth_user_may_select_dataset`
+says so plainly: it blocks a member whose only grant is a workspace-wide app
+role at editor or above from reading another member's unrestricted row, while
+keeping viewers, owners, settings and workspace managers, restricted paths, and
+explicit shares. The reasoning is that a read-only viewer role is safe to hand
+the workspace's unrestricted content, whereas a blanket Global Editor is not,
+since reading is the first step to editing something nobody granted you.
+
+The finding stands only as an *observability* change: P3's index widening makes
+a long-standing rule visible in the product for the first time. It is recorded
+in `docs/permissions-architecture.md` §4.1 with the rationale, so the next
+reader does not repeat this mistake. Widening it would give every Global Editor
+read access to every colleague's unrestricted dashboard and dataset, which
+nobody asked for.
 
 **D2. The publish analytics branch reads a column that no longer means what it
 did.** `makeDashboardPublishAnalyticsEventFromDashboards` branches on
@@ -589,20 +601,33 @@ after P3 is only `draft` rows belonging to another user.
 
 ## 11. Deferred
 
-- **An editor can rewrite the bytes an admin is about to publish.** While a
-  `target_visibility = 'public'` claim is open, the INSERT and UPDATE policies
-  on the `published` bucket require only
-  `util__auth_user_can_update_resource` (editor tier), so a non-admin editor
-  can overwrite the staged parquet and have an admin settle it onto the open
-  internet. Found by the adversarial review of §5.2's trigger, and left open
-  because the fix belongs to P2's storage helper
-  (`private.util__auth_user_can_write_dashboard_snapshot_object`), not to this
-  phase's permission key. The narrow fix is to require the admin role in that
-  helper when `p_bucket_id = 'published'`. Until then, "only a Dashboards admin
-  decides what reaches the open internet" is true of the *decision* and not yet
-  of the *bytes*.
-- **The viewer/editor discovery inversion** (§8 D1). The next permissions
-  question to settle, and P1's file to change.
+Three entries from the first draft of this section have since been closed, and
+are recorded here as resolved rather than deleted, because each was reasoned
+about at length above.
+
+- ~~**An editor can rewrite the bytes an admin is about to publish.**~~
+  **Closed.** `private.util__auth_user_can_write_dashboard_snapshot_object` now
+  requires the Dashboards admin role when, and only when, the target bucket is
+  the world-readable `published`. Writes to `published-private` stay at the
+  editor tier, because publishing internally is ordinary editor work. Deletes
+  were examined and deliberately left alone: removing an object retracts
+  exposure rather than creating it, and raising that bar would strand staged
+  bytes in the world-readable bucket whenever the editor who uploaded them is
+  not an admin, making the safe operation the harder one. "Only a Dashboards
+  admin decides what reaches the open internet" is now true of the bytes as
+  well as the decision.
+- ~~**Draft is enforced in the client only.**~~ **Closed.**
+  `util__auth_user_may_select_dashboard` now denies a `draft` row to anyone
+  without `editor` on it, after the owner and settings-admin short-circuits.
+  That also removes the dead card the widened index could show: a draft shared
+  with a viewer used to appear in their list and then refuse to open. §7's
+  route-level check stays as defense in depth.
+- ~~**The viewer/editor discovery inversion.**~~ **Not a defect.** §8 D1 was
+  wrong to call it one, and is corrected there. The behavior is deliberate and
+  predates this work; see `docs/permissions-architecture.md` §4.1.
+
+Still open:
+
 - **Search, then filter chips, on the dashboards index** (§6.3), on the
   tripwire recorded there.
 - **The plan-limit gate on the public option**, which is P4 item H and is the
