@@ -17,10 +17,13 @@ set
   search_path = auth,
   pg_temp;
 
--- TODO(jpsyx): verify if these 'revoke' and 'grant' statements are actually
--- getting applied. They might not get picked up when using Supabase's
--- declarative schemas.
--- do not allow public calls to `auth.get_user_id_by_email`
+-- Do not allow public calls to `auth.get_user_id_by_email`.
+--
+-- `supabase db diff` does not emit privilege changes, so these statements do
+-- not reach the database on their own. The revokes below are applied by
+-- 20260815213000_revoke_public_execute_on_get_user_id_by_email.sql and the
+-- migration that created the function. Any future change here needs a
+-- hand-written migration to match.
 revoke all on function public.util__get_user_id_by_email (text)
 from
   public;
