@@ -9,13 +9,13 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu";
-import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter";
+import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardShareModal/AddRowFilterMenu";
+import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type {
   FilterableColumn,
   PublishSliceDataset,
-} from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";
+} from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

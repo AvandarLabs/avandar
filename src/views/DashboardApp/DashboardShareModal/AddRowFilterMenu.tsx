@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { FilterableColumn } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";
+import type { FilterableColumn } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

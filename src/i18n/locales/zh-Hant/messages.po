@@ -31,7 +31,7 @@ msgstr "關閉聊天面板"
 msgid "ID field is required"
 msgstr "ID 欄位為必填"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "此資料集中的至少一個查詢使用了 <0>SELECT *</0> 或無法安全解析，因此所有欄位將被發布。"
@@ -49,7 +49,7 @@ msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下載離線聊天模型，再詢問資料相關問題。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
 
@@ -78,7 +78,7 @@ msgstr "這將允許資料集在線儲存，以便在其他設備上訪問。"
 msgid "Run a query to see results."
 msgstr "執行查詢以查看結果。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "開始日期（例如：2024-01-01）"
 
@@ -224,7 +224,7 @@ msgstr "H4"
 msgid "Query"
 msgstr "查詢"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Row filters"
 msgstr "行過濾器"
 
@@ -672,7 +672,7 @@ msgstr "窄"
 msgid "Column info"
 msgstr "列信息"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
@@ -872,7 +872,7 @@ msgstr "添加到工作區"
 msgid "Workspace Name"
 msgstr "工作區名稱"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard is published at:"
 msgstr "您的儀表板已發布於："
 
@@ -1040,7 +1040,7 @@ msgstr "漏斗圖"
 msgid "Invalid name column selected"
 msgstr "所選名稱欄位無效"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "自定義"
@@ -1102,7 +1102,7 @@ msgstr "Phi 3.5 Mini"
 msgid " Published to "
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "所有列"
 
@@ -1138,7 +1138,7 @@ msgstr "此圖表的篩選器"
 msgid "Align"
 msgstr "對齊"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
 msgstr "發布每一列，所有行。為觀眾提供最大的靈活性，最大限度地曝光。"
@@ -1357,7 +1357,7 @@ msgstr "授予其他成員存取權限"
 msgid "avg"
 msgstr "平均"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Generating…"
 msgstr "生成中…"
 
@@ -1539,7 +1539,7 @@ msgstr "SELECT 中不支援彙總函式「{funcName}」；已略過。"
 msgid "Private datasets"
 msgstr "私人資料集"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Scans to:"
 msgstr "掃描至："
 
@@ -1662,7 +1662,7 @@ msgstr "有可用的更新"
 msgid "Step"
 msgstr "步階"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "最大"
@@ -1814,7 +1814,7 @@ msgstr "，和"
 msgid "Password updated successfully"
 msgstr "密碼更新成功"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 msgid "Narrowest"
 msgstr "最窄"
 
@@ -1839,7 +1839,7 @@ msgstr "最大型的目錄選項。當 RAM 和下載大小不受限制時，提�
 msgid "Enter a name for this dataset"
 msgstr "請輸入此數據集的名稱"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "自定義選擇"
 
@@ -1903,7 +1903,7 @@ msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "無法總結此列。查詢可能因不支持的值或格式錯誤的單元格而失敗。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "數據範圍"
 
@@ -1924,7 +1924,7 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 "app to clear cached data and try once more."
 msgstr "請重新登入以繼續。如果無法登入，請重設應用程式以清除快取資料，然後再試一次。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "to"
 msgstr "至"
 
@@ -1956,7 +1956,7 @@ msgstr "有新版本可用。請重新整理以更新。"
 msgid "You haven't chosen an X axis"
 msgstr "您尚未選擇 X 軸"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Publishing makes this dashboard viewable by anyone with the link, no "
 "Avandar account required."
 msgstr "發布後，任何擁有連結的人都能查看此儀表板，無須 Avandar 帳戶。"
@@ -2036,7 +2036,7 @@ msgstr "{0} (~{1} MB) 將從此瀏覽器中刪除以釋放空間。您可以稍�
 msgid "Go to Data Explorer"
 msgstr "前往數據探索器"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
 msgstr "此儀表板是 <0>公開</0> 的。任何擁有以下鏈接的人都可以查看。"
 
@@ -2105,7 +2105,7 @@ msgstr "手動表單顯示近似值"
 msgid "The custom URL must be at least {0} characters"
 msgstr "自訂 URL 至少必須包含 {0} 個字元"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
 msgstr "您的儀表板將發布到："
 
@@ -2172,7 +2172,7 @@ msgstr "未選擇數據集"
 msgid "description"
 msgstr "描述"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "最小"
@@ -2197,7 +2197,7 @@ msgstr "選擇了無效的 X 軸"
 msgid "X axis maximum"
 msgstr "X 軸最大值"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
@@ -2292,7 +2292,7 @@ msgstr "儀表板成功儲存！"
 msgid "N/A"
 msgstr "不適用"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "僅發布儀表板所需的列。最狹窄，最私密。"
 
@@ -2340,7 +2340,7 @@ msgstr "您沒有權限打開工作區的這部分。"
 msgid "Please check your email"
 msgstr "請檢查您的電子郵件"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "選擇列並添加行約束（枚舉、數字範圍、日期範圍）。"
 
@@ -2366,7 +2366,7 @@ msgstr "X 軸刻度間隔"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Please try again."
 msgstr "請再試一次。"
 
@@ -2374,7 +2374,7 @@ msgstr "請再試一次。"
 msgid "Field Name"
 msgstr "字段名稱"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu.tsx
+#: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ 添加行過濾器"
 
@@ -2391,7 +2391,7 @@ msgstr "添加人員或用戶組"
 msgid "Size column"
 msgstr "大小列"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "值"
 
@@ -2446,7 +2446,7 @@ msgstr "與我們一起開始您的旅程"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B（離線）"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "QR code"
 msgstr "QR 碼"
 
@@ -2569,7 +2569,7 @@ msgid "Create groups for your workspace members. Datasets and dashboards can be 
 msgstr "為您的工作區成員創建群組。數據集和儀表板可以配置為僅與某些用戶群組共享（或限制）。"
 
 #: src/components/privacy/ConsentModal/RowValueList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Preview:"
 msgstr "預覽："
 
@@ -2933,7 +2933,7 @@ msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
 msgid "Drop to import"
 msgstr "拖放以導入"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "日期範圍"
 
@@ -3034,11 +3034,11 @@ msgstr "推理能力比 1.5B 更強，下載大小適中。相較於 8 GB 級別
 msgid "Starting…"
 msgstr "啟動中…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "數字範圍"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Columns"
 msgstr "列"
@@ -3159,7 +3159,7 @@ msgstr "來自數據集"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "一個配置文件可以由來自不同數據集的列組成。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "結束（例如：2024-12-31）"
 
@@ -3547,7 +3547,7 @@ msgstr "選項（以逗號分隔，適用於選擇模式）"
 msgid "Owner"
 msgstr "擁有者"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Never changes, so QR codes printed from here keep working even if the "
 "custom URL changes."
 msgstr "從這裡打印的 QR 碼不會改變，即使自定義 URL 變更也能正常使用。"
@@ -3650,7 +3650,7 @@ msgstr "儀表板已成功刪除！"
 msgid "The name you want other team members to see."
 msgstr "您希望其他團隊成員看到的名稱。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Custom URL"
 msgstr "自定義 URL"
 
@@ -3777,7 +3777,7 @@ msgstr "SQL"
 msgid "Ordered"
 msgstr "有序"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選列）。"
@@ -3981,7 +3981,7 @@ msgstr "升序"
 msgid "Ask about your data"
 msgstr "詢問您的數據"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "輸入值；每個值後按 Enter"
 
@@ -4260,7 +4260,7 @@ msgstr "在此輸入您的段落…"
 msgid "Send message"
 msgstr "發送消息"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Copied!"
 msgstr "已複製！"
 
@@ -4268,7 +4268,7 @@ msgstr "已複製！"
 msgid "date"
 msgstr "日期"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此儀表板未引用任何數據集：無法發布。"
 
@@ -4333,7 +4333,7 @@ msgstr "請稍後再試。"
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "將 <0>{0}</0> 值{1} 發送到 AI 嗎？"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL path"
 msgstr "自訂 URL 路徑"
 
@@ -4388,7 +4388,7 @@ msgstr "正在下載 {0} 以進行離線聊天"
 msgid "Open chat panel"
 msgstr "打開聊天面板"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "移除行篩選"
 
@@ -4608,7 +4608,7 @@ msgstr "重設密碼"
 msgid "Dataset Name"
 msgstr "資料集名稱"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Copy share link"
 msgstr "複製分享連結"
 
@@ -4637,7 +4637,7 @@ msgstr "設為僅限離線"
 msgid "{0} is available when you are offline."
 msgstr "{0} 在您離線時可用。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "自訂網址可用"
 
@@ -4836,11 +4836,11 @@ msgstr "發送答案"
 msgid "... and {remainingCount} more"
 msgstr "... 和 {remainingCount} 個更多"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Just what's queried"
 msgstr "僅查詢的內容"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Could not generate QR code"
 msgstr "無法生成 QR 碼"
 
@@ -4957,7 +4957,7 @@ msgstr "下載不同的離線聊天模型"
 msgid "Edit permissions"
 msgstr "編輯權限"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "queried"
 msgstr "查詢的"
 
@@ -4993,7 +4993,7 @@ msgid "Subscription updated successfully"
 msgstr "訂閱成功更新"
 
 #. placeholder {0}: columns.length
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "{0, plural, one {Will publish # column:} other {Will publish # "
 "columns:}}"
 msgstr "{0, plural, one {將發布 # 列：} other {將發布 # 列：}}"
@@ -5072,7 +5072,7 @@ msgstr "加載更多中..."
 msgid "Dataset \"{datasetName}\" saved successfully"
 msgstr "資料集「{datasetName}」已成功儲存"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "自定義 URL（可選）"
 
@@ -5096,7 +5096,7 @@ msgstr "使用其他帳戶登入"
 msgid "Freehand"
 msgstr "手繪"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Permanent link (use for QR codes)"
 msgstr "永久鏈接（用於 QR 碼）"
 
@@ -5211,7 +5211,7 @@ msgstr "發送給 AI 嗎？"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "購買 {seatsToAdd} 個席位"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Share link"
 msgstr "分享鏈接"
 
@@ -5219,7 +5219,7 @@ msgstr "分享鏈接"
 msgid "Current Plan"
 msgstr "當前計劃"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL. The permanent UUID link below also still works."
 msgstr "使用您的自定義 URL。下面的永久 UUID 鏈接仍然有效。"
 
@@ -5586,11 +5586,11 @@ msgid "Recommended"
 msgstr "推薦"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
 msgid "Select all"
 msgstr "全選"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "僅查詢的內容（推薦）"
 
@@ -5619,7 +5619,7 @@ msgstr "形狀"
 msgid "Members"
 msgstr "成員"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
 "type is kebab-cased automatically."
 msgstr "一個簡短且易記的 URL 用於傳單、報告和 QR 碼。您輸入的任何內容都會自動轉換為 kebab-case。"
@@ -5669,7 +5669,7 @@ msgstr "頂端"
 msgid "From your prompt:"
 msgstr "來自您的提示："
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Anyone with this link can view the dashboard."
 msgstr "任何擁有此連結的人都可以查看儀表板。"
 
@@ -5858,7 +5858,7 @@ msgstr "媒體"
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "新增提示並生成 SQL 以配置此視覺化。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Copy link"
 msgstr "複製連結"
 
@@ -6001,7 +6001,7 @@ msgstr "限制"
 msgid "Fix these issues before saving"
 msgstr "在保存之前修正這些問題"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
 "redirects here."
 msgstr "最適合口耳相傳的分享。訪問下面的永久連結也會重定向到這裡。"
@@ -6095,11 +6095,11 @@ msgstr "載入中..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "分享"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "整個數據集"
 
@@ -6190,7 +6190,7 @@ msgstr "底端"
 msgid "Offline ready"
 msgstr "已準備離線"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Download PNG"
 msgstr "下載 PNG"
 
@@ -6198,11 +6198,11 @@ msgstr "下載 PNG"
 msgid "Add at least one X / Y series"
 msgstr "至少添加一個 X / Y 系列"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Show QR code"
 msgstr "顯示 QR 碼"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a permanent UUID-based link. Add a custom path below "
 "for a nicer URL."
 msgstr "默認情況下，我們使用基於永久 UUID 的連結。請在下面添加自定義路徑以獲得更美觀的 URL。"

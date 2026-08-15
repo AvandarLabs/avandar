@@ -1,6 +1,6 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import { Badge, Group, ScrollArea, Stack, Text } from "@mantine/core";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

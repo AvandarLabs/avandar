@@ -1,10 +1,10 @@
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Radio, Stack } from "@mantine/core";
-import { CustomSliceEditor } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor";
-import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview";
+import { CustomSliceEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor";
+import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardShareModal/QueriedSlicePreview";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.types";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

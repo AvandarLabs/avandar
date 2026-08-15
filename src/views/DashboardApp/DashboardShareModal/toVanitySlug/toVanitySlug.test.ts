@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/toVanitySlug/toVanitySlug";
+import { toVanitySlug } from "@/views/DashboardApp/DashboardShareModal/toVanitySlug/toVanitySlug";
 
 describe("toVanitySlug", () => {
   it("lowercases", () => {

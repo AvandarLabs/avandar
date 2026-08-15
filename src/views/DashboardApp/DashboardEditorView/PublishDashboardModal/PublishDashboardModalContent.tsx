@@ -2,11 +2,11 @@ import { Trans } from "@lingui/react/macro";
 import { Anchor, Button, Divider, Group, Stack } from "@mantine/core";
 import { IconWorld } from "@tabler/icons-react";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus";
-import { PublishedShareLinks } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks";
-import { PublishSliceSection } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection";
-import { VanitySlugField } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField";
-import type { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
+import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
+import { PublishedShareLinks } from "@/views/DashboardApp/DashboardShareModal/PublishedShareLinks";
+import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection";
+import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
+import type { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 

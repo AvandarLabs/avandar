@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack, Title } from "@mantine/core";
-import { ShareUrlRow } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow";
-import type { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
+import { ShareUrlRow } from "@/views/DashboardApp/DashboardShareModal/ShareUrlRow";
+import type { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
 import type { ReactNode } from "react";
 
 type Props = {
