@@ -6,6 +6,28 @@ Turn the partially wired `usage_analytics_events` table into a complete,
 queryable product and growth analytics stream, and add a separate store for
 chat samples retained from free-plan workspaces.
 
+## Phase status
+
+**Phase 1, foundation: complete (2026-08-14).** The foundation work and the
+deferred client-event payload enrichment are implemented and landed. The
+existing event rows now carry trustworthy category, runtime, and version
+metadata; the shared registry and database emitter are in place; active client
+events carry their approved privacy-safe payloads; and authenticated dashboard
+filter analytics are scoped and debounced.
+
+**Phase 2, growth: complete (2026-08-14).** The retired waitlist feature is
+removed. The eight event-emitting triggers, the `analytics` schema, and its
+seven reporting views are implemented in this worktree. The growth funnel is
+readable end to end from service-role SQL. Two views carry columns that stay
+empty until Phase 3 instruments `query.ran`, `chat.turn_completed`, and
+`chat.turn.failed`.
+
+**Phase 3, product events: next.** `analyticsSurface` on `useDataQuery`,
+`query.ran`, `query.failed`, `dashboard.pdf_exported`,
+`dashboard.share_settings_updated`, `chat.turn_completed`, and
+`chat.turn_failed`. The reporting views that read those events already exist,
+so Phase 3 ships instrumentation only.
+
 Three things are wrong today. Ten event names are declared in
 `src/lib/analytics/analyticsEventTypes.ts` but only seven are emitted. Every
 emitter is in the browser, so events that happen without a browser session
@@ -63,8 +85,6 @@ must answer how many, of what kind, how fast, and whether it worked.
 
 | Event | Emitter | Payload |
 | --- | --- | --- |
-| `waitlist.code_verified` | edge (`waitlist`) | `emailDomain` |
-| `waitlist.code_claimed` | edge (`waitlist`) | `emailDomain` |
 | `user.registered` | trigger (`auth.users`) | `emailDomain`, `provider`, `hadPendingInvite` |
 | `user.email_confirmed` | trigger (`auth.users`) | `emailDomain`, `secondsToConfirm` |
 
@@ -427,7 +447,7 @@ change from a single webhook-driven `UPDATE`.
 
 `logAnalyticsEvent()` in `supabase/functions/_shared/analytics/`, taking the
 service-role client explicitly and swallowing failures the way
-`AnalyticsClient` already does. Used by the chat and waitlist functions.
+`AnalyticsClient` already does. Used by the chat function.
 
 ## Reporting Views
 
@@ -442,7 +462,7 @@ view in `public` would be exposed through PostgREST, and without
 
 | View | Content |
 | --- | --- |
-| `analytics.acquisition_funnel` | waitlist verified, claimed, registered, confirmed, first workspace, by week cohort |
+| `analytics.acquisition_funnel` | registered, confirmed, first workspace, by registration week cohort |
 | `analytics.activation` | per workspace, days to first dataset, first query, first published dashboard |
 | `analytics.active_users` | daily and weekly actives from `engagement` rows, split by `client` |
 | `analytics.retention_cohorts` | built from `user.signed_in`'s `daysSinceLastSignIn` |
@@ -482,7 +502,7 @@ categorising it fails CI.
 This is too large for one plan. It decomposes into four phases that each ship
 something useful on their own, in this order.
 
-**Phase 1, foundation.** The two enums, the three columns and their backfill,
+**Phase 1, foundation: complete.** The two enums, the three columns and their backfill,
 `util__analytics_event_category`, the category trigger,
 `util__log_analytics_event`, the edge helper, the `vite.config.ts` version
 define, the typed event registry, the dev-only `console.warn`, dropping
@@ -490,9 +510,10 @@ define, the typed event registry, the dev-only `console.warn`, dropping
 payloads of the seven events that already fire. After this phase the existing
 instrumentation is correct, categorised, and type-checked.
 
-**Phase 2, growth.** The eight event-emitting triggers, the waitlist events,
-the `analytics` schema and its views. After this phase the growth funnel is
-readable, which is the highest-value outcome in the spec.
+**Phase 2, growth: complete.** The retired waitlist feature is removed. The
+eight event-emitting triggers, the `analytics` schema, and its views make the
+growth funnel readable. Implemented by
+`docs/superpowers/plans/2026-08-14-analytics-growth-events.md`.
 
 **Phase 3, product events.** `analyticsSurface` on `useDataQuery`,
 `query.ran`, `query.failed`, `dashboard.pdf_exported`,

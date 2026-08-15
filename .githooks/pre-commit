@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Blocks commits that retain a branch-scoped local Supabase configuration.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO_ROOT" ]; then
+  exit 0
+fi
+cd "$REPO_ROOT" || exit 0
+
+VALIDATOR="$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"
+
+validate_working_config() {
+  "$VALIDATOR" < "$REPO_ROOT/supabase/config.toml"
+}
+
+validate_staged_config() {
+  if ! git cat-file -e :supabase/config.toml 2>/dev/null; then
+    echo "The staged tree does not contain supabase/config.toml." >&2
+    echo "Run 'ava supabase restore', stage the restored files, and retry." >&2
+    return 1
+  fi
+
+  git show :supabase/config.toml | "$VALIDATOR"
+}
+
+current_branch="$(git branch --show-current 2>/dev/null || true)"
+if [ "$current_branch" = "develop" ] && [ -f "$REPO_ROOT/supabase/config.toml" ]; then
+  if ! validate_working_config; then
+    exit 1
+  fi
+fi
+
+if ! git diff --cached --quiet -- supabase/config.toml; then
+  if ! validate_staged_config; then
+    exit 1
+  fi
+fi

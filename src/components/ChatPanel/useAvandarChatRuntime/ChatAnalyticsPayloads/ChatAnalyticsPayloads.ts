@@ -1,6 +1,6 @@
 import { excludeUndefinedShallow } from "@avandar/utils";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import type { AnalyticsEventPayloads } from "$/analytics/analyticsEvents/analyticsEvents";
+import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { ChatRuntimeMode } from "$/types/offlineChat.types";

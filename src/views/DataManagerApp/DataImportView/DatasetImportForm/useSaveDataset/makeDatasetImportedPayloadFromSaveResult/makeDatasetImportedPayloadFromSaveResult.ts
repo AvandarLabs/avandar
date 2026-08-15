@@ -1,4 +1,4 @@
-import type { AnalyticsEventPayloads } from "$/analytics/analyticsEvents/analyticsEvents";
+import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 
 type FileImportAnalyticsSource = {
   sourceType: "csv_file" | "xlsx_file";

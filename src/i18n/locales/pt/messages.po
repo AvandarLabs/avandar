@@ -122,12 +122,6 @@ msgstr "A entrada JOIN na posição {index} não é uma referência simples de "
 msgid "Geo Explorer"
 msgstr "Explorador geográfico"
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Ou {0} para ser notificado quando nosso lançamento público estiver "
-"pronto."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Extensão direita"
@@ -733,7 +727,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "Você não pode adicionar mais conjuntos de dados no seu plano atual. "
 "Faça um upgrade para adicionar este conjunto de dados do catálogo."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Por favor, verifique seu e-mail para um link de confirmação. Pode levar "
@@ -764,7 +758,7 @@ msgstr "Do conjunto de dados derivado"
 msgid "Single select"
 msgstr "Seleção única"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "No entanto, não estamos permitindo novas inscrições no momento."
 
@@ -1090,10 +1084,10 @@ msgstr "Carimbo de data/hora"
 msgid "Y axis tick interval"
 msgstr "Intervalo das marcações do eixo Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Senha"
 
@@ -1472,16 +1466,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocorreu um erro inesperado. Você pode tentar novamente ou voltar para a "
 "página inicial."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} para ser notificado quando for sua vez de se registrar! Se você já "
-"está na nossa lista de espera e não recebeu um código de inscrição, "
-"agradecemos sua paciência. Você receberá um código de inscrição em "
-"breve. Prometemos!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Viés detectado:"
@@ -1728,11 +1712,6 @@ msgstr "Exporte este painel como um PDF ou faça um esboço primeiro. Anotaçõe
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Atualização disponível"
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Por favor, <0>nos envie um e-mail</0> se você gostaria de acesso "
-"antecipado."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2369,7 +2348,7 @@ msgstr "Preenchimento"
 msgid "Theme"
 msgstr "Tema"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Registrar"
 
@@ -2407,7 +2386,7 @@ msgstr "Administrador Global"
 msgid "Comma (,)"
 msgstr "Vírgula (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "O registro requer uma conexão com a internet."
 
@@ -2439,7 +2418,7 @@ msgstr "Coluna 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Você não tem permissão para abrir esta parte do espaço de trabalho."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Por favor, verifique seu e-mail"
 
@@ -2467,10 +2446,6 @@ msgstr "Capturando painel…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "Intervalo das marcações do eixo X"
-
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "Este é um código de lista de espera inválido"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2506,6 +2481,10 @@ msgstr "Valores"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Cor do rótulo do eixo Y"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Envie um <0>e-mail para nós</0> se quiser obter acesso."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2545,7 +2524,7 @@ msgstr "Nenhuma das {totalRowCount} linhas pôde ser mapeada porque suas "
 msgid "Plan Features:"
 msgstr "Recursos do Plano:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Comece sua jornada conosco"
 
@@ -3052,10 +3031,6 @@ msgstr "Arraste para importar"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Intervalo de datas"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "inscreva-se na nossa lista de espera"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3612,8 +3587,8 @@ msgstr "Mais comum"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "As senhas não coincidem"
 
@@ -3811,7 +3786,7 @@ msgstr "Não foi possível remover o modelo de chat offline"
 msgid "Legend"
 msgstr "Legenda"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Criar uma nova conta"
 
@@ -3944,13 +3919,6 @@ msgstr "Detectamos tanto informações pessoais potenciais quanto linguagem que 
 msgid "Select aggregation"
 msgstr "Selecionar agregação"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "Enquanto o Avandar estiver em beta, estamos permitindo registro apenas "
-"se você estiver na nossa lista de espera e tiver recebido um código de "
-"inscrição em seu e-mail."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorar todos os filtros globais: esta visualização está sem filtro."
@@ -3962,10 +3930,6 @@ msgstr "Você escreveu:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Seleção múltipla"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Inscreva-se na nossa lista de espera"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3986,10 +3950,6 @@ msgstr "Recolher painel"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Compartilhamento falhou"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Seu código de lista de espera foi verificado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4148,9 +4108,9 @@ msgid "Looking up values in {column}…"
 msgstr "Buscando valores em {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "E-mail"
 
@@ -4328,8 +4288,8 @@ msgstr "Usuário removido"
 msgid "Limit {displayName} to app access"
 msgstr "Limitar {displayName} ao acesso do aplicativo"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Confirmar Senha"
 
@@ -4413,7 +4373,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Este painel não faz referência a nenhum conjunto de dados: nada para "
 "publicar."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Um e-mail de confirmação foi enviado para o seu endereço de e-mail."
 
@@ -4808,10 +4768,6 @@ msgstr "Carregando conjuntos de dados do painel"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Selecione um arquivo Excel ou CSV do seu computador para importar"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Por favor, escolha uma senha para completar seu registro"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5726,7 +5682,7 @@ msgstr "Avandar ainda está em beta. Alguns recursos podem não funcionar como "
 "esperado e alguns ainda podem estar em construção. Agradecemos sua "
 "paciência e feedback enquanto trabalhamos para melhorar o produto."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Obrigado pelo seu interesse!"
 
@@ -5926,7 +5882,7 @@ msgstr "Pesquisar painéis"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Endereço de e-mail inválido"
 

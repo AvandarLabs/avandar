@@ -120,11 +120,6 @@ msgstr "Ingizo la JOIN katika nafasi ya {index} si rejeleo la jedwali "
 msgid "Geo Explorer"
 msgstr "Kichunguzi cha Geo"
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Au {0} ili kuarifiwa wakati uzinduzi wetu wa umma uko tayari."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Span ya kulia"
@@ -729,7 +724,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "Huwezi kuongeza seti zaidi za data kwenye mpango wako wa sasa. Pandisha "
 "hadhi ili kuongeza seti hii ya katalogi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho. Inaweza "
@@ -760,7 +755,7 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 msgid "Single select"
 msgstr "Chaguo moja"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Hata hivyo, haturuhusu usajili mpya kwa sasa."
 
@@ -1085,10 +1080,10 @@ msgstr "Wakati"
 msgid "Y axis tick interval"
 msgstr "Muda wa alama za mhimili wa Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Nenosiri"
 
@@ -1465,16 +1460,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 "ukurasa wa mwanzo."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
-"kwenye orodha yetu ya kusubiri na hujapokea msimbo wa kujiandikisha, "
-"tunashukuru uvumilivu wako. Utapokea msimbo wa kujiandikisha hivi "
-"karibuni. Tunahidi!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
@@ -1720,11 +1705,6 @@ msgstr "Export dashboard hii kama PDF, au chora kwanza. Maelezo yanasaidia "
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Sasisho linapatikana"
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
-"wa mapema."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2363,7 +2343,7 @@ msgstr "Pengo la ndani"
 msgid "Theme"
 msgstr "Mandhari"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Jisajili"
 
@@ -2401,7 +2381,7 @@ msgstr "Msimamizi wa Kimataifa"
 msgid "Comma (,)"
 msgstr "Koma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "Usajili unahitaji muunganisho wa intaneti."
 
@@ -2433,7 +2413,7 @@ msgstr "Safu wima ya 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
 
@@ -2462,10 +2442,6 @@ msgstr "Inanasa dashibodi…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "Muda wa alama za mhimili wa X"
-
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "Hii ni nambari isiyo sahihi ya orodha ya kusubiri"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2501,6 +2477,10 @@ msgstr "Thamani"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Rangi ya lebo ya mhimili wa Y"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2541,7 +2521,7 @@ msgstr "Hakuna hata safu moja kati ya safu {totalRowCount} iliyoweza kuwekwa "
 msgid "Plan Features:"
 msgstr "Vipengele vya Mpango:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
@@ -3047,10 +3027,6 @@ msgstr "Angusha ili kuagiza"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Muda wa tarehe"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "jiandikishe kwenye orodha yetu ya kusubiri"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3607,8 +3583,8 @@ msgstr "Ya kawaida zaidi"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Nywila hazifanani"
 
@@ -3804,7 +3780,7 @@ msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
 msgid "Legend"
 msgstr "Ufafanuzi"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Unda akaunti mpya"
 
@@ -3936,13 +3912,6 @@ msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha "
 msgid "Select aggregation"
 msgstr "Chagua muungano"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye "
-"orodha yetu ya kusubiri na umepokea msimbo wa kujiandikisha kwenye "
-"barua pepe yako."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Puuza vichujio vyote vya kimataifa: uonyeshaji huu haujafichwa."
@@ -3954,10 +3923,6 @@ msgstr "Umeandika:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Chaguo nyingi"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Jiandikishe kwenye orodha yetu ya kusubiri"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3978,10 +3943,6 @@ msgstr "Kunja paneli ya pembeni"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Kushiriki kumeshindwa"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Msimbo wako wa orodha ya kusubiri umethibitishwa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4139,9 +4100,9 @@ msgid "Looking up values in {column}…"
 msgstr "Inatafuta thamani katika {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Barua pepe"
 
@@ -4319,8 +4280,8 @@ msgstr "Mtumiaji ameondolewa"
 msgid "Limit {displayName} to app access"
 msgstr "Punguza {displayName} kwa ufikiaji wa programu"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Thibitisha Neno la Siri"
 
@@ -4404,7 +4365,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 "kuchapisha."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Barua ya kuthibitisha imetumwa kwa anwani yako ya barua pepe."
 
@@ -4796,10 +4757,6 @@ msgstr "Inapakia seti za data za dashibodi"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Tafadhali chagua nenosiri kukamilisha usajili wako"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5713,7 +5670,7 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 "kama inavyotarajiwa na vingine bado vinaweza kuwa katika ujenzi. "
 "Tunashukuru uvumilivu wako na maoni unapotusaidia kuboresha bidhaa."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
 
@@ -5913,7 +5870,7 @@ msgstr "Tafuta dashibodi"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Anwani ya barua pepe isiyo sahihi"
 
