@@ -549,6 +549,18 @@ after P3 is only `draft` rows belonging to another user.
 
 ## 11. Deferred
 
+- **An editor can rewrite the bytes an admin is about to publish.** While a
+  `target_visibility = 'public'` claim is open, the INSERT and UPDATE policies
+  on the `published` bucket require only
+  `util__auth_user_can_update_resource` (editor tier), so a non-admin editor
+  can overwrite the staged parquet and have an admin settle it onto the open
+  internet. Found by the adversarial review of §5.2's trigger, and left open
+  because the fix belongs to P2's storage helper
+  (`private.util__auth_user_can_write_dashboard_snapshot_object`), not to this
+  phase's permission key. The narrow fix is to require the admin role in that
+  helper when `p_bucket_id = 'published'`. Until then, "only a Dashboards admin
+  decides what reaches the open internet" is true of the *decision* and not yet
+  of the *bytes*.
 - **The viewer/editor discovery inversion** (§8 D1). The next permissions
   question to settle, and P1's file to change.
 - **Search, then filter chips, on the dashboards index** (§6.3), on the
