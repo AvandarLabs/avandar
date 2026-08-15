@@ -1,8 +1,7 @@
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { buildGeometryExpression } from "./buildGeometryExpression";
 import { buildNormalizedBoundaryKey } from "./buildNormalizedBoundaryKey";
-import { escapeSqlStringLiteral } from "./escapeSqlStringLiteral";
 import { getSimplificationTolerance } from "./getSimplificationTolerance";
 import {
   MapLayerSpatialFeatureProperties,
@@ -89,11 +88,11 @@ function _buildPropertiesExpression(
     return "json_object()";
   }
   const entries = columnNames.flatMap((columnName) => {
-    return [escapeSqlStringLiteral(columnName), quoteSqlIdentifier(columnName)];
+    return [quoteSqlLiteral(columnName), quoteSqlIdentifier(columnName)];
   });
   if (denominatorColumnName) {
     entries.push(
-      escapeSqlStringLiteral(MapLayerSpatialFeatureProperties.denominator),
+      quoteSqlLiteral(MapLayerSpatialFeatureProperties.denominator),
       quoteSqlIdentifier(denominatorColumnName),
     );
   }
@@ -395,7 +394,7 @@ feature_rows AS (
       : undefined,
     )}) AS feature
   FROM typed_rows
-  WHERE ${family} = ${escapeSqlStringLiteral(binding.family)}
+  WHERE ${family} = ${quoteSqlLiteral(binding.family)}
     AND (SELECT has_mixed_families FROM diagnostic_summary) = false
 )
 ${_buildFinalSelect()}`;

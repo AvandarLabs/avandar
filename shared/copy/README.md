@@ -59,15 +59,27 @@ Give a copy function its own subdirectory only when it has a test to sit
 beside it. A directory that holds one file buys nothing, so the test is the
 whole reason to make one.
 
-Most copy functions have no test worth writing. A copy function is a lookup
-from a key to a translated string, so a test that asserts the label for one
-key restates the mapping it is reading from, and the English msgid usually
-equals the label, which makes the assertion look like an identity check.
+Whether a copy function has a test worth writing turns on one question: is
+the label derivable from the key?
 
-`shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts` is the case
-that earns a subdirectory: its test walks the viz descriptor registries and
-fails when a label is added there without a matching catalog entry. It checks
-an invariant across two files rather than the mapping in front of it.
+When it is not, a test carries real information and the function earns its
+subdirectory. `appLabel` maps `gis` to "Maps" and `data_sources` to "Data
+Sources"; nobody reading the key can predict those, so
+`expect(appLabel("gis")).toBe("Maps")` pins a mapping that a careless edit
+would otherwise break silently.
+
+When the label is the key, an assertion on it shows nothing.
+`resourceTypeLabel` returns "dashboard", "dataset", and "map" for the keys
+of the same name, so `expect(resourceTypeLabel("map")).toBe("map")` reads as
+`expect("map").toBe("map")`: it cannot distinguish the real function from
+one that returns its argument, and it leaves the two arms it does not cover
+unguarded. That function stays a flat file with no test.
+
+The strongest case is a test that checks an invariant across files rather
+than the mapping in front of it.
+`shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts` earns its
+subdirectory that way: its test walks the viz descriptor registries and
+fails when a label is added there without a matching catalog entry.
 
 ## Naming
 
