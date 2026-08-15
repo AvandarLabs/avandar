@@ -8,6 +8,7 @@
 # Usage:
 #   pnpm translations               # same as `all`
 #   pnpm translations all           # full scan / full translate
+#   pnpm translations resolve       # resolve merge conflicts in the catalogs
 #   pnpm translations <path> [...]  # narrow the LLM step to
 #                                               # entries referencing any of
 #                                               # the given path patterns
@@ -66,6 +67,16 @@ has_untranslated_entries() {
   done
   return 1
 }
+
+if [[ "${1:-}" == "resolve" ]]; then
+  if [[ $# -gt 1 ]]; then
+    printf '%s\n' "${BOLD}${YELLOW}resolve takes no arguments.${RESET}" >&2
+    exit 1
+  fi
+  printf '%s\n' "${BOLD}${CYAN}» Resolving catalog merge conflicts${RESET}"
+  exec pnpm vite-script \
+    scripts/i18n/resolveCatalogConflicts/resolveCatalogConflicts.ts
+fi
 
 SCOPES=()
 if [[ $# -gt 0 && "${1:-}" != "all" ]]; then
