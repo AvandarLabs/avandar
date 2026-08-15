@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardListView } from "@/views/DashboardApp/DashboardListView/DashboardListView";
 
@@ -11,21 +10,12 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/dashboards/")({
 function DashboardsPage(): JSX.Element {
   const { workspaceSlug } = Route.useParams();
   const workspace = useCurrentWorkspace();
-  const [userProfile] = useCurrentUserProfile();
 
-  const dashboardsWhere =
-    userProfile ?
-      {
-        workspace_id: { eq: workspace.id },
-        owner_id: { eq: userProfile.userId },
-      }
-    : undefined;
-
+  // No `owner_id` filter: RLS decides what this user may see, which is what
+  // makes a dashboard shared with you appear in your list at all. See the P3
+  // design, section 6.
   const [dashboards] = DashboardClient.useGetAll({
-    where: dashboardsWhere,
-    useQueryOptions: {
-      enabled: dashboardsWhere !== undefined,
-    },
+    where: { workspace_id: { eq: workspace.id } },
   });
 
   return (

@@ -24,6 +24,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
+import { sortDashboardsForList } from "@/views/DashboardApp/DashboardListView/sortDashboardsForList/sortDashboardsForList";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { UserId } from "$/models/User/User.types";
 
@@ -91,6 +92,10 @@ export function DashboardListView({
       },
     },
   );
+
+  const orderedDashboards = useMemo(() => {
+    return sortDashboardsForList(dashboards, userProfile?.userId);
+  }, [dashboards, userProfile?.userId]);
 
   const isEmpty = dashboards.length === 0;
 
@@ -160,7 +165,7 @@ export function DashboardListView({
       return (
         <Stack gap="lg">
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-            {dashboards.map((dashboard) => {
+            {orderedDashboards.map((dashboard) => {
               const onCardClick = () => {
                 navigate({
                   to: "/$workspaceSlug/dashboards/edit/$dashboardId",
@@ -175,6 +180,9 @@ export function DashboardListView({
                 <DashboardCard
                   key={dashboard.id}
                   dashboard={dashboard}
+                  isOwnedByCurrentUser={
+                    dashboard.ownerId === userProfile?.userId
+                  }
                   offlineStatus={getDashboardOfflineStatus(dashboard)}
                   onClick={onCardClick}
                 />
