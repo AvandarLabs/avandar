@@ -1,3 +1,4 @@
+import type { ObjectPaths } from "@avandar/utils";
 import { Select } from "@avandar/ui";
 import type {
   GenericFormSchemaRecord,
@@ -5,7 +6,6 @@ import type {
 } from "@/components/forms/AvaForm/AvaForm.types";
 import type { SelectOption, SelectProps } from "@avandar/ui";
 import type { FormType } from "@avandar/ui/hooks";
-import type { Paths } from "type-fest";
 
 type Props<
   FieldKey extends string,
@@ -39,7 +39,7 @@ export function AvaSelectInput<
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
   const formInputProps = form.getInputProps(
-    fieldKey as unknown as Paths<FormValues>,
+    fieldKey as unknown as ObjectPaths<FormValues>,
   );
 
   const onValueChange = (
@@ -56,7 +56,7 @@ export function AvaSelectInput<
 
   return (
     <Select
-      key={form.key(fieldKey as unknown as Paths<FormValues>)}
+      key={form.key(fieldKey as unknown as ObjectPaths<FormValues>)}
       {...formInputProps}
       {...props}
       data={data}

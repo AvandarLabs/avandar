@@ -1,3 +1,4 @@
+import type { ObjectPaths, PathValue, StringKeyOf  } from "@avandar/utils";
 import { isDefined, objectKeys, prop } from "@avandar/utils";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -6,9 +7,7 @@ import type {
   ValuesOfFieldRecord,
 } from "@/components/forms/AvaForm/AvaForm.types";
 import type { FormType } from "@avandar/ui/hooks";
-import type { PathValue, StringKeyOf } from "@avandar/utils";
 import type { ChangeEvent } from "react";
-import type { Paths } from "type-fest";
 
 type SyncedField<FieldSchemaRecord extends GenericFormSchemaRecord> = {
   fieldKey: StringKeyOf<FieldSchemaRecord>;
@@ -49,7 +48,7 @@ export function AvaTextInput<
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
   const formInputProps = form.getInputProps(
-    fieldKey as unknown as Paths<FormValues>,
+    fieldKey as unknown as ObjectPaths<FormValues>,
   );
   const fieldsToSyncTo = objectKeys(fields)
     .map((otherFieldKey) => {
@@ -73,8 +72,8 @@ export function AvaTextInput<
         onChange(value);
       }
       form.setFieldValue(
-        fieldKey as unknown as Paths<FormValues>,
-        value as PathValue<FormValues, Paths<FormValues>>,
+        fieldKey as unknown as ObjectPaths<FormValues>,
+        value as PathValue<FormValues, ObjectPaths<FormValues>>,
       );
     }, debounceMs ?? 0),
     immediate: (event: ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +110,7 @@ export function AvaTextInput<
 
   return (
     <TextInput
-      key={form.key(fieldKey as unknown as Paths<FormValues>)}
+      key={form.key(fieldKey as unknown as ObjectPaths<FormValues>)}
       {...formInputProps}
       {...props}
       name={props.name ?? fieldKey}
@@ -128,8 +127,8 @@ export function AvaTextInput<
 
             // set the synced value in the form
             form.setFieldValue(
-              syncedField.fieldKey as Paths<FormValues>,
-              newSyncedValue as PathValue<FormValues, Paths<FormValues>>,
+              syncedField.fieldKey as ObjectPaths<FormValues>,
+              newSyncedValue as PathValue<FormValues, ObjectPaths<FormValues>>,
             );
             if (syncedField.isDebounced) {
               onSyncedValueChange.debounced(newSyncedValue, syncedField);

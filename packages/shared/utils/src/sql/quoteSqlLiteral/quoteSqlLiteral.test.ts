@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { quoteSqlLiteral } from "@utils/sql/quoteSqlLiteral/quoteSqlLiteral.ts";
+import { describe, expect, it } from "vitest";
 
 describe("quoteSqlLiteral", () => {
   it("wraps a plain value in single quotes", () => {
