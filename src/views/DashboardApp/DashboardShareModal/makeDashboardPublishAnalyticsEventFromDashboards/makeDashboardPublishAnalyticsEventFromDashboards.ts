@@ -28,7 +28,10 @@ export function makeDashboardPublishAnalyticsEventFromDashboards(
   }>,
 ): DashboardPublishAnalyticsEvent {
   const { previousDashboard, updatedDashboard } = options;
-  return previousDashboard.isPublic ?
+  // `isPublic` is a generated column that is false for a workspace-published
+  // dashboard, so branching on it would report every internal republish as a
+  // first publish. The question this branch asks is "was it published at all".
+  return previousDashboard.visibility !== "draft" ?
       {
         event: "dashboard.share_settings_updated",
         payload: {
@@ -37,6 +40,7 @@ export function makeDashboardPublishAnalyticsEventFromDashboards(
             previousSlug: previousDashboard.slug,
             updatedSlug: updatedDashboard.slug,
           }),
+          visibility: updatedDashboard.visibility,
         },
       }
     : (() => {
@@ -49,6 +53,7 @@ export function makeDashboardPublishAnalyticsEventFromDashboards(
             dashboardId: updatedDashboard.id,
             blockCount: config.content.length,
             hasVanitySlug: Boolean(updatedDashboard.slug),
+            visibility: updatedDashboard.visibility,
           },
         };
       })();

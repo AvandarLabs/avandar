@@ -159,6 +159,7 @@ describe("PublishDashboardModal", () => {
         dashboardId: dashboardClientState.currentUpdatedDashboard.id,
         blockCount: 2,
         hasVanitySlug: true,
+        visibility: "public",
       },
     });
   });
