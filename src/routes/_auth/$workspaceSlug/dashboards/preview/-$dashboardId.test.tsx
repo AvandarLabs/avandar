@@ -42,9 +42,11 @@ type LoaderArgs = {
   context: { queryClient: QueryClient };
   params: { dashboardId: string; workspaceSlug: string };
 };
-type Loader = (
-  args: LoaderArgs,
-) => Promise<{ canEdit: boolean; dashboard: Dashboard.T }>;
+type Loader = (args: LoaderArgs) => Promise<{
+  canEdit: boolean;
+  dashboard: Dashboard.T;
+  isAccessDenied: boolean;
+}>;
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const WORKSPACE_ID = "22222222-2222-4222-8222-222222222222" as Workspace.Id;
@@ -107,6 +109,7 @@ describe("/$workspaceSlug/dashboards/preview/$dashboardId", () => {
     await expect(_getLoader()(_createLoaderArgs())).resolves.toEqual({
       canEdit: false,
       dashboard,
+      isAccessDenied: true,
     });
     expect(freshCanAccessResourceMock).toHaveBeenCalledWith({
       resourceId: DASHBOARD_ID,
@@ -124,6 +127,7 @@ describe("/$workspaceSlug/dashboards/preview/$dashboardId", () => {
     await expect(_getLoader()(_createLoaderArgs())).resolves.toEqual({
       canEdit: false,
       dashboard,
+      isAccessDenied: true,
     });
     expect(freshCanAccessResourceMock).toHaveBeenCalledWith({
       resourceId: DASHBOARD_ID,
@@ -131,5 +135,40 @@ describe("/$workspaceSlug/dashboards/preview/$dashboardId", () => {
       minRole: "editor",
     });
     expect(userClientWithCacheMock).not.toHaveBeenCalled();
+  });
+
+  it("denies a viewer on a draft dashboard", async () => {
+    // `draft` means the owner has not decided it is ready for anyone else.
+    // That is the whole product meaning of the state.
+    const dashboard = { ..._createDashboard(), visibility: "draft" as const };
+    getByIdMock.mockResolvedValue(dashboard);
+    freshCanAccessResourceMock.mockResolvedValue(false);
+
+    const data = await _getLoader()(_createLoaderArgs());
+
+    expect(data.isAccessDenied).toBe(true);
+  });
+
+  it("admits a viewer once the dashboard is published to the workspace", async () => {
+    const dashboard = {
+      ..._createDashboard(),
+      visibility: "workspace" as const,
+    };
+    getByIdMock.mockResolvedValue(dashboard);
+    freshCanAccessResourceMock.mockResolvedValue(false);
+
+    const data = await _getLoader()(_createLoaderArgs());
+
+    expect(data.isAccessDenied).toBe(false);
+  });
+
+  it("admits an editor on a draft, which is the whole point of preview", async () => {
+    const dashboard = { ..._createDashboard(), visibility: "draft" as const };
+    getByIdMock.mockResolvedValue(dashboard);
+    freshCanAccessResourceMock.mockResolvedValue(true);
+
+    const data = await _getLoader()(_createLoaderArgs());
+
+    expect(data.isAccessDenied).toBe(false);
   });
 });
