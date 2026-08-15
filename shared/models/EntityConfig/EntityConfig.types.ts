@@ -1,5 +1,5 @@
-import type { ObjectPaths, UUID  } from "@avandar/utils";
 import type { Model } from "@avandar/models";
+import type { ObjectPaths, UUID } from "@avandar/utils";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
@@ -81,8 +81,9 @@ export type EntityConfigModel = SupabaseCrudModelSpec<
   }
 >;
 
-export type EntityConfigWith<Keys extends ObjectPaths<EntityConfigModel["Full"]>> =
-  Simplify<SetRequiredDeep<EntityConfigModel["Full"], Keys>>;
+export type EntityConfigWith<
+  Keys extends ObjectPaths<EntityConfigModel["Full"]>,
+> = Simplify<SetRequiredDeep<EntityConfigModel["Full"], Keys>>;
 
 export type BuildableEntityConfig = EntityConfigWith<
   "datasets" | "fields" | `fields.${number}.valueExtractor`

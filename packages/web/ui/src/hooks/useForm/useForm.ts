@@ -1,6 +1,6 @@
-import type { ObjectPaths, UnknownObject  } from "@avandar/utils";
 import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
 import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
+import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,

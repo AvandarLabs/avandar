@@ -1,4 +1,3 @@
-import type { ObjectPaths, EmptyObject, PathValue, UnknownObject  } from "@avandar/utils";
 import {
   getValue,
   isFunction,
@@ -6,6 +5,12 @@ import {
   objectFilter,
   objectValuesMap,
   setValue,
+} from "@avandar/utils";
+import type {
+  EmptyObject,
+  ObjectPaths,
+  PathValue,
+  UnknownObject,
 } from "@avandar/utils";
 import type { Simplify } from "type-fest";
 
@@ -91,10 +96,8 @@ export type Accessors<
      * value.
      */
     set<
-      P extends (
-        [ObjectPaths<State>] extends [never] ? keyof State
-        : ObjectPaths<State>
-      ),
+      P extends [ObjectPaths<State>] extends [never] ? keyof State
+      : ObjectPaths<State>,
       V extends P extends keyof State ? State[P]
       : P extends ObjectPaths<State> ? PathValue<State, P>
       : never,
@@ -217,10 +220,8 @@ export function createModule<
       });
     },
     set: <
-      P extends (
-        [ObjectPaths<State>] extends [never] ? keyof State
-        : ObjectPaths<State>
-      ),
+      P extends [ObjectPaths<State>] extends [never] ? keyof State
+      : ObjectPaths<State>,
       V extends P extends keyof State ? State[P]
       : P extends ObjectPaths<State> ? PathValue<State, P>
       : never,

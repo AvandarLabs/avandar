@@ -1,4 +1,3 @@
-import type { ObjectPaths } from "@avandar/utils";
 import { Select } from "@avandar/ui";
 import type {
   GenericFormSchemaRecord,
@@ -6,6 +5,7 @@ import type {
 } from "@/components/forms/AvaForm/AvaForm.types";
 import type { SelectOption, SelectProps } from "@avandar/ui";
 import type { FormType } from "@avandar/ui/hooks";
+import type { ObjectPaths } from "@avandar/utils";
 
 type Props<
   FieldKey extends string,

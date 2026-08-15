@@ -1,4 +1,4 @@
-import type { ObjectPaths, PathValue, UnknownObject  } from "@avandar/utils";
+import type { ObjectPaths, PathValue, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import type {
   GetInputPropsOptions,
