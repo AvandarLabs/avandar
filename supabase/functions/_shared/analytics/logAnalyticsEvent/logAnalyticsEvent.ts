@@ -2,7 +2,7 @@ import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   AnalyticsApp,
   ServerAnalyticsEvent,
-} from "$/analytics/analyticsEvents/analyticsEvents.ts";
+} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
 
 type LogAnalyticsEventOptions = ServerAnalyticsEvent & {
   supabaseAdminClient: AvaSupabaseClient;

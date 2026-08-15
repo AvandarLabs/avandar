@@ -15,27 +15,79 @@ metadata:
 1. Put all declarative schema SQL files in `supabase/schemas/`.
 2. Never create or edit `supabase/migrations/*.sql` directly for schema changes. Generate migrations from the declarative schema. The one exception is `storage.objects` and `storage.buckets`, which must be hand-written; see the Storage section.
 3. Every schema file must be named `NN.<descriptive_name>.sql` where `NN` is a zero-padded two-digit index such as `00`, `01`, `10`, or `70`.
-4. Use descriptive names based on the entity in the file: `00.util_fns.sql`, `01.user_role_type.sql`, `10.workspaces.sql`, `20.user_profiles.sql`, `70.rpc_create_workspace.sql`.
+4. Use descriptive names based on the entity in the file: `00.util_fns.sql`, `00.enum.user_role_type.sql`, `10.workspaces.sql`, `20.user_profiles.sql`, `70.rpc_create_workspace.sql`.
 5. Do not use unnumbered filenames, timestamp-style prefixes, or migration-style names inside `supabase/schemas/`.
-6. Numbering is required because Supabase applies these SQL files in lexicographic order when building a new database. Use the prefix to layer dependencies safely.
+6. Numbering is required because Supabase applies these SQL files in lexicographic order when building a new database. Tens are broad layers and units are sub-layers within one broad layer; see Required File Layout for the full rule.
 7. If this is a brand new schema setup, always create `supabase/schemas/00.util_fns.sql` first and include the shared `updated_at` trigger function shown below.
 8. Prefer many small entity files over monolithic files. The only allowed exception is a small shared utility file such as `00.util_fns.sql`.
 
 ## Required File Layout
 
-Use the numbered prefixes to enforce this global order:
+Supabase applies `supabase/schemas/*.sql` in **lexicographic order** when it
+builds a database, so the two-digit prefix *is* the dependency graph. Read it
+as two levels: tens are broad layers, units are sub-layers within one.
 
-- `00`: global utilities and shared bootstrap files
-- `01` to `49`: custom datatypes, tables, and other schema entities in dependency order
-- `50` and above: RPCs and other call-oriented functions
+### Tens are broad layers
 
-Within that order:
+Each multiple of ten opens one. Anything in a layer may depend on anything
+in an earlier layer.
 
-- Global utilities come first.
-- Custom datatypes must live in their own dedicated SQL files and must appear before anything that depends on them.
-- Tables must come after shared utilities and after any custom datatypes they use.
-- RPC functions must be the highest-numbered files.
-- If table `B` depends on table `A`, give `A` a lower prefix than `B`.
+- `00`: global utilities, shared bootstrap, and custom datatypes
+- `10`, `20`, `30`, `40`: entities, one broad layer per ten, in dependency order
+- `50` to `89`: RPCs and other call-oriented functions
+- `90` to `98`: reporting views and anything else that reads the finished schema
+- `99`: the storage policy mirror (see Storage)
+
+### Units are sub-layers within one broad layer
+
+Step the units digit by one **only** when a file directly depends on something
+defined at the index just above it. `31.*` may use what `30.*` defines. It stays
+in the same broad layer because it is the same kind of thing; a new ten
+would claim it is a different kind.
+
+### Peers share an index
+
+Files that do **not** depend on each other take the **same** number, however
+many of them there are. Five independent trigger files are all `31.`, not `31.`
+through `35.`. Distinct numbers assert a dependency that does not exist, and
+the next person has to re-derive whether the order actually matters.
+
+### Never index with letters
+
+`10.a.workspaces.sql`, `10b.workspaces.sql`, and any other letter-based step
+are invalid. The index is numeric. If you need another step, use the next
+number.
+
+### Worked example
+
+```text
+00.util_fns.sql                     utilities every layer may call
+00.enum.app_type.sql                datatypes, same layer, no interdependency
+10.workspaces.sql                   first entity layer
+20.user_profiles.sql                depends on workspaces, new layer
+30.usage_analytics_events.sql       new layer, defines util__log_analytics_event
+31.analytics_auth_emitters.sql      ┐
+31.analytics_invite_emitters.sql    │ all call util__log_analytics_event,
+31.analytics_workspace_emitters.sql │ none calls another, so one shared index
+31.analytics_subscription_emitters.sql ┘
+70.rpc_create_workspace.sql         RPCs, after every entity exists
+91.analytics_view__activation.sql   reads the finished schema
+```
+
+### Rules that follow from this
+
+- Custom datatypes live in their own files and must appear before anything
+  that uses them.
+- If table `B` depends on table `A`, `A` takes the lower prefix.
+- Tables come after the utilities and datatypes they use. RPCs come after the
+  tables they call.
+- Choose the lowest prefix that preserves dependency order. Do not skip ahead
+  to leave room.
+- Renumbering an existing schema file is safe and is the right fix when the
+  numbering misstates dependencies. These files are declarative, so `db diff`
+  compares the final state and the filename never reaches the database. This
+  is the opposite of `supabase/migrations/`, where a file that may already be
+  applied must never be renamed.
 
 ## Decision Checklist
 
@@ -72,29 +124,11 @@ $$ language plpgsql;
 
 Use this shared trigger helper from table files that maintain an `updated_at` column.
 
-## Recommended Layering Pattern
-
-Use numbering to reflect dependency layers, for example:
-
-- `00.util_fns.sql`
-- `01.user_role_type.sql`
-- `10.workspaces.sql`
-- `20.user_profiles.sql`
-- `30.workspace_memberships.sql`
-- `60.rpc_create_workspace.sql`
-- `70.rpc_invite_workspace_member.sql`
-
-Interpretation:
-
-- `00.*` files define shared utilities and bootstrap helpers that many later files can depend on.
-- `01.*`, `10.*`, `20.*` and similar ranges define datatypes and tables in dependency order.
-- `60.*`, `70.*` and similar high-number ranges are reserved for RPCs after all dependent tables, policies, triggers, and supporting types already exist.
-
 ## Integrated Example
 
 If you are adding a new `projects` table that uses a custom enum and later exposing an RPC to create a project:
 
-1. Create the enum in a dedicated earlier file such as `01.project_status.sql`.
+1. Create the enum in a dedicated `00` file such as `00.enum.project_status.sql`.
 2. Create the table in its own file such as `10.projects.sql`.
 3. Put the `projects` table definition, indexes, constraints, triggers, RLS policies, and table-specific helper functions in `10.projects.sql`.
 4. Create the RPC in a higher-numbered dedicated file such as `70.rpc_create_project.sql`.
@@ -108,7 +142,8 @@ Define the desired final state in `supabase/schemas/`.
 
 - Create new numbered files when introducing new entities.
 - Update the existing entity file when changing an existing table, datatype, or RPC.
-- Choose the lowest reasonable prefix that preserves dependency order.
+- Choose the lowest prefix that preserves dependency order, and reuse an
+  existing index when the new file has no dependency on its peers there.
 - Do not place declarative schema anywhere else.
 
 ### 2. Generate Migration

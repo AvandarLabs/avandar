@@ -115,11 +115,6 @@ msgstr "位置 {index} 的 JOIN 項目不是純資料表參照。"
 msgid "Geo Explorer"
 msgstr "地理探索器"
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "或 {0} 以在我們的公開啟動準備好時獲得通知。"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "右側範圍"
@@ -703,7 +698,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您當前的計劃無法添加更多數據集。升級以添加此目錄數據集。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "請檢查您的電子郵件以獲取確認鏈接。可能需要幾分鐘才能到達。"
@@ -733,7 +728,7 @@ msgstr "來自衍生數據集"
 msgid "Single select"
 msgstr "單選"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "不過，我們目前不允許新的註冊。"
 
@@ -1049,10 +1044,10 @@ msgstr "時間戳"
 msgid "Y axis tick interval"
 msgstr "Y 軸刻度間隔"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "密碼"
 
@@ -1415,13 +1410,6 @@ msgstr "工作區名稱是必填的"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候補名單上並且尚未收到註冊代碼，我們感謝您的耐心。您將很快收到註冊代碼。我們保證！"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "檢測到偏見："
@@ -1652,10 +1640,6 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "有可用的更新"
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2271,7 +2255,7 @@ msgstr "內距"
 msgid "Theme"
 msgstr "主題"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "註冊"
 
@@ -2307,7 +2291,7 @@ msgstr "全域管理員"
 msgid "Comma (,)"
 msgstr "逗號 (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "註冊需要連接到互聯網。"
 
@@ -2339,7 +2323,7 @@ msgstr "第 9 欄"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "您沒有權限打開工作區的這部分。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "請檢查您的電子郵件"
 
@@ -2366,10 +2350,6 @@ msgstr "捕捉儀表板中…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "X 軸刻度間隔"
-
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "這是一個無效的候補名單代碼"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2406,6 +2386,10 @@ msgstr "值"
 msgid "Y axis label color"
 msgstr "Y 軸標籤顏色"
 
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "如果您想取得存取權，請<0>寄送電子郵件給我們</0>。"
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "關於您的工作區"
@@ -2441,7 +2425,7 @@ msgstr "{totalRowCount} 列皆無法繪製於地圖上，因為缺少座標或�
 msgid "Plan Features:"
 msgstr "計劃功能："
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "與我們一起開始您的旅程"
 
@@ -2932,10 +2916,6 @@ msgstr "拖放以導入"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "日期範圍"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "註冊我們的候補名單"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3475,8 +3455,8 @@ msgstr "最常見"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "密碼不匹配"
 
@@ -3666,7 +3646,7 @@ msgstr "無法移除離線聊天模型"
 msgid "Legend"
 msgstr "圖例"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "創建新帳戶"
 
@@ -3794,11 +3774,6 @@ msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語�
 msgid "Select aggregation"
 msgstr "選擇聚合"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "在 Avandar 還處於測試階段時，我們僅允許在您在候補名單上並且已在電子郵件中收到註冊代碼的情況下進行註冊。"
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "忽略所有全局篩選器：此可視化未經篩選。"
@@ -3810,10 +3785,6 @@ msgstr "您寫道："
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "多重選擇"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "註冊我們的候補名單"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3834,10 +3805,6 @@ msgstr "收合抽屜"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "分享失敗"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "您的候補名單代碼已被驗證"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -3992,9 +3959,9 @@ msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "電子郵件"
 
@@ -4169,8 +4136,8 @@ msgstr "用戶已移除"
 msgid "Limit {displayName} to app access"
 msgstr "限制 {displayName} 的應用訪問"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "確認密碼"
 
@@ -4252,7 +4219,7 @@ msgstr "日期"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此儀表板未引用任何數據集：無法發布。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "確認電子郵件已發送至您的電子郵件地址。"
 
@@ -4631,10 +4598,6 @@ msgstr "載入儀表板資料集"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "從您的電腦選擇一個 Excel 或 CSV 檔案以匯入"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "請選擇一個密碼以完成註冊"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5518,7 +5481,7 @@ msgid "Avandar is still in beta. Some features may not work as expected and "
 "feedback as we work to improve the product."
 msgstr "Avandar 仍在測試階段。某些功能可能無法按預期工作，某些功能可能仍在建設中。我們感謝您的耐心和反饋，幫助我們改進產品。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
 
@@ -5711,7 +5674,7 @@ msgstr "搜尋儀表板"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "電子郵件地址無效"
 

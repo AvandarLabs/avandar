@@ -7,12 +7,6 @@ export const SUPPORT_EMAIL = "support@avandarlabs.com";
 /** The email address to use for general inquiries */
 export const INFO_EMAIL = "info@avandarlabs.com";
 
-/**
- * The URL to the waitlist page. This is only used if self-registration is
- * disabled or if we require a sign up code to register.
- */
-export const WAITLIST_URL = "https://avandarlabs.com/waitlist";
-
 /** The maximum number of seats allowed for the free plan. */
 export const MAX_FREE_PLAN_SEATS = 2;
 

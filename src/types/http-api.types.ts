@@ -8,7 +8,6 @@ import type { PolarPublicAPI } from "@sbfn/polar-public/PolarPublicRoutes.types"
 import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types";
 import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
 import type { SupportAPI } from "@sbfn/support/SupportRoutes.types";
-import type { WaitlistAPI } from "@sbfn/waitlist/WaitlistRoutes.types";
 import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types";
 import type { Simplify } from "type-fest";
 
@@ -28,8 +27,7 @@ type FullAPI = SupportAPI &
   GoogleAuthCallbackAPI &
   GoogleSheetsAPI &
   PolarPublicAPI &
-  SubscriptionsAPI &
-  WaitlistAPI;
+  SubscriptionsAPI;
 
 type FlattenedAPI = {
   [FnName in Extract<keyof FullAPI, string>]: {

@@ -1,5 +1,8 @@
 # Analytics Payload Enrichment Implementation Plan
 
+> **Status:** Complete as of 2026-08-14. The active client analytics events now
+> emit the privacy-safe payloads described by the companion design.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Enrich active browser analytics events with approved, privacy-safe payloads and distinguish first dashboard publication from later sharing updates.

@@ -113,6 +113,22 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+- Before any database migration or schema work on a branch other than
+  `develop`, create an isolated local Supabase instance with
+  `ava supabase switch <temporary-project-id>`, even when no local Supabase
+  instance is running. Derive `<temporary-project-id>` from the current branch
+  by lowercasing it, replacing each run of characters outside `a-z`, `0-9`, and
+  `_` with `-`, collapsing repeated hyphens, and trimming leading and trailing
+  hyphens. For example, `feat/analytics-p2` becomes `feat-analytics-p2`.
+- Keep the switched local instance active unless the user explicitly asks to
+  merge into `develop`. When an authorized merge to `develop` is requested, run
+  `ava supabase restore` before staging, committing, or merging, then verify
+  `supabase/config.toml` uses the standard local `avandar` project id and ports.
+  If no merge is requested, tell the user they are responsible for running
+  `ava supabase restore` when they finish validating their branch.
+- Never commit a branch-scoped Supabase `config.toml` or switch-generated
+  environment changes. Git hooks enforce the standard configuration, but do not
+  bypass those hooks.
 
 ### Production database prohibition
 
