@@ -333,6 +333,94 @@ create trigger tr__dashboards__prevent_workspace_id_change before
 update of workspace_id on public.dashboards for each row
 execute function public.dashboards__prevent_workspace_id_change ();
 
+/**
+ * Blocks a transition into `public` for callers below the Dashboards admin
+ * tier.
+ *
+ * This is the server-side counterpart of the `dashboards__can_publish_publicly`
+ * permission key in `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts`.
+ * That registry is a UI catalog and grants nothing on its own, so without this
+ * trigger the client gate would be the only thing between an editor and the
+ * open internet.
+ *
+ * It is a trigger rather than an RLS `with check` because the rule is about the
+ * TRANSITION, and `with check` cannot see OLD. A state-based check would reject
+ * an editor re-saving a dashboard an admin published, which is a working flow.
+ *
+ * A publish reaches `public` in two steps: a durable claim that stages
+ * `snapshot_transition_target_visibility`, then a settlement that flips
+ * `visibility`. Both are guarded, so an unauthorized editor is stopped when the
+ * publish starts rather than after a full snapshot has been staged.
+ *
+ * @returns NEW, or raises 42501 (insufficient_privilege).
+ */
+create or replace function private.dashboards__enforce_publish_publicly () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  -- The rule governs end-user requests, which PostgREST runs as `authenticated`
+  -- with a JWT. The service role and direct psql writes (migrations, seeds,
+  -- pgTAP setup) already bypass RLS entirely, so gating them here would break
+  -- trusted paths without adding a boundary.
+  --
+  -- Both halves are load-bearing. `auth.uid()` alone is not enough because a
+  -- psql session that switches to `postgres` can still carry a leftover
+  -- `request.jwt.claims`, which is exactly what the storage pgTAP fixtures do.
+  -- `current_user` alone is not enough because an `authenticated` request with
+  -- no resolvable subject has no role to check against. The function is
+  -- SECURITY INVOKER on purpose: under SECURITY DEFINER `current_user` would be
+  -- the function owner rather than the caller.
+  if current_user <> 'authenticated' or auth.uid () is null then
+    return new;
+  end if;
+
+  if (
+    (
+      new.visibility = 'public'::public.dashboard_visibility and
+      old.visibility is distinct from 'public'::public.dashboard_visibility
+    ) or
+    (
+      new.snapshot_transition_target_visibility =
+        'public'::public.dashboard_visibility and
+      old.snapshot_transition_target_visibility is distinct from
+        'public'::public.dashboard_visibility
+    )
+  )
+    -- The role is checked against OLD.workspace_id, never NEW.workspace_id.
+    -- NEW is attacker-controlled in the same statement, so reading it would let
+    -- a caller name a workspace they are admin of to authorize publishing a
+    -- dashboard that lives somewhere else.
+    -- `tr__dashboards__prevent_workspace_id_change` also rejects that, but only
+    -- because its name happens to sort after this one, and trigger firing order
+    -- is not a boundary worth depending on.
+    and not public.util__auth_user_meets_min_app_role (
+      old.workspace_id,
+      'dashboards'::public.app_type,
+      'admin'::public.role_level
+    ) then
+    raise exception 'Publishing a dashboard publicly requires the Dashboards admin role'
+    using errcode = '42501';
+  end if;
+
+  return new;
+end;
+$$;
+
+revoke all on function private.dashboards__enforce_publish_publicly ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+-- `update of visibility, snapshot_transition_target_visibility` narrows the
+-- trigger to statements that mention either column at all; the OLD comparisons
+-- above are what make it exact.
+create trigger tr__dashboards__enforce_publish_publicly before
+update of visibility,
+snapshot_transition_target_visibility on public.dashboards for each row
+execute function private.dashboards__enforce_publish_publicly ();
+
 -- Trigger the `updated_at` update
 create trigger tr_dashboards__set_updated_at before
 update on public.dashboards for each row

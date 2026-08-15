@@ -39,7 +39,14 @@ with
       'dashboard'::public.resource_type,
       public.dashboards.owner_id
     ) and
-    public.dashboards.snapshot_transition_kind is null
+    public.dashboards.snapshot_transition_kind is null and
+    -- A dashboard is always born a draft. Publication is reachable only through
+    -- the guarded two-step snapshot transition, so
+    -- `tr__dashboards__enforce_publish_publicly` does not have to be duplicated
+    -- for INSERT. Without this, a plain editor could insert a row that is
+    -- already `public`, which is anon-readable, squats the global slug
+    -- namespace, and can point at a chosen `snapshot_revision`.
+    public.dashboards.visibility = 'draft'::public.dashboard_visibility
   );
 
 create policy "Users with editor access can update dashboards" on public.dashboards
