@@ -25,4 +25,19 @@ describe("makePrivateConfirmCopy", () => {
     });
     expect(JSON.stringify(copy)).not.toContain("still be public");
   });
+
+  it("names the resource rather than calling everything a dashboard", () => {
+    // This module renders for datasets too, so the publication sentence has to
+    // read like its siblings and interpolate what it is talking about.
+    const copy = makePrivateConfirmCopy({
+      resourceName: "California COVID",
+      app: "Data Manager",
+      numUsers: 0,
+      numGroups: 1,
+      losesWorkspaceAccess: false,
+      isPubliclyPublished: true,
+    });
+    expect(copy.body).toContain("California COVID");
+    expect(copy.body).not.toContain("dashboard");
+  });
 });

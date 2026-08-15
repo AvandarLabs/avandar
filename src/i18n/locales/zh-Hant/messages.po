@@ -415,6 +415,11 @@ msgstr "要更好地控制您的訂閱，您可以在您的訂閱中進行管理
 msgid "Extra large"
 msgstr "特大"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Nothing has been created or shared with you yet. Create a dashboard to "
+"track key metrics and insights."
+msgstr ""
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
@@ -1644,9 +1649,9 @@ msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "找不到與「{tableName}」相符的已知資料集。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
-msgid "This dashboard will still be public: anyone with the link keeps access "
-"until you unpublish it."
-msgstr ""
+#~ msgid "This dashboard will still be public: anyone with the link keeps access "
+#~ "until you unpublish it."
+#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -2295,6 +2300,10 @@ msgstr "確認操作"
 msgid "Data Preview"
 msgstr "數據預覽"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "No dashboards to show"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "Y 軸最大值"
@@ -2849,8 +2858,8 @@ msgid "Stroke width"
 msgstr "筆畫寬度"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "Create your first dashboard to track key metrics and insights."
-msgstr "建立您的第一個儀表板以追蹤關鍵指標和洞察。"
+#~ msgid "Create your first dashboard to track key metrics and insights."
+#~ msgstr "建立您的第一個儀表板以追蹤關鍵指標和洞察。"
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -3417,6 +3426,11 @@ msgstr "重試查詢"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "澄清"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
+"access until you unpublish it."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
@@ -5988,8 +6002,8 @@ msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "You have not created any dashboards"
-msgstr "您尚未創建任何儀表板"
+#~ msgid "You have not created any dashboards"
+#~ msgstr "您尚未創建任何儀表板"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

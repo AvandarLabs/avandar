@@ -427,6 +427,11 @@ msgstr "Kwa udhibiti zaidi juu ya usajili wako, unaweza kusimamia usajili wako "
 msgid "Extra large"
 msgstr "Kubwa zaidi"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Nothing has been created or shared with you yet. Create a dashboard to "
+"track key metrics and insights."
+msgstr ""
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
@@ -1705,9 +1710,9 @@ msgstr "Haikuweza kupata seti ya data inayojulikana inayolingana na "
 "\"{tableName}\"."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
-msgid "This dashboard will still be public: anyone with the link keeps access "
-"until you unpublish it."
-msgstr ""
+#~ msgid "This dashboard will still be public: anyone with the link keeps access "
+#~ "until you unpublish it."
+#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -2382,6 +2387,10 @@ msgstr "Thibitisha Kitendo"
 msgid "Data Preview"
 msgstr "Mapitio ya Data"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "No dashboards to show"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "Kima cha juu cha mhimili wa Y"
@@ -2957,8 +2966,8 @@ msgid "Stroke width"
 msgstr "Upana wa mstari"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "Create your first dashboard to track key metrics and insights."
-msgstr "Unda dashibodi yako ya kwanza kufuatilia vipimo na maarifa muhimu."
+#~ msgid "Create your first dashboard to track key metrics and insights."
+#~ msgstr "Unda dashibodi yako ya kwanza kufuatilia vipimo na maarifa muhimu."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -3545,6 +3554,11 @@ msgstr "Jaribu tena utafutaji"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "Mwelekeo"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
+"access until you unpublish it."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
@@ -6195,8 +6209,8 @@ msgid "Type the confirmation phrase"
 msgstr "Andika kifungu cha uthibitisho"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "You have not created any dashboards"
-msgstr "Hujaunda dashibodi yoyote"
+#~ msgid "You have not created any dashboards"
+#~ msgstr "Hujaunda dashibodi yoyote"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

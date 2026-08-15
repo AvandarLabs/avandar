@@ -146,7 +146,12 @@ export function ShareResourceModal({
     upsertShare,
     deleteShare,
     setRestricted,
-    isPubliclyPublished: publishing?.targetVisibility === "public",
+    // Two flags, deliberately not one. The dropdown follows the PENDING
+    // target so a pick does not snap back mid-request; the "Make private"
+    // warning follows what is PUBLISHED, because revoking shares leaves a
+    // public dashboard world-readable no matter what the dropdown now says.
+    isPublicPublishTargeted: publishing?.targetVisibility === "public",
+    isPubliclyPublished: publishing?.currentVisibility === "public",
   });
 
   const userById = useMemo((): Record<string, string> => {

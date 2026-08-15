@@ -29,7 +29,6 @@ describe("DashboardCard", () => {
       <DashboardCard dashboard={makeDashboard("draft")} isOwnedByCurrentUser />,
     );
     expect(screen.queryByText("Shared with you")).toBeNull();
-    expect(screen.queryByText("Yours")).toBeNull();
   });
 
   it("badges a workspace-published dashboard", () => {

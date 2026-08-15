@@ -138,11 +138,12 @@ export function DashboardListView({
 
             <Stack gap="xs">
               <Title order={2} fw={650}>
-                <Trans>You have not created any dashboards</Trans>
+                <Trans>No dashboards to show</Trans>
               </Title>
               <Text c="dimmed">
                 <Trans>
-                  Create your first dashboard to track key metrics and insights.
+                  Nothing has been created or shared with you yet. Create a
+                  dashboard to track key metrics and insights.
                 </Trans>
               </Text>
             </Stack>
@@ -180,8 +181,14 @@ export function DashboardListView({
                 <DashboardCard
                   key={dashboard.id}
                   dashboard={dashboard}
+                  // Until the profile lands there is no owner to compare
+                  // against, and the ambiguous answer has to be the quiet
+                  // one: `false` would badge every card on the grid,
+                  // including your own, and then un-badge them a tick later.
                   isOwnedByCurrentUser={
-                    dashboard.ownerId === userProfile?.userId
+                    userProfile ?
+                      dashboard.ownerId === userProfile.userId
+                    : true
                   }
                   offlineStatus={getDashboardOfflineStatus(dashboard)}
                   onClick={onCardClick}

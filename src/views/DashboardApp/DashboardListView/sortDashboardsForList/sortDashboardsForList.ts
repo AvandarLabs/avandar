@@ -18,6 +18,10 @@ export function sortDashboardsForList(
     if (aIsMine !== bIsMine) {
       return aIsMine ? -1 : 1;
     }
-    return b.updatedAt.localeCompare(a.updatedAt);
+    // Compared as instants rather than as text. `localeCompare` would run ICU
+    // collation over what is really an ordered timestamp, and it would rank a
+    // non-UTC offset by its digits: the parser accepts one even though
+    // PostgREST currently normalises everything to `+00:00`.
+    return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
   });
 }

@@ -1,7 +1,9 @@
+import { ModalsProvider } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ComponentProps } from "react";
 
 const MEMBERS = [
@@ -122,21 +124,31 @@ function renderModal(
   overrides: Readonly<Partial<ComponentProps<typeof ShareResourceModal>>> = {},
 ): void {
   render(
-    <ShareResourceModal
-      resourceName="Q3 Revenue"
-      resourceType="dashboard"
-      resourceId="dash-1"
-      onClose={vi.fn()}
-      {...overrides}
-    />,
+    // `ModalsProvider` is mounted here rather than in `TestProviders` because
+    // the app mounts it in the workspace layout. Without it the "Make private"
+    // confirmation opens into nothing and its assertions silently pass.
+    <ModalsProvider>
+      <ShareResourceModal
+        resourceName="Q3 Revenue"
+        resourceType="dashboard"
+        resourceId="dash-1"
+        onClose={vi.fn()}
+        {...overrides}
+      />
+    </ModalsProvider>,
   );
 }
 
 function _makePublishing(
-  overrides: Readonly<{ onGeneralAccessChange?: () => void }>,
+  overrides: Readonly<{
+    onGeneralAccessChange?: () => void;
+    targetVisibility?: Dashboard.Visibility;
+    currentVisibility?: Dashboard.Visibility;
+  }>,
 ): NonNullable<ComponentProps<typeof ShareResourceModal>["publishing"]> {
   return {
-    targetVisibility: "workspace",
+    targetVisibility: overrides.targetVisibility ?? "workspace",
+    currentVisibility: overrides.currentVisibility ?? "draft",
     publicOptionDisabledReason: undefined,
     section: <div data-testid="share-publishing-section" />,
     actions: <div data-testid="share-publishing-actions" />,
@@ -358,6 +370,7 @@ describe("ShareResourceModal", () => {
       resourceType: "dashboard",
       publishing: {
         targetVisibility: "workspace",
+        currentVisibility: "draft",
         publicOptionDisabledReason: undefined,
         section: <div data-testid="share-publishing-section" />,
         actions: <div data-testid="share-publishing-actions" />,
@@ -405,5 +418,41 @@ describe("ShareResourceModal", () => {
     expect(onGeneralAccessChange).toHaveBeenCalledWith("public");
     expect(mocks.upsertShare).not.toHaveBeenCalled();
     expect(mocks.setRestricted).not.toHaveBeenCalled();
+  });
+
+  // The two cases below are the whole reason the pending target and the
+  // persisted visibility are separate props. Read either one for both jobs and
+  // exactly one of these two fails.
+  it("does not warn about publication when only the pending target is public", async () => {
+    // A draft someone picked "Anyone with the link" on and then thought
+    // better of. Nothing has been published, so there is nothing to warn about
+    // and the warning would be a lie.
+    renderModal({
+      publishing: _makePublishing({
+        targetVisibility: "public",
+        currentVisibility: "draft",
+      }),
+    });
+
+    await _selectGeneralAccess("Only me");
+
+    await screen.findByRole("button", { name: "Make private" });
+    expect(screen.queryByText(/will still be public/)).toBeNull();
+  });
+
+  it("warns about publication for a live public resource whose target has moved off public", async () => {
+    // The dangerous case: the dashboard IS public, the user has since picked
+    // "Restricted", and going private now revokes shares while the whole
+    // internet keeps reading it. Suppressing the warning here would be silent.
+    renderModal({
+      publishing: _makePublishing({
+        targetVisibility: "workspace",
+        currentVisibility: "public",
+      }),
+    });
+
+    await _selectGeneralAccess("Only me");
+
+    expect(await screen.findByText(/will still be public/)).toBeInTheDocument();
   });
 });

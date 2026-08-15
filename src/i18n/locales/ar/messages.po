@@ -422,6 +422,11 @@ msgstr "للحصول على مزيد من التحكم في اشتراكك، ي�
 msgid "Extra large"
 msgstr "كبير جدًا"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Nothing has been created or shared with you yet. Create a dashboard to "
+"track key metrics and insights."
+msgstr ""
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
@@ -1685,9 +1690,9 @@ msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "تعذّر العثور على مجموعة بيانات معروفة تطابق \"{tableName}\"."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
-msgid "This dashboard will still be public: anyone with the link keeps access "
-"until you unpublish it."
-msgstr ""
+#~ msgid "This dashboard will still be public: anyone with the link keeps access "
+#~ "until you unpublish it."
+#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -2353,6 +2358,10 @@ msgstr "تأكيد الإجراء"
 msgid "Data Preview"
 msgstr "معاينة البيانات"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "No dashboards to show"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "الحد الأقصى للمحور Y"
@@ -2919,8 +2928,8 @@ msgid "Stroke width"
 msgstr "عرض الحد"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "Create your first dashboard to track key metrics and insights."
-msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
+#~ msgid "Create your first dashboard to track key metrics and insights."
+#~ msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -3497,6 +3506,11 @@ msgstr "إعادة محاولة البحث"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "توضيحات"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
+"access until you unpublish it."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
@@ -6120,8 +6134,8 @@ msgid "Type the confirmation phrase"
 msgstr "اكتب عبارة التأكيد"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "You have not created any dashboards"
-msgstr "لم تقم بإنشاء أي لوحات معلومات"
+#~ msgid "You have not created any dashboards"
+#~ msgstr "لم تقم بإنشاء أي لوحات معلومات"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

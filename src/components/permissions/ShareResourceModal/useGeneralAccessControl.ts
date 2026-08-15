@@ -38,9 +38,26 @@ type UseGeneralAccessControlOptions = {
     options: Parameters<typeof ResourceShareClient.setResourceRestricted>[0],
   ) => void;
   /**
-   * Whether the resource has a public publication. Public reads never consult
-   * `resource_shares`, so this outranks the derived share value in the
-   * dropdown; it is `false` for every resource type with no published form.
+   * Whether "Anyone with the link" is the PENDING selection. Public reads
+   * never consult `resource_shares`, so this outranks the derived share value
+   * in the dropdown; it is `false` for every resource type with no published
+   * form.
+   *
+   * Display only. It has to follow the pick rather than the database so the
+   * user's selection does not snap back while the publish is in flight, which
+   * is precisely why it must never decide a warning about real exposure.
+   */
+  isPublicPublishTargeted: boolean;
+  /**
+   * Whether the resource is publicly published RIGHT NOW, which is a fact
+   * about the database rather than about the dropdown.
+   *
+   * Kept separate from `isPublicPublishTargeted` because the two disagree in
+   * both directions, and both disagreements are user-visible: a draft someone
+   * has merely selected "Anyone with the link" on would raise a false alarm,
+   * and a live public dashboard someone has since selected "Restricted" on
+   * would suppress the alarm that matters. Only this flag may drive the
+   * "Make private" confirmation.
    */
   isPubliclyPublished: boolean;
 };
@@ -249,7 +266,7 @@ export function useGeneralAccessControl(
     options.sharingState ?
       GeneralAccessModule.fromResourceState({
         ...options.sharingState,
-        isPubliclyPublished: options.isPubliclyPublished,
+        isPubliclyPublished: options.isPublicPublishTargeted,
       })
     : "private";
   const displayedValue =

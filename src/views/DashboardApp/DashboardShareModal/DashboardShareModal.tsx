@@ -56,6 +56,7 @@ export function DashboardShareModal({
       onClose={onClose}
       publishing={{
         targetVisibility: publishing.targetVisibility,
+        currentVisibility: publishing.currentDashboard.visibility,
         publicOptionDisabledReason:
           canPublishPublicly ? undefined : (
             t`Only workspace admins can publish to the web.`

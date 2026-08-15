@@ -59,7 +59,7 @@ export function makePrivateConfirmCopy({
     t`Only you will be able to open it. You can share it again at any time.`,
     ...(isPubliclyPublished ?
       [
-        t`This dashboard will still be public: anyone with the link keeps access until you unpublish it.`,
+        t`"${resourceName}" will still be public: anyone with the link keeps access until you unpublish it.`,
       ]
     : []),
   ].filter(isDefined);

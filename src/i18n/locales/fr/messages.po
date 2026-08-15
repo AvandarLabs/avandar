@@ -433,6 +433,11 @@ msgstr "Pour plus de contrôle sur votre abonnement, vous pouvez gérer votre "
 msgid "Extra large"
 msgstr "Très grand"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "Nothing has been created or shared with you yet. Create a dashboard to "
+"track key metrics and insights."
+msgstr ""
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
@@ -1729,9 +1734,9 @@ msgstr "Impossible de trouver un jeu de données connu correspondant à "
 "« {tableName} »."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
-msgid "This dashboard will still be public: anyone with the link keeps access "
-"until you unpublish it."
-msgstr ""
+#~ msgid "This dashboard will still be public: anyone with the link keeps access "
+#~ "until you unpublish it."
+#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -2409,6 +2414,10 @@ msgstr "Confirmer l'action"
 msgid "Data Preview"
 msgstr "Aperçu des données"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+msgid "No dashboards to show"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "Maximum de l’axe Y"
@@ -2990,9 +2999,9 @@ msgid "Stroke width"
 msgstr "Épaisseur du contour"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "Create your first dashboard to track key metrics and insights."
-msgstr "Créez votre premier tableau de bord pour suivre les indicateurs clés et "
-"les insights."
+#~ msgid "Create your first dashboard to track key metrics and insights."
+#~ msgstr "Créez votre premier tableau de bord pour suivre les indicateurs clés et "
+#~ "les insights."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -3584,6 +3593,11 @@ msgstr "Réessayer la recherche"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
 msgstr "Clarifications"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
+"access until you unpublish it."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
@@ -6264,8 +6278,8 @@ msgid "Type the confirmation phrase"
 msgstr "Tapez la phrase de confirmation"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "You have not created any dashboards"
-msgstr "Vous n'avez créé aucun tableau de bord"
+#~ msgid "You have not created any dashboards"
+#~ msgstr "Vous n'avez créé aucun tableau de bord"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

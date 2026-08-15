@@ -2,10 +2,12 @@
 import { Model } from "@avandar/models";
 import { QueryClient } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@/test-utils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
 
 const {
   canAccessResourceMock,
@@ -35,6 +37,30 @@ vi.mock("@/clients/UserClient", () => {
     },
   };
 });
+
+// The viewer tree pulls the whole data-explorer stack in, and none of it is
+// what an access test is about. `DashboardAccessDeniedView` stays real: it is
+// the thing being asserted.
+vi.mock("@/views/DashboardApp/DashboardViewerView/DashboardViewerView", () => {
+  return {
+    DashboardViewerView: (): ReactNode => {
+      return <div data-testid="dashboard-viewer" />;
+    },
+  };
+});
+
+vi.mock(
+  "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager",
+  () => {
+    return {
+      DataExplorerStateManager: {
+        Provider: ({ children }: { children: ReactNode }): ReactNode => {
+          return children;
+        },
+      },
+    };
+  },
+);
 
 const { Route } = await import("./$dashboardId");
 
@@ -83,6 +109,20 @@ function _createLoaderArgs(): LoaderArgs {
     context: { queryClient: new QueryClient() },
     params: { dashboardId: DASHBOARD_ID, workspaceSlug: "acme" },
   };
+}
+
+/** Renders the route's own component with a loader result it would produce. */
+function _renderPreviewComponent(
+  options: Readonly<{ isAccessDenied: boolean }>,
+): void {
+  vi.spyOn(Route, "useParams").mockReturnValue({ workspaceSlug: "acme" });
+  vi.spyOn(Route, "useLoaderData").mockReturnValue({
+    dashboard: _createDashboard(),
+    canEdit: !options.isAccessDenied,
+    isAccessDenied: options.isAccessDenied,
+  });
+  const Component = Route.options.component as () => ReactNode;
+  render(<Component />);
 }
 
 beforeEach(() => {
@@ -170,5 +210,22 @@ describe("/$workspaceSlug/dashboards/preview/$dashboardId", () => {
     const data = await _getLoader()(_createLoaderArgs());
 
     expect(data.isAccessDenied).toBe(false);
+  });
+
+  // The loader only computes the flag. Without these two the early return in
+  // the component could be deleted and the suite would stay green while a
+  // denied viewer got the dashboard rendered to them anyway.
+  it("renders the access-denied view instead of the dashboard when denied", () => {
+    _renderPreviewComponent({ isAccessDenied: true });
+
+    expect(screen.getByText("You need access")).toBeInTheDocument();
+    expect(screen.queryByTestId("dashboard-viewer")).toBeNull();
+  });
+
+  it("renders the dashboard when access is allowed", () => {
+    _renderPreviewComponent({ isAccessDenied: false });
+
+    expect(screen.getByTestId("dashboard-viewer")).toBeInTheDocument();
+    expect(screen.queryByText("You need access")).toBeNull();
   });
 });
