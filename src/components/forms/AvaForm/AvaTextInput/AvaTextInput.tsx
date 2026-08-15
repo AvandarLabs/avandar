@@ -127,7 +127,7 @@ export function AvaTextInput<
 
             // set the synced value in the form
             form.setFieldValue(
-              syncedField.fieldKey as ObjectPaths<FormValues>,
+              syncedField.fieldKey as unknown as ObjectPaths<FormValues>,
               newSyncedValue as PathValue<FormValues, ObjectPaths<FormValues>>,
             );
             if (syncedField.isDebounced) {

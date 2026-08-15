@@ -1,6 +1,6 @@
 import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Text, Title } from "@mantine/core";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
@@ -11,6 +11,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
+import { WorkspaceDangerZone } from "./WorkspaceDangerZone";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
@@ -106,33 +107,38 @@ export function WorkspaceSettingsPage(): JSX.Element {
 
   const generalTabPanel = () => {
     return (
-      <AvaForm
-        fields={{
-          workspaceName: {
-            key: "workspaceName",
-            type: "text",
-            initialValue: workspace.name,
-            label: t`Workspace Name`,
-            validateFn: (value: string) => {
-              return value.trim() === "" ?
-                  t`Workspace name is required`
-                : undefined;
+      <Stack gap="xl">
+        <AvaForm
+          fields={{
+            workspaceName: {
+              key: "workspaceName",
+              type: "text",
+              initialValue: workspace.name,
+              label: t`Workspace Name`,
+              validateFn: (value: string) => {
+                return value.trim() === "" ?
+                    t`Workspace name is required`
+                  : undefined;
+              },
             },
-          },
-        }}
-        formElements={["workspaceName"]}
-        disableSubmitWhileUnchanged
-        buttonAlignment="right"
-        submitIsLoading={isWorkspaceSaving}
-        onSubmit={(values) => {
-          saveWorkspace({
-            id: workspace.id,
-            data: {
-              name: values.workspaceName,
-            },
-          });
-        }}
-      />
+          }}
+          formElements={["workspaceName"]}
+          disableSubmitWhileUnchanged
+          buttonAlignment="right"
+          submitIsLoading={isWorkspaceSaving}
+          onSubmit={(values) => {
+            saveWorkspace({
+              id: workspace.id,
+              data: {
+                name: values.workspaceName,
+              },
+            });
+          }}
+        />
+        {isCurrentUserTheWorkspaceOwner ?
+          <WorkspaceDangerZone workspace={workspace} />
+        : null}
+      </Stack>
     );
   };
 

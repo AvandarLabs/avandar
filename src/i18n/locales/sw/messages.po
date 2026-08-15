@@ -1320,7 +1320,7 @@ msgstr "Karibu tena"
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} suppressed"
 msgstr ""
@@ -2283,6 +2283,7 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -2364,7 +2365,7 @@ msgstr "Ongeza Sehemu"
 msgid "Layers"
 msgstr ""
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
 msgstr ""
@@ -2541,6 +2542,10 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} "
 "inapaswa kutokea..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Failed to delete workspace"
+msgstr "Imeshindikana kufuta workspace"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2911,6 +2916,10 @@ msgstr "Rangi ya lebo ya mhimili wa Y"
 msgid "Please <0>email us</0> if you would like access."
 msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Private maps"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
@@ -3028,6 +3037,10 @@ msgstr "Je, uko tayari kufuta {0}?"
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
 msgstr ""
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Type the workspace name to confirm"
+msgstr "Andika jina la workspace ili kuthibitisha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -3486,11 +3499,6 @@ msgstr ""
 msgid "Choose the maximum value"
 msgstr "Chagua thamani ya juu"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "Mahali pa kazi unajaribu kufikia halipo au huna ruhusa ya kulifikia."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Lipa kila mwaka"
@@ -3614,6 +3622,10 @@ msgstr "Lebele, mfano. Mkoa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Chagua faili"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete this workspace"
+msgstr "Futa workspace hii"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3992,6 +4004,13 @@ msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "Kitambulisho cha nafasi ya kazi kinaweza kuwa na herufi, nambari na "
 "vistari pekee"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "Hii itafuta kabisa <0>{0}</0> na data yake yote. Hatua hii haiwezi "
+"kutenduliwa."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Imeshindikana kufungua tovuti ya malipo. Tafadhali jaribu tena baadaye."
@@ -4051,6 +4070,10 @@ msgstr "Chagua safu"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete workspace"
+msgstr "Futa workspace"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4675,7 +4698,7 @@ msgstr "Haifanyi kazi"
 msgid "Right"
 msgstr "Kulia"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} no data"
 msgstr ""
@@ -5110,6 +5133,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Yasiyoegemea upande wowote"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "Hufuta kabisa workspace hii na data yake yote. Hatua hii haiwezi "
+"kutenduliwa."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Hesabu safu katika {datasetName} kwa {secondGroupByColumn}"
@@ -5252,7 +5281,6 @@ msgstr "Kukutana na hitilafu wakati wa kuhifadhi seti ya data"
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/GisApp/MapListView/MapListView.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Maps"
 msgstr "Ramani"
 
@@ -5478,7 +5506,7 @@ msgstr "URLs za Kikanuni"
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Mipangilio ya chati huonekana baada ya hoja kurejesha baadhi ya safu."
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
 msgstr ""
@@ -5933,7 +5961,7 @@ msgstr ""
 msgid "Default value"
 msgstr "Thamani ya kawaida"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
@@ -5964,6 +5992,12 @@ msgstr ""
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "Workspace hii haipo tena au umeondolewa kwenye ufikiaji wake. Ikiwa "
+"unafikiri hili ni kosa, wasiliana na mmiliki wa workspace."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -6043,6 +6077,10 @@ msgstr "Kiungo cha kudumu (tumia kwa QR codes)"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Mipangilio"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "Nenda kwenye ukurasa wa mwanzo"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

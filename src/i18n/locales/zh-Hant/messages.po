@@ -1282,7 +1282,7 @@ msgstr "歡迎回來"
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} suppressed"
 msgstr ""
@@ -2212,6 +2212,7 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -2290,7 +2291,7 @@ msgstr "添加欄位"
 msgid "Layers"
 msgstr ""
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
 msgstr ""
@@ -2459,6 +2460,10 @@ msgstr "收到非字串值的文本欄位"
 msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "告訴我們 {singularEntityConfigName} 數據應該來自哪裡..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Failed to delete workspace"
+msgstr "刪除工作區失敗"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2820,6 +2825,10 @@ msgstr "Y 軸標籤顏色"
 msgid "Please <0>email us</0> if you would like access."
 msgstr "如果您想取得存取權，請<0>寄送電子郵件給我們</0>。"
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Private maps"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "關於您的工作區"
@@ -2934,6 +2943,10 @@ msgstr "您確定要刪除 {0} 嗎？"
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
 msgstr ""
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Type the workspace name to confirm"
+msgstr "輸入工作區名稱以確認"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -3379,11 +3392,6 @@ msgstr ""
 msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "您嘗試訪問的工作區不存在或您沒有訪問權限。"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "每年支付"
@@ -3505,6 +3513,10 @@ msgstr "標籤，例如：區域"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "選擇檔案"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete this workspace"
+msgstr "刪除此工作區"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3871,6 +3883,12 @@ msgstr "配置文件管理頁面加載失敗。請稍後再試或聯繫支持。
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "工作區 ID 僅能包含字母、數字和連字號"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "這將永久刪除 <0>{0}</0> 及其所有資料。此動作無法復原。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "無法開啟帳單入口網站。請稍後再試。"
@@ -3926,6 +3944,10 @@ msgstr "選擇列"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在有未保存的更改時無法發布。請先保存。"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete workspace"
+msgstr "刪除工作區"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4539,7 +4561,7 @@ msgstr "不活躍"
 msgid "Right"
 msgstr "右"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} no data"
 msgstr ""
@@ -4966,6 +4988,11 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "中性"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "永久刪除此工作區及其所有資料。此動作無法復原。"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "依據 {secondGroupByColumn} 計算 {datasetName} 中的資料列數"
@@ -5105,7 +5132,6 @@ msgstr "儲存資料集時發生錯誤"
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/GisApp/MapListView/MapListView.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Maps"
 msgstr "地圖"
 
@@ -5321,7 +5347,7 @@ msgstr "標準網址"
 msgid "Chart settings appear once the query returns some columns."
 msgstr "查詢傳回欄位後，圖表設定才會顯示。"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
 msgstr ""
@@ -5762,7 +5788,7 @@ msgstr ""
 msgid "Default value"
 msgstr "默認值"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
@@ -5792,6 +5818,11 @@ msgstr ""
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "此工作區已不存在，或您已被撤銷存取權。如果您認為這是錯誤，請聯絡工作區擁有者。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -5870,6 +5901,10 @@ msgstr "永久鏈接（用於 QR 碼）"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "設置"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "前往首頁"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

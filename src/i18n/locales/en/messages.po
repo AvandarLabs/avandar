@@ -1313,7 +1313,7 @@ msgstr "Welcome back"
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} suppressed"
 msgstr "{0} suppressed"
@@ -2272,6 +2272,7 @@ msgstr "Single color"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
@@ -2352,7 +2353,7 @@ msgstr "Add Field"
 msgid "Layers"
 msgstr "Layers"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
 msgstr "{0} areas suppressed"
@@ -2531,6 +2532,10 @@ msgid "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
 msgstr "Tell us about where the {singularEntityConfigName} data should come "
 "from..."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Failed to delete workspace"
+msgstr "Failed to delete workspace"
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Delete Entity"
@@ -2899,6 +2904,10 @@ msgstr "Y axis label color"
 msgid "Please <0>email us</0> if you would like access."
 msgstr "Please <0>email us</0> if you would like access."
 
+#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
+msgid "Private maps"
+msgstr "Private maps"
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "About your workspace"
@@ -3016,6 +3025,10 @@ msgstr "Are you sure you want to delete {0}?"
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
 msgstr "Running the layer's query."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Type the workspace name to confirm"
+msgstr "Type the workspace name to confirm"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -3471,12 +3484,6 @@ msgstr "Annotate the map"
 msgid "Choose the maximum value"
 msgstr "Choose the maximum value"
 
-#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
-msgid "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-msgstr "The workspace you are trying to access either does not exist or you do "
-"not have access to it."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Pay yearly"
@@ -3599,6 +3606,10 @@ msgstr "Label, e.g. Region"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Select file"
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete this workspace"
+msgstr "Delete this workspace"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Edit {name}"
@@ -3974,6 +3985,13 @@ msgstr "The profile manager page failed to load. Please try again later or "
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
 msgstr "The workspace ID can only contain letters, numbers, and hyphens"
 
+#. placeholder {0}: workspace.name
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
+"cannot be undone."
+msgstr "This will permanently delete <0>{0}</0> and all of its data. This "
+"action cannot be undone."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Unable to open the billing portal. Please try again later."
@@ -4031,6 +4049,10 @@ msgstr "Select columns"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "You cannot publish while there are unsaved changes. Save first."
+
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Delete workspace"
+msgstr "Delete workspace"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4654,7 +4676,7 @@ msgstr "Inactive"
 msgid "Right"
 msgstr "Right"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} no data"
 msgstr "{0} no data"
@@ -5087,6 +5109,12 @@ msgstr "Qwen 2.5 7B"
 msgid "Neutral"
 msgstr "Neutral"
 
+#: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
+msgid "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+msgstr "Permanently deletes this workspace and all of its data. This action "
+"cannot be undone."
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -5230,7 +5258,6 @@ msgstr "An error occurred while saving the dataset"
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/GisApp/MapListView/MapListView.tsx
-#: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Maps"
 msgstr "Maps"
 
@@ -5452,7 +5479,7 @@ msgstr "Canonical URLs"
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Chart settings appear once the query returns some columns."
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
 msgstr "{0} areas are suppressed"
@@ -5906,7 +5933,7 @@ msgstr "The layer fetches exactly these fields, so adding one also makes it "
 msgid "Default value"
 msgstr "Default value"
 
-#. placeholder {0}: operationalState.count
+#. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
@@ -5936,6 +5963,12 @@ msgstr "Displace"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "If there are multiple {fieldName} values for one {0}, then..."
 msgstr "If there are multiple {fieldName} values for one {0}, then..."
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
+msgstr "This workspace no longer exists or your access has been revoked. If you "
+"think this is a mistake, contact your workspace owner."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -6015,6 +6048,10 @@ msgstr "Permanent link (use for QR codes)"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "Settings"
+
+#: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
+msgid "Go to home"
+msgstr "Go to home"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"

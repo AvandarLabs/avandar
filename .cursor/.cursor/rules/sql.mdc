@@ -1,7 +1,0 @@
----
-description: SQL style
-globs: "**/*.sql"
-alwaysApply: false
----
-
-@docs/rules/sql.md
