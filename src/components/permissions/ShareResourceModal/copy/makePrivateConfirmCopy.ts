@@ -15,6 +15,12 @@ export type MakePrivateConfirmCopyOptions = {
   numGroups: number;
   losesWorkspaceAccess: boolean;
   app: string;
+  /**
+   * Whether the resource is currently publicly published. Revoking shares
+   * never touches publication, so a public resource stays world-readable
+   * until it is explicitly unpublished; the confirmation has to say so.
+   */
+  isPubliclyPublished: boolean;
 };
 
 /**
@@ -33,6 +39,7 @@ export function makePrivateConfirmCopy({
   numGroups,
   losesWorkspaceAccess,
   app,
+  isPubliclyPublished,
 }: Readonly<MakePrivateConfirmCopyOptions>): MakePrivateConfirmCopy {
   const peopleClause =
     numUsers === 0 ? undefined
@@ -50,6 +57,11 @@ export function makePrivateConfirmCopy({
     isDefined(shareClause) ? t`${shareClause} will lose access.` : undefined,
     losesWorkspaceAccess ? t`Everyone in ${app} will lose access.` : undefined,
     t`Only you will be able to open it. You can share it again at any time.`,
+    ...(isPubliclyPublished ?
+      [
+        t`This dashboard will still be public: anyone with the link keeps access until you unpublish it.`,
+      ]
+    : []),
   ].filter(isDefined);
 
   return {

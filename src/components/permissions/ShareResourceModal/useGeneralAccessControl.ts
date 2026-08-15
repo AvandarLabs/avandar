@@ -107,6 +107,7 @@ function _requestMakePrivate(options: Readonly<GeneralAccessActions>): void {
     numUsers,
     numGroups,
     losesWorkspaceAccess,
+    isPubliclyPublished: options.isPubliclyPublished,
     onConfirm: () => {
       options.makePrivate(mutationOptions);
     },

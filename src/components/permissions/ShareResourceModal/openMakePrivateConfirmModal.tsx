@@ -9,6 +9,7 @@ type OpenMakePrivateConfirmModalOptions = {
   numUsers: number;
   numGroups: number;
   losesWorkspaceAccess: boolean;
+  isPubliclyPublished: boolean;
   onConfirm: () => void;
 };
 
@@ -24,6 +25,7 @@ export function openMakePrivateConfirmModal(
     numGroups: options.numGroups,
     losesWorkspaceAccess: options.losesWorkspaceAccess,
     app: options.app,
+    isPubliclyPublished: options.isPubliclyPublished,
   });
 
   modals.openConfirmModal({

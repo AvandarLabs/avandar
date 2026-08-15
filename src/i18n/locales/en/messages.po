@@ -1679,6 +1679,12 @@ msgstr "100% stacked"
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Could not find a known dataset matching \"{tableName}\"."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "This dashboard will still be public: anyone with the link keeps access "
+"until you unpublish it."
+msgstr "This dashboard will still be public: anyone with the link keeps access "
+"until you unpublish it."
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Data Visualization"

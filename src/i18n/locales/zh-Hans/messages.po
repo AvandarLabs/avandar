@@ -1633,6 +1633,11 @@ msgstr "100% 堆叠"
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "找不到与“{tableName}”匹配的已知数据集。"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "This dashboard will still be public: anyone with the link keeps access "
+"until you unpublish it."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "数据可视化"

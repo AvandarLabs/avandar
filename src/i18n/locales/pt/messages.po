@@ -1703,6 +1703,11 @@ msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Não foi possível encontrar um conjunto de dados conhecido "
 "correspondente a \"{tableName}\"."
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "This dashboard will still be public: anyone with the link keeps access "
+"until you unpublish it."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Visualização de Dados"
