@@ -3281,7 +3281,7 @@ msgstr "لا يوجد ملف محدد"
 msgid "Submit"
 msgstr "إرسال"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
@@ -3717,7 +3717,7 @@ msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 msgstr "تستخدم جملة JOIN ON مرجعًا غير معتمد على عمود؛ سيحتفظ النموذج به عبر "
 "SQL خام."
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "مجموعة البيانات"
 
@@ -6117,7 +6117,7 @@ msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUI
 msgid "No rows were read successfully"
 msgstr "لم تتم قراءة أي صفوف بنجاح"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "map"
 msgstr ""
 

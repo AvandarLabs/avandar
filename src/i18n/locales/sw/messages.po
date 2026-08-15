@@ -3318,7 +3318,7 @@ msgstr "Hakuna faili iliyochaguliwa"
 msgid "Submit"
 msgstr "Wasilisha"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "dashibodi"
 
@@ -3757,7 +3757,7 @@ msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 msgstr "Kifungu cha JOIN ON kinatumia rejeleo lisilo la safu; fomu italihifadhi "
 "kupitia SQL ghafi."
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "seti ya data"
 
@@ -6184,7 +6184,7 @@ msgstr "Ukifanya matumizi ya URL yako ya kawaida. Kiungo cha kudumu cha UUID "
 msgid "No rows were read successfully"
 msgstr "Hakuna safu zilizosomeka kwa mafanikio"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "map"
 msgstr ""
 

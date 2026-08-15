@@ -3322,7 +3322,7 @@ msgstr "Nenhum arquivo selecionado"
 msgid "Submit"
 msgstr "Enviar"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "painel"
 
@@ -3761,7 +3761,7 @@ msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 msgstr "A cláusula JOIN ON usa uma referência que não é uma coluna; o "
 "formulário a manterá via SQL bruto."
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "conjunto de dados"
 
@@ -6194,7 +6194,7 @@ msgstr "Usando sua URL personalizada. O link UUID permanente abaixo também "
 msgid "No rows were read successfully"
 msgstr "Nenhuma linha foi lida com sucesso"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "map"
 msgstr ""
 

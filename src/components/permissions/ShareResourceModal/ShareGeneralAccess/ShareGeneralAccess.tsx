@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
-import { resourceTypeLabel } from "$/copy/resourceTypeLabel/resourceTypeLabel";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";

@@ -52,11 +52,22 @@ down when it loses one.
 
 ## File layout
 
-One file per copy function, named after the function:
+One flat file per copy function, named after the function:
+`shared/copy/appLabel.ts` exports `appLabel`.
 
-- `shared/copy/appLabel.ts` exports `appLabel`.
-- `shared/copy/resourceTypeLabel/resourceTypeLabel.ts` exports
-  `resourceTypeLabel`, with its test alongside it.
+Give a copy function its own subdirectory only when it has a test to sit
+beside it. A directory that holds one file buys nothing, so the test is the
+whole reason to make one.
+
+Most copy functions have no test worth writing. A copy function is a lookup
+from a key to a translated string, so a test that asserts the label for one
+key restates the mapping it is reading from, and the English msgid usually
+equals the label, which makes the assertion look like an identity check.
+
+`shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts` is the case
+that earns a subdirectory: its test walks the viz descriptor registries and
+fails when a label is added there without a matching catalog entry. It checks
+an invariant across two files rather than the mapping in front of it.
 
 ## Naming
 

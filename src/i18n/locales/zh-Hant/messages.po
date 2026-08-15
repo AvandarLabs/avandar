@@ -3215,7 +3215,7 @@ msgstr "未選擇任何檔案"
 msgid "Submit"
 msgstr "提交"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "儀表板"
 
@@ -3643,7 +3643,7 @@ msgid "JOIN ON clause uses a non-column reference; the form will keep it via "
 "raw SQL."
 msgstr "JOIN ON 子句使用非欄位參照；表單將透過原始 SQL 保留該內容。"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "資料集"
 
@@ -6006,7 +6006,7 @@ msgstr "使用您的自定義 URL。下面的永久 UUID 鏈接仍然有效。"
 msgid "No rows were read successfully"
 msgstr "未成功讀取任何行"
 
-#: shared/copy/resourceTypeLabel/resourceTypeLabel.ts
+#: shared/copy/resourceTypeLabel.ts
 msgid "map"
 msgstr ""
 
