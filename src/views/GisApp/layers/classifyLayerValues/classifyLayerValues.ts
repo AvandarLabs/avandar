@@ -1,4 +1,4 @@
-import { makeJenksBreaks } from "./makeJenksBreaks";
+import { makeJenksBreaks } from "./makeJenksBreaks/makeJenksBreaks";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 export type LayerValue = { featureId: string; value: unknown };

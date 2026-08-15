@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import { getValue } from "@utils/objects/getValue/getValue.ts";
+import { describe, expect, it } from "vitest";
 import type {
-  ObjectPathValue,
   ObjectPaths,
+  ObjectPathValue,
 } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import type { Expect } from "@utils/types/testUtilities.types.ts";
 import type { IsEqual } from "type-fest";
@@ -62,9 +62,7 @@ export type ObjectPathsTypeTests = [
       "link" | "link.to" | "link.label"
     >
   >,
-  Expect<
-    IsEqual<ObjectPathValue<{ link: FakeAppLink }, "link.to">, string>
-  >,
+  Expect<IsEqual<ObjectPathValue<{ link: FakeAppLink }, "link.to">, string>>,
   // Arrays are descended through a `${number}` segment. `useForm` relies on
   // this to type field keys like `layers.0.name`, so it must not regress.
   Expect<
@@ -87,10 +85,7 @@ export type ObjectPathsTypeTests = [
   >,
   // An array of behavior-carrying values still stops at the index.
   Expect<
-    IsEqual<
-      ObjectPaths<{ nodes: FakeElement[] }>,
-      "nodes" | `nodes.${number}`
-    >
+    IsEqual<ObjectPaths<{ nodes: FakeElement[] }>, "nodes" | `nodes.${number}`>
   >,
   // Optional records are still descended into.
   Expect<
@@ -106,7 +101,10 @@ export type ObjectPathsTypeTests = [
   >,
   Expect<
     IsEqual<
-      ObjectPathValue<{ boundary?: { datasetId: string } }, "boundary.datasetId">,
+      ObjectPathValue<
+        { boundary?: { datasetId: string } },
+        "boundary.datasetId"
+      >,
       string
     >
   >,

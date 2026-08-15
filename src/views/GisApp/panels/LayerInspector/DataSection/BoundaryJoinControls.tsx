@@ -5,7 +5,7 @@ import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSing
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { AreaAggregationControls } from "./AreaAggregationControls";
 import { BoundarySourceControls } from "./BoundarySourceControls";
-import type { BoundarySourceOption } from "./useBoundarySourceOptions";
+import type { BoundarySourceOption } from "./useBoundarySourceOptions/useBoundarySourceOptions";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";

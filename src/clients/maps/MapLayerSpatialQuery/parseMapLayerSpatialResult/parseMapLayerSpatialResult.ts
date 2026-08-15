@@ -1,5 +1,5 @@
-import { MapLayerSpatialQueryColumns } from "./MapLayerSpatialQuery.constants";
-import type { MapLayerSpatialDiagnostics } from "./MapLayerSpatialQuery.types";
+import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
+import type { MapLayerSpatialDiagnostics } from "../MapLayerSpatialQuery.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";

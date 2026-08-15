@@ -65,22 +65,74 @@ Use this checklist only when the diff includes TypeScript or TSX files.
   that stays flat. The rule fires only once a *second* file for the same unit
   exists in the directory.
 
+  **A directory couples only the one unit it is named after.** This is the
+  case reviews miss, because being inside a `<Name>/` directory looks like the
+  rule is already satisfied for everything in it. It is not: `Name.ts` +
+  `Name.test.ts` are coupled by the directory itself and stay flat inside it,
+  while every *other* same-base-name pair sitting beside them is its own unit
+  and needs its own directory. Judge each stem separately rather than judging
+  the directory once.
+
+  Two kinds of file legitimately stay flat next to the pairs: a lone file with
+  no same-base-name sibling, and a `<Dir>.types.ts` / `<Dir>.constants.ts` that
+  belongs to the directory as a whole rather than to any one unit in it. The
+  latter is why a grouping directory may carry `<Dir>.types.ts` with no
+  `<Dir>.ts` beside it at all.
+
+  This is bad (four units share one directory, so the listing is a wall of
+  near-duplicate basenames and `Panel.types.ts` is buried among them):
+
+  ```text
+  Panel/
+    Panel.tsx
+    Panel.test.tsx
+    Panel.types.ts
+    useRowData.ts
+    useRowData.test.ts
+    formatCell.ts
+    formatCell.test.ts
+    EmptyState.tsx
+  ```
+
+  This is good (the directory couples `Panel`; the other two pairs get their
+  own directories; the lone component and the directory-level types stay flat):
+
+  ```text
+  Panel/
+    Panel.tsx
+    Panel.test.tsx
+    Panel.types.ts
+    EmptyState.tsx
+    useRowData/
+      useRowData.ts
+      useRowData.test.ts
+    formatCell/
+      formatCell.ts
+      formatCell.test.ts
+  ```
+
   **Find candidates** (base names that recur across suffixes in a directory but
   are not yet in their own directory):
 
   ```bash
   # For each directory under review, collapse test/module/types/constants
   # suffixes + the extension to the unit "stem", then flag stems with 2+ files.
+  # The stem matching the directory's own name is skipped: that unit is already
+  # coupled by the directory it sits in, and its siblings are the findings.
   for dir in $(git diff --name-only <base> | xargs -n1 dirname | sort -u); do
     ls "$dir" 2>/dev/null \
       | sed -E 's/\.(test|module|types|constants|stories)\.[a-z]+$//;
                 s/\.(ts|tsx|css|scss)$//' \
-      | sort | uniq -d | sed "s|^|$dir/|"
+      | sort | uniq -d \
+      | grep -vx "$(basename "$dir")" \
+      | sed "s|^|$dir/|"
   done
   ```
 
-  Each printed stem is a split unit that should be moved into its own `<stem>/`
-  directory (unless it already is one).
+  Every printed stem is a finding: a split unit sitting loose that must move
+  into its own `<stem>/` directory. Skipping the directory's own stem is what
+  keeps the output actionable, since that stem is always printed otherwise and
+  is never a finding.
 - **Flag a `<Name>/` directory whose only content is `<Name>.<ext>`.** This is
   the converse of the rule above, and it is a violation in its own right, not
   merely the absence of one: a directory groups siblings, so a directory with a

@@ -1,9 +1,9 @@
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useSyncExternalStore } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery";
-import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata";
-import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult";
+import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
+import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
+import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
 import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";

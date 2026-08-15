@@ -127,7 +127,7 @@ vi.mock("@/views/GisApp/panels/LayerInspector/useLayerSourceColumns", () => {
 });
 
 vi.mock(
-  "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions",
+  "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions",
   () => {
     return {
       useBoundarySourceOptions: () => {

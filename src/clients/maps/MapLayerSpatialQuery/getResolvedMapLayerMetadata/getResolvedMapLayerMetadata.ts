@@ -7,7 +7,7 @@ import type {
   MapLayerRebindReason,
   MapLayerRebindRequired,
   ResolvedBoundarySource,
-} from "./MapLayerSpatialQuery.types";
+} from "../MapLayerSpatialQuery.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

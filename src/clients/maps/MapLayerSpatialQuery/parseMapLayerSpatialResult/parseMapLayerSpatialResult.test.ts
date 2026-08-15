@@ -1,6 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
-import { MapLayerSpatialQueryColumns } from "./MapLayerSpatialQuery.constants";
+import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
 import { parseMapLayerSpatialResult } from "./parseMapLayerSpatialResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";

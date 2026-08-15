@@ -12,7 +12,7 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useMemo, useState } from "react";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { classifyLayerValues } from "@/views/GisApp/layers/classifyLayerValues/classifyLayerValues";
-import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/normalizeLayerValue";
+import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/normalizeLayerValue/normalizeLayerValue";
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";

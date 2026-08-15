@@ -1,4 +1,4 @@
-import type { ObjectPaths, UnknownObject  } from "@avandar/utils";
+import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type { Simplify, UnknownArray } from "type-fest";
 
 /**

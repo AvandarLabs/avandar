@@ -1,16 +1,16 @@
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { buildGeometryExpression } from "./buildGeometryExpression";
-import { buildNormalizedBoundaryKey } from "./buildNormalizedBoundaryKey";
-import { getSimplificationTolerance } from "./getSimplificationTolerance";
+import { buildGeometryExpression } from "../buildGeometryExpression/buildGeometryExpression";
+import { buildNormalizedBoundaryKey } from "../buildNormalizedBoundaryKey/buildNormalizedBoundaryKey";
+import { getSimplificationTolerance } from "../getSimplificationTolerance/getSimplificationTolerance";
 import {
   MapLayerSpatialFeatureProperties,
   MapLayerSpatialQueryColumns,
-} from "./MapLayerSpatialQuery.constants";
+} from "../MapLayerSpatialQuery.constants";
 import type {
   MapLayerSpatialQueryPlan,
   ResolvedMapLayerMetadata,
-} from "./MapLayerSpatialQuery.types";
+} from "../MapLayerSpatialQuery.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type CompileOptions = {
