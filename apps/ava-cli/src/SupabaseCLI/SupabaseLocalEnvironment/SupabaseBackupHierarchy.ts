@@ -16,8 +16,10 @@ async function _canonicalWorktreeRoot(
   }>,
 ): Promise<string> {
   const { io, worktreePath } = options;
-  const canonicalProjectRoot = await io.realPath(io.projectRoot);
-  const canonicalWorktreePath = await io.realPath(worktreePath);
+  const [canonicalProjectRoot, canonicalWorktreePath] = await Promise.all([
+    io.realPath(io.projectRoot),
+    io.realPath(worktreePath),
+  ]);
   if (canonicalProjectRoot !== canonicalWorktreePath) {
     throw new Error("Supabase backup hierarchy has a non-deterministic root.");
   }

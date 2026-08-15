@@ -706,7 +706,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "Huwezi kuongeza seti zaidi za data kwenye mpango wako wa sasa. Pandisha "
 "hadhi ili kuongeza seti hii ya katalogi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho. Inaweza "
@@ -736,7 +736,7 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 msgid "Single select"
 msgstr "Chaguo moja"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Hata hivyo, haturuhusu usajili mpya kwa sasa."
 
@@ -1052,10 +1052,10 @@ msgstr "Wakati"
 msgid "Y axis tick interval"
 msgstr "Muda wa alama za mhimili wa Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Nenosiri"
 
@@ -1667,11 +1667,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Export dashboard hii kama PDF, au chora kwanza. Maelezo yanasaidia "
 "maandiko, mishale, na kuchora kwa mkono kwa ukali unaoweza kubadilishwa "
 "(RoughJS)."
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
-"wa mapema."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2301,7 +2296,7 @@ msgstr "Pengo la ndani"
 msgid "Theme"
 msgstr "Mandhari"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Jisajili"
 
@@ -2339,7 +2334,7 @@ msgstr "Msimamizi wa Kimataifa"
 msgid "Comma (,)"
 msgstr "Koma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "Usajili unahitaji muunganisho wa intaneti."
 
@@ -2371,7 +2366,7 @@ msgstr "Safu wima ya 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
 
@@ -2436,6 +2431,10 @@ msgstr "Thamani"
 msgid "Y axis label color"
 msgstr "Rangi ya lebo ya mhimili wa Y"
 
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
@@ -2475,7 +2474,7 @@ msgstr "Hakuna hata safu moja kati ya safu {totalRowCount} iliyoweza kuwekwa "
 msgid "Plan Features:"
 msgstr "Vipengele vya Mpango:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
@@ -3533,8 +3532,8 @@ msgstr "Ya kawaida zaidi"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Nywila hazifanani"
 
@@ -3730,7 +3729,7 @@ msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
 msgid "Legend"
 msgstr "Ufafanuzi"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Unda akaunti mpya"
 
@@ -4045,9 +4044,9 @@ msgid "Looking up values in {column}…"
 msgstr "Inatafuta thamani katika {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Barua pepe"
 
@@ -4225,8 +4224,8 @@ msgstr "Mtumiaji ameondolewa"
 msgid "Limit {displayName} to app access"
 msgstr "Punguza {displayName} kwa ufikiaji wa programu"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Thibitisha Neno la Siri"
 
@@ -4309,7 +4308,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 "kuchapisha."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Barua ya kuthibitisha imetumwa kwa anwani yako ya barua pepe."
 
@@ -5597,7 +5596,7 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 "kama inavyotarajiwa na vingine bado vinaweza kuwa katika ujenzi. "
 "Tunashukuru uvumilivu wako na maoni unapotusaidia kuboresha bidhaa."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
 
@@ -5797,7 +5796,7 @@ msgstr "Tafuta dashibodi"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Anwani ya barua pepe isiyo sahihi"
 

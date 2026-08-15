@@ -680,7 +680,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您无法在当前计划中添加更多数据集。升级以添加此目录数据集。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "请检查您的电子邮件以获取确认链接。可能需要几分钟才能到达。"
@@ -709,7 +709,7 @@ msgstr "来自派生数据集"
 msgid "Single select"
 msgstr "单选"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "但是，我们目前不允许新的注册。"
 
@@ -1016,10 +1016,10 @@ msgstr "时间戳"
 msgid "Y axis tick interval"
 msgstr "Y 轴刻度间隔"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "密码"
 
@@ -1601,10 +1601,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
 msgstr "将此仪表板导出为 PDF，或先进行草图绘制。注释支持文本、箭头和可调粗糙度的手绘（RoughJS）。"
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2211,7 +2207,7 @@ msgstr "内边距"
 msgid "Theme"
 msgstr "主题"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "注册"
 
@@ -2247,7 +2243,7 @@ msgstr "全局管理员"
 msgid "Comma (,)"
 msgstr "逗号 (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "注册需要互联网连接。"
 
@@ -2279,7 +2275,7 @@ msgstr "第 9 列"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "您没有权限打开工作区的此部分。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "请检查您的电子邮件"
 
@@ -2342,6 +2338,10 @@ msgstr "值"
 msgid "Y axis label color"
 msgstr "Y 轴标签颜色"
 
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "如果您希望获得访问权限，请<0>给我们发送邮件</0>。"
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "关于您的工作区"
@@ -2377,7 +2377,7 @@ msgstr "由于坐标缺失或超出范围，{totalRowCount} 行均无法映射�
 msgid "Plan Features:"
 msgstr "计划功能："
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "与我们一起开始您的旅程"
 
@@ -3403,8 +3403,8 @@ msgstr "最常见"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "密码不匹配"
 
@@ -3594,7 +3594,7 @@ msgstr "无法移除离线聊天模型"
 msgid "Legend"
 msgstr "图例"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "创建新账户"
 
@@ -3903,9 +3903,9 @@ msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "电子邮件"
 
@@ -4080,8 +4080,8 @@ msgstr "用户已移除"
 msgid "Limit {displayName} to app access"
 msgstr "限制 {displayName} 的应用访问"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "确认密码"
 
@@ -4162,7 +4162,7 @@ msgstr "日期"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此仪表板未引用任何数据集：没有内容可发布。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "确认邮件已发送到您的电子邮件地址。"
 
@@ -5407,7 +5407,7 @@ msgid "Avandar is still in beta. Some features may not work as expected and "
 "feedback as we work to improve the product."
 msgstr "Avandar 仍在测试阶段。某些功能可能无法按预期工作，某些功能可能仍在建设中。感谢您的耐心和反馈，我们将努力改进产品。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "感谢您的关注！"
 
@@ -5600,7 +5600,7 @@ msgstr "搜索仪表板"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "无效的电子邮件地址"
 

@@ -42,31 +42,34 @@ function _makeStateFromContents(configContents: string): SupabaseConfigState {
     section: string;
     projectId?: string;
     ports: Record<string, number>;
-  }>((state, line) => {
-    const sectionName = line.match(SECTION_PATTERN)?.[1];
-    if (sectionName) {
-      return { ...state, section: sectionName };
-    }
-    const projectId = line.match(PROJECT_ID_PATTERN)?.[2];
-    if (projectId && state.section === "") {
-      return { ...state, projectId };
-    }
-    const portMatch = line.match(PORT_PATTERN);
-    if (
-      portMatch &&
-      state.section !== "" &&
-      !state.section.startsWith("remotes.")
-    ) {
-      return {
-        ...state,
-        ports: {
-          ...state.ports,
-          [`${state.section}.${portMatch[2]}`]: Number(portMatch[4]),
-        },
-      };
-    }
-    return state;
-  }, { section: "", ports: {} });
+  }>(
+    (state, line) => {
+      const sectionName = line.match(SECTION_PATTERN)?.[1];
+      if (sectionName) {
+        return { ...state, section: sectionName };
+      }
+      const projectId = line.match(PROJECT_ID_PATTERN)?.[2];
+      if (projectId && state.section === "") {
+        return { ...state, projectId };
+      }
+      const portMatch = line.match(PORT_PATTERN);
+      if (
+        portMatch &&
+        state.section !== "" &&
+        !state.section.startsWith("remotes.")
+      ) {
+        return {
+          ...state,
+          ports: {
+            ...state.ports,
+            [`${state.section}.${portMatch[2]}`]: Number(portMatch[4]),
+          },
+        };
+      }
+      return state;
+    },
+    { section: "", ports: {} },
+  );
 
   const apiPort = configState.ports["api.port"];
   if (!configState.projectId || apiPort === undefined) {

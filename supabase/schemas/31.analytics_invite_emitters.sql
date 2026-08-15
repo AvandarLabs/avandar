@@ -9,7 +9,6 @@
 -- `invite_accepted`, which avoids hashed emails entirely: a bare hash of an
 -- address is dictionary-reversible and still counts as personal data, while an
 -- invite id is meaningless outside `workspace_invites`.
-
 -- Records `workspace.invite_sent`.
 --
 -- `inviteeAlreadyRegistered` is resolved by looking the address up in

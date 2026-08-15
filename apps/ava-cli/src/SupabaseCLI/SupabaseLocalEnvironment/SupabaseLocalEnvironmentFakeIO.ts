@@ -216,10 +216,7 @@ function _createFakeWriteIO(
 
 function _createFakePathIO(
   factoryOptions: Readonly<FakeFactoryOptions>,
-): Pick<
-  SupabaseLocalEnvironmentIO,
-  "removePath" | "pathExists" | "realPath"
-> {
+): Pick<SupabaseLocalEnvironmentIO, "removePath" | "pathExists" | "realPath"> {
   const { options, state } = factoryOptions;
   return {
     removePath: async (targetPath) => {
@@ -284,8 +281,9 @@ function _createFakeDockerIO(
     },
     inspectSupabaseResource: async (resource) => {
       return (
-        options.resourceInspections?.[_getResourceKeyFromResource(resource)] ??
-        { exists: true, projectId: "analytics-p2-temp" }
+        options.resourceInspections?.[
+          _getResourceKeyFromResource(resource)
+        ] ?? { exists: true, projectId: "analytics-p2-temp" }
       );
     },
     removeSupabaseResource: async (resource) => {

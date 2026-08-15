@@ -1,6 +1,4 @@
-import {
-  rm,
-} from "node:fs/promises";
+import { rm } from "node:fs/promises";
 import * as net from "node:net";
 import path from "node:path";
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";

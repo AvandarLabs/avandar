@@ -129,7 +129,9 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
   verify it.
 - Stay inside the requested review scope (the files/diff under review). Do not
   hunt for issues in unrelated, untouched code. Within that scope there is no
-  "out of scope" finding: fix it.
+  "out of scope" finding: fix it. **Exception:** completion validation under
+  **Lint And Typecheck After Review** is repository-wide, so fix every lint
+  and typecheck error it reports, including errors in untouched files.
 - Continue reviewing and fixing until every checklist phase is exhausted and
   no reviewed line still breaks a rule.
 - The only findings you may leave unfixed are **verified false positives**: a
@@ -143,12 +145,10 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
 2. **Format.** If the repo defines a format script (e.g. a `format` entry in
    `package.json` such as `pnpm format`, or a documented formatter), run it
    once over the changed files.
-3. **Zero out errors from the changes.** After formatting, run the repo's
-   typecheck and lint and fix **every** type error and lint error that is
-   attributable to the set of changes under review. Do **not** fix
-   pre-existing errors that exist independently of this diff (confirm by
-   checking the base branch or the untouched committed state when unsure);
-   those are genuinely out of scope: report them, do not fix them.
+3. **Run completion validation.** Follow **Lint And Typecheck After Review**.
+   In auto mode, fix every lint and typecheck error in the repository,
+   including errors outside the reviewed diff, then rerun both commands until
+   they report zero errors.
 4. **Run the relevant tests** (see "Testing At The End Of Review") and get
    them green.
 5. **Re-verify.** Re-run the review's own checks (including any repo linters
@@ -156,11 +156,11 @@ Goal: agent acts as reviewer and fixer, fully autonomously. `Auto` means
    still breaks a rule except verified false positives. Loop back to step 1
    if anything remains.
 
-**Exit bar for auto mode:** by the time you report, there must be (a) no type
-errors and no lint errors introduced by the changes under review, and (b) no
-code-review rule still broken on the reviewed lines. End with a summary of
-what you fixed plus a short list of any verified false positives (with the
-reason each is not a real violation). The summary must NOT contain a
+**Exit bar for auto mode:** by the time you report, the repository must have
+zero lint errors and zero typecheck errors, and no code-review rule may still
+be broken on the reviewed lines. End with a summary of what you fixed plus a
+short list of any verified false positives (with the reason each is not a real
+violation). The summary must NOT contain a
 "recommended follow-up" section that punts real rule violations back to the
 user; in auto mode there are none.
 
@@ -275,8 +275,9 @@ modified by the author under review). Do not flag issues on context lines
 5. Follow the active review mode for how each finding is applied or
    reported (see the Execution Model's Apply stage for how the three modes
    differ).
-6. At the end of the review, run only the exact tests that are relevant to
-   the code changes.
+6. After all review findings have been reported or resolved, follow **Lint
+   And Typecheck After Review**, then run only the exact tests that are
+   relevant to the code changes.
 7. Report only concrete findings that are visible in the code under review.
 
 In pair review mode, announce the phase explicitly as you move through the
@@ -426,9 +427,9 @@ edited nothing, so there is no write contention.
   severity, per **Review Output**.
 - **Auto mode:** apply **every** surviving fix (never defer one as a
   follow-up), grouped by file, then run the auto-mode **Finish protocol**
-  defined under "Auto Mode" (format → zero out the type/lint errors
-  introduced by the changes → targeted tests → re-verify no reviewed line
-  still breaks a rule). Do not ask the user anything.
+  defined under "Auto Mode" (format → lint and typecheck with zero errors →
+  targeted tests → re-verify no reviewed line still breaks a rule). Do not ask
+  the user anything.
 - **Pair Review mode:** present the merged findings one at a time for
   approval (per **Pair Review Mode**), and apply each approved fix serially
   before moving to the next.
@@ -448,7 +449,9 @@ After completing the review, run the narrowest relevant tests you can identify.
 - Do not use broad commands like `pnpm test` without specific test-file
   arguments.
 - Prefer passing explicit test file names so only the changed areas are tested.
-- Run typecheck and lint when relevant, but keep test execution targeted.
+- Run only the test commands relevant to the changed areas. Lint and typecheck
+  are governed by **Lint And Typecheck After Review**, not this targeted-test
+  rule.
 - If you cannot determine the right tests, say so explicitly instead of running
   an expensive catch-all suite.
 
@@ -469,6 +472,40 @@ test code. If the extra-checklist.md does not contain E2E-specific
 instructions, then follow the same guidelines applied to Vitest and Unit
 tests, such as only narrowly running the relevant tests instead of the
 full test suite.
+
+## Lint And Typecheck After Review
+
+After every review phase is complete, validate the repository before running
+the targeted tests. Inspect the repo's `package.json` `scripts` object first:
+
+1. If it contains a `lint` script, run `pnpm lint`. Do not substitute a
+   guessed lint command when that script is absent.
+2. Find the repo's typecheck script, using its declared script name. Prefer a
+   script named `typecheck`; otherwise use the script whose name clearly
+   denotes type checking (for example `type-check` or `check-types`). Run it
+   as `pnpm <script-name>`. Do not invent a typecheck command or run a
+   compiler directly when no typecheck script exists.
+3. Address the results according to the active review mode, then rerun every
+   command that was run so the final result is current.
+
+Mode-specific scope:
+
+- **Report mode:** do not edit code. Report only lint and typecheck errors
+  attributable to the reviewed changes; unrelated pre-existing errors are out
+  of scope for the report.
+- **Pair Review mode (collaborate mode):** present only errors attributable to
+  the reviewed changes for the user's approval, then fix approved errors.
+  Unrelated pre-existing errors remain out of scope.
+- **Auto mode:** fix **all** lint and typecheck errors reported, whether or
+  not they are in the reviewed changeset. Continue until every command run
+  reports zero errors. There are no pre-existing-error exceptions in auto
+  mode.
+
+In auto mode, if `pnpm lint` runs, its final result must contain zero lint
+errors. If a typecheck script runs, its final result must contain zero
+typecheck errors. Report and Pair Review modes must resolve or report every
+validation error attributable to the reviewed changes, without taking
+unrelated errors into scope.
 
 ## Most Common Mistakes
 
@@ -842,13 +879,11 @@ sub-checklist file.
 - In report mode, report findings first, ordered by severity, with file and
   line references, in a format that can be pasted into GitHub or Slack.
 - In auto mode, summarize the fixes you applied and confirm the exit bar was
-  met (no type/lint errors introduced by the changes; no reviewed line still
-  breaks a rule). The only list you may include is **verified false
-  positives**, each with a one-line reason. Do NOT list "remaining findings"
-  or "recommended follow-ups" that are real rule violations left unfixed:
-  auto mode fixes them all. The only unfixed items you may mention are
-  pre-existing issues that are independent of the diff under review (and are
-  therefore out of scope).
+  met (zero lint and typecheck errors; no reviewed line still breaks a rule).
+  The only list you may include is **verified false positives**, each with a
+  one-line reason. Do NOT list "remaining findings" or "recommended
+  follow-ups" that are real rule violations or validation errors left unfixed:
+  auto mode fixes them all.
 - In pair review mode, present one finding at a time with the recommended fix
   and wait for user approval before changing code.
 - Skip sections that are not relevant to the diff.

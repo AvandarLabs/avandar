@@ -707,7 +707,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "No puedes agregar más conjuntos de datos en tu plan actual. Actualiza "
 "para agregar este conjunto de datos del catálogo."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Por favor, revisa tu correo electrónico para un enlace de confirmación. "
@@ -737,7 +737,7 @@ msgstr "Desde conjunto de datos derivado"
 msgid "Single select"
 msgstr "Selección única"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Sin embargo, no estamos permitiendo nuevas inscripciones en este "
 "momento."
@@ -1056,10 +1056,10 @@ msgstr "Marca de tiempo"
 msgid "Y axis tick interval"
 msgstr "Intervalo de marcas del eje Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Contraseña"
 
@@ -1676,11 +1676,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 msgstr "Exporta este tablero como un PDF, o dibuja en él primero. Las "
 "anotaciones admiten texto, flechas y dibujo a mano alzada con rugosidad "
 "ajustable (RoughJS)."
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Por favor <0>envíanos un correo electrónico</0> si deseas acceso "
-"anticipado."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2311,7 +2306,7 @@ msgstr "Relleno"
 msgid "Theme"
 msgstr "Tema"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Registrar"
 
@@ -2349,7 +2344,7 @@ msgstr "Administrador global"
 msgid "Comma (,)"
 msgstr "Coma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "El registro requiere una conexión a internet."
 
@@ -2381,7 +2376,7 @@ msgstr "Columna 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "No tienes permiso para abrir esta parte del espacio de trabajo."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Por favor, revisa tu correo electrónico"
 
@@ -2446,6 +2441,11 @@ msgstr "Valores"
 msgid "Y axis label color"
 msgstr "Color de la etiqueta del eje Y"
 
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Por favor, <0>envíenos un correo electrónico</0> si desea obtener "
+"acceso."
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Acerca de tu espacio de trabajo"
@@ -2484,7 +2484,7 @@ msgstr "No se pudo ubicar ninguna de las {totalRowCount} filas en el mapa "
 msgid "Plan Features:"
 msgstr "Características del plan:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Comienza tu viaje con nosotros"
 
@@ -3547,8 +3547,8 @@ msgstr "Más común"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Las contraseñas no coinciden"
 
@@ -3746,7 +3746,7 @@ msgstr "No se pudo eliminar el modelo de chat offline"
 msgid "Legend"
 msgstr "Leyenda"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Crear una nueva cuenta"
 
@@ -4064,9 +4064,9 @@ msgid "Looking up values in {column}…"
 msgstr "Buscando valores en {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -4244,8 +4244,8 @@ msgstr "Usuario eliminado"
 msgid "Limit {displayName} to app access"
 msgstr "Limitar {displayName} al acceso de la aplicación"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Confirmar contraseña"
 
@@ -4328,7 +4328,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Este tablero no hace referencia a ningún conjunto de datos: nada que "
 "publicar."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Se ha enviado un correo electrónico de confirmación a su dirección de "
 "correo electrónico."
@@ -5626,7 +5626,7 @@ msgstr "Avandar aún está en beta. Algunas funciones pueden no funcionar como s
 "espera y algunas pueden estar aún en construcción. Agradecemos tu "
 "paciencia y comentarios mientras trabajamos para mejorar el producto."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "¡Gracias por tu interés!"
 
@@ -5825,7 +5825,7 @@ msgstr "Buscar paneles"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Dirección de correo electrónico inválida"
 

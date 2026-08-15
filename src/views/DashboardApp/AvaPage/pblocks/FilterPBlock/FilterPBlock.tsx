@@ -5,8 +5,8 @@ import { useEffect, useMemo } from "react";
 import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { WithPuckProps } from "@puckeditor/core";
-import type { ReactElement } from "react";
 import type { DashboardFilterMode } from "$/types/dashboard.types";
+import type { ReactElement } from "react";
 
 export type FilterPBlockMode = DashboardFilterMode;
 

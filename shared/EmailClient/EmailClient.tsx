@@ -1,18 +1,18 @@
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig.ts";
 import { sendBroadcastEmail } from "$/EmailClient/sendBroadcastEmail.ts";
-import type { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
 import { sendTransactionalEmail } from "$/EmailClient/sendTransactionalEmail.ts";
-import type { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
 import WorkspaceInviteEmail from "$/emails/WorkspaceInviteEmail.tsx";
 import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
-import type {
-  CreateEmailResponseSuccess,
-  SendBroadcastResponseSuccess,
-} from "resend";
 import type {
   IEmailClient,
   WorkspaceInviteNotificationEmailOptions,
 } from "$/EmailClient/EmailClient.types.ts";
+import type { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
+import type { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
+import type {
+  CreateEmailResponseSuccess,
+  SendBroadcastResponseSuccess,
+} from "resend";
 
 async function _sendWorkspaceInviteNotification(
   options: Readonly<WorkspaceInviteNotificationEmailOptions>,

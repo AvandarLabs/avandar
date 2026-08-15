@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
-import type { SpawnSyncReturns } from "node:child_process";
 import { describe, expect, it } from "vitest";
+import type { SpawnSyncReturns } from "node:child_process";
 
 const VALIDATOR_PATH = "scripts/supabase/validate-standard-local-config.sh";
 
@@ -62,7 +62,11 @@ describe("validate-standard-local-config", () => {
     ["db.pooler.port", "port = 54329", "port = 55329"],
     ["studio.port", "port = 54323", "port = 55323"],
     ["inbucket.port", "port = 51634", "port = 52634"],
-    ["edge_runtime.inspector_port", "inspector_port = 8083", "inspector_port = 9083"],
+    [
+      "edge_runtime.inspector_port",
+      "inspector_port = 8083",
+      "inspector_port = 9083",
+    ],
     ["analytics.port", "port = 54327", "port = 55327"],
   ])("rejects a changed %s", (key, currentValue, changedValue) => {
     const result = _runValidator(

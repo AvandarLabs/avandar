@@ -80,10 +80,7 @@ function _requireUniqueCanonicalPaths(
 ): void {
   const sourcePaths = makeSet(files, { key: "sourcePath" });
   const backupPaths = makeSet(files, { key: "backupPath" });
-  if (
-    sourcePaths.size !== files.length ||
-    backupPaths.size !== files.length
-  ) {
+  if (sourcePaths.size !== files.length || backupPaths.size !== files.length) {
     throw new Error("Supabase backup manifest has duplicate canonical paths.");
   }
 }

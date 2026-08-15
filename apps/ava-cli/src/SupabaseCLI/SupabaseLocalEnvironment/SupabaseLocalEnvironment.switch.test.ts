@@ -155,11 +155,9 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
       io: fake.io,
       temporaryProjectId: "analytics-p2-temp",
     });
-    expect(
-      fake.copyOperations
-        .map(prop("0"))
-        .sort(),
-    ).toEqual([CONFIG_PATH, EDGE_ENV_PATH, ENV_PATH].sort());
+    expect(fake.copyOperations.map(prop("0")).sort()).toEqual(
+      [CONFIG_PATH, EDGE_ENV_PATH, ENV_PATH].sort(),
+    );
     const configWriteIndex = fake.operations.indexOf(`write:${CONFIG_PATH}`);
     const lastCopyIndex = Math.max(
       ...fake.operations

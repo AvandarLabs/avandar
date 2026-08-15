@@ -11,10 +11,8 @@ import {
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
 
-const {
-  create: createFakeIO,
-  getResourceKeyFromResource: resourceKey,
-} = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIO, getResourceKeyFromResource: resourceKey } =
+  SupabaseLocalEnvironmentFakeIO;
 const { makeBackupDirectory, seedActiveBackup } =
   SupabaseLocalEnvironmentFixtures;
 

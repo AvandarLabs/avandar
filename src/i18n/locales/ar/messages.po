@@ -698,7 +698,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية "
 "لإضافة مجموعة بيانات الكتالوج هذه."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق "
@@ -728,7 +728,7 @@ msgstr "من مجموعة البيانات المشتقة"
 msgid "Single select"
 msgstr "اختيار فردي"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في الوقت الحالي."
 
@@ -1041,10 +1041,10 @@ msgstr "الطابع الزمني"
 msgid "Y axis tick interval"
 msgstr "الفاصل بين تدريجات المحور Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "كلمة المرور"
 
@@ -1646,11 +1646,6 @@ msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "(RoughJS)."
 msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات "
 "النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
-"المبكر."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2271,7 +2266,7 @@ msgstr "حشوة"
 msgid "Theme"
 msgstr "السمة"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "تسجيل"
 
@@ -2308,7 +2303,7 @@ msgstr "مدير عالمي"
 msgid "Comma (,)"
 msgstr "فاصلة (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 
@@ -2340,7 +2335,7 @@ msgstr "العمود 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة العمل."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "يرجى التحقق من بريدك الإلكتروني"
 
@@ -2403,6 +2398,10 @@ msgstr "القيم"
 msgid "Y axis label color"
 msgstr "لون تسمية المحور Y"
 
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "يُرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنتم ترغبون في الوصول."
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
@@ -2440,7 +2439,7 @@ msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ ع�
 msgid "Plan Features:"
 msgstr "ميزات الخطة:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "ابدأ رحلتك معنا"
 
@@ -3485,8 +3484,8 @@ msgstr "الأكثر شيوعًا"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "كلمات المرور غير متطابقة"
 
@@ -3680,7 +3679,7 @@ msgstr "لم يتمكن من إزالة نموذج الدردشة غير الم�
 msgid "Legend"
 msgstr "وسيلة الإيضاح"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
@@ -3993,9 +3992,9 @@ msgid "Looking up values in {column}…"
 msgstr "جارٍ البحث عن القيم في {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
@@ -4172,8 +4171,8 @@ msgstr "تمت إزالة المستخدم"
 msgid "Limit {displayName} to app access"
 msgstr "تقييد {displayName} للوصول إلى التطبيق"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "تأكيد كلمة المرور"
 
@@ -4254,7 +4253,7 @@ msgstr "تاريخ"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "هذه اللوحة لا تشير إلى أي مجموعات بيانات: لا يوجد شيء لنشره."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "تم إرسال بريد إلكتروني للتأكيد إلى عنوان بريدك الإلكتروني."
 
@@ -5529,7 +5528,7 @@ msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل �
 "وقد لا تزال قيد الإنشاء. نقدر صبرك وملاحظاتك بينما نعمل على تحسين "
 "المنتج."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "شكرًا لاهتمامك!"
 
@@ -5726,7 +5725,7 @@ msgstr "البحث في لوحات المعلومات"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "عنوان البريد الإلكتروني غير صالح"
 
