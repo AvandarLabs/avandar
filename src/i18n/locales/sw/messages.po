@@ -1688,7 +1688,7 @@ msgstr "Hii ni ID ya kipekee ya shirika lako inayotumika katika URL."
 msgid "Previewing data for {0}"
 msgstr "Ikionyesha data kwa {0}"
 
-#: shared/copy/mapDisclaimer.ts
+#: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr ""

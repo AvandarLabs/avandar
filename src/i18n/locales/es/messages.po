@@ -1695,7 +1695,7 @@ msgstr "Este es el ID único de tu organización utilizado en las URL."
 msgid "Previewing data for {0}"
 msgstr "Previsualizando datos para {0}"
 
-#: shared/copy/mapDisclaimer.ts
+#: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr ""

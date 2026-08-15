@@ -1640,7 +1640,7 @@ msgstr "这是您组织在 URL 中使用的唯一 ID。"
 msgid "Previewing data for {0}"
 msgstr "预览 {0} 的数据"
 
-#: shared/copy/mapDisclaimer.ts
+#: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr ""

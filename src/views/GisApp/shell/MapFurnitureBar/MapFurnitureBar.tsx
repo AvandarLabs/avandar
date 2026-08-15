@@ -1,7 +1,6 @@
 import { formatNumber } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { mapDisclaimer } from "$/copy/mapDisclaimer";
 import { match } from "ts-pattern";
 import css from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.module.css";
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
@@ -89,7 +88,9 @@ export function MapFurnitureBar({
         </span>
       : null}
       <span className={css.mapFurnitureBarAttribution}>{attribution}</span>
-      <span className={css.mapFurnitureBarDisclaimer}>{mapDisclaimer()}</span>
+      <span className={css.mapFurnitureBarDisclaimer}>
+        {t`The boundaries and names shown do not imply official endorsement or acceptance.`}
+      </span>
     </div>
   );
 }

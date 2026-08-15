@@ -1693,7 +1693,7 @@ msgstr "Este é o ID único da sua organização usado em URLs."
 msgid "Previewing data for {0}"
 msgstr "Visualizando dados para {0}"
 
-#: shared/copy/mapDisclaimer.ts
+#: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr ""

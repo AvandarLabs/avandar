@@ -1641,7 +1641,7 @@ msgstr "這是您組織在網址中使用的唯一 ID。"
 msgid "Previewing data for {0}"
 msgstr "預覽 {0} 的數據"
 
-#: shared/copy/mapDisclaimer.ts
+#: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr ""

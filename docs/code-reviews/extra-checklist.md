@@ -334,6 +334,60 @@ undefined`. New code that wraps a Supabase session call should follow
 - Shared copy lives in `shared/copy/`, one file per copy function named after
   the function (`shared/copy/appLabel.ts`). A copy function reused by more than
   one view belongs there rather than being redeclared beside each caller.
+- Place a new copy function by counting its call sites, because the directory
+  it lands in is what tells the next reader how far the string's blast radius
+  reaches. Count the callers of the added function across the repo and route
+  it:
+  1. **Two or more sub-systems** call it: `shared/copy/`. A sub-system is a
+     top-level product area or cross-cutting feature, for example
+     `src/views/GisApp/`, `src/views/DashboardApp/`,
+     `src/views/DataExplorerApp/`, or `src/components/permissions/`.
+     `appLabel` qualifies: the share modal, the workspace settings form, and
+     the map route all render it.
+  2. **Two or more call sites inside exactly one sub-system**: a `copy/`
+     directory nested in that sub-system, for example
+     `src/views/GisApp/copy/`. Putting a single sub-system's copy in
+     `shared/copy/` advertises a repo-wide contract that does not exist, so
+     the next engineer has to grep the whole repo before renaming it.
+  3. **Exactly one call site**: do not extract it at all. Inline the `t` macro
+     where the string renders. A one-caller copy function costs a file and an
+     import while hiding the string from the component that shows it.
+
+  Flag a new `shared/copy/*` file whose exported function has one caller, and
+  flag one whose callers all sit under the same sub-system directory. The
+  contract is written up in
+  [`shared/copy/README.md`](../../shared/copy/README.md).
+
+  **Find candidates** (call sites of each copy function added by the diff):
+
+  ```bash
+  grep -rn "<copyFunctionName>" --include="*.ts" --include="*.tsx" src shared \
+    | grep -v '^shared/copy/'
+  ```
+
+  One hit means inline it. Several hits under a single `src/views/<App>/` or
+  `src/components/<feature>/` root mean nest it there.
+
+  This is bad (`mapDisclaimer` renders only in `MapFurnitureBar`):
+
+  ```ts
+  // shared/copy/mapDisclaimer.ts
+  import { t } from "@lingui/core/macro";
+
+  export function mapDisclaimer(): string {
+    return t`The boundaries and names shown do not imply official endorsement or acceptance.`;
+  }
+  ```
+
+  This is good:
+
+  ```tsx
+  // src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
+  <span className={css.mapFurnitureBarDisclaimer}>
+    {t`The boundaries and names shown do not imply official endorsement or acceptance.`}
+  </span>
+  ```
+
 - These functions are the one conversion exempt from the
   `to`/`from`/`make…From…`/`get…From…` naming rule, and take the name of the
   copy they return with no prefix: `appLabel`, `resourceTypeLabel`,
