@@ -1,6 +1,7 @@
 import { Stack } from "@mantine/core";
+import { noneOfAboveLabel } from "$/copy/noneOfAboveLabel";
+import { somethingElseLabel } from "$/copy/somethingElseLabel";
 import { ClarificationAnswerActions } from "./ClarificationAnswerActions";
-import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 import { ClarificationCustomTextInput } from "./ClarificationCustomTextInput";
 import { MultiOptionList } from "./MultiOptionList";
 import { useMultiOptionAnswer } from "./useMultiOptionAnswer";
@@ -17,14 +18,12 @@ export function MultiOptionBody({
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   const answer = useMultiOptionAnswer({ options, onSubmit });
-  const noneOfAboveLabel = ClarificationAnswer.useNoneOfAboveLabel();
-  const somethingElseLabel = ClarificationAnswer.useSomethingElseLabel();
   return (
     <Stack gap="xs" onKeyDown={answer.onKeyDown}>
       <MultiOptionList
         options={options}
         selectedOptions={answer.selectedOptions}
-        somethingElseLabel={somethingElseLabel}
+        somethingElseLabel={somethingElseLabel()}
         onChange={answer.onOptionsChange}
         onSelectAll={answer.onSelectAll}
       />
@@ -37,7 +36,7 @@ export function MultiOptionBody({
       <ClarificationAnswerActions
         canSubmit={answer.canSubmit}
         onConfirm={answer.onSubmitAnswer}
-        noneOfAboveLabel={noneOfAboveLabel}
+        noneOfAboveLabel={noneOfAboveLabel()}
         onNoneOfAbove={answer.onNoneOfAbove}
         isNoneOfAboveDisabled={answer.isCustomSelected}
       />

@@ -11,7 +11,7 @@ import {
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
 import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
-import { buildChatToolConfig } from "@sbfn/chat/PostChatMessages/prompt/buildChatToolConfig.ts";
+import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
 import {
   buildRetryContextNote,
   dashboardsSystemPrefix,
@@ -192,7 +192,7 @@ export const PostChatMessages = POST({
       priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
     Object.assign(
       requestBody,
-      buildChatToolConfig({
+      makeChatToolConfigFromOptions({
         isDataExplorer,
         isDashboards,
         clarificationCapReached,

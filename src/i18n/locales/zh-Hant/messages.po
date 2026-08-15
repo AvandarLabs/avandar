@@ -194,7 +194,7 @@ msgstr "表單不支援 UNION／INTERSECT／EXCEPT。"
 msgid "Chart settings"
 msgstr "圖表設定"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "在此上下文中無法使用發現功能。"
 
@@ -553,7 +553,7 @@ msgstr "收合於"
 msgid "Bubble Chart"
 msgstr "泡泡圖"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "其他…"
 
@@ -934,7 +934,7 @@ msgstr "載入計劃中..."
 msgid "User groups"
 msgstr "用戶組"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
@@ -1130,7 +1130,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 "exposure."
 msgstr "發布每一列，所有行。為觀眾提供最大的靈活性，最大限度地曝光。"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "查詢失敗。"
 
@@ -1472,7 +1472,7 @@ msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from 
 "the import preview and have been overwritten with the actual values."
 msgstr "在 \"{sourceFileName}\" 中檢測到 1 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 
@@ -2591,6 +2591,10 @@ msgstr "選擇此工作區中使用的語言。從右到左的語言會自動翻
 msgid "No plans available."
 msgstr "沒有可用的計劃。"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "沒有值可供總結。"
@@ -2951,6 +2955,11 @@ msgstr "正在產生 SQL…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "X 軸標籤旋轉"
+
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3315,6 +3324,10 @@ msgstr "新增欄位"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "工作區成功建立！"
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -3955,8 +3968,8 @@ msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "正在查找 {column} 中的值…"
+#~ msgid "Looking up values in {column}…"
+#~ msgstr "正在查找 {column} 中的值…"
 
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
@@ -4497,6 +4510,10 @@ msgstr "您目前的計劃僅支援最多 {0} 個資料集。升級到我們的 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "此資料集僅限離線使用。點擊以允許在線同步。"
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5153,7 +5170,7 @@ msgstr "新使用者群組"
 msgid "Left"
 msgstr "靠左"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "以上皆非"
 
@@ -5395,6 +5412,10 @@ msgstr "關閉面板 (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "圖片 URL"
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
+#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"
