@@ -1,6 +1,7 @@
 import { Stack } from "@mantine/core";
+import { noneOfAboveLabel } from "$/copy/noneOfAboveLabel";
+import { somethingElseLabel } from "$/copy/somethingElseLabel";
 import { ClarificationAnswerActions } from "./ClarificationAnswerActions";
-import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 import { ClarificationCustomTextInput } from "./ClarificationCustomTextInput";
 import { SingleOptionList } from "./SingleOptionList";
 import { useSingleOptionAnswer } from "./useSingleOptionAnswer";
@@ -17,15 +18,13 @@ export function SingleOptionBody({
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   const answer = useSingleOptionAnswer(onSubmit);
-  const noneOfAboveLabel = ClarificationAnswer.useNoneOfAboveLabel();
-  const somethingElseLabel = ClarificationAnswer.useSomethingElseLabel();
   return (
     <Stack gap="xs" onKeyDown={answer.onKeyDown}>
       <SingleOptionList
         options={options}
         selectedOption={answer.selectedOption}
-        noneOfAboveLabel={noneOfAboveLabel}
-        somethingElseLabel={somethingElseLabel}
+        noneOfAboveLabel={noneOfAboveLabel()}
+        somethingElseLabel={somethingElseLabel()}
         onChange={answer.onOptionChange}
       />
       {answer.isCustomSelected ?

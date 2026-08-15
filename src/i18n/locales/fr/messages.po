@@ -204,7 +204,7 @@ msgstr "UNION/INTERSECT/EXCEPT n’est pas pris en charge sous cette forme."
 msgid "Chart settings"
 msgstr "Paramètres du graphique"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "La découverte n'est pas disponible dans ce contexte."
 
@@ -579,7 +579,7 @@ msgstr "Réduire à"
 msgid "Bubble Chart"
 msgstr "Graphique à bulles"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Autre chose…"
 
@@ -982,7 +982,7 @@ msgstr "Chargement des plans..."
 msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Tapez votre réponse…"
 
@@ -1184,7 +1184,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 msgstr "Publiez chaque colonne, toutes les lignes. Flexibilité maximale pour "
 "les visualisateurs, exposition maximale."
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Échec de la requête."
 
@@ -1544,7 +1544,7 @@ msgstr "Les types de colonnes détectés pour 1 colonne dans \"{sourceFileName}\
 "diffèrent de l'aperçu d'importation et ont été remplacés par les "
 "valeurs réelles."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "Aucune valeur n'a été retournée depuis {column}. Décrivez ce dont vous "
 "avez besoin à la place."
@@ -2724,6 +2724,10 @@ msgstr "Choisissez la langue utilisée dans cet espace de travail. Les langues "
 msgid "No plans available."
 msgstr "Aucun plan disponible."
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr "Essayez une autre recherche"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "Aucune valeur à résumer."
@@ -3098,6 +3102,13 @@ msgstr "Génération de SQL…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "Rotation des libellés de l’axe X"
+
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr "[La recherche de découverte locale a échoué. Essayez une autre colonne "
+"ou une autre requête de recherche sans me demander de sélectionner un "
+"élément dans le catalogue qui a échoué.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3480,6 +3491,10 @@ msgstr "Nouveau champ"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "Espace de travail créé avec succès !"
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr "Réessayer la recherche"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -4141,10 +4156,6 @@ msgstr "Certaines parties de ce SQL n'ont pas pu être représentées dans le "
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Veuillez réessayer. Votre tableau de bord n'a pas été publié."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "Recherche de valeurs dans {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4706,6 +4717,10 @@ msgstr "Votre plan actuel ne prend en charge que jusqu'à {0} jeux de données. 
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "Ce jeu de données est uniquement hors ligne. Cliquez pour autoriser la "
 "synchronisation en ligne."
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr "Vérification de vos données…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5390,7 +5405,7 @@ msgstr "Nouveau groupe d'utilisateurs"
 msgid "Left"
 msgstr "Gauche"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "Aucun des éléments ci-dessus"
 

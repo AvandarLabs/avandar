@@ -1,0 +1,6 @@
+.discoveryStateBodyScrollArea {
+  max-height: min(40vh, 28rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline-end: var(--mantine-spacing-xs);
+}

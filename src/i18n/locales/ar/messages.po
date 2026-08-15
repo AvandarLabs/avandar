@@ -199,7 +199,7 @@ msgstr "لا يتم دعم UNION/INTERSECT/EXCEPT بهذا الشكل في ال�
 msgid "Chart settings"
 msgstr "إعدادات الرسم البياني"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "الاكتشاف غير متاح في هذا السياق."
 
@@ -564,7 +564,7 @@ msgstr "طي عند"
 msgid "Bubble Chart"
 msgstr "مخطط فقاعي"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "شيء آخر…"
 
@@ -959,7 +959,7 @@ msgstr "جارٍ تحميل الخطط..."
 msgid "User groups"
 msgstr "مجموعات المستخدمين"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "اكتب إجابتك..."
 
@@ -1157,7 +1157,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 "exposure."
 msgstr "نشر كل عمود، جميع الصفوف. أقصى مرونة للمشاهدين، أقصى تعرض."
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "فشل الاستعلام."
 
@@ -1508,7 +1508,7 @@ msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from 
 msgstr "أنواع الأعمدة المكتشفة لعمود واحد في \"{sourceFileName}\" تختلف عن "
 "المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاجه بدلاً من ذلك."
 
@@ -2656,6 +2656,10 @@ msgstr "اختر اللغة المستخدمة في هذه المساحة. ال�
 msgid "No plans available."
 msgstr "لا توجد خطط متاحة."
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr "جرّب بحثًا مختلفًا"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "لا توجد قيم للتلخيص."
@@ -3023,6 +3027,12 @@ msgstr "جارٍ إنشاء SQL…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "تدوير تسمية المحور X"
+
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr "[فشل البحث في الاكتشاف المحلي. جرّب عمودًا مختلفًا أو استعلام بحث دون "
+"أن تطلب مني الاختيار من الكتالوج الذي تعذّر الوصول إليه.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3394,6 +3404,10 @@ msgstr "حقل جديد"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "تم إنشاء مساحة العمل بنجاح!"
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr "إعادة محاولة البحث"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -4042,10 +4056,6 @@ msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج 
 msgid "Please try again. Your dashboard has not been published."
 msgstr "يرجى المحاولة مرة أخرى. لم يتم نشر لوحة التحكم الخاصة بك."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "جارٍ البحث عن القيم في {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4594,6 +4604,10 @@ msgstr "الخطة الحالية الخاصة بك تدعم فقط حتى {0} �
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "هذه مجموعة البيانات متاحة فقط عند عدم الاتصال. انقر للسماح بالمزامنة "
 "عبر الإنترنت."
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr "جارٍ التحقق من بياناتك…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5265,7 +5279,7 @@ msgstr "مجموعة مستخدمين جديدة"
 msgid "Left"
 msgstr "اليسار"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "لا شيء مما سبق"
 

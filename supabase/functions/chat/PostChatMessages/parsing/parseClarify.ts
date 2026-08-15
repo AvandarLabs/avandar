@@ -1,3 +1,4 @@
+import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 import { match } from "ts-pattern";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
@@ -15,6 +16,7 @@ type RawClarifyArgs = {
     multi?: unknown;
     query?: unknown;
     column?: unknown;
+    candidateValues?: unknown;
   };
 };
 
@@ -117,6 +119,9 @@ export function parseClarify(
           query,
           column,
           multi: shape.multi === true,
+          candidateValues: makeDiscoveryCandidateValuesFromModelOutput(
+            shape.candidateValues,
+          ),
         },
         turnNumber,
       };

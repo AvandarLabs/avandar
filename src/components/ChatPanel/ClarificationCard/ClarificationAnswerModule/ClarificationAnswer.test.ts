@@ -56,6 +56,7 @@ describe("ClarificationAnswer.needsCrossBoundary", () => {
           query: 'SELECT DISTINCT "state" FROM "t"',
           column: "state",
           multi: false,
+          candidateValues: ["CA"],
         },
       }),
     ).toBe(true);
