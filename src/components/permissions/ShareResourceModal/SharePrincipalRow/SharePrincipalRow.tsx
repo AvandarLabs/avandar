@@ -11,8 +11,8 @@ import {
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel/resourceTypeLabel";
-import { appForResource } from "../copy/appForResource";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -48,7 +48,7 @@ export function SharePrincipalRow({
   // these tooltips already had before the copy moved inline.
   const name = displayName;
   const isGroup = share.principalType === "user_group";
-  const app = appLabel(appForResource(resourceType));
+  const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
   const roleOptions: Array<{ value: RoleLevel; label: string }> = [

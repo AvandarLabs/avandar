@@ -3,6 +3,29 @@
 This directory holds copy functions: small functions that return a single
 piece of translated, user-facing text.
 
+## First: is it copy at all?
+
+A copy function returns translated text a person reads. Two mechanical checks
+decide it, and both must hold:
+
+1. **A Lingui macro appears in the function's own body**: `` t`…` ``,
+   `` msg`…` ``, or `i18n._(msg`…`)`. Copy is always translated, so a function
+   with no macro in it returns data, however user-facing that data eventually
+   becomes.
+2. **The return type is `string`**, or a record whose values are all `string`.
+   A string-literal union (`AppType`, `ResourceType`) is a key the program
+   branches on, not text.
+
+Fail either check and the function is an ordinary conversion. It takes a
+conversion name from [`docs/rules/typescript.md`](../../docs/rules/typescript.md)
+and it does not belong in this directory or any other `copy/` directory.
+Feeding a copy function does not qualify it: `getAppTypeFromResourceType`
+exists only to produce the argument for `appLabel`, and it still lives with
+the rest of `ShareResourceModal`, not beside the copy.
+
+This directory holds copy functions and nothing else. A lookup table, type
+map, or helper that copy calls goes with the code it converts.
+
 ## What belongs here
 
 **Only copy that is used by more than one sub-system.** A sub-system is a

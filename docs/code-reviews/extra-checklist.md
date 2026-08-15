@@ -327,90 +327,21 @@ undefined`. New code that wraps a Supabase session call should follow
   controlled-input sets, the large-parse fresh-browser policy, cleanup, and
   timeouts) and was bloating this entry point.
 
-### Phase: shared copy functions
+### Phase: copy functions
 
 - **Gate:** the diff adds or renames a function that returns user-facing copy,
-  or touches any file under `shared/copy/`.
-- Shared copy lives in `shared/copy/`, one file per copy function named after
-  the function (`shared/copy/appLabel.ts`). A copy function reused by more than
-  one view belongs there rather than being redeclared beside each caller.
-- Place a new copy function by counting its call sites, because the directory
-  it lands in is what tells the next reader how far the string's blast radius
-  reaches. Count the callers of the added function across the repo and route
-  it:
-  1. **Two or more sub-systems** call it: `shared/copy/`. A sub-system is a
-     top-level product area or cross-cutting feature, for example
-     `src/views/GisApp/`, `src/views/DashboardApp/`,
-     `src/views/DataExplorerApp/`, or `src/components/permissions/`.
-     `appLabel` qualifies: the share modal, the workspace settings form, and
-     the map route all render it.
-  2. **Two or more call sites inside exactly one sub-system**: a `copy/`
-     directory nested in that sub-system, for example
-     `src/views/GisApp/copy/`. Putting a single sub-system's copy in
-     `shared/copy/` advertises a repo-wide contract that does not exist, so
-     the next engineer has to grep the whole repo before renaming it.
-  3. **Exactly one call site**: do not extract it at all. Inline the `t` macro
-     where the string renders. A one-caller copy function costs a file and an
-     import while hiding the string from the component that shows it.
-
-  Flag a new `shared/copy/*` file whose exported function has one caller, and
-  flag one whose callers all sit under the same sub-system directory. The
-  contract is written up in
-  [`shared/copy/README.md`](../../shared/copy/README.md).
-
-  **Find candidates** (call sites of each copy function added by the diff):
-
-  ```bash
-  grep -rn "<copyFunctionName>" --include="*.ts" --include="*.tsx" src shared \
-    | grep -v '^shared/copy/'
-  ```
-
-  One hit means inline it. Several hits under a single `src/views/<App>/` or
-  `src/components/<feature>/` root mean nest it there.
-
-  This is bad (`mapDisclaimer` renders only in `MapFurnitureBar`):
-
-  ```ts
-  // shared/copy/mapDisclaimer.ts
-  import { t } from "@lingui/core/macro";
-
-  export function mapDisclaimer(): string {
-    return t`The boundaries and names shown do not imply official endorsement or acceptance.`;
-  }
-  ```
-
-  This is good:
-
-  ```tsx
-  // src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
-  <span className={css.mapFurnitureBarDisclaimer}>
-    {t`The boundaries and names shown do not imply official endorsement or acceptance.`}
-  </span>
-  ```
-
-- These functions are the one conversion exempt from the
-  `to`/`from`/`make…From…`/`get…From…` naming rule, and take the name of the
-  copy they return with no prefix: `appLabel`, `resourceTypeLabel`,
-  `vizTypeLabel`. Flag a prefixed variant (`getAppLabelFromAppType`,
-  `makeAppLabel`) and flag a copy function that has grown a second
-  responsibility, which puts it back under the naming rule. The reasoning is in
-  the copy-function rule in
-  [`typescript-checklist.md`](../../agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/typescript-checklist.md)
-  and in [`docs/rules/typescript.md`](../rules/typescript.md).
-- Copy functions still translate through Lingui, so they are subject to the
-  i18n phase below: a label built from a bare string literal is a finding even
-  though the function name is correct.
-
-  **Find candidates:**
-
-  ```bash
-  grep -rEn '^(export )?function (get|make)[A-Z][a-zA-Z]*(Label|Copy|Text|Title|Message)[a-zA-Z]*\(' \
-    --include="*.ts" --include="*.tsx" src shared
-  # copy-shaped functions declared outside shared/copy:
-  grep -rEln '^export function [a-z][a-zA-Z]*(Label|Copy)\(' \
-    --include="*.ts" --include="*.tsx" src shared \
-    | grep -v '^shared/copy/'
-  ```
+  or touches any file under `shared/copy/` or any nested `copy/` directory.
+  Skip otherwise.
+- **Reference:** this phase's rules live in
+  [`references/copy-functions.md`](references/copy-functions.md). Open it and
+  run it as its own phase.
+- **Why it is split out:** the ruleset carries three ordered decisions
+  (is it copy, which directory, what name) and a review *method* that a past
+  review got wrong. `appForResource` reached `ShareResourceModal/copy/`
+  because "returns something a user eventually reads" was treated as the test
+  for copy; the real tests are a Lingui macro in the body and a `string`
+  return type, and they have to run before the naming exemption is granted.
+  The detail belongs in its own file rather than bloating this entry point.
 
 ### Phase: internationalization (Lingui)
 

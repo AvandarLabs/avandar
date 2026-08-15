@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
-import { appForResource } from "./copy/appForResource";
+import { getAppTypeFromResourceType } from "./getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
 import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
@@ -97,7 +97,7 @@ function _requestMakePrivate(options: Readonly<GeneralAccessActions>): void {
   }
   openMakePrivateConfirmModal({
     resourceName: options.resourceName,
-    app: appLabel(appForResource(options.resourceType)),
+    app: appLabel(getAppTypeFromResourceType(options.resourceType)),
     numUsers,
     numGroups,
     losesWorkspaceAccess,

@@ -222,7 +222,62 @@
 - User-facing copy is the one conversion excluded from the four shapes. A
   function whose whole job is to produce a piece of copy is named after the
   copy it returns, with no prefix: `appLabel(app)`, `vizTypeLabel(vizType)`,
-  `resourceTypeLabel(type)`. These live in `shared/copy/`.
+  `resourceTypeLabel(type)`. These live in `shared/copy/`, or in a `copy/`
+  directory nested inside the one sub-system that uses them.
+
+  **Before applying this exception, prove the function is copy.** Both tests
+  below must pass. They are mechanical on purpose: "it produces text a user
+  reads" is a judgement call, and every misfiling of a plain conversion has
+  come from making that call generously.
+
+  1. **Lingui or it is not copy.** Every string the function returns is
+     produced by a Lingui macro in the function's own body: `` t`…` ``,
+     `` msg`…` ``, or `i18n._(msg`…`)`. A function with no macro in it
+     returns data, not copy, however user-facing the data eventually
+     becomes. Copy is always translated, so an untranslated string is proof
+     the function is something else.
+  2. **It returns `string`, not a literal union.** The return type is
+     `string`, or a record whose values are all `string`. A string-literal
+     union return type (`AppType`, `ResourceType`, `"gis" | "dashboards"`)
+     means the function returns a key the program branches on, not text a
+     person reads. That is a conversion and it takes a conversion name.
+
+  Fail either test and the function is an ordinary conversion: it takes one
+  of the four shapes, and it does **not** go in a `copy/` directory. Feeding
+  a copy function is not a qualification. "It exists only to produce the
+  argument for `appLabel`, so it lives beside the copy that consumes it" is
+  the rationalization to watch for; proximity to copy is not copy.
+
+  A `copy/` directory contains copy functions and nothing else. A helper,
+  lookup table, or type map that copy happens to call belongs with the rest
+  of the sub-system's code, under its own conversion name.
+
+  This is bad (no Lingui macro, and the return type is a literal union, so
+  this is a conversion wearing a copy name in a copy directory):
+
+  ```ts
+  // src/components/permissions/ShareResourceModal/copy/appForResource.ts
+  export function appForResource(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  // .../ShareResourceModal/getAppTypeFromResourceType/getAppTypeFromResourceType.ts
+  export function getAppTypeFromResourceType(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
 
   The absence of a prefix is the signal. A prefix would tell the reader that
   data is being converted, when what is really happening is that a string of

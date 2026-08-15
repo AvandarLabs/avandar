@@ -5,9 +5,9 @@ import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel/resourceTypeLabel";
-import { appForResource } from "../copy/appForResource";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -37,7 +37,7 @@ export function ShareGeneralAccess({
   onWorkspaceRoleChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const app = appLabel(appForResource(resourceType));
+  const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
   const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
