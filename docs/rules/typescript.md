@@ -755,6 +755,64 @@
   couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`. The
   converse is the single-file directory rule above: remove the directory again
   once a unit is back to one file.
+
+  **A directory couples only the one unit it is named after.** Judge each base
+  name separately rather than judging the directory once. Being inside a
+  `Foo/` directory looks like the rule is already satisfied for everything in
+  it, and it is not: `Foo.ts` + `Foo.test.ts` are coupled by the directory and
+  stay flat inside it, while every other co-named pair beside them is its own
+  unit and needs its own directory.
+
+  Two kinds of file legitimately stay flat next to those pairs: a lone file
+  with no co-named sibling, and a `<Dir>.types.ts` / `<Dir>.constants.ts` that
+  belongs to the directory as a whole rather than to any one unit in it. That
+  second case is why a grouping directory may hold `<Dir>.types.ts` with no
+  `<Dir>.ts` beside it at all.
+
+  This is bad (six units share one directory, so its listing is a wall of
+  near-duplicate base names):
+
+  ```plaintext
+  MapLayerSpatialQuery
+    | MapLayerSpatialQuery.types.ts
+    | MapLayerSpatialQuery.constants.ts
+    | compileMapLayerSpatialQuery.ts
+    | compileMapLayerSpatialQuery.test.ts
+    | buildGeometryExpression.ts
+    | buildGeometryExpression.test.ts
+    | ...
+  ```
+
+  This is good (every co-named pair gets its own directory; the two
+  directory-level files stay flat because they describe the group):
+
+  ```plaintext
+  MapLayerSpatialQuery
+    | MapLayerSpatialQuery.types.ts
+    | MapLayerSpatialQuery.constants.ts
+    | compileMapLayerSpatialQuery
+      | compileMapLayerSpatialQuery.ts
+      | compileMapLayerSpatialQuery.test.ts
+    | buildGeometryExpression
+      | buildGeometryExpression.ts
+      | buildGeometryExpression.test.ts
+  ```
+
+  And this is the mixed case, where the directory is named after one of its
+  own units (`classifyLayerValues.ts` stays flat because the directory already
+  couples it; its siblings do not):
+
+  ```plaintext
+  classifyLayerValues
+    | classifyLayerValues.ts
+    | classifyLayerValues.test.ts
+    | makeJenksBreaks
+      | makeJenksBreaks.ts
+      | makeJenksBreaks.test.ts
+    | normalizeLayerValue
+      | normalizeLayerValue.ts
+      | normalizeLayerValue.test.ts
+  ```
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.
