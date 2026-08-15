@@ -145,14 +145,20 @@ a brand-new review. Then:
 
 ### Comment style
 
-Never use em dashes. Keep comments direct and concise.
+Never use em dashes. Keep every comment direct and concise.
 
-Before writing any PR finding or review summary, read
-[`references/comment-style.md`](references/comment-style.md) and follow it. It
-governs the prose of a review comment: how to lead, how long to be, when to ask
-instead of assert, and what never to write. If
-`~/.diff-review/comment-style.md` exists, read that too and let it win on any
-conflict.
+Two different voices live in this skill, and they must not be mixed:
+
+| You are | You write | Follow |
+| --- | --- | --- |
+| The **reviewer**, leaving findings on a diff | PR findings, review summaries, explainer threads | [`references/review-comment-style.md`](references/review-comment-style.md) |
+| The **engineer**, answering a reviewer's comment | Continue-mode replies | [`references/reply-style.md`](references/reply-style.md) |
+
+Read the matching file before writing, and read the personal override next to
+it when it exists (`~/.diff-review/review-comment-style.md`,
+`~/.diff-review/reply-style.md`); the override wins on any conflict.
+
+#### As the reviewer
 
 For explainers on the agent's own diff, comment only when the reviewer benefits
 from context the diff does not state: why an abstraction exists, how data moves,
@@ -160,18 +166,27 @@ which domain rule or invariant applies, or why a fallback or integration works
 that way. Skip formatting, naming-only changes, obvious helpers, and narration
 of the attached line. Never comment outside the requested diff scope.
 
-For replies to change requests, use exactly `Done.` unless the reviewer asked a
-question or needs a non-obvious trade-off, behavior change, or out-of-scope
-follow-up. Never cite commits or restate code visible in the diff.
-
 For PR findings, write text a human can paste into GitHub unchanged, in the
-voice `references/comment-style.md` describes:
+voice `references/review-comment-style.md` describes:
 
 - Nit: state the correction only.
 - Documented rule violation: state the fix and cite the rule.
 - Undocumented convention: identify it without presenting it as a rule.
 - Bug: explain the failure condition and concrete fix.
 - Architecture or data-model concern: use concise bullets.
+
+#### As the engineer
+
+The default reply to a change request is exactly `Done.` Add a line beyond it
+only for what the reviewer cannot get from their own request plus the diff:
+a decision their request left open, a deviation or refusal, a verification
+result, a consequence they did not ask about, or the answer to a question. A
+question always gets a reply.
+
+Never restate the reviewer's own ask, rationale already written into the code
+or rule, where in the file the change landed, or code visible in the diff.
+Past one point, use bullets, one line each.
+`references/reply-style.md` carries the full rule with worked examples.
 
 ## Repository run command
 
@@ -414,8 +429,9 @@ files, commit, push, or merge in Initial mode.
 2. Load project instructions, contributing guidance, lint configuration, and
    applicable code-review skills. This skill defines the workflow, not the
    project's review rules. Also load
-   [`references/comment-style.md`](references/comment-style.md), plus
-   `~/.diff-review/comment-style.md` when it exists, before writing any finding.
+   [`references/review-comment-style.md`](references/review-comment-style.md),
+   plus `~/.diff-review/review-comment-style.md` when it exists, before writing
+   any finding. This mode is the reviewer voice, never the reply voice.
 3. Review the PR with `git diff <baseRefName>...HEAD`; for a local critique,
    review the selected comparison. Check correctness, edge cases, architecture,
    data modeling, documented conventions, and useful nits.
@@ -445,9 +461,12 @@ to the `/diff-review auto <PR-number>` alias for PR review.
    - `.` or `working`: tracked edits may remain unstaged and new files may
      remain untracked.
    - Inspect `git status` before replying.
-4. Create only new entries. A question requires a reply. A completed change may
-   omit the reply or use `Done.`; if declining a requested change, explain why
-   in a reply. Copy the parent location exactly and use fresh ids and timestamps.
+4. Read [`references/reply-style.md`](references/reply-style.md), plus
+   `~/.diff-review/reply-style.md` when it exists, before writing any reply.
+   This mode is the engineer voice, never the reviewer voice. Then create only
+   new entries. A question requires a reply. A completed change may omit the
+   reply or use `Done.`; if declining a requested change, explain why in a
+   reply. Copy the parent location exactly and use fresh ids and timestamps.
 5. Validate the full transcript plus new entries in a temporary file, or for one
    reply verify its parent location exactly. POST only new entries:
 

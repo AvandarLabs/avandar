@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# Pre-push (pre-PR) hook. Two stages:
-#   1. i18n translation pipeline: keep the Lingui catalogs in sync with the
+# Pre-push (pre-PR) hook. Three stages:
+#   1. Local Supabase configuration: rejects a pushed tree whose local project
+#      id or protected ports differ from the standard avandar configuration.
+#   2. i18n translation pipeline: keep the Lingui catalogs in sync with the
 #      source before pushing. The script no-ops fast when extract produces no
 #      catalog changes; otherwise it runs the LLM translation step and
 #      recompiles, and we exit 2 so the contributor can review and commit the
 #      regenerated files.
-#   2. Shared formatter: runs scripts/format-changed-files/format-changed-files.sh
+#   3. Shared formatter: runs scripts/format-changed-files/format-changed-files.sh
 #      on files changed on this branch (vs origin/develop or origin/main). All
 #      formatting logic lives there so the same behavior is available manually
 #      via `pnpm format`. If that script modifies any files it exits non-zero,
@@ -22,7 +24,7 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 cd "$REPO_ROOT" || exit 0
 
-# Stage 0: fast no-op when there is nothing to push. Git feeds the refs being
+# Stage 0: validate every Git tree that will be pushed. Git feeds the refs being
 # pushed on stdin as "<local-ref> <local-sha> <remote-ref> <remote-sha>" lines.
 # If every local sha already matches its remote sha (or stdin is empty), there
 # are no new commits to push, so skip the i18n and formatting stages entirely.
@@ -30,6 +32,21 @@ has_updates=0
 while read -r _local_ref local_sha _remote_ref remote_sha; do
   if [ "$local_sha" != "$remote_sha" ]; then
     has_updates=1
+
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+      continue
+    fi
+
+    if ! git cat-file -e "$local_sha:supabase/config.toml" 2>/dev/null; then
+      echo "pre-push hook: pushed tree is missing supabase/config.toml." >&2
+      echo "Run 'ava supabase restore', stage the restored files, and retry." >&2
+      exit 1
+    fi
+
+    if ! git show "$local_sha:supabase/config.toml" \
+      | "$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh"; then
+      exit 1
+    fi
   fi
 done
 if [ "$has_updates" -eq 0 ]; then

@@ -110,11 +110,6 @@ msgstr "Invite member"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "JOIN entry at position {index} is not a plain table reference."
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Or {0} to be notified when our public launch is ready."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Right span"
@@ -1420,15 +1415,6 @@ msgstr "Workspace name is required"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "An unexpected error occurred. You can try again, or return home."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate "
-"your patience. You will receive a sign-up code soon. We promise!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Bias detected:"
@@ -2386,10 +2372,6 @@ msgstr "Capturing dashboard…"
 msgid "X axis tick interval"
 msgstr "X axis tick interval"
 
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "This is an invalid waitlist code"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
@@ -2961,10 +2943,6 @@ msgstr "Drop to import"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Date range"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "sign up for our waitlist"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3838,12 +3816,6 @@ msgstr "We detected both potential personal information and language that may "
 msgid "Select aggregation"
 msgstr "Select aggregation"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignore all global filters: this visualization is unfiltered."
@@ -3855,10 +3827,6 @@ msgstr "You wrote:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Multi select"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Sign up for our waitlist"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3879,10 +3847,6 @@ msgstr "Collapse drawer"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Share failed"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Your waitlist code has been verified"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4680,10 +4644,6 @@ msgstr "Loading dashboard datasets"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Select an Excel or CSV file from your computer to import"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Please choose a password to complete your registration"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "

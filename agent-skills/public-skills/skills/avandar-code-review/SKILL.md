@@ -368,6 +368,7 @@ recommendedFix }`. It must not modify code.
 | `lib:@avandar/utils` | libraries/avandar-utils-checklist | package present |
 | `lib:@avandar/models` | libraries/avandar-models-checklist | package present |
 | `lib:@avandar/modules` | libraries/avandar-modules-checklist | package present |
+| `lib:supabase` | libraries/supabase-checklist (+ the `supabase-declarative-schema` skill when available) | repo has `supabase/migrations/` or `supabase/schemas/` and the diff touches one |
 | `extra-checklist:<phase>` (one lane per repo-local phase, including each referenced ruleset) | that phase's section in repo-local `extra-checklist.md` and any file it references | that phase's own gate matches |
 
 Repo-local phases fan out too. Spawn one find lane per phase declared in
@@ -541,6 +542,80 @@ Check these first because they are the most frequent review findings:
 - Functions should stay short, ideally 45 lines or fewer.
 - If a function is getting too long or contains reusable logic, extract a
   utility function.
+- **Treat a source file over 400 lines as monolithic and split it.** A file
+  that long stops being one unit a reader can hold at once: unrelated
+  concerns share a scroll buffer, every edit touches the same file, and the
+  seams between responsibilities stop being visible in the directory
+  listing. Thresholds:
+  - **400 lines or fewer:** fine, no finding.
+  - **401 to 500 lines:** flag it and ask for a split attempt. Accept the
+    file as-is only when the author shows there is no clean seam, for
+    example one exhaustive generated union or a single algorithm whose
+    steps cannot be named independently.
+  - **Over 500 lines:** always a finding. "No clean seam" is not an
+    accepted answer at this size.
+
+  **Exception: database migration files are never a finding, at any
+  length.** A migration is one unit by construction: it is applied as a
+  single step, its statements are ordered by dependency, and splitting it
+  changes what runs. This covers `supabase/migrations/`, and the
+  equivalent directory for any other migration runner.
+
+  **Exception: nothing outside reviewed source counts.** Dependency trees,
+  build output, and caches are never findings at any length:
+  `node_modules/`, `dist/`, `build/`, `out/`, `coverage/`, `.next/`,
+  Cargo's `target/` and `vendor/`, Python's `__pycache__/`, `.venv/`,
+  `venv/`, and `site-packages/`.
+
+  **The fix is always a directory module, never a sibling file.** The file
+  becomes a directory of the same name, the original file becomes the
+  entry point inside it, and each extracted unit becomes its own file
+  nested in that directory. Then apply the directory rules recursively: an
+  extracted unit that has its own child dependencies, or its own co-named
+  siblings such as a `.test` or `.module.css` file, becomes a directory in
+  turn.
+
+  This is bad:
+
+  ```text
+  SupabaseLocalEnvironment.ts        (1479 lines)
+  ```
+
+  This is good:
+
+  ```text
+  SupabaseLocalEnvironment/
+    SupabaseLocalEnvironment.ts      entry point
+    SupabaseLocalEnvironment.test.ts
+    SupabaseBackupManifest/
+      SupabaseBackupManifest.ts
+      SupabaseBackupManifest.test.ts
+  ```
+
+  **Find candidates** (every file the diff adds or modifies, longest
+  first, with anything at or under the threshold dropped):
+
+  ```bash
+  git diff --name-only --diff-filter=ACM <base>...HEAD \
+    | grep -E '\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs|rb|java|kt|swift)$' \
+    | grep -Ev '(^|/)(migrations|node_modules|dist|build|out|coverage|target|vendor|__pycache__|\.venv|venv|site-packages|\.next)/' \
+    | while read -r f; do
+        [ -f "$f" ] || continue
+        n=$(wc -l < "$f" | tr -d ' ')
+        [ "$n" -gt 400 ] && printf '%s\t%s\n' "$n" "$f"
+      done \
+    | sort -rn
+  ```
+
+  The extension whitelist keeps lock files, data, and markup out; the
+  second filter drops migrations, dependency trees, build output, and
+  caches. Add the repo's own equivalents if it uses different directory
+  names. Every printed file is a candidate. Report those over 500 lines as
+  findings outright, and those between 401 and 500 as a split attempt to
+  justify or make. Drop generated files (see "Files To Skip") before
+  flagging: a checked-in
+  type-generation output or a database migration is one unit by
+  construction and is never a monolith finding.
 - Follow normal language naming conventions for the file's language.
 - Variable names should be descriptive, including auxiliary verbs when useful,
   such as `isLoading` or `hasError`.
@@ -716,6 +791,30 @@ sub-checklist file.
   purpose into a single named module (a plain object by default; only use
   `createModule(...)` when the module needs state or mixins, and flag a
   stateless `createModule(...)` as something that should be a plain object).
+
+### Phase: Supabase
+
+- **Gate:** the repo under review has a `supabase/migrations/` or a
+  `supabase/schemas/` directory, **and** the diff touches one of them or
+  introduces a `null` from a Supabase auth call. If neither directory
+  exists, skip this phase even when the diff contains other `.sql` files.
+  This gate is the repo's use of Supabase, not a package dependency.
+- **Reference:**
+  [`docs/code-reviews/libraries/supabase-checklist.md`](docs/code-reviews/libraries/supabase-checklist.md).
+  That file declares four sub-gates; run only the ones the diff matches.
+- **Also load the `supabase-declarative-schema` skill when it is
+  available.** It is the authority on this workflow, and the checklist is
+  the review-time subset of it. If the two disagree, the skill wins.
+- **Covers:** new migrations sorting last; folding a run of successive new
+  migrations into one file; the five correctness rules for storage
+  migrations (storage-only, `_STORAGE` naming, idempotent, listed in
+  `[db.seed] sql_paths`, mirrored into `supabase/schemas/99.storage.sql`);
+  schema file numbering, where tens are broad layers, units are
+  sub-layers, and independent files share an index; normalizing a Supabase
+  auth `null` to `undefined` at the boundary.
+- **Note:** the first three sub-gates judge the set of files the diff
+  touches, so give its find agent the names of every migration and schema
+  file the diff adds or renames, not only the diff slice of one file.
 
 ## Repo-Local Phase
 

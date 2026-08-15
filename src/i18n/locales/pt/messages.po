@@ -114,12 +114,6 @@ msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "A entrada JOIN na posição {index} não é uma referência simples de "
 "tabela."
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Ou {0} para ser notificado quando nosso lançamento público estiver "
-"pronto."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Extensão direita"
@@ -1444,16 +1438,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocorreu um erro inesperado. Você pode tentar novamente ou voltar para a "
 "página inicial."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} para ser notificado quando for sua vez de se registrar! Se você já "
-"está na nossa lista de espera e não recebeu um código de inscrição, "
-"agradecemos sua paciência. Você receberá um código de inscrição em "
-"breve. Prometemos!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Viés detectado:"
@@ -2421,10 +2405,6 @@ msgstr "Capturando painel…"
 msgid "X axis tick interval"
 msgstr "Intervalo das marcações do eixo X"
 
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "Este é um código de lista de espera inválido"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
@@ -3001,10 +2981,6 @@ msgstr "Arraste para importar"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Intervalo de datas"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "inscreva-se na nossa lista de espera"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3888,13 +3864,6 @@ msgstr "Detectamos tanto informações pessoais potenciais quanto linguagem que 
 msgid "Select aggregation"
 msgstr "Selecionar agregação"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "Enquanto o Avandar estiver em beta, estamos permitindo registro apenas "
-"se você estiver na nossa lista de espera e tiver recebido um código de "
-"inscrição em seu e-mail."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorar todos os filtros globais: esta visualização está sem filtro."
@@ -3906,10 +3875,6 @@ msgstr "Você escreveu:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Seleção múltipla"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Inscreva-se na nossa lista de espera"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3930,10 +3895,6 @@ msgstr "Recolher painel"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Compartilhamento falhou"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Seu código de lista de espera foi verificado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4741,10 +4702,6 @@ msgstr "Carregando conjuntos de dados do painel"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Selecione um arquivo Excel ou CSV do seu computador para importar"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Por favor, escolha uma senha para completar seu registro"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "

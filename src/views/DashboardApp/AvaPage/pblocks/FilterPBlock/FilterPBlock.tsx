@@ -6,8 +6,9 @@ import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/F
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
+import type { DashboardFilterMode } from "$/types/dashboard.types";
 
-export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
+export type FilterPBlockMode = DashboardFilterMode;
 
 export type Props = {
   /** Stable id used by the filter state manager. */
