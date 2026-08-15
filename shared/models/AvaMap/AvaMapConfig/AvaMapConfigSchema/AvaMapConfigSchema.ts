@@ -484,7 +484,7 @@ const ConfigV2Schema = z
 type ConfigV1 = z.infer<typeof ConfigV1Schema>;
 type ConfigV1Layer = z.infer<typeof V1LayerSchema>;
 
-/** Migrates one valid Wave A layer without weakening its sensitivity. */
+/** Migrates one version 1 layer without weakening its sensitivity. */
 function _migrateVersion1Layer(layer: ConfigV1Layer): MapLayer.T {
   const legend: MapLayer.Legend = {
     ...layer.legend,
@@ -508,7 +508,7 @@ function _migrateVersion1Layer(layer: ConfigV1Layer): MapLayer.T {
   } as MapLayer.AggregateOnly;
 }
 
-/** Migrates a valid Wave A config into the current strict representation. */
+/** Migrates a valid version 1 config into the current strict representation. */
 function _migrateVersion1(config: ConfigV1): AvaMapConfigRead {
   return ConfigV2Schema.parse({
     ...config,

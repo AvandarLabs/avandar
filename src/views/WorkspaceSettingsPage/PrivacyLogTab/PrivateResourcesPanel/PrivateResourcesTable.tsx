@@ -29,7 +29,7 @@ export function PrivateResourcesTable({
             <Trans>Private datasets</Trans>
           </Table.Th>
           <Table.Th>
-            <Trans>Maps</Trans>
+            <Trans>Private maps</Trans>
           </Table.Th>
           <Table.Th />
         </Table.Tr>

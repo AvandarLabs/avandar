@@ -210,7 +210,9 @@ function PointBoundaryControls(
           });
           const boundary =
             option ? _createBoundaryFromOption(option) : undefined;
-          if (boundary) updateBoundary(boundary);
+          if (boundary) {
+            updateBoundary(boundary);
+          }
         }}
       />
       <BoundaryColumnControls

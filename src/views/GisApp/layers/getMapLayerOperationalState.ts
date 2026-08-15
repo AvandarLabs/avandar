@@ -1,11 +1,17 @@
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
+/**
+ * One layer's operational condition, resolved to the single state its status
+ * surfaces should show. The variants are ordered by the priority the resolver
+ * applies: a rebind requirement outranks a query error, which outranks
+ * suppression, and so on down to the plain query status.
+ */
 export type MapLayerOperationalState =
   | { type: "rebindRequired" }
   | { type: "spatialUnavailable" }
   | { type: "queryError" }
-  | { type: "suppressed"; count: number }
-  | { type: "noData"; count: number }
+  | { type: "suppressed"; featureCount: number }
+  | { type: "noData"; featureCount: number }
   | { type: "partialMatch" }
   | { type: "unbound" | "loading" | "empty" | "ready" };
 
@@ -14,21 +20,8 @@ export function getMapLayerOperationalState(
   viewState: MapLayerViewState,
 ): MapLayerOperationalState {
   const errorMessage = viewState.error?.message ?? "";
-  if (errorMessage.includes("requires rebinding")) {
-    return { type: "rebindRequired" };
-  }
-  if (errorMessage.includes("Spatial is unavailable")) {
-    return { type: "spatialUnavailable" };
-  }
-  if (viewState.status === "error") {
-    return { type: "queryError" };
-  }
-  if ((viewState.suppressedCount ?? 0) > 0) {
-    return { type: "suppressed", count: viewState.suppressedCount! };
-  }
-  if ((viewState.noDataCount ?? 0) > 0) {
-    return { type: "noData", count: viewState.noDataCount! };
-  }
+  const suppressedFeatureCount = viewState.suppressedCount ?? 0;
+  const noDataFeatureCount = viewState.noDataCount ?? 0;
   const diagnostics = viewState.spatialDiagnostics;
   const hasPartialMatch =
     viewState.droppedRowCount > 0 ||
@@ -36,8 +29,17 @@ export function getMapLayerOperationalState(
     (diagnostics?.duplicateBoundaryKeyCount ?? 0) > 0 ||
     (diagnostics?.invalidCount ?? 0) > 0 ||
     diagnostics?.hasMixedFamilies === true;
-  if (hasPartialMatch) {
-    return { type: "partialMatch" };
-  }
-  return { type: viewState.status };
+
+  return (
+    errorMessage.includes("requires rebinding") ? { type: "rebindRequired" }
+    : errorMessage.includes("Spatial is unavailable") ?
+      { type: "spatialUnavailable" }
+    : viewState.status === "error" ? { type: "queryError" }
+    : suppressedFeatureCount > 0 ?
+      { type: "suppressed", featureCount: suppressedFeatureCount }
+    : noDataFeatureCount > 0 ?
+      { type: "noData", featureCount: noDataFeatureCount }
+    : hasPartialMatch ? { type: "partialMatch" }
+    : { type: viewState.status }
+  );
 }

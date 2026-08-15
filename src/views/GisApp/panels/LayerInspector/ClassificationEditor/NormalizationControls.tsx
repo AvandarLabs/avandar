@@ -104,7 +104,9 @@ export function NormalizationControls(props: Props): ReactNode {
           value={String(color.normalization.multiplier)}
           allowDeselect={false}
           onChange={(value) => {
-            if (!value) return;
+            if (!value) {
+              return;
+            }
             props.onLayerChange((current) => {
               const currentColor = current.symbology.color;
               if (

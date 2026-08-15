@@ -70,7 +70,7 @@ export function MapStatusContent({
     return (
       <>
         <span className={css.mapStatusCardTitle}>
-          {i18n._(msg`${operationalState.count} areas are suppressed`)}
+          {i18n._(msg`${operationalState.featureCount} areas are suppressed`)}
         </span>
         <span className={css.mapStatusCardBody}>
           {i18n._(
@@ -84,7 +84,7 @@ export function MapStatusContent({
     return (
       <>
         <span className={css.mapStatusCardTitle}>
-          {i18n._(msg`${operationalState.count} areas have no data`)}
+          {i18n._(msg`${operationalState.featureCount} areas have no data`)}
         </span>
         <span className={css.mapStatusCardBody}>
           {i18n._(

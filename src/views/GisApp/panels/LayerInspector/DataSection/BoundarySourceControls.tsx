@@ -37,7 +37,9 @@ function _createBoundaryFromOption(
 export function BoundarySourceControls(props: Props): ReactNode {
   const { t } = useLingui();
   const binding = props.layer.geoBinding;
-  if (binding?.type !== "joinToBoundaries") return null;
+  if (binding?.type !== "joinToBoundaries") {
+    return null;
+  }
   const selected = props.options.find(({ dataset }) => {
     return dataset.id === binding.boundary.datasetId;
   });
@@ -127,7 +129,9 @@ function BoundaryColumnSelect(props: {
       value={props.value}
       allowDeselect={false}
       onChange={(value) => {
-        if (value) props.onChange(value as DatasetColumn.Id);
+        if (value) {
+          props.onChange(value as DatasetColumn.Id);
+        }
       }}
     />
   );

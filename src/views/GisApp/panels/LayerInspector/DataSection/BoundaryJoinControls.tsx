@@ -20,7 +20,9 @@ type Props = {
 export function BoundaryJoinControls(props: Props): ReactNode {
   const { t } = useLingui();
   const binding = props.layer.geoBinding;
-  if (binding?.type !== "joinToBoundaries") return null;
+  if (binding?.type !== "joinToBoundaries") {
+    return null;
+  }
   const dataSourceId =
     props.layer.source.dataSource ?
       Model.getTypedId(props.layer.source.dataSource)
@@ -29,7 +31,9 @@ export function BoundaryJoinControls(props: Props): ReactNode {
     layer: props.layer,
     columnId: binding.dataKeyColumn,
   });
-  if (!dataKeyColumn) return null;
+  if (!dataKeyColumn) {
+    return null;
+  }
   const updateJoin = (
     column: typeof dataKeyColumn,
     matching: "exact" | "normalizedName",
@@ -50,7 +54,9 @@ export function BoundaryJoinControls(props: Props): ReactNode {
         dataSourceId={dataSourceId}
         value={dataKeyColumn}
         onChange={(column) => {
-          if (column) updateJoin(column, binding.matching);
+          if (column) {
+            updateJoin(column, binding.matching);
+          }
         }}
       />
       <Select

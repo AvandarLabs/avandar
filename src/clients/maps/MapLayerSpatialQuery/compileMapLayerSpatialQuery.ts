@@ -418,8 +418,9 @@ function _buildPointExpression(
 ): string {
   if (binding.points.type === "geometryColumn") {
     const name = metadata.sourceColumnNames.get(binding.points.column);
-    if (!name)
+    if (!name) {
       throw new Error("The point geometry column could not be resolved");
+    }
     return buildGeometryExpression(
       quoteSqlIdentifier(name),
       binding.points.encoding,
@@ -447,9 +448,13 @@ function _buildPointAggregateValue(
   >,
   metadata: ResolvedMapLayerMetadata,
 ): string {
-  if (binding.aggregation.operation === "count") return "count(*)";
+  if (binding.aggregation.operation === "count") {
+    return "count(*)";
+  }
   const measure = metadata.aggregationMeasureColumnName;
-  if (!measure) throw new Error("The point aggregation measure is unresolved");
+  if (!measure) {
+    throw new Error("The point aggregation measure is unresolved");
+  }
   return `${binding.aggregation.operation}(${quoteSqlIdentifier(measure)})`;
 }
 

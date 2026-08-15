@@ -62,6 +62,7 @@ import type {
   CsvParseUserHints,
   DuckDbSniffCsvRow,
 } from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 const sql = knex({
@@ -424,7 +425,7 @@ class DuckDbClientImpl {
   }
 
   /** Returns the current DuckDB Spatial capability state. */
-  getSpatialAvailability() {
+  getSpatialAvailability(): DuckDbSpatialAvailability {
     return this.#spatialAvailability.getSnapshot();
   }
 

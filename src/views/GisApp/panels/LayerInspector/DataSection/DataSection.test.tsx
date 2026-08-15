@@ -493,7 +493,9 @@ describe("DataSection", () => {
     const update = onLayerChange.mock.calls[0]![0];
     const updatedLayer = update(_createBoundLayer());
     expect(updatedLayer.geoBinding?.type).toBe("latLngColumns");
-    if (updatedLayer.geoBinding?.type !== "latLngColumns") return;
+    if (updatedLayer.geoBinding?.type !== "latLngColumns") {
+      return;
+    }
     expect(updatedLayer.geoBinding.latitude).toBe(fixtures.latitudeColumn.id);
   });
 

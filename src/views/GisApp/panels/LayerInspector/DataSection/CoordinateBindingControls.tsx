@@ -29,8 +29,9 @@ export function CoordinateBindingControls({
   const isBound =
     binding?.latitude !== undefined && binding.longitude !== undefined;
   const hasCoordinateCandidates = guess !== undefined;
-  if (!hasCoordinateCandidates && !isBound && !layer.source.dataSource)
+  if (!hasCoordinateCandidates && !isBound && !layer.source.dataSource) {
     return null;
+  }
   return (
     <>
       {hasCoordinateCandidates || isBound ?

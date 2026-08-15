@@ -119,7 +119,9 @@ export function ClassificationEditor(props: Props): ReactNode {
         value={color.type}
         allowDeselect={false}
         onChange={(mode) => {
-          if (!mode) return;
+          if (!mode) {
+            return;
+          }
           const nextColor = _createColor(
             props.layer,
             mode as "single" | "categorical" | "graduated",
@@ -177,7 +179,9 @@ function GraduatedControls(
         value={color.classification.method}
         allowDeselect={false}
         onChange={(method) => {
-          if (!method) return;
+          if (!method) {
+            return;
+          }
           updateColor({
             ...color,
             classification:

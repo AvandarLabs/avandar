@@ -27,9 +27,9 @@ export function LayerLeadStatus({
     operationalState.type === "rebindRequired" ? t`Geometry must be rebound`
     : operationalState.type === "spatialUnavailable" ? t`Spatial is unavailable`
     : operationalState.type === "suppressed" ?
-      t`${operationalState.count} areas suppressed`
+      t`${operationalState.featureCount} areas suppressed`
     : operationalState.type === "noData" ?
-      t`${operationalState.count} areas have no data`
+      t`${operationalState.featureCount} areas have no data`
     : matchLiteral(viewState.status, {
         unbound: t`Not plotted yet`,
         loading: t`Loading`,

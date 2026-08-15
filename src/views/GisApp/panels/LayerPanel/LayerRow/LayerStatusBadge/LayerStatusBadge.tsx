@@ -68,14 +68,14 @@ export function LayerStatusBadge({ viewState }: Props): ReactNode {
       if (operationalState.type === "suppressed") {
         return (
           <Badge color="warning" variant="light" size="xs">
-            {t`${operationalState.count} suppressed`}
+            {t`${operationalState.featureCount} suppressed`}
           </Badge>
         );
       }
       if (operationalState.type === "noData") {
         return (
           <Badge color="neutral" variant="light" size="xs">
-            {t`${operationalState.count} no data`}
+            {t`${operationalState.featureCount} no data`}
           </Badge>
         );
       }

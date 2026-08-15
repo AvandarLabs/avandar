@@ -90,7 +90,9 @@ describe("withPopupColumns", () => {
   it("keeps a column the geometry binding needs when it is deselected", () => {
     const bound = _createBoundLayer();
     expect(bound.geoBinding?.type).toBe("latLngColumns");
-    if (bound.geoBinding?.type !== "latLngColumns") return;
+    if (bound.geoBinding?.type !== "latLngColumns") {
+      return;
+    }
     const updatedLayer = MapLayerUpdates.withPopupColumns({
       layer: bound,
       columns: [],
@@ -122,7 +124,9 @@ describe("withPopupColumns", () => {
   it("does not select the same base column twice under two ids", () => {
     const bound = _createBoundLayer();
     expect(bound.geoBinding?.type).toBe("latLngColumns");
-    if (bound.geoBinding?.type !== "latLngColumns") return;
+    if (bound.geoBinding?.type !== "latLngColumns") {
+      return;
+    }
     const latitudeColumn = MapLayerUpdates.getQueryColumnFromLayer({
       layer: bound,
       columnId: bound.geoBinding.latitude,

@@ -52,7 +52,9 @@ export function GeometryColumnControls(props: Props): ReactNode {
         value={binding.encoding}
         allowDeselect={false}
         onChange={(encoding) => {
-          if (!encoding) return;
+          if (!encoding) {
+            return;
+          }
           props.onLayerChange((current) => {
             return MapLayerUpdates.withGeometryEncoding(
               current,
@@ -84,7 +86,9 @@ export function GeometryColumnControls(props: Props): ReactNode {
           : undefined
         }
         onChange={(family) => {
-          if (!family) return;
+          if (!family) {
+            return;
+          }
           props.onLayerChange((current) => {
             return MapLayerUpdates.withGeometryFamily(
               current,

@@ -13,18 +13,16 @@ describe("buildNormalizedBoundaryKey", () => {
     expect(expression).toContain("'g'");
   });
 
-  it("makes punctuation and Unicode variants share one SQL normalization path", () => {
-    const expression = buildNormalizedBoundaryKey("candidate_key");
-    for (const sample of [
-      "Nord-Kivu",
-      "Nord Kivu",
-      "NORD KIVU",
-      "Québec",
-      "Québec",
-    ]) {
-      expect(expression.replace("candidate_key", `'${sample}'`)).toContain(
-        "nfc_normalize",
-      );
-    }
+  it("nests the steps so each one operates on the previous step's output", () => {
+    // Order is the whole contract, and every ordering still contains every
+    // function name, so only the composed expression can catch a swap:
+    // accents strip from the Unicode-normalized value, punctuation collapses
+    // after folding to lower case so the [^a-z0-9] class matches, and trim
+    // runs last so it sees the already-collapsed whitespace.
+    expect(buildNormalizedBoundaryKey('"district"')).toBe(
+      "trim(regexp_replace(regexp_replace(lower(strip_accents(" +
+        'nfc_normalize(CAST("district" AS VARCHAR)))), ' +
+        "'[^a-z0-9]+', ' ', 'g'), '\\s+', ' ', 'g'))",
+    );
   });
 });

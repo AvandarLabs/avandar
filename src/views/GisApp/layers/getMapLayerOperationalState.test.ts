@@ -30,6 +30,6 @@ describe("getMapLayerOperationalState", () => {
       getMapLayerOperationalState(
         _state({ suppressedCount: 3, noDataCount: 4, droppedRowCount: 2 }),
       ),
-    ).toEqual({ type: "suppressed", count: 3 });
+    ).toEqual({ type: "suppressed", featureCount: 3 });
   });
 });

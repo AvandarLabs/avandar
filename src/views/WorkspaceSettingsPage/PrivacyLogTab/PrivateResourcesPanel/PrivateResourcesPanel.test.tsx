@@ -86,7 +86,7 @@ describe("PrivateResourcesPanel", () => {
 
     expect(screen.getByText("Pablo")).toBeInTheDocument();
     expect(screen.getByText("Amara")).toBeInTheDocument();
-    expect(screen.getByText("Maps")).toBeInTheDocument();
+    expect(screen.getByText("Private maps")).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
     expect(screen.getByText("7")).toBeInTheDocument();
   });

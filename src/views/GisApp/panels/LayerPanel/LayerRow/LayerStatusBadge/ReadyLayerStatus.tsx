@@ -23,7 +23,5 @@ export function ReadyLayerStatus({
       </Badge>
     );
   }
-  return featureCount === 1 ?
-      <>{t`1 point`}</>
-    : <>{t`${featureCount} points`}</>;
+  return featureCount === 1 ? t`1 point` : t`${featureCount} points`;
 }

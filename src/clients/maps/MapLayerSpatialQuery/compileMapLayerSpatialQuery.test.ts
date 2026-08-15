@@ -137,7 +137,6 @@ describe("compileMapLayerSpatialQuery", () => {
 
   it("emits a direct query-column denominator as a reserved property", () => {
     const fixture = _createFixture();
-    const denominator = fixture.layer.source.queryColumns[1]!;
     const { rawSql } = compileMapLayerSpatialQuery({
       ...fixture,
       metadata: {
@@ -151,7 +150,6 @@ describe("compileMapLayerSpatialQuery", () => {
       simplificationReferenceLatitude: 0,
     });
 
-    expect(denominator.id).toBeDefined();
     expect(rawSql).toContain("'__avandar_denominator', \"label\"");
   });
 

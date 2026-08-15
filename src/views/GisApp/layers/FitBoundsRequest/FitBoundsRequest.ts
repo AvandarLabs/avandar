@@ -25,7 +25,6 @@ function _getUnionBounds(boundsList: readonly MapBounds[]): MapBounds {
   }, firstBounds);
 }
 
-/** Requests a camera fit once when each layer first has usable geometry. */
 /** Explicit and first-render camera-fit request hooks. */
 export const FitBoundsRequest = {
   /** Creates explicit camera requests using the current panel-aware padding. */

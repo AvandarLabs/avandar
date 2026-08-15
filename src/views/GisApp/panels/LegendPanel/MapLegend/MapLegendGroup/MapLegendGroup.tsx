@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
@@ -6,13 +7,11 @@ import type { ReactNode } from "react";
 type Props = { layer: MapLayer.T };
 
 function _getEntryClassName(entry: MapLayer.LegendEntry): string {
-  if (entry.type === "suppressed") {
-    return `${css.mapLegendGroupKey!} ${css.mapLegendGroupKeySuppressed!}`;
-  }
-  if (entry.type === "noData") {
-    return `${css.mapLegendGroupKey!} ${css.mapLegendGroupKeyNoData!}`;
-  }
-  return css.mapLegendGroupKey!;
+  return clsx(
+    css.mapLegendGroupKey,
+    entry.type === "suppressed" && css.mapLegendGroupKeySuppressed,
+    entry.type === "noData" && css.mapLegendGroupKeyNoData,
+  );
 }
 
 /** Renders one layer's title, units, and persisted ordered symbol keys. */
@@ -81,7 +80,7 @@ function FlatLegendEntries(props: {
       {props.layer.legend.showNoData ?
         <li className={css.mapLegendGroupItem}>
           <span
-            className={`${css.mapLegendGroupKey} ${css.mapLegendGroupKeyNoData}`}
+            className={clsx(css.mapLegendGroupKey, css.mapLegendGroupKeyNoData)}
           />
           {t`Not reported`}
         </li>

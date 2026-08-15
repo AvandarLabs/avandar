@@ -73,7 +73,9 @@ export function AreaAggregationControls(props: Props): ReactNode {
             }) ?? null
           }
           onChange={(measureColumn) => {
-            if (!measureColumn) return;
+            if (!measureColumn) {
+              return;
+            }
             props.onLayerChange((current) => {
               return MapLayerUpdates.withAreaAggregation(current, {
                 operation: aggregation.operation,

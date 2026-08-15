@@ -25,7 +25,7 @@ describe("AvaMapConfigSchema", () => {
     });
   });
 
-  it("adds persisted classification output while migrating a Wave A layer", () => {
+  it("adds persisted classification output while migrating a version 1 layer", () => {
     const currentLayer = MapLayer.makeEmpty("Cases");
     const {
       breaks: _breaks,
