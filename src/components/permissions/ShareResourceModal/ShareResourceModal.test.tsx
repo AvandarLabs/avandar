@@ -365,6 +365,25 @@ describe("ShareResourceModal", () => {
     expect(screen.queryByTestId("share-publishing-actions")).toBeNull();
   });
 
+  it("summarises what is published, not what the user has just picked", async () => {
+    // The summary states what IS true of the resource. A draft whose owner has
+    // picked "Anyone with the link" is not on the web yet, and saying it is
+    // would be the same false reassurance the Only me confirmation was fixed
+    // for. The pending change is the status alert's job to report.
+    renderModal({
+      resourceType: "dashboard",
+      publishing: _makePublishing({
+        currentVisibility: "draft",
+        targetVisibility: "public",
+      }),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Not published yet/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Published on the web/)).toBeNull();
+  });
+
   it("renders the publishing section and actions when supplied", async () => {
     renderModal({
       resourceType: "dashboard",

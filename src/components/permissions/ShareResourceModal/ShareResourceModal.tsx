@@ -262,7 +262,12 @@ export function ShareResourceModal({
     workspaceName: workspace.name,
     userById,
     groupById,
-    publication: publishing ? publishing.targetVisibility : undefined,
+    // The persisted value, not the target: this sentence states what IS true
+    // of the resource. A draft whose owner has just picked "Anyone with the
+    // link" is not published on the web, and saying so would be the same class
+    // of false reassurance the Only me confirmation was fixed for. The pending
+    // change is reported by the status alert, which exists to say exactly that.
+    publication: publishing ? publishing.currentVisibility : undefined,
   });
 
   return (
