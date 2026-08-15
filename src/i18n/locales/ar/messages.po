@@ -111,11 +111,6 @@ msgstr "عمود القيمة"
 msgid "0 rows"
 msgstr ""
 
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Hide the layer {0}"
-#~ msgstr ""
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "شهري"
@@ -146,8 +141,8 @@ msgstr "إدخال JOIN في الموضع {index} ليس مرجعًا لجدول
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "أو {0} لتكون مُنبهًا عندما يصبح إطلاقنا العام جاهزًا."
+#~ msgid "Or {0} to be notified when our public launch is ready."
+#~ msgstr "أو {0} لتكون مُنبهًا عندما يصبح إطلاقنا العام جاهزًا."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -244,11 +239,6 @@ msgstr "إعدادات الرسم البياني"
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "الاكتشاف غير متاح في هذا السياق."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#~ msgid "Geometry columns, boundary joins, and grid binning arrive in a later "
-#~ "release."
-#~ msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
@@ -795,11 +785,6 @@ msgstr "إزالة المستخدم"
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
 
-#. placeholder {0}: props.droppedRowCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} rows unmapped"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Request a data source connection via feedback"
 msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
@@ -877,7 +862,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية "
 "لإضافة مجموعة بيانات الكتالوج هذه."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق "
@@ -908,7 +893,7 @@ msgstr "من مجموعة البيانات المشتقة"
 msgid "Single select"
 msgstr "اختيار فردي"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في الوقت الحالي."
 
@@ -1287,10 +1272,10 @@ msgstr "الطابع الزمني"
 msgid "Y axis tick interval"
 msgstr "الفاصل بين تدريجات المحور Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "كلمة المرور"
 
@@ -1740,12 +1725,12 @@ msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخ
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة "
-"الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل "
-"قريبًا. نعدك!"
+#~ msgid "{0} to be notified when it's your turn to register! If you are already "
+#~ "on our waitlist and have not received a sign-up code, we appreciate your "
+#~ "patience. You will receive a sign-up code soon. We promise!"
+#~ msgstr "{0} ليتم إبلاغك عندما يحين دورك للتسجيل! إذا كنت بالفعل على قائمة "
+#~ "الانتظار لدينا ولم تتلق رمز التسجيل، نشكرك على صبرك. ستتلقى رمز تسجيل "
+#~ "قريبًا. نعدك!"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -2027,9 +2012,9 @@ msgid "Update available"
 msgstr "يتوفر تحديث"
 
 #: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
-"المبكر."
+#~ msgid "Please <0>email us</0> if you would like early access."
+#~ msgstr "يرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنت ترغب في الوصول "
+#~ "المبكر."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2182,11 +2167,6 @@ msgstr "لا يمكن مزامنة هذا الكيان"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "إزالة السلاسل"
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle.tsx
-#~ msgid "Reorder layer {0}"
-#~ msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
@@ -2414,10 +2394,6 @@ msgstr "إضافة حقل"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr ""
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{noDataCount} no data"
-#~ msgstr ""
 
 #. placeholder {0}: operationalState.count
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -2804,7 +2780,7 @@ msgstr "حشوة"
 msgid "Theme"
 msgstr "السمة"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "تسجيل"
 
@@ -2850,7 +2826,7 @@ msgstr "مدير عالمي"
 msgid "Comma (,)"
 msgstr "فاصلة (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 
@@ -2882,7 +2858,7 @@ msgstr "العمود 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة العمل."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "يرجى التحقق من بريدك الإلكتروني"
 
@@ -2920,8 +2896,8 @@ msgid "X axis tick interval"
 msgstr "الفاصل بين تدريجات المحور X"
 
 #: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "هذا رمز قائمة الانتظار غير صالح"
+#~ msgid "This is an invalid waitlist code"
+#~ msgstr "هذا رمز قائمة الانتظار غير صالح"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2961,6 +2937,10 @@ msgstr "القيم"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "لون تسمية المحور Y"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "يُرجى <0>مراسلتنا عبر البريد الإلكتروني</0> إذا كنتم ترغبون في الوصول."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -3011,7 +2991,7 @@ msgstr "ميزات الخطة:"
 msgid "Hide the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "ابدأ رحلتك معنا"
 
@@ -3052,11 +3032,6 @@ msgstr "تم إرسال الدعوة"
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "أنت غير متصل"
-
-#: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
-#~ msgid "This layer cannot be drawn yet. Aggregate only needs an area to "
-#~ "aggregate into, and boundary joins arrive in a later release."
-#~ msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -3618,8 +3593,8 @@ msgid "Date range"
 msgstr "نطاق التاريخ"
 
 #: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "اشترك في قائمة الانتظار الخاصة بنا"
+#~ msgid "sign up for our waitlist"
+#~ msgstr "اشترك في قائمة الانتظار الخاصة بنا"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3738,11 +3713,6 @@ msgstr "الأعمدة"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
 msgstr ""
-
-#. placeholder {0}: props.featureCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} points"
-#~ msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -4256,8 +4226,8 @@ msgstr "الأكثر شيوعًا"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "كلمات المرور غير متطابقة"
 
@@ -4483,7 +4453,7 @@ msgstr "وسيلة الإيضاح"
 msgid "Show the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
@@ -4640,10 +4610,10 @@ msgid "Class {0}: {1} values"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة "
-"الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
+#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
+#~ "on our waitlist and have received a sign-up code in your email."
+#~ msgstr "بينما Avandar في مرحلة البيتا، نحن نسمح بالتسجيل فقط إذا كنت على قائمة "
+#~ "الانتظار الخاصة بنا وقد تلقيت رمز التسجيل في بريدك الإلكتروني."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -4658,8 +4628,8 @@ msgid "Multi select"
 msgstr "تحديد متعدد"
 
 #: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "سجل في قائمة الانتظار الخاصة بنا"
+#~ msgid "Sign up for our waitlist"
+#~ msgstr "سجل في قائمة الانتظار الخاصة بنا"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4682,8 +4652,8 @@ msgid "Share failed"
 msgstr "فشل المشاركة"
 
 #: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "تم التحقق من رمز قائمة الانتظار الخاصة بك"
+#~ msgid "Your waitlist code has been verified"
+#~ msgstr "تم التحقق من رمز قائمة الانتظار الخاصة بك"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4884,9 +4854,9 @@ msgid "Looking up values in {column}…"
 msgstr "جارٍ البحث عن القيم في {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
@@ -5083,8 +5053,8 @@ msgstr "تمت إزالة المستخدم"
 msgid "Limit {displayName} to app access"
 msgstr "تقييد {displayName} للوصول إلى التطبيق"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "تأكيد كلمة المرور"
 
@@ -5175,7 +5145,7 @@ msgstr "تاريخ"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "هذه اللوحة لا تشير إلى أي مجموعات بيانات: لا يوجد شيء لنشره."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "تم إرسال بريد إلكتروني للتأكيد إلى عنوان بريدك الإلكتروني."
 
@@ -5570,11 +5540,6 @@ msgstr "نسخ رابط المشاركة"
 msgid "Canonical URLs"
 msgstr "عناوين URL القياسية"
 
-#. placeholder {0}: props.mapLabel
-#: src/views/GisApp/shell/MapShell/MapShell.tsx
-#~ msgid "{0}. Use the layer panel to change what is shown."
-#~ msgstr ""
-
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "تظهر إعدادات المخطط بعد أن يعرض الاستعلام بعض الأعمدة."
@@ -5653,8 +5618,8 @@ msgid "Boundary dataset"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
+#~ msgid "Please choose a password to complete your registration"
+#~ msgstr "يرجى اختيار كلمة مرور لإكمال تسجيلك"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5767,11 +5732,6 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ مساحات العمل الأخرى "
 "بأسمائها الخاصة."
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Show the layer {0}"
-#~ msgstr ""
 
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -6714,7 +6674,7 @@ msgstr "Avandar لا يزال في مرحلة البيتا. قد لا تعمل �
 "وقد لا تزال قيد الإنشاء. نقدر صبرك وملاحظاتك بينما نعمل على تحسين "
 "المنتج."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "شكرًا لاهتمامك!"
 
@@ -6905,10 +6865,6 @@ msgid "Aggregate only draws areas after at least {0} contributing records. "
 "their exact count."
 msgstr ""
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{suppressedCount} suppressed"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "تم حفظ مجموعة البيانات"
@@ -6966,7 +6922,7 @@ msgstr "البحث في لوحات المعلومات"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "عنوان البريد الإلكتروني غير صالح"
 

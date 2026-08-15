@@ -6,7 +6,6 @@ export const NOTIFICATION_EMAIL_FROM = {
   name: "Avandar Team",
 } as const;
 
-export const NOTIFICATION_EMAIL_TYPES = registry<NotificationEmailType>().keys(
-  "waitlist_signup_code",
-  "workspace_invite",
-);
+/** Registry of notification template identifiers accepted by EmailClient. */
+export const NOTIFICATION_EMAIL_TYPES =
+  registry<NotificationEmailType>().keys("workspace_invite");

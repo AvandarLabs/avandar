@@ -107,11 +107,6 @@ msgstr "值列"
 msgid "0 rows"
 msgstr ""
 
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Hide the layer {0}"
-#~ msgstr ""
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "每月"
@@ -142,8 +137,8 @@ msgstr "位置 {index} 的 JOIN 条目不是简单表引用。"
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "或 {0} 以在我们的公开发布准备好时收到通知。"
+#~ msgid "Or {0} to be notified when our public launch is ready."
+#~ msgstr "或 {0} 以在我们的公开发布准备好时收到通知。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -239,11 +234,6 @@ msgstr "图表设置"
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "在此上下文中无法使用发现功能。"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#~ msgid "Geometry columns, boundary joins, and grid binning arrive in a later "
-#~ "release."
-#~ msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
@@ -781,11 +771,6 @@ msgstr "移除用户"
 msgid "Updated {0}"
 msgstr "已更新 {0}"
 
-#. placeholder {0}: props.droppedRowCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} rows unmapped"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Request a data source connection via feedback"
 msgstr "通过反馈请求数据源连接"
@@ -859,7 +844,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您无法在当前计划中添加更多数据集。升级以添加此目录数据集。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "请检查您的电子邮件以获取确认链接。可能需要几分钟才能到达。"
@@ -889,7 +874,7 @@ msgstr "来自派生数据集"
 msgid "Single select"
 msgstr "单选"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "但是，我们目前不允许新的注册。"
 
@@ -1261,10 +1246,10 @@ msgstr "时间戳"
 msgid "Y axis tick interval"
 msgstr "Y 轴刻度间隔"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "密码"
 
@@ -1703,10 +1688,10 @@ msgstr "发生意外错误。你可以重试，或返回首页。"
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的候补名单上并且尚未收到注册代码，我们感谢您的耐心。您将很快收到注册代码。我们保证！"
+#~ msgid "{0} to be notified when it's your turn to register! If you are already "
+#~ "on our waitlist and have not received a sign-up code, we appreciate your "
+#~ "patience. You will receive a sign-up code soon. We promise!"
+#~ msgstr "{0} 在轮到您注册时会收到通知！如果您已经在我们的候补名单上并且尚未收到注册代码，我们感谢您的耐心。您将很快收到注册代码。我们保证！"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -1978,8 +1963,8 @@ msgid "Update available"
 msgstr "有可用更新"
 
 #: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
+#~ msgid "Please <0>email us</0> if you would like early access."
+#~ msgstr "如果您希望提前访问，请<0>通过电子邮件联系我们</0>。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2130,11 +2115,6 @@ msgstr "无法同步此实体"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "移除系列"
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle.tsx
-#~ msgid "Reorder layer {0}"
-#~ msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
@@ -2358,10 +2338,6 @@ msgstr "添加字段"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr ""
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{noDataCount} no data"
-#~ msgstr ""
 
 #. placeholder {0}: operationalState.count
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -2740,7 +2716,7 @@ msgstr "内边距"
 msgid "Theme"
 msgstr "主题"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "注册"
 
@@ -2785,7 +2761,7 @@ msgstr "全局管理员"
 msgid "Comma (,)"
 msgstr "逗号 (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "注册需要互联网连接。"
 
@@ -2817,7 +2793,7 @@ msgstr "第 9 列"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "您没有权限打开工作区的此部分。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "请检查您的电子邮件"
 
@@ -2855,8 +2831,8 @@ msgid "X axis tick interval"
 msgstr "X 轴刻度间隔"
 
 #: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "这是一个无效的候补名单代码"
+#~ msgid "This is an invalid waitlist code"
+#~ msgstr "这是一个无效的候补名单代码"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2896,6 +2872,10 @@ msgstr "值"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Y 轴标签颜色"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "如果您希望获得访问权限，请<0>给我们发送邮件</0>。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2944,7 +2924,7 @@ msgstr "计划功能："
 msgid "Hide the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "与我们一起开始您的旅程"
 
@@ -2984,11 +2964,6 @@ msgstr "邀请已发送"
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "您处于离线状态"
-
-#: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
-#~ msgid "This layer cannot be drawn yet. Aggregate only needs an area to "
-#~ "aggregate into, and boundary joins arrive in a later release."
-#~ msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -3539,8 +3514,8 @@ msgid "Date range"
 msgstr "日期范围"
 
 #: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "注册我们的候补名单"
+#~ msgid "sign up for our waitlist"
+#~ msgstr "注册我们的候补名单"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3658,11 +3633,6 @@ msgstr "列"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
 msgstr ""
-
-#. placeholder {0}: props.featureCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} points"
-#~ msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -4169,8 +4139,8 @@ msgstr "最常见"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "密码不匹配"
 
@@ -4392,7 +4362,7 @@ msgstr "图例"
 msgid "Show the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "创建新账户"
 
@@ -4545,9 +4515,9 @@ msgid "Class {0}: {1} values"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
+#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
+#~ "on our waitlist and have received a sign-up code in your email."
+#~ msgstr "在 Avandar 处于测试阶段时，只有在您在我们的候补名单上并且已在您的电子邮件中收到注册代码的情况下，才允许注册。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -4562,8 +4532,8 @@ msgid "Multi select"
 msgstr "多选"
 
 #: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "注册我们的候补名单"
+#~ msgid "Sign up for our waitlist"
+#~ msgstr "注册我们的候补名单"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4586,8 +4556,8 @@ msgid "Share failed"
 msgstr "分享失败"
 
 #: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "您的候补名单代码已被验证"
+#~ msgid "Your waitlist code has been verified"
+#~ msgstr "您的候补名单代码已被验证"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4787,9 +4757,9 @@ msgid "Looking up values in {column}…"
 msgstr "正在查找 {column} 中的值…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "电子邮件"
 
@@ -4984,8 +4954,8 @@ msgstr "用户已移除"
 msgid "Limit {displayName} to app access"
 msgstr "限制 {displayName} 的应用访问"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "确认密码"
 
@@ -5076,7 +5046,7 @@ msgstr "日期"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此仪表板未引用任何数据集：没有内容可发布。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "确认邮件已发送到您的电子邮件地址。"
 
@@ -5462,11 +5432,6 @@ msgstr "复制共享链接"
 msgid "Canonical URLs"
 msgstr "规范 URL"
 
-#. placeholder {0}: props.mapLabel
-#: src/views/GisApp/shell/MapShell/MapShell.tsx
-#~ msgid "{0}. Use the layer panel to change what is shown."
-#~ msgstr ""
-
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "查询返回一些列后，图表设置才会显示。"
@@ -5545,8 +5510,8 @@ msgid "Boundary dataset"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "请选一个密码以完成注册"
+#~ msgid "Please choose a password to complete your registration"
+#~ msgstr "请选一个密码以完成注册"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5653,11 +5618,6 @@ msgstr "输入数据集名称"
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "此名称仅适用于 {workspaceName}。您的其他工作区保持各自的名称。"
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Show the layer {0}"
-#~ msgstr ""
 
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -6585,7 +6545,7 @@ msgid "Avandar is still in beta. Some features may not work as expected and "
 "feedback as we work to improve the product."
 msgstr "Avandar 仍在测试阶段。某些功能可能无法按预期工作，某些功能可能仍在建设中。感谢您的耐心和反馈，我们将努力改进产品。"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "感谢您的关注！"
 
@@ -6774,10 +6734,6 @@ msgid "Aggregate only draws areas after at least {0} contributing records. "
 "their exact count."
 msgstr ""
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{suppressedCount} suppressed"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "数据集已保存"
@@ -6833,7 +6789,7 @@ msgstr "搜索仪表板"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "无效的电子邮件地址"
 

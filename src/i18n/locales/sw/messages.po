@@ -111,11 +111,6 @@ msgstr "Safu ya thamani"
 msgid "0 rows"
 msgstr ""
 
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Hide the layer {0}"
-#~ msgstr ""
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
 msgstr "Kila mwezi"
@@ -147,8 +142,8 @@ msgstr "Ingizo la JOIN katika nafasi ya {index} si rejeleo la jedwali "
 
 #. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Au {0} ili kuarifiwa wakati uzinduzi wetu wa umma uko tayari."
+#~ msgid "Or {0} to be notified when our public launch is ready."
+#~ msgstr "Au {0} ili kuarifiwa wakati uzinduzi wetu wa umma uko tayari."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -245,11 +240,6 @@ msgstr "Mipangilio ya chati"
 #: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "Utafutaji haupatikani katika muktadha huu."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#~ msgid "Geometry columns, boundary joins, and grid binning arrive in a later "
-#~ "release."
-#~ msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it on the canvas."
@@ -801,11 +791,6 @@ msgstr "Ondoa Mtumiaji"
 msgid "Updated {0}"
 msgstr "Imesasishwa {0}"
 
-#. placeholder {0}: props.droppedRowCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} rows unmapped"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Omba muunganisho wa chanzo cha data kupitia maoni"
@@ -885,7 +870,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "Huwezi kuongeza seti zaidi za data kwenye mpango wako wa sasa. Pandisha "
 "hadhi ili kuongeza seti hii ya katalogi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho. Inaweza "
@@ -916,7 +901,7 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 msgid "Single select"
 msgstr "Chaguo moja"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Hata hivyo, haturuhusu usajili mpya kwa sasa."
 
@@ -1298,10 +1283,10 @@ msgstr "Wakati"
 msgid "Y axis tick interval"
 msgstr "Muda wa alama za mhimili wa Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Nenosiri"
 
@@ -1755,13 +1740,13 @@ msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 
 #. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
 #: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
-"kwenye orodha yetu ya kusubiri na hujapokea msimbo wa kujiandikisha, "
-"tunashukuru uvumilivu wako. Utapokea msimbo wa kujiandikisha hivi "
-"karibuni. Tunahidi!"
+#~ msgid "{0} to be notified when it's your turn to register! If you are already "
+#~ "on our waitlist and have not received a sign-up code, we appreciate your "
+#~ "patience. You will receive a sign-up code soon. We promise!"
+#~ msgstr "{0} ili kuarifiwa wakati ni zamu yako kujiandikisha! Ikiwa tayari uko "
+#~ "kwenye orodha yetu ya kusubiri na hujapokea msimbo wa kujiandikisha, "
+#~ "tunashukuru uvumilivu wako. Utapokea msimbo wa kujiandikisha hivi "
+#~ "karibuni. Tunahidi!"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -2049,9 +2034,9 @@ msgid "Update available"
 msgstr "Sasisho linapatikana"
 
 #: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
-"wa mapema."
+#~ msgid "Please <0>email us</0> if you would like early access."
+#~ msgstr "Tafadhali <0>tuandikie barua pepe</0> ikiwa ungependa kupata ufikiaji "
+#~ "wa mapema."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2205,11 +2190,6 @@ msgstr "Haiwezi kusawazisha hii kitu"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Remove series"
 msgstr "Ondoa mfululizo"
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle.tsx
-#~ msgid "Reorder layer {0}"
-#~ msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
@@ -2440,10 +2420,6 @@ msgstr "Ongeza Sehemu"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr ""
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{noDataCount} no data"
-#~ msgstr ""
 
 #. placeholder {0}: operationalState.count
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -2835,7 +2811,7 @@ msgstr "Pengo la ndani"
 msgid "Theme"
 msgstr "Mandhari"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Jisajili"
 
@@ -2882,7 +2858,7 @@ msgstr "Msimamizi wa Kimataifa"
 msgid "Comma (,)"
 msgstr "Koma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "Usajili unahitaji muunganisho wa intaneti."
 
@@ -2914,7 +2890,7 @@ msgstr "Safu wima ya 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
 
@@ -2954,8 +2930,8 @@ msgid "X axis tick interval"
 msgstr "Muda wa alama za mhimili wa X"
 
 #: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "Hii ni nambari isiyo sahihi ya orodha ya kusubiri"
+#~ msgid "This is an invalid waitlist code"
+#~ msgstr "Hii ni nambari isiyo sahihi ya orodha ya kusubiri"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2995,6 +2971,10 @@ msgstr "Thamani"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Rangi ya lebo ya mhimili wa Y"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -3047,7 +3027,7 @@ msgstr "Vipengele vya Mpango:"
 msgid "Hide the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
@@ -3088,11 +3068,6 @@ msgstr "Mwaliko umetumwa"
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
 msgstr "Uko bila mtandao"
-
-#: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
-#~ msgid "This layer cannot be drawn yet. Aggregate only needs an area to "
-#~ "aggregate into, and boundary joins arrive in a later release."
-#~ msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -3658,8 +3633,8 @@ msgid "Date range"
 msgstr "Muda wa tarehe"
 
 #: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "jiandikishe kwenye orodha yetu ya kusubiri"
+#~ msgid "sign up for our waitlist"
+#~ msgstr "jiandikishe kwenye orodha yetu ya kusubiri"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3779,11 +3754,6 @@ msgstr "Safu"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
 msgstr ""
-
-#. placeholder {0}: props.featureCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{0} points"
-#~ msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -4305,8 +4275,8 @@ msgstr "Ya kawaida zaidi"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Nywila hazifanani"
 
@@ -4534,7 +4504,7 @@ msgstr "Ufafanuzi"
 msgid "Show the layer {layerName}"
 msgstr ""
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Unda akaunti mpya"
 
@@ -4693,11 +4663,11 @@ msgid "Class {0}: {1} values"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye "
-"orodha yetu ya kusubiri na umepokea msimbo wa kujiandikisha kwenye "
-"barua pepe yako."
+#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
+#~ "on our waitlist and have received a sign-up code in your email."
+#~ msgstr "Wakati Avandar iko kwenye beta, tunaruhusu usajili tu ikiwa uko kwenye "
+#~ "orodha yetu ya kusubiri na umepokea msimbo wa kujiandikisha kwenye "
+#~ "barua pepe yako."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -4712,8 +4682,8 @@ msgid "Multi select"
 msgstr "Chaguo nyingi"
 
 #: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Jiandikishe kwenye orodha yetu ya kusubiri"
+#~ msgid "Sign up for our waitlist"
+#~ msgstr "Jiandikishe kwenye orodha yetu ya kusubiri"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4736,8 +4706,8 @@ msgid "Share failed"
 msgstr "Kushiriki kumeshindwa"
 
 #: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Msimbo wako wa orodha ya kusubiri umethibitishwa"
+#~ msgid "Your waitlist code has been verified"
+#~ msgstr "Msimbo wako wa orodha ya kusubiri umethibitishwa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4940,9 +4910,9 @@ msgid "Looking up values in {column}…"
 msgstr "Inatafuta thamani katika {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Barua pepe"
 
@@ -5140,8 +5110,8 @@ msgstr "Mtumiaji ameondolewa"
 msgid "Limit {displayName} to app access"
 msgstr "Punguza {displayName} kwa ufikiaji wa programu"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Thibitisha Neno la Siri"
 
@@ -5234,7 +5204,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 "kuchapisha."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Barua ya kuthibitisha imetumwa kwa anwani yako ya barua pepe."
 
@@ -5634,11 +5604,6 @@ msgstr "Nakili kiungo cha kushiriki"
 msgid "Canonical URLs"
 msgstr "URLs za Kikanuni"
 
-#. placeholder {0}: props.mapLabel
-#: src/views/GisApp/shell/MapShell/MapShell.tsx
-#~ msgid "{0}. Use the layer panel to change what is shown."
-#~ msgstr ""
-
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Mipangilio ya chati huonekana baada ya hoja kurejesha baadhi ya safu."
@@ -5717,8 +5682,8 @@ msgid "Boundary dataset"
 msgstr ""
 
 #: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Tafadhali chagua nenosiri kukamilisha usajili wako"
+#~ msgid "Please choose a password to complete your registration"
+#~ msgstr "Tafadhali chagua nenosiri kukamilisha usajili wako"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5833,11 +5798,6 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 "their own."
 msgstr "Jina hili linatumika tu katika {workspaceName}. Workspace zako nyingine "
 "zina majina yao wenyewe."
-
-#. placeholder {0}: props.layerName
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
-#~ msgid "Show the layer {0}"
-#~ msgstr ""
 
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -6788,7 +6748,7 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 "kama inavyotarajiwa na vingine bado vinaweza kuwa katika ujenzi. "
 "Tunashukuru uvumilivu wako na maoni unapotusaidia kuboresha bidhaa."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
 
@@ -6982,10 +6942,6 @@ msgid "Aggregate only draws areas after at least {0} contributing records. "
 "their exact count."
 msgstr ""
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "{suppressedCount} suppressed"
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "Dataset imehifadhiwa"
@@ -7043,7 +6999,7 @@ msgstr "Tafuta dashibodi"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Anwani ya barua pepe isiyo sahihi"
 

@@ -65,16 +65,51 @@ create index usage_analytics_events__event_category__created_at_idx on public.us
 
 alter table public.usage_analytics_events enable row level security;
 
--- INSERT: any authenticated user can record events for workspaces they
--- are a member of. We trust the client to set workspace_id correctly,
--- and we verify the user_id matches the JWT principal so a member can't
--- record events as another user.
+-- Browser-authenticated clients may set only event fields. Database-owned
+-- identity, time, and category columns keep their defaults or trigger values.
+-- Column privileges are declared here because table-level INSERT would let a
+-- caller backdate events and pollute time-series reporting.
+revoke insert on table public.usage_analytics_events
+from
+  authenticated;
+
+grant insert (
+  workspace_id,
+  user_id,
+  event_name,
+  app,
+  payload,
+  client,
+  app_version
+) on public.usage_analytics_events to authenticated;
+
+-- INSERT: authenticated clients may record only browser-owned event names as
+-- themselves. Database and server emitters use privileged writers that bypass
+-- this policy. A nullable workspace remains valid for client events emitted
+-- before a workspace is available; when present, membership is mandatory.
 create policy "Authenticated users can INSERT analytics events for workspaces they belong to" on public.usage_analytics_events for insert to authenticated
 with
   check (
-    (
-      user_id is null or
-      user_id = auth.uid ()
+    user_id = (
+      select
+        auth.uid ()
+    ) and
+    client in (
+      'web',
+      'desktop'
+    ) and
+    event_name in (
+      'dataset.imported',
+      'query.ran',
+      'query.failed',
+      'dashboard.published',
+      'dashboard.share_settings_updated',
+      'dashboard.block_added_via_chat',
+      'dashboard.filter_changed',
+      'dashboard.pdf_export_opened',
+      'dashboard.pdf_exported',
+      'chat.message_sent',
+      'chat.sql_generated'
     ) and
     (
       workspace_id is null or
@@ -85,7 +120,10 @@ with
           public.workspace_memberships m
         where
           m.workspace_id = usage_analytics_events.workspace_id and
-          m.user_id = auth.uid ()
+          m.user_id = (
+            select
+              auth.uid ()
+          )
       )
     )
   );
@@ -124,8 +162,6 @@ create or replace function public.util__analytics_event_category (
   select (
     case p_event_name
       -- acquisition
-      when 'waitlist.code_verified' then 'acquisition'
-      when 'waitlist.code_claimed' then 'acquisition'
       when 'user.registered' then 'acquisition'
       when 'user.email_confirmed' then 'acquisition'
       -- activation

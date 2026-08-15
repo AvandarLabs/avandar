@@ -5,9 +5,10 @@ import { useEffect, useMemo } from "react";
 import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { WithPuckProps } from "@puckeditor/core";
+import type { DashboardFilterMode } from "$/types/dashboard.types";
 import type { ReactElement } from "react";
 
-export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
+export type FilterPBlockMode = DashboardFilterMode;
 
 export type Props = {
   /** Stable id used by the filter state manager. */

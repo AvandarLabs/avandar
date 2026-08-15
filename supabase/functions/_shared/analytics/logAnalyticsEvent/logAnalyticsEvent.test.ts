@@ -74,11 +74,11 @@ describe("logAnalyticsEvent", () => {
 
     await logAnalyticsEvent({
       supabaseAdminClient: fakeClient.client,
-      event: "waitlist.code_verified",
+      event: "dashboard.public_viewed",
     });
 
     expect(fakeClient.insert).toHaveBeenCalledWith({
-      event_name: "waitlist.code_verified",
+      event_name: "dashboard.public_viewed",
       workspace_id: null,
       user_id: null,
       app: null,

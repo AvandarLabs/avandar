@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Verifies the merged local Supabase configuration before a develop merge commit.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$REPO_ROOT" ]; then
+  exit 0
+fi
+cd "$REPO_ROOT" || exit 0
+
+current_branch="$(git branch --show-current 2>/dev/null || true)"
+if [ "$current_branch" != "develop" ]; then
+  exit 0
+fi
+
+exec "$REPO_ROOT/scripts/supabase/validate-standard-local-config.sh" \
+  < "$REPO_ROOT/supabase/config.toml"
