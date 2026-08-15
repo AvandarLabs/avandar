@@ -35,6 +35,12 @@ and run its rules just like an inline phase. Split a phase out to a
 readability. There is no cap on how many phases or referenced rulesets the
 repo can add; add as many as the codebase needs and they all run.
 
+A delegated phase is a gate and a pointer, nothing else. Do not explain why
+it was split out: this file is loaded into every review, and a note about
+file organization instructs the reviewer to do nothing while costing context
+in every run. Rationale for a ruleset belongs at the top of that ruleset,
+where the person applying it is already reading.
+
 Because each declared phase and each referenced ruleset counts as a real
 phase, they also feed the skill's sub-agent fan-out decision and each fans
 out as its own find lane. So the number of phases below (inline **and**
@@ -216,12 +222,6 @@ when the gate matches.
 - **Reference:** this phase's rules live in
   [`references/avapage-schema-migrations.md`](references/avapage-schema-migrations.md).
   Open it and run it as its own phase.
-- **Why it is split out:** it carries a review _method_ (establish the
-  current schema version and read a module's full, adjacent header rules
-  before flagging a "frozen snapshot / no live imports" violation) that a
-  past review got wrong, mis-flagging the current-version migration's
-  intended `V<N>_VizConfig = VizConfig` alias as a bug. The detail belongs in
-  its own file rather than bloating this entry point.
 
 ### Phase: utils package reference
 
@@ -322,10 +322,6 @@ undefined`. New code that wraps a Supabase session call should follow
 - **Reference:** this phase's rules live in
   [`references/e2e-tests.md`](references/e2e-tests.md). Open it and run it
   as its own phase.
-- **Why it is split out:** the E2E ruleset is large (running specs, UI vs
-  direct-DB writes, client-side navigation, minimal seeding, resilient
-  controlled-input sets, the large-parse fresh-browser policy, cleanup, and
-  timeouts) and was bloating this entry point.
 
 ### Phase: copy functions
 
@@ -335,13 +331,6 @@ undefined`. New code that wraps a Supabase session call should follow
 - **Reference:** this phase's rules live in
   [`references/copy-functions.md`](references/copy-functions.md). Open it and
   run it as its own phase.
-- **Why it is split out:** the ruleset carries three ordered decisions
-  (is it copy, which directory, what name) and a review *method* that a past
-  review got wrong. `appForResource` reached `ShareResourceModal/copy/`
-  because "returns something a user eventually reads" was treated as the test
-  for copy; the real tests are a Lingui macro in the body and a `string`
-  return type, and they have to run before the naming exemption is granted.
-  The detail belongs in its own file rather than bloating this entry point.
 
 ### Phase: internationalization (Lingui)
 
