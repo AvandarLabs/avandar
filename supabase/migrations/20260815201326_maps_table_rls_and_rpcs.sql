@@ -867,10 +867,12 @@ CREATE TRIGGER tr__maps__set_updated_at BEFORE UPDATE ON public.maps FOR EACH RO
 CREATE TRIGGER tr__maps__validate_owner_profile BEFORE INSERT OR UPDATE OF owner_id, owner_profile_id, workspace_id ON public.maps FOR EACH ROW EXECUTE FUNCTION public.maps__validate_owner_profile();
 
 
--- `supabase db diff` does not emit privilege changes, and the three RPCs above
--- are dropped and recreated by this migration, which resets their execute
--- privileges to the default. Re-apply the grants declared in
--- supabase/schemas/ so they survive the recreate.
+-- `supabase db diff` does not emit privilege changes, and every function this
+-- migration creates or recreates therefore lands with Postgres's default
+-- `execute to public`. Re-apply the privileges declared in supabase/schemas/
+-- so the security-definer helpers stay locked down. Without this block a
+-- schema dump shows anon and service_role holding execute on the map
+-- visibility helpers and on util__get_user_id_by_email.
 revoke
 execute on function public.rpc_workspaces__private_resource_counts (uuid)
 from
@@ -919,3 +921,84 @@ execute on function public.rpc_resources__transfer_ownership (
   uuid,
   uuid
 ) to authenticated;
+
+revoke
+execute on function public.util__auth_user_has_resource_share (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.app_type
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke
+execute on function public.util__auth_user_may_select_resource_base (
+  public.resource_type,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke
+execute on function public.maps__auth_user_may_select_grant (
+  uuid,
+  uuid,
+  uuid,
+  boolean
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke
+execute on function public.maps__auth_user_may_select (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.maps__auth_user_may_select (uuid) to authenticated;
+
+revoke
+execute on function public.maps__owner_id_matches_stored (
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  service_role;
+
+grant
+execute on function public.maps__owner_id_matches_stored (
+  uuid,
+  uuid
+) to authenticated;
+
+revoke
+execute on function public.maps__validate_owner_profile ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke all on function public.util__get_user_id_by_email (text)
+from
+  anon;
+
+revoke all on function public.util__get_user_id_by_email (text)
+from
+  authenticated;
