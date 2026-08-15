@@ -1,4 +1,5 @@
 import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 /**
  * The dashboardId-based URL is always valid for any published dashboard.
@@ -22,13 +23,32 @@ type Options = {
   workspaceSlug: string;
   dashboardId: Dashboard.Id;
   slug: string | undefined;
+  /**
+   * The audience the URLs are for, which is the publish TARGET while
+   * editing.
+   */
+  visibility: PublishedVisibility;
 };
 
-/** Builds canonical and optional vanity URLs for a published dashboard. */
+/**
+ * Builds the canonical and optional vanity URLs for a published dashboard.
+ *
+ * The two audiences have separate URL namespaces (P2 D-P2-3): a public
+ * dashboard resolves at `/d/<slugOrId>` for a visitor with no workspace
+ * context, and a workspace-only one at `/<workspaceSlug>/d/<slugOrId>`.
+ *
+ * `canonical` is what the QR affordance encodes. It points at the P2 routes
+ * rather than the legacy `/public/dashboards/...` path, which survives only as
+ * a redirect for QR codes already in circulation.
+ */
 export function buildShareUrls(args: Readonly<Options>): ShareUrls {
   const base = _origin().replace(/\/$/, "");
+  const prefix =
+    args.visibility === "public" ?
+      `${base}/d`
+    : `${base}/${args.workspaceSlug}/d`;
   return {
-    canonical: `${base}/public/dashboards/${args.workspaceSlug}/${args.dashboardId}`,
-    vanity: args.slug ? `${base}/d/${args.slug}` : undefined,
+    canonical: `${prefix}/${args.dashboardId}`,
+    vanity: args.slug ? `${prefix}/${args.slug}` : undefined,
   };
 }

@@ -9,9 +9,9 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
 import { makeDashboardPublishAnalyticsEventFromDashboards } from "@/views/DashboardApp/DashboardShareModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards";
-import { PublishDashboardModalContent } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardShareModal/toVanitySlug/toVanitySlug";
 import type { I18n } from "@lingui/core";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
@@ -336,6 +336,7 @@ export function PublishDashboardModal({
     workspaceSlug: workspace.slug,
     dashboardId: state.currentDashboard.id,
     slug: state.normalisedSlug || state.currentDashboard.slug,
+    visibility: "public",
   });
   const targetUrl = livePreviewUrls.vanity ?? livePreviewUrls.canonical;
   return (

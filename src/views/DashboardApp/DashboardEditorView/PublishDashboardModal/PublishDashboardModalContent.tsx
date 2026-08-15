@@ -58,6 +58,7 @@ export function PublishDashboardModalContent({
       <VanitySlugField
         slugInput={slugInput}
         normalisedSlug={normalisedSlug}
+        urlPrefix="/d/"
         errorMessage={slugErrorMessage}
         hasPendingCheck={hasPendingSlugCheck}
         isAccepted={isSlugAccepted}

@@ -15,6 +15,8 @@ import type { ReactNode } from "react";
 type Props = {
   slugInput: string;
   normalisedSlug: string;
+  /** Path the slug is appended to, e.g. `/d/` or `/acme/d/`. */
+  urlPrefix: string;
   errorMessage?: string;
   hasPendingCheck: boolean;
   isAccepted: boolean;
@@ -25,6 +27,7 @@ type Props = {
 export function VanitySlugField({
   slugInput,
   normalisedSlug,
+  urlPrefix,
   errorMessage,
   hasPendingCheck,
   isAccepted,
@@ -69,7 +72,8 @@ export function VanitySlugField({
             <Trans>Preview:</Trans>
           </Text>
           <Code className={css.vanitySlugFieldPreview}>
-            /d/{normalisedSlug}
+            {urlPrefix}
+            {normalisedSlug}
           </Code>
         </Group>
       : null}
