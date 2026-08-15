@@ -43,9 +43,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # @v1 tracks the action major and keeps CI aligned with the
-      # `react-doctor` devDependency in package.json.
+      # Pinned to 0.7.1. The 0.9.x line still reproduces the upstream "exited
+      # with status 0 before producing a JSON report" bug (stdout-flush race,
+      # millionco/react-doctor#1242) on this repo's PRs, so we pin back to the
+      # last release verified green in our CI instead of tracking "latest".
       - uses: millionco/react-doctor@v1
+        with:
+          version: "0.7.1"
         # Common configuration knobs — uncomment any to override the default.
         # Full reference: https://www.react.doctor/ci
         # with:

@@ -47,13 +47,6 @@ type CreatePointFeatureOptions = {
   rowIndex: number;
 };
 
-type MakeFeatureCollectionOptions = {
-  rows: readonly UnknownRow[];
-  binding: MapLayer.GeoBindingColumnNames;
-  sensitivity: MapLayer.Sensitivity;
-  layerId: string;
-};
-
 function _classifyCoordinate(
   latitude: number,
   longitude: number,
@@ -125,7 +118,7 @@ function _createPointFeature({
   coordinate,
   row,
   rowIndex,
-}: Readonly<CreatePointFeatureOptions>): GeoJSON.Feature {
+}: CreatePointFeatureOptions): GeoJSON.Feature {
   const properties: GeoJSON.GeoJsonProperties = omit(row, [
     binding.latitudeColumnName,
     binding.longitudeColumnName,
@@ -142,16 +135,17 @@ function _createPointFeature({
 }
 
 /** Reads and validates the coordinate columns of one source row. */
-function _readCoordinate(
-  options: Readonly<{
-    row: UnknownRow;
-    binding: MapLayer.GeoBindingColumnNames;
-  }>,
-):
+function _readCoordinate({
+  binding,
+  row,
+}: {
+  binding: MapLayer.GeoBindingColumnNames;
+  row: UnknownRow;
+}):
   | { coordinate: { longitude: number; latitude: number } }
   | { dropReason: DropReason } {
-  const rawLatitude = options.row[options.binding.latitudeColumnName];
-  const rawLongitude = options.row[options.binding.longitudeColumnName];
+  const rawLatitude = row[binding.latitudeColumnName];
+  const rawLongitude = row[binding.longitudeColumnName];
   if (isNullish(rawLatitude) || isNullish(rawLongitude)) {
     return { dropReason: "nullCoordinate" };
   }
@@ -268,7 +262,12 @@ export function makeFeatureCollectionFromRows({
   binding,
   sensitivity,
   layerId,
-}: Readonly<MakeFeatureCollectionOptions>): {
+}: {
+  rows: readonly UnknownRow[];
+  binding: MapLayer.GeoBindingColumnNames;
+  sensitivity: MapLayer.Sensitivity;
+  layerId: string;
+}): {
   featureCollection: GeoJSON.FeatureCollection;
   drops: GeometryDropReport[];
 } {

@@ -1,5 +1,6 @@
 import { matchLiteral, prop } from "@avandar/utils";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { DashboardFilterMode } from "$/types/dashboard.types";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
@@ -11,7 +12,7 @@ export type LocalFilter = {
   /** SQL column targeted by the filter. */
   columnName: string;
   /** Input and SQL-comparison behavior. */
-  mode: "select_single" | "select_multi" | "contains";
+  mode: DashboardFilterMode;
   /** Comma-separated allowed values for selection modes. */
   optionsRaw: string;
   /** Default value, encoded as JSON for multi-select filters. */

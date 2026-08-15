@@ -18,29 +18,30 @@ type ProportionalSymbol = Extract<
   { type: "proportionalSymbol" }
 >;
 
+/** Applies the selected scale to a numeric span. */
+function _getScaledSpan({
+  scale,
+  span,
+}: {
+  scale: ProportionalSymbol["scale"];
+  span: number;
+}): number {
+  return matchLiteral(scale, {
+    sqrt: () => {
+      return Math.sqrt(span);
+    },
+    linear: () => {
+      return span;
+    },
+  });
+}
+
 type CreateMapLayerSpecOptions = {
   layer: MapLayer.T;
   stats: LayerStats;
   valueColumnName: string | undefined;
   sourceId: string;
 };
-
-/** Applies the selected scale to a numeric span. */
-function _getScaledSpan(
-  options: Readonly<{
-    scale: ProportionalSymbol["scale"];
-    span: number;
-  }>,
-): number {
-  return matchLiteral(options.scale, {
-    sqrt: () => {
-      return Math.sqrt(options.span);
-    },
-    linear: () => {
-      return options.span;
-    },
-  });
-}
 
 /** Builds the MapLibre expression that scales a source value from zero. */
 function _buildScaledValueExpression({
@@ -112,7 +113,7 @@ function _createMapLayerSpec({
   stats,
   valueColumnName,
   sourceId,
-}: Readonly<CreateMapLayerSpecOptions>): MapLayerSpec {
+}: CreateMapLayerSpecOptions): MapLayerSpec {
   const { symbology } = layer;
   return {
     id: MapLayerIds.toLayerId(layer.id),

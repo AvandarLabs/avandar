@@ -10,10 +10,11 @@ export const MapLayerData = {
     );
   },
 
-  /**
-   * Cache key for a layer's rows, excluding display-only layer settings.
-   */
-  makeQueryKeyFromLayer: (layer: Readonly<MapLayer.T>): unknown[] => {
+  /** Cache key for a layer's rows, excluding display-only layer settings. */
+  toQueryKey: (layer: Readonly<MapLayer.T>): unknown[] => {
     return ["mapLayerData", layer.id, layer.source, layer.geoBinding];
   },
+} satisfies {
+  isQueryable: (layer: Readonly<MapLayer.T>) => boolean;
+  toQueryKey: (layer: Readonly<MapLayer.T>) => unknown[];
 };

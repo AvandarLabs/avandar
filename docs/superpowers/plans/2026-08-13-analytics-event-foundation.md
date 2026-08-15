@@ -1,5 +1,9 @@
 # Analytics Event Foundation Implementation Plan
 
+> **Status:** Complete as of 2026-08-14. The implementation landed with the
+> analytics foundation changes; the deferred client-event enrichment was
+> completed in the companion payload-enrichment plan.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give `usage_analytics_events` a trustworthy funnel-stage column, an

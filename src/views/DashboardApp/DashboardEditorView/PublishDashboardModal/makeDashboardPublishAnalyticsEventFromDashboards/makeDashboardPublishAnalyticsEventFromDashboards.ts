@@ -1,5 +1,5 @@
 import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { ClientAnalyticsEvent } from "$/analytics/analyticsEvents/analyticsEvents";
+import type { ClientAnalyticsEvent } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type DashboardPublishAnalyticsEvent = Extract<

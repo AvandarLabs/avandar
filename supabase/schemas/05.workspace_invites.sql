@@ -36,6 +36,12 @@ create table public.workspace_invites (
   updated_at timestamptz not null default now()
 );
 
+create index idx_workspace_invites__pending_email on public.workspace_invites (
+  lower(email)
+)
+where
+  invite_status = 'pending';
+
 -- Enable row level security
 alter table public.workspace_invites enable row level security;
 

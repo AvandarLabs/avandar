@@ -1,4 +1,10 @@
-import { objectEntries, objectKeys, prop, propEq } from "@avandar/utils";
+import {
+  isDefined,
+  objectEntries,
+  objectKeys,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import type {
   MapLayerSpec,
   MapSpec,
@@ -19,14 +25,16 @@ function _syncPaint(
   layerSpec: MapLayerSpec,
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
-  objectEntries(layerSpec.paint).forEach(([property, value]) => {
-    const previousValue =
-      previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
-    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-      return;
-    }
-    map.setPaintProperty(layerSpec.id, property, value);
-  });
+  objectEntries(layerSpec.paint)
+    .filter(isDefined)
+    .forEach(([property, value]) => {
+      const previousValue =
+        previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
+      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+        return;
+      }
+      map.setPaintProperty(layerSpec.id, property, value);
+    });
 }
 
 /** Applies only the layout properties whose values differ. */
@@ -39,14 +47,16 @@ function _syncLayout(
   const previousLayout = previousLayerSpec?.layout ?? {
     visibility: "visible",
   };
-  objectEntries(nextLayout).forEach(([property, value]) => {
-    const previousValue =
-      previousLayout[property as keyof typeof previousLayout];
-    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-      return;
-    }
-    map.setLayoutProperty(layerSpec.id, property, value);
-  });
+  objectEntries(nextLayout)
+    .filter(isDefined)
+    .forEach(([property, value]) => {
+      const previousValue =
+        previousLayout[property as keyof typeof previousLayout];
+      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+        return;
+      }
+      map.setLayoutProperty(layerSpec.id, property, value);
+    });
 }
 
 /**
@@ -122,8 +132,8 @@ function _needsReorder(
   // and `propPasses` only exposes its type-guard overload, so it rejects a
   // predicate that merely returns boolean.
   const survivingIds = previousSpec.layers
-    .filter((layer) => {
-      return nextLayerIds.has(layer.id);
+    .filter((layerSpec) => {
+      return nextLayerIds.has(layerSpec.id);
     })
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {

@@ -1311,30 +1311,6 @@ export type Database = {
           },
         ]
       }
-      waitlist_signups: {
-        Row: {
-          code_is_used: boolean
-          created_at: string
-          email: string
-          id: string
-          signup_code: string
-        }
-        Insert: {
-          code_is_used?: boolean
-          created_at?: string
-          email: string
-          id?: string
-          signup_code: string
-        }
-        Update: {
-          code_is_used?: boolean
-          created_at?: string
-          email?: string
-          id?: string
-          signup_code?: string
-        }
-        Relationships: []
-      }
       workspace_invites: {
         Row: {
           created_at: string
@@ -1775,6 +1751,7 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: boolean
       }
+      util__email_domain: { Args: { p_email: string }; Returns: string }
       util__get_auth_user_app_role: {
         Args: {
           p_app: Database["public"]["Enums"]["app_type"]
@@ -1861,6 +1838,12 @@ export type Database = {
       util__storage_object_workspace_id: {
         Args: { p_object_name: string }
         Returns: string
+      }
+      util__subscription_plan_rank: {
+        Args: {
+          p_plan: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+        }
+        Returns: number
       }
     }
     Enums: {

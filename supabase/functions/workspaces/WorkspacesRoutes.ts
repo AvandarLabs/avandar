@@ -5,167 +5,22 @@ import {
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import {
-  getRoleGroupIdFromAcceptedInvite,
+  makeRoleGroupIdFromAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
-} from "@sbfn/workspaces/getRoleGroupIdFromAcceptedInvite/getRoleGroupIdFromAcceptedInvite.ts";
+} from "@sbfn/workspaces/makeRoleGroupIdFromAcceptedInvite/makeRoleGroupIdFromAcceptedInvite.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
 import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
-import type { AppType, RoleLevel } from "$/models/Permissions/Permissions.ts";
-import type { User } from "$/models/User/User.ts";
-import type { Workspace } from "$/models/Workspace/Workspace.ts";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
-import type { Tables } from "$/types/database.types.ts";
+import type {
+  AppType,
+  RoleLevel,
+} from "$/models/Permissions/Permissions.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
-
-type AcceptInviteOptions = {
-  inviteId: string;
-  userId: string;
-  workspaceSlug: string;
-  supabaseAdminClient: AvaSupabaseDBClient;
-};
-
-type InviteAcceptanceContext = {
-  workspaceId: Workspace.Id;
-  user: SupabaseUser & { email: string };
-  invite: Tables<"workspace_invites">;
-};
-
-type CreateMembershipFromInviteOptions = InviteAcceptanceContext & {
-  client: AvaSupabaseDBClient;
-};
-
-type InviteMembershipResult = {
-  updatedInvite: Tables<"workspace_invites">;
-  membership: Tables<"workspace_memberships">;
-};
-
-type CreateInviteeProfileOptions = InviteAcceptanceContext & {
-  client: AvaSupabaseDBClient;
-  membershipId: string;
-};
-
-type AcceptedWorkspaceInvite = InviteMembershipResult & {
-  profile: Tables<"user_profiles">;
-};
-
-async function _getInviteAcceptanceContext(
-  options: Readonly<AcceptInviteOptions>,
-): Promise<InviteAcceptanceContext> {
-  const [{ data: workspace }, { data }] = await Promise.all([
-    options.supabaseAdminClient
-      .from("workspaces")
-      .select("id")
-      .eq("slug", options.workspaceSlug)
-      .single()
-      .throwOnError(),
-    options.supabaseAdminClient.auth.admin.getUserById(options.userId),
-  ]);
-  if (!data.user?.email) {
-    throw new Error("User not found");
-  }
-  const { data: invite } = await options.supabaseAdminClient
-    .from("workspace_invites")
-    .select("*")
-    .match({
-      id: options.inviteId,
-      email: data.user.email,
-      workspace_id: workspace.id,
-    })
-    .maybeSingle()
-    .throwOnError();
-  if (!invite) {
-    throw new Error("Sorry! No invitation was found.");
-  }
-  if (invite.invite_status === "accepted") {
-    throw new Error("This invite has already been accepted.");
-  }
-  return { workspaceId: workspace.id, user: data.user, invite };
-}
-
-async function _createMembershipFromInvite(
-  options: Readonly<CreateMembershipFromInviteOptions>,
-): Promise<InviteMembershipResult> {
-  const { client, workspaceId, user, invite } = options;
-  const [{ data: updatedInvite }, roleGroupId] = await Promise.all([
-    client
-      .from("workspace_invites")
-      .update({ invite_status: "accepted", user_id: user.id })
-      .eq("id", invite.id)
-      .select()
-      .single()
-      .throwOnError(),
-    getRoleGroupIdFromAcceptedInvite({
-      supabaseAdminClient: client,
-      workspaceId,
-      invite,
-    }),
-  ]);
-  const { data: membership } = await client
-    .from("workspace_memberships")
-    .insert({
-      workspace_id: workspaceId,
-      user_id: user.id,
-      role_group_id: roleGroupId,
-    })
-    .select()
-    .single()
-    .throwOnError();
-  return { updatedInvite, membership };
-}
-
-async function _createInviteeProfileAndTags(
-  options: Readonly<CreateInviteeProfileOptions>,
-): Promise<Tables<"user_profiles">> {
-  const { client, workspaceId, user, invite, membershipId } = options;
-  const { data: profile } = await client
-    .from("user_profiles")
-    .insert({
-      workspace_id: workspaceId,
-      user_id: user.id,
-      membership_id: membershipId,
-      full_name: user.email,
-      display_name: user.email,
-    })
-    .select()
-    .single()
-    .throwOnError();
-  const tagIds = invite.invite_user_group_ids ?? [];
-  if (tagIds.length > 0) {
-    await client
-      .from("user_group_memberships")
-      .insert(
-        tagIds.map((userGroupId) => {
-          return {
-            user_group_id: userGroupId,
-            user_id: user.id,
-          };
-        }),
-      )
-      .throwOnError();
-  }
-  return profile;
-}
-
-async function _acceptWorkspaceInvite(
-  options: Readonly<AcceptInviteOptions>,
-): Promise<AcceptedWorkspaceInvite> {
-  const context = await _getInviteAcceptanceContext(options);
-  const { updatedInvite, membership } = await _createMembershipFromInvite({
-    client: options.supabaseAdminClient,
-    ...context,
-  });
-  const profile = await _createInviteeProfileAndTags({
-    client: options.supabaseAdminClient,
-    ...context,
-    membershipId: membership.id,
-  });
-  return { invite: updatedInvite, membership, profile };
-}
 
 /**
  * This is the route handler for all workspaces endpoints.
@@ -294,10 +149,10 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
 
           // is the workspace allowed to invite more members?
           const canInviteUsers = await hasSubscriptionPermission({
-            workspaceId: workspaceId as Workspace.Id,
+            workspaceId: workspaceId as WorkspaceId,
             permissionType: "can_invite_users",
             supabaseAdminClient,
-            userId: user.id as User.Id,
+            userId: user.id as UserId,
           });
           if (!canInviteUsers) {
             throw new Error("Your workspace cannot invite any more members.");
@@ -442,12 +297,107 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
           body: { userId, workspaceSlug },
           supabaseAdminClient,
         }) => {
-          return _acceptWorkspaceInvite({
-            inviteId,
-            userId,
-            workspaceSlug,
-            supabaseAdminClient,
-          });
+          // Neither lookup depends on the other, so they run together.
+          const [
+            { data: workspace },
+            {
+              data: { user },
+            },
+          ] = await Promise.all([
+            supabaseAdminClient
+              .from("workspaces")
+              .select("id")
+              .eq("slug", workspaceSlug)
+              .single()
+              .throwOnError(),
+            supabaseAdminClient.auth.admin.getUserById(userId),
+          ]);
+
+          if (!user || !user.email) {
+            throw new Error("User not found");
+          }
+
+          const { data: invite } = await supabaseAdminClient
+            .from("workspace_invites")
+            .select("*")
+            .match({
+              id: inviteId,
+              email: user?.email,
+              workspace_id: workspace.id,
+            })
+            .maybeSingle()
+            .throwOnError();
+
+          if (!invite) {
+            throw new Error("Sorry! No invitation was found.");
+          }
+
+          if (invite.invite_status === "accepted") {
+            throw new Error("This invite has already been accepted.");
+          }
+
+          // Mark the invite accepted and link it to the user's account, while
+          // deriving the membership's role group. The role group is built from
+          // `invite`, not from the update's result, so the two are independent
+          // and run together.
+          const [{ data: updatedInvite }, membershipRoleGroupId] =
+            await Promise.all([
+              supabaseAdminClient
+                .from("workspace_invites")
+                .update({
+                  invite_status: "accepted",
+                  user_id: user.id,
+                })
+                .eq("id", invite.id)
+                .select()
+                .single()
+                .throwOnError(),
+              makeRoleGroupIdFromAcceptedInvite({
+                supabaseAdminClient: supabaseAdminClient,
+                workspaceId: workspace.id,
+                invite,
+              }),
+            ]);
+
+          // create the workspace membership
+          const { data: membership } = await supabaseAdminClient
+            .from("workspace_memberships")
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              role_group_id: membershipRoleGroupId,
+            })
+            .select()
+            .single()
+            .throwOnError();
+
+          // create the user profile
+          const { data: profile } = await supabaseAdminClient
+            .from("user_profiles")
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              membership_id: membership.id,
+              full_name: user.email,
+              display_name: user.email,
+            })
+            .select()
+            .single()
+            .throwOnError();
+
+          const tagIds = invite.invite_user_group_ids ?? [];
+          if (tagIds.length > 0) {
+            await supabaseAdminClient
+              .from("user_group_memberships")
+              .insert(
+                tagIds.map((userGroupId) => {
+                  return { user_group_id: userGroupId, user_id: user.id };
+                }),
+              )
+              .throwOnError();
+          }
+
+          return { invite: updatedInvite, membership, profile };
         },
       ),
   },

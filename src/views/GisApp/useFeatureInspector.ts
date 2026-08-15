@@ -1,7 +1,7 @@
 import { useDisclosure } from "@mantine/hooks";
 import { useCallback, useState } from "react";
 
-type FeatureInspector = {
+type UseFeatureInspectorResult = {
   selectedFeature: GeoJSON.Feature | undefined;
   isInspectorOpen: boolean;
   onFeatureClick: (feature: GeoJSON.Feature) => void;
@@ -9,7 +9,7 @@ type FeatureInspector = {
 };
 
 /** Holds the selected feature and the inspector's open state. */
-export function useFeatureInspector(): FeatureInspector {
+export function useFeatureInspector(): UseFeatureInspectorResult {
   const [selectedFeature, setSelectedFeature] = useState<
     GeoJSON.Feature | undefined
   >(undefined);

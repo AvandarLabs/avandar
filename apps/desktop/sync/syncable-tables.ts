@@ -118,7 +118,6 @@ export const EXCLUDED_TABLES = [
   "tokens__google",
   "usage_analytics_events",
   "user_roles",
-  "waitlist_signups",
   "workspace_invites",
   "role_groups",
   "role_group_app_roles",

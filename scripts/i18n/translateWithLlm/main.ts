@@ -102,6 +102,6 @@ export async function main(): Promise<void> {
     }
   }
   console.log(
-    "\nDone. Run `pnpm exec lingui compile --typescript` to regenerate runtime catalogs (or use `pnpm i18n:translations` for the full extract → translate → compile pipeline).",
+    "\nDone. Run `pnpm exec lingui compile --typescript` to regenerate runtime catalogs (or use `pnpm translations` for the full extract → translate → compile pipeline).",
   );
 }

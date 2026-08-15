@@ -44,7 +44,7 @@ msgstr "Regresa en línea para ver o hacer la página disponible sin conexión."
 
 #: src/config/AppLinks.tsx
 msgid "Create new entity"
-msgstr ""
+msgstr "Crear una entidad nueva"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -120,13 +120,7 @@ msgstr "La entrada JOIN en la posición {index} no es una referencia simple a "
 
 #: src/config/AppLinks.tsx
 msgid "Geo Explorer"
-msgstr ""
-
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "O {0} para ser notificado cuando nuestro lanzamiento público esté "
-"listo."
+msgstr "Geo Explorer"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -395,7 +389,7 @@ msgstr "Expandir panel"
 msgid "Export annotated PDF"
 msgstr "Exportar PDF anotado"
 
-#. placeholder {0}: options.failure.limit ?? 64
+#. placeholder {0}: failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "La URL personalizada no puede superar los {0} caracteres"
@@ -456,7 +450,7 @@ msgstr "Acerca de ti"
 
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
-msgstr ""
+msgstr "No se puede sincronizar el conjunto de datos en línea"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -546,7 +540,7 @@ msgstr "Promedio"
 
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "There was an error loading Google services."
-msgstr ""
+msgstr "Se produjo un error al cargar los servicios de Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -731,7 +725,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "No puedes agregar más conjuntos de datos en tu plan actual. Actualiza "
 "para agregar este conjunto de datos del catálogo."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Por favor, revisa tu correo electrónico para un enlace de confirmación. "
@@ -762,12 +756,12 @@ msgstr "Desde conjunto de datos derivado"
 msgid "Single select"
 msgstr "Selección única"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Sin embargo, no estamos permitiendo nuevas inscripciones en este "
 "momento."
 
-#. placeholder {0}: options.numPreviewRows
+#. placeholder {0}: previewRows.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
@@ -957,7 +951,7 @@ msgstr "Ocultar título"
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
-msgstr ""
+msgstr "Datos de {0} truncados"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1007,15 +1001,11 @@ msgstr "es igual a..."
 
 #: src/config/AppLinks.tsx
 msgid "Profile Designer"
-msgstr ""
+msgstr "Profile Designer"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} grupos"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
-msgid "Ask the dashboard's owner to share it with you."
-msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1094,10 +1084,10 @@ msgstr "Marca de tiempo"
 msgid "Y axis tick interval"
 msgstr "Intervalo de marcas del eje Y"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Contraseña"
 
@@ -1478,16 +1468,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocurrió un error inesperado. Puede intentarlo de nuevo o volver al "
 "inicio."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} para ser notificado cuando sea tu turno de registrarte. Si ya estás "
-"en nuestra lista de espera y no has recibido un código de registro, "
-"agradecemos tu paciencia. Recibirás un código de registro pronto. ¡Lo "
-"prometemos!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Sesgo detectado:"
@@ -1503,10 +1483,6 @@ msgstr "El nombre que otros miembros ven en {workspaceName}."
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
 msgstr "Sugerido:"
-
-#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
-msgid "No tables found"
-msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
@@ -1724,7 +1700,8 @@ msgstr "Díganos qué conjunto de datos abierto desea a través de comentarios"
 #: src/lib/hooks/useGooglePickerAPI.ts
 msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
-msgstr ""
+msgstr "Actualice la página e inténtelo de nuevo. Si el problema persiste, "
+"comuníquese con soporte."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
@@ -1736,12 +1713,7 @@ msgstr "Exporta este tablero como un PDF, o dibuja en él primero. Las "
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
-msgstr ""
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Por favor <0>envíanos un correo electrónico</0> si deseas acceso "
-"anticipado."
+msgstr "Actualización disponible"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -1879,7 +1851,7 @@ msgstr "Principal"
 
 #: src/clients/dashboards/DashboardClient.ts
 msgid "Unable to publish dashboard"
-msgstr ""
+msgstr "No se puede publicar el panel"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -1986,8 +1958,8 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-#~ msgid "You do not have access to this dashboard"
-#~ msgstr "No tienes acceso a este tablero"
+msgid "You do not have access to this dashboard"
+msgstr "No tienes acceso a este tablero"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -2048,7 +2020,7 @@ msgstr "Texto de anotación:"
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "A new version is available. Refresh to update."
-msgstr ""
+msgstr "Hay una nueva versión disponible. Actualice la página para instalarla."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2204,7 +2176,7 @@ msgstr "Datos personales + marco sesgado detectado"
 msgid "Manual form shows an approximation"
 msgstr "El formulario manual muestra una aproximación"
 
-#. placeholder {0}: options.failure.limit ?? 3
+#. placeholder {0}: failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
 msgstr "La URL personalizada debe tener al menos {0} caracteres"
@@ -2321,9 +2293,9 @@ msgid "Google authentication error"
 msgstr "Error de autenticación de Google"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-#~ msgid "This dashboard is private. This dashboard has not been made publicly "
-#~ "viewable."
-#~ msgstr "Este panel es privado. Este panel no se ha hecho visible públicamente."
+msgid "This dashboard is private. This dashboard has not been made publicly "
+"viewable."
+msgstr "Este panel es privado. Este panel no se ha hecho visible públicamente."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -2381,7 +2353,7 @@ msgstr "Relleno"
 msgid "Theme"
 msgstr "Tema"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Registrar"
 
@@ -2419,7 +2391,7 @@ msgstr "Administrador global"
 msgid "Comma (,)"
 msgstr "Coma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "El registro requiere una conexión a internet."
 
@@ -2431,7 +2403,7 @@ msgstr "No hay valores"
 msgid "Clarification {turnNumber} of 3"
 msgstr "Aclaración {turnNumber} de 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Back to editor"
 msgstr "Volver al editor"
 
@@ -2451,7 +2423,7 @@ msgstr "Columna 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "No tienes permiso para abrir esta parte del espacio de trabajo."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Por favor, revisa tu correo electrónico"
 
@@ -2480,10 +2452,6 @@ msgstr "Capturando panel…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "Intervalo de marcas del eje X"
-
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "Este es un código de lista de espera no válido"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2519,6 +2487,11 @@ msgstr "Valores"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Color de la etiqueta del eje Y"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Por favor, <0>envíenos un correo electrónico</0> si desea obtener "
+"acceso."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2558,7 +2531,7 @@ msgstr "No se pudo ubicar ninguna de las {totalRowCount} filas en el mapa "
 msgid "Plan Features:"
 msgstr "Características del plan:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Comienza tu viaje con nosotros"
 
@@ -2928,7 +2901,7 @@ msgstr "Crea tu primer panel para rastrear métricas e información clave."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -3032,10 +3005,6 @@ msgstr "Respuesta de aclaración"
 msgid "Generated SQL"
 msgstr "SQL generado"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
-msgid "You need access"
-msgstr ""
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "Máximo de filas a devolver"
@@ -3071,10 +3040,6 @@ msgstr "Suelta para importar"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Rango de fechas"
-
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "regístrate en nuestra lista de espera"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
@@ -3114,10 +3079,6 @@ msgstr "Rotación de las etiquetas del eje X"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "La descarga del modelo offline falló"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "Se procesaron {formattedNumRows} filas con éxito"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -3196,11 +3157,6 @@ msgstr "La cláusula WHERE compara \"{columnName}\" con una expresión que no es
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
 msgstr "Agregar a tu espacio de trabajo"
-
-#. placeholder {0}: options.numRows.toLocaleString()
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {0} rows successfully"
-msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
@@ -3352,10 +3308,6 @@ msgstr "Sincronización de {0} datos finalizada"
 msgid "Select column"
 msgstr "Seleccionar columna"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
-msgid "Not yet published. Viewers will not see this."
-msgstr ""
-
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "Elige una o más"
@@ -3370,7 +3322,7 @@ msgstr "Grande"
 
 #: src/config/AppLinks.tsx
 msgid "Invalid workspace"
-msgstr ""
+msgstr "Espacio de trabajo no válido"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3432,8 +3384,8 @@ msgid "Series"
 msgstr "Serie"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-#~ msgid "Not yet published. Public viewers will not see this."
-#~ msgstr "Aún no publicado. Los espectadores públicos no verán esto."
+msgid "Not yet published. Public viewers will not see this."
+msgstr "Aún no publicado. Los espectadores públicos no verán esto."
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -3646,8 +3598,8 @@ msgstr "Más común"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Las contraseñas no coinciden"
 
@@ -3845,7 +3797,7 @@ msgstr "No se pudo eliminar el modelo de chat offline"
 msgid "Legend"
 msgstr "Leyenda"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Crear una nueva cuenta"
 
@@ -3927,6 +3879,11 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "Sin filtros de fila. La porción incluirá cada fila en el conjunto de "
 "datos (para las columnas seleccionadas)."
 
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish."
+msgstr "Algunos conjuntos de datos aún no se han sincronizado en línea o no se "
+"pudieron publicar."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "Turno"
@@ -3934,10 +3891,6 @@ msgstr "Turno"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "Etiqueta del eje X"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "This custom URL is reserved. Try adding a word to it."
-msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -3977,13 +3930,6 @@ msgstr "Detectamos tanto información personal potencial como lenguaje que puede
 msgid "Select aggregation"
 msgstr "Seleccionar agregación"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "Mientras Avandar esté en beta, solo permitimos el registro si estás en "
-"nuestra lista de espera y has recibido un código de registro en tu "
-"correo electrónico."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorar todos los filtros globales: esta visualización no tiene "
@@ -3996,10 +3942,6 @@ msgstr "Escribiste:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Selección múltiple"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Regístrate en nuestra lista de espera"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4020,10 +3962,6 @@ msgstr "Contraer panel"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Compartir falló"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Tu código de lista de espera ha sido verificado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4064,8 +4002,8 @@ msgstr "Copiar código"
 
 #. placeholder {0}: savedDataset.name
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-#~ msgid "Dataset \"{0}\" saved successfully"
-#~ msgstr "Conjunto de datos \"{0}\" guardado con éxito"
+msgid "Dataset \"{0}\" saved successfully"
+msgstr "Conjunto de datos \"{0}\" guardado con éxito"
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -4116,11 +4054,6 @@ msgstr "Solicitar una función"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Descripción"
-
-#: src/clients/dashboards/DashboardClient.ts
-msgid "Some datasets are not synced online yet or failed to publish. "
-"{errorMessage}"
-msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -4187,9 +4120,9 @@ msgid "Looking up values in {column}…"
 msgstr "Buscando valores en {column}…"
 
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -4367,8 +4300,8 @@ msgstr "Usuario eliminado"
 msgid "Limit {displayName} to app access"
 msgstr "Limitar {displayName} al acceso de la aplicación"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Confirmar contraseña"
 
@@ -4452,7 +4385,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Este tablero no hace referencia a ningún conjunto de datos: nada que "
 "publicar."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "Se ha enviado un correo electrónico de confirmación a su dirección de "
 "correo electrónico."
@@ -4543,7 +4476,8 @@ msgstr "Iniciando sesión nuevamente…"
 #. placeholder {3}: limit.max
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
-msgstr ""
+msgstr "{0} solo puede representar hasta {1} {2}, por lo que solo se muestran "
+"los primeros {3}."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4847,10 +4781,6 @@ msgstr "Cargando conjuntos de datos del tablero"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Seleccione un archivo de Excel o CSV de su computadora para importar"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Por favor, elige una contraseña para completar tu registro"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5227,6 +5157,10 @@ msgstr "Si hay múltiples valores de {fieldName} para un {0}, entonces..."
 msgid "Only you have access to this {resource}."
 msgstr "Solo usted tiene acceso a este {resource}."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "File parsed successfully"
+msgstr "Archivo analizado correctamente"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "Grupo de apilamiento"
@@ -5264,10 +5198,6 @@ msgstr "Cubre <0>{0}</0>, desde <1>{1}</1> hasta <2>{2}</2>."
 msgid "Loading more..."
 msgstr "Cargando más..."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{datasetName}\" saved successfully"
-msgstr ""
-
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "URL personalizada (opcional)"
@@ -5283,10 +5213,6 @@ msgstr "nombre del conjunto de datos"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "Dirección de correo electrónico actualizada"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
-msgid "Sign in with a different account"
-msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
@@ -5774,7 +5700,7 @@ msgstr "Avandar aún está en beta. Algunas funciones pueden no funcionar como s
 "espera y algunas pueden estar aún en construcción. Agradecemos tu "
 "paciencia y comentarios mientras trabajamos para mejorar el producto."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "¡Gracias por tu interés!"
 
@@ -5811,7 +5737,7 @@ msgstr "¿Qué campo debe usarse como nombre de un {singularEntityConfigName}?"
 msgid "Untitled"
 msgstr "Sin título"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Previewing this dashboard"
 msgstr "Previsualizando este panel"
 
@@ -5973,7 +5899,7 @@ msgstr "Buscar paneles"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Dirección de correo electrónico inválida"
 
@@ -5998,7 +5924,7 @@ msgstr "(Mensaje no enviado.)"
 msgid "No workspace was found"
 msgstr "No se encontró ningún espacio de trabajo"
 
-#. placeholder {0}: options.numColumns
+#. placeholder {0}: importedColumns.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
@@ -6123,10 +6049,6 @@ msgstr "Buscar por nombre o grupo de usuarios"
 msgid "Failed to update email"
 msgstr "Error al actualizar el correo electrónico"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
-msgid "Published to your workspace."
-msgstr ""
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
 msgstr "más antiguo"
@@ -6204,7 +6126,6 @@ msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT hace referencia a la columna \"{columnName}\", que no está "
 "presente en el conjunto de datos."
 
-#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "El tablero aún no se ha cargado."
@@ -6213,7 +6134,6 @@ msgstr "El tablero aún no se ha cargado."
 msgid "Editorial serif"
 msgstr "Serif editorial"
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -6316,7 +6236,7 @@ msgstr "Ancho máximo"
 msgid "Not offline"
 msgstr "No disponible sin conexión"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "This dashboard is published publicly."
 msgstr "Este panel está publicado públicamente."
 

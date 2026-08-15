@@ -1,6 +1,6 @@
-import { useLayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec";
+import { useLayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec/useLayerMapSpec";
 import { useMapLayerData } from "@/views/GisApp/layers/useMapLayerData/useMapLayerData";
-import type { LayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec";
+import type { LayerMapSpec } from "@/views/GisApp/layers/useLayerMapSpec/useLayerMapSpec";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

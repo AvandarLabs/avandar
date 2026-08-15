@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
-function _createPoint(
-  options: Readonly<{ longitude: number; latitude: number }>,
-): GeoJSON.Feature {
+function _createPoint({
+  latitude,
+  longitude,
+}: {
+  latitude: number;
+  longitude: number;
+}): GeoJSON.Feature {
   return {
     type: "Feature",
-    geometry: {
-      type: "Point",
-      coordinates: [options.longitude, options.latitude],
-    },
+    geometry: { type: "Point", coordinates: [longitude, latitude] },
     properties: {},
   };
 }
@@ -126,9 +127,9 @@ describe("getBoundsFromFeatureCollection", () => {
   });
 
   it("ignores features with no geometry", () => {
-    const withoutGeometry: GeoJSON.Feature<GeoJSON.Geometry | null> = {
+    const withoutGeometry: GeoJSON.Feature = {
       type: "Feature",
-      geometry: null,
+      geometry: null as unknown as GeoJSON.Geometry,
       properties: {},
     };
     expect(

@@ -52,7 +52,9 @@ export const NavbarLinks = {
     return {
       link: {
         ...AppLinks.dataImport(workspaceSlug),
-        label: () => {return t`Data Sources`},
+        label: (): string => {
+          return t`Data Sources`;
+        },
       },
       icon: <IconDatabase size={DEFAULT_ICON_SIZE} stroke={1.5} />,
     };

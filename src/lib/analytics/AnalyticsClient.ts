@@ -10,7 +10,7 @@ import type { WithQueryHooks } from "@avandar/query-hooks";
 import type {
   AnalyticsApp,
   ClientAnalyticsEvent,
-} from "$/analytics/analyticsEvents/analyticsEvents";
+} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
