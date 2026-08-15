@@ -266,7 +266,7 @@ export function useGeneralAccessControl(
     options.sharingState ?
       GeneralAccessModule.fromResourceState({
         ...options.sharingState,
-        isPubliclyPublished: options.isPublicPublishTargeted,
+        isPublicSelected: options.isPublicPublishTargeted,
       })
     : "private";
   const displayedValue =

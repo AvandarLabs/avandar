@@ -46,25 +46,32 @@ function _getGeneralAccessValueFromShareState(
  * Resolves the value the dropdown shows for a resource that may also have a
  * published form.
  *
- * A publicly published resource displays "Anyone with the link" no matter what
- * its share rows say, because public reads never consult `resource_shares`:
- * the anon policy and the `is_public` short-circuit in
- * `util__auth_user_may_select_dashboard` both fire first. Showing the derived
- * share value here would tell an owner their dashboard is Restricted while the
- * whole internet can read it.
+ * "Anyone with the link" outranks whatever the share rows derive to, because
+ * public reads never consult `resource_shares`: the anon policy and the
+ * `is_public` short-circuit in `util__auth_user_may_select_dashboard` both fire
+ * first. Showing the derived share value instead would tell an owner their
+ * dashboard is Restricted while the whole internet can read it.
  *
- * `isPubliclyPublished` is a boolean rather than a visibility so this module
- * stays resource-generic; datasets have no published form and pass `false`.
+ * `isPublicSelected` is deliberately NOT named for the database. Callers pass
+ * the PENDING selection, so the dropdown keeps showing what the user picked
+ * rather than snapping back while a publish is in flight. It is therefore the
+ * wrong input for any warning about real exposure, which must read the
+ * persisted visibility instead; see `useGeneralAccessControl`, which keeps the
+ * two as separate options for exactly that reason. Do not "correct" a caller
+ * that passes a target here.
+ *
+ * It is a boolean rather than a visibility so this module stays
+ * resource-generic; datasets have no published form and pass `false`.
  */
 function _getGeneralAccessValueFromResourceState(
   options: Readonly<{
     isRestricted: boolean;
     shares: readonly ResourceShareRow[];
     ownerId: string;
-    isPubliclyPublished: boolean;
+    isPublicSelected: boolean;
   }>,
 ): GeneralAccessValue {
-  if (options.isPubliclyPublished) {
+  if (options.isPublicSelected) {
     return "public";
   }
   return _getGeneralAccessValueFromShareState(options);

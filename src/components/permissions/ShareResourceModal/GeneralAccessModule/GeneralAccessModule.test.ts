@@ -182,20 +182,20 @@ describe("fromResourceState", () => {
     ownerId,
   };
 
-  it("returns public when the resource is published publicly, whatever the shares say", () => {
+  it("returns public when the pending selection is public, whatever the shares say", () => {
     expect(
       GeneralAccessModule.fromResourceState({
         ...restrictedNoShares,
-        isPubliclyPublished: true,
+        isPublicSelected: true,
       }),
     ).toBe("public");
   });
 
-  it("falls back to the share-derived value when it is not published publicly", () => {
+  it("falls back to the share-derived value when public is not selected", () => {
     expect(
       GeneralAccessModule.fromResourceState({
         ...restrictedNoShares,
-        isPubliclyPublished: false,
+        isPublicSelected: false,
       }),
     ).toBe("private");
   });
