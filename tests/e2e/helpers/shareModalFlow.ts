@@ -82,6 +82,17 @@ export async function addShare(options: {
   const addCombobox = dialog.getByRole("combobox", {
     name: "Add people or user groups",
   });
+  // Restricted-with-no-shares persists as "Only me", which greys out this
+  // row. Switching to Restricted is the user-visible way to enable adding
+  // people; callers that already selected Restricted in this modal session
+  // skip the branch.
+  await expect(
+    dialog.getByRole("combobox", { name: "General access" }),
+  ).toBeEnabled({ timeout: LONG_WAIT });
+  if (await addCombobox.isDisabled()) {
+    await setGeneralAccess(page, "Restricted");
+  }
+  await expect(addCombobox).toBeEnabled({ timeout: MEDIUM_WAIT });
   await addCombobox.click();
   await addCombobox.fill(principalLabel);
   await page.getByRole("option", { name: principalLabel }).click();

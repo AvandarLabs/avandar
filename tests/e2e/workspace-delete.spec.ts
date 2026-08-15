@@ -1,8 +1,6 @@
 import { unknownToString } from "@avandar/utils";
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./helpers/constants";
-import { dismissBillingModalIfVisible } from "./helpers/dismissBillingModal";
 import {
   createE2ESupabaseViewerClient,
   getSupabaseAnonKeyFromEnv,
@@ -14,113 +12,58 @@ import {
   WORKSPACES_STORAGE_BUCKET,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import {
+  createWorkspaceViaNavbar,
+  getBillingPlanModal,
+  selectPlanFromBillingModal,
+} from "./helpers/workspaceBillingFlow";
 import { openWorkspaceSettingsTab } from "./helpers/workspaceTagsFlow";
 import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
-import { ensureWorkspaceSubscriptionForE2E } from "./setup/ensureWorkspaceSubscriptionForE2E";
-import type { Page, Response } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
-
-/**
- * Throws with HTTP status and body when `workspaces/validate-slug` does not
- * succeed, so timeouts vs 4xx/5xx are distinguishable in CI logs.
- */
-async function _assertSlugResponseOk(response: Response): Promise<void> {
-  if (response.ok()) {
-    return;
-  }
-
-  const bodySnippet = await (async () => {
-    try {
-      const text = await response.text();
-      return text.length > 800 ? `${text.slice(0, 800)}…` : text;
-    } catch {
-      return "(could not read response body)";
-    }
-  })();
-
-  throw new Error(
-    `workspaces/validate-slug request failed: HTTP ${response.status()} ${response.statusText()}. Response body: ${bodySnippet}`,
-  );
-}
-
-type FillCreateWorkspaceDialogOptions = {
-  page: Page;
-  workspaceName: string;
-  workspaceSlug: string;
-};
-
-/**
- * Fills the create-workspace dialog and waits until the new workspace URL
- * is showing.
- */
-async function _fillAndSubmitCreateWorkspaceDialog(
-  options: Readonly<FillCreateWorkspaceDialogOptions>,
-): Promise<void> {
-  const { page, workspaceName, workspaceSlug } = options;
-  const dialog = page.getByRole("dialog");
-  const slugValidationResponsePromise = page.waitForResponse(
-    (response) => {
-      return (
-        response.request().method() === "POST" &&
-        response.url().includes("validate-slug")
-      );
-    },
-    { timeout: LONG_WAIT },
-  );
-
-  await dialog.getByLabel("Workspace Name").fill(workspaceName);
-  await expect(dialog.getByLabel("Workspace ID")).toHaveValue(workspaceSlug, {
-    timeout: SHORT_WAIT,
-  });
-  await _assertSlugResponseOk(await slugValidationResponsePromise);
-
-  await dialog.getByLabel("Full Name").fill("E2E Tester");
-  await dialog.getByLabel("Display Name").fill("E2E Tester");
-  await expect(dialog.getByRole("button", { name: "Submit" })).toBeEnabled({
-    timeout: LONG_WAIT,
-  });
-  await dialog.getByRole("button", { name: "Submit" }).click();
-  await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}`), {
-    timeout: LONG_WAIT,
-  });
-}
 
 type CreateDeletableWorkspaceOptions = {
   page: Page;
   workspaceName: string;
   workspaceSlug: string;
-  polarCustomerEmail: string;
 };
 
 /**
- * Creates a workspace through the UI and seeds a subscription so Settings
- * and the danger zone can render.
+ * Creates a workspace through the UI and selects Avandar Free so Settings
+ * and the danger zone can render. New workspaces open the plan modal; the
+ * Free path is the same as `workspace-billing`'s native-free spec.
  */
 async function _createDeletableWorkspaceViaUi(
   options: Readonly<CreateDeletableWorkspaceOptions>,
 ): Promise<void> {
-  const { page, workspaceName, workspaceSlug, polarCustomerEmail } = options;
+  const { page, workspaceName, workspaceSlug } = options;
 
-  await page
-    .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
-    .click();
-  await page.getByRole("menuitem", { name: "Create Workspace" }).click();
-  await _fillAndSubmitCreateWorkspaceDialog({
+  await createWorkspaceViaNavbar({
     page,
     workspaceName,
     workspaceSlug,
   });
 
-  // The UI create flow does not leave a valid subscription in E2E, so
-  // Settings would redirect to /invalid-workspace (NO_SUBSCRIPTION) and the
-  // danger zone would never render. Seed native-free the same way the worker
-  // fixture does for the shared workspace.
-  await ensureWorkspaceSubscriptionForE2E({
-    workspaceSlug,
-    polarCustomerEmail,
+  await expect(getBillingPlanModal(page)).toBeVisible({
+    timeout: LONG_WAIT,
   });
-  await dismissBillingModalIfVisible(page);
+  const createFreeResponsePromise = page.waitForResponse(
+    (response) => {
+      return (
+        response.request().method() === "POST" &&
+        response.url().includes("create-free") &&
+        response.ok()
+      );
+    },
+    { timeout: LONG_WAIT },
+  );
+  await selectPlanFromBillingModal({
+    page,
+    planHeading: "Avandar Free",
+  });
+  await createFreeResponsePromise;
+  await expect(getBillingPlanModal(page)).toBeHidden({ timeout: LONG_WAIT });
 }
 
 type SeedNestedWorkspaceStorageOptions = {
@@ -187,7 +130,21 @@ async function _deleteWorkspaceViaDangerZone(options: {
   await confirmInput.fill(`  ${workspaceName}  `);
   await expect(confirmButton).toBeEnabled();
 
+  const deleteResponsePromise = page.waitForResponse(
+    (response) => {
+      return (
+        response.request().method() === "POST" &&
+        response.url().includes("/delete")
+      );
+    },
+    { timeout: LONG_WAIT },
+  );
   await confirmButton.click();
+  const deleteResponse = await deleteResponsePromise;
+  expect(
+    deleteResponse.ok(),
+    `workspace delete failed: HTTP ${deleteResponse.status()} ${await deleteResponse.text()}`,
+  ).toBe(true);
 }
 
 type AssertWorkspaceAndStoragePurgedOptions = {
@@ -347,7 +304,6 @@ test.describe("workspace deletion", () => {
         page,
         workspaceName,
         workspaceSlug,
-        polarCustomerEmail: e2eWorkerDb.primaryUser.email,
       });
 
       const admin = createSupabaseAdminClient();
