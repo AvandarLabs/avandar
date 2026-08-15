@@ -11,15 +11,19 @@ type Props = {
 };
 
 /** Renders saved view navigation and deletion items. */
-export function BookmarkMenuItems(props: Props): ReactNode {
+export function BookmarkMenuItems({
+  bookmarks,
+  onGoToBookmark,
+  onRemoveBookmark,
+}: Props): ReactNode {
   const { t } = useLingui();
-  return props.bookmarks.map((bookmark) => {
+  return bookmarks.map((bookmark) => {
     return (
       <Menu.Item
         key={bookmark.id}
         component="div"
         onClick={() => {
-          props.onGoToBookmark(bookmark);
+          onGoToBookmark(bookmark);
         }}
       >
         <Group gap="xs" justify="space-between" wrap="nowrap">
@@ -33,7 +37,7 @@ export function BookmarkMenuItems(props: Props): ReactNode {
             aria-label={t`Delete the view ${bookmark.name}`}
             onClick={(event) => {
               event.stopPropagation();
-              props.onRemoveBookmark(bookmark.id);
+              onRemoveBookmark(bookmark.id);
             }}
           >
             <IconTrash size={14} stroke={1.5} />

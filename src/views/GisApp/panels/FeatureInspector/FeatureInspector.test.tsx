@@ -1,7 +1,7 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@/test-utils";
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const FEATURE: GeoJSON.Feature = {
   type: "Feature",

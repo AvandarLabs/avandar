@@ -1,3 +1,4 @@
+import { isNonNullish, objectValues, prop } from "@avandar/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { RefCallback, RefObject } from "react";
 
@@ -49,11 +50,14 @@ function _getInsets(elementRefs: ChromeElementRefs): MapChromeInsets {
 
 /** Replaces one observed element and refreshes the current padding. */
 function _replaceObservedElement(
-  element: HTMLDivElement | null,
-  elementRef: ElementRef,
-  observer: ResizeObserver | undefined,
-  readInsets: () => void,
+  options: Readonly<{
+    element: HTMLDivElement | null;
+    elementRef: ElementRef;
+    observer: ResizeObserver | undefined;
+    readInsets: () => void;
+  }>,
 ): void {
+  const { element, elementRef, observer, readInsets } = options;
   if (elementRef.current) {
     observer?.unobserve(elementRef.current);
   }
@@ -66,19 +70,18 @@ function _replaceObservedElement(
 
 /** Starts observing mounted chrome elements and returns the cleanup. */
 function _observeChromeElements(
-  elementRefs: ChromeElementRefs,
-  observerRef: RefObject<ResizeObserver | undefined>,
-  readInsets: () => void,
+  options: Readonly<{
+    elementRefs: ChromeElementRefs;
+    observerRef: RefObject<ResizeObserver | undefined>;
+    readInsets: () => void;
+  }>,
 ): () => void {
+  const { elementRefs, observerRef, readInsets } = options;
   const observer = new ResizeObserver(readInsets);
   observerRef.current = observer;
-  Object.values(elementRefs)
-    .map((elementRef) => {
-      return elementRef.current;
-    })
-    .filter((element): element is HTMLDivElement => {
-      return element !== null;
-    })
+  objectValues(elementRefs)
+    .map(prop("current"))
+    .filter(isNonNullish)
     .forEach((element) => {
       observer.observe(element);
     });
@@ -90,21 +93,24 @@ function _observeChromeElements(
 }
 
 function useChromeElementRefs(
-  elementRefs: ChromeElementRefs,
-  observerRef: RefObject<ResizeObserver | undefined>,
-  readInsets: () => void,
+  options: Readonly<{
+    elementRefs: ChromeElementRefs;
+    observerRef: RefObject<ResizeObserver | undefined>;
+    readInsets: () => void;
+  }>,
 ): Pick<
   MapChromeInsetsResult,
   "topBarRef" | "leftColumnRef" | "rightColumnRef"
 > {
+  const { elementRefs, observerRef, readInsets } = options;
   const setElementRef = useCallback(
     (element: HTMLDivElement | null, elementRef: ElementRef): void => {
-      _replaceObservedElement(
+      _replaceObservedElement({
         element,
         elementRef,
-        observerRef.current,
+        observer: observerRef.current,
         readInsets,
-      );
+      });
     },
     [observerRef, readInsets],
   );
@@ -158,11 +164,15 @@ export function useMapChromeInsets(): MapChromeInsetsResult {
     insetsRef.current = _getInsets(elementRefs);
   }, [elementRefs]);
 
-  const refs = useChromeElementRefs(elementRefs, observerRef, readInsets);
+  const refs = useChromeElementRefs({
+    elementRefs,
+    observerRef,
+    readInsets,
+  });
 
   useEffect(
     function observeChromeSize() {
-      return _observeChromeElements(elementRefs, observerRef, readInsets);
+      return _observeChromeElements({ elementRefs, observerRef, readInsets });
     },
     [elementRefs, readInsets],
   );

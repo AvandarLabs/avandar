@@ -37,28 +37,47 @@ type Props = {
 };
 
 function _renderHeader(
-  props: Props,
-  titleId: string,
-  bodyId: string,
+  options: Readonly<{
+    title: string;
+    count?: number;
+    headerActions?: ReactNode;
+    isCollapsed: boolean;
+    onToggleCollapsed: () => void;
+    collapseLabel: string;
+    expandLabel: string;
+    titleId: string;
+    bodyId: string;
+  }>,
 ): ReactNode {
+  const {
+    title,
+    count,
+    headerActions,
+    isCollapsed,
+    onToggleCollapsed,
+    collapseLabel,
+    expandLabel,
+    titleId,
+    bodyId,
+  } = options;
   return (
     <div className={css.mapChromePanelHeader}>
       <h2 className={css.mapChromePanelTitle} id={titleId}>
-        {props.title}
+        {title}
       </h2>
-      {props.count === undefined ? null : (
-        <span className={css.mapChromePanelCount}>{props.count}</span>
+      {count === undefined ? null : (
+        <span className={css.mapChromePanelCount}>{count}</span>
       )}
       <span className={css.mapChromePanelSpacer} />
-      {props.headerActions}
+      {headerActions}
       <ActionIcon
         className={css.mapChromePanelHeaderAction}
         variant="subtle"
         color="neutral"
-        aria-expanded={!props.isCollapsed}
+        aria-expanded={!isCollapsed}
         aria-controls={bodyId}
-        aria-label={props.isCollapsed ? props.expandLabel : props.collapseLabel}
-        onClick={props.onToggleCollapsed}
+        aria-label={isCollapsed ? expandLabel : collapseLabel}
+        onClick={onToggleCollapsed}
       >
         <IconChevronDown size={16} stroke={1.8} />
       </ActionIcon>
@@ -67,10 +86,22 @@ function _renderHeader(
 }
 
 /** Renders a collapsible, accessible landmark over the map. */
-export function MapChromePanel(props: Props): ReactNode {
-  const titleId = `${props.id}-title`;
-  const bodyId = props.bodyId ?? `${props.id}-body`;
-  const variantClassName = matchLiteral(props.variant, {
+export function MapChromePanel({
+  variant,
+  id,
+  title,
+  count,
+  headerActions,
+  isCollapsed,
+  onToggleCollapsed,
+  collapseLabel,
+  expandLabel,
+  bodyId: providedBodyId,
+  children,
+}: Props): ReactNode {
+  const titleId = `${id}-title`;
+  const bodyId = providedBodyId ?? `${id}-body`;
+  const variantClassName = matchLiteral(variant, {
     layers: css["mapChromePanel--layers"]!,
     inspector: css["mapChromePanel--inspector"]!,
     legend: css["mapChromePanel--legend"]!,
@@ -80,21 +111,31 @@ export function MapChromePanel(props: Props): ReactNode {
     <Paper
       component="section"
       className={clsx(css.mapChromePanel, variantClassName)}
-      data-collapsed={props.isCollapsed}
+      data-collapsed={isCollapsed}
       aria-labelledby={titleId}
       p={0}
       radius={0}
       withBorder={false}
       shadow="none"
     >
-      {_renderHeader(props, titleId, bodyId)}
+      {_renderHeader({
+        title,
+        count,
+        headerActions,
+        isCollapsed,
+        onToggleCollapsed,
+        collapseLabel,
+        expandLabel,
+        titleId,
+        bodyId,
+      })}
       <Collapse
         className={css.mapChromePanelBody}
         id={bodyId}
-        tabIndex={props.bodyId === undefined ? undefined : -1}
-        expanded={!props.isCollapsed}
+        tabIndex={providedBodyId === undefined ? undefined : -1}
+        expanded={!isCollapsed}
       >
-        {props.children}
+        {children}
       </Collapse>
     </Paper>
   );

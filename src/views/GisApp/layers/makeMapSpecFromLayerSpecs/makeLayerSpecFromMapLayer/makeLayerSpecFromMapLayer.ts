@@ -1,4 +1,5 @@
 import { matchLiteral } from "@avandar/utils";
+import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
@@ -32,11 +33,44 @@ type CreateMapLayerSpecInput = {
   sourceId: string;
 };
 
+/** Builds color paint from flat or preclassified feature properties. */
+function _buildColor(color: MapLayer.Color): string | ExpressionSpecification {
+  if (color.type === "single") {
+    return color.color;
+  }
+  const classColors =
+    color.type === "graduated" ?
+      color.ramp
+    : color.categories.map(({ color: categoryColor }) => {
+        return categoryColor;
+      });
+  const noDataColor = color.noData.color;
+  const classMatch = [
+    "match",
+    ["get", MapLayerSpatialFeatureProperties.classIndex],
+    ...classColors.flatMap((classColor, index) => {
+      return [index, classColor];
+    }),
+    color.type === "categorical" ? color.other.color : noDataColor,
+  ] as unknown as ExpressionSpecification;
+  return [
+    "case",
+    ["==", ["get", MapLayerSpatialFeatureProperties.state], "suppressed"],
+    "#868e96",
+    ["==", ["get", MapLayerSpatialFeatureProperties.state], "noData"],
+    noDataColor,
+    classMatch,
+  ];
+}
+
 /** Applies the selected scale to a numeric span. */
-function _getScaledSpan(
-  scale: ProportionalSymbol["scale"],
-  span: number,
-): number {
+function _getScaledSpan({
+  scale,
+  span,
+}: Readonly<{
+  scale: ProportionalSymbol["scale"];
+  span: number;
+}>): number {
   return matchLiteral(scale, {
     sqrt: () => {
       return Math.sqrt(span);
@@ -90,6 +124,9 @@ function _buildCircleRadius({
   if (symbology.type === "circle") {
     return symbology.radius;
   }
+  if (symbology.type !== "proportionalSymbol") {
+    throw new Error("Point symbology is required");
+  }
   const { valueDomain } = stats;
   if (!valueColumnName || !valueDomain || valueDomain[0] === valueDomain[1]) {
     return symbology.minRadius;
@@ -106,19 +143,22 @@ function _buildCircleRadius({
     scaledValue,
     0,
     symbology.minRadius,
-    _getScaledSpan(symbology.scale, maximum - minimum),
+    _getScaledSpan({ scale: symbology.scale, span: maximum - minimum }),
     symbology.maxRadius,
   ];
 }
 
 /** Creates the MapLibre circle layer for one persisted map layer. */
-function _createMapLayerSpec({
+function _createCircleLayerSpec({
   layer,
   stats,
   valueColumnName,
   sourceId,
 }: Readonly<CreateMapLayerSpecInput>): MapLayerSpec {
   const { symbology } = layer;
+  if (symbology.type !== "circle" && symbology.type !== "proportionalSymbol") {
+    throw new Error("Point symbology is required");
+  }
   return {
     id: MapLayerIds.toLayerId(layer.id),
     type: "circle",
@@ -129,7 +169,7 @@ function _createMapLayerSpec({
         stats,
         valueColumnName,
       }),
-      "circle-color": symbology.color.color,
+      "circle-color": _buildColor(symbology.color),
       "circle-opacity": 0.8,
       "circle-stroke-width": symbology.stroke.width,
       "circle-stroke-color": [
@@ -141,6 +181,76 @@ function _createMapLayerSpec({
     },
     ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
   };
+}
+
+/** Creates the MapLibre line layer for one persisted map layer. */
+function _createLineLayerSpec(
+  layer: MapLayer.T,
+  sourceId: string,
+): MapLayerSpec {
+  const symbology = layer.symbology;
+  if (symbology.type !== "line") {
+    throw new Error("Line symbology is required");
+  }
+  return {
+    id: MapLayerIds.toLayerId(layer.id),
+    type: "line",
+    source: sourceId,
+    paint: {
+      "line-color": _buildColor(symbology.color),
+      "line-width": symbology.stroke.width,
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
+}
+
+/** Creates the polygon fill followed by its independently sized outline. */
+function _createFillLayerSpecs(
+  layer: MapLayer.T,
+  sourceId: string,
+): readonly MapLayerSpec[] {
+  const symbology = layer.symbology;
+  if (symbology.type !== "fill") {
+    throw new Error("Fill symbology is required");
+  }
+  const visibility =
+    layer.isVisible ? {} : { layout: { visibility: "none" as const } };
+  const layerId = MapLayerIds.toLayerId(layer.id);
+  return [
+    {
+      id: layerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": _buildColor(symbology.color),
+        "fill-opacity": symbology.opacity,
+      },
+      ...visibility,
+    },
+    {
+      id: `${layerId}-outline`,
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": symbology.stroke.color,
+        "line-width": symbology.stroke.width,
+      },
+      ...visibility,
+    },
+  ];
+}
+
+/** Creates the paint layers matching the configured geometry symbology. */
+function _createMapLayerSpecs(
+  options: Readonly<CreateMapLayerSpecInput>,
+): readonly MapLayerSpec[] {
+  if (options.layer.symbology.type === "fill") {
+    return _createFillLayerSpecs(options.layer, options.sourceId);
+  }
+  if (options.layer.symbology.type === "line") {
+    return [_createLineLayerSpec(options.layer, options.sourceId)];
+  }
+  return [_createCircleLayerSpec(options)];
 }
 
 /**
@@ -166,12 +276,15 @@ export function makeLayerSpecFromMapLayer({
   stats,
   valueColumnName,
 }: Readonly<MakeLayerSpecFromMapLayerInput>): MapSpec {
-  if (layer.sensitivity.mode === "aggregateOnly") {
+  if (
+    layer.sensitivity.mode === "aggregateOnly" &&
+    layer.symbology.type !== "fill"
+  ) {
     throw new SensitivityViolationError("aggregateOnlyLayerSpec", layer.name);
   }
 
   const sourceId = MapLayerIds.toSourceId(layer.id);
-  const layerSpec = _createMapLayerSpec({
+  const layerSpecs = _createMapLayerSpecs({
     layer,
     stats,
     valueColumnName,
@@ -180,6 +293,6 @@ export function makeLayerSpecFromMapLayer({
 
   return {
     sources: { [sourceId]: { type: "geojson", data: featureCollection } },
-    layers: [layerSpec],
+    layers: layerSpecs,
   };
 }

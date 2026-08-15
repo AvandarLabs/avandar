@@ -84,6 +84,70 @@ describe("MapLayer.makeEmpty", () => {
     expect(layer.symbology.type).toBe("circle");
     expect(layer.popup.action).toBeUndefined();
   });
+
+  it("starts with no persisted classification output", () => {
+    const layer = MapLayer.makeEmpty("Cases");
+    expect(layer.legend.breaks).toEqual([]);
+    expect(layer.legend.entries).toEqual([]);
+  });
+});
+
+describe("MapLayer.createArea", () => {
+  it("creates an exact fill layer awaiting an area binding", () => {
+    const layer = MapLayer.createArea("Cases by district");
+    expect(layer.geoBinding).toBeUndefined();
+    expect(layer.sensitivity).toEqual({ mode: "exact" });
+    expect(layer.symbology.type).toBe("fill");
+    expect(layer.legend.breaks).toEqual([]);
+    expect(layer.legend.entries).toEqual([]);
+  });
+});
+
+describe("MapLayer.withSensitivity", () => {
+  it("removes a point binding before applying aggregate-only", () => {
+    const layer = MapLayer.withSensitivity(_createBoundLayer(), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+    expect(layer.geoBinding).toBeUndefined();
+    expect(layer.symbology.type).toBe("fill");
+    expect(layer.sensitivity).toEqual({
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+  });
+
+  it("preserves an area binding while applying aggregate-only", () => {
+    const areaLayer = MapLayer.createArea("Cases by district");
+    const polygonColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("geometry"),
+    );
+    const layerWithPolygon: MapLayer.T = {
+      ...areaLayer,
+      source: {
+        ...areaLayer.source,
+        queryColumns: [polygonColumn],
+      },
+      geoBinding: {
+        type: "geometryColumn",
+        column: polygonColumn.id,
+        encoding: "wkt",
+        family: "polygon",
+        simplification: { tolerancePixels: 0.75 },
+      },
+    };
+
+    const protectedLayer = MapLayer.withSensitivity(layerWithPolygon, {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+
+    expect(protectedLayer.geoBinding).toEqual(layerWithPolygon.geoBinding);
+    expect(protectedLayer.symbology.type).toBe("fill");
+  });
 });
 
 describe("MapLayer.toGeoBinding", () => {
@@ -212,7 +276,7 @@ describe("MapLayer.toGeoBinding", () => {
 
 describe("makeFromDataSource", () => {
   it("names the layer and its legend after the caller's name", () => {
-    const layer = MapLayer.makeFromDataSource({
+    const layer = MapLayer.fromDataSource({
       dataSource: _createDataset(),
       name: "Cholera linelist",
     });
@@ -222,7 +286,7 @@ describe("makeFromDataSource", () => {
 
   it("selects the source and no columns, so nothing is bound yet", () => {
     const dataSource = _createDataset();
-    const layer = MapLayer.makeFromDataSource({
+    const layer = MapLayer.fromDataSource({
       dataSource,
       name: "Cholera linelist",
     });

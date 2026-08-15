@@ -13,9 +13,13 @@ type Props = {
 };
 
 /** Explains inferred, incomplete, or unavailable coordinate bindings. */
-export function CoordinateBindingStatus(props: Props): ReactNode {
+export function CoordinateBindingStatus({
+  layer,
+  guess,
+  isBound,
+  hasCoordinateCandidates,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { layer, guess, isBound, hasCoordinateCandidates } = props;
   if (isBound && guess) {
     return (
       <Callout>

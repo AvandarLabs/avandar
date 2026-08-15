@@ -29,36 +29,63 @@ type Props = {
 };
 
 function _renderChrome(
-  props: Props,
-  readOnlyHeading: string,
-  readOnlyBody: string,
+  options: Readonly<{
+    topBar: ReactNode;
+    layerPanel: ReactNode;
+    inspector: ReactNode;
+    legend: ReactNode;
+    toolCluster: ReactNode;
+    statusCard: ReactNode;
+    firstRunCard: ReactNode;
+    isChromeHidden: boolean;
+    topBarRef: RefCallback<HTMLDivElement>;
+    leftColumnRef: RefCallback<HTMLDivElement>;
+    rightColumnRef: RefCallback<HTMLDivElement>;
+    readOnlyHeading: string;
+    readOnlyBody: string;
+  }>,
 ): ReactNode {
+  const {
+    topBar,
+    layerPanel,
+    inspector,
+    legend,
+    toolCluster,
+    statusCard,
+    firstRunCard,
+    isChromeHidden,
+    topBarRef,
+    leftColumnRef,
+    rightColumnRef,
+    readOnlyHeading,
+    readOnlyBody,
+  } = options;
   return (
     <div className={css.mapShellChrome}>
-      <SkipLinks isChromeHidden={props.isChromeHidden} />
+      <SkipLinks isChromeHidden={isChromeHidden} />
       <div className={css.mapShellReadOnlyNotice} role="status">
         <span>
           <strong>{readOnlyHeading}</strong> {readOnlyBody}
         </span>
       </div>
-      {props.isChromeHidden ? null : (
+      {isChromeHidden ? null : (
         <>
-          <div className={css.mapShellTopBar} ref={props.topBarRef}>
-            {props.topBar}
+          <div className={css.mapShellTopBar} ref={topBarRef}>
+            {topBar}
           </div>
-          {props.firstRunCard ?
-            <div className={css.mapShellFirstRun}>{props.firstRunCard}</div>
+          {firstRunCard ?
+            <div className={css.mapShellFirstRun}>{firstRunCard}</div>
           : null}
-          <div className={css.mapShellLeftColumn} ref={props.leftColumnRef}>
-            {props.layerPanel}
+          <div className={css.mapShellLeftColumn} ref={leftColumnRef}>
+            {layerPanel}
           </div>
-          <div className={css.mapShellRightColumn} ref={props.rightColumnRef}>
-            {props.inspector}
+          <div className={css.mapShellRightColumn} ref={rightColumnRef}>
+            {inspector}
           </div>
-          <div className={css.mapShellBottomLeft}>{props.legend}</div>
+          <div className={css.mapShellBottomLeft}>{legend}</div>
           <div className={css.mapShellBottomCenter}>
-            {props.statusCard}
-            {props.toolCluster}
+            {statusCard}
+            {toolCluster}
           </div>
         </>
       )}
@@ -67,23 +94,48 @@ function _renderChrome(
 }
 
 /** Renders the full-bleed map with floating chrome and a furniture strip. */
-export function MapShell(props: Props): ReactNode {
+export function MapShell({
+  canvas,
+  topBar,
+  layerPanel,
+  inspector,
+  legend,
+  toolCluster,
+  statusCard,
+  furnitureBar,
+  firstRunCard,
+  mapLabel,
+  isChromeHidden,
+  topBarRef,
+  leftColumnRef,
+  rightColumnRef,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <div className={css.mapShell}>
       <div
         className={css.mapShellSurface}
         role="region"
-        aria-label={t`${props.mapLabel}. Use the layer panel to change what is shown.`}
+        aria-label={t`${mapLabel}. Use the layer panel to change what is shown.`}
       >
-        {props.canvas}
-        {_renderChrome(
-          props,
-          t`Viewing only on this screen size.`,
-          t`Pan, zoom and tap a feature to read it. To edit layers, open this map on a tablet or a laptop.`,
-        )}
+        {canvas}
+        {_renderChrome({
+          topBar,
+          layerPanel,
+          inspector,
+          legend,
+          toolCluster,
+          statusCard,
+          firstRunCard,
+          isChromeHidden,
+          topBarRef,
+          leftColumnRef,
+          rightColumnRef,
+          readOnlyHeading: t`Viewing only on this screen size.`,
+          readOnlyBody: t`Pan, zoom and tap a feature to read it. To edit layers, open this map on a tablet or a laptop.`,
+        })}
       </div>
-      {props.furnitureBar}
+      {furnitureBar}
     </div>
   );
 }

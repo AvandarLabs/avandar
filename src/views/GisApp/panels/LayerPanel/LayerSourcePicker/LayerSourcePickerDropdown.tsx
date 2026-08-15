@@ -7,7 +7,9 @@ import type { ReactNode } from "react";
 type Props = { onSourceSelected: (source: QueryDataSource.T) => void };
 
 /** Searches and selects the source for a new layer. */
-export function LayerSourcePickerDropdown(props: Props): ReactNode {
+export function LayerSourcePickerDropdown({
+  onSourceSelected,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <Popover.Dropdown p="xs">
@@ -19,7 +21,7 @@ export function LayerSourcePickerDropdown(props: Props): ReactNode {
         value={null}
         onChange={(dataSource) => {
           if (dataSource) {
-            props.onSourceSelected(dataSource);
+            onSourceSelected(dataSource);
           }
         }}
       />

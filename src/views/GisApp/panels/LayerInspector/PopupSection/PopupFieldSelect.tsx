@@ -32,7 +32,10 @@ export function PopupFieldSelect({ layer, onLayerChange }: Props): ReactNode {
       value={selectedColumns}
       onChange={(columns) => {
         onLayerChange((current) => {
-          return MapLayerUpdates.withPopupColumns(current, columns);
+          return MapLayerUpdates.withPopupColumns({
+            layer: current,
+            columns: columns,
+          });
         });
       }}
       description={t`The layer fetches exactly these fields, so adding one also makes it available to filter on.`}

@@ -1,3 +1,4 @@
+import { assertIsDefined } from "@avandar/utils";
 import { modals } from "@mantine/modals";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -107,13 +108,14 @@ vi.mock(
 );
 
 function _applyLatestUpdate(
-  onLayerChange: ReturnType<typeof vi.fn<LayerChangeHandler>>,
-  layer: MapLayer.T,
+  options: Readonly<{
+    onLayerChange: ReturnType<typeof vi.fn<LayerChangeHandler>>;
+    layer: MapLayer.T;
+  }>,
 ): MapLayer.T {
+  const { onLayerChange, layer } = options;
   const latestCall = onLayerChange.mock.lastCall;
-  if (!latestCall) {
-    throw new Error("Expected a layer update");
-  }
+  assertIsDefined(latestCall, "Expected a layer update");
   return latestCall[0](layer);
 }
 
@@ -130,7 +132,10 @@ describe("SensitivitySection", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Displace" }));
 
-    expect(_applyLatestUpdate(onLayerChange, layer).sensitivity).toEqual({
+    expect(
+      _applyLatestUpdate({ onLayerChange: onLayerChange, layer: layer })
+        .sensitivity,
+    ).toEqual({
       mode: "jitter",
       radiusMeters: 500,
     });
@@ -144,7 +149,10 @@ describe("SensitivitySection", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Aggregate only" }));
-    const aggregateLayer = _applyLatestUpdate(onLayerChange, layer);
+    const aggregateLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     rerender(
       <SensitivitySection
         layer={aggregateLayer}
@@ -155,21 +163,18 @@ describe("SensitivitySection", () => {
     expect(screen.getByLabelText("Suppress areas below")).toHaveValue("5");
     expect(
       screen.getByText(
-        "This layer cannot be drawn yet. Aggregate only needs an area to aggregate into, and boundary joins arrive in a later release.",
+        "Aggregate only draws areas after at least 5 contributing records. Areas below that minimum are shown as Not reported without revealing their exact count.",
       ),
     ).toBeInTheDocument();
   });
 
   it("requires confirmation before relaxing aggregate-only handling", () => {
     const onLayerChange = vi.fn<LayerChangeHandler>();
-    const layer = {
-      ...MapLayer.makeEmpty("Cases"),
-      sensitivity: {
-        mode: "aggregateOnly" as const,
-        minCellCount: 5,
-        minGeoLevel: "",
-      },
-    };
+    const layer = MapLayer.withSensitivity(MapLayer.makeEmpty("Cases"), {
+      mode: "aggregateOnly" as const,
+      minCellCount: 5,
+      minGeoLevel: "",
+    });
     let confirmOptions:
       | Parameters<typeof modals.openConfirmModal>[0]
       | undefined;
@@ -191,8 +196,36 @@ describe("SensitivitySection", () => {
 
     confirmOptions?.onConfirm?.();
 
-    expect(_applyLatestUpdate(onLayerChange, layer).sensitivity).toEqual({
+    expect(
+      _applyLatestUpdate({ onLayerChange: onLayerChange, layer: layer })
+        .sensitivity,
+    ).toEqual({
       mode: "exact",
     });
+  });
+
+  it("requires confirmation before relaxing aggregate-only handling to displacement", () => {
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    const layer = MapLayer.withSensitivity(MapLayer.makeEmpty("Cases"), {
+      mode: "aggregateOnly" as const,
+      minCellCount: 5,
+      minGeoLevel: "",
+    });
+    let confirmOptions:
+      | Parameters<typeof modals.openConfirmModal>[0]
+      | undefined;
+    vi.spyOn(modals, "openConfirmModal").mockImplementation((options) => {
+      confirmOptions = options;
+      return "sensitivity-confirmation";
+    });
+
+    render(<SensitivitySection layer={layer} onLayerChange={onLayerChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Displace" }));
+
+    expect(confirmOptions).toBeDefined();
+    expect(onLayerChange).not.toHaveBeenCalled();
+
+    confirmOptions?.onCancel?.();
+    expect(onLayerChange).not.toHaveBeenCalled();
   });
 });

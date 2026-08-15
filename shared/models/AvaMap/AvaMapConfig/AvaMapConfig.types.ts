@@ -3,9 +3,6 @@ import type { UUID } from "@avandar/utils";
 import type { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
-type ModelType = "AvaMapConfig";
-type CurrentAvaMapConfigVersion = 1;
-
 /**
  * Where the map is looking. `center` is `[longitude, latitude]`, MapLibre
  * order.
@@ -33,6 +30,13 @@ export type CustomBasemapKind =
 export type BasemapStyleKey =
   (typeof AvaMapConfigValues.basemapStyleKeys)[number];
 
+type CustomBasemapConfig = {
+  type: "custom";
+  kind: CustomBasemapKind;
+  url: string;
+  attribution: string;
+};
+
 /**
  * The map's backdrop.
  *
@@ -44,13 +48,19 @@ export type BasemapStyleKey =
  */
 export type BasemapConfig =
   | { type: "builtIn"; style: BasemapStyleKey }
-  | {
-      type: "custom";
-      kind: CustomBasemapKind;
-      url: string;
-      attribution: string;
-    }
+  | CustomBasemapConfig
   | { type: "none"; background: string };
+
+type AvaMapConfigBody = {
+  basemap: BasemapConfig;
+  view: MapViewState;
+
+  /** Saved camera positions, in the order the author created them. */
+  bookmarks: readonly MapBookmark[];
+
+  /** Draw order, bottom to top. */
+  layers: readonly MapLayer.T[];
+};
 
 /**
  * The editable body of a map: a basemap, a camera position, and an ordered
@@ -58,16 +68,7 @@ export type BasemapConfig =
  * versioned and carries no row identity of its own.
  */
 export type AvaMapConfigRead = Model.Versioned<
-  ModelType,
-  CurrentAvaMapConfigVersion,
-  {
-    basemap: BasemapConfig;
-    view: MapViewState;
-
-    /** Saved camera positions, in the order the author created them. */
-    bookmarks: readonly MapBookmark[];
-
-    /** Draw order, bottom to top. */
-    layers: readonly MapLayer.T[];
-  }
+  "AvaMapConfig",
+  2,
+  AvaMapConfigBody
 >;

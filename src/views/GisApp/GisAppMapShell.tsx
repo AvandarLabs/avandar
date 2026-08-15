@@ -6,7 +6,7 @@ import { GisAppLayerPanel } from "@/views/GisApp/GisAppLayerPanel";
 import { GisAppMapLegend } from "@/views/GisApp/GisAppMapLegend";
 import { GisAppStatusCard } from "@/views/GisApp/GisAppStatusCard";
 import { GisAppTopBar } from "@/views/GisApp/GisAppTopBar";
-import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface";
+import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";

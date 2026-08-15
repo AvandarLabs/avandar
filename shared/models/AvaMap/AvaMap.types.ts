@@ -7,14 +7,12 @@ import type { UserProfile } from "$/models/User/UserProfile.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
-type ModelType = "AvaMap";
-
 /** Identifies a persisted AvaMap row. */
-export type AvaMapId = UUID<ModelType>;
+export type AvaMapId = UUID<"AvaMap">;
 
 /** The persisted row for a map and its editable configuration. */
 export type AvaMapRead = Model.Base<
-  ModelType,
+  "AvaMap",
   {
     /** The map's basemap, camera, bookmarks, and ordered layer stack. */
     config: AvaMapConfig.T;
@@ -54,21 +52,23 @@ export type AvaMapRead = Model.Base<
   }
 >;
 
+type AvaMapCrudSpec = {
+  tableName: "maps";
+  modelName: "AvaMap";
+  modelPrimaryKeyType: AvaMapId;
+  modelTypes: {
+    Read: AvaMapRead;
+    Insert: SetOptional<
+      AvaMapRead,
+      "createdAt" | "id" | "isPublic" | "isRestricted" | "updatedAt"
+    >;
+    Update: Partial<AvaMapRead>;
+  };
+};
+
 /** CRUD type definitions for the AvaMap model. */
 export type AvaMapModel = SupabaseCrudModelSpec<
-  {
-    tableName: "maps";
-    modelName: "AvaMap";
-    modelPrimaryKeyType: AvaMapId;
-    modelTypes: {
-      Read: AvaMapRead;
-      Insert: SetOptional<
-        AvaMapRead,
-        "createdAt" | "id" | "isPublic" | "isRestricted" | "updatedAt"
-      >;
-      Update: Partial<AvaMapRead>;
-    };
-  },
+  AvaMapCrudSpec,
   {
     dbTablePrimaryKey: "id";
   }

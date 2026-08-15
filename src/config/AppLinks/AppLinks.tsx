@@ -178,6 +178,7 @@ export const AppLinks = {
       isAvailableOffline: false,
     };
   },
+  /** Builds the route for editing one map in a workspace. */
   mapEditor: ({
     workspaceSlug,
     mapId,

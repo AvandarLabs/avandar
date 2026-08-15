@@ -1,17 +1,19 @@
 import { where } from "@avandar/utils";
 import { Outlet } from "@tanstack/react-router";
-import { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { makeMainNavbarLinksFromPermissions } from "@/components/layouts/RootLayout/makeMainNavbarLinksFromPermissions";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { WorkspaceLayoutContents } from "@/components/layouts/RootLayout/WorkspaceLayoutContents";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
-import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
+import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { WorkspaceI18nProvider } from "@/i18n/WorkspaceI18nProvider";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type { ReactNode } from "react";
 
 type Props = {
   /**
@@ -21,7 +23,9 @@ type Props = {
   children?: ReactNode;
 };
 
-/** Builds main workspace navigation links from access permissions. */
+/**
+ * Renders the localized workspace shell and its permission-aware navigation.
+ */
 export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const { locale } = useWorkspaceLanguage(workspace.id);

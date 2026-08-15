@@ -37,7 +37,14 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 
 const { ResourceShareClient } = await import("./ResourceShareClient");
 
-function _createQuery(result: unknown) {
+function _createQuery(result: unknown): {
+  eq: ReturnType<typeof vi.fn>;
+  is: ReturnType<typeof vi.fn>;
+  select: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+  throwOnError: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+} {
   const query = {
     select: vi.fn(() => {
       return query;

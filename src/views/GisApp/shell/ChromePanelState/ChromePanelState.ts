@@ -29,16 +29,14 @@ const TABLET_AT_PX = 792;
  *
  * @param canvasWidth Width of the map canvas in CSS pixels, not the viewport.
  */
-function _getDefaultPanelStateFromCanvasWidth(
-  canvasWidth: number,
-): ChromePanelState {
-  if (canvasWidth <= TABLET_AT_PX) {
-    return { layers: true, inspector: true, legend: true };
-  }
-  if (canvasWidth < INSPECTOR_YIELDS_AT_PX) {
-    return { layers: false, inspector: true, legend: false };
-  }
-  return { layers: false, inspector: false, legend: false };
+function _panelStateFromCanvasWidth(canvasWidth: number): ChromePanelState {
+  return (
+    canvasWidth <= TABLET_AT_PX ?
+      { layers: true, inspector: true, legend: true }
+    : canvasWidth < INSPECTOR_YIELDS_AT_PX ?
+      { layers: false, inspector: true, legend: false }
+    : { layers: false, inspector: false, legend: false }
+  );
 }
 
 /**
@@ -55,12 +53,12 @@ function _getDefaultPanelStateFromCanvasWidth(
 /** Default calculation and persisted state for floating map panels. */
 export const ChromePanelState = {
   /** Returns the first-run panel state for a canvas width. */
-  getDefaultPanelStateFromCanvasWidth: _getDefaultPanelStateFromCanvasWidth,
+  fromCanvasWidth: _panelStateFromCanvasWidth,
 
   /** Reads and updates the current user's persisted panel state. */
   useChromePanelState: (canvasWidth: number): ChromePanelStateController => {
     const defaultState = useMemo(() => {
-      return _getDefaultPanelStateFromCanvasWidth(canvasWidth);
+      return _panelStateFromCanvasWidth(canvasWidth);
       // The default is a first-run value only, so it must not follow a resize.
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { Callout } from "@avandar/ui";
+import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
@@ -16,9 +17,11 @@ type Props = {
 };
 
 /** Edits the value column and largest radius for sized symbols. */
-export function ProportionalSymbolControls(props: Props): ReactNode {
+export function ProportionalSymbolControls({
+  layer,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { layer, onLayerChange } = props;
   const dataSourceId =
     layer.source.dataSource ?
       Model.getTypedId(layer.source.dataSource)
@@ -30,14 +33,17 @@ export function ProportionalSymbolControls(props: Props): ReactNode {
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
         value={
-          MapLayerUpdates.findQueryColumn(layer, layer.symbology.value) ?? null
+          MapLayerUpdates.getQueryColumnFromLayer({
+            layer: layer,
+            columnId: layer.symbology.value,
+          }) ?? null
         }
         onChange={(column) => {
           onLayerChange((current) => {
-            return MapLayerUpdates.withSymbolSizeColumn(
-              current,
-              column ?? undefined,
-            );
+            return MapLayerUpdates.withSymbolSizeColumn({
+              layer: current,
+              column: column ?? undefined,
+            });
           });
         }}
       />
@@ -48,11 +54,14 @@ export function ProportionalSymbolControls(props: Props): ReactNode {
         max={80}
         value={layer.symbology.maxRadius}
         onChange={(value) => {
-          if (typeof value !== "number") {
+          if (!isNumber(value)) {
             return;
           }
           onLayerChange((current) => {
-            return MapLayerUpdates.withMaxSymbolRadius(current, value);
+            return MapLayerUpdates.withMaxSymbolRadius({
+              layer: current,
+              maxRadius: value,
+            });
           });
         }}
       />

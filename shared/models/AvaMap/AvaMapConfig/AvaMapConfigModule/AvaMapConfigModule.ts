@@ -17,9 +17,12 @@ const DEFAULT_MAP_VIEW_STATE: MapViewState = {
 
 /** True when both id lists hold the same ids, in any order. */
 function _haveSameIds(
-  first: readonly MapLayer.Id[],
-  second: readonly MapLayer.Id[],
+  options: Readonly<{
+    first: readonly MapLayer.Id[];
+    second: readonly MapLayer.Id[];
+  }>,
 ): boolean {
+  const { first, second } = options;
   const firstSet = makeSet(first);
   const secondSet = makeSet(second);
   return (
@@ -39,7 +42,7 @@ export const AvaMapConfigModule = {
   /** A new, empty config with the default basemap and camera and no layers. */
   makeEmpty: (): AvaMapConfigRead => {
     return Model.make("AvaMapConfig", {
-      version: 1,
+      version: 2,
       basemap: { type: "builtIn", style: "avandar" },
       view: DEFAULT_MAP_VIEW_STATE,
       bookmarks: [],
@@ -54,15 +57,12 @@ export const AvaMapConfigModule = {
    * sees first.
    * @param config The map whose stack is being listed.
    */
-  toStackOrder: (config: AvaMapConfigRead): readonly MapLayer.T[] => {
+  toStackOrder: (config: AvaMapConfigRead): MapLayer.T[] => {
     return [...config.layers].reverse();
   },
 
   /**
    * Reorders the stack from a panel row order, top of the z-order first.
-   *
-   * Both the drag handler and the keyboard handler go through here, so the two
-   * cannot disagree about what a move means.
    *
    * @param config The map being reordered.
    * @param orderedLayerIds Every layer id, in panel row order.
@@ -71,11 +71,14 @@ export const AvaMapConfigModule = {
    * which would silently drop or duplicate a layer.
    */
   withStackOrder: (
-    config: AvaMapConfigRead,
-    orderedLayerIds: readonly MapLayer.Id[],
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      orderedLayerIds: readonly MapLayer.Id[];
+    }>,
   ): AvaMapConfigRead => {
+    const { config, orderedLayerIds } = options;
     const currentIds = config.layers.map(prop("id"));
-    if (!_haveSameIds(currentIds, orderedLayerIds)) {
+    if (!_haveSameIds({ first: currentIds, second: orderedLayerIds })) {
       throw new Error(
         "The requested layer order does not match the layers on the map.",
       );
@@ -91,17 +94,17 @@ export const AvaMapConfigModule = {
 
   /** Adds a layer at the top of the z-order, which is the first panel row. */
   withLayerAdded: (
-    config: AvaMapConfigRead,
-    layer: MapLayer.T,
+    options: Readonly<{ config: AvaMapConfigRead; layer: MapLayer.T }>,
   ): AvaMapConfigRead => {
+    const { config, layer } = options;
     return { ...config, layers: [...config.layers, layer] };
   },
 
   /** Removes a layer by id. Unknown ids leave the config untouched. */
   withLayerRemoved: (
-    config: AvaMapConfigRead,
-    layerId: MapLayer.Id,
+    options: Readonly<{ config: AvaMapConfigRead; layerId: MapLayer.Id }>,
   ): AvaMapConfigRead => {
+    const { config, layerId } = options;
     const nextLayers = config.layers.filter(propNotEq("id", layerId));
     return nextLayers.length === config.layers.length ?
         config
@@ -116,10 +119,13 @@ export const AvaMapConfigModule = {
    * the layer it was given to signal "nothing changed".
    */
   withLayerReplaced: (
-    config: AvaMapConfigRead,
-    layerId: MapLayer.Id,
-    update: (current: MapLayer.T) => MapLayer.T,
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      layerId: MapLayer.Id;
+      update: (current: MapLayer.T) => MapLayer.T;
+    }>,
   ): AvaMapConfigRead => {
+    const { config, layerId, update } = options;
     const currentLayer = config.layers.find(propEq("id", layerId));
     if (!currentLayer) {
       return config;
@@ -142,10 +148,13 @@ export const AvaMapConfigModule = {
    * @param name The copy's display name, already localized by the caller.
    */
   withLayerDuplicated: (
-    config: AvaMapConfigRead,
-    layerId: MapLayer.Id,
-    name: string,
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      layerId: MapLayer.Id;
+      name: string;
+    }>,
   ): AvaMapConfigRead => {
+    const { config, layerId, name } = options;
     const sourceIndex = config.layers.findIndex(propEq("id", layerId));
     const sourceLayer = config.layers[sourceIndex];
     if (!sourceLayer) {
@@ -166,13 +175,15 @@ export const AvaMapConfigModule = {
    * A bookmark for the given camera position.
    * @param params.name The bookmark's display name, already localized.
    */
-  makeBookmark: (params: {
-    name: string;
-    view: {
-      center: readonly [longitude: number, latitude: number];
-      zoom: number;
-    };
-  }): MapBookmark => {
+  makeBookmark: (
+    params: Readonly<{
+      name: string;
+      view: {
+        center: readonly [longitude: number, latitude: number];
+        zoom: number;
+      };
+    }>,
+  ): MapBookmark => {
     return {
       id: uuid<MapBookmarkId>(),
       name: params.name,
@@ -185,20 +196,24 @@ export const AvaMapConfigModule = {
 
   /** Appends a bookmark. */
   withBookmarkAdded: (
-    config: AvaMapConfigRead,
-    bookmark: MapBookmark,
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      bookmark: MapBookmark;
+    }>,
   ): AvaMapConfigRead => {
+    const { config, bookmark } = options;
     return { ...config, bookmarks: [...config.bookmarks, bookmark] };
   },
 
   /** Removes a bookmark by id. */
   withBookmarkRemoved: (
-    config: AvaMapConfigRead,
-    bookmarkId: MapBookmarkId,
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      bookmarkId: MapBookmarkId;
+    }>,
   ): AvaMapConfigRead => {
-    const nextBookmarks = config.bookmarks.filter((bookmark) => {
-      return bookmark.id !== bookmarkId;
-    });
+    const { config, bookmarkId } = options;
+    const nextBookmarks = config.bookmarks.filter(propNotEq("id", bookmarkId));
     return nextBookmarks.length === config.bookmarks.length ?
         config
       : { ...config, bookmarks: nextBookmarks };

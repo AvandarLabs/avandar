@@ -30,7 +30,7 @@ const dataSource = Model.make("Dataset", {
   ownerProfileId: uuid<UserProfile.Id>(),
 });
 const layer = MapLayer.makeEmpty("First layer");
-const viewState = {
+const VIEW_STATE = {
   status: "ready",
   error: undefined,
   featureCount: 1,
@@ -69,7 +69,7 @@ describe("LayerPanel", () => {
     render(
       <LayerPanel
         rows={[layer]}
-        viewStates={new Map([[layer.id, viewState]])}
+        viewStates={new Map([[layer.id, VIEW_STATE]])}
         selectedLayerId={layer.id}
         onStackOrderChange={vi.fn()}
         {...callbacks}

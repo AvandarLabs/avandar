@@ -4,7 +4,7 @@ import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale
 describe("getMapScaleFromMetersPerPixel", () => {
   it("rounds the bar down to a 1, 2, or 5 times a power of ten", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: 100,
         zoom: 10,
         maxWidthPx: 80,
@@ -14,7 +14,7 @@ describe("getMapScaleFromMetersPerPixel", () => {
 
   it("uses metres below one kilometre", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: 2,
         zoom: 16,
         maxWidthPx: 80,
@@ -24,7 +24,7 @@ describe("getMapScaleFromMetersPerPixel", () => {
 
   it("reports varying scale below zoom 4 instead of a bar", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: 20000,
         zoom: 3,
         maxWidthPx: 80,
@@ -34,21 +34,21 @@ describe("getMapScaleFromMetersPerPixel", () => {
 
   it("reports varying scale for non-positive or non-finite inputs", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: 0,
         zoom: 10,
         maxWidthPx: 80,
       }),
     ).toEqual({ kind: "varies" });
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: Number.POSITIVE_INFINITY,
         zoom: 10,
         maxWidthPx: 80,
       }),
     ).toEqual({ kind: "varies" });
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: 2,
         zoom: 10,
         maxWidthPx: 0,
@@ -58,7 +58,7 @@ describe("getMapScaleFromMetersPerPixel", () => {
 
   it("reports varying scale when the maximum distance overflows", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: Number.MAX_VALUE,
         zoom: 10,
         maxWidthPx: 2,
@@ -68,7 +68,7 @@ describe("getMapScaleFromMetersPerPixel", () => {
 
   it("reports varying scale when the maximum distance underflows", () => {
     expect(
-      MapScale.getFromMetersPerPixel({
+      MapScale.fromMetersPerPixel({
         metersPerPixel: Number.MIN_VALUE,
         zoom: 10,
         maxWidthPx: Number.MIN_VALUE,

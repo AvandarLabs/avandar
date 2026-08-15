@@ -33,7 +33,10 @@ describe("stack order", () => {
       ...AvaMapConfig.makeEmpty(),
       layers: [bottom, top],
     };
-    const reordered = AvaMapConfig.withStackOrder(config, [bottom.id, top.id]);
+    const reordered = AvaMapConfig.withStackOrder({
+      config,
+      orderedLayerIds: [bottom.id, top.id],
+    });
     expect(reordered.layers.map(prop("name"))).toEqual(["Top", "Bottom"]);
   });
 
@@ -43,7 +46,7 @@ describe("stack order", () => {
       layers: [MapLayer.makeEmpty("Only")],
     };
     expect(() => {
-      return AvaMapConfig.withStackOrder(config, []);
+      return AvaMapConfig.withStackOrder({ config, orderedLayerIds: [] });
     }).toThrow("does not match the layers on the map");
   });
 
@@ -54,9 +57,12 @@ describe("stack order", () => {
       ...AvaMapConfig.makeEmpty(),
       layers: [first, second],
     };
-    expect(AvaMapConfig.withStackOrder(config, [second.id, first.id])).toBe(
-      config,
-    );
+    expect(
+      AvaMapConfig.withStackOrder({
+        config,
+        orderedLayerIds: [second.id, first.id],
+      }),
+    ).toBe(config);
   });
 });
 
@@ -69,7 +75,9 @@ describe("layer operations", () => {
       layers: [existing],
     };
     expect(
-      AvaMapConfig.withLayerAdded(config, added).layers.map(prop("name")),
+      AvaMapConfig.withLayerAdded({ config, layer: added }).layers.map(
+        prop("name"),
+      ),
     ).toEqual(["Existing", "Added"]);
   });
 
@@ -80,13 +88,13 @@ describe("layer operations", () => {
       ...AvaMapConfig.makeEmpty(),
       layers: [kept, edited],
     };
-    const updatedConfig = AvaMapConfig.withLayerReplaced(
+    const updatedConfig = AvaMapConfig.withLayerReplaced({
       config,
-      edited.id,
-      (layer) => {
+      layerId: edited.id,
+      update: (layer) => {
         return { ...layer, isVisible: false };
       },
-    );
+    });
     expect(updatedConfig.layers[0]).toBe(kept);
     expect(updatedConfig.layers[1]?.isVisible).toBe(false);
   });
@@ -95,8 +103,12 @@ describe("layer operations", () => {
     const layer = MapLayer.makeEmpty("Layer");
     const config = { ...AvaMapConfig.makeEmpty(), layers: [layer] };
     expect(
-      AvaMapConfig.withLayerReplaced(config, layer.id, (current) => {
-        return current;
+      AvaMapConfig.withLayerReplaced({
+        config,
+        layerId: layer.id,
+        update: (current) => {
+          return current;
+        },
       }),
     ).toBe(config);
   });
@@ -104,11 +116,11 @@ describe("layer operations", () => {
   it("duplicates a layer directly above the original with a new id", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const config = { ...AvaMapConfig.makeEmpty(), layers: [layer] };
-    const updatedConfig = AvaMapConfig.withLayerDuplicated(
+    const updatedConfig = AvaMapConfig.withLayerDuplicated({
       config,
-      layer.id,
-      "Copy",
-    );
+      layerId: layer.id,
+      name: "Copy",
+    });
     expect(updatedConfig.layers.map(prop("name"))).toEqual(["Cases", "Copy"]);
     expect(updatedConfig.layers[1]?.id).not.toBe(layer.id);
   });
@@ -120,9 +132,9 @@ describe("layer operations", () => {
       ...AvaMapConfig.makeEmpty(),
       layers: [kept, dropped],
     };
-    expect(AvaMapConfig.withLayerRemoved(config, dropped.id).layers).toEqual([
-      kept,
-    ]);
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: dropped.id }).layers,
+    ).toEqual([kept]);
   });
 });
 
@@ -130,10 +142,10 @@ describe("bookmarks", () => {
   it("appends a bookmark holding the given camera", () => {
     const config = AvaMapConfig.makeEmpty();
     const view = { center: [29.2, -1.7], zoom: 8 } as const;
-    const updatedConfig = AvaMapConfig.withBookmarkAdded(
+    const updatedConfig = AvaMapConfig.withBookmarkAdded({
       config,
-      AvaMapConfig.makeBookmark({ name: "North Kivu", view }),
-    );
+      bookmark: AvaMapConfig.makeBookmark({ name: "North Kivu", view }),
+    });
     expect(updatedConfig.bookmarks).toHaveLength(1);
     expect(updatedConfig.bookmarks[0]?.view).toEqual(view);
   });
@@ -143,12 +155,15 @@ describe("bookmarks", () => {
       name: "Goma",
       view: AvaMapConfig.defaultViewState,
     });
-    const config = AvaMapConfig.withBookmarkAdded(
-      AvaMapConfig.makeEmpty(),
+    const config = AvaMapConfig.withBookmarkAdded({
+      config: AvaMapConfig.makeEmpty(),
       bookmark,
-    );
+    });
     expect(
-      AvaMapConfig.withBookmarkRemoved(config, bookmark.id).bookmarks,
+      AvaMapConfig.withBookmarkRemoved({
+        config,
+        bookmarkId: bookmark.id,
+      }).bookmarks,
     ).toEqual([]);
   });
 });

@@ -112,10 +112,10 @@ function _makeViewState(
 
 const firstLayer = MapLayer.makeEmpty("First layer");
 const secondLayer = MapLayer.makeEmpty("Second layer");
-const layers = [firstLayer, secondLayer];
+const LAYERS = [firstLayer, secondLayer];
 
-const listProps = {
-  rows: layers,
+const LIST_PROPS = {
+  rows: LAYERS,
   viewStates: new Map([
     [firstLayer.id, _makeViewState("ready")],
     [secondLayer.id, _makeViewState("loading")],
@@ -132,14 +132,14 @@ const listProps = {
 
 describe("LayerList", () => {
   it("explains that the panel is empty", () => {
-    render(<LayerList {...listProps} rows={[]} viewStates={new Map()} />);
+    render(<LayerList {...LIST_PROPS} rows={[]} viewStates={new Map()} />);
 
     expect(screen.getByText("No layers yet.")).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
   it("renders rows in stack order", () => {
-    render(<LayerList {...listProps} />);
+    render(<LayerList {...LIST_PROPS} />);
 
     const rowNames = within(screen.getByRole("list"))
       .getAllByRole("listitem")
@@ -160,7 +160,7 @@ describe("LayerList", () => {
       onDeleteLayer: vi.fn(),
     };
 
-    render(<LayerList {...listProps} {...callbacks} />);
+    render(<LayerList {...LIST_PROPS} {...callbacks} />);
     const secondRow =
       screen.getByText("Second layer").parentElement ?? undefined;
     assertIsDefined(secondRow, { name: "second layer row" });
@@ -189,7 +189,7 @@ describe("LayerList", () => {
     const onStackOrderChange = vi.fn();
 
     render(
-      <LayerList {...listProps} onStackOrderChange={onStackOrderChange} />,
+      <LayerList {...LIST_PROPS} onStackOrderChange={onStackOrderChange} />,
     );
     const firstRow = screen.getByText("First layer").parentElement ?? undefined;
     assertIsDefined(firstRow, { name: "first layer row" });

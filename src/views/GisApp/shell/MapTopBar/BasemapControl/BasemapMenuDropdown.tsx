@@ -13,17 +13,24 @@ type Props = {
 };
 
 /** Renders the built-in, tile-free, and custom basemap choices. */
-export function BasemapMenuDropdown(props: Props): ReactNode {
+export function BasemapMenuDropdown({
+  basemap,
+  onBasemapChange,
+  onOpenCustomForm,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <Menu.Dropdown>
       <Menu.Label>{t`Built in`}</Menu.Label>
-      <BuiltInBasemapItems {...props} />
+      <BuiltInBasemapItems
+        basemap={basemap}
+        onBasemapChange={onBasemapChange}
+      />
       <Menu.Divider />
       <Menu.Item
-        aria-current={props.basemap.type === "none"}
+        aria-current={basemap.type === "none"}
         onClick={() => {
-          props.onBasemapChange({
+          onBasemapChange({
             type: "none",
             background: NO_BASEMAP_BACKGROUND,
           });
@@ -32,8 +39,8 @@ export function BasemapMenuDropdown(props: Props): ReactNode {
         {t`No basemap`}
       </Menu.Item>
       <Menu.Item
-        aria-current={props.basemap.type === "custom"}
-        onClick={props.onOpenCustomForm}
+        aria-current={basemap.type === "custom"}
+        onClick={onOpenCustomForm}
       >
         {t`Add a tile service`}
       </Menu.Item>

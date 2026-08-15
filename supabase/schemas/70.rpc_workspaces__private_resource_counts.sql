@@ -80,3 +80,14 @@ begin
   where wm.workspace_id = p_workspace_id;
 end;
 $$;
+
+revoke
+execute on function public.rpc_workspaces__private_resource_counts (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_workspaces__private_resource_counts (uuid) to authenticated;

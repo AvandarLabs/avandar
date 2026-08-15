@@ -1,3 +1,4 @@
+import { assertIsNonNullish, isString } from "@avandar/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 type SeedAvaMapOptions = {
@@ -7,18 +8,19 @@ type SeedAvaMapOptions = {
   name: string;
 };
 
-type MapOwner = { ownerId: string; ownerProfileId: string };
-
 async function _getMapOwner(
-  admin: SupabaseClient,
-  workspaceId: string,
-  ownerEmail: string,
-): Promise<MapOwner> {
+  options: Readonly<{
+    admin: SupabaseClient;
+    workspaceId: string;
+    ownerEmail: string;
+  }>,
+): Promise<{ ownerId: string; ownerProfileId: string }> {
+  const { admin, workspaceId, ownerEmail } = options;
   const { data: ownerId, error: ownerLookupError } = await admin.rpc(
     "util__get_user_id_by_email",
     { p_email: ownerEmail },
   );
-  if (ownerLookupError || typeof ownerId !== "string") {
+  if (ownerLookupError || !isString(ownerId)) {
     throw new Error(
       `Could not find owner user by email "${ownerEmail}": ${ownerLookupError?.message ?? "no id returned"}`,
     );
@@ -32,11 +34,10 @@ async function _getMapOwner(
   if (profileError) {
     throw new Error(`profile lookup failed: ${profileError.message}`);
   }
-  if (!profile) {
-    throw new Error(
-      `No user_profile row for user_id ${ownerId} in workspace ${workspaceId}`,
-    );
-  }
+  assertIsNonNullish(
+    profile,
+    `No user_profile row for user_id ${ownerId} in workspace ${workspaceId}`,
+  );
   return { ownerId, ownerProfileId: profile.id };
 }
 
@@ -50,7 +51,7 @@ export async function seedAvaMap(
   options: Readonly<SeedAvaMapOptions>,
 ): Promise<string> {
   const { admin, workspaceId, ownerEmail, name } = options;
-  const owner = await _getMapOwner(admin, workspaceId, ownerEmail);
+  const owner = await _getMapOwner({ admin, workspaceId, ownerEmail });
 
   const { data: inserted, error: insertError } = await admin
     .from("maps")
@@ -73,9 +74,7 @@ export async function seedAvaMap(
   if (insertError) {
     throw new Error(`Could not seed map: ${insertError.message}`);
   }
-  if (!inserted) {
-    throw new Error("Map seed returned no row");
-  }
+  assertIsNonNullish(inserted, "Map seed returned no row");
 
   return inserted.id;
 }

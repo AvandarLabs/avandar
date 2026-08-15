@@ -22,7 +22,7 @@ export function CustomBasemapForm({
   onSubmit,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const draft = useCustomBasemapDraft(opened, basemap);
+  const draft = useCustomBasemapDraft({ opened, basemap });
   const { kind, url, attribution } = draft;
   const isSubmittable = url.trim() !== "" && attribution.trim() !== "";
 

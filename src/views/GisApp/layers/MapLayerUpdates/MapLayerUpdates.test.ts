@@ -79,14 +79,22 @@ describe("withPopupColumns", () => {
       _createNumericColumn("cases"),
     );
     const layer = MapLayer.makeEmpty("Cases");
-    const updatedLayer = MapLayerUpdates.withPopupColumns(layer, [column]);
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: layer,
+      columns: [column],
+    });
     expect(updatedLayer.popup.columnIds).toEqual([column.id]);
     expect(updatedLayer.source.queryColumns).toContain(column);
   });
 
   it("keeps a column the geometry binding needs when it is deselected", () => {
     const bound = _createBoundLayer();
-    const updatedLayer = MapLayerUpdates.withPopupColumns(bound, []);
+    expect(bound.geoBinding?.type).toBe("latLngColumns");
+    if (bound.geoBinding?.type !== "latLngColumns") return;
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: bound,
+      columns: [],
+    });
     expect(updatedLayer.popup.columnIds).toEqual([]);
     expect(updatedLayer.source.queryColumns.map(prop("id"))).toEqual(
       expect.arrayContaining([
@@ -100,25 +108,34 @@ describe("withPopupColumns", () => {
     const extra = QueryColumn.makeFromDatasetColumn(
       _createNumericColumn("cases"),
     );
-    const bound = MapLayerUpdates.withPopupColumns(_createBoundLayer(), [
-      extra,
-    ]);
-    const updatedLayer = MapLayerUpdates.withPopupColumns(bound, []);
+    const bound = MapLayerUpdates.withPopupColumns({
+      layer: _createBoundLayer(),
+      columns: [extra],
+    });
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: bound,
+      columns: [],
+    });
     expect(updatedLayer.source.queryColumns).not.toContain(extra);
   });
 
   it("does not select the same base column twice under two ids", () => {
     const bound = _createBoundLayer();
-    const latitudeColumn = MapLayerUpdates.findQueryColumn(
-      bound,
-      bound.geoBinding!.latitude,
-    )!;
+    expect(bound.geoBinding?.type).toBe("latLngColumns");
+    if (bound.geoBinding?.type !== "latLngColumns") return;
+    const latitudeColumn = MapLayerUpdates.getQueryColumnFromLayer({
+      layer: bound,
+      columnId: bound.geoBinding.latitude,
+    })!;
     // A freshly built QueryColumn for the same base column, which is what the
     // multi-select hands back: same baseColumn, different generated id.
     const rebuilt = QueryColumn.makeFromDatasetColumn(
       latitudeColumn.baseColumn as DatasetColumn.T,
     );
-    const updatedLayer = MapLayerUpdates.withPopupColumns(bound, [rebuilt]);
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: bound,
+      columns: [rebuilt],
+    });
     expect(updatedLayer.source.queryColumns).toHaveLength(2);
     expect(updatedLayer.popup.columnIds).toEqual([latitudeColumn.id]);
   });
@@ -129,16 +146,179 @@ describe("withDataSource", () => {
     const popupColumn = QueryColumn.makeFromDatasetColumn(
       _createNumericColumn("cases"),
     );
-    const layer = MapLayerUpdates.withPopupColumns(_createBoundLayer(), [
-      popupColumn,
-    ]);
+    const layer = MapLayerUpdates.withPopupColumns({
+      layer: _createBoundLayer(),
+      columns: [popupColumn],
+    });
 
-    const updatedLayer = MapLayerUpdates.withDataSource(
-      layer,
-      _createDataset(),
-    );
+    const updatedLayer = MapLayerUpdates.withDataSource({
+      layer: layer,
+      dataSource: _createDataset(),
+    });
 
     expect(updatedLayer.popup).toEqual({ columnIds: "all", action: undefined });
+  });
+});
+
+describe("geometry-column updates", () => {
+  it("switches from coordinates and selects the required geometry column", () => {
+    const geometry = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("shape"),
+    );
+    const updatedLayer = MapLayerUpdates.withGeometryBindingType(
+      _createBoundLayer(),
+      "geometryColumn",
+      geometry,
+    );
+
+    expect(updatedLayer.geoBinding).toEqual({
+      type: "geometryColumn",
+      column: geometry.id,
+      encoding: "wkt",
+      family: "point",
+      simplification: undefined,
+    });
+    expect(updatedLayer.source.queryColumns).toContain(geometry);
+  });
+
+  it("defaults line geometry to simplification and line symbology", () => {
+    const geometry = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("shape"),
+    );
+    const pointLayer = MapLayerUpdates.withGeometryBindingType(
+      _createBoundLayer(),
+      "geometryColumn",
+      geometry,
+    );
+    const updatedLayer = MapLayerUpdates.withGeometryFamily(pointLayer, "line");
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "geometryColumn",
+      family: "line",
+      simplification: { tolerancePixels: 0.75 },
+    });
+    expect(updatedLayer.symbology.type).toBe("line");
+  });
+
+  it("switches polygon geometry to fill and clears it when coordinates return", () => {
+    const geometry = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("shape"),
+    );
+    const geometryLayer = MapLayerUpdates.withGeometryFamily(
+      MapLayerUpdates.withGeometryBindingType(
+        _createBoundLayer(),
+        "geometryColumn",
+        geometry,
+      ),
+      "polygon",
+    );
+    const updatedLayer = MapLayerUpdates.withGeometryBindingType(
+      geometryLayer,
+      "latLngColumns",
+    );
+
+    expect(updatedLayer.geoBinding).toEqual({
+      type: "latLngColumns",
+      latitude: undefined,
+      longitude: undefined,
+    });
+    expect(updatedLayer.symbology.type).toBe("circle");
+  });
+
+  it("preserves identity for unchanged geometry settings", () => {
+    const geometry = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("shape"),
+    );
+    const layer = MapLayerUpdates.withGeometryBindingType(
+      _createBoundLayer(),
+      "geometryColumn",
+      geometry,
+    );
+
+    expect(MapLayerUpdates.withGeometryColumn(layer, geometry)).toBe(layer);
+    expect(MapLayerUpdates.withGeometryEncoding(layer, "wkt")).toBe(layer);
+    expect(MapLayerUpdates.withGeometryFamily(layer, "point")).toBe(layer);
+    expect(MapLayerUpdates.withGeometrySimplification(layer, undefined)).toBe(
+      layer,
+    );
+  });
+});
+
+describe("boundary join updates", () => {
+  it("creates a complete join and selects its source key", () => {
+    const dataKeyColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("district"),
+    );
+    const boundaryDataset = _createDataset();
+    const geometryColumn = _createNumericColumn("shape");
+    const boundaryKeyColumn = _createNumericColumn("pcode");
+    const updatedLayer = MapLayerUpdates.withBoundaryJoin(
+      MapLayer.makeEmpty("Districts"),
+      {
+        dataKeyColumn,
+        matching: "exact",
+        boundary: {
+          datasetId: boundaryDataset.id,
+          geometryColumnId: geometryColumn.id,
+          geometryEncoding: "wkt",
+          keyColumnId: boundaryKeyColumn.id,
+          displayNameColumnId: undefined,
+          simplification: { tolerancePixels: 0.75 },
+        },
+      },
+    );
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "joinToBoundaries",
+      dataKeyColumn: dataKeyColumn.id,
+      matching: "exact",
+      aggregation: { operation: "count" },
+    });
+    expect(updatedLayer.source.queryColumns).toContain(dataKeyColumn);
+    expect(updatedLayer.symbology.type).toBe("fill");
+  });
+
+  it("preserves aggregation identity when operation and measure change", () => {
+    const dataKeyColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("district"),
+    );
+    const measureColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const boundaryDataset = _createDataset();
+    const joined = MapLayerUpdates.withBoundaryJoin(
+      MapLayer.makeEmpty("Districts"),
+      {
+        dataKeyColumn,
+        matching: "exact",
+        boundary: {
+          datasetId: boundaryDataset.id,
+          geometryColumnId: _createNumericColumn("shape").id,
+          geometryEncoding: "wkt",
+          keyColumnId: _createNumericColumn("pcode").id,
+          displayNameColumnId: undefined,
+          simplification: { tolerancePixels: 0.75 },
+        },
+      },
+    );
+    const originalBinding = joined.geoBinding;
+    if (originalBinding?.type !== "joinToBoundaries") {
+      throw new Error("Expected a boundary join");
+    }
+    const updatedLayer = MapLayerUpdates.withAreaAggregation(joined, {
+      operation: "sum",
+      measureColumn,
+    });
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "joinToBoundaries",
+      aggregation: {
+        operation: "sum",
+        measureColumn: measureColumn.id,
+        outputValueId: originalBinding.aggregation.outputValueId,
+      },
+    });
+    expect(updatedLayer.source.queryColumns).toContain(measureColumn);
   });
 });
 
@@ -148,19 +328,25 @@ describe("withDefaultPopupColumns", () => {
     const extra = QueryColumn.makeFromDatasetColumn(
       _createNumericColumn("cases"),
     );
-    const updatedLayer = MapLayerUpdates.withDefaultPopupColumns(bound, [
-      ...bound.source.queryColumns,
-      extra,
-    ]);
+    const updatedLayer = MapLayerUpdates.withDefaultPopupColumns({
+      layer: bound,
+      availableColumns: [...bound.source.queryColumns, extra],
+    });
     expect(updatedLayer.popup.columnIds).toContain(extra.id);
   });
 
   it("leaves an explicit selection alone", () => {
-    const chosen = MapLayerUpdates.withPopupColumns(_createBoundLayer(), []);
+    const chosen = MapLayerUpdates.withPopupColumns({
+      layer: _createBoundLayer(),
+      columns: [],
+    });
     expect(
-      MapLayerUpdates.withDefaultPopupColumns(chosen, [
-        QueryColumn.makeFromDatasetColumn(_createNumericColumn("cases")),
-      ]),
+      MapLayerUpdates.withDefaultPopupColumns({
+        layer: chosen,
+        availableColumns: [
+          QueryColumn.makeFromDatasetColumn(_createNumericColumn("cases")),
+        ],
+      }),
     ).toBe(chosen);
   });
 });
@@ -170,14 +356,17 @@ describe("withSymbology", () => {
     const column = QueryColumn.makeFromDatasetColumn(
       _createNumericColumn("cases"),
     );
-    const layer = MapLayerUpdates.withSymbolColor(
-      MapLayer.makeEmpty("Cases"),
-      "#eb6834",
-    );
-    const updatedLayer = MapLayerUpdates.withSymbologyType(layer, {
-      nextType: "proportionalSymbol",
-      valueColumn: column,
-      remembered: undefined,
+    const layer = MapLayerUpdates.withSymbolColor({
+      layer: MapLayer.makeEmpty("Cases"),
+      color: "#eb6834",
+    });
+    const updatedLayer = MapLayerUpdates.withSymbologyType({
+      layer: layer,
+      change: {
+        nextType: "proportionalSymbol",
+        valueColumn: column,
+        remembered: undefined,
+      },
     });
     expect(updatedLayer.symbology.color).toEqual({
       type: "single",
@@ -186,16 +375,19 @@ describe("withSymbology", () => {
   });
 
   it("maps a circle's radius onto the proportional symbol's largest radius", () => {
-    const layer = MapLayerUpdates.withCircleRadius(
-      MapLayer.makeEmpty("Cases"),
-      11,
-    );
-    const updatedLayer = MapLayerUpdates.withSymbologyType(layer, {
-      nextType: "proportionalSymbol",
-      valueColumn: QueryColumn.makeFromDatasetColumn(
-        _createNumericColumn("cases"),
-      ),
-      remembered: undefined,
+    const layer = MapLayerUpdates.withCircleRadius({
+      layer: MapLayer.makeEmpty("Cases"),
+      radius: 11,
+    });
+    const updatedLayer = MapLayerUpdates.withSymbologyType({
+      layer: layer,
+      change: {
+        nextType: "proportionalSymbol",
+        valueColumn: QueryColumn.makeFromDatasetColumn(
+          _createNumericColumn("cases"),
+        ),
+        remembered: undefined,
+      },
     });
     expect(
       updatedLayer.symbology.type === "proportionalSymbol" &&
@@ -211,11 +403,56 @@ describe("withSymbology", () => {
       color: { type: "single" as const, color: "#008300" },
       stroke: { width: 2, color: "#ffffff" },
     };
-    const updatedLayer = MapLayerUpdates.withSymbologyType(layer, {
-      nextType: "circle",
-      valueColumn: undefined,
-      remembered,
+    const updatedLayer = MapLayerUpdates.withSymbologyType({
+      layer: layer,
+      change: {
+        nextType: "circle",
+        valueColumn: undefined,
+        remembered,
+      },
     });
     expect(updatedLayer.symbology).toEqual(remembered);
+  });
+});
+
+describe("classification updates", () => {
+  it("sets graduated color and clears incompatible derived legend output", () => {
+    const layer = MapLayer.createArea("Districts");
+    const valueColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const withLegend = {
+      ...layer,
+      source: { ...layer.source, queryColumns: [valueColumn] },
+      legend: {
+        ...layer.legend,
+        breaks: [{ lower: undefined, upper: 10 }],
+        entries: [
+          { type: "value" as const, color: "#f00", label: "< 10", count: 2 },
+        ],
+      },
+    } satisfies MapLayer.T;
+
+    const updated = MapLayerUpdates.withLayerColor(withLegend, {
+      type: "graduated",
+      value: { type: "queryColumn", column: valueColumn.id },
+      ramp: ["#fee", "#f00"],
+      classification: { method: "quantile", classCount: 2 },
+      normalization: undefined,
+      noData: { color: "#ccc", label: "" },
+    });
+
+    expect(updated.symbology.color.type).toBe("graduated");
+    expect(updated.legend.breaks).toEqual([]);
+    expect(updated.legend.entries).toEqual([]);
+  });
+
+  it("rejects manual breaks that are not finite and strictly increasing", () => {
+    const layer = MapLayer.createArea("Districts");
+
+    expect(MapLayerUpdates.withManualBreaks(layer, [1, 1])).toBe(layer);
+    expect(MapLayerUpdates.withManualBreaks(layer, [1, Number.NaN])).toBe(
+      layer,
+    );
   });
 });

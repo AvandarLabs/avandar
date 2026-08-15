@@ -9,7 +9,7 @@ import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryData
 /** Returns every column a data source offers as stable `QueryColumn` values. */
 export function useLayerSourceColumns(
   dataSourceId: Model.TypedId<QueryDataSource.T> | undefined,
-): readonly QueryColumn.T[] {
+): QueryColumn.T[] {
   const [datasetColumns] = DatasetColumnClient.useGetAll({
     ...where("dataset_id", "eq", dataSourceId?.id),
     useQueryOptions: {

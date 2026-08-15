@@ -4,14 +4,12 @@ import { LayerSourcePickerDropdown } from "@/views/GisApp/panels/LayerPanel/Laye
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { ReactNode } from "react";
 
-type TargetProps = {
-  onClick: () => void;
-  "aria-expanded": boolean;
-};
-
 type Props = {
   /** Renders the trigger with the props that control the picker. */
-  children: (targetProps: TargetProps) => ReactNode;
+  children: (targetProps: {
+    onClick: () => void;
+    "aria-expanded": boolean;
+  }) => ReactNode;
   onSourceSelected: (dataSource: QueryDataSource.T) => void;
 };
 

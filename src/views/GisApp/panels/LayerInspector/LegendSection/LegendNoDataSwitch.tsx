@@ -8,9 +8,11 @@ import type { ReactNode } from "react";
 type Props = { legend: MapLayer.Legend; onLayerChange: LayerChangeHandler };
 
 /** Controls whether the legend explains missing values. */
-export function LegendNoDataSwitch(props: Props): ReactNode {
+export function LegendNoDataSwitch({
+  legend,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { legend, onLayerChange } = props;
   return (
     <Switch
       label={t`Show a Not reported entry`}
@@ -19,7 +21,10 @@ export function LegendNoDataSwitch(props: Props): ReactNode {
       onChange={(event) => {
         const showNoData = event.currentTarget.checked;
         onLayerChange((current) => {
-          return MapLayerUpdates.withLegend(current, { showNoData });
+          return MapLayerUpdates.withLegend({
+            layer: current,
+            legend: { showNoData },
+          });
         });
       }}
     />

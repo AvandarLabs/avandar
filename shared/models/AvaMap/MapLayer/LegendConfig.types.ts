@@ -5,6 +5,20 @@ export type LegendPosition =
   | "topRight"
   | "hidden";
 
+/** One numeric interval used by the active graduated classification. */
+export type LegendBreak = {
+  lower: number | undefined;
+  upper: number | undefined;
+};
+
+/** One ordered row displayed by a map legend. */
+export type LegendEntry = {
+  type: "value" | "noData" | "suppressed";
+  color: string;
+  label: string;
+  count: number;
+};
+
 /**
  * A layer's legend. Persisted rather than derived at render time so that the
  * live map, a dashboard embed, and an exported PDF cannot disagree.
@@ -14,4 +28,6 @@ export type LegendConfig = {
   units: string | undefined;
   showNoData: boolean;
   position: LegendPosition;
+  breaks: readonly LegendBreak[];
+  entries: readonly LegendEntry[];
 };

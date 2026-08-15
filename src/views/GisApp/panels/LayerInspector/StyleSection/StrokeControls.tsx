@@ -1,3 +1,4 @@
+import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ColorInput, Group, NumberInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
@@ -11,9 +12,8 @@ type Props = {
 };
 
 /** Edits a symbol's outline color and width. */
-export function StrokeControls(props: Props): ReactNode {
+export function StrokeControls({ stroke, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const { stroke, onLayerChange } = props;
   return (
     <Group grow align="flex-start">
       <ColorInput
@@ -22,7 +22,10 @@ export function StrokeControls(props: Props): ReactNode {
         value={stroke.color}
         onChange={(color) => {
           onLayerChange((current) => {
-            return MapLayerUpdates.withStroke(current, { color });
+            return MapLayerUpdates.withStroke({
+              layer: current,
+              stroke: { color },
+            });
           });
         }}
       />
@@ -34,11 +37,14 @@ export function StrokeControls(props: Props): ReactNode {
         step={0.5}
         value={stroke.width}
         onChange={(value) => {
-          if (typeof value !== "number") {
+          if (!isNumber(value)) {
             return;
           }
           onLayerChange((current) => {
-            return MapLayerUpdates.withStroke(current, { width: value });
+            return MapLayerUpdates.withStroke({
+              layer: current,
+              stroke: { width: value },
+            });
           });
         }}
       />

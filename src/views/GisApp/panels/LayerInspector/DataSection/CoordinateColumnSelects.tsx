@@ -14,19 +14,24 @@ type Props = {
 };
 
 /** Selects the latitude and longitude columns for a point layer. */
-export function CoordinateColumnSelects(props: Props): ReactNode {
+export function CoordinateColumnSelects({
+  layer,
+  dataSourceId,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { layer, dataSourceId, onLayerChange } = props;
+  const binding =
+    layer.geoBinding?.type === "latLngColumns" ? layer.geoBinding : undefined;
   const selectAxis = (axis: "latitude" | "longitude") => {
     return (
       column: Parameters<typeof MapLayerUpdates.withGeoBindingAxis>[2] | null,
     ) => {
       onLayerChange((current) => {
-        return MapLayerUpdates.withGeoBindingAxis(
-          current,
-          axis,
-          column ?? undefined,
-        );
+        return MapLayerUpdates.withGeoBindingAxis({
+          layer: current,
+          axis: axis,
+          column: column ?? undefined,
+        });
       });
     };
   };
@@ -37,8 +42,10 @@ export function CoordinateColumnSelects(props: Props): ReactNode {
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
         value={
-          MapLayerUpdates.findQueryColumn(layer, layer.geoBinding?.latitude) ??
-          null
+          MapLayerUpdates.getQueryColumnFromLayer({
+            layer: layer,
+            columnId: binding?.latitude,
+          }) ?? null
         }
         onChange={selectAxis("latitude")}
       />
@@ -47,8 +54,10 @@ export function CoordinateColumnSelects(props: Props): ReactNode {
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
         value={
-          MapLayerUpdates.findQueryColumn(layer, layer.geoBinding?.longitude) ??
-          null
+          MapLayerUpdates.getQueryColumnFromLayer({
+            layer: layer,
+            columnId: binding?.longitude,
+          }) ?? null
         }
         onChange={selectAxis("longitude")}
       />

@@ -19,7 +19,16 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 const { AvaMapClient } = await import("./AvaMapClient");
 const { MapSaveConflictError } = await import("./MapSaveConflictError");
 
-function _createQuery(result: unknown, error?: unknown) {
+function _createQuery(
+  options: Readonly<{ result: unknown; error?: unknown }>,
+): {
+  update: ReturnType<typeof vi.fn>;
+  eq: ReturnType<typeof vi.fn>;
+  select: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+  throwOnError: ReturnType<typeof vi.fn>;
+} {
+  const { result, error } = options;
   const query = {
     update: vi.fn(() => {
       return query;
@@ -34,16 +43,13 @@ function _createQuery(result: unknown, error?: unknown) {
       return query;
     }),
     throwOnError: vi.fn(() => {
-      if (error) {
-        return Promise.reject(error);
-      }
-      return Promise.resolve({ data: result });
+      return error ? Promise.reject(error) : Promise.resolve({ data: result });
     }),
   };
   return query;
 }
 
-function _createMapRow(updatedAt: string) {
+function _createMapRow(updatedAt: string): AvaMap.T<"DBRead"> {
   return {
     config: AvaMapConfig.makeEmpty(),
     created_at: "2026-08-14T00:00:00.000Z",
@@ -62,7 +68,9 @@ function _createMapRow(updatedAt: string) {
 
 describe("AvaMapClient.saveMapConfig", () => {
   it("updates only the map revision that the editor read", async () => {
-    const query = _createQuery(_createMapRow("2026-08-14T00:01:00.000Z"));
+    const query = _createQuery({
+      result: _createMapRow("2026-08-14T00:01:00.000Z"),
+    });
     fromMock.mockReturnValue(query);
 
     await AvaMapClient.saveMapConfig({
@@ -88,10 +96,13 @@ describe("AvaMapClient.saveMapConfig", () => {
     let saveCount = 0;
     fromMock.mockImplementation(() => {
       saveCount += 1;
-      return _createQuery(
-        saveCount === 1 ? _createMapRow("2026-08-14T00:01:00.000Z") : undefined,
-        saveCount === 1 ? undefined : { code: "PGRST116" },
-      );
+      return _createQuery({
+        result:
+          saveCount === 1 ?
+            _createMapRow("2026-08-14T00:01:00.000Z")
+          : undefined,
+        error: saveCount === 1 ? undefined : { code: "PGRST116" },
+      });
     });
 
     const saveParams = {
@@ -101,7 +112,7 @@ describe("AvaMapClient.saveMapConfig", () => {
       expectedUpdatedAt: "2026-08-14T00:00:00.000Z",
     };
 
-    await expect(AvaMapClient.saveMapConfig(saveParams)).resolves.toBeDefined();
+    await AvaMapClient.saveMapConfig(saveParams);
     await expect(AvaMapClient.saveMapConfig(saveParams)).rejects.toBeInstanceOf(
       MapSaveConflictError,
     );

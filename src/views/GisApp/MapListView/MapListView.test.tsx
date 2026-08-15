@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { MapListView } from "@/views/GisApp/MapListView/MapListView";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { UserId } from "$/models/User/User.types";
-import type { UserProfileId } from "$/models/User/UserProfile.types";
+import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
@@ -133,8 +133,8 @@ function _makeMap(overrides: Partial<AvaMap.T> = {}): AvaMap.T {
     description: undefined,
     isPublic: false,
     isRestricted: false,
-    ownerId: "00000000-0000-4000-8000-0000000000bb" as UserId,
-    ownerProfileId: "00000000-0000-4000-8000-0000000000cc" as UserProfileId,
+    ownerId: "00000000-0000-4000-8000-0000000000bb" as User.Id,
+    ownerProfileId: "00000000-0000-4000-8000-0000000000cc" as UserProfile.Id,
     workspaceId: "00000000-0000-4000-8000-0000000000aa" as Workspace.Id,
     config,
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -149,8 +149,8 @@ describe("MapListView", () => {
     permissionMock.mockReturnValue(true);
     useCurrentUserProfileMock.mockReturnValue([
       {
-        userId: "00000000-0000-4000-8000-0000000000bb" as UserId,
-        profileId: "00000000-0000-4000-8000-0000000000cc" as UserProfileId,
+        userId: "00000000-0000-4000-8000-0000000000bb" as User.Id,
+        profileId: "00000000-0000-4000-8000-0000000000cc" as UserProfile.Id,
       },
       false,
     ]);

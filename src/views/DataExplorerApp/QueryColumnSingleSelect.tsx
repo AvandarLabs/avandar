@@ -67,9 +67,15 @@ export function QueryColumnSingleSelect({
     // and there should be a global cache
     const queryColumns = [
       ...(datasetColumns ?? []).map((col) => {
+        if (col.id === currentSelectedColumn?.baseColumn.id) {
+          return currentSelectedColumn;
+        }
         return QueryColumnModule.makeFromDatasetColumn(col);
       }),
       ...(entityFieldConfigs ?? []).map((col) => {
+        if (col.id === currentSelectedColumn?.baseColumn.id) {
+          return currentSelectedColumn;
+        }
         return QueryColumnModule.makeFromEntityFieldConfig(col);
       }),
     ];
@@ -81,7 +87,7 @@ export function QueryColumnSingleSelect({
       }),
       queryColumnLookup: makeIdLookupMap(queryColumns),
     };
-  }, [datasetColumns, entityFieldConfigs]);
+  }, [currentSelectedColumn, datasetColumns, entityFieldConfigs]);
 
   // If the available columns change (e.g. if the `dataSourceId` changed)
   // we should drop the selection if it's no longer valid.
@@ -91,7 +97,9 @@ export function QueryColumnSingleSelect({
       return col.baseColumn.id === currentSelectedColumn?.baseColumn.id;
     });
 
-    setCurrentSelectedColumn(matchingColumn ?? null);
+    if (currentSelectedColumn && !matchingColumn) {
+      setCurrentSelectedColumn(null);
+    }
   }, [queryColumnLookup, currentSelectedColumn, setCurrentSelectedColumn]);
 
   const selectedColumnId = useMemo(() => {

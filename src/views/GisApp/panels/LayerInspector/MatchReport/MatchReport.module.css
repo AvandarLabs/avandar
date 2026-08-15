@@ -1,0 +1,19 @@
+.report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+  padding: var(--mantine-spacing-md);
+}
+
+.list {
+  display: grid;
+  gap: var(--mantine-spacing-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sample {
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-sm);
+}

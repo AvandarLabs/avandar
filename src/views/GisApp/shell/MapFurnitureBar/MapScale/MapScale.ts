@@ -58,7 +58,7 @@ function _hasValidScaleInputs({
 /** Scale calculations and live camera tracking for the map furniture bar. */
 export const MapScale = {
   /** Calculates the scale bar for a map resolution. */
-  getFromMetersPerPixel: ({
+  fromMetersPerPixel: ({
     metersPerPixel,
     zoom,
     maxWidthPx,
@@ -101,7 +101,7 @@ export const MapScale = {
             centerY,
           ]);
           setScale(
-            MapScale.getFromMetersPerPixel({
+            MapScale.fromMetersPerPixel({
               metersPerPixel:
                 leftCoordinate.distanceTo(rightCoordinate) /
                 SCALE_BAR_MAX_WIDTH_PX,

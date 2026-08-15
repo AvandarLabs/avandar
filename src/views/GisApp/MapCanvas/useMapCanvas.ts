@@ -1,3 +1,4 @@
+import { noop } from "@avandar/utils";
 import { useRef } from "react";
 import { FitMapBounds } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
@@ -11,6 +12,7 @@ import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { RefObject } from "react";
 
+/** Inputs used to synchronize map configuration with the live map canvas. */
 export type MapCanvasOptions = {
   basemap: AvaMapConfig.Basemap;
 
@@ -30,12 +32,11 @@ export type MapCanvasOptions = {
   onViewChange?: (view: AvaMapConfig.ViewState) => void;
 };
 
+/** References owned by the live map canvas controller. */
 export type MapCanvasController = {
   containerRef: RefObject<HTMLDivElement | null>;
   mapInstance: MapInstance;
 };
-
-function _ignoreViewChange(): void {}
 
 /** Owns the live map controller so nearby siblings can consume it directly. */
 export function useMapCanvas({
@@ -45,7 +46,7 @@ export function useMapCanvas({
   fitBoundsRequest,
   interactiveLayerIds,
   onFeatureClick,
-  onViewChange = _ignoreViewChange,
+  onViewChange = noop,
 }: Readonly<MapCanvasOptions>): MapCanvasController {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useMapInstance({

@@ -23,7 +23,7 @@
 }
 
 [data-mantine-color-scheme="dark"] .layerRow[data-selected="true"] {
-  background: rgb(21 99 254 / 22%);
+  background: var(--mantine-primary-color-light);
   border-color: var(--mantine-color-primary-7);
 }
 

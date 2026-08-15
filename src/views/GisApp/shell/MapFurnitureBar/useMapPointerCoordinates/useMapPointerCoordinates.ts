@@ -17,10 +17,6 @@ export type MapPointerEventSource = {
   ) => unknown;
 };
 
-type MapPointerSource = {
-  mapRef: RefObject<MapPointerEventSource | undefined>;
-};
-
 /**
  * Tracks the geographic position under the pointer while it is over the map.
  *
@@ -28,7 +24,9 @@ type MapPointerSource = {
  * coordinate as the map's current pointer position.
  */
 export function useMapPointerCoordinates(
-  mapInstance: MapPointerSource,
+  mapInstance: Readonly<{
+    mapRef: RefObject<MapPointerEventSource | undefined>;
+  }>,
 ): MapPointerCoordinates | undefined {
   const { mapRef } = mapInstance;
   const [coordinates, setCoordinates] = useState<

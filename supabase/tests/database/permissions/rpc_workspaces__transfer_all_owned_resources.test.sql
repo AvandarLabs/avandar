@@ -64,7 +64,34 @@ values (
   true
 );
 
-select plan(8);
+select plan(11);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'authenticated can execute the bulk ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the bulk ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'service_role cannot execute the bulk ownership-transfer RPC'
+);
 
 set local role authenticated;
 

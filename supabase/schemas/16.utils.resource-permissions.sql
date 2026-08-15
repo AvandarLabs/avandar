@@ -865,7 +865,7 @@ from
   service_role;
 
 /** Applies map-specific visibility grants after workspace checks. */
-create or replace function public.util__auth_user_may_select_map_grant (
+create or replace function public.maps__auth_user_may_select_grant (
   p_map_id uuid,
   p_workspace_id uuid,
   p_owner_id uuid,
@@ -899,7 +899,7 @@ end;
 $$;
 
 revoke
-execute on function public.util__auth_user_may_select_map_grant (
+execute on function public.maps__auth_user_may_select_grant (
   uuid,
   uuid,
   uuid,
@@ -918,7 +918,7 @@ from
  * access, owner access, settings-manager access, shares, and GIS app roles are
  * all evaluated by the composed helpers below.
  */
-create or replace function public.util__auth_user_may_select_map (
+create or replace function public.maps__auth_user_may_select (
   p_map_id uuid
 ) returns boolean language plpgsql security definer stable
 set
@@ -939,14 +939,14 @@ begin
     return false;
   end if;
 
-  return public.util__auth_user_may_select_map_grant (
+  return public.maps__auth_user_may_select_grant (
     p_map_id, v_workspace_id, v_owner_id, v_is_restricted
   );
 end;
 $$;
 
 revoke
-execute on function public.util__auth_user_may_select_map (uuid)
+execute on function public.maps__auth_user_may_select (uuid)
 from
   public,
   anon,
@@ -954,7 +954,7 @@ from
   service_role;
 
 grant
-execute on function public.util__auth_user_may_select_map (uuid) to authenticated;
+execute on function public.maps__auth_user_may_select (uuid) to authenticated;
 
 /**
  * Dataset id encoded in a `workspaces` storage bucket object name, or null.

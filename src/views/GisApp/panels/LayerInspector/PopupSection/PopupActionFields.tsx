@@ -11,14 +11,16 @@ type Props = {
 };
 
 /** Edits the label and URL template of a popup record link. */
-export function PopupActionFields(props: Props): ReactNode {
+export function PopupActionFields({ action, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const { action, onLayerChange } = props;
   const updateAction = (updates: Partial<MapLayer.PopupAction>): void => {
     onLayerChange((current) => {
-      return MapLayerUpdates.withPopupAction(current, {
-        ...action,
-        ...updates,
+      return MapLayerUpdates.withPopupAction({
+        layer: current,
+        action: {
+          ...action,
+          ...updates,
+        },
       });
     });
   };

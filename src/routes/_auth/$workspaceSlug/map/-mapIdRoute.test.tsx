@@ -1,5 +1,6 @@
 /** Verifies that map navigation isolates stateful editor instances. */
 import { Model } from "@avandar/models";
+import { assertIsDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { describe, expect, it, vi } from "vitest";
@@ -64,10 +65,10 @@ type RouteComponent = NonNullable<typeof Route.options.component>;
 function _getRouteComponentFromRouteOptions(options: {
   component?: RouteComponent;
 }): RouteComponent {
-  if (!options.component) {
-    throw new Error("Expected the map editor route to declare a component.");
-  }
-
+  assertIsDefined(
+    options.component,
+    "Expected the map editor route to declare a component.",
+  );
   return options.component;
 }
 

@@ -8,12 +8,15 @@ import { describe, expect, it } from "vitest";
 
 function _makePopulatedConfig(): AvaMapConfig.T {
   const layer = MapLayer.makeEmpty("Cases");
-  return AvaMapConfig.withLayerAdded(AvaMapConfig.makeEmpty(), {
-    ...layer,
-    geoBinding: {
-      type: "latLngColumns",
-      latitude: uuid<"QueryColumn">(),
-      longitude: uuid<"QueryColumn">(),
+  return AvaMapConfig.withLayerAdded({
+    config: AvaMapConfig.makeEmpty(),
+    layer: {
+      ...layer,
+      geoBinding: {
+        type: "latLngColumns",
+        latitude: uuid<"QueryColumn">(),
+        longitude: uuid<"QueryColumn">(),
+      },
     },
   });
 }

@@ -10,8 +10,10 @@ import type { ReactNode } from "react";
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
 /** Coordinates binding inference, selection, and validation messages. */
-export function CoordinateBindingControls(props: Props): ReactNode {
-  const { layer, onLayerChange } = props;
+export function CoordinateBindingControls({
+  layer,
+  onLayerChange,
+}: Props): ReactNode {
   const dataSourceId =
     layer.source.dataSource ?
       Model.getTypedId(layer.source.dataSource)
@@ -22,9 +24,10 @@ export function CoordinateBindingControls(props: Props): ReactNode {
     sourceColumns,
     onLayerChange,
   });
+  const binding =
+    layer.geoBinding?.type === "latLngColumns" ? layer.geoBinding : undefined;
   const isBound =
-    layer.geoBinding?.latitude !== undefined &&
-    layer.geoBinding?.longitude !== undefined;
+    binding?.latitude !== undefined && binding.longitude !== undefined;
   const hasCoordinateCandidates = guess !== undefined;
   if (!hasCoordinateCandidates && !isBound && !layer.source.dataSource)
     return null;

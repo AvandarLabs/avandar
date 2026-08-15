@@ -11,9 +11,8 @@ import type { ReactNode } from "react";
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
 /** Renders the layer's spatial sensitivity policy controls. */
-export function SensitivitySection(props: Props): ReactNode {
+export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const { layer, onLayerChange } = props;
   const { sensitivity } = layer;
   const note = match(sensitivity)
     .with({ mode: "exact" }, () => {

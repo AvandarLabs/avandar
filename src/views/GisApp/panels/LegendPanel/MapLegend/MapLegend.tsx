@@ -1,7 +1,7 @@
 import { propNotEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.module.css";
-import { MapLegendGroup } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup";
+import { MapLegendGroup } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";

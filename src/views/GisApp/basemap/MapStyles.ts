@@ -35,5 +35,6 @@ export const MapStyles = {
 /** The key of a built-in basemap style, aliased from the AvaMapConfig model. */
 export type MapStyleKey = AvaMapConfig.BasemapStyle;
 
+/** Built-in basemap keys in the order presented by map controls. */
 export const MapStyleKeys: readonly MapStyleKey[] =
   AvaMapConfigValues.basemapStyleKeys;

@@ -56,8 +56,13 @@ export type IQetlClient = Module<
       <RowObject extends UnknownRow = UnknownRow>(params: {
         rawSql: string;
         returnType?: "js";
+        signal?: AbortSignal;
       }): Promise<QueryResult<RowObject>>;
-      (params: { rawSql: string; returnType: "parquet" }): Promise<Blob>;
+      (params: {
+        rawSql: string;
+        returnType: "parquet";
+        signal?: AbortSignal;
+      }): Promise<Blob>;
     };
   }
 >;
@@ -504,19 +509,23 @@ export const QetlClientFactory = createModuleFactory<IQetlClient>(
       async function runQuery(options: {
         rawSql: string;
         returnType: "parquet";
+        signal?: AbortSignal;
       }): Promise<Blob>;
       async function runQuery<
         RowObject extends UnknownObject = UnknownRow,
       >(options: {
         rawSql: string;
         returnType?: "js";
+        signal?: AbortSignal;
       }): Promise<QueryResult<RowObject>>;
       async function runQuery<RowObject extends UnknownObject = UnknownRow>({
         rawSql,
         returnType = "js",
+        signal,
       }: {
         rawSql: string;
         returnType?: "parquet" | "js";
+        signal?: AbortSignal;
       }): Promise<Blob | QueryResult<RowObject>> {
         // From Baldacci et. al. (2017) p.6:
         // 1. Dice management determines the set of missing dice and transmits
@@ -546,6 +555,7 @@ export const QetlClientFactory = createModuleFactory<IQetlClient>(
         //   are needed to answer the query. For now, we will just take all
         //   dataset ids and see which are in memory and local storage. We are
         //   not using anything more sophisticated for v0.
+        signal?.throwIfAborted();
         const { missingDice } = await DiceManager.determineMissingDice({
           rawSql,
         });
@@ -588,14 +598,16 @@ export const QetlClientFactory = createModuleFactory<IQetlClient>(
         await FilteringEngine.loadFacts({
           facts: preparedData,
         });
+        signal?.throwIfAborted();
 
         // now run the actual query against the memory cube, because we can be
         // confident that all the data is in the memory cube.
         if (returnType === "js") {
-          return await DuckDbClient.runRawQuery<RowObject>(rawSql);
+          return await DuckDbClient.runRawQuery<RowObject>(rawSql, { signal });
         } else {
           return await DuckDbClient.runRawQuery(rawSql, {
             returnType: "parquet",
+            signal,
           });
         }
       }

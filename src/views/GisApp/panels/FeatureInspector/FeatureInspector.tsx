@@ -22,8 +22,7 @@ export function FeatureInspector({
   popup,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const properties: Readonly<Record<string, unknown>> =
-    feature?.properties ?? {};
+  const properties: Record<string, unknown> = feature?.properties ?? {};
 
   return (
     <Drawer

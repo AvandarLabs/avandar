@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody";
+import { useEffect, useRef, useState } from "react";
+import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
-import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
+import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
@@ -20,6 +21,12 @@ type Props = {
   filterFocusRequest?: number;
 };
 
+/** Inspector-local navigation that does not alter persisted collapse state. */
+export type LayerInspectorView =
+  | { type: "sections" }
+  | { type: "matchReport" }
+  | { type: "classification" };
+
 /** The selected layer's editor, sectioned by the model's axes. */
 export function LayerInspector({
   layer,
@@ -30,6 +37,39 @@ export function LayerInspector({
   filterFocusRequest,
 }: Props): ReactNode {
   const { t } = useLingui();
+  const [inspectorView, setInspectorView] = useState<LayerInspectorView>({
+    type: "sections",
+  });
+  const openedFingerprints = useRef(new Set<string>());
+  const autoOpenEligibleLayerIds = useRef(
+    new Set<MapLayer.Id>(
+      layer?.geoBinding?.type === "joinToBoundaries" ? [layer.id] : [],
+    ),
+  );
+  const previousLayerIdRef = useRef(layer?.id);
+  if (layer?.id !== previousLayerIdRef.current) {
+    previousLayerIdRef.current = layer?.id;
+    if (layer?.geoBinding?.type === "joinToBoundaries") {
+      autoOpenEligibleLayerIds.current.add(layer.id);
+    }
+  }
+  const diagnostics = viewState?.spatialDiagnostics;
+  useEffect(() => {
+    if (
+      !layer ||
+      !autoOpenEligibleLayerIds.current.has(layer.id) ||
+      !diagnostics ||
+      diagnostics.sourceCount === 0 ||
+      diagnostics.matchedSourceKeyCount !== 0
+    ) {
+      return;
+    }
+    const fingerprint = `${layer.id}:${JSON.stringify(diagnostics)}`;
+    if (!openedFingerprints.current.has(fingerprint)) {
+      openedFingerprints.current.add(fingerprint);
+      setInspectorView({ type: "matchReport" });
+    }
+  }, [diagnostics, layer]);
   return (
     <MapChromePanel
       variant="inspector"
@@ -46,6 +86,16 @@ export function LayerInspector({
         viewState={viewState}
         onLayerChange={onLayerChange}
         filterFocusRequest={filterFocusRequest}
+        inspectorView={inspectorView}
+        onOpenMatchReport={() => {
+          setInspectorView({ type: "matchReport" });
+        }}
+        onOpenClassification={() => {
+          setInspectorView({ type: "classification" });
+        }}
+        onCloseMatchReport={() => {
+          setInspectorView({ type: "sections" });
+        }}
       />
     </MapChromePanel>
   );

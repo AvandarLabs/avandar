@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { LayerActionsMenu } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu";
 
-const layerName = "Population";
+const LAYER_NAME = "Population";
 
 describe("LayerActionsMenu", () => {
   it("exposes the layer actions through an accessible menu", async () => {
     render(
       <LayerActionsMenu
-        layerName={layerName}
+        layerName={LAYER_NAME}
         onRename={vi.fn()}
         onDuplicate={vi.fn()}
         onZoomToLayer={vi.fn()}
@@ -55,7 +55,7 @@ describe("LayerActionsMenu", () => {
         onDelete: vi.fn(),
       };
 
-      render(<LayerActionsMenu layerName={layerName} {...callbacks} />);
+      render(<LayerActionsMenu layerName={LAYER_NAME} {...callbacks} />);
       fireEvent.click(
         screen.getByRole("button", {
           name: "More actions for the layer Population",

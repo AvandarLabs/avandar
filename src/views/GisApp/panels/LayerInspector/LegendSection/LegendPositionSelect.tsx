@@ -8,9 +8,11 @@ import type { ReactNode } from "react";
 type Props = { legend: MapLayer.Legend; onLayerChange: LayerChangeHandler };
 
 /** Chooses where the map legend is displayed. */
-export function LegendPositionSelect(props: Props): ReactNode {
+export function LegendPositionSelect({
+  legend,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { legend, onLayerChange } = props;
   return (
     <Select
       label={t`Position`}
@@ -27,8 +29,11 @@ export function LegendPositionSelect(props: Props): ReactNode {
           return;
         }
         onLayerChange((current) => {
-          return MapLayerUpdates.withLegend(current, {
-            position: value as MapLayer.Legend["position"],
+          return MapLayerUpdates.withLegend({
+            layer: current,
+            legend: {
+              position: value as MapLayer.Legend["position"],
+            },
           });
         });
       }}

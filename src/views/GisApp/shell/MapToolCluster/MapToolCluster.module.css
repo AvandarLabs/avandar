@@ -43,7 +43,7 @@
 }
 
 [data-mantine-color-scheme="dark"] .mapToolClusterTool[aria-pressed="true"] {
-  background: rgb(21 99 254 / 24%);
+  background: var(--mantine-primary-color-light);
   border-color: var(--mantine-color-primary-7);
   color: var(--mantine-color-primary-2);
 }

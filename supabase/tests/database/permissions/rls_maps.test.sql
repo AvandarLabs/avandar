@@ -249,7 +249,31 @@ values
   )
 on conflict (id) do nothing;
 
-select plan (24);
+select plan (28);
+
+select isnt(
+  to_regprocedure('public.maps__auth_user_may_select_grant(uuid,uuid,uuid,boolean)'),
+  null,
+  'map-specific grant helper uses the maps namespace'
+);
+
+select isnt(
+  to_regprocedure('public.maps__auth_user_may_select(uuid)'),
+  null,
+  'map-specific select helper uses the maps namespace'
+);
+
+select is(
+  to_regprocedure('public.util__auth_user_may_select_map_grant(uuid,uuid,uuid,boolean)'),
+  null,
+  'old generic-prefixed map grant helper is absent'
+);
+
+select is(
+  to_regprocedure('public.util__auth_user_may_select_map(uuid)'),
+  null,
+  'old generic-prefixed map select helper is absent'
+);
 
 -- 1. The owner reads their own restricted map.
 select lives_ok (

@@ -13,7 +13,14 @@ type Props = {
 };
 
 /** Edits a custom basemap's protocol, URL, and attribution. */
-export function CustomBasemapFields(props: Props): ReactNode {
+export function CustomBasemapFields({
+  kind,
+  url,
+  attribution,
+  onKindChange,
+  onUrlChange,
+  onAttributionChange,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <>
@@ -24,32 +31,32 @@ export function CustomBasemapFields(props: Props): ReactNode {
           { value: "wms", label: t`WMS` },
           { value: "wmts", label: t`WMTS` },
         ]}
-        value={props.kind}
+        value={kind}
         allowDeselect={false}
         onChange={(value) => {
           if (value === "xyz" || value === "wms" || value === "wmts") {
-            props.onKindChange(value);
+            onKindChange(value);
           }
         }}
       />
       <TextInput
         label={t`URL template`}
         description={
-          props.kind === "wms" ?
+          kind === "wms" ?
             t`Include the bbox-epsg-3857 placeholder where the server expects the bounding box.`
           : t`Include the z, x and y placeholders where the server expects the tile index.`
         }
-        value={props.url}
+        value={url}
         onChange={(event) => {
-          props.onUrlChange(event.currentTarget.value);
+          onUrlChange(event.currentTarget.value);
         }}
       />
       <TextInput
         label={t`Attribution`}
         description={t`Shown under the map and in every export. Required.`}
-        value={props.attribution}
+        value={attribution}
         onChange={(event) => {
-          props.onAttributionChange(event.currentTarget.value);
+          onAttributionChange(event.currentTarget.value);
         }}
       />
     </>

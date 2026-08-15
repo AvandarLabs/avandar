@@ -6,7 +6,7 @@
  *    editor: SELECT, INSERT (new row in workspace), UPDATE
  *    admin: SELECT, INSERT, UPDATE, DELETE
  *
- *  SELECT also uses `util__auth_user_may_select_map` so workspace editors
+ *  SELECT also uses `maps__auth_user_may_select` so workspace editors
  * cannot read other members' unrestricted rows without an explicit share.
  *
  *  There is deliberately NO anon policy. `maps.is_public` is reserved for a
@@ -22,7 +22,7 @@ set
   search_path = '' as $$
   select
     m.owner_id = p_owner_id and
-    public.util__auth_user_may_select_map (p_map_id) and
+    public.maps__auth_user_may_select (p_map_id) and
     public.util__auth_user_can_update_resource ('map', p_map_id)
   from public.maps m
   where m.id = p_map_id;
@@ -55,7 +55,7 @@ select
       select
         auth.uid ()
     ) or
-    public.util__auth_user_may_select_map (
+    public.maps__auth_user_may_select (
       public.maps.id
     )
   );

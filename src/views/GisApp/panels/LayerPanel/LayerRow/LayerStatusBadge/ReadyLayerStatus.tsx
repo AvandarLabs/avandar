@@ -6,9 +6,12 @@ import type { ReactNode } from "react";
 type Props = { droppedRowCount: number; featureCount: number };
 
 /** Reports mapped and unmapped counts for a ready layer. */
-export function ReadyLayerStatus(props: Props): ReactNode {
+export function ReadyLayerStatus({
+  droppedRowCount,
+  featureCount,
+}: Props): ReactNode {
   const { t } = useLingui();
-  if (props.droppedRowCount > 0) {
+  if (droppedRowCount > 0) {
     return (
       <Badge
         color="warning"
@@ -16,11 +19,11 @@ export function ReadyLayerStatus(props: Props): ReactNode {
         size="xs"
         leftSection={<IconAlertTriangle size={9} stroke={2.4} />}
       >
-        {t`${props.droppedRowCount} rows unmapped`}
+        {t`${droppedRowCount} rows unmapped`}
       </Badge>
     );
   }
-  return props.featureCount === 1 ?
+  return featureCount === 1 ?
       <>{t`1 point`}</>
-    : <>{t`${props.featureCount} points`}</>;
+    : <>{t`${featureCount} points`}</>;
 }

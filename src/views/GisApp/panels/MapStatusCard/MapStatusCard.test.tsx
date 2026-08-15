@@ -118,4 +118,42 @@ describe("MapStatusCard", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Some coordinates are 0, 0.")).toBeInTheDocument();
   });
+
+  it("explains suppressed areas without exposing exact counts", () => {
+    render(
+      <MapStatusCard
+        layer={_makeLayer()}
+        viewState={_makeViewState({ suppressedCount: 2 })}
+        onReviewFilter={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("2 areas are suppressed")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Their contributor counts stay hidden because they are below the layer's minimum.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("explains that unavailable Spatial does not discard configuration", () => {
+    render(
+      <MapStatusCard
+        layer={_makeLayer()}
+        viewState={_makeViewState({
+          status: "error",
+          error: new Error(
+            "DuckDB Spatial is unavailable for this geometry layer",
+          ),
+        })}
+        onReviewFilter={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        "The layer configuration is saved. Retry after connectivity or the Spatial extension becomes available.",
+      ),
+    ).toBeInTheDocument();
+  });
 });

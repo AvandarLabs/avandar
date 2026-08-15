@@ -1,3 +1,4 @@
+import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
@@ -11,9 +12,11 @@ type Props = {
 };
 
 /** Edits a fixed point symbol radius. */
-export function CircleRadiusControl(props: Props): ReactNode {
+export function CircleRadiusControl({
+  symbology,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { symbology, onLayerChange } = props;
   return (
     <NumberInput
       label={t`Radius`}
@@ -22,11 +25,14 @@ export function CircleRadiusControl(props: Props): ReactNode {
       max={40}
       value={symbology.radius}
       onChange={(value) => {
-        if (typeof value !== "number") {
+        if (!isNumber(value)) {
           return;
         }
         onLayerChange((current) => {
-          return MapLayerUpdates.withCircleRadius(current, value);
+          return MapLayerUpdates.withCircleRadius({
+            layer: current,
+            radius: value,
+          });
         });
       }}
     />

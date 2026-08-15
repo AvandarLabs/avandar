@@ -1,4 +1,5 @@
 import { Callout } from "@avandar/ui";
+import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
@@ -12,9 +13,11 @@ type Props = {
 };
 
 /** Edits aggregate suppression and explains its current rendering limit. */
-export function AggregateSensitivityControls(props: Props): ReactNode {
+export function AggregateSensitivityControls({
+  sensitivity,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { sensitivity, onLayerChange } = props;
   return (
     <>
       <NumberInput
@@ -25,19 +28,22 @@ export function AggregateSensitivityControls(props: Props): ReactNode {
         value={sensitivity.minCellCount}
         description={t`Areas with fewer records are drawn as Not reported, never as zero.`}
         onChange={(value) => {
-          if (typeof value !== "number") {
+          if (!isNumber(value)) {
             return;
           }
           onLayerChange((current) => {
-            return MapLayerUpdates.withSensitivity(current, {
-              ...sensitivity,
-              minCellCount: value,
+            return MapLayerUpdates.withSensitivity({
+              layer: current,
+              sensitivity: {
+                ...sensitivity,
+                minCellCount: value,
+              },
             });
           });
         }}
       />
       <Callout color="warning">
-        {t`This layer cannot be drawn yet. Aggregate only needs an area to aggregate into, and boundary joins arrive in a later release.`}
+        {t`Aggregate only draws areas after at least ${sensitivity.minCellCount} contributing records. Areas below that minimum are shown as Not reported without revealing their exact count.`}
       </Callout>
     </>
   );

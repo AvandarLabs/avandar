@@ -73,3 +73,22 @@ begin
   return v_moved;
 end;
 $$;
+
+revoke
+execute on function public.rpc_workspaces__transfer_all_owned_resources (
+  uuid,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_workspaces__transfer_all_owned_resources (
+  uuid,
+  uuid,
+  uuid
+) to authenticated;

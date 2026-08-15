@@ -71,7 +71,34 @@ values (
   true
 );
 
-select plan(16);
+select plan(19);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.rpc_resources__transfer_ownership(public.resource_type,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'authenticated can execute the ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.rpc_resources__transfer_ownership(public.resource_type,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.rpc_resources__transfer_ownership(public.resource_type,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'service_role cannot execute the ownership-transfer RPC'
+);
 
 set local role authenticated;
 

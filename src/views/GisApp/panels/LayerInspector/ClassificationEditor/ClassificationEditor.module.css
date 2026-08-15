@@ -1,0 +1,41 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-sm);
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.histogram {
+  align-items: end;
+  display: flex;
+  gap: 2px;
+  height: 72px;
+}
+
+.histogramBar {
+  background: var(--mantine-primary-color-filled);
+  flex: 1;
+  min-height: 2px;
+}
+
+.handles {
+  display: flex;
+  justify-content: space-around;
+}
+
+.handle:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .handle {
+    transition: none;
+  }
+}

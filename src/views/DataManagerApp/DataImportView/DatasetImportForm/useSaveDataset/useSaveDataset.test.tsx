@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSaveDataset } from "./useSaveDataset";
 import type { CsvFileLoadResult } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
@@ -104,6 +104,18 @@ vi.mock("@/clients/datasets/DatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      QueryKeys: {
+        getAll: vi.fn(() => {
+          return ["dataset-columns"];
+        }),
+      },
+    },
+  };
+});
+
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
@@ -200,6 +212,10 @@ describe("useSaveDataset", () => {
     workspaceDatasetsMock.mockReset();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("emits first-import metadata from the pre-save snapshot", async () => {
     workspaceDatasetsMock.mockReturnValue([[], false]);
     const { result } = renderHook(
@@ -228,6 +244,29 @@ describe("useSaveDataset", () => {
       });
     });
     expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
+  });
+
+  it("invalidates datasets and their columns after an import", async () => {
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const invalidateQueries = vi.spyOn(
+      QueryClient.prototype,
+      "invalidateQueries",
+    );
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async(CSV_PARAMS);
+    });
+
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ["datasets"] });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ["dataset-columns"],
+    });
   });
 
   it("marks a later import as non-first", async () => {

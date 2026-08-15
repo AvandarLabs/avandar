@@ -16,7 +16,7 @@ vi.mock(
   },
 );
 
-const viewState: MapLayerViewState = {
+const VIEW_STATE: MapLayerViewState = {
   status: "ready",
   error: undefined,
   featureCount: 1,
@@ -36,7 +36,7 @@ describe("LayerRow", () => {
       <DragDropProvider>
         <LayerRow
           layer={layer}
-          viewState={viewState}
+          viewState={VIEW_STATE}
           isSelected
           rowIndex={0}
           onSelect={onSelect}
@@ -72,7 +72,7 @@ describe("LayerRow", () => {
       <DragDropProvider>
         <LayerRow
           layer={layer}
-          viewState={viewState}
+          viewState={VIEW_STATE}
           isSelected={false}
           rowIndex={1}
           onSelect={vi.fn()}
@@ -107,7 +107,7 @@ describe("LayerRow", () => {
       <DragDropProvider>
         <LayerRow
           layer={layer}
-          viewState={viewState}
+          viewState={VIEW_STATE}
           isSelected={false}
           rowIndex={0}
           onSelect={vi.fn()}

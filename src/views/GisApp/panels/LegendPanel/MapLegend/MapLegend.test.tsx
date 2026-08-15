@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it, vi } from "vitest";
@@ -78,11 +79,7 @@ describe("MapLegend", () => {
 
     const groups = screen.getByRole("region", { name: "Legend" });
     expect(
-      within(groups)
-        .getAllByRole("heading")
-        .map((heading) => {
-          return heading.textContent;
-        }),
+      within(groups).getAllByRole("heading").map(prop("textContent")),
     ).toEqual([firstLayer.legend.title, secondLayer.legend.title]);
     expect(within(groups).queryByText("Hidden layer")).not.toBeInTheDocument();
     expect(within(groups).getByText("people")).toBeInTheDocument();
@@ -123,5 +120,43 @@ describe("MapLegend", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Cities" })).toBeInTheDocument();
+  });
+
+  it("renders persisted entries in order with counts and safe-state labels", () => {
+    const layer = MapLayer.createArea("Districts");
+    const classifiedLayer = {
+      ...layer,
+      legend: {
+        ...layer.legend,
+        units: "per 100,000",
+        entries: [
+          { type: "value" as const, color: "#fee", label: "< 10", count: 3 },
+          { type: "noData" as const, color: "#ccc", label: "", count: 2 },
+          {
+            type: "suppressed" as const,
+            color: "#888",
+            label: "",
+            count: 1,
+          },
+        ],
+      },
+    } satisfies MapLayer.T;
+
+    render(
+      <MapLegend
+        layers={[classifiedLayer]}
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    const items = screen.getAllByRole("listitem");
+    expect(
+      items.map((item) => {
+        return item.textContent;
+      }),
+    ).toEqual(["< 103", "Not reported2", "Suppressed1"]);
+    expect(screen.getByText("per 100,000")).toBeInTheDocument();
+    expect(screen.getByLabelText("Suppressed")).toBeInTheDocument();
   });
 });

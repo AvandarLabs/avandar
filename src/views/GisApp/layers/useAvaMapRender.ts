@@ -2,19 +2,25 @@ import {
   isDefined,
   makeMap,
   makeSet,
+  noop,
   prop,
   propEq,
   sortObjList,
 } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
+import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
+import { classifyLayerValues } from "@/views/GisApp/layers/classifyLayerValues/classifyLayerValues";
+import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/normalizeLayerValue";
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import { buildLayerLegendFingerprint } from "@/views/GisApp/layers/usePersistedLayerLegends/usePersistedLayerLegends";
+import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type {
   DropReason,
@@ -23,44 +29,31 @@ import type {
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import type { LayerLegendUpdate } from "@/views/GisApp/layers/usePersistedLayerLegends/usePersistedLayerLegends";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** All map inputs derived from a complete layer stack. */
 export type AvaMapRender = {
   spec: MapSpec;
-  interactiveLayerIds: readonly string[];
-  layerViewStates: ReadonlyMap<MapLayer.Id, MapLayerViewState>;
-  layerBounds: ReadonlyMap<MapLayer.Id, MapBounds | undefined>;
+  interactiveLayerIds: string[];
+  layerViewStates: Map<MapLayer.Id, MapLayerViewState>;
+  layerBounds: Map<MapLayer.Id, MapBounds | undefined>;
+  legendUpdates: Map<MapLayer.Id, LayerLegendUpdate>;
 };
 
 type GetLayerStatusInput = {
-  binding: MapLayer.GeoBindingColumnNames | undefined;
+  hasBinding: boolean;
   error: Error | undefined;
   isLoading: boolean | undefined;
   featureCount: number;
   droppedRowCount: number;
 };
 
-type LayerGeometry = ReturnType<
-  ReturnType<typeof createLayerGeometryCache>["get"]
->;
-
 type MakeLayerViewStateInput = {
   layer: MapLayer.T;
-  binding: MapLayer.GeoBindingColumnNames | undefined;
+  hasBinding: boolean;
   geometry: LayerGeometry;
   queryState: MapLayerQueryState | undefined;
-};
-
-type UseAvaMapRenderInput = {
-  mapConfig: AvaMapConfig.T;
-  layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
-};
-
-type MakeLayerRenderInput = {
-  layer: MapLayer.T;
-  layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
-  geometryCache: ReturnType<typeof createLayerGeometryCache>;
 };
 
 type LayerRender = {
@@ -69,6 +62,12 @@ type LayerRender = {
   interactiveLayerId: string | undefined;
   viewState: MapLayerViewState;
   bounds: MapBounds | undefined;
+  legendUpdate: LayerLegendUpdate | undefined;
+};
+
+type ClassifiedGeometry = {
+  geometry: LayerGeometry;
+  legendUpdate: LayerLegendUpdate | undefined;
 };
 
 /** The largest single drop reason, or `undefined` when nothing was dropped. */
@@ -76,9 +75,7 @@ function _getLargestDropReason(
   drops: readonly GeometryDropReport[],
 ): DropReason | undefined {
   return sortObjList(drops, {
-    sortBy: (drop) => {
-      return drop.count;
-    },
+    sortBy: prop("count"),
     comparator: (firstCount, secondCount) => {
       return secondCount - firstCount;
     },
@@ -94,14 +91,14 @@ function _getDroppedRowCount(drops: readonly GeometryDropReport[]): number {
 
 /** Chooses the data-health status presented for one layer. */
 function _getLayerStatus({
-  binding,
+  hasBinding,
   error,
   isLoading,
   featureCount,
   droppedRowCount,
 }: GetLayerStatusInput): MapLayerViewState["status"] {
   return (
-    !binding ? "unbound"
+    !hasBinding ? "unbound"
     : error ? "error"
     : isLoading ? "loading"
     : featureCount === 0 && droppedRowCount === 0 ? "empty"
@@ -112,7 +109,7 @@ function _getLayerStatus({
 /** Builds the status consumed by the layer list and selected-layer controls. */
 function _makeLayerViewState({
   layer,
-  binding,
+  hasBinding,
   geometry,
   queryState,
 }: MakeLayerViewStateInput): MapLayerViewState {
@@ -120,7 +117,7 @@ function _makeLayerViewState({
   const error = queryState?.error ?? geometry.error;
   return {
     status: _getLayerStatus({
-      binding,
+      hasBinding,
       error,
       isLoading: queryState?.isLoading,
       featureCount: geometry.featureCollection.features.length,
@@ -130,13 +127,40 @@ function _makeLayerViewState({
     featureCount: geometry.featureCollection.features.length,
     droppedRowCount,
     largestDropReason: _getLargestDropReason(geometry.drops),
+    spatialDiagnostics:
+      queryState?.data?.type === "spatial" ?
+        queryState.data.diagnostics
+      : undefined,
+    ..._getAggregateFeatureCounts(geometry.featureCollection),
     filterCount: layer.source.filters.rules.length,
-    onRetry:
-      queryState?.refetch ??
-      (() => {
-        return undefined;
-      }),
+    onRetry: queryState?.refetch ?? noop,
   };
+}
+
+/** Counts aggregate feature states without exposing suppressed metrics. */
+function _getAggregateFeatureCounts(
+  featureCollection: GeoJSON.FeatureCollection,
+): Pick<
+  MapLayerViewState,
+  "contributorCount" | "noDataCount" | "suppressedCount"
+> {
+  let contributorCount = 0;
+  let noDataCount = 0;
+  let suppressedCount = 0;
+  featureCollection.features.forEach(({ properties }) => {
+    const state = properties?.[MapLayerSpatialFeatureProperties.state];
+    if (state === "noData") {
+      noDataCount += 1;
+    } else if (state === "suppressed") {
+      suppressedCount += 1;
+    }
+    const count =
+      properties?.[MapLayerSpatialFeatureProperties.contributorCount];
+    if (typeof count === "number") {
+      contributorCount += count;
+    }
+  });
+  return { contributorCount, noDataCount, suppressedCount };
 }
 
 /** Gets the result-column name driving proportional symbol sizing. */
@@ -150,11 +174,184 @@ function _getValueColumnName(layer: MapLayer.T): string | undefined {
     : undefined;
 }
 
-function _makeRenderedLayerSpec(
+/** Resolves a persisted value reference to its GeoJSON property name. */
+function _getColorValuePropertyName(
+  layer: MapLayer.T,
+  value: MapLayer.LayerValue,
+): string | undefined {
+  if (value.type === "areaAggregation") {
+    return MapLayerSpatialFeatureProperties.value;
+  }
+  const column = layer.source.queryColumns.find(propEq("id", value.column));
+  return column ? QueryColumn.getDerivedColumnName(column) : undefined;
+}
+
+/** Reads and optionally normalizes one feature value. */
+function _getFeatureColorValue(
+  layer: MapLayer.T,
+  properties: GeoJSON.GeoJsonProperties,
+): unknown {
+  const color = layer.symbology.color;
+  if (color.type === "single" || !properties) {
+    return undefined;
+  }
+  const propertyName = _getColorValuePropertyName(layer, color.value);
+  const value = propertyName ? properties[propertyName] : undefined;
+  if (color.type !== "graduated" || !color.normalization) {
+    return value;
+  }
+  const denominator = properties[MapLayerSpatialFeatureProperties.denominator];
+  return normalizeLayerValue(
+    value,
+    denominator,
+    color.normalization.multiplier,
+  );
+}
+
+function _getFeatureId(feature: GeoJSON.Feature, index: number): string {
+  const reservedId =
+    feature.properties?.[MapLayerSpatialFeatureProperties.featureId];
+  return String(reservedId ?? feature.id ?? index);
+}
+
+/** Classifies configured categories in author order, followed by Other. */
+function _classifyCategories(
+  layer: MapLayer.T,
+  features: readonly GeoJSON.Feature[],
+  color: Extract<MapLayer.Color, { type: "categorical" }>,
+): {
+  breaks: readonly MapLayer.LegendBreak[];
+  classIndexByFeatureId: ReadonlyMap<string, number>;
+  entries: readonly MapLayer.LegendEntry[];
+} {
+  const classIndexes = new Map<string, number>();
+  const counts = Array.from({ length: color.categories.length + 1 }, () => {
+    return 0;
+  });
+  let noDataCount = 0;
+  features.forEach((feature, index) => {
+    const value = _getFeatureColorValue(layer, feature.properties);
+    if (value === null || value === undefined) {
+      noDataCount += 1;
+      return;
+    }
+    const categoryIndex = color.categories.findIndex(({ value: category }) => {
+      return category === String(value);
+    });
+    const classIndex =
+      categoryIndex === -1 ? color.categories.length : categoryIndex;
+    classIndexes.set(_getFeatureId(feature, index), classIndex);
+    counts[classIndex] = (counts[classIndex] ?? 0) + 1;
+  });
+  const entries: MapLayer.LegendEntry[] = color.categories.map(
+    (category, index) => {
+      return { type: "value", ...category, count: counts[index] ?? 0 };
+    },
+  );
+  entries.push({
+    type: "value",
+    color: color.other.color,
+    label: color.other.label,
+    count: counts.at(-1) ?? 0,
+  });
+  if (noDataCount > 0) {
+    entries.push({ type: "noData", ...color.noData, count: noDataCount });
+  }
+  return { breaks: [], classIndexByFeatureId: classIndexes, entries };
+}
+
+function _makeClassifiedFeatures(
+  features: readonly GeoJSON.Feature[],
+  classIndexes: ReadonlyMap<string, number>,
+): GeoJSON.Feature[] {
+  return features.map((feature, index) => {
+    const featureId = _getFeatureId(feature, index);
+    const classIndex = classIndexes.get(featureId);
+    if (classIndex === undefined) {
+      return feature;
+    }
+    return {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        [MapLayerSpatialFeatureProperties.classIndex]: classIndex,
+      },
+    };
+  });
+}
+
+/** Adds derived class indexes and the exact legend produced from them. */
+function _classifyGeometry(
   layer: MapLayer.T,
   geometry: LayerGeometry,
-  isRendered: boolean,
+  hasQueryData: boolean,
+): ClassifiedGeometry {
+  const color = layer.symbology.color;
+  if (color.type === "single" || !hasQueryData) {
+    return { geometry, legendUpdate: undefined };
+  }
+  const reportableFeatures = geometry.featureCollection.features.filter(
+    (feature) => {
+      return (
+        feature.properties?.[MapLayerSpatialFeatureProperties.state] !==
+        "suppressed"
+      );
+    },
+  );
+  const classification =
+    color.type === "categorical" ?
+      _classifyCategories(layer, reportableFeatures, color)
+    : classifyLayerValues(
+        reportableFeatures.map((feature, index) => {
+          return {
+            featureId: _getFeatureId(feature, index),
+            value: _getFeatureColorValue(layer, feature.properties),
+          };
+        }),
+        {
+          classification: color.classification,
+          ramp: color.ramp,
+          noData: color.noData,
+        },
+      );
+  const suppressedCount =
+    geometry.featureCollection.features.length - reportableFeatures.length;
+  const entries = [...classification.entries];
+  if (suppressedCount > 0) {
+    entries.push({
+      type: "suppressed",
+      color: "#868e96",
+      label: "",
+      count: suppressedCount,
+    });
+  }
+  return {
+    geometry: {
+      ...geometry,
+      featureCollection: {
+        ...geometry.featureCollection,
+        features: _makeClassifiedFeatures(
+          geometry.featureCollection.features,
+          classification.classIndexByFeatureId,
+        ),
+      },
+    },
+    legendUpdate: {
+      layerFingerprint: buildLayerLegendFingerprint(layer),
+      breaks: classification.breaks,
+      entries,
+    },
+  };
+}
+
+function _makeRenderedLayerSpec(
+  options: Readonly<{
+    layer: MapLayer.T;
+    geometry: LayerGeometry;
+    isRendered: boolean;
+  }>,
 ): MapSpec | undefined {
+  const { layer, geometry, isRendered } = options;
   if (!isRendered) {
     return undefined;
   }
@@ -175,42 +372,80 @@ function _makeLayerRender({
   layer,
   layerQueryStates,
   geometryCache,
-}: MakeLayerRenderInput): LayerRender {
+}: Readonly<{
+  layer: MapLayer.T;
+  layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
+  geometryCache: ReturnType<typeof createLayerGeometryCache>;
+}>): LayerRender {
   const queryState = layerQueryStates.get(layer.id);
   const binding = MapLayer.toGeoBinding(layer);
-  const geometry = geometryCache.get({
-    layerId: layer.id,
-    binding,
-    sensitivity: layer.sensitivity,
-    propertyColumnNames: MapLayer.toPopupColumnNames(layer),
-    rows: queryState?.queryResult?.data,
-  });
-  const viewState = _makeLayerViewState({
+  const rawGeometry = _getLayerGeometry({
     layer,
     binding,
+    queryState,
+    geometryCache,
+  });
+  const { geometry, legendUpdate } = _classifyGeometry(
+    layer,
+    rawGeometry,
+    queryState?.data !== undefined,
+  );
+  const viewState = _makeLayerViewState({
+    layer,
+    hasBinding: layer.geoBinding !== undefined,
     geometry,
     queryState,
   });
   const isRendered = layer.isVisible && viewState.status === "ready";
   return {
     layerId: layer.id,
-    layerSpec: _makeRenderedLayerSpec(layer, geometry, isRendered),
+    layerSpec: _makeRenderedLayerSpec({ layer, geometry, isRendered }),
     interactiveLayerId:
       isRendered ? MapLayerIds.toLayerId(layer.id) : undefined,
     viewState,
     bounds: getBoundsFromFeatureCollection(geometry.featureCollection),
+    legendUpdate,
   };
+}
+
+/** Selects direct spatial GeoJSON or cached row conversion. */
+function _getLayerGeometry(options: {
+  layer: MapLayer.T;
+  binding: MapLayer.GeoBindingColumnNames | undefined;
+  queryState: MapLayerQueryState | undefined;
+  geometryCache: ReturnType<typeof createLayerGeometryCache>;
+}): LayerGeometry {
+  if (options.queryState?.data?.type === "spatial") {
+    return {
+      featureCollection: options.queryState.data.featureCollection,
+      drops: [],
+      error: undefined,
+    };
+  }
+  return options.geometryCache.get({
+    layerId: options.layer.id,
+    binding: options.binding,
+    sensitivity: options.layer.sensitivity,
+    propertyColumnNames: MapLayer.toPopupColumnNames(options.layer),
+    rows:
+      options.queryState?.data?.type === "rows" ?
+        options.queryState.data.queryResult.data
+      : undefined,
+  });
 }
 
 /** Derives rendering, interaction, status, and bounds for all map layers. */
 export function useAvaMapRender({
   mapConfig,
   layerQueryStates,
-}: UseAvaMapRenderInput): AvaMapRender {
-  const geometryCacheRef = useRef(createLayerGeometryCache());
+}: Readonly<{
+  mapConfig: AvaMapConfig.T;
+  layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
+}>): AvaMapRender {
+  const [geometryCache] = useState(createLayerGeometryCache);
 
   return useMemo(() => {
-    const cache = geometryCacheRef.current;
+    const cache = geometryCache;
     cache.prune(makeSet(mapConfig.layers, { key: "id" }));
     const renderedLayers = mapConfig.layers.map((layer) => {
       return _makeLayerRender({
@@ -235,6 +470,12 @@ export function useAvaMapRender({
         key: "layerId",
         valueKey: "bounds",
       }),
+      legendUpdates: makeMap(
+        renderedLayers.filter(({ legendUpdate }) => {
+          return legendUpdate !== undefined;
+        }),
+        { key: "layerId", valueKey: "legendUpdate" },
+      ) as Map<MapLayer.Id, LayerLegendUpdate>,
     };
-  }, [mapConfig.layers, layerQueryStates]);
+  }, [geometryCache, mapConfig.layers, layerQueryStates]);
 }

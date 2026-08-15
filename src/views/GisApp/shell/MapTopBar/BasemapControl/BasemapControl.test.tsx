@@ -4,12 +4,12 @@ import { BasemapControl } from "@/views/GisApp/shell/MapTopBar/BasemapControl/Ba
 import { CustomBasemapForm } from "@/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
-const builtInBasemap = {
+const BUILT_IN_BASEMAP = {
   type: "builtIn",
   style: "avandar",
 } as const satisfies AvaMapConfig.Basemap;
 
-const customBasemap = {
+const CUSTOM_BASEMAP = {
   type: "custom",
   kind: "wms",
   url: "https://tiles.example/{bbox-epsg-3857}",
@@ -22,7 +22,7 @@ describe("BasemapControl", () => {
 
     render(
       <BasemapControl
-        basemap={builtInBasemap}
+        basemap={BUILT_IN_BASEMAP}
         onBasemapChange={onBasemapChange}
       />,
     );
@@ -41,7 +41,7 @@ describe("BasemapControl", () => {
 
     render(
       <BasemapControl
-        basemap={builtInBasemap}
+        basemap={BUILT_IN_BASEMAP}
         onBasemapChange={onBasemapChange}
       />,
     );
@@ -86,7 +86,7 @@ describe("BasemapControl", () => {
     const { rerender } = render(
       <CustomBasemapForm
         opened={false}
-        basemap={builtInBasemap}
+        basemap={BUILT_IN_BASEMAP}
         onClose={onClose}
         onSubmit={onSubmit}
       />,
@@ -95,7 +95,7 @@ describe("BasemapControl", () => {
     rerender(
       <CustomBasemapForm
         opened
-        basemap={customBasemap}
+        basemap={CUSTOM_BASEMAP}
         onClose={onClose}
         onSubmit={onSubmit}
       />,
@@ -106,9 +106,9 @@ describe("BasemapControl", () => {
     ).toHaveValue("WMS");
     expect(
       await screen.findByRole("textbox", { name: "URL template" }),
-    ).toHaveValue(customBasemap.url);
+    ).toHaveValue(CUSTOM_BASEMAP.url);
     expect(
       await screen.findByRole("textbox", { name: "Attribution" }),
-    ).toHaveValue(customBasemap.attribution);
+    ).toHaveValue(CUSTOM_BASEMAP.attribution);
   });
 });

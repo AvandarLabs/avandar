@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { noop, sleep } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -198,7 +199,7 @@ describe("useAvaMapEditor", () => {
   });
 
   it("goes back to unsaved when an edit lands during a save", async () => {
-    let releaseSave = (): void => {};
+    let releaseSave = noop;
     saveMapConfigMock.mockImplementationOnce(async () => {
       await new Promise<void>((resolve) => {
         releaseSave = resolve;
@@ -274,15 +275,13 @@ describe("useAvaMapEditor", () => {
     });
 
     await act(async () => {
-      await new Promise((resolve) => {
-        window.setTimeout(resolve, 850);
-      });
+      await sleep(850);
     });
     expect(saveMapConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it("flushes the latest pending edit on unmount", async () => {
-    let releaseSave = (): void => {};
+    let releaseSave = noop;
     saveMapConfigMock.mockImplementationOnce(() => {
       return new Promise<void>((resolve) => {
         releaseSave = resolve;

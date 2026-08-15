@@ -3,7 +3,7 @@ import { render, screen } from "@/test-utils";
 import { SaveStateIndicator } from "@/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator";
 import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 
-const saveStateCases: ReadonlyArray<{
+const SAVE_STATE_CASES: Array<{
   saveState: MapSaveState;
   label: string;
 }> = [
@@ -17,7 +17,7 @@ const saveStateCases: ReadonlyArray<{
 ];
 
 describe("SaveStateIndicator", () => {
-  it.each(saveStateCases)(
+  it.each(SAVE_STATE_CASES)(
     "shows the $saveState status without an alert interruption",
     ({ saveState, label }) => {
       render(<SaveStateIndicator saveState={saveState} />);

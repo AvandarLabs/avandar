@@ -1,4 +1,4 @@
-import { MapOutputActions } from "@/views/GisApp/shell/MapTopBar/MapOutputActions";
+import { MapOutputActions } from "@/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions";
 import { MapTitleInput } from "@/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleInput";
 import css from "@/views/GisApp/shell/MapTopBar/MapTopBar.module.css";
 import { SaveStateIndicator } from "@/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator";

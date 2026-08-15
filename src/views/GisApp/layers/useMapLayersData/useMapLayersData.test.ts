@@ -3,20 +3,52 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
 
-const { runStructuredQueryMock } = vi.hoisted(() => {
-  return { runStructuredQueryMock: vi.fn() };
+const {
+  initializeDuckDbMock,
+  runStructuredQueryMock,
+  runSpatialQueryMock,
+  spatialAvailability,
+} = vi.hoisted(() => {
+  return {
+    initializeDuckDbMock: vi.fn(),
+    runStructuredQueryMock: vi.fn(),
+    runSpatialQueryMock: vi.fn(),
+    spatialAvailability: { value: "available" },
+  };
+});
+
+vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+  return {
+    DuckDbClient: {
+      initialize: initializeDuckDbMock,
+      getSpatialAvailability: () => {
+        return spatialAvailability.value;
+      },
+      subscribeSpatialAvailability: () => {
+        return () => {
+          return undefined;
+        };
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+  return {
+    WorkspaceQetlClient: { runQuery: runSpatialQueryMock },
+  };
 });
 
 vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
@@ -70,7 +102,7 @@ function _createDataset(): Dataset.T {
 }
 
 /** A layer with a data source and a geo binding that resolves. */
-function _createQueryableLayer(): MapLayer.T {
+function _createQueryableLayer(): MapLayer.Standard {
   const layer = MapLayer.makeEmpty("Cases");
   const latitude = QueryColumn.makeFromDatasetColumn(
     _createNumericColumn("lat"),
@@ -93,6 +125,30 @@ function _createQueryableLayer(): MapLayer.T {
   };
 }
 
+/** A direct WKT point layer that requires DuckDB Spatial. */
+function _createSpatialLayer(): MapLayer.Standard {
+  const layer = MapLayer.makeEmpty("Shapes");
+  const dataset = _createDataset();
+  const geometry = QueryColumn.makeFromDatasetColumn(
+    _createNumericColumn("shape"),
+  );
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      dataSource: dataset,
+      queryColumns: [geometry],
+    },
+    geoBinding: {
+      type: "geometryColumn",
+      column: geometry.id,
+      encoding: "wkt",
+      family: "point",
+      simplification: undefined,
+    },
+  };
+}
+
 /** Wraps a hook under test with the QueryClient it needs. */
 function _wrapperForHook(options: { children: ReactNode }): ReactElement {
   const client = new QueryClient({
@@ -105,7 +161,11 @@ describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
   beforeEach(() => {
+    initializeDuckDbMock.mockReset();
+    initializeDuckDbMock.mockResolvedValue(undefined);
     runStructuredQueryMock.mockReset();
+    runSpatialQueryMock.mockReset();
+    spatialAvailability.value = "available";
   });
 
   it("queries with a layer's source when the layer is queryable", async () => {
@@ -126,7 +186,10 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(layer.id)?.queryResult).toEqual(queryResult);
+      expect(result.current.get(layer.id)?.data).toEqual({
+        type: "rows",
+        queryResult,
+      });
     });
 
     expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
@@ -146,7 +209,7 @@ describe("useMapLayersData", () => {
     );
 
     expect(runStructuredQueryMock).not.toHaveBeenCalled();
-    expect(result.current.get(layer.id)?.queryResult).toBeUndefined();
+    expect(result.current.get(layer.id)?.data).toBeUndefined();
     expect(result.current.get(layer.id)?.isLoading).toBe(false);
   });
 
@@ -169,7 +232,7 @@ describe("useMapLayersData", () => {
     );
 
     expect(runStructuredQueryMock).not.toHaveBeenCalled();
-    expect(result.current.get(layer.id)?.queryResult).toBeUndefined();
+    expect(result.current.get(layer.id)?.data).toBeUndefined();
     expect(result.current.get(layer.id)?.isLoading).toBe(false);
   });
 
@@ -203,15 +266,92 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(firstLayer.id)?.queryResult).toEqual(
-        firstQueryResult,
-      );
-      expect(result.current.get(secondLayer.id)?.queryResult).toEqual(
-        secondQueryResult,
-      );
+      expect(result.current.get(firstLayer.id)?.data).toEqual({
+        type: "rows",
+        queryResult: firstQueryResult,
+      });
+      expect(result.current.get(secondLayer.id)?.data).toEqual({
+        type: "rows",
+        queryResult: secondQueryResult,
+      });
     });
 
     expect(runStructuredQueryMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("waits for Spatial capability before running a geometry layer", () => {
+    spatialAvailability.value = "loading";
+    const layer = _createSpatialLayer();
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({ layers: [layer], workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    expect(runSpatialQueryMock).not.toHaveBeenCalled();
+    expect(initializeDuckDbMock).toHaveBeenCalledTimes(1);
+    expect(result.current.get(layer.id)?.isLoading).toBe(true);
+  });
+
+  it("reports unavailable Spatial without executing QETL", () => {
+    spatialAvailability.value = "unavailable";
+    const layer = _createSpatialLayer();
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({ layers: [layer], workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    expect(runSpatialQueryMock).not.toHaveBeenCalled();
+    expect(result.current.get(layer.id)?.error?.message).toMatch(/spatial/i);
+  });
+
+  it("runs available geometry layers as raw SQL and parses the envelope", async () => {
+    const layer = _createSpatialLayer();
+    const featureCollection = { type: "FeatureCollection", features: [] };
+    const diagnostics = {
+      sourceCount: 0,
+      parsedCount: 0,
+      invalidCount: 0,
+      observedFamilies: [],
+      hasMixedFamilies: false,
+    };
+    runSpatialQueryMock.mockResolvedValue({
+      id: uuid<QueryResult.Id>(),
+      columns: [],
+      numRows: 1,
+      data: [
+        {
+          __avandar_feature_collection: featureCollection,
+          __avandar_diagnostics: diagnostics,
+        },
+      ],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({ layers: [layer], workspaceId });
+      },
+      { wrapper: _wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data).toEqual({
+        type: "spatial",
+        featureCollection,
+        diagnostics,
+      });
+    });
+    expect(runSpatialQueryMock).toHaveBeenCalledWith({
+      rawSql: expect.stringContaining("ST_GeomFromText"),
+      signal: expect.any(AbortSignal),
+      workspaceId,
+    });
+    expect(runStructuredQueryMock).not.toHaveBeenCalled();
   });
 });
 
@@ -234,12 +374,12 @@ describe("MapLayerData.isQueryable", () => {
   });
 });
 
-describe("MapLayerData.makeQueryKey", () => {
+describe("MapLayerData.toQueryKey", () => {
   it("changes when the source changes", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(MapLayerData.makeQueryKey(layer)).not.toEqual(
-      MapLayerData.makeQueryKey(withLimit),
+    expect(MapLayerData.toQueryKey(layer)).not.toEqual(
+      MapLayerData.toQueryKey(withLimit),
     );
   });
 
@@ -252,8 +392,8 @@ describe("MapLayerData.makeQueryKey", () => {
         color: { type: "single" as const, color: "#ef4444" },
       },
     };
-    expect(MapLayerData.makeQueryKey(layer)).toEqual(
-      MapLayerData.makeQueryKey(recolored),
+    expect(MapLayerData.toQueryKey(layer)).toEqual(
+      MapLayerData.toQueryKey(recolored),
     );
   });
 });

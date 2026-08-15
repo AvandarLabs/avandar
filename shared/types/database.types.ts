@@ -1490,6 +1490,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      maps__auth_user_may_select: {
+        Args: { p_map_id: string }
+        Returns: boolean
+      }
+      maps__auth_user_may_select_grant: {
+        Args: {
+          p_is_restricted: boolean
+          p_map_id: string
+          p_owner_id: string
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
       maps__owner_id_matches_stored: {
         Args: { p_map_id: string; p_owner_id: string }
         Returns: boolean
@@ -1796,19 +1809,6 @@ export type Database = {
       }
       util__auth_user_may_select_dataset: {
         Args: { p_dataset_id: string }
-        Returns: boolean
-      }
-      util__auth_user_may_select_map: {
-        Args: { p_map_id: string }
-        Returns: boolean
-      }
-      util__auth_user_may_select_map_grant: {
-        Args: {
-          p_is_restricted: boolean
-          p_map_id: string
-          p_owner_id: string
-          p_workspace_id: string
-        }
         Returns: boolean
       }
       util__auth_user_may_select_resource_base: {

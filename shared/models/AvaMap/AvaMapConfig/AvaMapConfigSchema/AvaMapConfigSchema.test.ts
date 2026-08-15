@@ -1,10 +1,86 @@
+import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import { describe, expect, it } from "vitest";
 // eslint-disable-next-line no-restricted-imports
 import { AvaMapConfigSchema } from "./AvaMapConfigSchema.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 describe("AvaMapConfigSchema", () => {
+  function createVersion1Json() {
+    return {
+      __type: "AvaMapConfig",
+      version: 1,
+      basemap: { type: "builtIn", style: "avandar" },
+      view: { center: [-119.4, 36.8], zoom: 6 },
+      bookmarks: [],
+      layers: [],
+    } as const;
+  }
+
+  it("migrates an empty version 1 config to version 2", () => {
+    expect(AvaMapConfigSchema.fromJson(createVersion1Json())).toEqual({
+      ...createVersion1Json(),
+      version: 2,
+    });
+  });
+
+  it("adds persisted classification output while migrating a Wave A layer", () => {
+    const currentLayer = MapLayer.makeEmpty("Cases");
+    const {
+      breaks: _breaks,
+      entries: _entries,
+      ...version1Legend
+    } = currentLayer.legend;
+    const parsed = AvaMapConfigSchema.fromJson({
+      ...createVersion1Json(),
+      layers: [{ ...currentLayer, legend: version1Legend }],
+    });
+
+    expect(parsed.version).toBe(2);
+    expect(parsed.layers[0]).toMatchObject({
+      id: currentLayer.id,
+      name: "Cases",
+      geoBinding: undefined,
+      sensitivity: { mode: "exact" },
+      symbology: currentLayer.symbology,
+      legend: { ...version1Legend, breaks: [], entries: [] },
+    });
+  });
+
+  it("keeps a version 1 aggregate-only layer blocked during migration", () => {
+    const currentLayer = MapLayer.makeEmpty("Protected cases");
+    const {
+      breaks: _breaks,
+      entries: _entries,
+      ...version1Legend
+    } = currentLayer.legend;
+    const queryColumnId = uuid<QueryColumn.Id>();
+    const parsed = AvaMapConfigSchema.fromJson({
+      ...createVersion1Json(),
+      layers: [
+        {
+          ...currentLayer,
+          geoBinding: {
+            type: "latLngColumns",
+            latitude: queryColumnId,
+            longitude: queryColumnId,
+          },
+          sensitivity: {
+            mode: "aggregateOnly",
+            minCellCount: 5,
+            minGeoLevel: "district",
+          },
+          legend: version1Legend,
+        },
+      ],
+    });
+
+    expect(parsed.layers[0]?.sensitivity.mode).toBe("aggregateOnly");
+    expect(parsed.layers[0]?.geoBinding).toBeUndefined();
+    expect(parsed.layers[0]?.symbology.type).toBe("fill");
+  });
+
   it("round trips an empty config", () => {
     const config = AvaMapConfig.makeEmpty();
     const parsed = AvaMapConfigSchema.fromJson(
@@ -14,16 +90,16 @@ describe("AvaMapConfigSchema", () => {
   });
 
   it("round trips a config carrying a layer and a bookmark", () => {
-    const config = AvaMapConfig.withBookmarkAdded(
-      AvaMapConfig.withLayerAdded(
-        AvaMapConfig.makeEmpty(),
-        MapLayer.makeEmpty("Cases"),
-      ),
-      AvaMapConfig.makeBookmark({
+    const config = AvaMapConfig.withBookmarkAdded({
+      config: AvaMapConfig.withLayerAdded({
+        config: AvaMapConfig.makeEmpty(),
+        layer: MapLayer.makeEmpty("Cases"),
+      }),
+      bookmark: AvaMapConfig.makeBookmark({
         name: "Goma",
         view: { center: [29.2, -1.7], zoom: 9 },
       }),
-    );
+    });
     expect(
       AvaMapConfigSchema.fromJson(AvaMapConfigSchema.toJson(config)),
     ).toEqual(config);
@@ -32,17 +108,17 @@ describe("AvaMapConfigSchema", () => {
   it("rejects a config written by a future version", () => {
     const config = AvaMapConfig.makeEmpty();
     const json = AvaMapConfigSchema.toJson(config) as Record<string, unknown>;
-    const future = { ...json, version: 2 };
+    const future = { ...json, version: 3 };
     expect(() => {
       return AvaMapConfigSchema.fromJson(future);
     }).toThrow();
   });
 
   it("rejects a layer whose symbology is not a known kind", () => {
-    const config = AvaMapConfig.withLayerAdded(
-      AvaMapConfig.makeEmpty(),
-      MapLayer.makeEmpty("Cases"),
-    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: MapLayer.makeEmpty("Cases"),
+    });
     const json = AvaMapConfigSchema.toJson(config) as {
       layers: Array<{ symbology: { type: string } }>;
     };
@@ -68,10 +144,10 @@ describe("AvaMapConfigSchema", () => {
   });
 
   it("round trips a popup action in serialized config JSON", () => {
-    const config = AvaMapConfig.withLayerAdded(
-      AvaMapConfig.makeEmpty(),
-      MapLayer.makeEmpty("Cases"),
-    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: MapLayer.makeEmpty("Cases"),
+    });
     const serializedJson = AvaMapConfigSchema.toJson(config) as {
       layers: Array<{ popup: Record<string, unknown> }>;
     };
@@ -86,10 +162,10 @@ describe("AvaMapConfigSchema", () => {
   });
 
   it("rejects unknown fields inside a popup action", () => {
-    const config = AvaMapConfig.withLayerAdded(
-      AvaMapConfig.makeEmpty(),
-      MapLayer.makeEmpty("Cases"),
-    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: MapLayer.makeEmpty("Cases"),
+    });
     const serializedJson = AvaMapConfigSchema.toJson(config) as {
       layers: Array<{ popup: Record<string, unknown> }>;
     };
@@ -107,10 +183,10 @@ describe("AvaMapConfigSchema", () => {
   it.each(["javascript:alert(1)", "data:text/html,<script>alert(1)</script>"])(
     "rejects unsafe popup URL protocol %s",
     (urlTemplate) => {
-      const config = AvaMapConfig.withLayerAdded(
-        AvaMapConfig.makeEmpty(),
-        MapLayer.makeEmpty("Cases"),
-      );
+      const config = AvaMapConfig.withLayerAdded({
+        config: AvaMapConfig.makeEmpty(),
+        layer: MapLayer.makeEmpty("Cases"),
+      });
       const serializedJson = AvaMapConfigSchema.toJson(config) as {
         layers: Array<{ popup: Record<string, unknown> }>;
       };
@@ -127,11 +203,14 @@ describe("AvaMapConfigSchema", () => {
 
   it("rejects unsafe popup URLs before serializing a config", () => {
     const layer = MapLayer.makeEmpty("Cases");
-    const config = AvaMapConfig.withLayerAdded(AvaMapConfig.makeEmpty(), {
-      ...layer,
-      popup: {
-        ...layer.popup,
-        action: { label: "Open case", urlTemplate: "javascript:alert(1)" },
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: {
+        ...layer,
+        popup: {
+          ...layer.popup,
+          action: { label: "Open case", urlTemplate: "javascript:alert(1)" },
+        },
       },
     });
 
@@ -141,10 +220,10 @@ describe("AvaMapConfigSchema", () => {
   });
 
   it("rejects an array as a structured query source", () => {
-    const config = AvaMapConfig.withLayerAdded(
-      AvaMapConfig.makeEmpty(),
-      MapLayer.makeEmpty("Cases"),
-    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: MapLayer.makeEmpty("Cases"),
+    });
     const serializedJson = AvaMapConfigSchema.toJson(config) as {
       layers: Array<{ source: unknown }>;
     };
@@ -156,10 +235,10 @@ describe("AvaMapConfigSchema", () => {
   });
 
   it("rejects a non-plain object as a structured query source", () => {
-    const config = AvaMapConfig.withLayerAdded(
-      AvaMapConfig.makeEmpty(),
-      MapLayer.makeEmpty("Cases"),
-    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: MapLayer.makeEmpty("Cases"),
+    });
     const serializedJson = AvaMapConfigSchema.toJson(config) as {
       layers: Array<{ source: unknown }>;
     };

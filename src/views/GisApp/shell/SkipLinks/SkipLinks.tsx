@@ -1,17 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
+import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import css from "@/views/GisApp/shell/SkipLinks/SkipLinks.module.css";
 import type { MouseEvent, ReactNode } from "react";
 
 type Props = { isChromeHidden: boolean };
-
-/**
- * Element ids the skip links target. Exported so the panels that own them
- * cannot drift from the links that point at them.
- */
-export const GIS_SKIP_TARGET_IDS = {
-  inspectorBody: "gis-inspector-body",
-  toolCluster: "gis-map-tools",
-} as const;
 
 function _focusHashTarget(event: MouseEvent<HTMLAnchorElement>): void {
   const target = document.getElementById(event.currentTarget.hash.slice(1));

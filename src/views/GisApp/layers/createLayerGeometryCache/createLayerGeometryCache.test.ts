@@ -1,6 +1,7 @@
 import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
+import type { LayerGeometryInputs } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const LAYER_ID = uuid<MapLayer.Id>();
@@ -13,7 +14,9 @@ const BINDING = {
 
 const ROWS = [{ lat: 1, lng: 2, caseId: "c1" }];
 
-function _inputs(overrides: Record<string, unknown> = {}) {
+function _inputs(
+  overrides: Partial<LayerGeometryInputs> = {},
+): LayerGeometryInputs {
   return {
     layerId: LAYER_ID,
     binding: BINDING,

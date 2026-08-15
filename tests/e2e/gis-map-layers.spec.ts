@@ -15,24 +15,18 @@ import {
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
-import {
-  ensureCloudStorageCheckedAndSaveDataset,
-  parseDatasetIdFromDataManagerUrl,
-  pollUntilCloudDatasetToggleShowsOnline,
-} from "./helpers/manualUploadCloudSyncFlow";
+import { importDatasetViaUi } from "./helpers/importDatasetViaUi";
 import { seedAvaMap } from "./helpers/seedAvaMap";
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "small-california-covid-sample.csv";
 const MAP_NAME = "E2E California response";
 const KNOWN_FEATURE_COORDINATE = [-121.8929271, 37.64629437] as const;
-
-type ProjectedCoordinate = { x: number; y: number };
 
 /** Escapes a layer name before using it as an accessible-name prefix. */
 function _buildLayerButtonNamePattern(layerName: string): RegExp {
@@ -41,50 +35,20 @@ function _buildLayerButtonNamePattern(layerName: string): RegExp {
 }
 
 /** Returns one layer stack item using its select button as the row identity. */
-function _layerRow(page: Page, layerName: string) {
+function _layerRow(
+  options: Readonly<{ page: Page; layerName: string }>,
+): Locator {
+  const { page, layerName } = options;
   const layersPanel = page.getByRole("region", { name: "Layers" });
   return layersPanel.getByRole("listitem").filter({
     has: page.getByText(layerName, { exact: true }),
   });
 }
 
-/** Imports the sample CSV through the Data Sources UI. */
-async function _importSampleCsv(options: {
-  page: Page;
-  workspaceSlug: string;
-}): Promise<string> {
-  const { page, workspaceSlug } = options;
-  await page.getByRole("link", { name: "Data Sources" }).click();
-  await page.getByRole("button", { name: "Add new dataset" }).click();
-
-  const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-  await uploadPanel
-    .locator('input[type="file"]')
-    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
-
-  const formattedRowCount =
-    SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
-  await expect(
-    page.getByText(`Parsed ${formattedRowCount} rows successfully`),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-  await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
-  const datasetId = parseDatasetIdFromDataManagerUrl({
-    url: page.url(),
-    workspaceSlug,
-  });
-  if (!datasetId) {
-    throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-  }
-  await pollUntilCloudDatasetToggleShowsOnline(page);
-  return datasetId;
-}
-
 /** Projects the known Alameda CSV coordinate through the app's MapLibre map. */
-async function _projectKnownFeature(page: Page): Promise<ProjectedCoordinate> {
+async function _projectKnownFeature(
+  page: Page,
+): Promise<{ x: number; y: number }> {
   return page.evaluate((coordinate) => {
     const map = window.__avandarE2EMap;
     if (!map) {
@@ -143,7 +107,15 @@ test.describe("GIS map layers", () => {
         password: primaryUser.password,
         workspaceSlug,
       });
-      datasetId = await _importSampleCsv({ page, workspaceSlug });
+      await importDatasetViaUi({
+        page,
+        workspaceSlug,
+        filePath: SMALL_CALIFORNIA_CSV_PATH,
+        expectedRowCount: SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+        onDatasetCreated: (createdDatasetId) => {
+          datasetId = createdDatasetId;
+        },
+      });
 
       await page.getByRole("link", { name: "Maps" }).click();
       await page
@@ -158,7 +130,7 @@ test.describe("GIS map layers", () => {
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const layerRow = _layerRow(page, DATASET_NAME);
+      const layerRow = _layerRow({ page, layerName: DATASET_NAME });
       await expect(layerRow).toBeVisible({ timeout: MEDIUM_WAIT });
 
       const layerInspector = page.getByRole("region", { name: "Layer" });
@@ -177,7 +149,7 @@ test.describe("GIS map layers", () => {
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
       await page.reload();
-      await expect(_layerRow(page, DATASET_NAME)).toContainText(
+      await expect(_layerRow({ page, layerName: DATASET_NAME })).toContainText(
         "3 rows unmapped",
         {
           timeout: LONG_WAIT,
@@ -189,7 +161,7 @@ test.describe("GIS map layers", () => {
 
       await page.getByRole("button", { name: "Basemap" }).click();
       await page.getByRole("menuitem", { name: "Positron" }).click();
-      await expect(_layerRow(page, DATASET_NAME)).toContainText(
+      await expect(_layerRow({ page, layerName: DATASET_NAME })).toContainText(
         "3 rows unmapped",
         { timeout: MEDIUM_WAIT },
       );
@@ -202,12 +174,21 @@ test.describe("GIS map layers", () => {
       await page.getByRole("menuitem", { name: "Duplicate" }).click();
 
       const layersPanel = page.getByRole("region", { name: "Layers" });
+      const duplicatedLayerRow = _layerRow({
+        page,
+        layerName: `${DATASET_NAME} copy`,
+      });
+      await expect(duplicatedLayerRow).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(layersPanel.getByRole("listitem")).toHaveCount(2);
+      await expect(duplicatedLayerRow).toContainText("3 rows unmapped", {
+        timeout: LONG_WAIT,
+      });
       const rowsBefore = await layersPanel
         .getByRole("listitem")
         .allInnerTexts();
-      await _layerRow(page, DATASET_NAME)
+      await duplicatedLayerRow
         .getByRole("button", {
-          name: _buildLayerButtonNamePattern(DATASET_NAME),
+          name: _buildLayerButtonNamePattern(`${DATASET_NAME} copy`),
         })
         .focus();
       await page.keyboard.press("Alt+ArrowDown");
@@ -215,7 +196,7 @@ test.describe("GIS map layers", () => {
         .poll(async () => {
           return layersPanel.getByRole("listitem").allInnerTexts();
         })
-        .not.toEqual(rowsBefore);
+        .toEqual([...rowsBefore].reverse());
 
       await _clickKnownFeature(page);
       await expect(page.getByRole("dialog", { name: "Feature" })).toContainText(

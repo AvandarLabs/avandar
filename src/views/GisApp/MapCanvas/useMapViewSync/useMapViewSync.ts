@@ -14,19 +14,16 @@ type MapViewSyncInstance = {
   mapRef: RefObject<MapViewSyncMap | null | undefined>;
 };
 
-type MapViewSyncInput = {
-  mapInstance: MapViewSyncInstance;
-  view: AvaMapConfig.ViewState;
-  onViewChange: (view: AvaMapConfig.ViewState) => void;
-};
-
 /** Maximum camera-coordinate drift treated as the same persisted view. */
 const VIEW_EPSILON = 0.000_000_1;
 
 function _areViewsEqual(
-  first: AvaMapConfig.ViewState,
-  second: AvaMapConfig.ViewState,
+  options: Readonly<{
+    first: AvaMapConfig.ViewState;
+    second: AvaMapConfig.ViewState;
+  }>,
 ): boolean {
+  const { first, second } = options;
   return (
     Math.abs(first.center[0] - second.center[0]) < VIEW_EPSILON &&
     Math.abs(first.center[1] - second.center[1]) < VIEW_EPSILON &&
@@ -47,10 +44,13 @@ function _getMapView(
 
 /** Subscribes to user-driven camera changes and returns the cleanup. */
 function _subscribeToMapCameraChanges(
-  mapInstance: MapViewSyncInstance,
-  pendingConfigViewRef: MutableRefObject<AvaMapConfig.ViewState | undefined>,
-  onViewChange: (view: AvaMapConfig.ViewState) => void,
+  options: Readonly<{
+    mapInstance: MapViewSyncInstance;
+    pendingConfigViewRef: MutableRefObject<AvaMapConfig.ViewState | undefined>;
+    onViewChange: (view: AvaMapConfig.ViewState) => void;
+  }>,
 ): (() => void) | undefined {
+  const { mapInstance, pendingConfigViewRef, onViewChange } = options;
   const map = mapInstance.mapRef.current;
   if (!map) {
     return undefined;
@@ -62,7 +62,10 @@ function _subscribeToMapCameraChanges(
     }
     const pendingConfigView = pendingConfigViewRef.current;
     pendingConfigViewRef.current = undefined;
-    if (pendingConfigView && _areViewsEqual(mapView, pendingConfigView)) {
+    if (
+      pendingConfigView &&
+      _areViewsEqual({ first: mapView, second: pendingConfigView })
+    ) {
       return;
     }
     onViewChange(mapView);
@@ -78,18 +81,22 @@ export function useMapViewSync({
   mapInstance,
   view,
   onViewChange,
-}: MapViewSyncInput): void {
+}: Readonly<{
+  mapInstance: MapViewSyncInstance;
+  view: AvaMapConfig.ViewState;
+  onViewChange: (view: AvaMapConfig.ViewState) => void;
+}>): void {
   const pendingConfigViewRef = useRef<AvaMapConfig.ViewState | undefined>(
     undefined,
   );
 
   useEffect(
     function publishMapCameraChanges() {
-      return _subscribeToMapCameraChanges(
+      return _subscribeToMapCameraChanges({
         mapInstance,
         pendingConfigViewRef,
         onViewChange,
-      );
+      });
     },
     [mapInstance, onViewChange],
   );
@@ -98,7 +105,11 @@ export function useMapViewSync({
     function applyPersistedMapCamera() {
       const map = mapInstance.mapRef.current;
       const mapView = _getMapView(mapInstance);
-      if (!map || !mapView || _areViewsEqual(mapView, view)) {
+      if (
+        !map ||
+        !mapView ||
+        _areViewsEqual({ first: mapView, second: view })
+      ) {
         return;
       }
       pendingConfigViewRef.current = view;

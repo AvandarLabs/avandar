@@ -1,3 +1,4 @@
+import { assertIsDefined } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { useMapPointerCoordinates } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
@@ -32,9 +33,7 @@ describe("useMapPointerCoordinates", () => {
     });
 
     const [onMouseMove] = [...(listeners.get("mousemove") ?? [])];
-    if (!onMouseMove) {
-      throw new Error("mousemove listener was not registered");
-    }
+    assertIsDefined(onMouseMove, "mousemove listener was not registered");
     act(() => {
       onMouseMove({
         lngLat: { lng: -73.987, lat: 40.748 },
@@ -44,9 +43,7 @@ describe("useMapPointerCoordinates", () => {
     expect(result.current).toEqual({ longitude: -73.987, latitude: 40.748 });
 
     const [onMouseOut] = [...(listeners.get("mouseout") ?? [])];
-    if (!onMouseOut) {
-      throw new Error("mouseout listener was not registered");
-    }
+    assertIsDefined(onMouseOut, "mouseout listener was not registered");
     expect(map.on).toHaveBeenCalledWith("mouseout", onMouseOut);
 
     act(() => {

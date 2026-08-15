@@ -37,7 +37,10 @@ export function FilterSection({
         value={layer.source.filters}
         onChange={(filters) => {
           onLayerChange((current) => {
-            return MapLayerUpdates.withFilters(current, filters);
+            return MapLayerUpdates.withFilters({
+              layer: current,
+              filters: filters,
+            });
           });
         }}
       />

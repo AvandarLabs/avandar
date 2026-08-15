@@ -222,18 +222,112 @@ describe("makeLayerSpecFromMapLayer", () => {
     expect(spec.layers[0]?.layout).toEqual({ visibility: "none" });
   });
 
-  it("refuses to draw an aggregate-only layer as symbols", () => {
+  it("renders line geometry with line paint", () => {
+    const base = MapLayer.makeEmpty("Roads");
+    const layer: MapLayer.T = {
+      ...base,
+      symbology: {
+        type: "line",
+        color: { type: "single", color: "#123456" },
+        stroke: { width: 4, color: "#abcdef" },
+      },
+    };
+    const spec = makeLayerSpecFromMapLayer({
+      layer,
+      featureCollection,
+      stats: { valueDomain: undefined },
+    });
+
+    expect(spec.layers[0]).toMatchObject({
+      type: "line",
+      paint: { "line-color": "#123456", "line-width": 4 },
+    });
+  });
+
+  it("renders polygon geometry as fill followed by its outline", () => {
+    const base = MapLayer.createArea("Districts");
+    const layer: MapLayer.T = {
+      ...base,
+      symbology: {
+        type: "fill",
+        color: { type: "single", color: "#123456" },
+        stroke: { width: 2, color: "#abcdef" },
+        opacity: 0.6,
+      },
+    };
+    const spec = makeLayerSpecFromMapLayer({
+      layer,
+      featureCollection,
+      stats: { valueDomain: undefined },
+    });
+
+    expect(
+      spec.layers.map(({ type }) => {
+        return type;
+      }),
+    ).toEqual(["fill", "line"]);
+    expect(spec.layers[0]?.paint).toMatchObject({
+      "fill-color": "#123456",
+      "fill-opacity": 0.6,
+    });
+    expect(spec.layers[1]?.paint).toMatchObject({
+      "line-color": "#abcdef",
+      "line-width": 2,
+    });
+  });
+
+  it("paints graduated classes after suppressed and no-data states", () => {
+    const base = MapLayer.createArea("Districts");
     const layer = {
-      ...MapLayer.makeEmpty("Protection cases"),
-      sensitivity: {
-        mode: "aggregateOnly" as const,
+      ...base,
+      symbology: {
+        ...base.symbology,
+        color: {
+          type: "graduated" as const,
+          value: {
+            type: "areaAggregation" as const,
+            outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+          },
+          ramp: ["#fee", "#f00"],
+          classification: { method: "quantile" as const, classCount: 2 },
+          normalization: undefined,
+          noData: { color: "#ccc", label: "" },
+        },
+      },
+    } satisfies MapLayer.T;
+
+    const spec = makeLayerSpecFromMapLayer({
+      layer,
+      featureCollection,
+      stats: { valueDomain: undefined },
+    });
+
+    expect(spec.layers[0]?.paint["fill-color"]).toEqual([
+      "case",
+      ["==", ["get", "__avandar_state"], "suppressed"],
+      "#868e96",
+      ["==", ["get", "__avandar_state"], "noData"],
+      "#ccc",
+      ["match", ["get", "__avandar_class_index"], 0, "#fee", 1, "#f00", "#ccc"],
+    ]);
+  });
+
+  it("refuses to draw an aggregate-only layer as point symbols", () => {
+    const layer = MapLayer.withSensitivity(
+      MapLayer.makeEmpty("Protection cases"),
+      {
+        mode: "aggregateOnly",
         minCellCount: 5,
         minGeoLevel: "admin2",
       },
-    };
+    );
+    const unsafeLayer = {
+      ...layer,
+      symbology: MapLayer.makeEmpty("Unsafe").symbology,
+    } as MapLayer.T;
     expect(() => {
       return makeLayerSpecFromMapLayer({
-        layer,
+        layer: unsafeLayer,
         featureCollection,
         stats: { valueDomain: undefined },
       });

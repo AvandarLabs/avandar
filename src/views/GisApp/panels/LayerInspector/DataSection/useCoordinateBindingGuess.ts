@@ -6,12 +6,6 @@ import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFr
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
-type Input = {
-  layer: MapLayer.T;
-  sourceColumns: readonly QueryColumn.T[];
-  onLayerChange: LayerChangeHandler;
-};
-
 function _getGuess(
   columns: readonly QueryColumn.T[],
 ): GeoBindingGuess | undefined {
@@ -25,10 +19,13 @@ function _getGuess(
   );
 }
 
-function _findColumn(
-  columns: readonly QueryColumn.T[],
-  name: string,
-): QueryColumn.T | undefined {
+function _findColumn({
+  columns,
+  name,
+}: Readonly<{
+  columns: readonly QueryColumn.T[];
+  name: string;
+}>): QueryColumn.T | undefined {
   return columns.find((column) => {
     return QueryColumn.getDerivedColumnName(column) === name;
   });
@@ -39,36 +36,50 @@ export function useCoordinateBindingGuess({
   layer,
   sourceColumns,
   onLayerChange,
-}: Input): GeoBindingGuess | undefined {
+}: Readonly<{
+  layer: MapLayer.T;
+  sourceColumns: readonly QueryColumn.T[];
+  onLayerChange: LayerChangeHandler;
+}>): GeoBindingGuess | undefined {
   const guess = useMemo(() => {
     return _getGuess(sourceColumns);
   }, [sourceColumns]);
   const hasBinding =
-    layer.geoBinding?.latitude !== undefined ||
-    layer.geoBinding?.longitude !== undefined;
+    layer.geoBinding?.type === "latLngColumns" &&
+    (layer.geoBinding.latitude !== undefined ||
+      layer.geoBinding.longitude !== undefined);
 
   useEffect(
     function applyCoordinateGuess() {
       if (hasBinding || !guess || sourceColumns.length === 0) {
         return;
       }
-      const latitude = _findColumn(sourceColumns, guess.latitudeColumnName);
-      const longitude = _findColumn(sourceColumns, guess.longitudeColumnName);
+      const latitude = _findColumn({
+        columns: sourceColumns,
+        name: guess.latitudeColumnName,
+      });
+      const longitude = _findColumn({
+        columns: sourceColumns,
+        name: guess.longitudeColumnName,
+      });
       if (!latitude || !longitude) {
         return;
       }
       onLayerChange((current) => {
-        const withLatitude = MapLayerUpdates.withGeoBindingAxis(
-          current,
-          "latitude",
-          latitude,
-        );
-        const withBoth = MapLayerUpdates.withGeoBindingAxis(
-          withLatitude,
-          "longitude",
-          longitude,
-        );
-        return MapLayerUpdates.withDefaultPopupColumns(withBoth, sourceColumns);
+        const withLatitude = MapLayerUpdates.withGeoBindingAxis({
+          layer: current,
+          axis: "latitude",
+          column: latitude,
+        });
+        const withBoth = MapLayerUpdates.withGeoBindingAxis({
+          layer: withLatitude,
+          axis: "longitude",
+          column: longitude,
+        });
+        return MapLayerUpdates.withDefaultPopupColumns({
+          layer: withBoth,
+          availableColumns: sourceColumns,
+        });
       });
     },
     [guess, hasBinding, onLayerChange, sourceColumns],

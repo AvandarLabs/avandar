@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@/test-utils";
 import { ViewsMenu } from "@/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
-const bookmark = {
+const BOOKMARK = {
   id: "00000000-0000-4000-8000-000000000001" as AvaMapConfig.BookmarkId,
   name: "Response overview",
   view: { center: [-74.006, 40.7128], zoom: 10 },
@@ -16,7 +16,7 @@ describe("ViewsMenu", () => {
 
     render(
       <ViewsMenu
-        bookmarks={[bookmark]}
+        bookmarks={[BOOKMARK]}
         onSaveCurrentView={onSaveCurrentView}
         onGoToBookmark={onGoToBookmark}
         onRemoveBookmark={vi.fn()}
@@ -30,7 +30,7 @@ describe("ViewsMenu", () => {
     fireEvent.click(await screen.findByText("Response overview"));
 
     expect(onSaveCurrentView).toHaveBeenCalledOnce();
-    expect(onGoToBookmark).toHaveBeenCalledWith(bookmark);
+    expect(onGoToBookmark).toHaveBeenCalledWith(BOOKMARK);
   });
 
   it("removes a saved view without navigating to it", async () => {
@@ -39,7 +39,7 @@ describe("ViewsMenu", () => {
 
     render(
       <ViewsMenu
-        bookmarks={[bookmark]}
+        bookmarks={[BOOKMARK]}
         onSaveCurrentView={vi.fn()}
         onGoToBookmark={onGoToBookmark}
         onRemoveBookmark={onRemoveBookmark}
@@ -53,7 +53,7 @@ describe("ViewsMenu", () => {
       }),
     );
 
-    expect(onRemoveBookmark).toHaveBeenCalledWith(bookmark.id);
+    expect(onRemoveBookmark).toHaveBeenCalledWith(BOOKMARK.id);
     expect(onGoToBookmark).not.toHaveBeenCalled();
   });
 });

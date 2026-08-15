@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { assertIsDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -57,12 +58,12 @@ vi.mock(
 vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
   return {
     MapLayerUpdates: {
-      findQueryColumn: vi.fn(() => {
+      getQueryColumnFromLayer: vi.fn(() => {
         return undefined;
       }),
-      withSymbologyType: vi.fn((layer, options) => {
-        if (options.nextType === "circle") {
-          const remembered = options.remembered;
+      withSymbologyType: vi.fn(({ layer, change }) => {
+        if (change.nextType === "circle") {
+          const remembered = change.remembered;
           return {
             ...layer,
             symbology: remembered ?? {
@@ -75,9 +76,9 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
         }
         return {
           ...layer,
-          symbology: options.remembered ?? {
+          symbology: change.remembered ?? {
             type: "proportionalSymbol",
-            value: options.valueColumn?.id ?? queryColumn.id,
+            value: change.valueColumn?.id ?? queryColumn.id,
             minRadius: 4,
             maxRadius: 24,
             scale: "sqrt",
@@ -86,7 +87,7 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
           },
         };
       }),
-      withSymbolColor: vi.fn((layer, color) => {
+      withSymbolColor: vi.fn(({ layer, color }) => {
         return {
           ...layer,
           symbology: {
@@ -95,10 +96,10 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
           },
         };
       }),
-      withCircleRadius: vi.fn((layer, radius) => {
+      withCircleRadius: vi.fn(({ layer, radius }) => {
         return { ...layer, symbology: { ...layer.symbology, radius } };
       }),
-      withSymbolSizeColumn: vi.fn((layer, column) => {
+      withSymbolSizeColumn: vi.fn(({ layer, column }) => {
         return {
           ...layer,
           symbology: {
@@ -108,10 +109,10 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
           },
         };
       }),
-      withMaxSymbolRadius: vi.fn((layer, maxRadius) => {
+      withMaxSymbolRadius: vi.fn(({ layer, maxRadius }) => {
         return { ...layer, symbology: { ...layer.symbology, maxRadius } };
       }),
-      withStroke: vi.fn((layer, stroke) => {
+      withStroke: vi.fn(({ layer, stroke }) => {
         return {
           ...layer,
           symbology: {
@@ -148,17 +149,34 @@ vi.mock("@/views/DataExplorerApp/QueryColumnSingleSelect", () => {
 });
 
 function _applyLatestUpdate(
-  onLayerChange: ReturnType<typeof vi.fn>,
-  layer: MapLayer.T,
+  options: Readonly<{
+    onLayerChange: ReturnType<typeof vi.fn>;
+    layer: MapLayer.T;
+  }>,
 ): MapLayer.T {
+  const { onLayerChange, layer } = options;
   const latestCall = onLayerChange.mock.lastCall;
-  if (!latestCall) {
-    throw new Error("Expected a layer update");
-  }
+  assertIsDefined(latestCall, "Expected a layer update");
   return latestCall[0](layer);
 }
 
 describe("StyleSection", () => {
+  it("opens classification from polygon fill style", () => {
+    const onOpenClassification = vi.fn();
+    render(
+      <StyleSection
+        layer={MapLayer.createArea("Districts")}
+        onLayerChange={vi.fn()}
+        onOpenClassification={onOpenClassification}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Edit classification" }),
+    );
+    expect(onOpenClassification).toHaveBeenCalledOnce();
+  });
+
   it("keeps unavailable symbology options focusable and explains why", () => {
     render(
       <StyleSection
@@ -196,11 +214,17 @@ describe("StyleSection", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Sized" }));
-    const sizedLayer = _applyLatestUpdate(onLayerChange, layer);
+    const sizedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     rerender(<StyleSection layer={sizedLayer} onLayerChange={onLayerChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Point" }));
-    const restoredLayer = _applyLatestUpdate(onLayerChange, sizedLayer);
+    const restoredLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: sizedLayer,
+    });
 
     expect(restoredLayer.symbology).toEqual(layer.symbology);
   });
@@ -216,7 +240,10 @@ describe("StyleSection", () => {
     render(<StyleSection layer={layer} onLayerChange={onLayerChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Sized" }));
-    const updatedLayer = _applyLatestUpdate(onLayerChange, layer);
+    const updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
 
     expect(updatedLayer.symbology).toMatchObject({
       type: "proportionalSymbol",
@@ -233,25 +260,40 @@ describe("StyleSection", () => {
     fireEvent.change(screen.getByLabelText("Color"), {
       target: { value: "#ff0000" },
     });
-    let updatedLayer = _applyLatestUpdate(onLayerChange, layer);
-    expect(updatedLayer.symbology.color.color).toBe("#ff0000");
+    let updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
+    expect(updatedLayer.symbology.color).toEqual({
+      type: "single",
+      color: "#ff0000",
+    });
 
     fireEvent.change(screen.getByLabelText("Radius"), {
       target: { value: "12" },
     });
-    updatedLayer = _applyLatestUpdate(onLayerChange, updatedLayer);
+    updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: updatedLayer,
+    });
     expect(updatedLayer.symbology).toMatchObject({ radius: 12 });
 
     fireEvent.change(screen.getByLabelText("Outline"), {
       target: { value: "#000000" },
     });
-    updatedLayer = _applyLatestUpdate(onLayerChange, updatedLayer);
+    updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: updatedLayer,
+    });
     expect(updatedLayer.symbology.stroke.color).toBe("#000000");
 
     fireEvent.change(screen.getByLabelText("Outline width"), {
       target: { value: "2" },
     });
-    updatedLayer = _applyLatestUpdate(onLayerChange, updatedLayer);
+    updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: updatedLayer,
+    });
     expect(updatedLayer.symbology.stroke.width).toBe(2);
   });
 
@@ -263,17 +305,26 @@ describe("StyleSection", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Sized" }));
-    const sizedLayer = _applyLatestUpdate(onLayerChange, layer);
+    const sizedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     rerender(<StyleSection layer={sizedLayer} onLayerChange={onLayerChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Size by" }));
-    const selectedLayer = _applyLatestUpdate(onLayerChange, sizedLayer);
+    const selectedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: sizedLayer,
+    });
     expect(selectedLayer.symbology).toMatchObject({ value: queryColumn.id });
 
     fireEvent.change(screen.getByLabelText("Largest radius"), {
       target: { value: "48" },
     });
-    const resizedLayer = _applyLatestUpdate(onLayerChange, selectedLayer);
+    const resizedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: selectedLayer,
+    });
     expect(resizedLayer.symbology).toMatchObject({ maxRadius: 48 });
   });
 });

@@ -16,11 +16,15 @@ export {
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/AvaMapConfigModule.ts";
 
 export namespace AvaMapConfig {
+  /** A persisted map configuration. */
   export type T = AvaMapConfigRead;
+  /** A built-in or custom basemap configuration. */
   export type Basemap = BasemapConfig;
+  /** Identifies a built-in basemap style. */
   export type BasemapStyle = BasemapStyleKey;
   /** Identifies the tile protocol for a custom basemap. */
   export type CustomBasemapKind = CustomBasemapKindType;
+  /** A persisted map camera position. */
   export type ViewState = MapViewState;
   /** A saved camera position in a map configuration. */
   export type Bookmark = MapBookmark;

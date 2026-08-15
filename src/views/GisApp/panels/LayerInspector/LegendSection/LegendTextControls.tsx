@@ -8,9 +8,11 @@ import type { ReactNode } from "react";
 type Props = { legend: MapLayer.Legend; onLayerChange: LayerChangeHandler };
 
 /** Edits a layer legend's title and optional units. */
-export function LegendTextControls(props: Props): ReactNode {
+export function LegendTextControls({
+  legend,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { legend, onLayerChange } = props;
   return (
     <>
       <TextInput
@@ -19,7 +21,10 @@ export function LegendTextControls(props: Props): ReactNode {
         onChange={(event) => {
           const title = event.currentTarget.value;
           onLayerChange((current) => {
-            return MapLayerUpdates.withLegend(current, { title });
+            return MapLayerUpdates.withLegend({
+              layer: current,
+              legend: { title },
+            });
           });
         }}
       />
@@ -30,8 +35,11 @@ export function LegendTextControls(props: Props): ReactNode {
         onChange={(event) => {
           const value = event.currentTarget.value;
           onLayerChange((current) => {
-            return MapLayerUpdates.withLegend(current, {
-              units: value === "" ? undefined : value,
+            return MapLayerUpdates.withLegend({
+              layer: current,
+              legend: {
+                units: value === "" ? undefined : value,
+              },
             });
           });
         }}

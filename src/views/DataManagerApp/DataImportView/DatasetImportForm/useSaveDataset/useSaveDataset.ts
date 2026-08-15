@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
@@ -103,7 +104,10 @@ export function useSaveDataset(
     Error,
     SaveDatasetMutationContext
   >({
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    queriesToInvalidate: [
+      DatasetClient.QueryKeys.getAll(),
+      DatasetColumnClient.QueryKeys.getAll(),
+    ],
     onMutate: () => {
       return {
         isFirstInWorkspace:

@@ -4,7 +4,24 @@ import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapVi
 
 type MoveEndHandler = () => void;
 
-function _createMapHarness() {
+type FakeMap = {
+  getCenter: ReturnType<typeof vi.fn>;
+  getZoom: ReturnType<typeof vi.fn>;
+  jumpTo: ReturnType<typeof vi.fn>;
+  off: ReturnType<typeof vi.fn>;
+  on: ReturnType<typeof vi.fn>;
+};
+
+function _createMapHarness(): {
+  map: FakeMap;
+  mapInstance: { mapRef: { current: FakeMap } };
+  moveCamera: (
+    options: Readonly<{
+      center: { lng: number; lat: number };
+      zoom: number;
+    }>,
+  ) => void;
+} {
   let center = { lng: -74, lat: 40 };
   let zoom = 8;
   let moveEndHandler: MoveEndHandler | undefined;
@@ -34,10 +51,7 @@ function _createMapHarness() {
   return {
     map,
     mapInstance,
-    moveCamera: (
-      nextCenter: { lng: number; lat: number },
-      nextZoom: number,
-    ) => {
+    moveCamera: ({ center: nextCenter, zoom: nextZoom }) => {
       center = nextCenter;
       zoom = nextZoom;
       moveEndHandler?.();
@@ -58,7 +72,7 @@ describe("useMapViewSync", () => {
     });
 
     act(() => {
-      harness.moveCamera({ lng: 12.5, lat: 34.25 }, 9.5);
+      harness.moveCamera({ center: { lng: 12.5, lat: 34.25 }, zoom: 9.5 });
     });
 
     expect(onViewChange).toHaveBeenCalledWith({

@@ -10,6 +10,7 @@ import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryData
 
 type GisAppLayerAction = (layerId: MapLayer.Id) => void;
 
+/** Layer actions shared by the map panel and inspector surfaces. */
 export type GisAppLayerActions = {
   onDeleteLayer: GisAppLayerAction;
   onDuplicateLayer: GisAppLayerAction;
@@ -20,16 +21,6 @@ export type GisAppLayerActions = {
   onToggleLayerVisible: GisAppLayerAction;
   updateSelectedLayer: (update: (current: MapLayer.T) => MapLayer.T) => void;
 };
-
-type GisAppLayerSelectionActions = Pick<
-  GisAppLayerActions,
-  "onAddLayerFromSource" | "updateSelectedLayer"
->;
-
-type GisAppLayerStackActions = Pick<
-  GisAppLayerActions,
-  "onStackOrderChange" | "onToggleLayerVisible"
->;
 
 type RenameLayerModalOptions = {
   cancelLabel: string;
@@ -68,9 +59,12 @@ function _openRenameLayerModal(options: RenameLayerModalOptions): void {
 
 /** Chooses the adjacent persisted layer that survives a deletion. */
 function _getNearestSurvivingLayerId(
-  layers: readonly MapLayer.T[],
-  deletedLayerId: MapLayer.Id,
+  options: Readonly<{
+    layers: readonly MapLayer.T[];
+    deletedLayerId: MapLayer.Id;
+  }>,
 ): MapLayer.Id | undefined {
+  const { layers, deletedLayerId } = options;
   const deletedLayerIndex = layers.findIndex(propEq("id", deletedLayerId));
   return deletedLayerIndex === -1 ? undefined : (
       (layers[deletedLayerIndex + 1]?.id ?? layers[deletedLayerIndex - 1]?.id)
@@ -80,7 +74,7 @@ function _getNearestSurvivingLayerId(
 /** Updates a selected layer and creates one from a chosen data source. */
 function useGisAppLayerSelectionActions(
   app: GisAppState,
-): GisAppLayerSelectionActions {
+): Pick<GisAppLayerActions, "onAddLayerFromSource" | "updateSelectedLayer"> {
   const updateSelectedLayer = (
     update: (current: MapLayer.T) => MapLayer.T,
   ): void => {
@@ -89,16 +83,20 @@ function useGisAppLayerSelectionActions(
       return;
     }
     app.updateConfig((current) => {
-      return AvaMapConfig.withLayerReplaced(current, selectedLayerId, update);
+      return AvaMapConfig.withLayerReplaced({
+        config: current,
+        layerId: selectedLayerId,
+        update,
+      });
     });
   };
   const onAddLayerFromSource = (dataSource: QueryDataSource.T): void => {
-    const layer = MapLayer.makeFromDataSource({
+    const layer = MapLayer.fromDataSource({
       dataSource,
       name: dataSource.name,
     });
     app.updateConfig((current) => {
-      return AvaMapConfig.withLayerAdded(current, layer);
+      return AvaMapConfig.withLayerAdded({ config: current, layer });
     });
     app.setSelectedLayerId(layer.id);
   };
@@ -107,18 +105,27 @@ function useGisAppLayerSelectionActions(
 }
 
 /** Updates layer order and visibility from layer-panel controls. */
-function useGisAppLayerStackActions(app: GisAppState): GisAppLayerStackActions {
+function useGisAppLayerStackActions(
+  app: GisAppState,
+): Pick<GisAppLayerActions, "onStackOrderChange" | "onToggleLayerVisible"> {
   const onStackOrderChange = (
     orderedLayerIds: readonly MapLayer.Id[],
   ): void => {
     app.updateConfig((current) => {
-      return AvaMapConfig.withStackOrder(current, orderedLayerIds);
+      return AvaMapConfig.withStackOrder({ config: current, orderedLayerIds });
     });
   };
   const onToggleLayerVisible = (layerId: MapLayer.Id): void => {
     app.updateConfig((current) => {
-      return AvaMapConfig.withLayerReplaced(current, layerId, (layer) => {
-        return MapLayerUpdates.withVisibility(layer, !layer.isVisible);
+      return AvaMapConfig.withLayerReplaced({
+        config: current,
+        layerId,
+        update: (layer) => {
+          return MapLayerUpdates.withVisibility({
+            layer: layer,
+            isVisible: !layer.isVisible,
+          });
+        },
       });
     });
   };
@@ -141,13 +148,16 @@ function useGisAppLayerRename(app: GisAppState): GisAppLayerAction {
       fieldLabel: t`Layer name`,
       onRename: (nextName) => {
         app.updateConfig((current) => {
-          return AvaMapConfig.withLayerReplaced(
-            current,
+          return AvaMapConfig.withLayerReplaced({
+            config: current,
             layerId,
-            (currentLayer) => {
-              return MapLayerUpdates.withName(currentLayer, nextName);
+            update: (currentLayer) => {
+              return MapLayerUpdates.withName({
+                layer: currentLayer,
+                name: nextName,
+              });
             },
-          );
+          });
         });
       },
       submitLabel: t`Rename`,
@@ -163,11 +173,11 @@ function useGisAppLayerDuplication(app: GisAppState): GisAppLayerAction {
   return (layerId: MapLayer.Id): void => {
     const layer = app.mapConfig.layers.find(propEq("id", layerId));
     app.updateConfig((current) => {
-      return AvaMapConfig.withLayerDuplicated(
-        current,
+      return AvaMapConfig.withLayerDuplicated({
+        config: current,
         layerId,
-        t`${layer?.name ?? ""} copy`,
-      );
+        name: t`${layer?.name ?? ""} copy`,
+      });
     });
   };
 }
@@ -175,12 +185,12 @@ function useGisAppLayerDuplication(app: GisAppState): GisAppLayerAction {
 /** Deletes a layer and selects its nearest surviving neighbor. */
 function useGisAppLayerDeletion(app: GisAppState): GisAppLayerAction {
   return (layerId: MapLayer.Id): void => {
-    const nearestSurvivingLayerId = _getNearestSurvivingLayerId(
-      app.mapConfig.layers,
-      layerId,
-    );
+    const nearestSurvivingLayerId = _getNearestSurvivingLayerId({
+      layers: app.mapConfig.layers,
+      deletedLayerId: layerId,
+    });
     app.updateConfig((current) => {
-      return AvaMapConfig.withLayerRemoved(current, layerId);
+      return AvaMapConfig.withLayerRemoved({ config: current, layerId });
     });
     if (layerId === app.selectedLayerId) {
       app.setSelectedLayerId(nearestSurvivingLayerId);

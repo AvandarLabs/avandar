@@ -213,22 +213,24 @@ describe("makeFeatureCollectionFromRows", () => {
   });
 
   it("refuses to build exact points for an aggregate-only layer", () => {
-    let caughtError: unknown;
-    try {
-      makeFeatureCollectionFromRows({
-        rows: [{ lat: -4.44, lon: 15.27 }],
-        binding,
-        propertyColumnNames: "all",
-        sensitivity: {
-          mode: "aggregateOnly",
-          minCellCount: 5,
-          minGeoLevel: "admin2",
-        },
-        layerId: "layer-1",
-      });
-    } catch (error) {
-      caughtError = error;
-    }
+    const caughtError = (() => {
+      try {
+        makeFeatureCollectionFromRows({
+          rows: [{ lat: -4.44, lon: 15.27 }],
+          binding,
+          propertyColumnNames: "all",
+          sensitivity: {
+            mode: "aggregateOnly",
+            minCellCount: 5,
+            minGeoLevel: "admin2",
+          },
+          layerId: "layer-1",
+        });
+        return undefined;
+      } catch (error) {
+        return error;
+      }
+    })();
 
     expect(caughtError).toMatchObject({ code: "aggregateOnly" });
   });

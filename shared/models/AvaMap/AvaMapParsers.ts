@@ -7,7 +7,7 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
+import { supabaseJSONSchema as supabaseJsonSchema } from "$/lib/zodHelpers.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
@@ -18,7 +18,7 @@ import type { UserProfile } from "$/models/User/UserProfile.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({
-  config: supabaseJSONSchema,
+  config: supabaseJsonSchema,
   created_at: z.iso.datetime({ offset: true }),
   description: z.string().nullable(),
   id: z.uuid(),
@@ -32,13 +32,12 @@ const DBReadSchema = z.object({
   workspace_id: z.uuid(),
 });
 
-type DBReadWithoutConfig = Omit<AvaMapModel["DBRead"], "config">;
 type ModelReadWithoutConfig = Omit<AvaMapModel["Read"], "config">;
 type DBInsertWithoutConfig = Omit<AvaMapModel["DBInsert"], "config">;
 type DBUpdateWithoutConfig = Omit<AvaMapModel["DBUpdate"], "config">;
 
 function _camelCaseMapReadRow(
-  row: DBReadWithoutConfig,
+  row: Omit<AvaMapModel["DBRead"], "config">,
 ): ModelReadWithoutConfig {
   const camelCaseRow = camelCaseKeysDeep(row) as ModelReadWithoutConfig;
   return nullsToUndefinedDeep(camelCaseRow) as ModelReadWithoutConfig;
@@ -73,8 +72,8 @@ function _snakeCaseMapUpdateRow(
 export const AvaMapParsers = makeParserRegistry<AvaMapModel>().build({
   modelName: "AvaMap",
   DBReadSchema,
-  fromDBReadToModelRead: (obj): AvaMapModel["Read"] => {
-    const { config, ...row } = obj;
+  fromDBReadToModelRead: (databaseReadRow): AvaMapModel["Read"] => {
+    const { config, ...row } = databaseReadRow;
     const modelRow = _camelCaseMapReadRow(row);
 
     return Model.make("AvaMap", {

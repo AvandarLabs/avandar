@@ -1,3 +1,4 @@
+import { isNullish } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Anchor } from "@mantine/core";
 import { isSafePopupUrlTemplate } from "$/models/AvaMap/AvaMapConfig/isSafePopupUrlTemplate";
@@ -11,12 +12,15 @@ type Props = {
 
 /** Fills `{columnName}` placeholders from a feature's properties. */
 function _buildActionUrl(
-  urlTemplate: string,
-  properties: Readonly<Record<string, unknown>>,
+  options: Readonly<{
+    urlTemplate: string;
+    properties: Readonly<Record<string, unknown>>;
+  }>,
 ): string {
+  const { urlTemplate, properties } = options;
   return urlTemplate.replace(/\{([^}]+)\}/g, (placeholder, columnName) => {
     const value = properties?.[columnName];
-    return value == null ? placeholder : encodeURIComponent(String(value));
+    return isNullish(value) ? placeholder : encodeURIComponent(String(value));
   });
 }
 
@@ -32,7 +36,7 @@ export function FeatureAction({ action, properties }: Props): ReactNode {
   }
   return (
     <Anchor
-      href={_buildActionUrl(action.urlTemplate, properties)}
+      href={_buildActionUrl({ urlTemplate: action.urlTemplate, properties })}
       target="_blank"
       rel="noreferrer"
       size="sm"

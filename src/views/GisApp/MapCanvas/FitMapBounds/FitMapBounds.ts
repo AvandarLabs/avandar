@@ -5,9 +5,12 @@ import type { MapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/us
 import type { RefObject } from "react";
 
 function _areBoundsEqual(
-  first: MapBounds | undefined,
-  second: MapBounds | undefined,
+  options: Readonly<{
+    first: MapBounds | undefined;
+    second: MapBounds | undefined;
+  }>,
 ): boolean {
+  const { first, second } = options;
   if (first === second) {
     return true;
   }
@@ -23,9 +26,12 @@ function _areBoundsEqual(
 }
 
 function _arePaddingEqual(
-  first: MapChromeInsets | undefined,
-  second: MapChromeInsets | undefined,
+  options: Readonly<{
+    first: MapChromeInsets | undefined;
+    second: MapChromeInsets | undefined;
+  }>,
 ): boolean {
+  const { first, second } = options;
   if (first === second) {
     return true;
   }
@@ -64,39 +70,24 @@ type LegacyStoreState = {
   request: FitBoundsRequest | undefined;
 };
 
-type LegacyFitBoundsInput = {
-  bounds: MapBounds | undefined;
-  padding: MapChromeInsets;
-};
-
-type FitBoundsOptions = {
-  padding: MapChromeInsets;
-  animate: boolean;
-  duration: number;
-};
-
-type FitBoundsMap = {
-  fitBounds: (bounds: MapBounds, options: FitBoundsOptions) => unknown;
-};
-
-type FitMapBoundsInstance = {
-  mapRef: RefObject<FitBoundsMap | undefined>;
-};
-
-type FitMapBoundsInput = {
-  mapInstance: FitMapBoundsInstance;
-  request: FitBoundsRequest | undefined;
-};
-
 /** Updates a legacy request store and notifies its subscribers. */
 function _updateLegacyStore(
-  state: LegacyStoreState,
-  listeners: ReadonlySet<() => void>,
-  bounds: MapBounds | undefined,
-  padding: MapChromeInsets,
+  options: Readonly<{
+    state: LegacyStoreState;
+    listeners: ReadonlySet<() => void>;
+    bounds: MapBounds | undefined;
+    padding: MapChromeInsets;
+  }>,
 ): void {
-  const hasBoundsChanged = !_areBoundsEqual(state.previousBounds, bounds);
-  const hasPaddingChanged = !_arePaddingEqual(state.previousPadding, padding);
+  const { state, listeners, bounds, padding } = options;
+  const hasBoundsChanged = !_areBoundsEqual({
+    first: state.previousBounds,
+    second: bounds,
+  });
+  const hasPaddingChanged = !_arePaddingEqual({
+    first: state.previousPadding,
+    second: padding,
+  });
   if (!hasBoundsChanged && !hasPaddingChanged) {
     return;
   }
@@ -135,16 +126,19 @@ function _createLegacyFitBoundsRequestStore(): LegacyFitBoundsRequestStore {
     };
   };
   const update = (bounds: MapBounds | undefined, padding: MapChromeInsets) => {
-    _updateLegacyStore(state, listeners, bounds, padding);
+    _updateLegacyStore({ state, listeners, bounds, padding });
   };
   return { getServerSnapshot, getSnapshot, subscribe, update };
 }
 
 function useLegacyStoreUpdate(
-  store: LegacyFitBoundsRequestStore,
-  bounds: MapBounds | undefined,
-  padding: MapChromeInsets,
+  options: Readonly<{
+    store: LegacyFitBoundsRequestStore;
+    bounds: MapBounds | undefined;
+    padding: MapChromeInsets;
+  }>,
 ): void {
+  const { store, bounds, padding } = options;
   const southwestLongitude = bounds?.[0]?.[0];
   const southwestLatitude = bounds?.[0]?.[1];
   const northeastLongitude = bounds?.[1]?.[0];
@@ -191,9 +185,12 @@ export const FitMapBounds = {
   useLegacyFitBoundsRequest: ({
     bounds,
     padding,
-  }: LegacyFitBoundsInput): FitBoundsRequest | undefined => {
+  }: Readonly<{
+    bounds: MapBounds | undefined;
+    padding: MapChromeInsets;
+  }>): FitBoundsRequest | undefined => {
     const [store] = useState(_createLegacyFitBoundsRequestStore);
-    useLegacyStoreUpdate(store, bounds, padding);
+    useLegacyStoreUpdate({ store, bounds, padding });
     return useSyncExternalStore(
       store.subscribe,
       store.getSnapshot,
@@ -202,7 +199,27 @@ export const FitMapBounds = {
   },
 
   /** Applies each camera request once, using the request id as its identity. */
-  useFitMapBounds: ({ mapInstance, request }: FitMapBoundsInput): void => {
+  useFitMapBounds: ({
+    mapInstance,
+    request,
+  }: Readonly<{
+    mapInstance: {
+      mapRef: RefObject<
+        | {
+            fitBounds: (
+              bounds: MapBounds,
+              options: {
+                padding: MapChromeInsets;
+                animate: boolean;
+                duration: number;
+              },
+            ) => unknown;
+          }
+        | undefined
+      >;
+    };
+    request: FitBoundsRequest | undefined;
+  }>): void => {
     const { mapRef } = mapInstance;
     const appliedRequestIdRef = useRef<number | undefined>(undefined);
     const prefersReducedMotion = useReducedMotion();

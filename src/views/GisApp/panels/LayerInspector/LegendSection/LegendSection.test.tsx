@@ -1,3 +1,4 @@
+import { assertIsDefined } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
@@ -31,13 +32,14 @@ vi.mock(
 );
 
 function _applyLatestUpdate(
-  onLayerChange: ReturnType<typeof vi.fn>,
-  layer: MapLayer.T,
+  options: Readonly<{
+    onLayerChange: ReturnType<typeof vi.fn>;
+    layer: MapLayer.T;
+  }>,
 ): MapLayer.T {
+  const { onLayerChange, layer } = options;
   const latestCall = onLayerChange.mock.lastCall;
-  if (!latestCall) {
-    throw new Error("Expected a layer update");
-  }
+  assertIsDefined(latestCall, "Expected a layer update");
   return latestCall[0](layer);
 }
 
@@ -51,19 +53,28 @@ describe("LegendSection", () => {
     fireEvent.change(screen.getByLabelText("Title"), {
       target: { value: "Population" },
     });
-    let updatedLayer = _applyLatestUpdate(onLayerChange, layer);
+    let updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     expect(updatedLayer.legend.title).toBe("Population");
 
     fireEvent.change(screen.getByLabelText("Units"), {
       target: { value: "people" },
     });
-    updatedLayer = _applyLatestUpdate(onLayerChange, updatedLayer);
+    updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: updatedLayer,
+    });
     expect(updatedLayer.legend.units).toBe("people");
 
     fireEvent.click(
       screen.getByRole("switch", { name: /show a not reported entry/i }),
     );
-    updatedLayer = _applyLatestUpdate(onLayerChange, updatedLayer);
+    updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: updatedLayer,
+    });
     expect(updatedLayer.legend.showNoData).toBe(false);
   });
 
@@ -78,7 +89,10 @@ describe("LegendSection", () => {
     );
     pickMantineSelectOption("Position", "Top right");
 
-    const updatedLayer = _applyLatestUpdate(onLayerChange, layer);
+    const updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     expect(updatedLayer.legend.position).toBe("topRight");
   });
 });

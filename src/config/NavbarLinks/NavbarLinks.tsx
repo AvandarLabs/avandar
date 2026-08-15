@@ -8,11 +8,12 @@ import {
   IconSettings,
   IconTable,
 } from "@tabler/icons-react";
-import { ReactNode } from "react";
-import { AppLink, AppLinkKey, AppLinks } from "@/config/AppLinks/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
 
 export type NavbarLink = {
   link: AppLink;

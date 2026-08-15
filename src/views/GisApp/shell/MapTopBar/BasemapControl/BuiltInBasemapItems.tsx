@@ -11,7 +11,10 @@ type Props = {
 };
 
 /** Renders the built-in basemap style choices. */
-export function BuiltInBasemapItems(props: Props): ReactNode {
+export function BuiltInBasemapItems({
+  basemap,
+  onBasemapChange,
+}: Props): ReactNode {
   const { t } = useLingui();
   const labels = {
     avandar: t`Avandar`,
@@ -25,11 +28,9 @@ export function BuiltInBasemapItems(props: Props): ReactNode {
     return (
       <Menu.Item
         key={styleKey}
-        aria-current={
-          props.basemap.type === "builtIn" && props.basemap.style === styleKey
-        }
+        aria-current={basemap.type === "builtIn" && basemap.style === styleKey}
         onClick={() => {
-          props.onBasemapChange({ type: "builtIn", style: styleKey });
+          onBasemapChange({ type: "builtIn", style: styleKey });
         }}
       >
         {matchLiteral(styleKey, labels)}

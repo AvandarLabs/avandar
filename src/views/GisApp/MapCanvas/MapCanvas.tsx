@@ -1,4 +1,4 @@
-import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface";
+import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import type { MapCanvasOptions } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import type { ReactNode } from "react";

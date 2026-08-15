@@ -1,9 +1,9 @@
 import { useSortable } from "@dnd-kit/react/sortable";
 import { LayerActionsMenu } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu";
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow.module.css";
-import { LayerRowDragHandle } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle";
-import { LayerRowInstructions } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions";
-import { LayerRowSelection } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection";
+import { LayerRowDragHandle } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle";
+import { LayerRowInstructions } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions";
+import { LayerRowSelection } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection/LayerRowSelection";
 import { LayerVisibilityButton } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -24,19 +24,30 @@ type Props = {
 };
 
 /** Renders the selection, visibility, drag, status, and action controls. */
-export function LayerRow(props: Props): ReactNode {
-  const { layer } = props;
+export function LayerRow({
+  layer,
+  viewState,
+  isSelected,
+  rowIndex,
+  onSelect,
+  onToggleVisible,
+  onMoveByOffset,
+  onRename,
+  onDuplicate,
+  onZoomToLayer,
+  onDelete,
+}: Props): ReactNode {
   const dragId = `layer-${layer.id}-drag-instructions`;
   const keyboardMoveId = `layer-${layer.id}-keyboard-move-instructions`;
   const { ref, handleRef, isDragging } = useSortable({
     id: layer.id,
-    index: props.rowIndex,
+    index: rowIndex,
   });
   return (
     <li ref={ref}>
       <div
         className={css.layerRow}
-        data-selected={props.isSelected}
+        data-selected={isSelected}
         data-dragging={isDragging}
         data-hidden={!layer.isVisible}
       >
@@ -47,10 +58,23 @@ export function LayerRow(props: Props): ReactNode {
         <LayerVisibilityButton
           layerName={layer.name}
           isVisible={layer.isVisible}
-          onClick={props.onToggleVisible}
+          onClick={onToggleVisible}
         />
-        <LayerRowSelection {...props} instructionsId={keyboardMoveId} />
-        <LayerActionsMenu layerName={layer.name} {...props} />
+        <LayerRowSelection
+          layer={layer}
+          viewState={viewState}
+          isSelected={isSelected}
+          instructionsId={keyboardMoveId}
+          onSelect={onSelect}
+          onMoveByOffset={onMoveByOffset}
+        />
+        <LayerActionsMenu
+          layerName={layer.name}
+          onRename={onRename}
+          onDuplicate={onDuplicate}
+          onZoomToLayer={onZoomToLayer}
+          onDelete={onDelete}
+        />
         <LayerRowInstructions dragId={dragId} keyboardMoveId={keyboardMoveId} />
       </div>
     </li>

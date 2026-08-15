@@ -144,3 +144,22 @@ begin
   );
 end;
 $$;
+
+revoke
+execute on function public.rpc_resources__transfer_ownership (
+  public.resource_type,
+  uuid,
+  uuid
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_resources__transfer_ownership (
+  public.resource_type,
+  uuid,
+  uuid
+) to authenticated;

@@ -1,10 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-type Options = { admin: SupabaseClient; mapIds: readonly string[] };
-
 /** Deletes maps and their shares by id. */
 export async function deleteMapsByIds(
-  options: Readonly<Options>,
+  options: Readonly<{
+    admin: SupabaseClient;
+    mapIds: readonly string[];
+  }>,
 ): Promise<void> {
   if (options.mapIds.length === 0) {
     return;

@@ -1,16 +1,20 @@
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
 import type {
-  GeoBinding, // prettier-ignore
+  AreaGeoBinding,
+  GeoBinding,
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
+  FillSymbology,
   LayerSymbology, // prettier-ignore
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
   LegendConfig, // prettier-ignore
 } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
 import type {
-  SensitivityPolicy, // prettier-ignore
+  AggregateOnlySensitivity,
+  ExactSensitivity,
+  JitterSensitivity,
 } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 import type {
   QueryColumn, // prettier-ignore
@@ -44,28 +48,56 @@ export type PopupConfig = {
   action: PopupLinkAction | undefined;
 };
 
+type MapLayerCommon = {
+  id: MapLayerId;
+  name: string;
+  isVisible: boolean;
+
+  /** The query producing this layer's rows. */
+  source: StructuredQuery.Partial;
+
+  popup: PopupConfig;
+  legend: LegendConfig;
+};
+
+type LayerProtectionAndRendering =
+  | {
+      sensitivity: ExactSensitivity | JitterSensitivity;
+      geoBinding: GeoBinding | undefined;
+      symbology: LayerSymbology;
+    }
+  | {
+      sensitivity: AggregateOnlySensitivity;
+      geoBinding: AreaGeoBinding | undefined;
+      symbology: FillSymbology;
+    };
+
 /**
  * One layer of a map. The three axes are independent: `source` decides which
  * rows, `geoBinding` decides how those rows become geometry, and `symbology`
  * decides how that geometry is painted. `sensitivity` constrains `symbology`.
  */
-export type MapLayerRead = Model.Versioned<
+export type StandardMapLayerRead = Model.Versioned<
   ModelType,
   CurrentMapLayerVersion,
-  {
-    id: MapLayerId;
-    name: string;
-    isVisible: boolean;
-
-    /** The query producing this layer's rows. */
-    source: StructuredQuery.Partial;
-
-    /** Undefined until the author has picked geometry columns. */
-    geoBinding: GeoBinding | undefined;
-
-    symbology: LayerSymbology;
-    sensitivity: SensitivityPolicy;
-    popup: PopupConfig;
-    legend: LegendConfig;
-  }
+  MapLayerCommon &
+    Extract<
+      LayerProtectionAndRendering,
+      { sensitivity: ExactSensitivity | JitterSensitivity }
+    >
 >;
+
+export type AggregateOnlyMapLayerRead = Model.Versioned<
+  ModelType,
+  CurrentMapLayerVersion,
+  MapLayerCommon &
+    Extract<
+      LayerProtectionAndRendering,
+      { sensitivity: AggregateOnlySensitivity }
+    >
+>;
+
+/**
+ * A map layer whose sensitivity structurally constrains its binding and paint.
+ */
+export type MapLayerRead = StandardMapLayerRead | AggregateOnlyMapLayerRead;

@@ -1,3 +1,4 @@
+import { formatNumber } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { mapDisclaimer } from "$/copy/mapDisclaimer";
@@ -17,10 +18,10 @@ type Props = {
 };
 
 /** Returns the localized-message descriptor for one coordinate hemisphere. */
-function _getHemisphereMessage(
-  value: number,
-  axis: "lat" | "lng",
+function _hemisphereMessage(
+  options: Readonly<{ value: number; axis: "lat" | "lng" }>,
 ): MessageDescriptor {
+  const { value, axis } = options;
   return match({ axis, isNegative: value < 0 })
     .with({ axis: "lat", isNegative: true }, () => {
       return msg`S`;
@@ -50,10 +51,20 @@ export function MapFurnitureBar({
     <div className={css.mapFurnitureBar} data-testid="map-furniture-bar">
       <span className={css.mapFurnitureBarCoordinates}>
         {coordinates ?
-          `${Math.abs(coordinates.latitude).toFixed(3)} ${i18n._(
-            _getHemisphereMessage(coordinates.latitude, "lat"),
-          )}, ${Math.abs(coordinates.longitude).toFixed(3)} ${i18n._(
-            _getHemisphereMessage(coordinates.longitude, "lng"),
+          `${formatNumber(Math.abs(coordinates.latitude), {
+            locale: i18n.locale,
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+            useGrouping: false,
+          })} ${i18n._(
+            _hemisphereMessage({ value: coordinates.latitude, axis: "lat" }),
+          )}, ${formatNumber(Math.abs(coordinates.longitude), {
+            locale: i18n.locale,
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+            useGrouping: false,
+          })} ${i18n._(
+            _hemisphereMessage({ value: coordinates.longitude, axis: "lng" }),
           )}`
         : t`Move the pointer over the map to read a coordinate`}
       </span>

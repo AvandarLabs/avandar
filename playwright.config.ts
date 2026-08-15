@@ -2,7 +2,10 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
-import { ensureE2EViteFeatureFlags } from "./tests/e2e/setup/ensureE2EViteFeatureFlags";
+import {
+  ensureE2EViteFeatureFlags,
+  shouldReuseE2EViteServer,
+} from "./tests/e2e/setup/ensureE2EViteFeatureFlags";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 ensureE2EViteFeatureFlags();
@@ -66,7 +69,7 @@ export default defineConfig({
       VITE_FEATURE_FLAGS: e2eFeatureFlags,
     },
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: shouldReuseE2EViteServer(isCI),
     timeout: 180_000,
   },
   globalSetup: "./tests/e2e/setup/globalSetup.ts",

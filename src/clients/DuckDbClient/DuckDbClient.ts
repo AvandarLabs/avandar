@@ -16,6 +16,7 @@ import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types"
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
+import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import {
   CSV_SNIFF_SAMPLE_SIZE,
   DEFAULT_CSV_ESCAPE_CHAR,
@@ -52,6 +53,7 @@ import {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { buildManualDuckDbBundles } from "@/clients/DuckDbClient/duckDbManualBundles";
+import { createDuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import { shouldLoadDuckDbNetworkExtensions } from "@/clients/DuckDbClient/shouldLoadDuckDbNetworkExtensions";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { Logger } from "@/utils/Logger";
@@ -315,6 +317,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
  */
 class DuckDbClientImpl {
   #db?: Promise<duckdb.AsyncDuckDB>;
+  #spatialAvailability = createDuckDbSpatialAvailabilityStore();
 
   /**
    * Tracking open connections. This is useful for debugging if we ever need to
@@ -362,19 +365,26 @@ class DuckDbClientImpl {
     // .xlsx flows hit a runtime "unknown function/format" error instead of
     // breaking the whole client.
     // TODO(jpsyx): only load spatial when a geo query needs it.
-    const loadOptionalExtension = async (name: string): Promise<void> => {
+    const loadOptionalExtension = async (name: string): Promise<boolean> => {
       try {
         await conn.query(`LOAD ${name};`);
+        return true;
       } catch (error) {
         this.#logger.warn(
           `DuckDB extension "${name}" failed to load (likely offline); ` +
             "queries that need it will fail.",
           { error },
         );
+        return false;
       }
     };
     if (loadNetworkExtensions) {
-      await loadOptionalExtension("spatial");
+      const didLoadSpatial = await loadOptionalExtension("spatial");
+      this.#spatialAvailability.set(
+        didLoadSpatial ? "available" : "unavailable",
+      );
+    } else {
+      this.#spatialAvailability.set("unavailable");
     }
     await conn.query("LOAD parquet;");
     if (loadNetworkExtensions) {
@@ -389,6 +399,7 @@ class DuckDbClientImpl {
     if (!this.#db) {
       this.#db = this.#initialize().catch((error: unknown) => {
         this.#db = undefined;
+        this.#spatialAvailability.set("unavailable");
         throw error;
       });
     }
@@ -405,6 +416,21 @@ class DuckDbClientImpl {
   async #closeConnection(conn: duckdb.AsyncDuckDBConnection): Promise<void> {
     this.#openConnections.delete(conn);
     await conn.close();
+  }
+
+  /** Starts DuckDB initialization if it has not already begun. */
+  async initialize(): Promise<void> {
+    await this.#getDB();
+  }
+
+  /** Returns the current DuckDB Spatial capability state. */
+  getSpatialAvailability() {
+    return this.#spatialAvailability.getSnapshot();
+  }
+
+  /** Subscribes to DuckDB Spatial capability changes. */
+  subscribeSpatialAvailability(listener: () => void): () => void {
+    return this.#spatialAvailability.subscribe(listener);
   }
 
   /**
@@ -1278,6 +1304,7 @@ SET enable_external_file_cache = true;
       params?: Record<string, string | number | bigint | undefined>;
       returnType?: "js";
       conn?: duckdb.AsyncDuckDBConnection;
+      signal?: AbortSignal;
     },
   ): Promise<QueryResult<RowObject>>;
   async runRawQuery(
@@ -1286,6 +1313,7 @@ SET enable_external_file_cache = true;
       params?: Record<string, string | number | bigint | undefined>;
       returnType: "parquet";
       conn?: duckdb.AsyncDuckDBConnection;
+      signal?: AbortSignal;
     },
   ): Promise<Blob>;
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
@@ -1294,10 +1322,18 @@ SET enable_external_file_cache = true;
       params?: Record<string, string | number | bigint | undefined>;
       returnType?: "parquet" | "js";
       conn?: duckdb.AsyncDuckDBConnection;
+      signal?: AbortSignal;
     } = {},
   ): Promise<Blob | QueryResult<RowObject>> {
-    const { params = {}, returnType = "js" } = options;
+    const { params = {}, returnType = "js", signal } = options;
+    signal?.throwIfAborted();
     const conn = options.conn ?? (await this.#connect());
+    const removeAbortListener =
+      signal ?
+        abortDuckDbQuery(signal, conn)
+      : () => {
+          return undefined;
+        };
     let queryResults: QueryResult<RowObject> | Blob;
     const paramNames = objectKeys(params);
     const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
@@ -1335,6 +1371,7 @@ SET enable_external_file_cache = true;
       });
       throw error;
     } finally {
+      removeAbortListener();
       // If we created the connection in this function, then we can close it.
       // Otherwise, if a connection was passed to us, we should do nothing. It
       // should be up to the caller to close the connection.

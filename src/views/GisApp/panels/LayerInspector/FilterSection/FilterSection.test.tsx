@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { assertIsDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -8,7 +9,7 @@ import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSectio
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
 
@@ -59,7 +60,7 @@ vi.mock(
 vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
   return {
     MapLayerUpdates: {
-      withFilters: vi.fn((layer, filters) => {
+      withFilters: vi.fn(({ layer, filters }) => {
         return { ...layer, source: { ...layer.source, filters } };
       }),
     },
@@ -74,10 +75,10 @@ vi.mock(
         onChange,
         value,
       }: {
-        onChange: (filters: QueryFilterGroup) => void;
-        value: QueryFilterGroup;
+        onChange: (filters: StructuredQuery.FilterGroup) => void;
+        value: StructuredQuery.FilterGroup;
       }) => {
-        const nextFilters: QueryFilterGroup = {
+        const nextFilters: StructuredQuery.FilterGroup = {
           ...value,
           rules: [
             {
@@ -104,17 +105,20 @@ vi.mock(
 );
 
 function _applyLatestUpdate(
-  onLayerChange: ReturnType<typeof vi.fn<LayerChangeHandler>>,
-  layer: MapLayer.T,
+  options: Readonly<{
+    onLayerChange: ReturnType<typeof vi.fn<LayerChangeHandler>>;
+    layer: MapLayer.T;
+  }>,
 ): MapLayer.T {
+  const { onLayerChange, layer } = options;
   const latestCall = onLayerChange.mock.lastCall;
-  if (!latestCall) {
-    throw new Error("Expected a layer update");
-  }
+  assertIsDefined(latestCall, "Expected a layer update");
   return latestCall[0](layer);
 }
 
-function _makeLayerWithFilters(rules: QueryFilterGroup["rules"]): MapLayer.T {
+function _makeLayerWithFilters(
+  rules: StructuredQuery.FilterGroup["rules"],
+): MapLayer.T {
   const layer = MapLayer.makeEmpty("Cases");
   return {
     ...layer,
@@ -154,7 +158,10 @@ describe("FilterSection", () => {
     render(<FilterSection layer={layer} onLayerChange={onLayerChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Change filter" }));
 
-    const updatedLayer = _applyLatestUpdate(onLayerChange, layer);
+    const updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
     expect(updatedLayer.source.filters.rules).toEqual([
       {
         type: "rule",

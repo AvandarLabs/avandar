@@ -1,7 +1,9 @@
 import {
   getFiniteNumberFromValue,
   isDefined,
+  isNullish,
   makeBucketMap,
+  makeObject,
   omit,
   prop,
 } from "@avandar/utils";
@@ -70,7 +72,7 @@ type MakeFeatureCollectionInput = {
 
 type FeatureCollectionConversion = {
   featureCollection: GeoJSON.FeatureCollection;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 };
 
 function _classifyCoordinate(
@@ -134,18 +136,22 @@ function _placeCoordinate({
 
 /** Copies requested keys that are own properties of the source row. */
 function _pickOwnProperties(
-  row: UnknownRow,
-  propertyColumnNames: readonly string[],
+  options: Readonly<{
+    row: UnknownRow;
+    propertyColumnNames: readonly string[];
+  }>,
 ): GeoJSON.GeoJsonProperties {
-  return Object.fromEntries(
-    propertyColumnNames
-      .filter((propertyColumnName) => {
-        return Object.prototype.hasOwnProperty.call(row, propertyColumnName);
-      })
-      .map((propertyColumnName) => {
-        return [propertyColumnName, row[propertyColumnName]];
-      }),
+  const { row, propertyColumnNames } = options;
+  const ownPropertyColumnNames = propertyColumnNames.filter(
+    (propertyColumnName) => {
+      return Object.prototype.hasOwnProperty.call(row, propertyColumnName);
+    },
   );
+  return makeObject(ownPropertyColumnNames, {
+    valueFn: (propertyColumnName) => {
+      return row[propertyColumnName];
+    },
+  });
 }
 
 /** Builds a point feature carrying exactly the requested properties. */
@@ -159,7 +165,7 @@ function _createPointFeature({
   const properties: GeoJSON.GeoJsonProperties =
     propertyColumnNames === "all" ?
       omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
-    : _pickOwnProperties(row, propertyColumnNames);
+    : _pickOwnProperties({ row, propertyColumnNames });
   return {
     type: "Feature",
     id: rowIndex,
@@ -173,14 +179,17 @@ function _createPointFeature({
 
 /** Reads and validates the coordinate columns of one source row. */
 function _readCoordinate(
-  row: UnknownRow,
-  binding: MapLayer.GeoBindingColumnNames,
+  options: Readonly<{
+    row: UnknownRow;
+    binding: MapLayer.GeoBindingColumnNames;
+  }>,
 ):
   | { coordinate: { longitude: number; latitude: number } }
   | { dropReason: DropReason } {
+  const { row, binding } = options;
   const rawLatitude = row[binding.latitudeColumnName];
   const rawLongitude = row[binding.longitudeColumnName];
-  if (rawLatitude == null || rawLongitude == null) {
+  if (isNullish(rawLatitude) || isNullish(rawLongitude)) {
     return { dropReason: "nullCoordinate" };
   }
   const latitude = getFiniteNumberFromValue(rawLatitude);
@@ -206,7 +215,7 @@ function _placeRow({
   layerId,
   propertyColumnNames,
 }: PlaceRowInput): RowPlacement {
-  const coordinateRead = _readCoordinate(row, binding);
+  const coordinateRead = _readCoordinate({ row, binding });
   if ("dropReason" in coordinateRead) {
     return { rowIndex, dropReason: coordinateRead.dropReason };
   }

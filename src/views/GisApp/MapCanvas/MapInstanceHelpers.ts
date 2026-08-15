@@ -18,12 +18,6 @@ export type MapInstanceRefs = {
   isStyleSwapPendingRef: RefObject<boolean>;
 };
 
-type CreateMapLibreInstanceInput = {
-  basemap: AvaMapConfig.Basemap;
-  container: HTMLDivElement;
-  view: AvaMapConfig.ViewState;
-};
-
 type CreateStyleLoadHandlerInput = {
   emptySpec: MapSpec;
   instanceRefs: MapInstanceRefs;
@@ -47,7 +41,11 @@ function _createMapLibreInstance({
   basemap,
   container,
   view,
-}: CreateMapLibreInstanceInput): MapLibreMap {
+}: Readonly<{
+  basemap: AvaMapConfig.Basemap;
+  container: HTMLDivElement;
+  view: AvaMapConfig.ViewState;
+}>): MapLibreMap {
   const map = new maplibregl.Map({
     attributionControl: false,
     container,
@@ -61,9 +59,12 @@ function _createMapLibreInstance({
 
 /** Creates the single map-level click handler used by every rendered layer. */
 function _createMapClickHandler(
-  map: MapLibreMap,
-  latestValues: LatestMapValues,
+  options: Readonly<{
+    map: MapLibreMap;
+    latestValues: LatestMapValues;
+  }>,
 ): (event: maplibregl.MapMouseEvent) => void {
+  const { map, latestValues } = options;
   return (event) => {
     const layerIds = latestValues.interactiveLayerIdsRef.current.filter(
       (layerId) => {
@@ -133,7 +134,7 @@ function _attachMapInstance({
   instanceRefs.mapRef.current = map;
   _attachE2EMapInspectionHook(map);
   instanceRefs.appliedStyleKeyRef.current = BasemapStyle.toKey(basemap);
-  const onMapClick = _createMapClickHandler(map, latestValues);
+  const onMapClick = _createMapClickHandler({ map, latestValues });
   const onStyleLoad = _createStyleLoadHandler({
     emptySpec,
     instanceRefs,

@@ -9,14 +9,18 @@ type Props = {
 };
 
 /** Renders custom basemap cancellation and submission actions. */
-export function CustomBasemapActions(props: Props): ReactNode {
+export function CustomBasemapActions({
+  isSubmittable,
+  onClose,
+  onSubmit,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <Group justify="flex-end">
-      <Button variant="default" onClick={props.onClose}>
+      <Button variant="default" onClick={onClose}>
         {t`Cancel`}
       </Button>
-      <Button disabled={!props.isSubmittable} onClick={props.onSubmit}>
+      <Button disabled={!isSubmittable} onClick={onSubmit}>
         {t`Use this basemap`}
       </Button>
     </Group>

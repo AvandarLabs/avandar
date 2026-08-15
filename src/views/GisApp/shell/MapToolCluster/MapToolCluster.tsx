@@ -10,7 +10,7 @@ import {
   IconVector,
 } from "@tabler/icons-react";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
-import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
+import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
 

@@ -11,10 +11,13 @@ type Draft = {
 };
 
 /** Keeps the custom-basemap draft synchronized when the modal opens. */
-export function useCustomBasemapDraft(
-  opened: boolean,
-  basemap: AvaMapConfig.Basemap,
-): Draft {
+export function useCustomBasemapDraft({
+  basemap,
+  opened,
+}: Readonly<{
+  basemap: AvaMapConfig.Basemap;
+  opened: boolean;
+}>): Draft {
   const [kind, setKind] = useState<AvaMapConfig.CustomBasemapKind>("xyz");
   const [url, setUrl] = useState("");
   const [attribution, setAttribution] = useState("");

@@ -18,7 +18,7 @@ export type LayerGeometryInputs = {
 /** One layer's converted geometry, and why rows were lost. */
 export type LayerGeometry = {
   featureCollection: GeoJSON.FeatureCollection;
-  drops: readonly GeometryDropReport[];
+  drops: GeometryDropReport[];
 
   /** Conversion error, when the layer cannot produce point geometry. */
   error: Error | undefined;
@@ -89,10 +89,13 @@ function _getGeometryFromEntries({
 }
 
 /** Removes cache entries for layers absent from the current map. */
-function _pruneEntries(
-  entries: Map<MapLayer.Id, CacheEntry>,
-  liveLayerIds: ReadonlySet<MapLayer.Id>,
-): void {
+function _pruneEntries({
+  entries,
+  liveLayerIds,
+}: Readonly<{
+  entries: Map<MapLayer.Id, CacheEntry>;
+  liveLayerIds: ReadonlySet<MapLayer.Id>;
+}>): void {
   [...entries.keys()].forEach((layerId) => {
     if (!liveLayerIds.has(layerId)) {
       entries.delete(layerId);
@@ -113,7 +116,7 @@ export function createLayerGeometryCache(): {
     },
 
     prune: (liveLayerIds) => {
-      _pruneEntries(entries, liveLayerIds);
+      _pruneEntries({ entries, liveLayerIds });
     },
   };
 }

@@ -20,11 +20,11 @@ vi.mock("@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync", () => {
   return { useMapViewSync: vi.fn() };
 });
 
-const mapInstance = {} as MapInstance;
+const MAP_INSTANCE = {} as MapInstance;
 describe("MapCanvas", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useMapInstance).mockReturnValue(mapInstance);
+    vi.mocked(useMapInstance).mockReturnValue(MAP_INSTANCE);
   });
 
   it("returns the live map instance directly to its owner", () => {
@@ -44,6 +44,6 @@ describe("MapCanvas", () => {
       });
     });
 
-    expect(result.current.mapInstance).toBe(mapInstance);
+    expect(result.current.mapInstance).toBe(MAP_INSTANCE);
   });
 });

@@ -52,6 +52,30 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 /** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
+const GIS_WAVE_B_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-b");
+
+export const GIS_WAVE_B_GEOMETRY_CSV_PATH = path.join(
+  GIS_WAVE_B_DATA_DIR,
+  "gis-wave-b-geometry.csv",
+);
+export const GIS_WAVE_B_BOUNDARIES_CSV_PATH = path.join(
+  GIS_WAVE_B_DATA_DIR,
+  "gis-wave-b-boundaries.csv",
+);
+export const GIS_WAVE_B_POINTS_CSV_PATH = path.join(
+  GIS_WAVE_B_DATA_DIR,
+  "gis-wave-b-points.csv",
+);
+export const GIS_WAVE_B_SUMMARY_CSV_PATH = path.join(
+  GIS_WAVE_B_DATA_DIR,
+  "gis-wave-b-summary.csv",
+);
+
+export const GIS_WAVE_B_GEOMETRY_ROW_COUNT = 4;
+export const GIS_WAVE_B_BOUNDARY_ROW_COUNT = 4;
+export const GIS_WAVE_B_POINT_ROW_COUNT = 8;
+export const GIS_WAVE_B_SUMMARY_ROW_COUNT = 7;
+
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),

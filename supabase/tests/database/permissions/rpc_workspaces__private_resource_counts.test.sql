@@ -68,7 +68,34 @@ values (
   true
 );
 
-select plan(6);
+select plan(9);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.rpc_workspaces__private_resource_counts(uuid)',
+    'EXECUTE'
+  ),
+  'authenticated can execute the private-resource-counts RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.rpc_workspaces__private_resource_counts(uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the private-resource-counts RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.rpc_workspaces__private_resource_counts(uuid)',
+    'EXECUTE'
+  ),
+  'service_role cannot execute the private-resource-counts RPC'
+);
 
 set local role authenticated;
 

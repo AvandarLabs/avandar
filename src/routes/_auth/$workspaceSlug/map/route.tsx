@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { appLabel } from "$/copy/appLabel";
 import { RouteMiddleware } from "@/utils/RouteMiddleware";
+import type { ReactNode } from "react";
 
 /** Guards and renders the authenticated GIS route subtree. */
 export const Route = createFileRoute("/_auth/$workspaceSlug/map")({
@@ -18,6 +19,6 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/map")({
   component: MapLayout,
 });
 
-function MapLayout(): JSX.Element {
+function MapLayout(): ReactNode {
   return <Outlet />;
 }

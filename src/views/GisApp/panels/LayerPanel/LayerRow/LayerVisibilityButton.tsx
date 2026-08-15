@@ -6,22 +6,26 @@ import type { ReactNode } from "react";
 type Props = { layerName: string; isVisible: boolean; onClick: () => void };
 
 /** Toggles a layer's visibility from its row. */
-export function LayerVisibilityButton(props: Props): ReactNode {
+export function LayerVisibilityButton({
+  layerName,
+  isVisible,
+  onClick,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <ActionIcon
       variant="subtle"
       color="neutral"
       size="sm"
-      aria-pressed={props.isVisible}
+      aria-pressed={isVisible}
       aria-label={
-        props.isVisible ?
-          t`Hide the layer ${props.layerName}`
-        : t`Show the layer ${props.layerName}`
+        isVisible ?
+          t`Hide the layer ${layerName}`
+        : t`Show the layer ${layerName}`
       }
-      onClick={props.onClick}
+      onClick={onClick}
     >
-      {props.isVisible ?
+      {isVisible ?
         <IconEye size={15} stroke={1.5} />
       : <IconEyeOff size={15} stroke={1.5} />}
     </ActionIcon>

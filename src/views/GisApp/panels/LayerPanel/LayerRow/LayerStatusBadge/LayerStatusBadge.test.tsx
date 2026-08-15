@@ -44,4 +44,28 @@ describe("LayerStatusBadge", () => {
     expect(screen.getByText("2 rows unmapped")).toBeInTheDocument();
     expect(screen.queryByText("3 points")).not.toBeInTheDocument();
   });
+
+  it("prioritizes suppressed areas over no-data areas", () => {
+    render(
+      <LayerStatusBadge
+        viewState={_makeViewState({
+          suppressedCount: 2,
+          noDataCount: 4,
+        })}
+      />,
+    );
+
+    expect(screen.getByText("2 suppressed")).toBeInTheDocument();
+    expect(screen.queryByText("4 no data")).not.toBeInTheDocument();
+  });
+
+  it("reports no-data areas when none are suppressed", () => {
+    render(
+      <LayerStatusBadge
+        viewState={_makeViewState({ noDataCount: 4, suppressedCount: 0 })}
+      />,
+    );
+
+    expect(screen.getByText("4 no data")).toBeInTheDocument();
+  });
 });

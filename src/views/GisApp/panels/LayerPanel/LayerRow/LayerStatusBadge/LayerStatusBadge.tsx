@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Badge, Group, Loader } from "@mantine/core";
 import { IconCircleX } from "@tabler/icons-react";
 import { match } from "ts-pattern";
+import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState";
 import { ReadyLayerStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
@@ -12,6 +13,25 @@ type Props = { viewState: MapLayerViewState };
 export function LayerStatusBadge({ viewState }: Props): ReactNode {
   const { t } = useLingui();
   const { droppedRowCount, featureCount, status } = viewState;
+  const operationalState = getMapLayerOperationalState(viewState);
+  if (operationalState.type === "rebindRequired") {
+    return (
+      <Badge
+        color="danger"
+        variant="light"
+        size="xs"
+      >{t`Rebind required`}</Badge>
+    );
+  }
+  if (operationalState.type === "spatialUnavailable") {
+    return (
+      <Badge
+        color="warning"
+        variant="light"
+        size="xs"
+      >{t`Spatial unavailable`}</Badge>
+    );
+  }
 
   return match(status)
     .with("unbound", () => {
@@ -45,6 +65,20 @@ export function LayerStatusBadge({ viewState }: Props): ReactNode {
       );
     })
     .with("ready", () => {
+      if (operationalState.type === "suppressed") {
+        return (
+          <Badge color="warning" variant="light" size="xs">
+            {t`${operationalState.count} suppressed`}
+          </Badge>
+        );
+      }
+      if (operationalState.type === "noData") {
+        return (
+          <Badge color="neutral" variant="light" size="xs">
+            {t`${operationalState.count} no data`}
+          </Badge>
+        );
+      }
       return (
         <ReadyLayerStatus
           droppedRowCount={droppedRowCount}

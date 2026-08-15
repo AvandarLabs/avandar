@@ -16,25 +16,30 @@ type Props = {
 };
 
 /** Renders the rename, zoom, duplicate, and delete layer actions. */
-export function LayerActionItems(props: Props): ReactNode {
+export function LayerActionItems({
+  onRename,
+  onDuplicate,
+  onZoomToLayer,
+  onDelete,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <>
       <Menu.Item
         leftSection={<IconPencil size={14} stroke={1.5} />}
-        onClick={props.onRename}
+        onClick={onRename}
       >
         {t`Rename`}
       </Menu.Item>
       <Menu.Item
         leftSection={<IconZoomScan size={14} stroke={1.5} />}
-        onClick={props.onZoomToLayer}
+        onClick={onZoomToLayer}
       >
         {t`Zoom to layer`}
       </Menu.Item>
       <Menu.Item
         leftSection={<IconCopy size={14} stroke={1.5} />}
-        onClick={props.onDuplicate}
+        onClick={onDuplicate}
       >
         {t`Duplicate`}
       </Menu.Item>
@@ -42,7 +47,7 @@ export function LayerActionItems(props: Props): ReactNode {
       <Menu.Item
         color="danger"
         leftSection={<IconTrash size={14} stroke={1.5} />}
-        onClick={props.onDelete}
+        onClick={onDelete}
       >
         {t`Delete`}
       </Menu.Item>

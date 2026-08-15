@@ -59,25 +59,26 @@ async function _drainSaveQueue(options: DrainSaveQueueInput): Promise<void> {
   if (queue.isMounted) {
     options.setSaveState("saving");
   }
-  let didSaveSucceed = false;
-  try {
-    const savedMap = await AvaMapClient.saveMapConfig({
-      mapId: options.avaMapId,
-      name: pendingAtStart.name,
-      mapConfig: pendingAtStart.mapConfig,
-      expectedUpdatedAt: queue.updatedAt,
-    });
-    if (savedMap !== undefined) {
-      queue.updatedAt = savedMap.updatedAt;
+  const didSaveSucceed = await (async () => {
+    try {
+      const savedMap = await AvaMapClient.saveMapConfig({
+        mapId: options.avaMapId,
+        name: pendingAtStart.name,
+        mapConfig: pendingAtStart.mapConfig,
+        expectedUpdatedAt: queue.updatedAt,
+      });
+      if (savedMap !== undefined) {
+        queue.updatedAt = savedMap.updatedAt;
+      }
+      AvaQueryClient.invalidateQueries({
+        queryKey: AvaMapClient.QueryKeys.getAll(),
+      });
+      queue.savedRevision = revisionAtStart;
+      return true;
+    } catch {
+      return false;
     }
-    AvaQueryClient.invalidateQueries({
-      queryKey: AvaMapClient.QueryKeys.getAll(),
-    });
-    didSaveSucceed = true;
-    queue.savedRevision = revisionAtStart;
-  } catch {
-    didSaveSucceed = false;
-  }
+  })();
   if (queue.requestedRevision > revisionAtStart) {
     await _drainSaveQueue(options);
     return;
@@ -106,15 +107,24 @@ function _makeSaveQueueState(avaMap: AvaMap.T): SaveQueueState {
 }
 
 /** Flushes an edited map when its editor unmounts. */
-function useFlushMapSaveOnUnmount(
-  saveQueueRef: RefObject<SaveQueueState>,
-  runSave: () => void,
-  scheduleSave: ReturnType<typeof useDebouncedCallback>,
-): void {
+function useFlushMapSaveOnUnmount({
+  runSave,
+  saveQueueRef,
+  scheduleSave,
+}: Readonly<{
+  runSave: () => void;
+  saveQueueRef: RefObject<SaveQueueState>;
+  scheduleSave: ReturnType<typeof useDebouncedCallback>;
+}>): void {
   const runSaveRef = useRef(runSave);
   const scheduleSaveRef = useRef(scheduleSave);
-  runSaveRef.current = runSave;
-  scheduleSaveRef.current = scheduleSave;
+  useEffect(
+    function syncMapSaveCallbacks() {
+      runSaveRef.current = runSave;
+      scheduleSaveRef.current = scheduleSave;
+    },
+    [runSave, scheduleSave],
+  );
   useEffect(
     function flushPendingMapSaveOnUnmount() {
       const queue = saveQueueRef.current;
@@ -138,7 +148,10 @@ function useMapSaveController(avaMap: AvaMap.T): MapSaveController {
     name: avaMap.name,
     mapConfig: avaMap.config,
   });
-  const saveQueueRef = useRef<SaveQueueState>(_makeSaveQueueState(avaMap));
+  const [initialSaveQueue] = useState(() => {
+    return _makeSaveQueueState(avaMap);
+  });
+  const saveQueueRef = useRef(initialSaveQueue);
   const runSave = useCallback((): void => {
     const queue = saveQueueRef.current;
     queue.requestedRevision = queue.editCount;
@@ -163,16 +176,20 @@ function useMapSaveController(avaMap: AvaMap.T): MapSaveController {
     scheduleSave.cancel();
     runSave();
   }, [runSave, scheduleSave]);
-  useFlushMapSaveOnUnmount(saveQueueRef, runSave, scheduleSave);
+  useFlushMapSaveOnUnmount({ runSave, saveQueueRef, scheduleSave });
   return { markEdited, pendingRef, saveNow, saveState };
 }
 
 /** Owns the editable name and map configuration. */
-function useMapDraftController(
-  avaMap: AvaMap.T,
-  pendingRef: RefObject<PendingMapState>,
-  markEdited: () => void,
-): MapDraftController {
+function useMapDraftController({
+  avaMap,
+  markEdited,
+  pendingRef,
+}: Readonly<{
+  avaMap: AvaMap.T;
+  markEdited: () => void;
+  pendingRef: RefObject<PendingMapState>;
+}>): MapDraftController {
   const [name, setName] = useState(avaMap.name);
   const [mapConfig, setMapConfig] = useState(avaMap.config);
   const updateName = useCallback(
@@ -213,11 +230,11 @@ function useMapDraftController(
  */
 export function useAvaMapEditor(avaMap: AvaMap.T): AvaMapEditor {
   const saveController = useMapSaveController(avaMap);
-  const draftController = useMapDraftController(
+  const draftController = useMapDraftController({
     avaMap,
-    saveController.pendingRef,
-    saveController.markEdited,
-  );
+    pendingRef: saveController.pendingRef,
+    markEdited: saveController.markEdited,
+  });
   return {
     ...draftController,
     saveNow: saveController.saveNow,

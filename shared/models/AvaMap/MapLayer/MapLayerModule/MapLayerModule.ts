@@ -8,11 +8,17 @@ import {
   StructuredQuery, // prettier-ignore
 } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type {
+  AreaGeoBinding,
   GeoBindingColumnNames, // prettier-ignore
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
+  FillSymbology, // prettier-ignore
+} from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
+import type {
+  AggregateOnlyMapLayerRead,
   MapLayerId,
   MapLayerRead,
+  StandardMapLayerRead,
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type {
   QueryDataSource, // prettier-ignore
@@ -29,6 +35,30 @@ const DEFAULT_MIN_SYMBOL_RADIUS = 4;
 
 /** Fallback largest radius of a proportional symbol, in pixels. */
 const DEFAULT_MAX_SYMBOL_RADIUS = 24;
+
+/** Fallback polygon opacity when the author has not picked one. */
+const DEFAULT_FILL_OPACITY = 0.72;
+
+/** Creates the default single-color polygon paint. */
+function _createDefaultFillSymbology(): FillSymbology {
+  return {
+    type: "fill",
+    color: { type: "single", color: DEFAULT_SYMBOL_COLOR },
+    stroke: { width: 1, color: "#ffffff" },
+    opacity: DEFAULT_FILL_OPACITY,
+  };
+}
+
+/** True when a binding produces polygon geometry. */
+function _isAreaGeoBinding(
+  binding: MapLayerRead["geoBinding"],
+): binding is AreaGeoBinding {
+  return (
+    binding?.type === "joinToBoundaries" ||
+    binding?.type === "aggregatePointsToBoundaries" ||
+    (binding?.type === "geometryColumn" && binding.family === "polygon")
+  );
+}
 
 /** Constructors, defaults, and binding helpers for map layers. */
 export const MapLayerModule = {
@@ -49,7 +79,7 @@ export const MapLayerModule = {
    * geometry columns picked yet.
    * @param name The layer's display name, already localized by the caller.
    */
-  makeEmpty: (name: string): MapLayerRead => {
+  makeEmpty: (name: string): StandardMapLayerRead => {
     return Model.make("MapLayer", {
       id: uuid<MapLayerId>(),
       version: 1,
@@ -70,8 +100,43 @@ export const MapLayerModule = {
         units: undefined,
         showNoData: true,
         position: "bottomRight",
+        breaks: [],
+        entries: [],
       },
     } as const);
+  },
+
+  /** Creates the default single-color polygon paint. */
+  createDefaultFillSymbology: (): FillSymbology => {
+    return _createDefaultFillSymbology();
+  },
+
+  /** Creates an exact, unbound polygon layer for area authoring flows. */
+  createArea: (name: string): StandardMapLayerRead => {
+    return {
+      ...MapLayerModule.makeEmpty(name),
+      symbology: _createDefaultFillSymbology(),
+    };
+  },
+
+  /** Applies sensitivity while preventing aggregate-only point rendering. */
+  withSensitivity: (
+    layer: MapLayerRead,
+    sensitivity: MapLayerRead["sensitivity"],
+  ): StandardMapLayerRead | AggregateOnlyMapLayerRead => {
+    if (sensitivity.mode !== "aggregateOnly") {
+      return { ...layer, sensitivity } as StandardMapLayerRead;
+    }
+    return {
+      ...layer,
+      sensitivity,
+      geoBinding:
+        _isAreaGeoBinding(layer.geoBinding) ? layer.geoBinding : undefined,
+      symbology:
+        layer.symbology.type === "fill" ?
+          layer.symbology
+        : _createDefaultFillSymbology(),
+    } as AggregateOnlyMapLayerRead;
   },
 
   /**
@@ -84,10 +149,12 @@ export const MapLayerModule = {
    * @param params.dataSource The source whose rows the layer will query.
    * @param params.name The layer's display name, already localized.
    */
-  makeFromDataSource: (params: {
-    dataSource: QueryDataSource.T;
-    name: string;
-  }): MapLayerRead => {
+  fromDataSource: (
+    params: Readonly<{
+      dataSource: QueryDataSource.T;
+      name: string;
+    }>,
+  ): StandardMapLayerRead => {
     const layer = MapLayerModule.makeEmpty(params.name);
     return {
       ...layer,
@@ -104,7 +171,11 @@ export const MapLayerModule = {
    */
   toGeoBinding: (layer: MapLayerRead): GeoBindingColumnNames | undefined => {
     const { geoBinding, source } = layer;
-    if (!geoBinding || !geoBinding.latitude || !geoBinding.longitude) {
+    if (
+      geoBinding?.type !== "latLngColumns" ||
+      !geoBinding.latitude ||
+      !geoBinding.longitude
+    ) {
       return undefined;
     }
     const findColumnName = (columnId: QueryColumn.Id): string | undefined => {
@@ -127,7 +198,7 @@ export const MapLayerModule = {
    * @returns `"all"` when the popup shows everything, otherwise the resolved
    * names of selected columns that are still in the layer's query.
    */
-  toPopupColumnNames: (layer: MapLayerRead): readonly string[] | "all" => {
+  toPopupColumnNames: (layer: MapLayerRead): string[] | "all" => {
     const { columnIds } = layer.popup;
     return columnIds === "all" ? "all" : (
         columnIds

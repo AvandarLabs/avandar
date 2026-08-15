@@ -36,12 +36,17 @@ function _getSensitivityFromMode(mode: string): MapLayer.Sensitivity {
 }
 
 /** Chooses how precisely the layer exposes sensitive locations. */
-export function SensitivityModeSelect(props: Props): ReactNode {
+export function SensitivityModeSelect({
+  sensitivity,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { sensitivity, onLayerChange } = props;
   const update = (value: MapLayer.Sensitivity): void => {
     onLayerChange((current) => {
-      return MapLayerUpdates.withSensitivity(current, value);
+      return MapLayerUpdates.withSensitivity({
+        layer: current,
+        sensitivity: value,
+      });
     });
   };
   return (
@@ -59,7 +64,7 @@ export function SensitivityModeSelect(props: Props): ReactNode {
         if (!mode) {
           return;
         }
-        if (mode !== "exact" || sensitivity.mode !== "aggregateOnly") {
+        if (sensitivity.mode !== "aggregateOnly" || mode === "aggregateOnly") {
           update(_getSensitivityFromMode(mode));
           return;
         }
@@ -68,7 +73,7 @@ export function SensitivityModeSelect(props: Props): ReactNode {
           children: t`Individual locations will be drawn on the map, and suppressed areas will show their real counts. Continue?`,
           labels: { confirm: t`Continue`, cancel: t`Cancel` },
           onConfirm: () => {
-            update({ mode: "exact" });
+            update(_getSensitivityFromMode(mode));
           },
         });
       }}

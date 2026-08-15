@@ -1,3 +1,4 @@
+import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
@@ -11,9 +12,11 @@ type Props = {
 };
 
 /** Edits the deterministic displacement radius for sensitive points. */
-export function JitterSensitivityControl(props: Props): ReactNode {
+export function JitterSensitivityControl({
+  sensitivity,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { sensitivity, onLayerChange } = props;
   return (
     <NumberInput
       label={t`Displace within`}
@@ -23,13 +26,16 @@ export function JitterSensitivityControl(props: Props): ReactNode {
       value={sensitivity.radiusMeters}
       description={t`Each point moves by the same amount every time this map is opened, so a reader cannot average several views back to the real location.`}
       onChange={(value) => {
-        if (typeof value !== "number") {
+        if (!isNumber(value)) {
           return;
         }
         onLayerChange((current) => {
-          return MapLayerUpdates.withSensitivity(current, {
-            mode: "jitter",
-            radiusMeters: value,
+          return MapLayerUpdates.withSensitivity({
+            layer: current,
+            sensitivity: {
+              mode: "jitter",
+              radiusMeters: value,
+            },
           });
         });
       }}

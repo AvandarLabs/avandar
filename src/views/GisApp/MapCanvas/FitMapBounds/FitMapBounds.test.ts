@@ -14,20 +14,18 @@ vi.mock("@mantine/hooks", async () => {
   };
 });
 
-type FakeMap = {
-  fitBounds: ReturnType<typeof vi.fn>;
-};
-
-function _createMapInstance(fakeMap: FakeMap) {
+function _createMapInstance(fakeMap: { fitBounds: ReturnType<typeof vi.fn> }): {
+  mapRef: { current: typeof fakeMap };
+} {
   return { mapRef: { current: fakeMap } };
 }
 
-const padding = { top: 24, right: 360, bottom: 88, left: 304 };
-const bounds = [
+const PADDING = { top: 24, right: 360, bottom: 88, left: 304 };
+const BOUNDS = [
   [-73.99, 40.7],
   [-73.95, 40.78],
 ] as [[number, number], [number, number]];
-type BoundsProps = { currentBounds: typeof bounds | undefined };
+type BoundsProps = { currentBounds: typeof BOUNDS | undefined };
 
 describe("useFitMapBounds", () => {
   it("assigns the first defined bounds request id after an effect", async () => {
@@ -35,7 +33,7 @@ describe("useFitMapBounds", () => {
       ({ currentBounds }: BoundsProps) => {
         return FitMapBounds.useLegacyFitBoundsRequest({
           bounds: currentBounds,
-          padding,
+          padding: PADDING,
         });
       },
       {
@@ -45,7 +43,7 @@ describe("useFitMapBounds", () => {
 
     expect(result.current).toBeUndefined();
 
-    rerender({ currentBounds: bounds });
+    rerender({ currentBounds: BOUNDS });
 
     await waitFor(() => {
       expect(result.current?.id).toBe(1);
@@ -59,12 +57,12 @@ describe("useFitMapBounds", () => {
       ({ currentBounds }: BoundsProps) => {
         const request = FitMapBounds.useLegacyFitBoundsRequest({
           bounds: currentBounds,
-          padding,
+          padding: PADDING,
         });
         FitMapBounds.useFitMapBounds({ mapInstance, request });
         return request;
       },
-      { initialProps: { currentBounds: bounds } as BoundsProps },
+      { initialProps: { currentBounds: BOUNDS } as BoundsProps },
     );
 
     await waitFor(() => {
@@ -72,7 +70,7 @@ describe("useFitMapBounds", () => {
     });
     const initialRequestId = result.current?.id;
 
-    rerender({ currentBounds: [...bounds] as typeof bounds });
+    rerender({ currentBounds: [...BOUNDS] as typeof BOUNDS });
 
     await waitFor(() => {
       expect(result.current?.id).toBe(initialRequestId);
@@ -86,17 +84,17 @@ describe("useFitMapBounds", () => {
     const changedBounds = [
       [-73.98, 40.7],
       [-73.94, 40.78],
-    ] as typeof bounds;
+    ] as typeof BOUNDS;
     const { result, rerender } = renderHook(
-      ({ currentBounds }: { currentBounds: typeof bounds }) => {
+      ({ currentBounds }: { currentBounds: typeof BOUNDS }) => {
         const request = FitMapBounds.useLegacyFitBoundsRequest({
           bounds: currentBounds,
-          padding,
+          padding: PADDING,
         });
         FitMapBounds.useFitMapBounds({ mapInstance, request });
         return request;
       },
-      { initialProps: { currentBounds: bounds } },
+      { initialProps: { currentBounds: BOUNDS } },
     );
 
     await waitFor(() => {
@@ -121,12 +119,12 @@ describe("useFitMapBounds", () => {
       ({ currentBounds }: BoundsProps) => {
         const request = FitMapBounds.useLegacyFitBoundsRequest({
           bounds: currentBounds,
-          padding,
+          padding: PADDING,
         });
         FitMapBounds.useFitMapBounds({ mapInstance, request });
         return request;
       },
-      { initialProps: { currentBounds: bounds } as BoundsProps },
+      { initialProps: { currentBounds: BOUNDS } as BoundsProps },
     );
 
     await waitFor(() => {
@@ -139,7 +137,7 @@ describe("useFitMapBounds", () => {
       expect(result.current).toBeUndefined();
     });
 
-    rerender({ currentBounds: bounds });
+    rerender({ currentBounds: BOUNDS });
 
     await waitFor(() => {
       expect(result.current?.id).toBe(2);
@@ -150,24 +148,24 @@ describe("useFitMapBounds", () => {
   it("uses padding values as dependencies and refits deliberate changes", async () => {
     const fakeMap = { fitBounds: vi.fn() };
     const mapInstance = _createMapInstance(fakeMap);
-    const changedPadding = { ...padding, left: 320 };
+    const changedPadding = { ...PADDING, left: 320 };
     const { result, rerender } = renderHook(
-      ({ currentPadding }: { currentPadding: typeof padding }) => {
+      ({ currentPadding }: { currentPadding: typeof PADDING }) => {
         const request = FitMapBounds.useLegacyFitBoundsRequest({
-          bounds: [...bounds] as typeof bounds,
+          bounds: [...BOUNDS] as typeof BOUNDS,
           padding: { ...currentPadding },
         });
         FitMapBounds.useFitMapBounds({ mapInstance, request });
         return request;
       },
-      { initialProps: { currentPadding: padding } },
+      { initialProps: { currentPadding: PADDING } },
     );
 
     await waitFor(() => {
       expect(result.current?.id).toBe(1);
     });
 
-    rerender({ currentPadding: { ...padding } });
+    rerender({ currentPadding: { ...PADDING } });
 
     await waitFor(() => {
       expect(result.current?.id).toBe(1);
@@ -196,25 +194,33 @@ describe("useFitMapBounds", () => {
       },
       {
         initialProps: {
-          request: { id: 1, bounds, padding },
+          request: { id: 1, bounds: BOUNDS, padding: PADDING },
         },
       },
     );
 
     expect(fakeMap.fitBounds).toHaveBeenCalledTimes(1);
-    expect(fakeMap.fitBounds).toHaveBeenLastCalledWith(bounds, {
-      padding,
+    expect(fakeMap.fitBounds).toHaveBeenLastCalledWith(BOUNDS, {
+      padding: PADDING,
       animate: true,
       duration: 800,
     });
 
     rerender({
-      request: { id: 1, bounds: [...bounds] as typeof bounds, padding },
+      request: {
+        id: 1,
+        bounds: [...BOUNDS] as typeof BOUNDS,
+        padding: PADDING,
+      },
     });
     expect(fakeMap.fitBounds).toHaveBeenCalledTimes(1);
 
     rerender({
-      request: { id: 2, bounds: [...bounds] as typeof bounds, padding },
+      request: {
+        id: 2,
+        bounds: [...BOUNDS] as typeof BOUNDS,
+        padding: PADDING,
+      },
     });
     expect(fakeMap.fitBounds).toHaveBeenCalledTimes(2);
   });
@@ -226,12 +232,12 @@ describe("useFitMapBounds", () => {
     renderHook(() => {
       FitMapBounds.useFitMapBounds({
         mapInstance: _createMapInstance(fakeMap),
-        request: { id: 1, bounds, padding },
+        request: { id: 1, bounds: BOUNDS, padding: PADDING },
       });
     });
 
-    expect(fakeMap.fitBounds).toHaveBeenCalledWith(bounds, {
-      padding,
+    expect(fakeMap.fitBounds).toHaveBeenCalledWith(BOUNDS, {
+      padding: PADDING,
       animate: false,
       duration: 0,
     });

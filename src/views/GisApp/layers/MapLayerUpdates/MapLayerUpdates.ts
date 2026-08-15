@@ -6,13 +6,17 @@ import {
   propEq,
   propPasses,
 } from "@avandar/utils";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 /** True when `column` is already in the layer's selected query columns. */
-function _hasQueryColumn(layer: MapLayer.T, column: QueryColumn.T): boolean {
+function _hasQueryColumn(
+  options: Readonly<{ layer: MapLayer.T; column: QueryColumn.T }>,
+): boolean {
+  const { layer, column } = options;
   return layer.source.queryColumns.some(propEq("id", column.id));
 }
 
@@ -21,10 +25,10 @@ function _hasQueryColumn(layer: MapLayer.T, column: QueryColumn.T): boolean {
  * layer binds to must be part of its query, or it yields no column names.
  */
 function _withQueryColumn(
-  layer: MapLayer.T,
-  column: QueryColumn.T,
+  options: Readonly<{ layer: MapLayer.T; column: QueryColumn.T }>,
 ): MapLayer.T {
-  if (_hasQueryColumn(layer, column)) {
+  const { layer, column } = options;
+  if (_hasQueryColumn({ layer, column })) {
     return layer;
   }
   return {
@@ -33,32 +37,93 @@ function _withQueryColumn(
       ...layer.source,
       queryColumns: [...layer.source.queryColumns, column],
     },
-  };
+  } as MapLayer.Standard;
 }
 
 /** How many source columns the default popup selects. */
 const DEFAULT_POPUP_COLUMN_LIMIT = 12;
 
 /** Column ids the layer needs regardless of what the popup shows. */
-function _getRequiredColumnIds(layer: MapLayer.T): ReadonlySet<QueryColumn.Id> {
+function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
+  const binding = layer.geoBinding;
+  const color = layer.symbology.color;
   return makeSet(
     [
-      layer.geoBinding?.latitude,
-      layer.geoBinding?.longitude,
+      binding?.type === "latLngColumns" ? binding.latitude : undefined,
+      binding?.type === "latLngColumns" ? binding.longitude : undefined,
+      binding?.type === "geometryColumn" ? binding.column : undefined,
       layer.symbology.type === "proportionalSymbol" ?
         layer.symbology.value
+      : undefined,
+      color.type !== "single" && color.value.type === "queryColumn" ?
+        color.value.column
+      : undefined,
+      (
+        color.type === "graduated" &&
+        color.normalization?.denominator.type === "queryColumn"
+      ) ?
+        color.normalization.denominator.column
       : undefined,
     ].filter(isDefined),
   );
 }
 
-type SymbologyTypeChange = {
-  nextType: MapLayer.Symbology["type"];
-  valueColumn: QueryColumn.T | undefined;
-  remembered: MapLayer.Symbology | undefined;
+type GeometryBindingType = "latLngColumns" | "geometryColumn";
+
+type BoundaryJoinUpdate = {
+  dataKeyColumn: QueryColumn.T;
+  matching: "exact" | "normalizedName";
+  boundary: MapLayer.BoundarySource;
 };
 
+type PointAggregationUpdate = {
+  points: MapLayer.PointBinding;
+  boundary: MapLayer.BoundarySource;
+  pointColumns?: readonly QueryColumn.T[];
+};
+
+type AreaAggregationUpdate =
+  | { operation: "count" }
+  | {
+      operation: "sum" | "avg" | "min" | "max";
+      measureColumn: QueryColumn.T;
+    };
+
+/** Creates paint compatible with one direct geometry family. */
+function _withGeometryFamilySymbology(
+  layer: MapLayer.T,
+  family: MapLayer.GeometryFamily,
+): MapLayer.Symbology {
+  const color =
+    layer.symbology.color.type === "single" ?
+      layer.symbology.color
+    : { type: "single" as const, color: MapLayer.defaultSymbolColor };
+  const stroke = layer.symbology.stroke;
+  if (family === "polygon") {
+    return { ...MapLayer.createDefaultFillSymbology(), color, stroke };
+  }
+  if (family === "line") {
+    return { type: "line", color, stroke };
+  }
+  return {
+    type: "circle",
+    radius: MapLayer.defaultSymbolRadius,
+    color,
+    stroke,
+  };
+}
+
+/** Returns default simplification for the selected geometry family. */
+function _getDefaultSimplification(
+  family: MapLayer.GeometryFamily,
+): MapLayer.GeometrySimplification | undefined {
+  return family === "point" ? undefined : { tolerancePixels: 0.75 };
+}
+
 function _withCircleSymbology(layer: MapLayer.T): MapLayer.T {
+  if (layer.sensitivity.mode === "aggregateOnly") {
+    return layer;
+  }
   const radius =
     layer.symbology.type === "proportionalSymbol" ?
       layer.symbology.maxRadius
@@ -71,21 +136,24 @@ function _withCircleSymbology(layer: MapLayer.T): MapLayer.T {
       color: layer.symbology.color,
       stroke: layer.symbology.stroke,
     },
-  };
+  } as MapLayer.Standard;
 }
 
 function _withProportionalSymbology(
-  layer: MapLayer.T,
-  valueColumn: QueryColumn.T | undefined,
+  options: Readonly<{
+    layer: MapLayer.T;
+    valueColumn: QueryColumn.T | undefined;
+  }>,
 ): MapLayer.T {
-  if (!valueColumn) {
+  const { layer, valueColumn } = options;
+  if (!valueColumn || layer.sensitivity.mode === "aggregateOnly") {
     return layer;
   }
   const maxRadius =
     layer.symbology.type === "circle" ?
       layer.symbology.radius
     : MapLayer.defaultMaxSymbolRadius;
-  const withColumn = _withQueryColumn(layer, valueColumn);
+  const withColumn = _withQueryColumn({ layer, column: valueColumn });
   return {
     ...withColumn,
     symbology: {
@@ -97,7 +165,7 @@ function _withProportionalSymbology(
       color: layer.symbology.color,
       stroke: layer.symbology.stroke,
     },
-  };
+  } as MapLayer.Standard;
 }
 
 /**
@@ -109,10 +177,13 @@ function _withProportionalSymbology(
  */
 export const MapLayerUpdates = {
   /** Finds a query column already selected on the layer by its id. */
-  findQueryColumn: (
-    layer: MapLayer.T,
-    columnId: QueryColumn.Id | undefined,
+  getQueryColumnFromLayer: (
+    options: Readonly<{
+      layer: MapLayer.T;
+      columnId: QueryColumn.Id | undefined;
+    }>,
   ): QueryColumn.T | undefined => {
+    const { layer, columnId } = options;
     return columnId ?
         layer.source.queryColumns.find(propEq("id", columnId))
       : undefined;
@@ -120,9 +191,12 @@ export const MapLayerUpdates = {
 
   /** Points the layer at a new data source, clearing what no longer applies. */
   withDataSource: (
-    layer: MapLayer.T,
-    dataSource: QueryDataSource.T | undefined,
+    options: Readonly<{
+      layer: MapLayer.T;
+      dataSource: QueryDataSource.T | undefined;
+    }>,
   ): MapLayer.T => {
+    const { layer, dataSource } = options;
     const isUnchanged =
       layer.source.dataSource === dataSource &&
       layer.source.queryColumns.length === 0 &&
@@ -145,26 +219,255 @@ export const MapLayerUpdates = {
    * the layer's query if it is not already there.
    */
   withGeoBindingAxis: (
-    layer: MapLayer.T,
-    axis: "latitude" | "longitude",
-    column: QueryColumn.T | undefined,
+    options: Readonly<{
+      layer: MapLayer.T;
+      axis: "latitude" | "longitude";
+      column: QueryColumn.T | undefined;
+    }>,
   ): MapLayer.T => {
+    const { layer, axis, column } = options;
+    const binding =
+      layer.geoBinding?.type === "latLngColumns" ? layer.geoBinding : undefined;
     const isUnchanged =
-      column?.id === layer.geoBinding?.[axis] &&
-      (!column || _hasQueryColumn(layer, column));
+      column?.id === binding?.[axis] &&
+      (!column || _hasQueryColumn({ layer, column }));
     if (isUnchanged) {
       return layer;
     }
-    const withColumn = column ? _withQueryColumn(layer, column) : layer;
+    const withColumn = column ? _withQueryColumn({ layer, column }) : layer;
     return {
       ...withColumn,
       geoBinding: {
         type: "latLngColumns",
-        latitude: withColumn.geoBinding?.latitude,
-        longitude: withColumn.geoBinding?.longitude,
+        latitude: binding?.latitude,
+        longitude: binding?.longitude,
         [axis]: column?.id,
       },
-    };
+    } as MapLayer.T;
+  },
+
+  /** Switches between coordinate and encoded-geometry bindings. */
+  withGeometryBindingType: (
+    layer: MapLayer.T,
+    type: GeometryBindingType,
+    geometryColumn?: QueryColumn.T,
+  ): MapLayer.T => {
+    if (type === "latLngColumns") {
+      if (layer.geoBinding?.type === "latLngColumns") {
+        return layer;
+      }
+      if (layer.sensitivity.mode === "aggregateOnly") {
+        return layer;
+      }
+      return {
+        ...layer,
+        geoBinding: {
+          type: "latLngColumns",
+          latitude: undefined,
+          longitude: undefined,
+        },
+        symbology: _withGeometryFamilySymbology(layer, "point"),
+      } as MapLayer.T;
+    }
+    if (!geometryColumn) {
+      return layer;
+    }
+    const withColumn = _withQueryColumn({ layer, column: geometryColumn });
+    const family =
+      layer.sensitivity.mode === "aggregateOnly" ? "polygon" : "point";
+    return {
+      ...withColumn,
+      geoBinding: {
+        type: "geometryColumn",
+        column: geometryColumn.id,
+        encoding: "wkt",
+        family,
+        simplification: _getDefaultSimplification(family),
+      },
+      symbology: _withGeometryFamilySymbology(layer, family),
+    } as MapLayer.T;
+  },
+
+  /** Selects the encoded geometry source column and keeps it in the query. */
+  withGeometryColumn: (
+    layer: MapLayer.T,
+    column: QueryColumn.T,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "geometryColumn") {
+      return layer;
+    }
+    const isUnchanged =
+      binding.column === column.id && _hasQueryColumn({ layer, column });
+    if (isUnchanged) {
+      return layer;
+    }
+    const withColumn = _withQueryColumn({ layer, column });
+    return {
+      ...withColumn,
+      geoBinding: { ...binding, column: column.id },
+    } as MapLayer.T;
+  },
+
+  /** Sets how the selected geometry column is encoded. */
+  withGeometryEncoding: (
+    layer: MapLayer.T,
+    encoding: MapLayer.GeometryEncoding,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "geometryColumn" || binding.encoding === encoding) {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: { ...binding, encoding },
+    } as MapLayer.T;
+  },
+
+  /** Sets expected geometry family and compatible paint defaults. */
+  withGeometryFamily: (
+    layer: MapLayer.T,
+    family: MapLayer.GeometryFamily,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "geometryColumn" || binding.family === family) {
+      return layer;
+    }
+    if (layer.sensitivity.mode === "aggregateOnly" && family !== "polygon") {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: {
+        ...binding,
+        family,
+        simplification: _getDefaultSimplification(family),
+      },
+      symbology: _withGeometryFamilySymbology(layer, family),
+    } as MapLayer.T;
+  },
+
+  /** Sets or disables line and polygon simplification. */
+  withGeometrySimplification: (
+    layer: MapLayer.T,
+    simplification: MapLayer.GeometrySimplification | undefined,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "geometryColumn" || binding.family === "point") {
+      return layer;
+    }
+    if (
+      binding.simplification?.tolerancePixels ===
+      simplification?.tolerancePixels
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: { ...binding, simplification },
+    } as MapLayer.T;
+  },
+
+  /** Creates or updates a complete source-key boundary join. */
+  withBoundaryJoin: (
+    layer: MapLayer.T,
+    update: BoundaryJoinUpdate,
+  ): MapLayer.T => {
+    const withColumn = _withQueryColumn({
+      layer,
+      column: update.dataKeyColumn,
+    });
+    const currentBinding = layer.geoBinding;
+    const outputValueId =
+      currentBinding?.type === "joinToBoundaries" ?
+        currentBinding.aggregation.outputValueId
+      : uuid<MapLayer.AreaAggregationOutputId>();
+    const aggregation =
+      currentBinding?.type === "joinToBoundaries" ?
+        currentBinding.aggregation
+      : { operation: "count" as const, outputValueId };
+    return {
+      ...withColumn,
+      geoBinding: {
+        type: "joinToBoundaries",
+        dataKeyColumn: update.dataKeyColumn.id,
+        matching: update.matching,
+        boundary: update.boundary,
+        aggregation,
+      },
+      symbology: _withGeometryFamilySymbology(layer, "polygon"),
+    } as MapLayer.T;
+  },
+
+  /** Creates or updates a point-in-polygon boundary aggregation. */
+  withPointAggregation: (
+    layer: MapLayer.T,
+    update: PointAggregationUpdate,
+  ): MapLayer.T => {
+    const pointColumnIds =
+      update.points.type === "latLngColumns" ?
+        [update.points.latitude, update.points.longitude]
+      : [update.points.column];
+    const pointColumnIdSet = makeSet(pointColumnIds.filter(isDefined));
+    const withPointColumns = (update.pointColumns ?? []).reduce(
+      (currentLayer, column) => {
+        return pointColumnIdSet.has(column.id) ?
+            _withQueryColumn({ layer: currentLayer, column })
+          : currentLayer;
+      },
+      layer,
+    );
+    const currentBinding = layer.geoBinding;
+    const aggregation =
+      currentBinding?.type === "aggregatePointsToBoundaries" ?
+        currentBinding.aggregation
+      : {
+          operation: "count" as const,
+          outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+        };
+    return {
+      ...withPointColumns,
+      geoBinding: {
+        type: "aggregatePointsToBoundaries",
+        points: update.points,
+        boundary: update.boundary,
+        aggregation,
+      },
+      symbology: _withGeometryFamilySymbology(layer, "polygon"),
+    } as MapLayer.T;
+  },
+
+  /** Changes an area aggregation while preserving its stable output id. */
+  withAreaAggregation: (
+    layer: MapLayer.T,
+    update: AreaAggregationUpdate,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (
+      binding?.type !== "joinToBoundaries" &&
+      binding?.type !== "aggregatePointsToBoundaries"
+    ) {
+      return layer;
+    }
+    const withMeasure =
+      update.operation === "count" ?
+        layer
+      : _withQueryColumn({ layer, column: update.measureColumn });
+    const aggregation: MapLayer.AreaAggregation =
+      update.operation === "count" ?
+        {
+          operation: "count",
+          outputValueId: binding.aggregation.outputValueId,
+        }
+      : {
+          operation: update.operation,
+          measureColumn: update.measureColumn.id,
+          outputValueId: binding.aggregation.outputValueId,
+        };
+    return {
+      ...withMeasure,
+      geoBinding: { ...binding, aggregation },
+    } as MapLayer.T;
   },
 
   /**
@@ -172,14 +475,20 @@ export const MapLayerUpdates = {
    * by `column`. Passing `undefined` returns it to a flat circle.
    */
   withSymbolSizeColumn: (
-    layer: MapLayer.T,
-    column: QueryColumn.T | undefined,
+    options: Readonly<{
+      layer: MapLayer.T;
+      column: QueryColumn.T | undefined;
+    }>,
   ): MapLayer.T => {
+    const { layer, column } = options;
+    if (layer.sensitivity.mode === "aggregateOnly") {
+      return layer;
+    }
     const { symbology } = layer;
     if (!column) {
       return symbology.type === "circle" ?
           layer
-        : {
+        : ({
             ...layer,
             symbology: {
               type: "circle",
@@ -187,16 +496,16 @@ export const MapLayerUpdates = {
               color: symbology.color,
               stroke: symbology.stroke,
             },
-          };
+          } as MapLayer.Standard);
     }
     const isUnchanged =
       symbology.type === "proportionalSymbol" &&
       symbology.value === column.id &&
-      _hasQueryColumn(layer, column);
+      _hasQueryColumn({ layer, column });
     if (isUnchanged) {
       return layer;
     }
-    const withColumn = _withQueryColumn(layer, column);
+    const withColumn = _withQueryColumn({ layer, column });
     return {
       ...withColumn,
       symbology: {
@@ -208,12 +517,18 @@ export const MapLayerUpdates = {
         color: symbology.color,
         stroke: symbology.stroke,
       },
-    };
+    } as MapLayer.Standard;
   },
 
   /** Repaints the layer's symbols in `color`. */
-  withSymbolColor: (layer: MapLayer.T, color: string): MapLayer.T => {
-    if (layer.symbology.color.color === color) {
+  withSymbolColor: (
+    options: Readonly<{ layer: MapLayer.T; color: string }>,
+  ): MapLayer.T => {
+    const { layer, color } = options;
+    if (
+      layer.symbology.color.type === "single" &&
+      layer.symbology.color.color === color
+    ) {
       return layer;
     }
     return {
@@ -222,14 +537,46 @@ export const MapLayerUpdates = {
         ...layer.symbology,
         color: { type: "single", color },
       },
-    };
+    } as MapLayer.T;
+  },
+
+  /** Replaces color behavior and invalidates its derived legend output. */
+  withLayerColor: (layer: MapLayer.T, color: MapLayer.Color): MapLayer.T => {
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, color },
+      legend: { ...layer.legend, breaks: [], entries: [] },
+    } as MapLayer.T;
+  },
+
+  /** Applies finite, strictly increasing manual classification cuts. */
+  withManualBreaks: (
+    layer: MapLayer.T,
+    breaks: readonly number[],
+  ): MapLayer.T => {
+    const color = layer.symbology.color;
+    const isValid = breaks.every((value, index) => {
+      return (
+        Number.isFinite(value) && (index === 0 || value > breaks[index - 1]!)
+      );
+    });
+    if (color.type !== "graduated" || !isValid) {
+      return layer;
+    }
+    return MapLayerUpdates.withLayerColor(layer, {
+      ...color,
+      classification: { method: "manual", breaks },
+    });
   },
 
   /** Sets which columns a feature's popup shows and queries. */
   withPopupColumns: (
-    layer: MapLayer.T,
-    columns: readonly QueryColumn.T[],
+    options: Readonly<{
+      layer: MapLayer.T;
+      columns: readonly QueryColumn.T[];
+    }>,
   ): MapLayer.T => {
+    const { layer, columns } = options;
     const requiredIds = _getRequiredColumnIds(layer);
     const existingByBaseColumnId = makeMap(layer.source.queryColumns, {
       keyFn: prop("baseColumn.id"),
@@ -240,9 +587,11 @@ export const MapLayerUpdates = {
     const selectedIds = makeSet(selected, { key: "id" });
     const existingIds = makeSet(layer.source.queryColumns, { key: "id" });
     const nextQueryColumns = [
-      ...layer.source.queryColumns.filter((column) => {
-        return requiredIds.has(column.id) || selectedIds.has(column.id);
-      }),
+      ...layer.source.queryColumns.filter(
+        propPasses("id", (columnId) => {
+          return requiredIds.has(columnId) || selectedIds.has(columnId);
+        }),
+      ),
       ...selected.filter(
         propPasses<QueryColumn.T, "id", QueryColumn.Id>(
           "id",
@@ -261,34 +610,50 @@ export const MapLayerUpdates = {
 
   /** Selects capped source columns while the popup uses its default. */
   withDefaultPopupColumns: (
-    layer: MapLayer.T,
-    availableColumns: readonly QueryColumn.T[],
+    options: Readonly<{
+      layer: MapLayer.T;
+      availableColumns: readonly QueryColumn.T[];
+    }>,
   ): MapLayer.T => {
+    const { layer, availableColumns } = options;
     if (layer.popup.columnIds !== "all") {
       return layer;
     }
-    return MapLayerUpdates.withPopupColumns(
+    return MapLayerUpdates.withPopupColumns({
       layer,
-      availableColumns.slice(0, DEFAULT_POPUP_COLUMN_LIMIT),
-    );
+      columns: availableColumns.slice(0, DEFAULT_POPUP_COLUMN_LIMIT),
+    });
   },
 
   /** Sets the popup's optional click-through link. */
   withPopupAction: (
-    layer: MapLayer.T,
-    action: MapLayer.PopupAction | undefined,
+    options: Readonly<{
+      layer: MapLayer.T;
+      action: MapLayer.PopupAction | undefined;
+    }>,
   ): MapLayer.T => {
+    const { layer, action } = options;
     return { ...layer, popup: { ...layer.popup, action } };
   },
 
   /** Switches the layer's symbology type, preserving compatible settings. */
   withSymbologyType: (
-    layer: MapLayer.T,
-    params: SymbologyTypeChange,
+    options: Readonly<{
+      layer: MapLayer.T;
+      change: Readonly<{
+        nextType: "circle" | "proportionalSymbol";
+        valueColumn: QueryColumn.T | undefined;
+        remembered: MapLayer.Symbology | undefined;
+      }>;
+    }>,
   ): MapLayer.T => {
-    const { nextType, valueColumn, remembered } = params;
+    const { layer, change } = options;
+    if (layer.sensitivity.mode === "aggregateOnly") {
+      return layer;
+    }
+    const { nextType, valueColumn, remembered } = change;
     if (remembered && remembered.type === nextType) {
-      return { ...layer, symbology: remembered };
+      return { ...layer, symbology: remembered } as MapLayer.Standard;
     }
     if (layer.symbology.type === nextType) {
       return layer;
@@ -298,38 +663,53 @@ export const MapLayerUpdates = {
         return _withCircleSymbology(layer);
       })
       .with("proportionalSymbol", () => {
-        return _withProportionalSymbology(layer, valueColumn);
+        return _withProportionalSymbology({ layer, valueColumn });
       })
       .exhaustive();
   },
 
   /** Sets a flat circle's radius, in pixels. */
-  withCircleRadius: (layer: MapLayer.T, radius: number): MapLayer.T => {
+  withCircleRadius: (
+    options: Readonly<{ layer: MapLayer.T; radius: number }>,
+  ): MapLayer.T => {
+    const { layer, radius } = options;
     if (
       layer.symbology.type !== "circle" ||
       layer.symbology.radius === radius
     ) {
       return layer;
     }
-    return { ...layer, symbology: { ...layer.symbology, radius } };
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, radius },
+    } as MapLayer.Standard;
   },
 
   /** Sets a proportional symbol's largest radius, in pixels. */
-  withMaxSymbolRadius: (layer: MapLayer.T, maxRadius: number): MapLayer.T => {
+  withMaxSymbolRadius: (
+    options: Readonly<{ layer: MapLayer.T; maxRadius: number }>,
+  ): MapLayer.T => {
+    const { layer, maxRadius } = options;
     if (
       layer.symbology.type !== "proportionalSymbol" ||
       layer.symbology.maxRadius === maxRadius
     ) {
       return layer;
     }
-    return { ...layer, symbology: { ...layer.symbology, maxRadius } };
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, maxRadius },
+    } as MapLayer.Standard;
   },
 
   /** Sets the symbol outline. */
   withStroke: (
-    layer: MapLayer.T,
-    stroke: Partial<MapLayer.Symbology["stroke"]>,
+    options: Readonly<{
+      layer: MapLayer.T;
+      stroke: Partial<MapLayer.Symbology["stroke"]>;
+    }>,
   ): MapLayer.T => {
+    const { layer, stroke } = options;
     const updatedStroke = { ...layer.symbology.stroke, ...stroke };
     if (
       updatedStroke.color === layer.symbology.stroke.color &&
@@ -340,22 +720,28 @@ export const MapLayerUpdates = {
     return {
       ...layer,
       symbology: { ...layer.symbology, stroke: updatedStroke },
-    };
+    } as MapLayer.T;
   },
 
   /** Sets the layer's spatial privacy policy. */
   withSensitivity: (
-    layer: MapLayer.T,
-    sensitivity: MapLayer.Sensitivity,
+    options: Readonly<{
+      layer: MapLayer.T;
+      sensitivity: MapLayer.Sensitivity;
+    }>,
   ): MapLayer.T => {
-    return { ...layer, sensitivity };
+    const { layer, sensitivity } = options;
+    return MapLayer.withSensitivity(layer, sensitivity);
   },
 
   /** Replaces the layer's filter tree. */
   withFilters: (
-    layer: MapLayer.T,
-    filters: MapLayer.T["source"]["filters"],
+    options: Readonly<{
+      layer: MapLayer.T;
+      filters: MapLayer.T["source"]["filters"];
+    }>,
   ): MapLayer.T => {
+    const { layer, filters } = options;
     if (filters === layer.source.filters) {
       return layer;
     }
@@ -364,14 +750,20 @@ export const MapLayerUpdates = {
 
   /** Patches the layer's legend. */
   withLegend: (
-    layer: MapLayer.T,
-    legend: Partial<MapLayer.Legend>,
+    options: Readonly<{
+      layer: MapLayer.T;
+      legend: Partial<MapLayer.Legend>;
+    }>,
   ): MapLayer.T => {
+    const { layer, legend } = options;
     return { ...layer, legend: { ...layer.legend, ...legend } };
   },
 
   /** Renames the layer, keeping its legend title in step until it diverges. */
-  withName: (layer: MapLayer.T, name: string): MapLayer.T => {
+  withName: (
+    options: Readonly<{ layer: MapLayer.T; name: string }>,
+  ): MapLayer.T => {
+    const { layer, name } = options;
     if (name === layer.name) {
       return layer;
     }
@@ -383,7 +775,10 @@ export const MapLayerUpdates = {
   },
 
   /** Shows or hides the layer. */
-  withVisibility: (layer: MapLayer.T, isVisible: boolean): MapLayer.T => {
+  withVisibility: (
+    options: Readonly<{ layer: MapLayer.T; isVisible: boolean }>,
+  ): MapLayer.T => {
+    const { layer, isVisible } = options;
     return isVisible === layer.isVisible ? layer : { ...layer, isVisible };
   },
 };

@@ -19,8 +19,19 @@ type Props = {
 };
 
 /** Maps layer state and actions into ordered layer rows. */
-export function LayerRows(props: Props): ReactNode {
-  const { rows, rowIds, viewStates, selectedLayerId } = props;
+export function LayerRows({
+  rows,
+  rowIds,
+  viewStates,
+  selectedLayerId,
+  onStackOrderChange,
+  onSelectLayer,
+  onToggleLayerVisible,
+  onRenameLayer,
+  onDuplicateLayer,
+  onZoomToLayer,
+  onDeleteLayer,
+}: Props): ReactNode {
   return rows.map((layer, rowIndex) => {
     const viewState = viewStates.get(layer.id);
     if (!viewState) {
@@ -38,14 +49,14 @@ export function LayerRows(props: Props): ReactNode {
         viewState={viewState}
         rowIndex={rowIndex}
         isSelected={layer.id === selectedLayerId}
-        onSelect={bind(props.onSelectLayer)}
-        onToggleVisible={bind(props.onToggleLayerVisible)}
-        onRename={bind(props.onRenameLayer)}
-        onDuplicate={bind(props.onDuplicateLayer)}
-        onZoomToLayer={bind(props.onZoomToLayer)}
-        onDelete={bind(props.onDeleteLayer)}
+        onSelect={bind(onSelectLayer)}
+        onToggleVisible={bind(onToggleLayerVisible)}
+        onRename={bind(onRenameLayer)}
+        onDuplicate={bind(onDuplicateLayer)}
+        onZoomToLayer={bind(onZoomToLayer)}
+        onDelete={bind(onDeleteLayer)}
         onMoveByOffset={(offset) => {
-          props.onStackOrderChange(
+          onStackOrderChange(
             makeStackOrderFromLayerMove({
               orderedLayerIds: rowIds,
               layerId: layer.id,

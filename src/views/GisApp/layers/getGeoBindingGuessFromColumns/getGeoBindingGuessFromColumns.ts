@@ -53,11 +53,10 @@ export function getGeoBindingGuessFromColumns(
     ),
   );
 
-  if (!latitudeColumn || !longitudeColumn) {
-    return undefined;
-  }
-  return {
-    latitudeColumnName: latitudeColumn.name,
-    longitudeColumnName: longitudeColumn.name,
-  };
+  return latitudeColumn && longitudeColumn ?
+      {
+        latitudeColumnName: latitudeColumn.name,
+        longitudeColumnName: longitudeColumn.name,
+      }
+    : undefined;
 }

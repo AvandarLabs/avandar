@@ -21,13 +21,13 @@ export function useGisAppTopBarActions(app: GisAppState): GisAppTopBarActions {
   };
   const onSaveCurrentView = (): void => {
     app.updateConfig((current) => {
-      return AvaMapConfig.withBookmarkAdded(
-        current,
-        AvaMapConfig.makeBookmark({
+      return AvaMapConfig.withBookmarkAdded({
+        config: current,
+        bookmark: AvaMapConfig.makeBookmark({
           name: t`View ${current.bookmarks.length + 1}`,
           view: current.view,
         }),
-      );
+      });
     });
   };
   const onGoToBookmark = (bookmark: GisAppBookmark): void => {
@@ -37,7 +37,7 @@ export function useGisAppTopBarActions(app: GisAppState): GisAppTopBarActions {
   };
   const onRemoveBookmark = (bookmarkId: AvaMapConfig.BookmarkId): void => {
     app.updateConfig((current) => {
-      return AvaMapConfig.withBookmarkRemoved(current, bookmarkId);
+      return AvaMapConfig.withBookmarkRemoved({ config: current, bookmarkId });
     });
   };
 

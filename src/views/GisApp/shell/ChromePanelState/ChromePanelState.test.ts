@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { ChromePanelState } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
 
-const chromePanelStorageKey = "ava:gis:chrome-panels";
+const CHROME_PANEL_STORAGE_KEY = "ava:gis:chrome-panels";
 
 beforeEach(() => {
-  window.localStorage.removeItem(chromePanelStorageKey);
+  window.localStorage.removeItem(CHROME_PANEL_STORAGE_KEY);
 });
 
 afterEach(() => {
-  window.localStorage.removeItem(chromePanelStorageKey);
+  window.localStorage.removeItem(CHROME_PANEL_STORAGE_KEY);
 });
 
 describe("getDefaultPanelState", () => {
   it("expands both panels on a wide canvas", () => {
-    expect(ChromePanelState.getDefaultPanelStateFromCanvasWidth(1200)).toEqual({
+    expect(ChromePanelState.fromCanvasWidth(1200)).toEqual({
       layers: false,
       inspector: false,
       legend: false,
@@ -22,7 +22,7 @@ describe("getDefaultPanelState", () => {
   });
 
   it("collapses the inspector first below 1000px of canvas", () => {
-    expect(ChromePanelState.getDefaultPanelStateFromCanvasWidth(900)).toEqual({
+    expect(ChromePanelState.fromCanvasWidth(900)).toEqual({
       layers: false,
       inspector: true,
       legend: false,
@@ -30,17 +30,17 @@ describe("getDefaultPanelState", () => {
   });
 
   it("collapses everything at and below the tablet boundary", () => {
-    expect(ChromePanelState.getDefaultPanelStateFromCanvasWidth(700)).toEqual({
+    expect(ChromePanelState.fromCanvasWidth(700)).toEqual({
       layers: true,
       inspector: true,
       legend: true,
     });
-    expect(ChromePanelState.getDefaultPanelStateFromCanvasWidth(792)).toEqual({
+    expect(ChromePanelState.fromCanvasWidth(792)).toEqual({
       layers: true,
       inspector: true,
       legend: true,
     });
-    expect(ChromePanelState.getDefaultPanelStateFromCanvasWidth(793)).toEqual({
+    expect(ChromePanelState.fromCanvasWidth(793)).toEqual({
       layers: false,
       inspector: true,
       legend: false,

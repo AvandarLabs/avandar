@@ -1,3 +1,4 @@
+import { assertIsNonEmptyArray, isDefined } from "@avandar/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { FitBoundsRequest as CameraFitBoundsRequest } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
@@ -5,22 +6,10 @@ import type { MapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/us
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { RefObject } from "react";
 
-type FitBoundsRequestController = {
-  fitBoundsRequest: CameraFitBoundsRequest | undefined;
-  requestFitBounds: (bounds: MapBounds) => void;
-};
-
-type AutoFitNewLayersInput = {
-  layerBounds: ReadonlyMap<MapLayer.Id, MapBounds | undefined>;
-  requestFitBounds: (bounds: MapBounds) => void;
-};
-
-/** Creates explicit camera requests using the current panel-aware padding. */
+/** Returns the bounds enclosing every supplied bounds value. */
 function _getUnionBounds(boundsList: readonly MapBounds[]): MapBounds {
+  assertIsNonEmptyArray(boundsList, "At least one bounds value is required");
   const [firstBounds, ...remainingBounds] = boundsList;
-  if (!firstBounds) {
-    throw new Error("At least one bounds value is required");
-  }
 
   return remainingBounds.reduce<MapBounds>((unionBounds, bounds) => {
     return [
@@ -42,7 +31,10 @@ export const FitBoundsRequest = {
   /** Creates explicit camera requests using the current panel-aware padding. */
   useFitBoundsRequest: (
     insetsRef: RefObject<MapChromeInsets>,
-  ): FitBoundsRequestController => {
+  ): {
+    fitBoundsRequest: CameraFitBoundsRequest | undefined;
+    requestFitBounds: (bounds: MapBounds) => void;
+  } => {
     const nextIdRef = useRef(0);
     const [fitBoundsRequest, setFitBoundsRequest] = useState<
       CameraFitBoundsRequest | undefined
@@ -65,7 +57,10 @@ export const FitBoundsRequest = {
   useAutoFitNewLayers: ({
     layerBounds,
     requestFitBounds,
-  }: AutoFitNewLayersInput): void => {
+  }: Readonly<{
+    layerBounds: ReadonlyMap<MapLayer.Id, MapBounds | undefined>;
+    requestFitBounds: (bounds: MapBounds) => void;
+  }>): void => {
     const fittedLayerIdsRef = useRef(new Set<MapLayer.Id>());
     useEffect(
       function fitFirstRenderOfEachLayer() {
@@ -84,9 +79,7 @@ export const FitBoundsRequest = {
           .map(([, bounds]) => {
             return bounds;
           })
-          .filter((bounds): bounds is MapBounds => {
-            return bounds !== undefined;
-          });
+          .filter(isDefined);
         if (newlyReadyBounds.length > 0) {
           requestFitBounds(_getUnionBounds(newlyReadyBounds));
         }

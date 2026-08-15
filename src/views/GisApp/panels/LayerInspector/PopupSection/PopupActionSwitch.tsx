@@ -7,9 +7,11 @@ import type { ReactNode } from "react";
 type Props = { isEnabled: boolean; onLayerChange: LayerChangeHandler };
 
 /** Enables or removes a source-record link from the popup. */
-export function PopupActionSwitch(props: Props): ReactNode {
+export function PopupActionSwitch({
+  isEnabled,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { isEnabled, onLayerChange } = props;
   return (
     <Switch
       label={t`Link to the source record`}
@@ -17,10 +19,10 @@ export function PopupActionSwitch(props: Props): ReactNode {
       onChange={(event) => {
         const isOn = event.currentTarget.checked;
         onLayerChange((current) => {
-          return MapLayerUpdates.withPopupAction(
-            current,
-            isOn ? { label: "", urlTemplate: "" } : undefined,
-          );
+          return MapLayerUpdates.withPopupAction({
+            layer: current,
+            action: isOn ? { label: "", urlTemplate: "" } : undefined,
+          });
         });
       }}
     />
