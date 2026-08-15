@@ -325,6 +325,10 @@ msgstr "无法从 FROM 子句中确定基础表。"
 msgid "Select a field"
 msgstr "选择一个字段"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Checking whether that custom URL is available."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
@@ -1591,6 +1595,10 @@ msgstr "在下面输入或粘贴电子邮件。您的工作区将按成员收费
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "使用的建议"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Fix the custom URL before publishing."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."

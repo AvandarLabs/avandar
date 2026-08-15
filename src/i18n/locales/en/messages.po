@@ -333,6 +333,10 @@ msgstr "Could not determine a base table from FROM clause."
 msgid "Select a field"
 msgstr "Select a field"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Checking whether that custom URL is available."
+msgstr "Checking whether that custom URL is available."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
@@ -1637,6 +1641,10 @@ msgstr "Type or paste an email below. Your workspace will be billed per member."
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Used suggestion"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Fix the custom URL before publishing."
+msgstr "Fix the custom URL before publishing."
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."

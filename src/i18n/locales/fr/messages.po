@@ -340,6 +340,10 @@ msgstr "Impossible de déterminer une table de base à partir de la clause FROM.
 msgid "Select a field"
 msgstr "Sélectionner un champ"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Checking whether that custom URL is available."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
@@ -1674,6 +1678,10 @@ msgstr "Tapez ou collez un e-mail ci-dessous. Votre espace de travail sera "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Suggestion utilisée"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Fix the custom URL before publishing."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."

@@ -337,6 +337,10 @@ msgstr "Não foi possível determinar uma tabela base a partir da cláusula FROM
 msgid "Select a field"
 msgstr "Selecionar um campo"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Checking whether that custom URL is available."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "When"
@@ -1659,6 +1663,10 @@ msgstr "Digite ou cole um e-mail abaixo. Seu espaço de trabalho será cobrado "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Sugestão usada"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Fix the custom URL before publishing."
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."

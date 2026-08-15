@@ -16,6 +16,9 @@ const mocks = vi.hoisted(() => {
     canPublishPublicly: true,
     resourceRole: "admin" as string,
     canManageShares: undefined as boolean | undefined,
+    normalisedSlug: "",
+    hasPendingSlugCheck: false,
+    isSlugRejected: false,
   };
 });
 
@@ -71,6 +74,9 @@ vi.mock(
           targetVisibility: "workspace",
           actionKind: "publish_workspace",
           isBusy: false,
+          normalisedSlug: mocks.normalisedSlug,
+          hasPendingSlugCheck: mocks.hasPendingSlugCheck,
+          isSlugRejected: mocks.isSlugRejected,
           onPrimaryAction: vi.fn(),
           onGeneralAccessChange: vi.fn(),
         };
@@ -99,6 +105,9 @@ describe("DashboardShareModal", () => {
     mocks.canPublishPublicly = true;
     mocks.resourceRole = "admin";
     mocks.canManageShares = undefined;
+    mocks.normalisedSlug = "";
+    mocks.hasPendingSlugCheck = false;
+    mocks.isSlugRejected = false;
   });
 
   it("enables publishing when saved and online", () => {
@@ -153,5 +162,47 @@ describe("DashboardShareModal", () => {
     expect(
       screen.getByRole("button", { name: "Publish to workspace" }),
     ).toBeDisabled();
+  });
+
+  // The button must not look clickable while the custom URL is still being
+  // checked: clicking it while pending would silently do nothing, because
+  // `onPrimaryAction` refuses to publish over an unresolved slug check.
+  it("blocks publishing while the custom URL check is pending", () => {
+    mocks.normalisedSlug = "my-dashboard";
+    mocks.hasPendingSlugCheck = true;
+
+    renderModal();
+
+    expect(
+      screen.getByRole("button", { name: "Publish to workspace" }),
+    ).toBeDisabled();
+  });
+
+  // Same story for a slug the server has already rejected: the guard in
+  // `onPrimaryAction` refuses to publish, so the button must say why.
+  it("blocks publishing when the custom URL was rejected", () => {
+    mocks.normalisedSlug = "my-dashboard";
+    mocks.isSlugRejected = true;
+
+    renderModal();
+
+    expect(
+      screen.getByRole("button", { name: "Publish to workspace" }),
+    ).toBeDisabled();
+  });
+
+  // The slug flags only matter once the field holds something: an empty slug
+  // clears its own pending/rejected state in the real hook, but a test double
+  // could still set both, so the modal must not honor them without a slug.
+  it("does not block publishing on a pending or rejected slug when the field is empty", () => {
+    mocks.normalisedSlug = "";
+    mocks.hasPendingSlugCheck = true;
+    mocks.isSlugRejected = true;
+
+    renderModal();
+
+    expect(
+      screen.getByRole("button", { name: "Publish to workspace" }),
+    ).toBeEnabled();
   });
 });

@@ -41,10 +41,17 @@ export function DashboardShareModal({
     resourceId: dashboard.id,
   });
   const publishing = useDashboardPublishingControl({ dashboard });
+  // Mirrors the guard in `onPrimaryAction`: a slug that is still being
+  // checked, or that the server has already rejected, would otherwise leave
+  // the button enabled and clicking it silently do nothing.
   const isBlockedReason =
     offline.isBlocked ? t`Unavailable offline`
     : hasUnsavedChanges ?
       t`You cannot publish while there are unsaved changes. Save first.`
+    : publishing.normalisedSlug && publishing.hasPendingSlugCheck ?
+      t`Checking whether that custom URL is available.`
+    : publishing.normalisedSlug && publishing.isSlugRejected ?
+      t`Fix the custom URL before publishing.`
     : undefined;
 
   return (
