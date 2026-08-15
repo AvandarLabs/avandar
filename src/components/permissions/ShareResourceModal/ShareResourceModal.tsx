@@ -19,6 +19,7 @@ import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
 import { useGeneralAccessControl } from "./useGeneralAccessControl";
 import type { DisplayShare } from "./SharePrincipalList";
+import type { ShareResourcePublishing } from "./ShareResourceModal.types";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
@@ -28,6 +29,15 @@ type Props = {
   resourceName: string;
   resourceType: ResourceType;
   resourceId: string;
+  /** Only dashboards have a published form; datasets omit this entirely. */
+  publishing?: ShareResourcePublishing;
+  /**
+   * Whether the viewer may write share rows. Defaults to `true` because every
+   * caller but the dashboard one only opens this modal for resource admins. A
+   * dashboard editor may publish without being allowed to hand out access, so
+   * the sharing half renders read-only for them while publishing stays live.
+   */
+  canManageShares?: boolean;
   onClose: () => void;
 };
 
@@ -63,6 +73,8 @@ export function ShareResourceModal({
   resourceName,
   resourceType,
   resourceId,
+  publishing,
+  canManageShares = true,
   onClose,
 }: Props): JSX.Element {
   const { t, i18n } = useLingui();
@@ -134,6 +146,7 @@ export function ShareResourceModal({
     upsertShare,
     deleteShare,
     setRestricted,
+    isPubliclyPublished: publishing?.targetVisibility === "public",
   });
 
   const userById = useMemo((): Record<string, string> => {
@@ -244,6 +257,7 @@ export function ShareResourceModal({
     workspaceName: workspace.name,
     userById,
     groupById,
+    publication: publishing ? publishing.targetVisibility : undefined,
   });
 
   return (
@@ -256,11 +270,16 @@ export function ShareResourceModal({
         resourceType={resourceType}
         value={generalAccess.displayedValue}
         isOwner={generalAccess.isOwner}
-        isBusy={generalAccess.isBusy}
+        isBusy={generalAccess.isBusy || !canManageShares}
         workspaceShareRole={workspaceShare?.role ?? null}
-        isPublicOptionAvailable={false}
-        publicOptionDisabledReason={undefined}
-        onChange={generalAccess.onChange}
+        isPublicOptionAvailable={publishing !== undefined}
+        publicOptionDisabledReason={publishing?.publicOptionDisabledReason}
+        onChange={(value) => {
+          // The dropdown moves the publish target and writes share state; it
+          // never writes visibility. The footer button does that.
+          publishing?.onGeneralAccessChange(value);
+          generalAccess.onChange(value);
+        }}
         onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
       />
 
@@ -281,7 +300,9 @@ export function ShareResourceModal({
           })}
           isAdding={isUpserting}
           isDisabled={
-            generalAccess.displayedValue === "private" || generalAccess.isBusy
+            generalAccess.displayedValue === "private" ||
+            generalAccess.isBusy ||
+            !canManageShares
           }
           onAdd={({ principalType, principalId, role }) => {
             upsertShare({
@@ -300,6 +321,7 @@ export function ShareResourceModal({
       <SharePrincipalList
         shares={displayShares}
         resourceType={resourceType}
+        isReadOnly={!canManageShares}
         onRoleChange={(share, role) => {
           if (share.isOwnerRow) {
             return;
@@ -338,10 +360,13 @@ export function ShareResourceModal({
 
       <ShareSummaryLine spans={spans} />
 
-      <Group justify="flex-end" mt="md">
+      {publishing?.section}
+
+      <Group justify={publishing ? "space-between" : "flex-end"} mt="md">
         <Button variant="default" onClick={onClose}>
           <Trans>Done</Trans>
         </Button>
+        {publishing?.actions}
       </Group>
     </Stack>
   );

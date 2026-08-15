@@ -37,6 +37,12 @@ type UseGeneralAccessControlOptions = {
   setRestricted: (
     options: Parameters<typeof ResourceShareClient.setResourceRestricted>[0],
   ) => void;
+  /**
+   * Whether the resource has a public publication. Public reads never consult
+   * `resource_shares`, so this outranks the derived share value in the
+   * dropdown; it is `false` for every resource type with no published form.
+   */
+  isPubliclyPublished: boolean;
 };
 
 type GeneralAccessControl = {
@@ -240,7 +246,10 @@ export function useGeneralAccessControl(
     });
   const derivedValue =
     options.sharingState ?
-      GeneralAccessModule.fromShareState(options.sharingState)
+      GeneralAccessModule.fromResourceState({
+        ...options.sharingState,
+        isPubliclyPublished: options.isPubliclyPublished,
+      })
     : "private";
   const displayedValue =
     derivedValue === "private" && wantsRestricted ? "restricted" : derivedValue;

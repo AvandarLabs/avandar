@@ -19,6 +19,8 @@ export type DisplayShare = ResourceShareRow & {
 type Props = {
   shares: readonly DisplayShare[];
   resourceType: ResourceType;
+  /** Renders every row inert, for a caller who may not write share rows. */
+  isReadOnly?: boolean;
   onRoleChange: (share: DisplayShare, role: RoleLevel) => void;
   onToggleRequiresAppAccess: (share: DisplayShare, next: boolean) => void;
   onRemove: (share: DisplayShare) => void;
@@ -32,6 +34,7 @@ type Props = {
 export function SharePrincipalList({
   shares,
   resourceType,
+  isReadOnly = false,
   onRoleChange,
   onToggleRequiresAppAccess,
   onRemove,
@@ -49,6 +52,7 @@ export function SharePrincipalList({
             displayName={share.displayName}
             resourceType={resourceType}
             isOwnerRow={share.isOwnerRow}
+            isReadOnly={isReadOnly}
             onRoleChange={(role) => {
               return onRoleChange(share, role);
             }}

@@ -18,20 +18,18 @@ export function PublishedShareLinks({ shareUrls }: Readonly<Props>): ReactNode {
         <ShareUrlRow
           label={t`Custom URL`}
           url={shareUrls.vanity}
-          hint={t`Best for word-of-mouth sharing. Visiting the permanent link below also redirects here.`}
+          hint={t`Best for word-of-mouth sharing. Visiting the direct link below also redirects here.`}
           showQr={false}
         />
       : null}
       <ShareUrlRow
         label={
-          shareUrls.vanity ?
-            t`Permanent link (use for QR codes)`
-          : t`Share link`
+          shareUrls.vanity ? t`Direct link (use for QR codes)` : t`Share link`
         }
         url={shareUrls.canonical}
         hint={
           shareUrls.vanity ?
-            t`Never changes, so QR codes printed from here keep working even if the custom URL changes.`
+            t`Stable for as long as this dashboard keeps its current audience, so QR codes printed from here keep working even if the custom URL changes. Changing between workspace and public changes this link.`
           : t`Anyone with this link can view the dashboard.`
         }
       />

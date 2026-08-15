@@ -3,7 +3,6 @@ import { Alert, Flex, Text } from "@mantine/core";
 import { Data, Puck } from "@puckeditor/core";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
@@ -12,7 +11,6 @@ import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAv
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
-import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton";
 import {
   getDashboardTitleFromPuckData,
@@ -20,6 +18,7 @@ import {
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import { DashboardShareButton } from "@/views/DashboardApp/DashboardShareModal/DashboardShareButton";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
@@ -188,7 +187,6 @@ function useDashboardEditorViewState(
 
 type RenderDashboardEditorToolbarOptions = {
   dashboard: Dashboard.T;
-  dashboardTitle: string;
   workspaceSlug: string;
   hasUnsavedChanges: boolean;
   onSave: (data: AvaPageData) => void;
@@ -197,24 +195,18 @@ type RenderDashboardEditorToolbarOptions = {
 function _renderDashboardEditorToolbar(
   options: Readonly<RenderDashboardEditorToolbarOptions>,
 ): ReactElement {
-  const { dashboard, dashboardTitle, workspaceSlug, hasUnsavedChanges } =
-    options;
+  const { dashboard, workspaceSlug, hasUnsavedChanges } = options;
   return (
     <>
       <SaveDashboardButton onSave={options.onSave} />
-      <ShareResourceButton
-        resourceName={dashboardTitle}
-        resourceType="dashboard"
-        resourceId={dashboard.id}
+      <DashboardShareButton
+        dashboard={dashboard}
+        hasUnsavedChanges={hasUnsavedChanges}
         size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
       />
       <ViewDashboardButton
         workspaceSlug={workspaceSlug}
         dashboardId={dashboard.id}
-        hasUnsavedChanges={hasUnsavedChanges}
-      />
-      <PublishDashboardButton
-        dashboard={dashboard}
         hasUnsavedChanges={hasUnsavedChanges}
       />
       <ExportPdfButton
@@ -272,7 +264,6 @@ function _renderDashboardEditorContent(
               headerActions: () => {
                 return _renderDashboardEditorToolbar({
                   dashboard,
-                  dashboardTitle: state.dashboardTitle,
                   workspaceSlug,
                   hasUnsavedChanges: state.hasUnsavedChanges,
                   onSave: state.onSave,

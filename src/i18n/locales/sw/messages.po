@@ -388,7 +388,6 @@ msgid "Export annotated PDF"
 msgstr "Export PDF iliyo na maelezo"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "URL maalum haiwezi kuzidi herufi {0}"
@@ -403,8 +402,8 @@ msgstr "Pakia faili"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Manage sharing"
-msgstr "Simamia kushiriki"
+#~ msgid "Manage sharing"
+#~ msgstr "Simamia kushiriki"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
@@ -513,6 +512,10 @@ msgstr "Hakuna datasets zilizoongezwa bado"
 msgid "Fixing query…"
 msgstr "Inarekebisha swali…"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Only workspace admins can publish to the web."
+msgstr ""
+
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. To increase the "
@@ -586,6 +589,10 @@ msgstr "Maudhui"
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
 msgstr "Tumia pendekezo"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Unpublish"
+msgstr ""
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityManagerApp/EntityNavbar.tsx
@@ -802,8 +809,8 @@ msgid "Discovery query failed."
 msgstr "Swali la ugunduzi limefeli."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Publish dashboard"
-msgstr "Chapisha dashibodi"
+#~ msgid "Publish dashboard"
+#~ msgstr "Chapisha dashibodi"
 
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
@@ -991,6 +998,11 @@ msgstr "Kurekebisha nenosiri kumeshindikana"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "Kundi jipya la jukumu"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "The published copy still serves the previous audience. Use the button "
+"below to apply your change."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1360,7 +1372,6 @@ msgstr "Badilisha kuwa mpango wa Bure"
 msgid "Parsed {0} rows"
 msgstr "Imepangwa {0} safu"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
@@ -1564,6 +1575,11 @@ msgstr "Inatofautiana kutoka <0>{numericLow}</0> hadi <1>{numericHigh}</1>, "
 msgid "No columns are available"
 msgstr "Hakuna safu zinazopatikana"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#~ msgid "Your access change is saved, but the published copy still reflects the "
+#~ "previous audience. Use the button below to apply it."
+#~ msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "Dataset isiyo na jina"
@@ -1747,6 +1763,12 @@ msgstr "Ingiza data"
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Descending"
 msgstr "Kushuka"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Stable for as long as this dashboard keeps its current audience, so QR "
+"codes printed from here keep working even if the custom URL changes. "
+"Changing between workspace and public changes this link."
+msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
@@ -1955,7 +1977,6 @@ msgstr "seti yako ya data"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
@@ -2042,10 +2063,10 @@ msgid "You haven't chosen an X axis"
 msgstr "Hujachagua mhimili wa X"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-"Avandar account required."
-msgstr "Kuchapisha kunafanya dashibodi hii ionekane kwa mtu yeyote aliye na "
-"kiungo, bila kuhitaji akaunti ya Avandar."
+#~ msgid "Publishing makes this dashboard viewable by anyone with the link, no "
+#~ "Avandar account required."
+#~ msgstr "Kuchapisha kunafanya dashibodi hii ionekane kwa mtu yeyote aliye na "
+#~ "kiungo, bila kuhitaji akaunti ya Avandar."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2084,6 +2105,11 @@ msgstr "Maandishi tupu"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "Bahari"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Not published yet. Nobody can open this dashboard from a link until you "
+"publish it."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -2127,9 +2153,9 @@ msgid "Go to Data Explorer"
 msgstr "Nenda kwa Mchambuzi wa Data"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-msgstr "Dashboard hii ni <0>ya umma</0>. Mtu yeyote mwenye kiungo kilicho hapa "
-"chini anaweza kuiona."
+#~ msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
+#~ msgstr "Dashboard hii ni <0>ya umma</0>. Mtu yeyote mwenye kiungo kilicho hapa "
+#~ "chini anaweza kuiona."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -2150,8 +2176,7 @@ msgstr "Hakuna"
 msgid "You'll be asked to confirm your current password."
 msgstr "Utatazamiwa kuthibitisha nenosiri lako la sasa."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
 msgid "Publish"
 msgstr "Chapisha"
 
@@ -2194,7 +2219,6 @@ msgid "Manual form shows an approximation"
 msgstr "Fomu ya Manual inaonyesha makadirio"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "URL maalum lazima iwe na angalau herufi {0}"
@@ -2817,6 +2841,7 @@ msgstr "Data"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "Haipatikani bila mtandao"
 
@@ -2886,6 +2911,10 @@ msgstr "chini ya dakika moja"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
 msgstr "Tuma mwaliko"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Using your custom URL. The direct UUID link below also still works."
+msgstr ""
 
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -2992,7 +3021,6 @@ msgstr "Rudi"
 msgid "Continue to your workspace"
 msgstr "Endelea kwenye ofisi yako"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
@@ -3505,6 +3533,11 @@ msgstr "Jaribu tena utafutaji"
 msgid "Clarifications"
 msgstr "Mwelekeo"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is still public on the web. Anyone with the link can view "
+"it until you press the button below."
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "Kitu kimefutwa"
@@ -3513,7 +3546,7 @@ msgstr "Kitu kimefutwa"
 msgid "Select columns"
 msgstr "Chagua safu"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "Huwezi kuchapisha wakati kuna mabadiliko yasiyohifadhiwa. Hifadhi "
 "kwanza."
@@ -3692,11 +3725,16 @@ msgstr "Chaguzi (zinazo tengwa kwa koma, kwa njia za kuchagua)"
 msgid "Owner"
 msgstr "Mmiliki"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is <0>public</0>. Anyone with the link can view it, with "
+"no Avandar account."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the "
-"custom URL changes."
-msgstr "Habadiliki kamwe, hivyo QR codes zilizochapishwa kutoka hapa "
-"zinaendelea kufanya kazi hata kama URL ya kawaida inabadilika."
+#~ msgid "Never changes, so QR codes printed from here keep working even if the "
+#~ "custom URL changes."
+#~ msgstr "Habadiliki kamwe, hivyo QR codes zilizochapishwa kutoka hapa "
+#~ "zinaendelea kufanya kazi hata kama URL ya kawaida inabadilika."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -3786,6 +3824,10 @@ msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 msgid "Reassign failed"
 msgstr "Uhamishaji wa umiliki umeshindikana"
 
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+msgid "You need edit access on this resource to share or publish it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "Chagua safu ya ukubwa wa alama"
@@ -3822,6 +3864,10 @@ msgstr ""
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "Mviringo"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Direct link (use for QR codes)"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -3874,6 +3920,15 @@ msgstr "Dataset imehifadhiwa kwa mafanikio!"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "By default we use a direct UUID-based link. Add a custom path below for "
+"a nicer URL."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Make internal"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -3940,7 +3995,6 @@ msgstr "Geuza"
 msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
@@ -4032,7 +4086,6 @@ msgstr "aina"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "Mipangilio ya kushiriki dashibodi imeboreshwa."
@@ -4164,7 +4217,6 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 "inaonyesha makadirio bora; SQL iliyo juu ndiyo inayoendesha."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
@@ -4265,7 +4317,7 @@ msgstr "Anza kwa kuchunguza eneo lako la kazi au kupakia dataset yako ya "
 msgid "Stacked"
 msgstr "Zilizopangwa kwa tabaka"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
 msgid "Share this {resourceLabel}"
 msgstr "Shiriki hii {resourceLabel}"
 
@@ -4538,7 +4590,6 @@ msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo inaonyesha {3} za "
 "kwanza pekee."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "URL maalum haiwezi kuwa tupu"
@@ -4759,6 +4810,11 @@ msgstr "Mpangilio"
 msgid "Role for {displayName}"
 msgstr "Jukumu la {displayName}"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is published to your workspace. Only people you have "
+"given access can open the link below."
+msgstr ""
+
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
 msgstr "Kagua kabla ya kutuma"
@@ -4836,6 +4892,11 @@ msgstr "Imefungwa"
 msgid "Contains (free-text)"
 msgstr "Inajumuisha (maneno ya bure)"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is not published yet. Use the button below to publish it "
+"to the audience you picked."
+msgstr ""
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "Tuma maoni"
@@ -4843,6 +4904,11 @@ msgstr "Tuma maoni"
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Loading dashboard datasets"
 msgstr "Inapakia seti za data za dashibodi"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Best for word-of-mouth sharing. Visiting the direct link below also "
+"redirects here."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
@@ -4854,7 +4920,6 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 msgstr "Kifungu cha WHERE kina nodi ya \"{nodeType}\" ambayo fomu haiungi "
 "mkono."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "Dashibodi imechapishwa!"
@@ -5058,7 +5123,6 @@ msgstr "Jina linahitajika"
 msgid "User group saved"
 msgstr "Kikundi cha mtumiaji kimehifadhiwa"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "Haiwezekani kuchapisha dashibodi"
@@ -5178,6 +5242,10 @@ msgstr "Hitilafu katika kuhifadhi seti ya data"
 msgid "Save"
 msgstr "Hifadhi"
 
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+msgid "Share or publish this {resourceLabel}"
+msgstr ""
+
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
 msgstr "Kutoka Google Sheets"
@@ -5208,7 +5276,7 @@ msgstr "Hujachagua safu ya jina"
 msgid "Grouped"
 msgstr "Zilizowekwa katika makundi"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
 msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 "kushiriki."
@@ -5294,8 +5362,8 @@ msgid "Freehand"
 msgstr "Mchoro wa bure"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Permanent link (use for QR codes)"
-msgstr "Kiungo cha kudumu (tumia kwa QR codes)"
+#~ msgid "Permanent link (use for QR codes)"
+#~ msgstr "Kiungo cha kudumu (tumia kwa QR codes)"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks.tsx
@@ -5335,8 +5403,8 @@ msgid "Admin"
 msgstr "Admin"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Published"
-msgstr "Imepakiwa"
+#~ msgid "Published"
+#~ msgstr "Imepakiwa"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
@@ -5421,9 +5489,9 @@ msgid "Current Plan"
 msgstr "Mpango wa Sasa"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Using your custom URL. The permanent UUID link below also still works."
-msgstr "Ukifanya matumizi ya URL yako ya kawaida. Kiungo cha kudumu cha UUID "
-"kilichoko hapa chini pia bado kinatumika."
+#~ msgid "Using your custom URL. The permanent UUID link below also still works."
+#~ msgstr "Ukifanya matumizi ya URL yako ya kawaida. Kiungo cha kudumu cha UUID "
+#~ "kilichoko hapa chini pia bado kinatumika."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -5472,7 +5540,6 @@ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 msgid "Make \"{resourceName}\" private?"
 msgstr "Uweke \"{resourceName}\" kuwa ya faragha?"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "URL hii maalum tayari inatumika"
@@ -5641,7 +5708,7 @@ msgstr "Hariri kundi la jukumu"
 msgid "Profiles"
 msgstr "Profaili"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
 msgid "Update & republish"
 msgstr "Sasisha & chapisha tena"
 
@@ -6179,6 +6246,10 @@ msgstr "Tafadhali angalia data na uhakikishe ni sahihi. Mara tu "
 msgid "Stroke ({strokeWidth}px)"
 msgstr "Mchoro ({strokeWidth}px)"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Publish to workspace"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Nambari kamili"
@@ -6237,10 +6308,10 @@ msgid "Fix these issues before saving"
 msgstr "Tengeneza masuala haya kabla ya kuhifadhi"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
-"redirects here."
-msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa "
-"chini pia kunarudisha hapa."
+#~ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
+#~ "redirects here."
+#~ msgstr "Bora kwa kushiriki kwa njia ya mdomo. Kutembelea kiungo cha kudumu hapa "
+#~ "chini pia kunarudisha hapa."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -6286,8 +6357,8 @@ msgid "Clear all"
 msgstr "Futa yote"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
-msgid "Close"
-msgstr "Funga"
+#~ msgid "Close"
+#~ msgstr "Funga"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6333,6 +6404,7 @@ msgstr "Inapakia..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "Shiriki"
@@ -6442,10 +6514,10 @@ msgid "Show QR code"
 msgstr "Onyesha QR code"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below "
-"for a nicer URL."
-msgstr "Kwa kawaida tunatumia kiungo cha kudumu kinachotegemea UUID. Ongeza "
-"njia maalum hapa chini kwa URL nzuri zaidi."
+#~ msgid "By default we use a permanent UUID-based link. Add a custom path below "
+#~ "for a nicer URL."
+#~ msgstr "Kwa kawaida tunatumia kiungo cha kudumu kinachotegemea UUID. Ongeza "
+#~ "njia maalum hapa chini kwa URL nzuri zaidi."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"

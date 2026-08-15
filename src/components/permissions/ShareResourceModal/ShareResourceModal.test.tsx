@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
-import { render, screen, waitFor } from "@/test-utils";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import type { ComponentProps } from "react";
 
 const MEMBERS = [
   {
@@ -34,6 +35,8 @@ const mocks = vi.hoisted(() => {
     isSharingStateFetching: false,
     getResourceSharingStateOptions: vi.fn(),
     makeResourcePrivate: vi.fn(),
+    setRestricted: vi.fn(),
+    upsertShare: vi.fn(),
   };
 });
 
@@ -70,13 +73,13 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
         return [mocks.makeResourcePrivate, false] as const;
       },
       useUpsertResourceShare: () => {
-        return [vi.fn(), false] as const;
+        return [mocks.upsertShare, false] as const;
       },
       useDeleteResourceShare: () => {
         return [vi.fn()] as const;
       },
       useSetResourceRestricted: () => {
-        return [vi.fn(), false] as const;
+        return [mocks.setRestricted, false] as const;
       },
     },
   };
@@ -110,6 +113,46 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
   };
 });
 
+/**
+ * Renders the modal with sensible defaults so a test only states what it
+ * varies. The pre-existing cases keep their explicit inline `render` calls, so
+ * this helper cannot silently change what they assert.
+ */
+function renderModal(
+  overrides: Readonly<Partial<ComponentProps<typeof ShareResourceModal>>> = {},
+): void {
+  render(
+    <ShareResourceModal
+      resourceName="Q3 Revenue"
+      resourceType="dashboard"
+      resourceId="dash-1"
+      onClose={vi.fn()}
+      {...overrides}
+    />,
+  );
+}
+
+function _makePublishing(
+  overrides: Readonly<{ onGeneralAccessChange?: () => void }>,
+): NonNullable<ComponentProps<typeof ShareResourceModal>["publishing"]> {
+  return {
+    targetVisibility: "workspace",
+    publicOptionDisabledReason: undefined,
+    section: <div data-testid="share-publishing-section" />,
+    actions: <div data-testid="share-publishing-actions" />,
+    onGeneralAccessChange: overrides.onGeneralAccessChange ?? vi.fn(),
+  };
+}
+
+/** Opens the General access dropdown and picks an option by its label. */
+async function _selectGeneralAccess(optionLabel: string): Promise<void> {
+  const combobox = await screen.findByRole("combobox", {
+    name: "General access",
+  });
+  fireEvent.click(combobox);
+  fireEvent.click(await screen.findByRole("option", { name: optionLabel }));
+}
+
 describe("ShareResourceModal", () => {
   beforeEach(() => {
     mocks.membersResult = [MEMBERS, false];
@@ -121,6 +164,8 @@ describe("ShareResourceModal", () => {
     mocks.isSharingStateFetching = false;
     mocks.getResourceSharingStateOptions.mockClear();
     mocks.makeResourcePrivate.mockClear();
+    mocks.setRestricted.mockClear();
+    mocks.upsertShare.mockClear();
   });
 
   it("renders the Drive-style layout with general access and owner row", async () => {
@@ -294,5 +339,71 @@ describe("ShareResourceModal", () => {
       screen.getByRole("combobox", { name: "Role for new share" }),
     ).toBeDisabled();
     expect(screen.getByRole("button", { name: "Share" })).toBeDisabled();
+  });
+
+  it("renders no publishing section for a resource that has none", async () => {
+    // Datasets pass no `publishing` prop, so the modal must look exactly as it
+    // did before dashboards grew one.
+    renderModal({ resourceType: "dataset" });
+
+    await waitFor(() => {
+      expect(screen.getByText("General access")).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("share-publishing-section")).toBeNull();
+    expect(screen.queryByTestId("share-publishing-actions")).toBeNull();
+  });
+
+  it("renders the publishing section and actions when supplied", async () => {
+    renderModal({
+      resourceType: "dashboard",
+      publishing: {
+        targetVisibility: "workspace",
+        publicOptionDisabledReason: undefined,
+        section: <div data-testid="share-publishing-section" />,
+        actions: <div data-testid="share-publishing-actions" />,
+        onGeneralAccessChange: vi.fn(),
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("share-publishing-section"),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("share-publishing-actions")).toBeInTheDocument();
+  });
+
+  // The dropdown's handler does two things at once: it moves the publish
+  // target AND writes share rows. Delete either half and nothing else in the
+  // suite notices, so these two cases pin both halves.
+  it("moves the publish target and writes shares from one dropdown change", async () => {
+    const onGeneralAccessChange = vi.fn();
+    mocks.sharingState = {
+      isRestricted: false,
+      ownerId: "user-owner",
+      shares: [],
+    };
+    renderModal({ publishing: _makePublishing({ onGeneralAccessChange }) });
+
+    await _selectGeneralAccess("Restricted");
+
+    expect(onGeneralAccessChange).toHaveBeenCalledWith("restricted");
+    expect(mocks.setRestricted).toHaveBeenCalledWith(
+      expect.objectContaining({ isRestricted: true, resourceId: "dash-1" }),
+    );
+  });
+
+  it("moves the publish target without writing shares for the public option", async () => {
+    // Public reads never consult `resource_shares`, so this option must move
+    // the target and touch nothing else. Writing shares here would widen EDIT
+    // access as a side effect of a READ decision.
+    const onGeneralAccessChange = vi.fn();
+    renderModal({ publishing: _makePublishing({ onGeneralAccessChange }) });
+
+    await _selectGeneralAccess("Anyone with the link");
+
+    expect(onGeneralAccessChange).toHaveBeenCalledWith("public");
+    expect(mocks.upsertShare).not.toHaveBeenCalled();
+    expect(mocks.setRestricted).not.toHaveBeenCalled();
   });
 });

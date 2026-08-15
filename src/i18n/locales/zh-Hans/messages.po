@@ -377,7 +377,6 @@ msgid "Export annotated PDF"
 msgstr "导出带注释的 PDF"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "自定义 URL 不能超过 {0} 个字符"
@@ -392,8 +391,8 @@ msgstr "上传文件"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Manage sharing"
-msgstr "管理共享"
+#~ msgid "Manage sharing"
+#~ msgstr "管理共享"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
@@ -498,6 +497,10 @@ msgstr "尚未添加数据集"
 msgid "Fixing query…"
 msgstr "正在修复查询…"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Only workspace admins can publish to the web."
+msgstr ""
+
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. To increase the "
@@ -569,6 +572,10 @@ msgstr "内容"
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
 msgstr "使用建议"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Unpublish"
+msgstr ""
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityManagerApp/EntityNavbar.tsx
@@ -773,8 +780,8 @@ msgid "Discovery query failed."
 msgstr "发现查询失败。"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Publish dashboard"
-msgstr "发布仪表板"
+#~ msgid "Publish dashboard"
+#~ msgstr "发布仪表板"
 
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
@@ -955,6 +962,11 @@ msgstr "密码重置失败"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "New role group"
 msgstr "新角色组"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "The published copy still serves the previous audience. Use the button "
+"below to apply your change."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1313,7 +1325,6 @@ msgstr "切换到免费计划"
 msgid "Parsed {0} rows"
 msgstr "解析了 {0} 行"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "自定义 URL 只能包含小写字母、数字和连字符"
@@ -1509,6 +1520,11 @@ msgstr "范围从 <0>{numericLow}</0> 到 <1>{numericHigh}</1>，平均 <2>{avg}
 msgid "No columns are available"
 msgstr "没有可用的列"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#~ msgid "Your access change is saved, but the published copy still reflects the "
+#~ "previous audience. Use the button below to apply it."
+#~ msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "未命名数据集"
@@ -1680,6 +1696,12 @@ msgstr "导入数据"
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
 msgid "Descending"
 msgstr "降序"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Stable for as long as this dashboard keeps its current audience, so QR "
+"codes printed from here keep working even if the custom URL changes. "
+"Changing between workspace and public changes this link."
+msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
@@ -1881,7 +1903,6 @@ msgstr "您的数据集"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
@@ -1965,9 +1986,9 @@ msgid "You haven't chosen an X axis"
 msgstr "您尚未选择 X 轴"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-"Avandar account required."
-msgstr "发布后，任何拥有链接的人都可以查看此仪表板，无需 Avandar 账户。"
+#~ msgid "Publishing makes this dashboard viewable by anyone with the link, no "
+#~ "Avandar account required."
+#~ msgstr "发布后，任何拥有链接的人都可以查看此仪表板，无需 Avandar 账户。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
@@ -2005,6 +2026,11 @@ msgstr "文本为空"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "海洋"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Not published yet. Nobody can open this dashboard from a link until you "
+"publish it."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -2045,8 +2071,8 @@ msgid "Go to Data Explorer"
 msgstr "前往数据探索器"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-msgstr "此仪表板是 <0>公开</0> 的。任何拥有以下链接的人都可以查看。"
+#~ msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
+#~ msgstr "此仪表板是 <0>公开</0> 的。任何拥有以下链接的人都可以查看。"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -2067,8 +2093,7 @@ msgstr "无"
 msgid "You'll be asked to confirm your current password."
 msgstr "系统将要求您确认当前密码。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
 msgid "Publish"
 msgstr "发布"
 
@@ -2109,7 +2134,6 @@ msgid "Manual form shows an approximation"
 msgstr "手动表单显示近似值"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "自定义 URL 必须至少包含 {0} 个字符"
@@ -2710,6 +2734,7 @@ msgstr "数据"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "离线不可用"
 
@@ -2777,6 +2802,10 @@ msgstr "少于一分钟"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Send invite"
 msgstr "发送邀请"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Using your custom URL. The direct UUID link below also still works."
+msgstr ""
 
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -2880,7 +2909,6 @@ msgstr "返回"
 msgid "Continue to your workspace"
 msgstr "继续进入您的工作区"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自定义 URL 不能包含空格"
@@ -3375,6 +3403,11 @@ msgstr "重试查找"
 msgid "Clarifications"
 msgstr "澄清"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is still public on the web. Anyone with the link can view "
+"it until you press the button below."
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "实体已删除"
@@ -3383,7 +3416,7 @@ msgstr "实体已删除"
 msgid "Select columns"
 msgstr "选择列"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在存在未保存更改时无法发布。请先保存。"
 
@@ -3557,10 +3590,15 @@ msgstr "选项（逗号分隔，用于选择模式）"
 msgid "Owner"
 msgstr "所有者"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is <0>public</0>. Anyone with the link can view it, with "
+"no Avandar account."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the "
-"custom URL changes."
-msgstr "永不更改，因此从这里打印的二维码即使自定义 URL 更改也能继续使用。"
+#~ msgid "Never changes, so QR codes printed from here keep working even if the "
+#~ "custom URL changes."
+#~ msgstr "永不更改，因此从这里打印的二维码即使自定义 URL 更改也能继续使用。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -3648,6 +3686,10 @@ msgstr "这是您数据集的前 {0} 行。"
 msgid "Reassign failed"
 msgstr "重新分配失败"
 
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+msgid "You need edit access on this resource to share or publish it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
 msgstr "选择符号大小列"
@@ -3684,6 +3726,10 @@ msgstr ""
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "曲线"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Direct link (use for QR codes)"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -3736,6 +3782,15 @@ msgstr "数据集保存成功！"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "未找到已保存的数据集。"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "By default we use a direct UUID-based link. Add a custom path below for "
+"a nicer URL."
+msgstr ""
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Make internal"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -3800,7 +3855,6 @@ msgstr "转动"
 msgid "X axis label"
 msgstr "X 轴标签"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "此自定义 URL 已被占用。请尝试在其中添加一个词。"
@@ -3891,7 +3945,6 @@ msgstr "类型"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "仪表板共享设置已更新。"
@@ -4019,7 +4072,6 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分内容无法以手动形式表示。该表单显示了最佳努力的近似值；上面的 SQL 是实际运行的内容。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "请再试一次。您的仪表板尚未发布。"
@@ -4117,7 +4169,7 @@ msgstr "通过探索您的工作区或上传您的第一个数据集开始。"
 msgid "Stacked"
 msgstr "堆叠"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
 msgid "Share this {resourceLabel}"
 msgstr "分享此 {resourceLabel}"
 
@@ -4384,7 +4436,6 @@ msgstr "正在重新登录…"
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} 最多只能渲染 {1} 个 {2}，因此仅显示前 {3} 个。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "自定义 URL 不能为空"
@@ -4595,6 +4646,11 @@ msgstr "布局"
 msgid "Role for {displayName}"
 msgstr "{displayName} 的角色"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is published to your workspace. Only people you have "
+"given access can open the link below."
+msgstr ""
+
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
 msgstr "发送前审核"
@@ -4671,6 +4727,11 @@ msgstr "受限"
 msgid "Contains (free-text)"
 msgstr "包含（自由文本）"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "This dashboard is not published yet. Use the button below to publish it "
+"to the audience you picked."
+msgstr ""
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "发送反馈"
@@ -4678,6 +4739,11 @@ msgstr "发送反馈"
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Loading dashboard datasets"
 msgstr "加载仪表板数据集"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
+msgid "Best for word-of-mouth sharing. Visiting the direct link below also "
+"redirects here."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
@@ -4688,7 +4754,6 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "WHERE 子句包含表单不支持的“{nodeType}”节点。"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "仪表板已发布！"
@@ -4883,7 +4948,6 @@ msgstr "名称是必需的"
 msgid "User group saved"
 msgstr "用户组已保存"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "无法发布仪表板"
@@ -4999,6 +5063,10 @@ msgstr "保存数据集时出错"
 msgid "Save"
 msgstr "保存"
 
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+msgid "Share or publish this {resourceLabel}"
+msgstr ""
+
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
 msgstr "来自 Google Sheets"
@@ -5029,7 +5097,7 @@ msgstr "您尚未选择名称列"
 msgid "Grouped"
 msgstr "分组"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
 msgstr "您需要对该资源具有管理员访问权限才能管理共享。"
 
@@ -5112,8 +5180,8 @@ msgid "Freehand"
 msgstr "手绘"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Permanent link (use for QR codes)"
-msgstr "永久链接（用于二维码）"
+#~ msgid "Permanent link (use for QR codes)"
+#~ msgstr "永久链接（用于二维码）"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks.tsx
@@ -5153,8 +5221,8 @@ msgid "Admin"
 msgstr "管理员"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Published"
-msgstr "已发布"
+#~ msgid "Published"
+#~ msgstr "已发布"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
@@ -5235,8 +5303,8 @@ msgid "Current Plan"
 msgstr "当前计划"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Using your custom URL. The permanent UUID link below also still works."
-msgstr "使用您的自定义 URL。下面的永久 UUID 链接仍然有效。"
+#~ msgid "Using your custom URL. The permanent UUID link below also still works."
+#~ msgstr "使用您的自定义 URL。下面的永久 UUID 链接仍然有效。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -5285,7 +5353,6 @@ msgstr "无法准备离线聊天模型。"
 msgid "Make \"{resourceName}\" private?"
 msgstr "要将“{resourceName}”设为私密吗？"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "此自定义 URL 已被占用"
@@ -5449,7 +5516,7 @@ msgstr "编辑角色组"
 msgid "Profiles"
 msgstr "配置文件"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
 msgid "Update & republish"
 msgstr "更新并重新发布"
 
@@ -5967,6 +6034,10 @@ msgstr "请查看数据并确保其正确。一旦确认，数据集将与此数
 msgid "Stroke ({strokeWidth}px)"
 msgstr "描边 ({strokeWidth}px)"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Publish to workspace"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "整数"
@@ -6022,9 +6093,9 @@ msgid "Fix these issues before saving"
 msgstr "在保存之前修复这些问题"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
-"redirects here."
-msgstr "最适合口碑分享。访问下面的永久链接也会重定向到此处。"
+#~ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
+#~ "redirects here."
+#~ msgstr "最适合口碑分享。访问下面的永久链接也会重定向到此处。"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -6069,8 +6140,8 @@ msgid "Clear all"
 msgstr "清除所有"
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
-msgid "Close"
-msgstr "关闭"
+#~ msgid "Close"
+#~ msgstr "关闭"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6115,6 +6186,7 @@ msgstr "加载中..."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Share"
 msgstr "分享"
@@ -6223,9 +6295,9 @@ msgid "Show QR code"
 msgstr "显示二维码"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below "
-"for a nicer URL."
-msgstr "默认情况下，我们使用基于永久 UUID 的链接。请在下面添加自定义路径以获得更好的 URL。"
+#~ msgid "By default we use a permanent UUID-based link. Add a custom path below "
+#~ "for a nicer URL."
+#~ msgstr "默认情况下，我们使用基于永久 UUID 的链接。请在下面添加自定义路径以获得更好的 URL。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"
