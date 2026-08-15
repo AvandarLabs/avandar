@@ -2,12 +2,15 @@ import { Trans } from "@lingui/react/macro";
 import { Alert, Code, Stack, Text } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { DiscoveryCustomFallback } from "./DiscoveryCustomFallback";
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
+import { DiscoveryRecoveryActions } from "./DiscoveryRecoveryActions";
+import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   column: string;
   error?: string;
   queryPreview: string;
+  onRetry?: () => void;
+  onRequestDifferentDiscovery?: () => void;
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 };
 
@@ -16,6 +19,8 @@ export function DiscoveryUnavailableBody({
   column,
   error,
   queryPreview,
+  onRetry,
+  onRequestDifferentDiscovery,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   return (
@@ -40,6 +45,12 @@ export function DiscoveryUnavailableBody({
           </Trans>
         </Text>
       }
+      {error && (onRetry || onRequestDifferentDiscovery) ?
+        <DiscoveryRecoveryActions
+          onRetry={onRetry}
+          onRequestDifferentDiscovery={onRequestDifferentDiscovery}
+        />
+      : null}
       <DiscoveryCustomFallback onSubmit={onSubmit} />
     </Stack>
   );

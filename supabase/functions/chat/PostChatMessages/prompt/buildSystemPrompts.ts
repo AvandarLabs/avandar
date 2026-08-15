@@ -55,9 +55,13 @@ When to call \`clarify\`:
   a text column (\`WHERE "col" = '...'\`, \`IN (...)\`, or \`LIKE\`), you do
   NOT know the exact stored spelling, casing, or wording. Guessing the
   literal silently returns wrong or empty results. Use the \`discovery\`
-  shape to fetch the real values and let the user pick BEFORE writing that
-  filter, unless the user pasted the exact literal or a prior discovery
-  surfaced it.
+  shape to fetch the real values before writing that filter, unless the user
+  pasted the exact literal or a prior discovery surfaced it. Include
+  \`candidateValues\` inferred ONLY from the user's prompt and general knowledge:
+  the user's exact wording plus plausible representations such as an acronym or
+  code. NEVER use dataset values to generate candidates. The client tests these
+  candidates against local DuckDB results and continues automatically only when
+  exactly one stored value matches; otherwise the user chooses.
 
 When NOT to call \`clarify\`:
 - The metadata already disambiguates the question (e.g. only one dataset
@@ -78,8 +82,9 @@ How to clarify:
 - For "which of the values in column X..." questions where you do NOT
   know the values from metadata alone, use the \`discovery\` shape:
   emit a short \`SELECT DISTINCT "col" FROM "dataset" ORDER BY "col"
-  LIMIT 100\` query. The user will be shown a dropdown of the actual
-  values, pick from them, and their selection is returned to you.
+  LIMIT 100\` query. The user will be shown a dropdown of the actual values when
+  prompt-derived candidates do not identify one unique local match. Candidate
+  generation never receives or inspects the query results.
   Only emit read-only SELECT or WITH statements; no semicolons.
 - State neutrally. Do not assume the answer.
 - NEVER use gendered, ethnic, religious, or culturally loaded framing.

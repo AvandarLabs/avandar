@@ -138,16 +138,6 @@ msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "La entrada JOIN en la posición {index} no es una referencia simple a "
 "una tabla."
 
-#: src/config/AppLinks.tsx
-#~ msgid "Geo Explorer"
-#~ msgstr "Geo Explorer"
-
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-#~ msgid "Or {0} to be notified when our public launch is ready."
-#~ msgstr "O {0} para ser notificado cuando nuestro lanzamiento público esté "
-#~ "listo."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Extensión derecha"
@@ -240,7 +230,7 @@ msgstr "UNION/INTERSECT/EXCEPT no es compatible con el formulario."
 msgid "Chart settings"
 msgstr "Configuraciones del gráfico"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "El descubrimiento no está disponible en este contexto."
 
@@ -700,7 +690,7 @@ msgstr "Gráfico de burbujas"
 msgid " records"
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Algo más…"
 
@@ -804,10 +794,6 @@ msgstr "Este conjunto de datos no tiene descripción."
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "El restablecimiento de contraseña requiere una conexión a internet."
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size"
-#~ msgstr "Tamaño del símbolo"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
@@ -1066,12 +1052,6 @@ msgstr ""
 msgid "Copied"
 msgstr "Copiado"
 
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Add a member or a user group to grant access. Use General access below "
-#~ "to share more broadly."
-#~ msgstr "Agrega un miembro o un grupo de usuarios para otorgar acceso. Usa el "
-#~ "acceso general a continuación para compartir de manera más amplia."
-
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Measure distance and area"
 msgstr ""
@@ -1165,7 +1145,7 @@ msgstr "Cargando planes..."
 msgid "User groups"
 msgstr "Grupos de usuarios"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Escribe tu respuesta…"
 
@@ -1364,11 +1344,6 @@ msgid "Add a member or a user group to grant access. Use General access above "
 msgstr "Agregue un miembro o un grupo de usuarios para otorgar acceso. Use "
 "Acceso general arriba para compartir con más personas."
 
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "This {resource} is currently only accessible to its owner."
-#~ msgstr "Este {resource} actualmente solo es accesible para su propietario."
-
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
@@ -1402,7 +1377,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 msgstr "Publicar cada columna, todas las filas. Máxima flexibilidad para los "
 "espectadores, máxima exposición."
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Consulta fallida."
 
@@ -1422,12 +1397,6 @@ msgstr "Deshacer"
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Recomendado si tiene aproximadamente 8 GB de RAM (opción predeterminada "
 "para la mayoría de los usuarios)."
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "Se omitieron {droppedRowCount} de {totalRowCount} filas porque sus "
-#~ "coordenadas faltaban o estaban fuera de rango."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1747,16 +1716,6 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocurrió un error inesperado. Puede intentarlo de nuevo o volver al "
 "inicio."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-#~ msgid "{0} to be notified when it's your turn to register! If you are already "
-#~ "on our waitlist and have not received a sign-up code, we appreciate your "
-#~ "patience. You will receive a sign-up code soon. We promise!"
-#~ msgstr "{0} para ser notificado cuando sea tu turno de registrarte. Si ya estás "
-#~ "en nuestra lista de espera y no has recibido un código de registro, "
-#~ "agradecemos tu paciencia. Recibirás un código de registro pronto. ¡Lo "
-#~ "prometemos!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Sesgo detectado:"
@@ -1798,10 +1757,6 @@ msgstr "Sección"
 msgid "Aggregate only"
 msgstr ""
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "No rows could be mapped"
-#~ msgstr "No se pudo ubicar ninguna fila en el mapa"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1826,7 +1781,7 @@ msgstr "Los tipos de columna detectados para 1 columna en \"{sourceFileName}\" "
 "difieren de la vista previa de importación y han sido sobrescritos con "
 "los valores reales."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No se devolvieron valores de {column}. Describe lo que necesitas en su "
 "lugar."
@@ -2043,11 +1998,6 @@ msgstr "Exporta este tablero como un PDF, o dibuja en él primero. Las "
 msgid "Update available"
 msgstr "Actualización disponible"
 
-#: src/routes/register.tsx
-#~ msgid "Please <0>email us</0> if you would like early access."
-#~ msgstr "Por favor <0>envíanos un correo electrónico</0> si deseas acceso "
-#~ "anticipado."
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr "Paso"
@@ -2104,10 +2054,6 @@ msgstr "Eliminar"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Failed to save dataset: {0}"
 msgstr "Error al guardar el conjunto de datos: {0}"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
-#~ msgid "Query form"
-#~ msgstr "Formulario de consulta"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2312,10 +2258,6 @@ msgstr ""
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "Campos a ingresar manualmente"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
-#~ msgid "Loading map data"
-#~ msgstr "Cargando datos del mapa"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2847,10 +2789,6 @@ msgstr "¡Panel guardado exitosamente!"
 msgid "Method"
 msgstr ""
 
-#: src/views/GisApp/panels/FeatureInspector.tsx
-#~ msgid "N/A"
-#~ msgstr "N/A"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Longitude"
@@ -2940,10 +2878,6 @@ msgstr "Capturando panel…"
 msgid "X axis tick interval"
 msgstr "Intervalo de marcas del eje X"
 
-#: src/routes/register.tsx
-#~ msgid "This is an invalid waitlist code"
-#~ msgstr "Este es un código de lista de espera no válido"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
@@ -3023,12 +2957,6 @@ msgstr "La cláusula WHERE usa \"{operator}\" en \"{columnName}\" con una lista 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "None of the {totalRowCount} rows could be mapped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "No se pudo ubicar ninguna de las {totalRowCount} filas en el mapa "
-#~ "porque sus coordenadas faltaban o estaban fuera de rango."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3229,6 +3157,10 @@ msgstr "Elige el idioma utilizado en este espacio de trabajo. Los idiomas de "
 msgid "No plans available."
 msgstr "No hay planes disponibles."
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr "Prueba una búsqueda diferente"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr ""
@@ -3363,21 +3295,9 @@ msgstr "Volver a la página de inicio de sesión"
 msgid "1 filter"
 msgstr ""
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
-#~ msgid "Pick a data source and its latitude and longitude columns to plot it."
-#~ msgstr "Seleccione una fuente de datos y sus columnas de latitud y longitud "
-#~ "para graficarla."
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
 msgstr ""
-
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Controls the default for the rest of the workspace. People without app "
-#~ "access still need a direct share above."
-#~ msgstr "Controla el valor predeterminado para el resto del espacio de trabajo. "
-#~ "Las personas sin acceso a la aplicación aún necesitan un compartir "
-#~ "directo por encima."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
@@ -3503,10 +3423,6 @@ msgstr "¿Está seguro de que desea eliminar este conjunto de datos? Esta acció
 msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
 msgstr ""
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size column must be numeric."
-#~ msgstr "La columna de tamaño de símbolo debe ser numérica."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -3647,10 +3563,6 @@ msgstr "Suelta para importar"
 msgid "Date range"
 msgstr "Rango de fechas"
 
-#: src/routes/register.tsx
-#~ msgid "sign up for our waitlist"
-#~ msgstr "regístrate en nuestra lista de espera"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Agregar conjunto de datos al espacio de trabajo"
@@ -3694,13 +3606,16 @@ msgstr "Generando SQL…"
 msgid "X axis label rotation"
 msgstr "Rotación de las etiquetas del eje X"
 
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr "[La búsqueda de descubrimiento local falló. Prueba con otra columna o "
+"consulta de búsqueda sin pedirme que seleccione del catálogo que "
+"falló.]"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "La descarga del modelo offline falló"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "Se procesaron {formattedNumRows} filas con éxito"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Point geometry column"
@@ -4132,6 +4047,10 @@ msgstr "Nuevo campo"
 msgid "Workspace created successfully!"
 msgstr "¡Espacio de trabajo creado exitosamente!"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr "Reintentar búsqueda"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
@@ -4148,10 +4067,6 @@ msgstr "Seleccionar columnas"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "No puedes publicar mientras haya cambios no guardados. Guarda primero."
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Latitude column"
-#~ msgstr "Columna de latitud"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4259,10 +4174,6 @@ msgstr "Conjunto de datos agregado"
 msgid "Optional"
 msgstr "Opcional"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "Some rows could not be mapped"
-#~ msgstr "No se pudieron ubicar algunas filas en el mapa"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
 msgstr ""
@@ -4302,10 +4213,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Cada serie es una columna numérica trazada en el valor radial. Los "
 "valores se agrupan por el eje de categoría (\"{axisKeyValue}\")."
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select longitude column"
-#~ msgstr "Seleccionar columna de longitud"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -4447,10 +4354,6 @@ msgstr "No se pudo reasignar"
 msgid "Join to boundaries"
 msgstr ""
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Select symbol size column"
-#~ msgstr "Seleccionar columna de tamaño de símbolo"
-
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
 msgstr "¡Panel eliminado con éxito!"
@@ -4466,10 +4369,6 @@ msgstr "URL personalizada"
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "Pregunta sobre tus datos..."
-
-#: src/views/GisApp/basemap/MapStylePicker.tsx
-#~ msgid "Theme picker"
-#~ msgstr "Selector de tema"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
@@ -4550,13 +4449,6 @@ msgstr "No se encontraron conjuntos de datos guardados."
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr ""
-
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Every workspace member who can open the {app} app gets this role on this "
-#~ "{resource}, in addition to whatever's listed above."
-#~ msgstr "Cada miembro del espacio de trabajo que puede abrir la aplicación {app} "
-#~ "obtiene este rol en este {resource}, además de lo que se enumera "
-#~ "arriba."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -4682,13 +4574,6 @@ msgstr "Seleccionar agregación"
 msgid "Class {0}: {1} values"
 msgstr ""
 
-#: src/routes/register.tsx
-#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
-#~ "on our waitlist and have received a sign-up code in your email."
-#~ msgstr "Mientras Avandar esté en beta, solo permitimos el registro si estás en "
-#~ "nuestra lista de espera y has recibido un código de registro en tu "
-#~ "correo electrónico."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorar todos los filtros globales: esta visualización no tiene "
@@ -4701,10 +4586,6 @@ msgstr "Escribiste:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Selección múltiple"
-
-#: src/routes/register.tsx
-#~ msgid "Sign up for our waitlist"
-#~ msgstr "Regístrate en nuestra lista de espera"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4725,10 +4606,6 @@ msgstr "Contraer panel"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Compartir falló"
-
-#: src/routes/register.tsx
-#~ msgid "Your waitlist code has been verified"
-#~ msgstr "Tu código de lista de espera ha sido verificado"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4927,10 +4804,6 @@ msgstr "Por favor, inténtelo de nuevo. Su tablero no ha sido publicado."
 msgid "Encoding"
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "Buscando valores en {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -5039,10 +4912,6 @@ msgstr "Apilado"
 msgid "Share this {resourceLabel}"
 msgstr "Compartir este {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select latitude column"
-#~ msgstr "Seleccionar columna de latitud"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
 msgstr "Este {resource} está compartido con: "
@@ -5059,10 +4928,6 @@ msgstr "Subir"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Something went wrong while loading this layer's data."
-#~ msgstr "Ocurrió un error al cargar los datos de esta capa."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -5577,6 +5442,10 @@ msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "Este conjunto de datos es solo para uso offline. Haga clic para "
 "permitir la sincronización en línea."
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr "Comprobando tus datos…"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Filtros globales"
@@ -5706,10 +5575,6 @@ msgstr "Seleccione un archivo de Excel o CSV de su computadora para importar"
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Boundary dataset"
 msgstr ""
-
-#: src/routes/register.tsx
-#~ msgid "Please choose a password to complete your registration"
-#~ msgstr "Por favor, elige una contraseña para completar tu registro"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5989,10 +5854,6 @@ msgstr "Sin columnas numéricas"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "Servicio"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Could not load map data"
-#~ msgstr "No se pudieron cargar los datos del mapa"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -6293,11 +6154,6 @@ msgstr "Tono"
 msgid "Editor"
 msgstr "Editor"
 
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Only the people and groups listed above can access this {resource}."
-#~ msgstr "Solo las personas y grupos mencionados arriba pueden acceder a este "
-#~ "{resource}."
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "Organización"
@@ -6369,7 +6225,7 @@ msgstr "Nuevo grupo de usuarios"
 msgid "Left"
 msgstr "Izquierda"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "Ninguna de las anteriores"
 
@@ -6739,10 +6595,6 @@ msgstr "Tableros"
 msgid "integer"
 msgstr "entero"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
-#~ msgid "Symbol color"
-#~ msgstr "Color del símbolo"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "Respuesta de aclaración personalizada"
@@ -6860,10 +6712,6 @@ msgstr "Actualmente estás suscrito a este plan."
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "Subir un conjunto de datos"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Invalid column type"
-#~ msgstr "Tipo de columna inválido"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
@@ -7290,10 +7138,6 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Los valores que seleccionaste pueden contener información personal. El "
 "proveedor de IA los recibirá y puede registrar la solicitud."
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
-#~ msgid "No mappable rows in this data source."
-#~ msgstr "No hay filas que se puedan ubicar en el mapa en esta fuente de datos."
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "Archivo CSV o Excel"
@@ -7407,10 +7251,6 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "Compartido contigo"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Longitude column"
-#~ msgstr "Columna de longitud"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Run a query to configure a chart."

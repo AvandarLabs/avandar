@@ -118,6 +118,85 @@ repo) so the output stays small and tied to the diff.
   grep -rEn '\bhandle[A-Z][a-zA-Z]*\b' --include="*.ts" --include="*.tsx" .
   ```
 
+- Flag indirection that the inline form does not need. A named binding used in
+  exactly one place makes the reader jump to a second location to learn
+  something the use site could have shown outright, so when the value is small
+  the inline form is the more readable one and is what the code should use.
+
+  Flag only when all three hold, which keeps the check decidable from the added
+  lines alone:
+  1) the binding is referenced exactly once in the file; 2) it is a top-level
+  `const` or a `_`-prefixed helper, not an import or a parameter; 3) inlined it
+  would add 5 lines or fewer at the use site, which an object literal of 4 or
+  fewer properties and a function body of a single statement both satisfy.
+
+  Exceptions: 1) referenced more than once, including by a test that imports
+  it; 2) inlining would add more than 5 lines, where the extra nesting costs
+  the reader more than the jump; 3) the name is the only thing explaining an
+  otherwise opaque value, such as a magic number or a regular expression;
+  4) it exists to give a value a stable identity, such as a module-level empty
+  array used as a default for a prop or a hook dependency, where inlining would
+  build a new value on every call and defeat the reference check; 5) the
+  binding is recursive, or a `const` whose use would precede its declaration.
+
+  This rule takes precedence over the two helper rules below. Those govern how
+  to write a helper that should exist; this one asks whether it should exist.
+  Do not ask for a `_` prefix or a move above the caller on a helper that this
+  rule says to inline.
+
+  This is bad:
+
+  ```ts
+  const metadata = {
+    custom: {
+      isDiscoveryContinuation: true,
+    },
+  } as const;
+
+  function _isInternal(messageMetadata: MessageMetadata): boolean {
+    return messageMetadata?.custom?.isDiscoveryContinuation === true;
+  }
+
+  export const DiscoveryContinuationMessage = {
+    metadata,
+    isInternal: _isInternal,
+  };
+  ```
+
+  This is good:
+
+  ```ts
+  export const DiscoveryContinuationMessage = {
+    metadata: {
+      custom: {
+        isDiscoveryContinuation: true,
+      },
+    } as const,
+
+    isInternal: (messageMetadata: MessageMetadata): boolean => {
+      return messageMetadata?.custom?.isDiscoveryContinuation === true;
+    },
+  };
+  ```
+
+  **Find candidates** (top-level `const` and `_` helpers, with a count of how
+  often each name appears in its own file; a total of 2 means one declaration
+  plus one use):
+
+  ```bash
+  for f in <files-under-review-ending-in-.ts-or-.tsx>; do
+    grep -Eho '^(const|function|async function) _?[A-Za-z0-9_]+' "$f" \
+      | sed -E 's/^(const|(async )?function) //' \
+      | while read -r name; do
+          n="$(grep -Ecw "$name" "$f")"
+          [ "$n" = 2 ] && printf '%s %s used once\n' "$f" "$name"
+        done
+  done
+  ```
+
+  Each hit is a candidate, not a finding. Open it and apply the 5-line test and
+  the exceptions before flagging.
+
 - Non-exported top-level helper functions should be prefixed with `_`.
 
 - Declare local helper functions above the exported function that uses them,
@@ -178,19 +257,44 @@ repo) so the output stays small and tied to the diff.
   the earlier export; an unrelated helper serving a second export is one of
   the exceptions above.
 
-- Name a function that turns one value into another with one of exactly four
-  shapes, so the name states both the source and the target:
-  `[Receiver].to{Target}` when the receiver names the source,
-  `[Receiver].from{Source}` when the receiver names the target,
-  `make{Target}From{Source}` for a free function returning a new value, and
-  `get{Target}From{Source}` for a free function returning something logically
-  contained in the source (a nested value, a display label, a derived
-  property). A name that states only one side leaves the reader guessing what
-  goes in, which is the whole cost of `resolve...`: it names neither side.
+- Name a function that turns one value into another so that the source and the
+  target are both named, counting the receiver as part of the name. A name that
+  states only one side leaves the reader guessing what goes in, which is the
+  whole cost of `resolve...`: it names neither side.
 
-  A method takes the missing half from its receiver and must not repeat it. A
-  free function has no receiver, so it spells out both halves and never uses
-  `To`.
+  First decide what the receiver is. The receiver is the module, namespace, or
+  object the function hangs off (`MapLayer` in `MapLayer.toGeoBinding`). It
+  either **is the source** (the value being converted is a `MapLayer`), **is
+  the target** (the value being produced is a `GeoBinding`), or is **neither**,
+  meaning a general grouping name such as `MapUtils`, `Formatters`, or
+  `DateHelpers`. Only a receiver that is the source or the target supplies a
+  half, so only then may the function name drop that half:
+
+  | Shape                                 | Use when                           |
+  | ------------------------------------- | ---------------------------------- |
+  | `[Source].to{Target}`                 | Receiver is the source, converting |
+  | `[Source].get{Target}`                | Receiver is the source, looking up |
+  | `[Target].from{Source}`               | Receiver is the target             |
+  | `[Receiver].make{Target}From{Source}` | Receiver is neither, new value     |
+  | `[Receiver].get{Target}From{Source}`  | Receiver is neither, value inside  |
+  | `make{Target}From{Source}`            | Free function, new value           |
+  | `get{Target}From{Source}`             | Free function, value inside source |
+
+  A method on a receiver that names a side takes the missing half from that
+  receiver and must not repeat it. A method on a receiver that names neither
+  side gets nothing from it, so it spells out both halves exactly as a free
+  function does: `MapUtils.makeGeoBindingFromMapLayer(layer)` is right and
+  `MapUtils.toGeoBinding(layer)` is a finding, because `MapUtils` is not the
+  source. A free function has no receiver, so it spells out both halves and
+  never uses `To`.
+
+  `to` and `get` are both correct on a receiver that names the source; pick by
+  what the function does. `to` converts the receiver into another
+  representation of itself (`MapLayer.toGeoBinding`, `Dataset.toCsv`). `get`
+  fetches, filters, or looks up something logically contained in the source
+  (`MapLayer.getQueryableFields`, `MapLayer.getFieldById`). Do not flag a
+  `get{Target}` method as a missing `to{Target}`, or the reverse, when the
+  chosen prefix matches the work being done.
 
   Flag `resolve...` on **any** function, exported or not, including a
   `_resolve...` helper: the word carries no information inside a file either,
@@ -199,10 +303,10 @@ repo) so the output stays small and tied to the diff.
   (`_resolveCompletionWaiters`, a `resolve` callback), because there it names a
   real action rather than a conversion. Also flag `compute...`,
   `build...`, and `create...` on an exported function that is really one of the
-  four shapes: a smaller prefix vocabulary where each prefix carries
+  shapes above: a smaller prefix vocabulary where each prefix carries
   information beats a wide set of near-synonyms.
 
-  The four shapes are required only for exported functions. A non-exported
+  These shapes are required only for exported functions. A non-exported
   `_`-prefixed helper has callers in its own file that can see its source, so
   `_build...` is the right name for one that assembles a piece of a value
   (`_buildCircleRadius`, `_buildDropReports`), and the verbose form is not
@@ -219,6 +323,8 @@ repo) so the output stays small and tied to the diff.
   ```ts
   MapLayer.resolveGeoBinding(layer);
   toFeatureCollection({ rows, binding });
+  // `MapUtils` names neither side, so the source is missing.
+  MapUtils.toGeoBinding(layer);
   computeBounds(featureCollection);
   createMapSpec(layerSpecs);
   ```
@@ -227,6 +333,8 @@ repo) so the output stays small and tied to the diff.
 
   ```ts
   MapLayer.toGeoBinding(layer);
+  MapLayer.getQueryableFields(layer);
+  MapUtils.makeGeoBindingFromMapLayer(layer);
   makeFeatureCollectionFromRows({ rows, binding });
   getBoundsFromFeatureCollection(featureCollection);
   makeMapSpecFromLayerSpecs(layerSpecs);
@@ -256,6 +364,12 @@ repo) so the output stays small and tied to the diff.
   finding, and a method whose receiver supplies the other half is already
   correct.
 
+  For a `to{Target}`, `get{Target}`, or `from{Source}` method added in the
+  diff, read the receiver's own name before deciding. If the receiver names the
+  source or the target, the short form is correct and there is no finding. Only
+  flag it when the receiver names neither side, and then ask for the full
+  `make{Target}From{Source}` or `get{Target}From{Source}` form.
+
 - Name a function that returns user-facing copy after the copy itself, with no
   prefix: `appLabel(app)`, `vizTypeLabel(vizType)`. This is the one conversion
   exempt from the naming rule above, so flag `getAppLabelFromAppType` or
@@ -266,8 +380,8 @@ repo) so the output stays small and tied to the diff.
 
   The exemption is only for a function that returns copy and nothing else. One
   that takes copy as an input among several and returns data still follows the
-  four shapes. Repos that keep copy in a dedicated module should say where in
-  their repo-local checklist.
+  naming shapes above. Repos that keep copy in a dedicated module should say
+  where in their repo-local checklist.
 
   This is bad:
 

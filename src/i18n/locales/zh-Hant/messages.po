@@ -131,15 +131,6 @@ msgstr "邀請成員"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "位置 {index} 的 JOIN 項目不是純資料表參照。"
 
-#: src/config/AppLinks.tsx
-#~ msgid "Geo Explorer"
-#~ msgstr "地理探索器"
-
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-#~ msgid "Or {0} to be notified when our public launch is ready."
-#~ msgstr "或 {0} 以在我們的公開啟動準備好時獲得通知。"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "右側範圍"
@@ -231,7 +222,7 @@ msgstr "表單不支援 UNION／INTERSECT／EXCEPT。"
 msgid "Chart settings"
 msgstr "圖表設定"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "在此上下文中無法使用發現功能。"
 
@@ -681,7 +672,7 @@ msgstr "泡泡圖"
 msgid " records"
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "其他…"
 
@@ -782,10 +773,6 @@ msgstr "此數據集沒有描述。"
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "重設密碼需要連接到互聯網。"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size"
-#~ msgstr "符號大小"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
@@ -1028,11 +1015,6 @@ msgstr ""
 msgid "Copied"
 msgstr "已複製"
 
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Add a member or a user group to grant access. Use General access below "
-#~ "to share more broadly."
-#~ msgstr "添加成員或用戶組以授予訪問權限。使用下方的一般訪問來更廣泛地分享。"
-
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Measure distance and area"
 msgstr ""
@@ -1124,7 +1106,7 @@ msgstr "載入計劃中..."
 msgid "User groups"
 msgstr "用戶組"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
@@ -1318,11 +1300,6 @@ msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "新增成員或使用者群組以授予存取權限。使用上方的「一般存取權限」即可更廣泛地分享。"
 
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "This {resource} is currently only accessible to its owner."
-#~ msgstr "此 {resource} 目前僅可由其擁有者訪問。"
-
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
@@ -1355,7 +1332,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 "exposure."
 msgstr "發布每一列，所有行。為觀眾提供最大的靈活性，最大限度地曝光。"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "查詢失敗。"
 
@@ -1374,11 +1351,6 @@ msgstr "撤銷"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "如果您有約 8 GB RAM（大多數使用者的預設選項），建議使用此選項。"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "{totalRowCount} 列中有 {droppedRowCount} 列因缺少座標或座標超出範圍而遭略過。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1687,13 +1659,6 @@ msgstr "工作區名稱是必填的"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-#~ msgid "{0} to be notified when it's your turn to register! If you are already "
-#~ "on our waitlist and have not received a sign-up code, we appreciate your "
-#~ "patience. You will receive a sign-up code soon. We promise!"
-#~ msgstr "{0} 在您輪到註冊時會收到通知！如果您已在我們的候補名單上並且尚未收到註冊代碼，我們感謝您的耐心。您將很快收到註冊代碼。我們保證！"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "檢測到偏見："
@@ -1735,10 +1700,6 @@ msgstr "區段"
 msgid "Aggregate only"
 msgstr ""
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "No rows could be mapped"
-#~ msgstr "沒有列可繪製於地圖上"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Unknown group"
@@ -1761,7 +1722,7 @@ msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from 
 "the import preview and have been overwritten with the actual values."
 msgstr "在 \"{sourceFileName}\" 中檢測到 1 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 
@@ -1964,10 +1925,6 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 msgid "Update available"
 msgstr "有可用的更新"
 
-#: src/routes/register.tsx
-#~ msgid "Please <0>email us</0> if you would like early access."
-#~ msgstr "如果您想要提前訪問，請<0>發送電子郵件給我們</0>。"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr "步階"
@@ -2023,10 +1980,6 @@ msgstr "刪除"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Failed to save dataset: {0}"
 msgstr "無法保存數據集：{0}"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
-#~ msgid "Query form"
-#~ msgstr "查詢表單"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2225,10 +2178,6 @@ msgstr ""
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "需要手動輸入的欄位"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
-#~ msgid "Loading map data"
-#~ msgstr "正在載入地圖資料"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
@@ -2742,10 +2691,6 @@ msgstr "儀表板成功儲存！"
 msgid "Method"
 msgstr ""
 
-#: src/views/GisApp/panels/FeatureInspector.tsx
-#~ msgid "N/A"
-#~ msgstr "不適用"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Longitude"
@@ -2832,10 +2777,6 @@ msgstr "捕捉儀表板中…"
 msgid "X axis tick interval"
 msgstr "X 軸刻度間隔"
 
-#: src/routes/register.tsx
-#~ msgid "This is an invalid waitlist code"
-#~ msgstr "這是一個無效的候補名單代碼"
-
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
@@ -2912,11 +2853,6 @@ msgstr "WHERE 子句對「{columnName}」使用「{operator}」，但右側為�
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "None of the {totalRowCount} rows could be mapped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "{totalRowCount} 列皆無法繪製於地圖上，因為缺少座標或座標超出範圍。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3110,6 +3046,10 @@ msgstr "選擇此工作區中使用的語言。從右到左的語言會自動翻
 msgid "No plans available."
 msgstr "沒有可用的計劃。"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr "嘗試其他查詢"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr ""
@@ -3239,18 +3179,9 @@ msgstr "返回登錄頁面"
 msgid "1 filter"
 msgstr ""
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
-#~ msgid "Pick a data source and its latitude and longitude columns to plot it."
-#~ msgstr "選取資料來源及其緯度與經度欄，將資料繪製於地圖上。"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
 msgstr ""
-
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Controls the default for the rest of the workspace. People without app "
-#~ "access still need a direct share above."
-#~ msgstr "控制工作區其餘部分的預設。沒有應用訪問權限的人仍然需要直接共享以上內容。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
@@ -3373,10 +3304,6 @@ msgstr "您確定要刪除此資料集嗎？此操作無法撤銷。"
 msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
 msgstr ""
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size column must be numeric."
-#~ msgstr "符號大小欄位必須為數字。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -3515,10 +3442,6 @@ msgstr "拖放以導入"
 msgid "Date range"
 msgstr "日期範圍"
 
-#: src/routes/register.tsx
-#~ msgid "sign up for our waitlist"
-#~ msgstr "註冊我們的候補名單"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "將資料集添加到工作區"
@@ -3562,13 +3485,14 @@ msgstr "正在產生 SQL…"
 msgid "X axis label rotation"
 msgstr "X 軸標籤旋轉"
 
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr "[本機探索查詢失敗。請嘗試其他欄位或查詢語句，不要要求我從失敗的目錄中選取。]"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "離線模型下載失敗"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {formattedNumRows} rows successfully"
-#~ msgstr "成功解析 {formattedNumRows} 行"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Point geometry column"
@@ -3982,6 +3906,10 @@ msgstr "新增欄位"
 msgid "Workspace created successfully!"
 msgstr "工作區成功建立！"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr "重試查詢"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
@@ -3998,10 +3926,6 @@ msgstr "選擇列"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "在有未保存的更改時無法發布。請先保存。"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Latitude column"
-#~ msgstr "緯度欄"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4108,10 +4032,6 @@ msgstr "資料集已添加"
 msgid "Optional"
 msgstr "可選"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "Some rows could not be mapped"
-#~ msgstr "部分列無法繪製於地圖上"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
 msgstr ""
@@ -4150,10 +4070,6 @@ msgstr "密碼不匹配"
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。值按類別軸（\"{axisKeyValue}\"）分組。"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select longitude column"
-#~ msgstr "選擇經度欄"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -4288,10 +4204,6 @@ msgstr "重新指派失敗"
 msgid "Join to boundaries"
 msgstr ""
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Select symbol size column"
-#~ msgstr "選擇符號大小欄"
-
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
 msgstr "儀表板已成功刪除！"
@@ -4307,10 +4219,6 @@ msgstr "自定義 URL"
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "詢問您的數據..."
-
-#: src/views/GisApp/basemap/MapStylePicker.tsx
-#~ msgid "Theme picker"
-#~ msgstr "主題選擇器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
@@ -4391,11 +4299,6 @@ msgstr "未找到已保存的資料集。"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr ""
-
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Every workspace member who can open the {app} app gets this role on this "
-#~ "{resource}, in addition to whatever's listed above."
-#~ msgstr "每個可以打開 {app} 應用程式的工作區成員在此 {resource} 上獲得此角色，此外還包括上述列出的內容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -4516,11 +4419,6 @@ msgstr "選擇聚合"
 msgid "Class {0}: {1} values"
 msgstr ""
 
-#: src/routes/register.tsx
-#~ msgid "While Avandar is in beta, we are only allowing registration if you are "
-#~ "on our waitlist and have received a sign-up code in your email."
-#~ msgstr "在 Avandar 還處於測試階段時，我們僅允許在您在候補名單上並且已在電子郵件中收到註冊代碼的情況下進行註冊。"
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "忽略所有全局篩選器：此可視化未經篩選。"
@@ -4532,10 +4430,6 @@ msgstr "您寫道："
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "多重選擇"
-
-#: src/routes/register.tsx
-#~ msgid "Sign up for our waitlist"
-#~ msgstr "註冊我們的候補名單"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -4556,10 +4450,6 @@ msgstr "收合抽屜"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "分享失敗"
-
-#: src/routes/register.tsx
-#~ msgid "Your waitlist code has been verified"
-#~ msgstr "您的候補名單代碼已被驗證"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4754,10 +4644,6 @@ msgstr "請再試一次。您的儀表板尚未發布。"
 msgid "Encoding"
 msgstr ""
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "正在查找 {column} 中的值…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4863,10 +4749,6 @@ msgstr "堆疊"
 msgid "Share this {resourceLabel}"
 msgstr "分享這個 {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select latitude column"
-#~ msgstr "選擇緯度列"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 與以下人員共享："
@@ -4883,10 +4765,6 @@ msgstr "上傳"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Something went wrong while loading this layer's data."
-#~ msgstr "載入此圖層的資料時發生錯誤。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -5384,6 +5262,10 @@ msgstr "您目前的計劃僅支援最多 {0} 個資料集。升級到我們的 
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "此資料集僅限離線使用。點擊以允許在線同步。"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr "正在檢查您的資料…"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "全域篩選"
@@ -5511,10 +5393,6 @@ msgstr "從您的電腦選擇一個 Excel 或 CSV 檔案以匯入"
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Boundary dataset"
 msgstr ""
-
-#: src/routes/register.tsx
-#~ msgid "Please choose a password to complete your registration"
-#~ msgstr "請選擇一個密碼以完成註冊"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5782,10 +5660,6 @@ msgstr "沒有數值欄"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "服務"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Could not load map data"
-#~ msgstr "無法載入地圖資料"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -6075,10 +5949,6 @@ msgstr "語氣"
 msgid "Editor"
 msgstr "編輯者"
 
-#: src/components/permissions/ShareResourceModal/shareCopy/shareCopy.ts
-#~ msgid "Only the people and groups listed above can access this {resource}."
-#~ msgstr "只有上述列出的人和群組可以訪問此 {resource}。"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "組織"
@@ -6149,7 +6019,7 @@ msgstr "新使用者群組"
 msgid "Left"
 msgstr "靠左"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "以上皆非"
 
@@ -6511,10 +6381,6 @@ msgstr "儀表板"
 msgid "integer"
 msgstr "整數"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
-#~ msgid "Symbol color"
-#~ msgstr "符號顏色"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "自定義澄清答案"
@@ -6627,10 +6493,6 @@ msgstr "您目前已訂閱此計劃。"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "上傳數據集"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Invalid column type"
-#~ msgstr "無效的欄位類型"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
@@ -7040,10 +6902,6 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
-#~ msgid "No mappable rows in this data source."
-#~ msgstr "此資料來源中沒有可繪製於地圖上的列。"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "CSV 或 Excel 文件"
@@ -7153,10 +7011,6 @@ msgstr ""
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "與您共享"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Longitude column"
-#~ msgstr "經度欄"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Run a query to configure a chart."

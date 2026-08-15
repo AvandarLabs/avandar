@@ -5,8 +5,8 @@ import { useState } from "react";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
-import { getAppTypeFromResourceType } from "./getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "./getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
 import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type {
