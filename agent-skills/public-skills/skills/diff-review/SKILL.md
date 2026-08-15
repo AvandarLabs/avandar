@@ -454,12 +454,14 @@ to the `/diff-review auto <PR-number>` alias for PR review.
    both. Do not edit code for a question alone.
 3. When changing code, ensure the result remains visible to the active
    comparison. The bundled runner always uses these semantics:
-   - Branch comparison: run relevant checks and commit the complete
+   - A committed branch comparison, such as `develop`, `main`, or another
+     ref: run relevant checks and automatically commit the complete
      comment-addressing change.
+   - An unstaged comparison, such as `.` or `working`: make the requested
+     changes without committing them. Tracked edits may remain unstaged and
+     new files may remain untracked.
    - `staged`: stage every tracked edit and new file. `git add -N` is
      insufficient.
-   - `.` or `working`: tracked edits may remain unstaged and new files may
-     remain untracked.
    - Inspect `git status` before replying.
 4. Read [`references/reply-style.md`](references/reply-style.md), plus
    `~/.diff-review/reply-style.md` when it exists, before writing any reply.

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   IconBlocks,
   IconDatabase,
@@ -51,7 +52,9 @@ export const NavbarLinks = {
     return {
       link: {
         ...AppLinks.dataImport(workspaceSlug),
-        label: "Data Sources",
+        label: (): string => {
+          return t`Data Sources`;
+        },
       },
       icon: <IconDatabase size={DEFAULT_ICON_SIZE} stroke={1.5} />,
     };

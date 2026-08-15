@@ -41,6 +41,10 @@ msgstr "على الأقل استعلام واحد في مجموعة البيان
 msgid "Return online to view or make the page available offline."
 msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها متاحة دون اتصال."
 
+#: src/config/AppLinks.tsx
+msgid "Create new entity"
+msgstr "إنشاء كيان جديد"
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -110,6 +114,10 @@ msgstr "دعوة عضو"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "إدخال JOIN في الموضع {index} ليس مرجعًا لجدول عادي."
+
+#: src/config/AppLinks.tsx
+msgid "Geo Explorer"
+msgstr "Geo Explorer"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -361,6 +369,8 @@ msgstr "قائمة"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
+#: src/config/NavbarLinks.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "مصادر البيانات"
@@ -431,6 +441,10 @@ msgstr "لا تحتوي تصور الجدول على إعدادات إضافية
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "حولك"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Unable to sync dataset online"
+msgstr "تعذّر مزامنة مجموعة البيانات عبر الإنترنت"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -516,6 +530,10 @@ msgstr "مخطط دائري"
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Average"
 msgstr "متوسط"
+
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "There was an error loading Google services."
+msgstr "حدث خطأ أثناء تحميل خدمات Google."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide published date"
@@ -712,6 +730,7 @@ msgstr "هل تريد إزالة نموذج الدردشة دون اتصال؟"
 msgid "Share “{resourceName}”"
 msgstr "مشاركة “{resourceName}”"
 
+#: src/config/AppLinks.tsx
 #: src/routes/signin.tsx
 msgid "Sign in"
 msgstr "تسجيل الدخول"
@@ -916,6 +935,11 @@ msgstr "حذف مجموعة الأدوار"
 msgid "Hide title"
 msgstr "إخفاء العنوان"
 
+#. placeholder {0}: vizTypeLabel(vizType)
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "{0} data truncated"
+msgstr "تم اقتطاع بيانات {0}"
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "أدخل بريدك الإلكتروني للحصول على رابط إعادة تعيين"
@@ -960,6 +984,10 @@ msgstr "تأكيد"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "is equal to..."
 msgstr "يساوي..."
+
+#: src/config/AppLinks.tsx
+msgid "Profile Designer"
+msgstr "مصمم الملف الشخصي"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -1640,12 +1668,22 @@ msgstr "لم يتم اختيار أي كيان"
 msgid "Tell us which open dataset you want via feedback"
 msgstr "أخبرنا أي مجموعة بيانات مفتوحة تريدها عبر التعليقات"
 
+#: src/lib/hooks/useGooglePickerAPI.ts
+msgid "Please refresh and try again. If it still does not work, please contact "
+"support"
+msgstr "يرجى التحديث والمحاولة مرة أخرى. إذا استمرت المشكلة، يرجى التواصل مع "
+"الدعم"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
 msgstr "قم بتصدير هذه اللوحة كملف PDF، أو ارسم عليها أولاً. تدعم التعليقات "
 "النصوص، والسهام، والرسم اليدوي مع قابلية ضبط الخشونة (RoughJS)."
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "Update available"
+msgstr "يتوفر تحديث"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -1657,6 +1695,7 @@ msgid "Max"
 msgstr "الأقصى"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "استيراد البيانات"
@@ -1778,6 +1817,10 @@ msgstr "اسم مجموعة البيانات مطلوب"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Main"
 msgstr "رئيسي"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Unable to publish dashboard"
+msgstr "تعذّر نشر لوحة المعلومات"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -1940,6 +1983,10 @@ msgstr "إضافة حقل"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "نص التعليق:"
+
+#: src/lib/offline/registerServiceWorker.ts
+msgid "A new version is available. Refresh to update."
+msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -2801,6 +2848,10 @@ msgstr "عرض الحد"
 msgid "Create your first dashboard to track key metrics and insights."
 msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
 
+#: src/config/AppLinks.tsx
+msgid "Home"
+msgstr "الصفحة الرئيسية"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
 msgstr "الأنبوب (|)"
@@ -2976,10 +3027,6 @@ msgstr "تدوير تسمية المحور X"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
 msgstr "فشل تحميل النموذج غير المتصل"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {formattedNumRows} rows successfully"
-msgstr "تم تحليل {formattedNumRows} صفوف بنجاح"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -3215,6 +3262,10 @@ msgstr "اسم العمود"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "كبير"
+
+#: src/config/AppLinks.tsx
+msgid "Invalid workspace"
+msgstr "مساحة عمل غير صالحة"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Line width"
@@ -3760,6 +3811,10 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة "
 "للأعمدة المحددة)."
 
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish."
+msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو تعذّر نشرها."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "تحويل"
@@ -4195,6 +4250,7 @@ msgstr "تحرير الاستعلام"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Data Explorer"
 msgstr "مستكشف البيانات"
@@ -4322,6 +4378,7 @@ msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
 msgid "Mean"
 msgstr "المتوسط"
 
+#: src/config/AppLinks.tsx
 #: src/routes/update-password.tsx
 msgid "Update password"
 msgstr "تحديث كلمة المرور"
@@ -4333,6 +4390,14 @@ msgstr "لقطة لوحة التحكم"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "جارٍ تسجيل دخولك مرة أخرى…"
+
+#. placeholder {0}: vizTypeLabel(vizType)
+#. placeholder {1}: limit.max
+#. placeholder {2}: limit.noun
+#. placeholder {3}: limit.max
+#: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
+msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
+msgstr "يمكن لـ {0} عرض ما يصل إلى {1} {2} فقط، لذا يتم عرض أول {3} فقط."
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot be empty"
@@ -4998,6 +5063,10 @@ msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد
 msgid "Only you have access to this {resource}."
 msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "File parsed successfully"
+msgstr "تم تحليل الملف بنجاح"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "مجموعة التكديس"
@@ -5060,6 +5129,7 @@ msgid "Permanent link (use for QR codes)"
 msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: shared/copy/appLabel.ts
+#: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Settings"
 msgstr "الإعدادات"
@@ -5298,6 +5368,7 @@ msgid "Query editor mode"
 msgstr "وضع محرر الاستعلام"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
+#: src/config/AppLinks.tsx
 #: src/views/ProfileView/ProfileView.tsx
 msgid "Profile"
 msgstr "الملف الشخصي"
@@ -5479,6 +5550,7 @@ msgstr "إزالة {0}"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Dashboards"

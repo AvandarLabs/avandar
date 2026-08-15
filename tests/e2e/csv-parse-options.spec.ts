@@ -143,7 +143,7 @@ async function expectParsedRowCount(
 ): Promise<void> {
   const formatted = formatImportPreviewRowCount(expectedRowCount);
   await expect(
-    page.getByText(`Parsed ${formatted} rows successfully`),
+    page.getByText(`These are the first ${formatted} rows`, { exact: false }),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 

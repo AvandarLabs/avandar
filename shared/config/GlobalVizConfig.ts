@@ -7,25 +7,25 @@ import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
  * well before the dataset is "large" in any analytical sense, so we cap
  * client-side and surface a toast explaining the truncation.
  *
- * `name` is the user-facing visualization name used in the toast title.
- * `noun` is the plural unit the viz draws ("bars", "points", ...).
+ * `noun` is the plural unit the viz draws ("bars", "points", ...). The
+ * user-facing viz name for the truncation toast comes from `vizTypeLabel`,
+ * so it stays translated and this config is not duplicated as a copy source.
  */
 export type VizRenderLimit = {
   max: number;
-  name: string;
   noun: string;
 };
 
 export const VIZ_RENDER_LIMITS = {
   table: undefined,
-  bar: { max: 200, name: "Bar Chart", noun: "bars" },
-  line: { max: 500, name: "Line Chart", noun: "points" },
-  area: { max: 500, name: "Area Chart", noun: "points" },
-  scatter: { max: 1000, name: "Scatter Plot", noun: "points" },
-  bubble: { max: 500, name: "Bubble Chart", noun: "bubbles" },
-  pie: { max: 50, name: "Pie Chart", noun: "slices" },
-  funnel: { max: 50, name: "Funnel Chart", noun: "steps" },
-  radar: { max: 50, name: "Radar Chart", noun: "axes" },
+  bar: { max: 200, noun: "bars" },
+  line: { max: 500, noun: "points" },
+  area: { max: 500, noun: "points" },
+  scatter: { max: 1000, noun: "points" },
+  bubble: { max: 500, noun: "bubbles" },
+  pie: { max: 50, noun: "slices" },
+  funnel: { max: 50, noun: "steps" },
+  radar: { max: 50, noun: "axes" },
 } as const satisfies Record<VizType, VizRenderLimit | undefined>;
 
 export type VizRenderLimitKey = keyof typeof VIZ_RENDER_LIMITS;

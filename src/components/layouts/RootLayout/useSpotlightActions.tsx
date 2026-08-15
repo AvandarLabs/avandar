@@ -37,7 +37,7 @@ export function useSpotlightActions(
       }): SpotlightActionData | SpotlightActionGroupData => {
         return {
           id: link.key,
-          label: link.label,
+          label: link.label(),
           description: spotlightDescription,
           leftSection: icon,
           onClick: () => {
