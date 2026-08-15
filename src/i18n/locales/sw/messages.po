@@ -387,7 +387,7 @@ msgstr "Panua droo"
 msgid "Export annotated PDF"
 msgstr "Export PDF iliyo na maelezo"
 
-#. placeholder {0}: failure.limit ?? 64
+#. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "URL maalum haiwezi kuzidi herufi {0}"
@@ -759,7 +759,7 @@ msgstr "Chaguo moja"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "Hata hivyo, haturuhusu usajili mpya kwa sasa."
 
-#. placeholder {0}: previewRows.length
+#. placeholder {0}: options.numPreviewRows
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
@@ -1003,6 +1003,10 @@ msgstr "Mbuni wa Wasifu"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "Vikundi {numGroups}"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Ask the dashboard's owner to share it with you."
+msgstr "Mwombe mmiliki wa dashibodi akushirikishe."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1476,6 +1480,10 @@ msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 msgid "Suggested:"
 msgstr "Ilipendekezwa:"
 
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+msgid "No tables found"
+msgstr "Hakuna majedwali yaliyopatikana"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "Badilisha SQL kwa mabadiliko ya fomu"
@@ -1948,10 +1956,6 @@ msgstr "seti yako ya data"
 msgid "Cancel"
 msgstr "Ghairi"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "You do not have access to this dashboard"
-msgstr "Huna ufaccess kwa dashboard hii"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
 msgstr "Safu wima ya 8"
@@ -2165,7 +2169,7 @@ msgstr "Data binafsi + upendeleo umebainishwa"
 msgid "Manual form shows an approximation"
 msgstr "Fomu ya Manual inaonyesha makadirio"
 
-#. placeholder {0}: failure.limit ?? 3
+#. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
 msgstr "URL maalum lazima iwe na angalau herufi {0}"
@@ -2281,12 +2285,6 @@ msgstr "Umiliki umehamishwa."
 msgid "Google authentication error"
 msgstr "Kosa la uthibitisho la Google"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly "
-"viewable."
-msgstr "Dashibodi hii ni ya faragha. Dashibodi hii haijafanywa kuwa inapatikana "
-"kwa umma."
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
 msgstr "Imepatikana"
@@ -2393,7 +2391,7 @@ msgstr "Hakuna thamani"
 msgid "Clarification {turnNumber} of 3"
 msgstr "Ufafanuzi {turnNumber} wa 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "Rudi kwa mhariri"
 
@@ -2996,6 +2994,10 @@ msgstr "Jibu la ufafanuzi"
 msgid "Generated SQL"
 msgstr "SQL iliyozalishwa"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "You need access"
+msgstr "Unahitaji ufikiaji"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "Mistari ya juu ya kurudisha"
@@ -3155,6 +3157,11 @@ msgstr "Kifungu cha WHERE kinalinganisha \"{columnName}\" na usemi usio wa "
 msgid "Add to your workspace"
 msgstr "Ongeza kwenye eneo lako la kazi"
 
+#. placeholder {0}: options.numRows.toLocaleString()
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Parsed {0} rows successfully"
+msgstr "Safu mlalo {0} zimechanganuliwa kwa mafanikio"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
 msgstr "Haiwezekani kupakia dashibodi"
@@ -3304,6 +3311,10 @@ msgstr "Imekamilisha kusawazisha data {0}"
 msgid "Select column"
 msgstr "Chagua safu"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Not yet published. Viewers will not see this."
+msgstr "Bado haijachapishwa. Watazamaji hawataiona."
+
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "Chagua moja au zaidi"
@@ -3377,10 +3388,6 @@ msgstr "Llama 3.2 1B (nje ya mtandao)"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "Mfululizo"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "Not yet published. Public viewers will not see this."
-msgstr "Bado haijachapishwa. Waangalizi wa umma hawawezi kuona hii."
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -3876,11 +3883,6 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
 "(kwa safu zilizochaguliwa)."
 
-#: src/clients/dashboards/DashboardClient.ts
-msgid "Some datasets are not synced online yet or failed to publish."
-msgstr "Baadhi ya mikusanyiko ya data bado haijasawazishwa mtandaoni au "
-"imeshindwa kuchapishwa."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "Geuza"
@@ -3888,6 +3890,10 @@ msgstr "Geuza"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "This custom URL is reserved. Try adding a word to it."
+msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -3996,11 +4002,6 @@ msgstr "Ombi la mazungumzo limeshindwa"
 msgid "Copy code"
 msgstr "Nakili msimbo"
 
-#. placeholder {0}: savedDataset.name
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{0}\" saved successfully"
-msgstr "Dataset \"{0}\" imehifadhiwa kwa mafanikio"
-
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
@@ -4050,6 +4051,12 @@ msgstr "Omba kipengele"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "Maelezo"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish. "
+"{errorMessage}"
+msgstr "Baadhi ya seti za data bado hazijasawazishwa mtandaoni au zimeshindwa "
+"kuchapishwa. {errorMessage}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5145,10 +5152,6 @@ msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
 msgid "Only you have access to this {resource}."
 msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "File parsed successfully"
-msgstr "Faili imechanganuliwa kwa mafanikio"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "Kundi la tabaka"
@@ -5186,6 +5189,10 @@ msgstr "Inashughulikia <0>{0}</0>, kutoka <1>{1}</1> hadi <2>{2}</2>."
 msgid "Loading more..."
 msgstr "Inapakua zaidi..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{datasetName}\" saved successfully"
+msgstr "Seti ya data \"{datasetName}\" imehifadhiwa kwa mafanikio"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "URL ya kawaida (hiari)"
@@ -5201,6 +5208,10 @@ msgstr "jina la seti ya data"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "Anwani ya barua pepe imeboreshwa"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Sign in with a different account"
+msgstr "Ingia ukitumia akaunti tofauti"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
@@ -5723,7 +5734,7 @@ msgstr "Ni uwanja gani unapaswa kutumika kama jina la "
 msgid "Untitled"
 msgstr "Bila kichwa"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "Kuangalia dashibodi hii"
 
@@ -5910,7 +5921,7 @@ msgstr "(Ujumbe haukutumwa.)"
 msgid "No workspace was found"
 msgstr "Hakuna eneo la kazi lililopatikana"
 
-#. placeholder {0}: importedColumns.length
+#. placeholder {0}: options.numColumns
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
@@ -6034,6 +6045,10 @@ msgstr "Tafuta kwa jina au kikundi cha mtumiaji"
 msgid "Failed to update email"
 msgstr "Imeshindwa kuboresha barua pepe"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Published to your workspace."
+msgstr "Imechapishwa kwenye nafasi yako ya kazi."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
 msgstr "mapema"
@@ -6111,6 +6126,7 @@ msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT inarejelea safu wima \"{columnName}\" ambayo haipo kwenye seti "
 "ya data."
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "Dashibodi haijapakiwa bado."
@@ -6119,6 +6135,7 @@ msgstr "Dashibodi haijapakiwa bado."
 msgid "Editorial serif"
 msgstr "Serif ya toleo"
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -6221,7 +6238,7 @@ msgstr "Upana wa juu zaidi"
 msgid "Not offline"
 msgstr "Sio mtandaoni"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "Dashibodi hii imechapishwa hadharani."
 

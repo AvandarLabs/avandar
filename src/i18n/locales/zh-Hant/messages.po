@@ -376,7 +376,7 @@ msgstr "展開抽屜"
 msgid "Export annotated PDF"
 msgstr "導出註解 PDF"
 
-#. placeholder {0}: failure.limit ?? 64
+#. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "自訂 URL 不得超過 {0} 個字元"
@@ -732,7 +732,7 @@ msgstr "單選"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "不過，我們目前不允許新的註冊。"
 
-#. placeholder {0}: previewRows.length
+#. placeholder {0}: options.numPreviewRows
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
@@ -967,6 +967,10 @@ msgstr "設定檔設計器"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} 個群組"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Ask the dashboard's owner to share it with you."
+msgstr "請要求儀表板擁有者與您分享。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1426,6 +1430,10 @@ msgstr "{workspaceName} 中其他成員看到的名稱。"
 msgid "Suggested:"
 msgstr "建議："
 
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+msgid "No tables found"
+msgstr "找不到資料表"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "用表單更改覆蓋 SQL"
@@ -1876,10 +1884,6 @@ msgstr "您的數據集"
 msgid "Cancel"
 msgstr "取消"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "You do not have access to this dashboard"
-msgstr "您無法訪問此儀表板"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
 msgstr "第 8 欄"
@@ -2082,7 +2086,7 @@ msgstr "檢測到個人數據 + 偏見框架"
 msgid "Manual form shows an approximation"
 msgstr "手動表單顯示近似值"
 
-#. placeholder {0}: failure.limit ?? 3
+#. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
 msgstr "自訂 URL 至少必須包含 {0} 個字元"
@@ -2195,11 +2199,6 @@ msgstr "已重新指派擁有權。"
 msgid "Google authentication error"
 msgstr "Google 認證錯誤"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly "
-"viewable."
-msgstr "此儀表板為私人儀表板，尚未公開可見。"
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
 msgstr "衍生"
@@ -2303,7 +2302,7 @@ msgstr "沒有值"
 msgid "Clarification {turnNumber} of 3"
 msgstr "澄清 {turnNumber} / 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "返回編輯器"
 
@@ -2885,6 +2884,10 @@ msgstr "澄清答案"
 msgid "Generated SQL"
 msgstr "生成的 SQL"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "You need access"
+msgstr "您需要存取權限"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "最大返回行數"
@@ -3039,6 +3042,11 @@ msgstr "WHERE 子句將「{columnName}」與非常值運算式進行比較。"
 msgid "Add to your workspace"
 msgstr "添加到您的工作區"
 
+#. placeholder {0}: options.numRows.toLocaleString()
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Parsed {0} rows successfully"
+msgstr "已成功解析 {0} 列"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
 msgstr "無法加載儀表板"
@@ -3184,6 +3192,10 @@ msgstr "完成同步 {0} 數據"
 msgid "Select column"
 msgstr "選擇列"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Not yet published. Viewers will not see this."
+msgstr "尚未發布。檢視者將無法看到此內容。"
+
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "選擇一個或多個"
@@ -3257,10 +3269,6 @@ msgstr "Llama 3.2 1B（離線）"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "系列"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "Not yet published. Public viewers will not see this."
-msgstr "尚未發布。公眾觀眾將無法看到此內容。"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -3738,10 +3746,6 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 "selected columns)."
 msgstr "沒有行過濾器。切片將包括資料集中每一行（針對所選列）。"
 
-#: src/clients/dashboards/DashboardClient.ts
-msgid "Some datasets are not synced online yet or failed to publish."
-msgstr "部分資料集尚未在線上同步，或發佈失敗。"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "轉換"
@@ -3749,6 +3753,10 @@ msgstr "轉換"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "X 軸標籤"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "This custom URL is reserved. Try adding a word to it."
+msgstr "此自訂 URL 已被保留。請嘗試在其中加入一個字詞。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -3856,11 +3864,6 @@ msgstr "聊天請求失敗"
 msgid "Copy code"
 msgstr "複製代碼"
 
-#. placeholder {0}: savedDataset.name
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{0}\" saved successfully"
-msgstr "資料集 \"{0}\" 已成功儲存"
-
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
@@ -3908,6 +3911,11 @@ msgstr "請求功能"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "描述"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish. "
+"{errorMessage}"
+msgstr "部分資料集尚未同步至線上，或發布失敗。{errorMessage}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -4969,10 +4977,6 @@ msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
 msgid "Only you have access to this {resource}."
 msgstr "只有您可以存取此 {resource}。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "File parsed successfully"
-msgstr "檔案剖析成功"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "堆疊群組"
@@ -5009,6 +5013,10 @@ msgstr "涵蓋 <0>{0}</0>，從 <1>{1}</1> 到 <2>{2}</2>。"
 msgid "Loading more..."
 msgstr "加載更多中..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{datasetName}\" saved successfully"
+msgstr "資料集「{datasetName}」已成功儲存"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "自定義 URL（可選）"
@@ -5024,6 +5032,10 @@ msgstr "數據集名稱"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "電子郵件地址已更新"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Sign in with a different account"
+msgstr "使用其他帳戶登入"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
@@ -5531,7 +5543,7 @@ msgstr "應使用哪個欄位作為 {singularEntityConfigName} 的名稱？"
 msgid "Untitled"
 msgstr "未命名"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "預覽此儀表板"
 
@@ -5712,7 +5724,7 @@ msgstr "（訊息未傳送。）"
 msgid "No workspace was found"
 msgstr "未找到工作區"
 
-#. placeholder {0}: importedColumns.length
+#. placeholder {0}: options.numColumns
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
@@ -5829,6 +5841,10 @@ msgstr "按名稱或用戶群組搜索"
 msgid "Failed to update email"
 msgstr "更新電子郵件失敗"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Published to your workspace."
+msgstr "已發布至您的工作區。"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
 msgstr "最早"
@@ -5901,6 +5917,7 @@ msgstr "CSV 或 Excel 文件"
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT 參照的欄位「{columnName}」不在資料集內。"
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "儀表板尚未加載。"
@@ -5909,6 +5926,7 @@ msgstr "儀表板尚未加載。"
 msgid "Editorial serif"
 msgstr "編輯 serif"
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -6008,7 +6026,7 @@ msgstr "最大寬度"
 msgid "Not offline"
 msgstr "不離線"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
 

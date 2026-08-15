@@ -383,7 +383,7 @@ msgstr "توسيع اللوحة الجانبية"
 msgid "Export annotated PDF"
 msgstr "تصدير PDF معلق"
 
-#. placeholder {0}: failure.limit ?? 64
+#. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "لا يمكن أن يتجاوز عنوان URL المخصص {0} حرفًا"
@@ -751,7 +751,7 @@ msgstr "اختيار فردي"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في الوقت الحالي."
 
-#. placeholder {0}: previewRows.length
+#. placeholder {0}: options.numPreviewRows
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
@@ -992,6 +992,10 @@ msgstr "مصمم الملف الشخصي"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} مجموعات"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Ask the dashboard's owner to share it with you."
+msgstr "اطلب من مالك لوحة المعلومات مشاركتها معك."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1461,6 +1465,10 @@ msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspa
 msgid "Suggested:"
 msgstr "مقترح:"
 
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+msgid "No tables found"
+msgstr "لم يتم العثور على جداول"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
 msgstr "استبدال SQL بتغييرات النموذج"
@@ -1924,10 +1932,6 @@ msgstr "مجموعة البيانات الخاصة بك"
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "You do not have access to this dashboard"
-msgstr "ليس لديك حق الوصول إلى هذه اللوحة"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
 msgstr "العمود 8"
@@ -2137,7 +2141,7 @@ msgstr "تم الكشف عن بيانات شخصية + تأطير متحيز"
 msgid "Manual form shows an approximation"
 msgstr "تظهر النموذج اليدوي تقريبًا"
 
-#. placeholder {0}: failure.limit ?? 3
+#. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
 msgid "The custom URL must be at least {0} characters"
 msgstr "يجب ألا يقل عنوان URL المخصص عن {0} أحرف"
@@ -2253,11 +2257,6 @@ msgstr "تمت إعادة تعيين الملكية."
 msgid "Google authentication error"
 msgstr "خطأ في مصادقة Google"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly "
-"viewable."
-msgstr "هذه اللوحة خاصة. لم يتم جعل هذه اللوحة قابلة للرؤية للجمهور."
-
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
 msgstr "مشتق"
@@ -2362,7 +2361,7 @@ msgstr "لا توجد قيم"
 msgid "Clarification {turnNumber} of 3"
 msgstr "توضيح {turnNumber} من 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "العودة إلى المحرر"
 
@@ -2957,6 +2956,10 @@ msgstr "إجابة توضيحية"
 msgid "Generated SQL"
 msgstr "SQL المُولد"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "You need access"
+msgstr "تحتاج إلى الوصول"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "الحد الأقصى لعدد الصفوف للعودة"
@@ -3113,6 +3116,11 @@ msgstr "تقارن جملة WHERE ‏\"{columnName}\" بتعبير غير حرف
 msgid "Add to your workspace"
 msgstr "أضف إلى مساحة العمل الخاصة بك"
 
+#. placeholder {0}: options.numRows.toLocaleString()
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Parsed {0} rows successfully"
+msgstr "تم تحليل {0} صفوف بنجاح"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
 msgstr "غير قادر على تحميل لوحة التحكم"
@@ -3261,6 +3269,10 @@ msgstr "تم الانتهاء من مزامنة {0} بيانات"
 msgid "Select column"
 msgstr "اختر العمود"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Not yet published. Viewers will not see this."
+msgstr "لم يُنشر بعد. لن يتمكن المشاهدون من رؤيته."
+
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "اختر واحدًا أو أكثر"
@@ -3334,10 +3346,6 @@ msgstr "Llama 3.2 1B (دون اتصال بالإنترنت)"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "سلسلة"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "Not yet published. Public viewers will not see this."
-msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون العامون من رؤية هذا."
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -3825,10 +3833,6 @@ msgid "No row filters. The slice will include every row in the dataset (for the 
 msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة "
 "للأعمدة المحددة)."
 
-#: src/clients/dashboards/DashboardClient.ts
-msgid "Some datasets are not synced online yet or failed to publish."
-msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو تعذّر نشرها."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
 msgstr "تحويل"
@@ -3836,6 +3840,10 @@ msgstr "تحويل"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "تسمية المحور X"
+
+#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+msgid "This custom URL is reserved. Try adding a word to it."
+msgstr "عنوان URL مخصص محجوز. جرّب إضافة كلمة إليه."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -3944,11 +3952,6 @@ msgstr "فشل طلب الدردشة"
 msgid "Copy code"
 msgstr "نسخ الكود"
 
-#. placeholder {0}: savedDataset.name
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{0}\" saved successfully"
-msgstr "تم حفظ مجموعة البيانات \"{0}\" بنجاح"
-
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
@@ -3996,6 +3999,12 @@ msgstr "طلب ميزة"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "الوصف"
+
+#: src/clients/dashboards/DashboardClient.ts
+msgid "Some datasets are not synced online yet or failed to publish. "
+"{errorMessage}"
+msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو فشل نشرها. "
+"{errorMessage}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -5077,10 +5086,6 @@ msgstr "إذا كانت هناك قيم متعددة لـ {fieldName} لواحد
 msgid "Only you have access to this {resource}."
 msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "File parsed successfully"
-msgstr "تم تحليل الملف بنجاح"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "مجموعة التكديس"
@@ -5118,6 +5123,10 @@ msgstr "يغطي <0>{0}</0>، من <1>{1}</1> إلى <2>{2}</2>."
 msgid "Loading more..."
 msgstr "تحميل المزيد..."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{datasetName}\" saved successfully"
+msgstr "تم حفظ مجموعة البيانات \"{datasetName}\" بنجاح"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "رابط مخصص (اختياري)"
@@ -5133,6 +5142,10 @@ msgstr "اسم مجموعة البيانات"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Sign in with a different account"
+msgstr "تسجيل الدخول باستخدام حساب مختلف"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
@@ -5651,7 +5664,7 @@ msgstr "ما الحقل الذي يجب استخدامه كاسم لـ {singular
 msgid "Untitled"
 msgstr "بلا عنوان"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "معاينة لوحة المعلومات هذه"
 
@@ -5836,7 +5849,7 @@ msgstr "(لم تُرسل الرسالة.)"
 msgid "No workspace was found"
 msgstr "لم يتم العثور على مساحة عمل"
 
-#. placeholder {0}: importedColumns.length
+#. placeholder {0}: options.numColumns
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
@@ -5958,6 +5971,10 @@ msgstr "ابحث بالاسم أو مجموعة المستخدمين"
 msgid "Failed to update email"
 msgstr "فشل في تحديث البريد الإلكتروني"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Published to your workspace."
+msgstr "تم النشر إلى مساحة عملك."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
 msgstr "الأقدم"
@@ -6033,6 +6050,7 @@ msgstr "ملف CSV أو Excel"
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "يشير SELECT إلى العمود \"{columnName}\" غير الموجود في مجموعة البيانات."
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "لم يتم تحميل لوحة التحكم بعد."
@@ -6041,6 +6059,7 @@ msgstr "لم يتم تحميل لوحة التحكم بعد."
 msgid "Editorial serif"
 msgstr "خط تحرير"
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -6143,7 +6162,7 @@ msgstr "الحد الأقصى للعرض"
 msgid "Not offline"
 msgstr "ليس في وضع عدم الاتصال"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
 
