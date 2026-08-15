@@ -170,6 +170,13 @@ function _applyGeneralAccessChange(
     workspace: () => {
       _applyWorkspaceAccess(options.actions);
     },
+    public: () => {
+      // Public reads never consult `resource_shares`, so selecting this writes
+      // no share rows: the anon policy and the `is_public` short-circuit in
+      // util__auth_user_may_select_dashboard both fire first. Rewriting shares
+      // here would widen EDIT access as a side effect of a READ decision, and
+      // would destroy the narrowing the owner gets back on a downgrade.
+    },
   });
 }
 

@@ -3651,6 +3651,11 @@ msgstr "主题选择器"
 msgid "Title"
 msgstr "标题"
 
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Anyone with the link can view this {resource}, with no Avandar account. "
+"People and groups below still control who can edit it."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "曲线"
@@ -4479,6 +4484,10 @@ msgstr "此功能尚未实现。"
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
 msgstr "此数据集较大，因此我们应用了 100 行限制。您可以随时更改此限制。"
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Anyone with the link"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "

@@ -12,12 +12,20 @@ import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessMod
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
+// Only one `ShareGeneralAccess` renders per modal, so a static id is safe:
+// there is no risk of two instances colliding in the same document.
+const _PUBLIC_OPTION_DISABLED_REASON_ID = "share-general-access-public-reason";
+
 type Props = {
   resourceType: ResourceType;
   value: GeneralAccessValue;
   isOwner: boolean;
   isBusy: boolean;
   workspaceShareRole: RoleLevel | null;
+  /** False for resource types with no published form; hides the option. */
+  isPublicOptionAvailable: boolean;
+  /** Set when the option is visible but not selectable. */
+  publicOptionDisabledReason: string | undefined;
   onChange: (nextValue: GeneralAccessValue) => void;
   onWorkspaceRoleChange: (role: RoleLevel) => void;
 };
@@ -33,12 +41,16 @@ export function ShareGeneralAccess({
   isOwner,
   isBusy,
   workspaceShareRole,
+  isPublicOptionAvailable,
+  publicOptionDisabledReason,
   onChange,
   onWorkspaceRoleChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const app = appLabel(appForResource(resourceType));
   const resource = resourceTypeLabel(resourceType);
+  const showPublicOptionDisabledReason =
+    isPublicOptionAvailable && publicOptionDisabledReason !== undefined;
 
   const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
     isOwner,
@@ -46,7 +58,10 @@ export function ShareGeneralAccess({
       private: t`Only me`,
       restricted: t`Restricted`,
       workspace: t`Anyone in ${app}`,
+      public: t`Anyone with the link`,
     },
+    isPublicOptionAvailable,
+    isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
   });
 
   const generalAccessTooltip = matchLiteral(value, {
@@ -60,6 +75,9 @@ export function ShareGeneralAccess({
     },
     workspace: () => {
       return t`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed below.`;
+    },
+    public: () => {
+      return t`Anyone with the link can view this ${resource}, with no Avandar account. People and groups below still control who can edit it.`;
     },
   });
 
@@ -86,6 +104,11 @@ export function ShareGeneralAccess({
               }
             }}
             aria-label={t`General access`}
+            aria-describedby={
+              showPublicOptionDisabledReason ?
+                _PUBLIC_OPTION_DISABLED_REASON_ID
+              : undefined
+            }
           />
         </Tooltip>
         {value === "workspace" ?
@@ -110,6 +133,11 @@ export function ShareGeneralAccess({
           </Tooltip>
         : null}
       </Group>
+      {showPublicOptionDisabledReason ?
+        <Text id={_PUBLIC_OPTION_DISABLED_REASON_ID} size="xs" c="dimmed">
+          {publicOptionDisabledReason}
+        </Text>
+      : null}
       <Text size="xs" c="dimmed">
         <Trans>
           Controls the default for the rest of the workspace. People without app

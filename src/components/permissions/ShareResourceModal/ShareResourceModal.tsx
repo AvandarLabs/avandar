@@ -258,6 +258,8 @@ export function ShareResourceModal({
         isOwner={generalAccess.isOwner}
         isBusy={generalAccess.isBusy}
         workspaceShareRole={workspaceShare?.role ?? null}
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={generalAccess.onChange}
         onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
       />
