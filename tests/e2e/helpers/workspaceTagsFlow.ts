@@ -3,13 +3,12 @@ import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
- * Opens one tab of the Workspace settings page. Navigates client-side because
- * a `page.goto` would rehydrate the persisted React Query cache from
- * IndexedDB, and since the throttled persister may not have written the newest
- * snapshot yet, the restored entry can be a pre-mutation one that still counts
- * as fresh. See `docs/rules/e2e-testing.md`.
+ * Opens a Workspace settings tab via the in-app Settings link and tab.
+ *
+ * Callers must not `page.goto` onto settings: a hard reload can rehydrate a
+ * stale React Query snapshot. See `docs/rules/e2e-testing.md`.
  */
-async function _openWorkspaceSettingsTab(options: {
+export async function openWorkspaceSettingsTab(options: {
   page: Page;
   workspaceSlug: string;
   tabName: string;
@@ -37,7 +36,7 @@ export async function createWorkspaceTagViaSettings(options: {
 }): Promise<void> {
   const { page, workspaceSlug, tagName, tagColor = "#228be6" } = options;
 
-  await _openWorkspaceSettingsTab({
+  await openWorkspaceSettingsTab({
     page,
     workspaceSlug,
     tabName: "User groups",
@@ -69,7 +68,7 @@ export async function assignWorkspaceTagToMember(options: {
 }): Promise<void> {
   const { page, workspaceSlug, memberDisplayName, tagName } = options;
 
-  await _openWorkspaceSettingsTab({ page, workspaceSlug, tabName: "Members" });
+  await openWorkspaceSettingsTab({ page, workspaceSlug, tabName: "Members" });
 
   const memberRow = page
     .getByRole("row")
