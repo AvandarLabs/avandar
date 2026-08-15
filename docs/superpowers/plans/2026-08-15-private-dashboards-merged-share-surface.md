@@ -490,11 +490,32 @@ Expected: PASS, including the six pre-existing cases. The pre-existing cases
 now need the two new props; add `isPublicOptionAvailable={false}` and
 `publicOptionDisabledReason={undefined}` to each of them.
 
-- [ ] **Step 5: Extract strings and commit**
+- [ ] **Step 5: Close the second exhaustiveness break**
+
+Widening `GeneralAccessValue` also breaks `useGeneralAccessControl.ts:163`,
+whose `matchLiteral` dispatch has no `public` case. Add the branch now so the
+tree type-checks at every commit; Task 9 wires the rest of that hook.
+
+```ts
+    public: () => {
+      // Public reads never consult `resource_shares`, so selecting this writes
+      // no share rows: the anon policy and the `is_public` short-circuit in
+      // util__auth_user_may_select_dashboard both fire first. Rewriting shares
+      // here would widen EDIT access as a side effect of a READ decision, and
+      // would destroy the narrowing the owner gets back on a downgrade.
+    },
+```
+
+Run: `pnpm type-check`
+
+Expected: PASS, the whole monorepo. Task 1 deliberately left it red; this is
+the step that makes it green again.
+
+- [ ] **Step 6: Extract strings and commit**
 
 ```bash
 pnpm i18n:extract
-git add src/components/permissions/ShareResourceModal/ShareGeneralAccess src/i18n
+git add src/components/permissions/ShareResourceModal src/i18n
 git commit -m "feat(permissions): render the public General access option"
 ```
 
@@ -2150,15 +2171,8 @@ branch:
     : "private";
 ```
 
-```ts
-    public: () => {
-      // Public reads never consult `resource_shares`, so selecting this writes
-      // no share rows: the anon policy and the `is_public` short-circuit in
-      // util__auth_user_may_select_dashboard both fire first. Rewriting shares
-      // here would widen EDIT access as a side effect of a READ decision, and
-      // would destroy the narrowing the owner gets back on a downgrade.
-    },
-```
+The `public` branch of that hook's `matchLiteral` already exists: Task 2 added
+it to keep the tree type-checking. Leave it as it is.
 
 - [ ] **Step 10: Run the modal test to verify it passes**
 
