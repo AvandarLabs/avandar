@@ -214,6 +214,10 @@ export type {
   MergeObjects,
 } from "@utils/types/utilities.types.ts";
 export type { PathValue } from "@utils/objects/getValue/getValue.ts";
+export type {
+  ObjectPathValue,
+  ObjectPaths,
+} from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 export type { ExcludeNullsExceptIn } from "@utils/objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
 export type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
 export type { ExcludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
