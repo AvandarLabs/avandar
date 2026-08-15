@@ -86,12 +86,19 @@ test.describe("viewer-role dashboard routing", () => {
     let dashboardId: string | undefined;
 
     try {
+      // Published to the workspace rather than left as a draft. A draft is
+      // hidden from a viewer-level share by
+      // `util__auth_user_may_select_dashboard`, so a draft fixture could never
+      // reach the preview route at all; publishing is the realistic shape of a
+      // dashboard a viewer is meant to open.
       dashboardId = await seedDashboard({
         admin,
         workspaceId: e2eViewerMembership.workspaceId,
         ownerEmail: primaryUser.email,
         name: "Viewer routing e2e dashboard",
         isRestricted: true,
+        visibility: "workspace",
+        snapshotRevision: crypto.randomUUID(),
       });
       await _shareDashboardWithViewer({
         admin,

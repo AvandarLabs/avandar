@@ -624,6 +624,14 @@ $$;
  * Group shares with requires_app_access=true additionally require the auth
  * user to have a dashboards app role.
  *
+ * Dashboards additionally have a publication state that datasets do not.
+ * A `draft` is visible only to those who could edit it: the owner, a settings
+ * admin, and any grant worth `editor` or better. A viewer-level grant, whether
+ * a share or a workspace app role, does NOT open a draft. That is what gives
+ * `draft` its product meaning, that the owner decides when the dashboard is
+ * ready for others to see, and it keeps the `config` jsonb off the wire for
+ * readers the UI would refuse anyway.
+ *
  * @param p_dashboard_id Primary key of `public.dashboards`.
  * @returns True when the row should be visible to `auth.uid()`.
  */
@@ -638,6 +646,7 @@ declare
   v_owner uuid;
   v_restricted boolean;
   v_public boolean;
+  v_visibility public.dashboard_visibility;
   v_app_role public.role_level;
   v_editor_rank int := public.util__role_level_rank ('editor'::public.role_level);
   v_user_rank int;
@@ -651,8 +660,9 @@ begin
     d.workspace_id,
     d.owner_id,
     coalesce(d.is_restricted, false),
-    coalesce(d.is_public, false)
-  into v_ws, v_owner, v_restricted, v_public
+    coalesce(d.is_public, false),
+    d.visibility
+  into v_ws, v_owner, v_restricted, v_public, v_visibility
   from
     public.dashboards d
   where
@@ -691,6 +701,20 @@ begin
 
   if v_owner = v_uid then
     return true;
+  end if;
+
+  -- `draft` means the owner has not decided this dashboard is ready for anyone
+  -- else, which is the product meaning P2 gave the state and P3's publishing
+  -- control finally makes actionable. Owners and settings admins short-circuit
+  -- above; what remains here is share holders and workspace app roles, and for
+  -- a draft those need edit rights rather than mere read access.
+  if v_visibility = 'draft'::public.dashboard_visibility
+    and not public.util__auth_user_can_access_resource (
+      'dashboard'::public.resource_type,
+      p_dashboard_id,
+      'editor'::public.role_level
+    ) then
+    return false;
   end if;
 
   select exists (

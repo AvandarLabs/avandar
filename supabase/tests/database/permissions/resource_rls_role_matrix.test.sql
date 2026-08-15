@@ -174,21 +174,30 @@ insert into public.dashboards (
   description,
   visibility,
   config,
-  is_restricted
+  is_restricted,
+  snapshot_revision
 )
 values
   (
+    -- Published to the workspace, not a draft: this row is the subject of the
+    -- viewer-share SELECT case below, and the draft gate in
+    -- `util__auth_user_may_select_dashboard` denies a viewer-level grant on a
+    -- draft regardless of the share. Publishing keeps the matrix measuring the
+    -- share ladder rather than the publication state.
     'e200b001-0000-4000-8000-000000000001'::uuid,
     'e2001001-0000-4000-8000-000000000001'::uuid,
     'e2000001-0000-4000-8000-000000000001'::uuid,
     'e2003001-0000-4000-8000-000000000001'::uuid,
     'shared dashboard',
     '',
-    'draft',
+    'workspace',
     '{}'::jsonb,
-    true
+    true,
+    'e200b0a1-0000-4000-8000-000000000001'::uuid
   ),
   (
+    -- Stays a draft: every grant exercised against it is admin, which clears
+    -- the draft gate on its own.
     'e200b002-0000-4000-8000-000000000002'::uuid,
     'e2001001-0000-4000-8000-000000000001'::uuid,
     'e2000001-0000-4000-8000-000000000001'::uuid,
@@ -197,7 +206,8 @@ values
     '',
     'draft',
     '{}'::jsonb,
-    true
+    true,
+    null
   )
 on conflict (id) do nothing;
 
