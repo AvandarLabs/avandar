@@ -12,12 +12,15 @@ type Props = {
   dashboard: Dashboard.T;
   offlineStatus?: DashboardOfflineStatus;
   onClick?: () => void;
+  /** Drives the "Shared with you" badge; there is deliberately no "Yours". */
+  isOwnedByCurrentUser: boolean;
 };
 
 export function DashboardCard({
   dashboard,
   offlineStatus = "none",
   onClick,
+  isOwnedByCurrentUser,
 }: Props): JSX.Element {
   const { i18n } = useLingui();
   const [isHovered, setIsHovered] = useState(false);
@@ -73,6 +76,21 @@ export function DashboardCard({
         </Group>
 
         <Group gap="xs">
+          {!isOwnedByCurrentUser ?
+            <Badge size="xs" color="grape" variant="light">
+              <Trans>Shared with you</Trans>
+            </Badge>
+          : null}
+          {dashboard.visibility === "workspace" ?
+            <Badge size="xs" color="blue" variant="light">
+              <Trans>Published to workspace</Trans>
+            </Badge>
+          : null}
+          {dashboard.visibility === "public" ?
+            <Badge size="xs" color="orange" variant="light">
+              <Trans>Public</Trans>
+            </Badge>
+          : null}
           {offlineStatus === "full" ?
             <Badge size="xs" color="teal" variant="light">
               <Trans>Offline ready</Trans>

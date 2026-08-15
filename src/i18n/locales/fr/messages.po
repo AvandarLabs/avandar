@@ -774,6 +774,10 @@ msgstr "Enregistrer en tant que nouvel ensemble de données"
 msgid "From derived dataset"
 msgstr "À partir du jeu de données dérivé"
 
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Published to workspace"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Sélection unique"
@@ -966,6 +970,10 @@ msgstr "Échec de la création"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr "Naturel"
+
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Public"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -6442,6 +6450,7 @@ msgstr "Votre espace de travail a utilisé {currentSeatUsage} de ses "
 "{totalSeats} sièges."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "Partagé avec vous"

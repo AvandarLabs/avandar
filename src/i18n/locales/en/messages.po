@@ -757,6 +757,10 @@ msgstr "Save as new dataset"
 msgid "From derived dataset"
 msgstr "From derived dataset"
 
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Published to workspace"
+msgstr "Published to workspace"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "Single select"
@@ -943,6 +947,10 @@ msgstr "Create failed"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr "Natural"
+
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+msgid "Public"
+msgstr "Public"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -6325,6 +6333,7 @@ msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seat."
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "Shared with you"
