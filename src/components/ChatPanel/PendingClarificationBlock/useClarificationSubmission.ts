@@ -3,9 +3,10 @@ import { useCallback } from "react";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { resolveClarificationAnswer } from "./resolveClarificationAnswer";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
+import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -17,15 +18,16 @@ export function useClarificationSubmission(
     userId: User.Id | undefined;
     workspaceId: Workspace.Id;
   }>,
-): (answer: ClarificationSubmitAnswer) => Promise<void> {
+): ClarificationAnswerHandler {
   const { request, userId, workspaceId } = parameters;
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useThreadRuntime();
 
   return useCallback(
-    async function submitClarificationAnswer(answer) {
+    async (submission: Parameters<ClarificationAnswerHandler>[0]) => {
+      const { answer, isInternalDiscovery } = submission;
       if (!request) {
-        return;
+        return false;
       }
       const resolvedAnswer = await resolveClarificationAnswer({
         answer,
@@ -34,7 +36,7 @@ export function useClarificationSubmission(
         workspaceId,
       });
       if (!resolvedAnswer) {
-        return;
+        return false;
       }
       dispatch.setPendingClarification(undefined);
       if (request.auditId) {
@@ -43,7 +45,17 @@ export function useClarificationSubmission(
           outcome: "answered",
         });
       }
-      runtime?.append(ClarificationAnswer.formatForThread(resolvedAnswer));
+      const answerText = ClarificationAnswer.formatForThread(resolvedAnswer);
+      runtime?.append(
+        isInternalDiscovery ?
+          {
+            role: "user",
+            content: [{ type: "text", text: answerText }],
+            metadata: DiscoveryContinuationMessage.metadata,
+          }
+        : answerText,
+      );
+      return true;
     },
     [dispatch, request, runtime, userId, workspaceId],
   );

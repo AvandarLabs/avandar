@@ -1,3 +1,7 @@
+import {
+  MAX_DISCOVERY_CANDIDATE_CHARS,
+  MAX_DISCOVERY_CANDIDATE_VALUES,
+} from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
 type DataExplorerToolDefinition = {
@@ -93,8 +97,18 @@ const CLARIFY_TOOL = {
                   maxLength: 80,
                 },
                 multi: { type: "boolean" },
+                candidateValues: {
+                  type: "array",
+                  maxItems: MAX_DISCOVERY_CANDIDATE_VALUES,
+                  items: {
+                    type: "string",
+                    maxLength: MAX_DISCOVERY_CANDIDATE_CHARS,
+                  },
+                  description:
+                    "Possible stored representations inferred only from the user's prompt and general knowledge, never from dataset values. Include the user's exact wording plus plausible codes or abbreviations.",
+                },
               },
-              required: ["kind", "query", "column", "multi"],
+              required: ["kind", "query", "column", "multi", "candidateValues"],
               additionalProperties: false,
             },
           ],

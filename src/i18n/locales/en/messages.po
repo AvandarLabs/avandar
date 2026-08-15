@@ -118,11 +118,6 @@ msgstr "JOIN entry at position {index} is not a plain table reference."
 msgid "Geo Explorer"
 msgstr "Geo Explorer"
 
-#. placeholder {0}: elements.waitlistLink(t`sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "Or {0} to be notified when our public launch is ready."
-msgstr "Or {0} to be notified when our public launch is ready."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "Right span"
@@ -203,7 +198,7 @@ msgstr "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgid "Chart settings"
 msgstr "Chart settings"
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Discovery is not available in this context."
 msgstr "Discovery is not available in this context."
 
@@ -571,7 +566,7 @@ msgstr "Collapse at"
 msgid "Bubble Chart"
 msgstr "Bubble Chart"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
 msgstr "Something else…"
 
@@ -721,7 +716,7 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 msgstr "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "Please check your email for a confirmation link. It may take a few "
@@ -752,7 +747,7 @@ msgstr "From derived dataset"
 msgid "Single select"
 msgstr "Single select"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "However, we are not allowing new registrations at the moment."
 
@@ -963,7 +958,7 @@ msgstr "Loading plans..."
 msgid "User groups"
 msgstr "User groups"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryCustomFallback.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Type your answer…"
 
@@ -1073,10 +1068,10 @@ msgstr "Timestamp"
 msgid "Y axis tick interval"
 msgstr "Y axis tick interval"
 
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/ProfileView/PasswordSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
 msgstr "Password"
 
@@ -1162,7 +1157,7 @@ msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum 
 msgstr "Publish every column, all rows. Maximum flexibility for viewers, "
 "maximum exposure."
 
-#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts
+#: src/components/ChatPanel/ClarificationCard/useDiscoveryOptions/useDiscoveryOptions.ts
 msgid "Query failed."
 msgstr "Query failed."
 
@@ -1448,15 +1443,6 @@ msgstr "Workspace name is required"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "An unexpected error occurred. You can try again, or return home."
 
-#. placeholder {0}: elements.waitlistLink(t`Sign up for our waitlist`)
-#: src/routes/register.tsx
-msgid "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate your "
-"patience. You will receive a sign-up code soon. We promise!"
-msgstr "{0} to be notified when it's your turn to register! If you are already "
-"on our waitlist and have not received a sign-up code, we appreciate "
-"your patience. You will receive a sign-up code soon. We promise!"
-
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Bias detected:"
@@ -1521,7 +1507,7 @@ msgstr "Detected column types for 1 column in \"{sourceFileName}\" differed "
 "from the import preview and have been overwritten with the actual "
 "values."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryUnavailableBody.tsx
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No values were returned from {column}. Describe what you need instead."
 
@@ -1698,10 +1684,6 @@ msgstr "Export this dashboard as a PDF, or sketch on it first. Annotations "
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Update available"
-
-#: src/routes/register.tsx
-msgid "Please <0>email us</0> if you would like early access."
-msgstr "Please <0>email us</0> if you would like early access."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2341,7 +2323,7 @@ msgstr "Padding"
 msgid "Theme"
 msgstr "Theme"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Register"
 
@@ -2378,7 +2360,7 @@ msgstr "Global Admin"
 msgid "Comma (,)"
 msgstr "Comma (,)"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Registration requires an internet connection."
 msgstr "Registration requires an internet connection."
 
@@ -2410,7 +2392,7 @@ msgstr "Column 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "You do not have permission to open this part of the workspace."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Please check your email"
 
@@ -2437,10 +2419,6 @@ msgstr "Capturing dashboard…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "X axis tick interval"
-
-#: src/routes/register.tsx
-msgid "This is an invalid waitlist code"
-msgstr "This is an invalid waitlist code"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -2476,6 +2454,10 @@ msgstr "Values"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Y axis label color"
+
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
+msgid "Please <0>email us</0> if you would like access."
+msgstr "Please <0>email us</0> if you would like access."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -2515,7 +2497,7 @@ msgstr "None of the {totalRowCount} rows could be mapped because their "
 msgid "Plan Features:"
 msgstr "Plan Features:"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
 msgstr "Start your journey with us"
 
@@ -2689,6 +2671,10 @@ msgstr "Choose the language used across this workspace. Right-to-left languages 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "No plans available."
 msgstr "No plans available."
+
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Try a different lookup"
+msgstr "Try a different lookup"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -3016,10 +3002,6 @@ msgstr "Drop to import"
 msgid "Date range"
 msgstr "Date range"
 
-#: src/routes/register.tsx
-msgid "sign up for our waitlist"
-msgstr "sign up for our waitlist"
-
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Add dataset to workspace"
@@ -3054,6 +3036,12 @@ msgstr "Generating SQL…"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "X axis label rotation"
+
+#: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
+msgid "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
+msgstr "[The local discovery lookup failed. Try a different column or lookup "
+"query without asking me to select from the failed catalog.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3440,6 +3428,10 @@ msgstr "New field"
 msgid "Workspace created successfully!"
 msgstr "Workspace created successfully!"
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
+msgid "Retry lookup"
+msgstr "Retry lookup"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
@@ -3584,8 +3576,8 @@ msgstr "Most common"
 msgid "H3"
 msgstr "H3"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
 msgstr "Passwords do not match"
 
@@ -3780,7 +3772,7 @@ msgstr "Could not remove offline chat model"
 msgid "Legend"
 msgstr "Legend"
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
 msgstr "Create a new account"
 
@@ -3911,12 +3903,6 @@ msgstr "We detected both potential personal information and language that may "
 msgid "Select aggregation"
 msgstr "Select aggregation"
 
-#: src/routes/register.tsx
-msgid "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-msgstr "While Avandar is in beta, we are only allowing registration if you are "
-"on our waitlist and have received a sign-up code in your email."
-
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignore all global filters: this visualization is unfiltered."
@@ -3928,10 +3914,6 @@ msgstr "You wrote:"
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Multi select"
-
-#: src/routes/register.tsx
-msgid "Sign up for our waitlist"
-msgstr "Sign up for our waitlist"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard datasets"
@@ -3952,10 +3934,6 @@ msgstr "Collapse drawer"
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 msgid "Share failed"
 msgstr "Share failed"
-
-#: src/routes/register.tsx
-msgid "Your waitlist code has been verified"
-msgstr "Your waitlist code has been verified"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4107,14 +4085,10 @@ msgstr "Parts of this SQL could not be represented in the Manual form. The form 
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Please try again. Your dashboard has not been published."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-msgid "Looking up values in {column}…"
-msgstr "Looking up values in {column}…"
-
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Email"
 msgstr "Email"
 
@@ -4292,8 +4266,8 @@ msgstr "User removed"
 msgid "Limit {displayName} to app access"
 msgstr "Limit {displayName} to app access"
 
-#: src/routes/register.tsx
 #: src/routes/update-password.tsx
+#: src/views/RegisterView/RegistrationFields.tsx
 msgid "Confirm Password"
 msgstr "Confirm Password"
 
@@ -4376,7 +4350,7 @@ msgstr "date"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "This dashboard doesn't reference any datasets: nothing to publish."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "A confirmation email has been sent to your email address."
 
@@ -4669,6 +4643,10 @@ msgstr "Your current plan only supports up to {0} datasets. Upgrade to our "
 msgid "This dataset is offline-only. Click to allow online syncing."
 msgstr "This dataset is offline-only. Click to allow online syncing."
 
+#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
+msgid "Checking your data…"
+msgstr "Checking your data…"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Global filters"
@@ -4770,10 +4748,6 @@ msgstr "Loading dashboard datasets"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "Select an Excel or CSV file from your computer to import"
-
-#: src/routes/register.tsx
-msgid "Please choose a password to complete your registration"
-msgstr "Please choose a password to complete your registration"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5355,7 +5329,7 @@ msgstr "New user group"
 msgid "Left"
 msgstr "Left"
 
-#: src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts
+#: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "None of the above"
 
@@ -5690,7 +5664,7 @@ msgstr "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
 "feedback as we work to improve the product."
 
-#: src/routes/register.tsx
+#: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Thank you for your interest!"
 
@@ -5887,7 +5861,7 @@ msgstr "Search dashboards"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
-#: src/routes/register.tsx
+#: src/views/RegisterView/useRegistrationForm.ts
 msgid "Invalid email address"
 msgstr "Invalid email address"
 

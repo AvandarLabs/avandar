@@ -93,6 +93,7 @@ describe("ClarificationAuditEntryClient", () => {
           query: "select distinct region from sales",
           column: "region",
           multi: true,
+          candidateValues: ["North"],
         },
       }),
     });

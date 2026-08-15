@@ -1,8 +1,13 @@
-import { ActionBarPrimitive, MessagePrimitive } from "@assistant-ui/react";
+import {
+  ActionBarPrimitive,
+  MessagePrimitive,
+  useMessage,
+} from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import css from "./AssistantMessage.module.css";
 
 /**
@@ -13,33 +18,36 @@ import css from "./AssistantMessage.module.css";
  */
 export function AssistantMessage(): React.ReactNode {
   const { t } = useLingui();
-  return (
-    <MessagePrimitive.Root className={css.assistantMessageRow}>
-      <div className={css.assistantMessageStack}>
-        <div className={css.assistantMessageBubble}>
-          <MessagePrimitive.If hasContent={false}>
-            <Loader
-              type="dots"
-              size="sm"
-              color="neutral.5"
-              aria-label={t`Assistant is typing`}
-            />
+  const isInternalDiscovery = useMessage((message) => {
+    return DiscoveryContinuationMessage.isInternal(message.metadata);
+  });
+  return isInternalDiscovery ? null : (
+      <MessagePrimitive.Root className={css.assistantMessageRow}>
+        <div className={css.assistantMessageStack}>
+          <div className={css.assistantMessageBubble}>
+            <MessagePrimitive.If hasContent={false}>
+              <Loader
+                type="dots"
+                size="sm"
+                color="neutral.5"
+                aria-label={t`Assistant is typing`}
+              />
+            </MessagePrimitive.If>
+            <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
+          </div>
+          <MessagePrimitive.If hasContent={true}>
+            <ActionBarPrimitive.Root className={css.assistantMessageActions}>
+              <ActionBarPrimitive.Reload
+                className={css.assistantMessageTryAgainButton}
+                aria-label={t`Try again`}
+                title={t`Try again`}
+              >
+                <IconRefresh size={12} />
+                <span>{t`Try again`}</span>
+              </ActionBarPrimitive.Reload>
+            </ActionBarPrimitive.Root>
           </MessagePrimitive.If>
-          <MessagePrimitive.Parts components={{ Text: MarkdownTextPart }} />
         </div>
-        <MessagePrimitive.If hasContent={true}>
-          <ActionBarPrimitive.Root className={css.assistantMessageActions}>
-            <ActionBarPrimitive.Reload
-              className={css.assistantMessageTryAgainButton}
-              aria-label={t`Try again`}
-              title={t`Try again`}
-            >
-              <IconRefresh size={12} />
-              <span>{t`Try again`}</span>
-            </ActionBarPrimitive.Reload>
-          </ActionBarPrimitive.Root>
-        </MessagePrimitive.If>
-      </div>
-    </MessagePrimitive.Root>
-  );
+      </MessagePrimitive.Root>
+    );
 }

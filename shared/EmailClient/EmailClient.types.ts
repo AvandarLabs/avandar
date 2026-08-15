@@ -1,12 +1,13 @@
-import { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
-import { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
-import {
+import type { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
+import type { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
+import type {
   CreateEmailResponseSuccess,
   SendBroadcastResponseSuccess,
 } from "resend";
-import { Simplify } from "type-fest";
+import type { Simplify } from "type-fest";
 
-export type NotificationEmailType = "waitlist_signup_code" | "workspace_invite";
+/** Notification templates supported by the shared email client. */
+export type NotificationEmailType = "workspace_invite";
 
 type BaseNotificationEmailOptions = {
   /** The email address of the recipient to send the email to. */
@@ -27,6 +28,15 @@ type BaseNotificationEmailOptions = {
   disableDevEmailOverride?: boolean;
 };
 
+/** Options required to send one workspace invitation notification. */
+export type WorkspaceInviteNotificationEmailOptions =
+  BaseNotificationEmailOptions & {
+    type: "workspace_invite";
+    workspaceSlug: string;
+    workspaceName: string;
+    inviteId: string;
+  };
+
 export type IEmailClient = {
   /**
    * Sends a notification email to a single recipient using Resend.
@@ -37,19 +47,7 @@ export type IEmailClient = {
    * `sendTransactionalEmail` instead.
    */
   sendNotificationEmail: (
-    options:
-      | (BaseNotificationEmailOptions & {
-          type: "waitlist_signup_code";
-
-          /** The recipient's waitlist signup code */
-          waitlistSignupCode: string;
-        })
-      | (BaseNotificationEmailOptions & {
-          type: "workspace_invite";
-          workspaceSlug: string;
-          workspaceName: string;
-          inviteId: string;
-        }),
+    options: Readonly<WorkspaceInviteNotificationEmailOptions>,
   ) => Promise<Simplify<CreateEmailResponseSuccess>>;
 
   /**

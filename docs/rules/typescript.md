@@ -131,6 +131,68 @@
   const myString = `Hello ${name}`;
   ```
 
+- Do not introduce indirection that the inline form does not need. A named
+  binding used in exactly one place makes the reader jump to a second location
+  to learn something the call site could have shown them outright. When the
+  value is small, inlining it is the more readable option, so choose that.
+
+  Inline when all of these hold:
+  - The binding is referenced exactly once.
+  - It is a top-level `const` or a `_`-prefixed helper in the same file.
+  - Inlined, it adds 5 lines or fewer at the use site. An object literal with
+    4 or fewer properties and a function body of a single statement both
+    qualify.
+
+  This is bad:
+
+  ```ts
+  const metadata = {
+    custom: {
+      isDiscoveryContinuation: true,
+    },
+  } as const;
+
+  function _isInternal(messageMetadata: MessageMetadata): boolean {
+    return messageMetadata?.custom?.isDiscoveryContinuation === true;
+  }
+
+  export const DiscoveryContinuationMessage = {
+    metadata,
+    isInternal: _isInternal,
+  };
+  ```
+
+  This is good:
+
+  ```ts
+  export const DiscoveryContinuationMessage = {
+    metadata: {
+      custom: {
+        isDiscoveryContinuation: true,
+      },
+    } as const,
+
+    isInternal: (messageMetadata: MessageMetadata): boolean => {
+      return messageMetadata?.custom?.isDiscoveryContinuation === true;
+    },
+  };
+  ```
+
+  Keep the separate binding when any of these apply:
+  - It is referenced more than once, now or by a test.
+  - Inlining would push the enclosing literal or function past 5 added lines,
+    where the extra nesting costs more than the jump.
+  - The name is the only thing explaining an otherwise opaque value, such as a
+    magic number or a regular expression.
+  - It exists to give a value a stable identity, such as a module-level empty
+    array used as a default for a prop or a hook dependency. Inlining it would
+    build a new value on every call and defeat the reference check.
+  - It is recursive, or a `const` whose use would precede its declaration.
+
+  This rule runs before the helper-prefix and helper-ordering rules below. Those
+  say how to write a helper that should exist; this one asks whether it should
+  exist at all.
+
 ## Naming Conventions
 
 - Use PascalCase for React components, classes, singleton class instances, or
@@ -152,36 +214,65 @@
 
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
-- A function that turns one value into another must name both sides. There are
-  exactly four allowed shapes, and every conversion, derivation, or lookup uses
-  one of them:
+- A function that turns one value into another must name both sides, either in
+  the function name alone or in the receiver plus the function name. Start by
+  asking what the receiver is:
 
-  | Shape                      | Use when                                             |
-  | -------------------------- | ---------------------------------------------------- |
-  | `[Receiver].to[Target]`    | The receiver names the source                        |
-  | `[Receiver].from[Source]`  | The receiver names the target                        |
-  | `make[Target]From[Source]` | Free function, the target is a new value             |
-  | `get[Target]From[Source]`  | Free function, the target is contained in the source |
+  **Step 1: is the receiver the source or the target?** The receiver is the
+  module, namespace, or object the function hangs off (`MapLayer` in
+  `MapLayer.toGeoBinding`). A free function has no receiver at all.
+  - The receiver **is the source** when the value being converted is a
+    `MapLayer` and the receiver is `MapLayer`.
+  - The receiver **is the target** when the value being produced is a
+    `GeoBinding` and the receiver is `GeoBinding`.
+  - The receiver is **neither** when it is a general grouping name that does
+    not name either side, such as `MapUtils`, `Formatters`, or `DateHelpers`.
 
-  A method on a module gets the missing half from its receiver, so it never
-  repeats it: `MapLayer.toGeoBinding(layer)`, not
+  **Step 2: pick the shape.** Only a receiver that names one of the two sides
+  lets the name drop that half. A receiver that names neither side supplies
+  nothing, so the function name must still spell out both halves, exactly as a
+  free function does:
+
+  | Shape                                 | Use when                           |
+  | ------------------------------------- | ---------------------------------- |
+  | `[Source].to[Target]`                 | Receiver is the source, converting |
+  | `[Source].get[Target]`                | Receiver is the source, looking up |
+  | `[Target].from[Source]`               | Receiver is the target             |
+  | `[Receiver].make[Target]From[Source]` | Receiver is neither, new value     |
+  | `[Receiver].get[Target]From[Source]`  | Receiver is neither, value inside  |
+  | `make[Target]From[Source]`            | Free function, new value           |
+  | `get[Target]From[Source]`             | Free function, value inside source |
+
+  When the receiver names a side, the method takes the missing half from it and
+  must never repeat it: `MapLayer.toGeoBinding(layer)`, not
   `MapLayer.mapLayerToGeoBinding(layer)` and not
-  `MapLayer.resolveGeoBinding(layer)`. Free functions have no receiver, so they
-  must spell out both halves, and they never use `To`: write
-  `makeFeatureCollectionFromRows(rows)`, not `rowsToFeatureCollection(rows)`
-  and not `toFeatureCollection(rows)`.
+  `MapLayer.resolveGeoBinding(layer)`. When the receiver names neither side, the
+  full form is still required: `MapUtils.makeGeoBindingFromMapLayer(layer)`, not
+  `MapUtils.toGeoBinding(layer)`, because `MapUtils` leaves the source unnamed.
 
-  Choose between `make` and `get` by what comes back:
+  Free functions have no receiver, so they must spell out both halves, and they
+  never use `To`: write `makeFeatureCollectionFromRows(rows)`, not
+  `rowsToFeatureCollection(rows)` and not `toFeatureCollection(rows)`.
+
+  Choose between `make`, `get`, and `to` by what the function does:
   - `make` constructs a new object or a value of a new type out of the source.
     `makeMapSpecFromLayerSpecs`, `makeFeatureCollectionFromRows`.
   - `get` returns something logically contained in the source, directly or
-    indirectly: a nested value, a display label, a derived property.
-    `getBoundsFromFeatureCollection`, `getFiniteNumberFromValue`.
+    indirectly: a nested value, a display label, a derived property, a
+    filtered or looked-up subset. `getBoundsFromFeatureCollection`,
+    `getFiniteNumberFromValue`, `MapLayer.getQueryableFields(layer)`.
+  - `to` converts the whole receiver into another representation of itself.
+    `MapLayer.toGeoBinding(layer)`, `Dataset.toCsv(dataset)`.
+
+  `to` and `get` are equally valid on a receiver that names the source, so pick
+  the one that describes the work: `to` implies conversion, `get` implies
+  fetching, filtering, or looking up. Prefer `MapLayer.getFieldById(layer, id)`
+  over `MapLayer.toFieldById(layer, id)`, because nothing is being converted.
 
   Never name a conversion `resolve...`. It names neither side, so the reader
   learns nothing about what went in or what comes out. The same goes for
   reaching for `compute...`, `build...`, or `create...` on a function that is
-  really one of the four shapes above: fewer prefixes, each carrying real
+  really one of the shapes above: fewer prefixes, each carrying real
   information, beats a wide vocabulary of near-synonyms.
 
   This is bad:
@@ -191,6 +282,8 @@
   MapLayer.resolveGeoBinding(layer);
   // Free function using `To`, and the source is unnamed.
   toFeatureCollection({ rows, binding });
+  // `MapUtils` is neither side, so the source is left unnamed.
+  MapUtils.toGeoBinding(layer);
   // Near-synonym prefixes for the same kind of work.
   computeBounds(featureCollection);
   createMapSpec(layerSpecs);
@@ -200,6 +293,8 @@
 
   ```ts
   MapLayer.toGeoBinding(layer);
+  MapLayer.getQueryableFields(layer);
+  MapUtils.makeGeoBindingFromMapLayer(layer);
   makeFeatureCollectionFromRows({ rows, binding });
   getBoundsFromFeatureCollection(featureCollection);
   makeMapSpecFromLayerSpecs(layerSpecs);
@@ -219,10 +314,65 @@
   pending promise (`_resolveCompletionWaiters`): that names an action, not a
   conversion.
 
-- User-facing copy is the one conversion excluded from the four shapes. A
+- User-facing copy is the one conversion excluded from the shapes above. A
   function whose whole job is to produce a piece of copy is named after the
   copy it returns, with no prefix: `appLabel(app)`, `vizTypeLabel(vizType)`,
-  `resourceTypeLabel(type)`. These live in `shared/copy/`.
+  `resourceTypeLabel(type)`. These live in `shared/copy/`, or in a `copy/`
+  directory nested inside the one sub-system that uses them.
+
+  **Before applying this exception, prove the function is copy.** Both tests
+  below must pass. They are mechanical on purpose: "it produces text a user
+  reads" is a judgement call, and every misfiling of a plain conversion has
+  come from making that call generously.
+
+  1. **Lingui or it is not copy.** Every string the function returns is
+     produced by a Lingui macro in the function's own body: `` t`…` ``,
+     `` msg`…` ``, or `i18n._(msg`…`)`. A function with no macro in it
+     returns data, not copy, however user-facing the data eventually
+     becomes. Copy is always translated, so an untranslated string is proof
+     the function is something else.
+  2. **It returns `string`, not a literal union.** The return type is
+     `string`, or a record whose values are all `string`. A string-literal
+     union return type (`AppType`, `ResourceType`, `"gis" | "dashboards"`)
+     means the function returns a key the program branches on, not text a
+     person reads. That is a conversion and it takes a conversion name.
+
+  Fail either test and the function is an ordinary conversion: it takes one
+  of the four shapes, and it does **not** go in a `copy/` directory. Feeding
+  a copy function is not a qualification. "It exists only to produce the
+  argument for `appLabel`, so it lives beside the copy that consumes it" is
+  the rationalization to watch for; proximity to copy is not copy.
+
+  A `copy/` directory contains copy functions and nothing else. A helper,
+  lookup table, or type map that copy happens to call belongs with the rest
+  of the sub-system's code, under its own conversion name.
+
+  This is bad (no Lingui macro, and the return type is a literal union, so
+  this is a conversion wearing a copy name in a copy directory):
+
+  ```ts
+  // src/components/permissions/ShareResourceModal/copy/appForResource.ts
+  export function appForResource(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  // .../ShareResourceModal/getAppTypeFromResourceType/getAppTypeFromResourceType.ts
+  export function getAppTypeFromResourceType(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
 
   The absence of a prefix is the signal. A prefix would tell the reader that
   data is being converted, when what is really happening is that a string of
@@ -245,7 +395,7 @@
 
   The exception is only for functions that return copy and nothing else. A
   function that takes copy as one input among several and returns data still
-  follows the four shapes.
+  follows the naming shapes above.
 
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased

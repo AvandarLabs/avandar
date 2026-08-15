@@ -13,6 +13,60 @@ function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
 }
 
 describe("applyChatTurnResponse", () => {
+  it("marks a discovery clarification as an internal continuation", async () => {
+    const handlers = _createHandlers();
+    const responseData: Omit<ChatResponse.T, "__type"> = {
+      assistantText: "Which stored state represents California?",
+      clarification: {
+        question: "Which stored state represents California?",
+        responseShape: {
+          kind: "discovery",
+          query: 'SELECT DISTINCT "state" FROM "mortality"',
+          column: "state",
+          multi: false,
+          candidateValues: ["California", "CA"],
+        },
+        turnNumber: 1,
+      },
+    };
+    const response = Model.make("ChatResponse", responseData);
+
+    const result = await applyChatTurnResponse({
+      response,
+      sqlApplied: false,
+      handlers,
+    });
+
+    expect(result.metadata?.custom).toEqual({
+      isDiscoveryContinuation: true,
+    });
+  });
+
+  it("keeps an ordinary clarification visible", async () => {
+    const handlers = _createHandlers();
+    const responseData: Omit<ChatResponse.T, "__type"> = {
+      assistantText: "Which period?",
+      clarification: {
+        question: "Which period?",
+        responseShape: {
+          kind: "fixed_options",
+          options: ["This month", "Last month"],
+          multi: false,
+        },
+        turnNumber: 1,
+      },
+    };
+    const response = Model.make("ChatResponse", responseData);
+
+    const result = await applyChatTurnResponse({
+      response,
+      sqlApplied: false,
+      handlers,
+    });
+
+    expect(result.metadata).toBeUndefined();
+  });
+
   it("preserves dashboard, clarification, and generated SQL handling", async () => {
     const handlers = _createHandlers();
     const responseData: Omit<ChatResponse.T, "__type"> = {

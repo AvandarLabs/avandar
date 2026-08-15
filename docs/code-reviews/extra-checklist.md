@@ -35,6 +35,12 @@ and run its rules just like an inline phase. Split a phase out to a
 readability. There is no cap on how many phases or referenced rulesets the
 repo can add; add as many as the codebase needs and they all run.
 
+A delegated phase is a gate and a pointer, nothing else. Do not explain why
+it was split out: this file is loaded into every review, and a note about
+file organization instructs the reviewer to do nothing while costing context
+in every run. Rationale for a ruleset belongs at the top of that ruleset,
+where the person applying it is already reading.
+
 Because each declared phase and each referenced ruleset counts as a real
 phase, they also feed the skill's sub-agent fan-out decision and each fans
 out as its own find lane. So the number of phases below (inline **and**
@@ -216,12 +222,6 @@ when the gate matches.
 - **Reference:** this phase's rules live in
   [`references/avapage-schema-migrations.md`](references/avapage-schema-migrations.md).
   Open it and run it as its own phase.
-- **Why it is split out:** it carries a review _method_ (establish the
-  current schema version and read a module's full, adjacent header rules
-  before flagging a "frozen snapshot / no live imports" violation) that a
-  past review got wrong, mis-flagging the current-version migration's
-  intended `V<N>_VizConfig = VizConfig` alias as a bug. The detail belongs in
-  its own file rather than bloating this entry point.
 
 ### Phase: utils package reference
 
@@ -234,87 +234,6 @@ when the gate matches.
   general "utility reuse" principle is covered by the skill; this
   phase just records the in-repo README path.
 
-### Phase: Supabase session `null` normalization
-
-- **Gate:** the diff introduces a `null` (a `| null` type, a `= null`
-  initializer, or a `return null`) on a value derived from a Supabase
-  auth/session call (`refreshSession`, `getSession`, `getUser`, etc.).
-  Skip if no such `null` is introduced.
-- **Rule:** the skill's general `null`-vs-`undefined` rule applies (own
-  signatures use `undefined`; normalize external `null` at the boundary
-  with `?? undefined`). This phase records the in-repo specifics:
-  - The canonical normalization pattern lives in
-    `src/clients/AuthClient.ts` — `getCurrentSession` returns
-    `Promise<Session | undefined>` and does `return data.session ??
-undefined`. New code that wraps a Supabase session call should follow
-    that shape rather than propagating `Session | null` outward.
-  - The **one** place `null` is legitimate is the `onAuthStateChange`
-    callback parameter (`(event, session: Session | null) => ...`), whose
-    type Supabase dictates. Keep `null` there; normalize everywhere else.
-
-  This is bad (our own module owns these signatures, so they should be
-  `undefined`):
-
-  ```ts
-  let onSessionExpired: (() => void) | null = null;
-
-  async function doRefresh(): Promise<Session | null> {
-    const { data } = await AvaSupabase.db().auth.refreshSession();
-    return data.session;
-  }
-  ```
-
-  This is good:
-
-  ```ts
-  let onSessionExpired: (() => void) | undefined = undefined;
-
-  async function doRefresh(): Promise<Session | undefined> {
-    const { data } = await AvaSupabase.db().auth.refreshSession();
-    return data.session ?? undefined;
-  }
-  ```
-
-### Phase: Supabase migration chronology
-
-- **Gate:** the diff adds, renames, or modifies any file under
-  `supabase/migrations/`. Skip otherwise.
-- **Rule:** every newly added migration must sort after the latest migration
-  already present in the review base's `supabase/migrations/` directory, and
-  new migrations must sort after one another in their dependency order.
-  Compare the 14-digit timestamp prefix, not the descriptive suffix. Supabase
-  applies pending migrations in timestamp order and tracks those timestamps in
-  `supabase_migrations.schema_migrations`; inserting a branch migration before
-  an already-applied migration can leave staging history out of sync or run a
-  migration before the objects it depends on. This most often happens after a
-  rebase with `develop`.
-
-  **Find candidates:**
-
-  ```bash
-  git diff --name-status <base>...HEAD -- supabase/migrations/
-  git ls-tree -r --name-only <base> supabase/migrations/ \
-    | sed 's#supabase/migrations/##' | sort
-  ```
-
-  **Exceptions:** none for a new migration. Never rename or edit a migration
-  that may already be applied remotely to make room in the timeline; create a
-  new migration with a later timestamp instead.
-
-  This is bad:
-
-  ```text
-  develop: 20260813214231_restore_storage_policies.sql
-  branch:  20260813175930_backfill_gis_roles.sql
-  ```
-
-  This is good:
-
-  ```text
-  develop: 20260813214231_restore_storage_policies.sql
-  branch:  20260814010032_backfill_gis_roles.sql
-  ```
-
 ### Phase: E2E tests (Playwright)
 
 - **Gate:** the diff includes any file under `tests/e2e/` (specs,
@@ -322,41 +241,15 @@ undefined`. New code that wraps a Supabase session call should follow
 - **Reference:** this phase's rules live in
   [`references/e2e-tests.md`](references/e2e-tests.md). Open it and run it
   as its own phase.
-- **Why it is split out:** the E2E ruleset is large (running specs, UI vs
-  direct-DB writes, client-side navigation, minimal seeding, resilient
-  controlled-input sets, the large-parse fresh-browser policy, cleanup, and
-  timeouts) and was bloating this entry point.
 
-### Phase: shared copy functions
+### Phase: copy functions
 
 - **Gate:** the diff adds or renames a function that returns user-facing copy,
-  or touches any file under `shared/copy/`.
-- Shared copy lives in `shared/copy/`, one file per copy function named after
-  the function (`shared/copy/appLabel.ts`). A copy function reused by more than
-  one view belongs there rather than being redeclared beside each caller.
-- These functions are the one conversion exempt from the
-  `to`/`from`/`make…From…`/`get…From…` naming rule, and take the name of the
-  copy they return with no prefix: `appLabel`, `resourceTypeLabel`,
-  `vizTypeLabel`. Flag a prefixed variant (`getAppLabelFromAppType`,
-  `makeAppLabel`) and flag a copy function that has grown a second
-  responsibility, which puts it back under the naming rule. The reasoning is in
-  the copy-function rule in
-  [`typescript-checklist.md`](../../agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/typescript-checklist.md)
-  and in [`docs/rules/typescript.md`](../rules/typescript.md).
-- Copy functions still translate through Lingui, so they are subject to the
-  i18n phase below: a label built from a bare string literal is a finding even
-  though the function name is correct.
-
-  **Find candidates:**
-
-  ```bash
-  grep -rEn '^(export )?function (get|make)[A-Z][a-zA-Z]*(Label|Copy|Text|Title|Message)[a-zA-Z]*\(' \
-    --include="*.ts" --include="*.tsx" src shared
-  # copy-shaped functions declared outside shared/copy:
-  grep -rEln '^export function [a-z][a-zA-Z]*(Label|Copy)\(' \
-    --include="*.ts" --include="*.tsx" src shared \
-    | grep -v '^shared/copy/'
-  ```
+  or touches any file under `shared/copy/` or any nested `copy/` directory.
+  Skip otherwise.
+- **Reference:** this phase's rules live in
+  [`references/copy-functions.md`](references/copy-functions.md). Open it and
+  run it as its own phase.
 
 ### Phase: internationalization (Lingui)
 

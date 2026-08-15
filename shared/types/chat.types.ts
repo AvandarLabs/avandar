@@ -103,6 +103,8 @@ export type ChatClarifyResponseShape =
       query: string;
       column: string;
       multi: boolean;
+      /** Prompt-derived values to test against local discovery results. */
+      candidateValues: string[];
     };
 
 export type ChatClarifyRequest = {

@@ -1,4 +1,5 @@
-import { MessagePrimitive } from "@assistant-ui/react";
+import { MessagePrimitive, useMessage } from "@assistant-ui/react";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { MessageTextPart } from "../MessageTextPart/MessageTextPart";
 import css from "./UserMessage.module.css";
 
@@ -7,12 +8,15 @@ import css from "./UserMessage.module.css";
  * Selected by `ThreadPrimitive.Messages` for messages with the `user` role and
  * delegates content rendering to `MessagePrimitive.Parts`.
  */
-export function UserMessage(): JSX.Element {
-  return (
-    <MessagePrimitive.Root className={css.userMessageRow}>
-      <div className={css.userMessageBubble}>
-        <MessagePrimitive.Parts components={{ Text: MessageTextPart }} />
-      </div>
-    </MessagePrimitive.Root>
-  );
+export function UserMessage(): React.ReactNode {
+  const isInternalDiscovery = useMessage((message) => {
+    return DiscoveryContinuationMessage.isInternal(message.metadata);
+  });
+  return isInternalDiscovery ? null : (
+      <MessagePrimitive.Root className={css.userMessageRow}>
+        <div className={css.userMessageBubble}>
+          <MessagePrimitive.Parts components={{ Text: MessageTextPart }} />
+        </div>
+      </MessagePrimitive.Root>
+    );
 }
