@@ -1983,6 +1983,32 @@ That second alert is the one that makes umbrella section 5.4's ordering
 legible to the user: share writes land immediately, the snapshot moves only on
 the button.
 
+- [ ] **Step 5b: Correct the QR-code promise in `PublishedShareLinks`**
+
+Task 7 made `canonical` audience-dependent, which falsified the copy this
+component renders. It currently labels `canonical` "Permanent link (use for QR
+codes)" with the hint "Never changes, so QR codes printed from here keep
+working even if the custom URL changes." That is no longer true: a dashboard
+moved between `public` and `workspace` gets a different canonical URL, so a
+printed QR code stops resolving.
+
+The promise the product can still keep is narrower, so say exactly that:
+
+```tsx
+        hint={
+          shareUrls.vanity ?
+            t`Stable for as long as this dashboard keeps its current audience, so QR codes printed from here keep working even if the custom URL changes. Changing between workspace and public changes this link.`
+          : t`Anyone with this link can view the dashboard.`
+        }
+```
+
+and change the label from `t`Permanent link (use for QR codes)`` to
+`t`Direct link (use for QR codes)``.
+
+Do not try to preserve the old promise by keeping the legacy
+`/public/dashboards/...` path here. That route is a redirect P2 wants deleted,
+and minting new QR codes against it would extend its life indefinitely.
+
 - [ ] **Step 6: Compose the section**
 
 Create `PublishingSection.tsx`:
