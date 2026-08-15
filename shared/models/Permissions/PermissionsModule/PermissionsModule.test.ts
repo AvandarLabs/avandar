@@ -1,4 +1,5 @@
 import { Permissions } from "$/models/Permissions/Permissions.ts";
+import { PermissionRegistry } from "$/models/Permissions/PermissionsModule/PermissionRegistry.ts";
 import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { describe, expect, it } from "vitest";
 import type {
@@ -151,6 +152,21 @@ describe("Permissions.PermissionCatalog", () => {
     expect(Permissions.PermissionCatalog.settings.editor.length).toBe(0);
     expect(Permissions.PermissionCatalog.settings.admin.length).toBeGreaterThan(
       0,
+    );
+  });
+
+  it("grants dashboards__can_publish_publicly at the admin tier only", () => {
+    // Publishing to your own workspace is ordinary editor work. Putting a slice
+    // of workspace data on the open internet is not, so the two are separate
+    // capabilities rather than one.
+    expect(PermissionRegistry.dashboards.viewer).not.toContain(
+      "dashboards__can_publish_publicly",
+    );
+    expect(PermissionRegistry.dashboards.editor).not.toContain(
+      "dashboards__can_publish_publicly",
+    );
+    expect(PermissionRegistry.dashboards.admin).toContain(
+      "dashboards__can_publish_publicly",
     );
   });
 });
