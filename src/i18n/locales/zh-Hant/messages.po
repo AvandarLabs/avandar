@@ -574,6 +574,11 @@ msgstr "使用建議"
 msgid "{0} Manager"
 msgstr "{0} 管理員"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+#~ msgid " Published on the web: Anyone with the link can view it, and the list "
+#~ "above controls editing only."
+#~ msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
 msgstr "該工作表有一個標題列"
@@ -1092,6 +1097,10 @@ msgstr "歡迎回來"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published to "
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -3376,6 +3385,10 @@ msgstr "刪除工作區"
 msgid "Latitude column"
 msgstr "緯度欄"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Not published yet."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
 msgstr "選擇一個儀表板，或創建一個新儀表板。"
@@ -4258,6 +4271,11 @@ msgstr "日期"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此儀表板未引用任何數據集：無法發布。"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published on the web: anyone with the link can view it, and the list "
+"above controls editing only."
+msgstr ""
 
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."

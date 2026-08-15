@@ -29,6 +29,12 @@ type BuildShareSummaryOptions = {
   workspaceName: string;
   userById: Record<string, string>;
   groupById: Record<string, string>;
+  /**
+   * Publication state, for resource types that have one. `undefined` means the
+   * resource has no published form at all, which is every type except
+   * dashboards today, and produces no publication span.
+   */
+  publication?: "draft" | "workspace" | "public";
 };
 
 /**
@@ -65,15 +71,24 @@ export function buildShareSummary(
     !opts.isRestricted || opts.workspaceShareRole !== null;
   const generalAccessRole = opts.workspaceShareRole ?? "viewer";
 
+  const publicationSpans =
+    opts.publication ?
+      buildPublicationSpans(opts.publication, opts.workspaceName)
+    : [];
+
   if (!hasAnyShares) {
     if (hasGeneralAccess) {
-      return buildGeneralAccessOnlySummary(resource, app, generalAccessRole);
+      return [
+        ...buildGeneralAccessOnlySummary(resource, app, generalAccessRole),
+        ...publicationSpans,
+      ];
     }
     return [
       {
         kind: "text",
         text: t`Only you have access to this ${resource}.`,
       },
+      ...publicationSpans,
     ];
   }
 
@@ -127,6 +142,7 @@ export function buildShareSummary(
     { kind: "text", text: t`This ${resource} is shared with: ` },
     ...joinedFragments,
     { kind: "text", text: "." },
+    ...publicationSpans,
   ];
 }
 
@@ -153,5 +169,36 @@ function buildGeneralAccessFragment(
     { kind: "text", text: " " },
     { kind: "pill", label: capitalize(role), variant: "role" },
     { kind: "text", text: t` permission` },
+  ];
+}
+
+/**
+ * The publication sentence appended to every summary for a resource that can
+ * be published.
+ *
+ * The public case carries the warning deliberately: while a dashboard is
+ * public, the people list below governs who can EDIT it, not who can read it.
+ * That is the one place the two axes of this modal stop being independent, and
+ * it is worth a sentence rather than a footnote.
+ */
+function buildPublicationSpans(
+  publication: "draft" | "workspace" | "public",
+  workspaceName: string,
+): SummarySpan[] {
+  if (publication === "draft") {
+    return [{ kind: "text", text: t` Not published yet.` }];
+  }
+  if (publication === "workspace") {
+    return [
+      { kind: "text", text: t` Published to ` },
+      { kind: "pill", label: workspaceName, variant: "workspace" },
+      { kind: "text", text: "." },
+    ];
+  }
+  return [
+    {
+      kind: "text",
+      text: t` Published on the web: anyone with the link can view it, and the list above controls editing only.`,
+    },
   ];
 }

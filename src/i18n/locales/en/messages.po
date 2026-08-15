@@ -587,6 +587,12 @@ msgstr "Use suggestion"
 msgid "{0} Manager"
 msgstr "{0} Manager"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+#~ msgid " Published on the web: Anyone with the link can view it, and the list "
+#~ "above controls editing only."
+#~ msgstr " Published on the web: Anyone with the link can view it, and the list "
+#~ "above controls editing only."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
 msgstr "The sheet has a header row"
@@ -1117,6 +1123,10 @@ msgstr "Welcome back"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published to "
+msgstr " Published to "
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -3464,6 +3474,10 @@ msgstr "Delete workspace"
 msgid "Latitude column"
 msgstr "Latitude column"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Not published yet."
+msgstr " Not published yet."
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
 msgstr "Pick a dashboard, or create a new one."
@@ -4363,6 +4377,12 @@ msgstr "date"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "This dashboard doesn't reference any datasets: nothing to publish."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published on the web: anyone with the link can view it, and the list "
+"above controls editing only."
+msgstr " Published on the web: anyone with the link can view it, and the list "
+"above controls editing only."
 
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."

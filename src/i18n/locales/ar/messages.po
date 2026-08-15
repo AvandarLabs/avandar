@@ -585,6 +585,11 @@ msgstr "استخدام الاقتراح"
 msgid "{0} Manager"
 msgstr "{0} مدير"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+#~ msgid " Published on the web: Anyone with the link can view it, and the list "
+#~ "above controls editing only."
+#~ msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
 msgstr "تحتوي الورقة على صف رأس"
@@ -1118,6 +1123,10 @@ msgstr "مرحبًا بعودتك"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published to "
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "All columns"
@@ -3456,6 +3465,10 @@ msgstr "حذف مساحة العمل"
 msgid "Latitude column"
 msgstr "عمود خط العرض"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Not published yet."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
 msgstr "اختر لوحة تحكم، أو أنشئ واحدة جديدة."
@@ -4350,6 +4363,11 @@ msgstr "تاريخ"
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "هذه اللوحة لا تشير إلى أي مجموعات بيانات: لا يوجد شيء لنشره."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published on the web: anyone with the link can view it, and the list "
+"above controls editing only."
+msgstr ""
 
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
