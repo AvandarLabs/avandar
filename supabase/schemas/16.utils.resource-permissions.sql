@@ -890,9 +890,23 @@ $$;
  * The authorization check prevents callers from using this helper to probe or
  * mutate dashboards they cannot edit.
  *
+ * The bucket is the discriminator for the extra admin requirement because the
+ * bucket, not the claim, is what decides who can read the bytes.
+ * `private.dashboards__enforce_publish_publicly` guards the DECISION to expose
+ * a dashboard to the open internet; this guards the CONTENT that decision
+ * publishes. Without the bucket check an editor could overwrite the objects of
+ * an admin's open public claim, and the admin would then settle a transition
+ * over data no admin ever approved. `published-private` stays editor-tier
+ * because publishing internally is ordinary editor work.
+ *
+ * The admin bar is `util__auth_user_meets_min_app_role`, the same predicate the
+ * transition trigger uses, so the two gates agree; in particular both treat the
+ * workspace owner as an admin.
+ *
  * @param p_bucket_id The `storage.objects.bucket_id` value.
  * @param p_object_name The exact `storage.objects.name` value.
- * @returns True only for an editor, the active staged revision, and its bucket.
+ * @returns True only for an editor, the active staged revision, and its bucket,
+ *   and additionally only for a dashboards admin when the bucket is public.
  */
 create or replace function private.util__auth_user_can_write_dashboard_snapshot_object (
   p_bucket_id text,
@@ -907,6 +921,14 @@ begin
     public.util__auth_user_can_update_resource (
       'dashboard'::public.resource_type,
       dashboards.id
+    ) and
+    (
+      p_bucket_id <> 'published' or
+      public.util__auth_user_meets_min_app_role (
+        dashboards.workspace_id,
+        'dashboards'::public.app_type,
+        'admin'::public.role_level
+      )
     ) and
     dashboards.snapshot_transition_kind = 'publish' and
     dashboards.snapshot_transition_revision =
@@ -953,6 +975,13 @@ execute on function private.util__auth_user_can_write_dashboard_snapshot_object 
  * @param p_object_name The exact `storage.objects.name` value.
  * Delete transitions require admin access. Other cleanup paths require editor
  * access because editors may unpublish or abort their own publication attempt.
+ *
+ * Deliberately NOT mirrored from
+ * `util__auth_user_can_write_dashboard_snapshot_object`: the bucket is not a
+ * discriminator here. Writing into `published` CREATES exposure, so it takes
+ * the dashboards admin bar; deleting from it REMOVES exposure. Requiring admin
+ * to delete would only strand staged bytes in the world-readable bucket
+ * whenever the editor who uploaded them cannot clean them up.
  *
  * @returns True only with the required role and matching durable cleanup claim.
  */

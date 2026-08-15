@@ -4,14 +4,15 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(24);
+select plan(26);
 
 insert into auth.users (id, email, aud, role)
 values
   ('e3000001-0000-4000-8000-000000000001'::uuid, 'e3_reader@test.dev', 'authenticated', 'authenticated'),
   ('e3000002-0000-4000-8000-000000000002'::uuid, 'e3_other_owner@test.dev', 'authenticated', 'authenticated'),
   ('e3000003-0000-4000-8000-000000000003'::uuid, 'e3_editor@test.dev', 'authenticated', 'authenticated'),
-  ('e3000004-0000-4000-8000-000000000004'::uuid, 'e3_viewer@test.dev', 'authenticated', 'authenticated');
+  ('e3000004-0000-4000-8000-000000000004'::uuid, 'e3_viewer@test.dev', 'authenticated', 'authenticated'),
+  ('e3000005-0000-4000-8000-000000000005'::uuid, 'e3_admin@test.dev', 'authenticated', 'authenticated');
 
 insert into public.workspaces (id, owner_id, name, slug)
 values
@@ -27,6 +28,32 @@ values
     'E3 other workspace',
     'e3-other-workspace'
   );
+
+-- The public bucket holds bytes the open internet can read, so writing into it
+-- is an admin-tier act. `e3 admins` is what makes e3000005 a Dashboards admin
+-- without any share on the dashboard.
+insert into public.role_groups (id, workspace_id, name, is_builtin)
+values (
+  'e300cf01-0000-4000-8000-000000000001'::uuid,
+  'e3001001-0000-4000-8000-000000000001'::uuid,
+  'e3 admins',
+  false
+);
+
+insert into public.role_group_app_roles (role_group_id, app, role)
+values (
+  'e300cf01-0000-4000-8000-000000000001'::uuid,
+  'dashboards'::public.app_type,
+  'admin'::public.role_level
+);
+
+insert into public.workspace_memberships (id, workspace_id, user_id, role_group_id)
+values (
+  'e3002005-0000-4000-8000-000000000005'::uuid,
+  'e3001001-0000-4000-8000-000000000001'::uuid,
+  'e3000005-0000-4000-8000-000000000005'::uuid,
+  'e300cf01-0000-4000-8000-000000000001'::uuid
+);
 
 insert into public.workspace_memberships (id, workspace_id, user_id)
 values
@@ -127,6 +154,18 @@ values
     'user'::public.share_principal_type,
     'e3000004-0000-4000-8000-000000000004'::uuid,
     'viewer'::public.role_level
+  ),
+  -- The admin carries the SAME editor share as e3000003, so the only thing
+  -- separating them below is the dashboards admin app role. The share is also
+  -- what lets an UPDATE ... RETURNING see its own row: dashboard SELECT RLS
+  -- hides another member's unshared workspace dashboard even from an admin.
+  (
+    'dashboard'::public.resource_type,
+    'e3004001-0000-4000-8000-000000000001'::uuid,
+    'e3001001-0000-4000-8000-000000000001'::uuid,
+    'user'::public.share_principal_type,
+    'e3000005-0000-4000-8000-000000000005'::uuid,
+    'editor'::public.role_level
   );
 
 insert into storage.buckets (id, name, public)
@@ -336,14 +375,33 @@ select is(
   'an editor cannot list a prior revision as though it were staged'
 );
 
+-- The transition trigger gates the DECISION to expose a dashboard publicly.
+-- These two assertions gate the CONTENT: without them an editor could overwrite
+-- the bytes of a claim an admin opened, and the admin would settle the
+-- transition over data no admin ever approved.
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name)
+    values (
+      'published',
+      'dashboards/e3004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/e3007010-0000-4000-8000-000000000010.parquet'
+    )$$,
+  '42501',
+  'new row violates row-level security policy for table "objects"',
+  'an editor cannot insert a staged object into the world-readable bucket'
+);
+
+set local "request.jwt.claims" to '{"sub":"e3000005-0000-4000-8000-000000000005"}';
+
 select lives_ok(
   $$insert into storage.objects (bucket_id, name)
     values (
       'published',
       'dashboards/e3004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/e3007010-0000-4000-8000-000000000010.parquet'
     )$$,
-  'an editor can insert a staged object'
+  'a dashboards admin can insert a staged object into the world-readable bucket'
 );
+
+set local "request.jwt.claims" to '{"sub":"e3000003-0000-4000-8000-000000000003"}';
 
 select is(
   (
@@ -356,6 +414,20 @@ select is(
   'an editor can read only the exact active staged revision'
 );
 
+-- An overwrite reaches the open internet exactly as an insert does, so UPDATE
+-- carries the same admin requirement.
+select results_eq(
+  $$update storage.objects
+    set metadata = '{"retry":"updated"}'::jsonb
+    where bucket_id = 'published'
+      and name = 'dashboards/e3004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/e3007010-0000-4000-8000-000000000010.parquet'
+    returning name$$,
+  array[]::text[],
+  'an editor cannot update a staged object in the world-readable bucket'
+);
+
+set local "request.jwt.claims" to '{"sub":"e3000005-0000-4000-8000-000000000005"}';
+
 select results_eq(
   $$update storage.objects
     set metadata = '{"retry":"updated"}'::jsonb
@@ -365,8 +437,10 @@ select results_eq(
   array[
     'dashboards/e3004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/e3007010-0000-4000-8000-000000000010.parquet'
   ]::text[],
-  'an editor can update a staged object for retry-compatible upsert semantics'
+  'a dashboards admin can update a staged object for retry-compatible upsert semantics'
 );
+
+set local "request.jwt.claims" to '{"sub":"e3000003-0000-4000-8000-000000000003"}';
 
 select set_config('storage.allow_delete_query', 'true', true);
 

@@ -469,13 +469,20 @@ select is(
   'an editor cannot select a staged generation from the non-target bucket'
 );
 
+-- Writing into the world-readable bucket takes the dashboards admin role (see
+-- `private.util__auth_user_can_write_dashboard_snapshot_object`), so the staged
+-- public generation is exercised as the workspace owner. What is under test
+-- here is the generation and bucket matching, not the role bar, which
+-- dashboards/storage_published_visibility_guard.test.sql pins.
+set local "request.jwt.claims" to '{"sub":"f4000001-0000-4000-8000-000000000001"}';
+
 select lives_ok(
   $$insert into storage.objects (bucket_id, name)
     values (
       'published',
       'dashboards/f4004004-0000-4000-8000-000000000004/revisions/dddddddd-dddd-4ddd-8ddd-ddddddddddd4/datasets/f4007010-0000-4000-8000-000000000010.parquet'
     )$$,
-  'an editor can insert a staged generation in the public bucket'
+  'a dashboards admin can insert a staged generation in the public bucket'
 );
 
 select throws_ok(
@@ -497,7 +504,7 @@ select results_eq(
   array[
     'dashboards/f4004004-0000-4000-8000-000000000004/revisions/dddddddd-dddd-4ddd-8ddd-ddddddddddd4/datasets/f4007010-0000-4000-8000-000000000010.parquet'
   ]::text[],
-  'an editor can update a staged generation in the public bucket'
+  'a dashboards admin can update a staged generation in the public bucket'
 );
 
 select results_eq(
@@ -508,6 +515,8 @@ select results_eq(
   array[]::text[],
   'a public publish claim cannot update the private bucket'
 );
+
+set local "request.jwt.claims" to '{"sub":"f4000002-0000-4000-8000-000000000002"}';
 
 select set_config('storage.allow_delete_query', 'true', true);
 

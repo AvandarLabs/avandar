@@ -11,7 +11,7 @@ set search_path to extensions, public;
 -- access rules apply. It returns null rather than raising on a path it does not
 -- recognise, so a malformed name is a policy DENIAL instead of a storage error.
 --
-select plan(56);
+select plan(59);
 
 select is(
   public.util__storage_object_dashboard_id (
@@ -606,7 +606,7 @@ select results_eq(
   'an unshared member cannot update a published object'
 );
 
--- A non-owner editor can INSERT, UPDATE, and DELETE in both buckets --------
+-- A non-owner editor can INSERT and UPDATE in the private bucket -----------
 
 select set_config(
   'request.jwt.claims',
@@ -644,13 +644,50 @@ select results_eq(
   'active publish denies an editor deleting its staged private object'
 );
 
+-- ...but the world-readable bucket is admin-only ---------------------------
+--
+-- The transition trigger already gates the DECISION to expose a dashboard
+-- publicly. These assertions gate the CONTENT: an editor holding only an editor
+-- share must not be able to fill an admin's open public claim with its own
+-- bytes.
+
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name)
+    values (
+      'published',
+      'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007022-0000-4000-8000-000000000022.parquet'
+    )$$,
+  '42501',
+  'new row violates row-level security policy for table "objects"',
+  'a non-owner editor cannot insert a published object'
+);
+
+select results_eq(
+  $$update storage.objects
+    set metadata = '{"attempted_by":"editor"}'::jsonb
+    where bucket_id = 'published'
+      and name = 'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'
+    returning name$$,
+  array[]::text[],
+  'a non-owner editor cannot update a published object'
+);
+
+-- The workspace owner clears the dashboards admin bar, so the same two writes
+-- succeed for it and leave the staged object the later sections operate on.
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"d2000001-0000-4000-8000-000000000001"}',
+  true
+);
+
 select lives_ok(
   $$insert into storage.objects (bucket_id, name)
     values (
       'published',
       'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007022-0000-4000-8000-000000000022.parquet'
     )$$,
-  'a non-owner editor can insert a published object'
+  'a dashboards admin can insert a published object'
 );
 
 select results_eq(
@@ -662,7 +699,13 @@ select results_eq(
   array[
     'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007023-0000-4000-8000-000000000023.parquet'
   ]::text[],
-  'a non-owner editor can update a published object'
+  'a dashboards admin can update a published object'
+);
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"d2000004-0000-4000-8000-000000000004"}',
+  true
 );
 
 select results_eq(
@@ -754,22 +797,32 @@ select throws_ok(
 
 select throws_ok(
   $$update storage.objects
-    set name = 'dashboards/d2004002-0000-4000-8000-000000000002/revisions/11111111-1111-4111-8111-111111111111/datasets/d2007031-0000-4000-8000-000000000031.parquet'
-    where bucket_id = 'published'
-      and name = 'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'$$,
-  '42501',
-  'new row violates row-level security policy for table "objects"',
-  'a public object cannot be moved to a dashboard the editor cannot update'
-);
-
-select throws_ok(
-  $$update storage.objects
     set name = 'dashboards/d2004003-0000-4000-8000-000000000003/revisions/11111111-1111-4111-8111-111111111111/datasets/d2007032-0000-4000-8000-000000000032.parquet'
     where bucket_id = 'published-private'
       and name = 'dashboards/d2004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007026-0000-4000-8000-000000000026.parquet'$$,
   '42501',
   'new row violates row-level security policy for table "objects"',
   'a private object cannot be moved into another workspace'
+);
+
+-- The public-bucket halves run as the workspace owner. An editor no longer
+-- passes the USING half on `published` at all, so its move would silently match
+-- zero rows and prove nothing about WITH CHECK.
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"d2000001-0000-4000-8000-000000000001"}',
+  true
+);
+
+select throws_ok(
+  $$update storage.objects
+    set name = 'dashboards/d2004002-0000-4000-8000-000000000002/revisions/11111111-1111-4111-8111-111111111111/datasets/d2007031-0000-4000-8000-000000000031.parquet'
+    where bucket_id = 'published'
+      and name = 'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'$$,
+  '42501',
+  'new row violates row-level security policy for table "objects"',
+  'a public object cannot be moved to a dashboard its writer cannot update'
 );
 
 select throws_ok(
@@ -1104,6 +1157,29 @@ select results_eq(
     'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007023-0000-4000-8000-000000000023.parquet'
   ]::text[],
   'an abort claim can delete its exact staged public object'
+);
+
+-- DELETE stays editor-tier on BOTH buckets, deliberately. Writing to the
+-- world-readable bucket creates exposure and so takes the admin bar; removing
+-- from it retracts exposure, and aborting one's own failed publish is ordinary
+-- editor work. Raising this bar would strand staged bytes in the public bucket
+-- whenever the editor who uploaded them is not an admin.
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"d2000004-0000-4000-8000-000000000004"}',
+  true
+);
+
+select results_eq(
+  $$delete from storage.objects
+    where bucket_id = 'published'
+      and name = 'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'
+    returning name$$,
+  array[
+    'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'
+  ]::text[],
+  'an editor without the dashboards admin role can abort its own public staging'
 );
 
 -- Delete cleanup requires admin authority, even with an editor share --------
