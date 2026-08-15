@@ -2698,7 +2698,7 @@ msgstr "Nenhum plano disponível."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
-msgstr ""
+msgstr "Tente uma pesquisa diferente"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -3075,7 +3075,8 @@ msgstr "Rotação dos rótulos do eixo X"
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
-msgstr ""
+msgstr "[A pesquisa de descoberta local falhou. Tente outra coluna ou consulta "
+"de pesquisa sem me pedir para selecionar no catálogo que falhou.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3457,7 +3458,7 @@ msgstr "Espaço de trabalho criado com sucesso!"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Retry lookup"
-msgstr ""
+msgstr "Tentar novamente a pesquisa"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -4116,10 +4117,6 @@ msgstr "Partes deste SQL não puderam ser representadas na forma Manual. A forma
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Por favor, tente novamente. Seu painel não foi publicado."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-#~ msgid "Looking up values in {column}…"
-#~ msgstr "Buscando valores em {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4681,7 +4678,7 @@ msgstr "Este conjunto de dados é apenas offline. Clique para permitir "
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
 msgid "Checking your data…"
-msgstr ""
+msgstr "Verificando seus dados…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5609,10 +5606,6 @@ msgstr "Fechar painel (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "URL da imagem"
-
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
-#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
-#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"

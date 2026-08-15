@@ -2695,7 +2695,7 @@ msgstr "Hakuna mipango inapatikana."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
-msgstr ""
+msgstr "Jaribu utafutaji tofauti"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -3070,7 +3070,9 @@ msgstr "Mzunguko wa lebo ya mhimili wa X"
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
-msgstr ""
+msgstr "[Utafutaji wa ugunduzi wa ndani umeshindikana. Jaribu safu wima tofauti "
+"au hoja ya utafutaji bila kuniomba nichague kwenye katalogi "
+"iliyoshindwa.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3453,7 +3455,7 @@ msgstr "Ofisi imeundwa kwa mafanikio!"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Retry lookup"
-msgstr ""
+msgstr "Jaribu tena utafutaji"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -4108,10 +4110,6 @@ msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-#~ msgid "Looking up values in {column}…"
-#~ msgstr "Inatafuta thamani katika {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4671,7 +4669,7 @@ msgstr "Seti hii ya data ni ya mtandaoni pekee. Bonyeza kuruhusu usawazishaji "
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
 msgid "Checking your data…"
-msgstr ""
+msgstr "Inaangalia data yako…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5597,10 +5595,6 @@ msgstr "Funga paneli (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "URL ya picha"
-
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
-#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
-#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"

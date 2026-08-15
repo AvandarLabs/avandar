@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
-import css from "./DiscoveryStateBody.module.css";
 import { DiscoveryUnavailableBody } from "../../DiscoveryUnavailableBody/DiscoveryUnavailableBody";
 import { FixedOptionsBody } from "../../FixedOptionsBody";
 import { DiscoveryLoadingBody } from "../DiscoveryLoadingBody";
+import css from "./DiscoveryStateBody.module.css";
 import type {
   ClarificationAnswerHandler,
   ClarificationSubmitAnswer,

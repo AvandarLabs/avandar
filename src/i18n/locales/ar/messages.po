@@ -2658,7 +2658,7 @@ msgstr "لا توجد خطط متاحة."
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
-msgstr ""
+msgstr "جرّب بحثًا مختلفًا"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -3031,7 +3031,8 @@ msgstr "تدوير تسمية المحور X"
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
-msgstr ""
+msgstr "[فشل البحث في الاكتشاف المحلي. جرّب عمودًا مختلفًا أو استعلام بحث دون "
+"أن تطلب مني الاختيار من الكتالوج الذي تعذّر الوصول إليه.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3406,7 +3407,7 @@ msgstr "تم إنشاء مساحة العمل بنجاح!"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Retry lookup"
-msgstr ""
+msgstr "إعادة محاولة البحث"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -4055,10 +4056,6 @@ msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج 
 msgid "Please try again. Your dashboard has not been published."
 msgstr "يرجى المحاولة مرة أخرى. لم يتم نشر لوحة التحكم الخاصة بك."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-#~ msgid "Looking up values in {column}…"
-#~ msgstr "جارٍ البحث عن القيم في {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4610,7 +4607,7 @@ msgstr "هذه مجموعة البيانات متاحة فقط عند عدم ا�
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
 msgid "Checking your data…"
-msgstr ""
+msgstr "جارٍ التحقق من بياناتك…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5527,10 +5524,6 @@ msgstr "إغلاق اللوحة (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "عنوان URL للصورة"
-
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
-#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
-#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"

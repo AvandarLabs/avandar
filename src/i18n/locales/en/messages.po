@@ -4067,10 +4067,6 @@ msgstr "Parts of this SQL could not be represented in the Manual form. The form 
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Please try again. Your dashboard has not been published."
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-#~ msgid "Looking up values in {column}…"
-#~ msgstr "Looking up values in {column}…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -5544,10 +5540,6 @@ msgstr "Close panel (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "Image URL"
-
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
-#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
-#~ msgstr "Looking up values in {column} (attempt {attempt} of 3)…"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"

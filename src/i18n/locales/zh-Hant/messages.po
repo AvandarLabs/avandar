@@ -2593,7 +2593,7 @@ msgstr "沒有可用的計劃。"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
-msgstr ""
+msgstr "嘗試其他查詢"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -2959,7 +2959,7 @@ msgstr "X 軸標籤旋轉"
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
-msgstr ""
+msgstr "[本機探索查詢失敗。請嘗試其他欄位或查詢語句，不要要求我從失敗的目錄中選取。]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline model download failed"
@@ -3327,7 +3327,7 @@ msgstr "工作區成功建立！"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Retry lookup"
-msgstr ""
+msgstr "重試查詢"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
@@ -3967,10 +3967,6 @@ msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努�
 msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx
-#~ msgid "Looking up values in {column}…"
-#~ msgstr "正在查找 {column} 中的值…"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4513,7 +4509,7 @@ msgstr "此資料集僅限離線使用。點擊以允許在線同步。"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
 msgid "Checking your data…"
-msgstr ""
+msgstr "正在檢查您的資料…"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -5412,10 +5408,6 @@ msgstr "關閉面板 (⌘/)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
 msgstr "圖片 URL"
-
-#: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
-#~ msgid "Looking up values in {column} (attempt {attempt} of 3)…"
-#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "New owner"
