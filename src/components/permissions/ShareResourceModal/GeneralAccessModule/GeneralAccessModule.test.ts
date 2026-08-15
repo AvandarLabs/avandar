@@ -10,6 +10,7 @@ const LABELS = {
   private: "Only me",
   restricted: "Restricted",
   workspace: "Anyone in Dashboards",
+  public: "Anyone with the link",
 } as const;
 
 function _buildShare(
@@ -123,6 +124,8 @@ describe("GeneralAccess.toOptions", () => {
     const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: true,
       labels: LABELS,
+      isPublicOptionAvailable: true,
+      isPublicOptionDisabled: false,
     });
     expect(options.map(prop("value"))).toEqual(GeneralAccessModule.values);
   });
@@ -131,6 +134,8 @@ describe("GeneralAccess.toOptions", () => {
     const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: true,
       labels: LABELS,
+      isPublicOptionAvailable: false,
+      isPublicOptionDisabled: false,
     });
     expect(options[0]?.disabled).toBe(false);
   });
@@ -139,6 +144,8 @@ describe("GeneralAccess.toOptions", () => {
     const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: false,
       labels: LABELS,
+      isPublicOptionAvailable: false,
+      isPublicOptionDisabled: false,
     });
     expect(options[0]?.disabled).toBe(true);
   });
@@ -147,6 +154,8 @@ describe("GeneralAccess.toOptions", () => {
     const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
       isOwner: false,
       labels: LABELS,
+      isPublicOptionAvailable: false,
+      isPublicOptionDisabled: false,
     });
     expect(options[1]?.disabled).toBe(false);
     expect(options[2]?.disabled).toBe(false);
@@ -162,5 +171,69 @@ describe("GeneralAccess.isValid", () => {
 
   it("rejects unsupported values", () => {
     expect(GeneralAccessModule.isValidAccessValue("organization")).toBe(false);
+  });
+});
+
+describe("fromResourceState", () => {
+  const ownerId = "user-1";
+  const restrictedNoShares = {
+    isRestricted: true,
+    shares: [],
+    ownerId,
+  };
+
+  it("returns public when the resource is published publicly, whatever the shares say", () => {
+    expect(
+      GeneralAccessModule.fromResourceState({
+        ...restrictedNoShares,
+        isPubliclyPublished: true,
+      }),
+    ).toBe("public");
+  });
+
+  it("falls back to the share-derived value when it is not published publicly", () => {
+    expect(
+      GeneralAccessModule.fromResourceState({
+        ...restrictedNoShares,
+        isPubliclyPublished: false,
+      }),
+    ).toBe("private");
+  });
+});
+
+describe("makeDropdownOptionsFromLabels", () => {
+  const labels = {
+    private: "Only me",
+    restricted: "Restricted",
+    workspace: "Anyone in Dashboards",
+    public: "Anyone with the link",
+  };
+
+  it("omits the public option when the resource has no published form", () => {
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
+      isOwner: true,
+      labels,
+      isPublicOptionAvailable: false,
+      isPublicOptionDisabled: false,
+    });
+    expect(
+      options.map((option) => {
+        return option.value;
+      }),
+    ).toEqual(["private", "restricted", "workspace"]);
+  });
+
+  it("renders the public option disabled when the caller cannot publish publicly", () => {
+    const options = GeneralAccessModule.makeDropdownOptionsFromLabels({
+      isOwner: true,
+      labels,
+      isPublicOptionAvailable: true,
+      isPublicOptionDisabled: true,
+    });
+    expect(options.at(-1)).toEqual({
+      value: "public",
+      label: "Anyone with the link",
+      disabled: true,
+    });
   });
 });

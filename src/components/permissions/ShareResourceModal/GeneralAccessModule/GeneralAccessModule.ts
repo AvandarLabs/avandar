@@ -1,6 +1,11 @@
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 
-const _GENERAL_ACCESS_VALUES = ["private", "restricted", "workspace"] as const;
+const _GENERAL_ACCESS_VALUES = [
+  "private",
+  "restricted",
+  "workspace",
+  "public",
+] as const;
 
 /** A value available in the General access dropdown. */
 export type GeneralAccessValue = (typeof _GENERAL_ACCESS_VALUES)[number];
@@ -37,10 +42,42 @@ function _getGeneralAccessValueFromShareState(
   return options.isRestricted ? restrictedValue : "workspace";
 }
 
+/**
+ * Resolves the value the dropdown shows for a resource that may also have a
+ * published form.
+ *
+ * A publicly published resource displays "Anyone with the link" no matter what
+ * its share rows say, because public reads never consult `resource_shares`:
+ * the anon policy and the `is_public` short-circuit in
+ * `util__auth_user_may_select_dashboard` both fire first. Showing the derived
+ * share value here would tell an owner their dashboard is Restricted while the
+ * whole internet can read it.
+ *
+ * `isPubliclyPublished` is a boolean rather than a visibility so this module
+ * stays resource-generic; datasets have no published form and pass `false`.
+ */
+function _getGeneralAccessValueFromResourceState(
+  options: Readonly<{
+    isRestricted: boolean;
+    shares: readonly ResourceShareRow[];
+    ownerId: string;
+    isPubliclyPublished: boolean;
+  }>,
+): GeneralAccessValue {
+  if (options.isPubliclyPublished) {
+    return "public";
+  }
+  return _getGeneralAccessValueFromShareState(options);
+}
+
 function _makeDropdownOptionsFromLabels(
   options: Readonly<{
     isOwner: boolean;
     labels: Record<GeneralAccessValue, string>;
+    /** False for every resource type with no published form. */
+    isPublicOptionAvailable: boolean;
+    /** True when the caller may not publish publicly. */
+    isPublicOptionDisabled: boolean;
   }>,
 ): Array<{
   value: GeneralAccessValue;
@@ -55,6 +92,15 @@ function _makeDropdownOptionsFromLabels(
     },
     { value: "restricted", label: options.labels.restricted, disabled: false },
     { value: "workspace", label: options.labels.workspace, disabled: false },
+    ...(options.isPublicOptionAvailable ?
+      [
+        {
+          value: "public" as const,
+          label: options.labels.public,
+          disabled: options.isPublicOptionDisabled,
+        },
+      ]
+    : []),
   ];
 }
 
@@ -77,6 +123,9 @@ export const GeneralAccessModule = {
 
   /** Maps persisted sharing state to its General access value. */
   fromShareState: _getGeneralAccessValueFromShareState,
+
+  /** Maps sharing state plus publication state to its General access value. */
+  fromResourceState: _getGeneralAccessValueFromResourceState,
 
   /** Maps localized labels to dropdown options. */
   makeDropdownOptionsFromLabels: _makeDropdownOptionsFromLabels,
