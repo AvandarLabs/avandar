@@ -138,10 +138,12 @@ function _readPragma(db: AvaSqliteDatabase, name: string): unknown {
   return Object.values(row)[0];
 }
 
-function _readGeneratedColumnNames(options: Readonly<{
-  db: AvaSqliteDatabase;
-  table: string;
-}>): Set<string> {
+function _readGeneratedColumnNames(
+  options: Readonly<{
+    db: AvaSqliteDatabase;
+    table: string;
+  }>,
+): Set<string> {
   const { db, table } = options;
   const columns = db
     .query<

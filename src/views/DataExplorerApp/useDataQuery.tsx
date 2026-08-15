@@ -29,22 +29,28 @@ function _getStructuredQueryAuth(
   options: Readonly<UseDataQueryOptions>,
 ): StructuredQueryAuth {
   return match(options)
-    .with({ auth: "workspace" }, ({ workspaceId }) => {return {
-      auth: "workspace" as const,
-      workspaceId,
-    }})
-    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) => {return {
-      auth: "public" as const,
-      publicAvaPageId,
-      snapshotRevision,
-    }})
-    .with(
-      { auth: "workspace_published" },
-      ({ publicAvaPageId, snapshotRevision }) => {return {
-        auth: "workspace_published" as const,
+    .with({ auth: "workspace" }, ({ workspaceId }) => {
+      return {
+        auth: "workspace" as const,
+        workspaceId,
+      };
+    })
+    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) => {
+      return {
+        auth: "public" as const,
         publicAvaPageId,
         snapshotRevision,
-      }},
+      };
+    })
+    .with(
+      { auth: "workspace_published" },
+      ({ publicAvaPageId, snapshotRevision }) => {
+        return {
+          auth: "workspace_published" as const,
+          publicAvaPageId,
+          snapshotRevision,
+        };
+      },
     )
     .exhaustive();
 }
@@ -53,26 +59,27 @@ async function _runDataQuery(
   options: Readonly<RunDataQueryOptions>,
 ): Promise<QueryResult.T<UnknownRow>> {
   return match(options.auth)
-    .with({ auth: "workspace" }, ({ workspaceId }) =>
-      {return runStructuredQuery({ ...options, auth: "workspace", workspaceId })},
-    )
-    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) =>
-      {return runStructuredQuery({
+    .with({ auth: "workspace" }, ({ workspaceId }) => {
+      return runStructuredQuery({ ...options, auth: "workspace", workspaceId });
+    })
+    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) => {
+      return runStructuredQuery({
         ...options,
         auth: "public",
         publicAvaPageId,
         snapshotRevision,
-      })},
-    )
+      });
+    })
     .with(
       { auth: "workspace_published" },
-      ({ publicAvaPageId, snapshotRevision }) =>
-        {return runStructuredQuery({
+      ({ publicAvaPageId, snapshotRevision }) => {
+        return runStructuredQuery({
           ...options,
           auth: "workspace_published",
           publicAvaPageId,
           snapshotRevision,
-        })},
+        });
+      },
     )
     .exhaustive();
 }
@@ -112,12 +119,13 @@ export function useDataQuery(
       "structuredInSync",
       isStructuredQueryInSync,
     ],
-    queryFn: () =>
-      {return _runDataQuery({
+    queryFn: () => {
+      return _runDataQuery({
         auth: queryAuth,
         query,
         rawSql,
         isStructuredQueryInSync,
-      })},
+      });
+    },
   });
 }

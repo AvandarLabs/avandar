@@ -1,3 +1,5 @@
+-- Verify published dashboards receive the legacy revision while draft
+-- dashboards remain without a snapshot revision.
 do $$
 declare
   legacy_revision constant uuid :=

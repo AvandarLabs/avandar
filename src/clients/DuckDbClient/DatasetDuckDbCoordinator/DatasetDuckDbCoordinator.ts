@@ -26,10 +26,12 @@ const loadedSnapshotOwnerByDatasetId = new Map<
 const invalidDatasetTableIds = new Set<Dataset.Id>();
 const operationCompletionByDatasetId = new Map<string, Promise<void>>();
 
-function _isSameOwner(options: Readonly<{
-  leftOwner: PublicSnapshotDuckDbOwner | undefined;
-  rightOwner: PublicSnapshotDuckDbOwner;
-}>): boolean {
+function _isSameOwner(
+  options: Readonly<{
+    leftOwner: PublicSnapshotDuckDbOwner | undefined;
+    rightOwner: PublicSnapshotDuckDbOwner;
+  }>,
+): boolean {
   const { leftOwner, rightOwner } = options;
   return (
     leftOwner?.bucket === rightOwner.bucket &&
@@ -38,10 +40,12 @@ function _isSameOwner(options: Readonly<{
   );
 }
 
-function _hasLeaseForDatasetIds(options: Readonly<{
-  lease: DatasetDuckDbLease;
-  datasetIds: readonly string[];
-}>): boolean {
+function _hasLeaseForDatasetIds(
+  options: Readonly<{
+    lease: DatasetDuckDbLease;
+    datasetIds: readonly string[];
+  }>,
+): boolean {
   const { lease, datasetIds } = options;
   return datasetIds.every((datasetId) => {
     return lease.datasetIds.has(datasetId);
@@ -56,10 +60,12 @@ function _createLease(datasetIds: readonly string[]): DatasetDuckDbLease {
 }
 
 /** Returns whether a dataset's bare table belongs to the given snapshot. */
-function _isPublicSnapshotDatasetOwner(options: Readonly<{
-  datasetId: Dataset.Id;
-  owner: PublicSnapshotDuckDbOwner;
-}>): boolean {
+function _isPublicSnapshotDatasetOwner(
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    owner: PublicSnapshotDuckDbOwner;
+  }>,
+): boolean {
   if (invalidDatasetTableIds.has(options.datasetId)) {
     return false;
   }
@@ -78,10 +84,12 @@ function _hasPublicSnapshotDatasetOwner(datasetId: Dataset.Id): boolean {
 }
 
 /** Records which published snapshot owns a dataset's bare DuckDB table. */
-function _setPublicSnapshotDatasetOwner(options: Readonly<{
-  datasetId: Dataset.Id;
-  owner: PublicSnapshotDuckDbOwner;
-}>): void {
+function _setPublicSnapshotDatasetOwner(
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    owner: PublicSnapshotDuckDbOwner;
+  }>,
+): void {
   invalidDatasetTableIds.delete(options.datasetId);
   loadedSnapshotOwnerByDatasetId.set(options.datasetId, options.owner);
 }
@@ -124,10 +132,12 @@ function _assertWorkspaceDatasetTables(datasetIds: readonly string[]): void {
 }
 
 /** Rejects a query when a referenced table belongs to another snapshot. */
-function _assertPublicSnapshotDatasetOwners(options: Readonly<{
-  datasetIds: readonly string[];
-  owner: PublicSnapshotDuckDbOwner;
-}>): void {
+function _assertPublicSnapshotDatasetOwners(
+  options: Readonly<{
+    datasetIds: readonly string[];
+    owner: PublicSnapshotDuckDbOwner;
+  }>,
+): void {
   const hasMismatchedOwner = options.datasetIds.some((datasetId) => {
     return !_isPublicSnapshotDatasetOwner({
       datasetId: datasetId as Dataset.Id,
@@ -143,11 +153,13 @@ function _assertPublicSnapshotDatasetOwners(options: Readonly<{
  * Runs an operation after prior work on the same dataset IDs has settled.
  * Unrelated dataset IDs use independent queues.
  */
-async function _runCoordinatedDatasetDuckDbOperation<Result>(options: Readonly<{
-  datasetIds: readonly string[];
-  lease?: DatasetDuckDbLease;
-  operation: (lease: DatasetDuckDbLease) => Promise<Result>;
-}>): Promise<Result> {
+async function _runCoordinatedDatasetDuckDbOperation<Result>(
+  options: Readonly<{
+    datasetIds: readonly string[];
+    lease?: DatasetDuckDbLease;
+    operation: (lease: DatasetDuckDbLease) => Promise<Result>;
+  }>,
+): Promise<Result> {
   const datasetIds = Array.from(new Set(options.datasetIds)).sort();
   if (options.lease) {
     if (

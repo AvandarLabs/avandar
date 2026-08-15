@@ -77,9 +77,7 @@ type LoaderArgs = {
 };
 type DashboardRouteLoader = (
   args: LoaderArgs,
-) => Promise<
-  Extract<DashboardRouteOutcome, { kind: "render" | "denied" }>
->;
+) => Promise<Extract<DashboardRouteOutcome, { kind: "render" | "denied" }>>;
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const WORKSPACE_ID = "22222222-2222-4222-8222-222222222222" as Workspace.Id;

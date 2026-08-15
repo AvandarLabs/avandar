@@ -1,5 +1,5 @@
-\set ON_ERROR_STOP on
-
+-- Recreate the pre-migration dashboard shape with a boolean is_public column
+-- and representative public and draft rows.
 begin;
 
 drop table public.dashboards cascade;

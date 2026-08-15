@@ -1,3 +1,5 @@
+-- Verify visibility values survive the migration and is_public becomes a
+-- generated column derived from dashboard visibility.
 do $$
 declare
   public_visibility public.dashboard_visibility;

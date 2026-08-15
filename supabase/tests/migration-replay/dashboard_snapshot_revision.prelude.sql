@@ -1,5 +1,5 @@
-\set ON_ERROR_STOP on
-
+-- Recreate dashboards before snapshot_revision existed with public, workspace,
+-- and draft rows used to verify migration backfill behavior.
 begin;
 
 set search_path to extensions, public;
