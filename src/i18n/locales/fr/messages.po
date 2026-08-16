@@ -321,7 +321,9 @@ msgstr "Échec de la suppression"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
-msgstr ""
+msgstr "Votre forfait ne permet pas de partager ce tableau de bord avec "
+"d’autres personnes. Passez à un forfait supérieur ou cessez de partager "
+"un autre tableau de bord, puis réessayez."
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -347,7 +349,7 @@ msgstr "Sélectionner un champ"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Checking whether that custom URL is available."
-msgstr ""
+msgstr "Vérification de la disponibilité de cette URL personnalisée."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -414,11 +416,6 @@ msgstr "Modèle de chat hors ligne"
 msgid "Upload file"
 msgstr "Télécharger le fichier"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-#~ msgid "Manage sharing"
-#~ msgstr "Gérer le partage"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
 msgstr "Journal de confidentialité effacé."
@@ -445,7 +442,8 @@ msgstr "Très grand"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
 "track key metrics and insights."
-msgstr ""
+msgstr "Rien n’a encore été créé ni partagé avec vous. Créez un tableau de bord "
+"pour suivre les indicateurs clés et les insights."
 
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -534,7 +532,8 @@ msgstr "Correction de la requête…"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Only workspace admins can publish to the web."
-msgstr ""
+msgstr "Seuls les administrateurs de l’espace de travail peuvent publier sur le "
+"Web."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -615,17 +614,12 @@ msgstr "Utiliser la suggestion"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Unpublish"
-msgstr ""
+msgstr "Dépublier"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "{0} Manager"
 msgstr "{0} Gestionnaire"
-
-#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#~ msgid " Published on the web: Anyone with the link can view it, and the list "
-#~ "above controls editing only."
-#~ msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -790,7 +784,7 @@ msgstr "À partir du jeu de données dérivé"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Published to workspace"
-msgstr ""
+msgstr "Publié dans l’espace de travail"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
@@ -838,10 +832,6 @@ msgstr " permission"
 msgid "Discovery query failed."
 msgstr "Échec de la requête de découverte."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#~ msgid "Publish dashboard"
-#~ msgstr "Publier le tableau de bord"
-
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
 msgid "Container max width"
@@ -874,7 +864,7 @@ msgstr "Pipeline"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
-msgstr ""
+msgstr "Impossible de dépublier le tableau de bord"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -987,7 +977,7 @@ msgstr "Naturel"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Public"
-msgstr ""
+msgstr "Public"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -1036,7 +1026,8 @@ msgstr "Nouveau groupe de rôles"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "The published copy still serves the previous audience. Use the button "
 "below to apply your change."
-msgstr ""
+msgstr "La version publiée s’adresse toujours à l’audience précédente. Utilisez "
+"le bouton ci-dessous pour appliquer votre modification."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1192,7 +1183,7 @@ msgstr "Phi 3.5 Mini"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published to "
-msgstr ""
+msgstr " Publié dans "
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
@@ -1618,11 +1609,6 @@ msgstr "Allant de <0>{numericLow}</0> à <1>{numericHigh}</1>, avec une moyenne 
 msgid "No columns are available"
 msgstr "Aucune colonne n'est disponible"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "Your access change is saved, but the published copy still reflects the "
-#~ "previous audience. Use the button below to apply it."
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
 msgstr "Jeu de données sans titre"
@@ -1687,7 +1673,7 @@ msgstr "Suggestion utilisée"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
-msgstr ""
+msgstr "Corrigez l’URL personnalisée avant de publier."
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
@@ -1746,11 +1732,6 @@ msgstr "Empilé à 100 %"
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Impossible de trouver un jeu de données connu correspondant à "
 "« {tableName} »."
-
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
-#~ msgid "This dashboard will still be public: anyone with the link keeps access "
-#~ "until you unpublish it."
-#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -1824,7 +1805,10 @@ msgstr "Descendant"
 msgid "Stable for as long as this dashboard keeps its current audience, so QR "
 "codes printed from here keep working even if the custom URL changes. "
 "Changing between workspace and public changes this link."
-msgstr ""
+msgstr "Ce lien reste stable tant que ce tableau de bord conserve son audience "
+"actuelle. Ainsi, les codes QR imprimés depuis cet emplacement "
+"continuent de fonctionner même si l’URL personnalisée change. Passer de "
+"l’espace de travail au mode public, ou inversement, modifie ce lien."
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
@@ -1863,7 +1847,10 @@ msgstr "Échec de l'enregistrement du jeu de données : {0}"
 msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboard. Upgrade to our Starter or Impact plan to share as many "
 "dashboards as you like."
-msgstr ""
+msgstr "Votre espace de travail utilise le forfait Free, qui vous permet de "
+"partager ou de publier un tableau de bord. Passez à notre forfait "
+"Starter ou Impact pour partager autant de tableaux de bord que vous le "
+"souhaitez."
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
@@ -1922,7 +1909,7 @@ msgstr "Chaque série est une colonne numérique tracée sur l'axe Y. Les valeur
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
-msgstr ""
+msgstr "Tableau de bord dépublié."
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
@@ -2125,12 +2112,6 @@ msgstr "Une nouvelle version est disponible. Actualisez la page pour effectuer "
 msgid "You haven't chosen an X axis"
 msgstr "Vous n'avez pas choisi d'axe X"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-#~ "Avandar account required."
-#~ msgstr "La publication rend ce tableau de bord visible à toute personne "
-#~ "disposant du lien, sans qu’un compte Avandar soit requis."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "et est également égal à..."
@@ -2173,7 +2154,8 @@ msgstr "Océan"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Not published yet. Nobody can open this dashboard from a link until you "
 "publish it."
-msgstr ""
+msgstr "Pas encore publié. Personne ne peut ouvrir ce tableau de bord à partir "
+"d’un lien tant que vous ne l’avez pas publié."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -2215,11 +2197,6 @@ msgstr "{0} (~{1} Mo) sera supprimé de ce navigateur pour libérer de l'espace.
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
 msgstr "Aller à l'Explorateur de données"
-
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-#~ msgstr "Ce tableau de bord est <0>public</0>. Quiconque possède le lien "
-#~ "ci-dessous peut le consulter."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -2436,7 +2413,7 @@ msgstr "Aperçu des données"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
-msgstr ""
+msgstr "Aucun tableau de bord à afficher"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -2458,12 +2435,6 @@ msgstr "Marge intérieure"
 #: src/views/GisApp/basemap/MapStylePicker.tsx
 msgid "Theme"
 msgstr "Thème"
-
-#. placeholder {0}: subscription.maxShareableDashboardsAllowed
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-#~ "Contact us to raise the limit for your workspace."
-#~ msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -2523,7 +2494,8 @@ msgstr "Retour à l'éditeur"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Among signed-in people, only you will be able to open it. You can share "
 "it again at any time."
-msgstr ""
+msgstr "Parmi les personnes connectées, vous seul pourrez l’ouvrir. Vous pouvez "
+"le partager à nouveau à tout moment."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
@@ -2691,7 +2663,9 @@ msgstr "Invitation envoyée"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "{maxAllowed, plural, one {Your plan allows # shared or public "
 "dashboard.} other {Your plan allows # shared or public dashboards.}}"
-msgstr ""
+msgstr "{maxAllowed, plural, one {Votre forfait autorise # tableau de bord "
+"partagé ou public.} other {Votre forfait autorise # tableaux de bord "
+"partagés ou publics.}}"
 
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
@@ -2995,11 +2969,6 @@ msgstr "Certains jeux de données publiés n'ont pas pu être chargés. Veuillez
 msgid "First point"
 msgstr "Premier point"
 
-#. placeholder {0}: limit.maxAllowed
-#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
-#~ msgid "Your plan allows {0} shared or public dashboard(s)."
-#~ msgstr ""
-
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
 msgstr "moins d'une minute"
@@ -3010,7 +2979,8 @@ msgstr "Envoyer l'invitation"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL. The direct UUID link below also still works."
-msgstr ""
+msgstr "Utilisation de votre URL personnalisée. Le lien direct UUID ci-dessous "
+"fonctionne également toujours."
 
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -3038,11 +3008,6 @@ msgstr "Créer"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr "Épaisseur du contour"
-
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-#~ msgid "Create your first dashboard to track key metrics and insights."
-#~ msgstr "Créez votre premier tableau de bord pour suivre les indicateurs clés et "
-#~ "les insights."
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -3118,7 +3083,10 @@ msgstr "Retour"
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Contact us to raise the limit "
 "for your workspace."
-msgstr ""
+msgstr "Votre forfait actuel vous permet uniquement de partager ou de publier "
+"{maxAllowed, plural, one {# tableau de bord} other {# tableaux de "
+"bord}}. Contactez-nous pour augmenter la limite de votre espace de "
+"travail."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
@@ -3316,11 +3284,6 @@ msgstr "La clause WHERE compare « {columnName} » à une expression qui n’est
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
 msgstr "Ajouter à votre espace de travail"
-
-#. placeholder {0}: options.numRows.toLocaleString()
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-#~ msgid "Parsed {0} rows successfully"
-#~ msgstr "{0} lignes analysées avec succès"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
@@ -3524,7 +3487,7 @@ msgstr "Réessayer"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
-msgstr ""
+msgstr "Passer à un forfait supérieur"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
@@ -3648,12 +3611,15 @@ msgstr "Clarifications"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
 "access until you unpublish it."
-msgstr ""
+msgstr "\"{resourceName}\" restera public : toute personne disposant du lien "
+"conservera l’accès jusqu’à ce que vous le dépubliiez."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
 "it until you press the button below."
-msgstr ""
+msgstr "Ce tableau de bord est toujours public sur le Web. Toute personne "
+"disposant du lien peut le consulter jusqu’à ce que vous appuyiez sur le "
+"bouton ci-dessous."
 
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Entity deleted"
@@ -3678,7 +3644,7 @@ msgstr "Colonne de latitude"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
-msgstr ""
+msgstr " Pas encore publié."
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
@@ -3847,13 +3813,8 @@ msgstr "Propriétaire"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it, with "
 "no Avandar account."
-msgstr ""
-
-#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-#~ msgid "Never changes, so QR codes printed from here keep working even if the "
-#~ "custom URL changes."
-#~ msgstr "Ne change jamais, donc les codes QR imprimés d'ici continuent de "
-#~ "fonctionner même si l'URL personnalisée change."
+msgstr "Ce tableau de bord est <0>public</0>. Toute personne disposant du lien "
+"peut le consulter, sans compte Avandar."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -3948,11 +3909,15 @@ msgstr "Échec de la réattribution"
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
 "Impact plan to share as many dashboards as you like."
-msgstr ""
+msgstr "Votre forfait actuel vous permet uniquement de partager ou de publier "
+"{maxAllowed, plural, one {# tableau de bord} other {# tableaux de "
+"bord}}. Passez à notre forfait Starter ou Impact pour partager autant "
+"de tableaux de bord que vous le souhaitez."
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
-msgstr ""
+msgstr "Vous devez disposer d’un accès en modification à cette ressource pour "
+"la partager ou la publier."
 
 #: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
 msgid "Select symbol size column"
@@ -3985,7 +3950,9 @@ msgstr "Titre"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link can view this {resource}, with no Avandar account. "
 "People and groups below still control who can edit it."
-msgstr ""
+msgstr "Toute personne disposant du lien peut consulter cette ressource, sans "
+"compte Avandar. Les personnes et groupes ci-dessous contrôlent toujours "
+"les droits de modification."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
@@ -3993,7 +3960,7 @@ msgstr "Courbe"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Direct link (use for QR codes)"
-msgstr ""
+msgstr "Lien direct (à utiliser pour les codes QR)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -4050,11 +4017,12 @@ msgstr "Aucun jeu de données enregistré trouvé."
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
 "a nicer URL."
-msgstr ""
+msgstr "Par défaut, nous utilisons un lien direct basé sur un UUID. Ajoutez un "
+"chemin personnalisé ci-dessous pour obtenir une URL plus conviviale."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Make internal"
-msgstr ""
+msgstr "Rendre interne"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -4569,7 +4537,7 @@ msgstr "Se reconnecter"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
-msgstr ""
+msgstr "Limite de tableaux de bord partagés atteinte"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -4626,7 +4594,9 @@ msgstr "Ce tableau de bord ne fait référence à aucun jeu de données : rien �
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
 "above controls editing only."
-msgstr ""
+msgstr " Publié sur le Web : toute personne disposant du lien peut le "
+"consulter, et la liste ci-dessus contrôle uniquement les droits de "
+"modification."
 
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
@@ -4871,14 +4841,7 @@ msgstr "Ce jeu de données est volumineux, nous avons donc appliqué une limite 
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
-msgstr ""
-
-#. placeholder {0}: subscription.maxShareableDashboardsAllowed
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-#~ "Upgrade to our Starter or Impact plan to share as many dashboards as you "
-#~ "like."
-#~ msgstr ""
+msgstr "Toute personne disposant du lien"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
 msgid "This dataset can be stored in the cloud. "
@@ -4907,7 +4870,7 @@ msgstr "Supprimer le jeu de données"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Your plan does not allow sharing more dashboards."
-msgstr ""
+msgstr "Votre forfait ne permet pas de partager davantage de tableaux de bord."
 
 #: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4965,7 +4928,9 @@ msgstr "Rôle pour {displayName}"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is published to your workspace. Only people you have "
 "given access can open the link below."
-msgstr ""
+msgstr "Ce tableau de bord est publié dans votre espace de travail. Seules les "
+"personnes auxquelles vous avez accordé l’accès peuvent ouvrir le lien "
+"ci-dessous."
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
@@ -5048,7 +5013,8 @@ msgstr "Contient (texte libre)"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "This dashboard is not published yet. Use the button below to publish it "
 "to the audience you picked."
-msgstr ""
+msgstr "Ce tableau de bord n’est pas encore publié. Utilisez le bouton "
+"ci-dessous pour le publier auprès de l’audience que vous avez choisie."
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
@@ -5061,7 +5027,8 @@ msgstr "Chargement des jeux de données du tableau de bord"
 #: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
 msgid "Best for word-of-mouth sharing. Visiting the direct link below also "
 "redirects here."
-msgstr ""
+msgstr "Idéal pour le partage de bouche-à-oreille. Accéder au lien direct "
+"ci-dessous redirige également ici."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel or CSV file from your computer to import"
@@ -5401,7 +5368,7 @@ msgstr "Enregistrer"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
-msgstr ""
+msgstr "Partager ou publier ce {resourceLabel}"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -5520,10 +5487,6 @@ msgstr "Se connecter avec un autre compte"
 msgid "Freehand"
 msgstr "Dessin libre"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-#~ msgid "Permanent link (use for QR codes)"
-#~ msgstr "Lien permanent (à utiliser pour les codes QR)"
-
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -5560,10 +5523,6 @@ msgstr "Choisir des groupes d'utilisateurs pour ce membre"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Admin"
 msgstr "Administrateur"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#~ msgid "Published"
-#~ msgstr "Publié"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
@@ -5646,11 +5605,6 @@ msgstr "Partager le lien"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
 msgstr "Plan actuel"
-
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "Using your custom URL. The permanent UUID link below also still works."
-#~ msgstr "Utilisation de votre URL personnalisée. Le lien UUID permanent "
-#~ "ci-dessous fonctionne également."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6004,7 +5958,10 @@ msgstr "Compter"
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
 "share as many dashboards as you like."
-msgstr ""
+msgstr "Votre forfait actuel vous permet uniquement de partager ou de publier "
+"{maxAllowed, plural, one {# tableau de bord} other {# tableaux de "
+"bord}}. Passez à notre forfait Impact pour partager autant de tableaux "
+"de bord que vous le souhaitez."
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
@@ -6068,7 +6025,8 @@ msgstr "Forme"
 #. placeholder {0}: options.numRows
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Parsed {0, plural, one {# row} other {# rows}} successfully"
-msgstr ""
+msgstr "{0, plural, one {# ligne analysée avec succès} other {# lignes "
+"analysées avec succès}}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -6099,7 +6057,7 @@ msgstr "Type de colonne invalide"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
-msgstr ""
+msgstr "Veuillez réessayer. Votre tableau de bord est toujours publié."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
@@ -6362,10 +6320,6 @@ msgstr "Échec du chargement de la feuille Google"
 msgid "Type the confirmation phrase"
 msgstr "Tapez la phrase de confirmation"
 
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-#~ msgid "You have not created any dashboards"
-#~ msgstr "Vous n'avez créé aucun tableau de bord"
-
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "Bêta"
@@ -6431,7 +6385,7 @@ msgstr "Trait ({strokeWidth}px)"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Publish to workspace"
-msgstr ""
+msgstr "Publier dans l’espace de travail"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
@@ -6490,12 +6444,6 @@ msgstr "Limite"
 msgid "Fix these issues before saving"
 msgstr "Corrigez ces problèmes avant de sauvegarder"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishedShareLinks.tsx
-#~ msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
-#~ "redirects here."
-#~ msgstr "Idéal pour le partage de bouche à oreille. Visiter le lien permanent "
-#~ "ci-dessous redirige également ici."
-
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
 msgstr "Nuage de points"
@@ -6505,12 +6453,6 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr "La clause WHERE utilise BETWEEN sur « {columnName} » avec une valeur "
 "que le formulaire ne peut pas représenter."
-
-#. placeholder {0}: subscription.maxShareableDashboardsAllowed
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-#~ "Upgrade to our Impact plan to share as many dashboards as you like."
-#~ msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
@@ -6544,10 +6486,6 @@ msgstr "Rôle et groupes d'utilisateurs"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Clear all"
 msgstr "Tout effacer"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
-#~ msgid "Close"
-#~ msgstr "Fermer"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6704,12 +6642,6 @@ msgstr "Ajoutez au moins une série X / Y"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
 msgid "Show QR code"
 msgstr "Afficher le code QR"
-
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-#~ msgid "By default we use a permanent UUID-based link. Add a custom path below "
-#~ "for a nicer URL."
-#~ msgstr "Par défaut, nous utilisons un lien permanent basé sur UUID. Ajoutez un "
-#~ "chemin personnalisé ci-dessous pour une URL plus agréable."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"
