@@ -1,4 +1,5 @@
 import { matchLiteral } from "@avandar/utils";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
@@ -8,7 +9,6 @@ import type {
   MapLayerSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
 
 /** Highlight applied to the feature the user has selected. */
@@ -240,6 +240,143 @@ function _createFillLayerSpecs(
   ];
 }
 
+/** Creates the count-sized circle representing one point cluster. */
+function _createClusterCircleLayerSpec(
+  layer: MapLayer.T,
+  sourceId: string,
+): MapLayerSpec {
+  const { symbology } = layer;
+  if (symbology.type !== "cluster") {
+    throw new Error("Cluster symbology is required");
+  }
+  return {
+    id: MapLayerIds.toLayerId(layer.id),
+    type: "circle",
+    source: sourceId,
+    filter: ["has", "point_count"],
+    paint: {
+      "circle-color": symbology.color.color,
+      "circle-opacity": 0.8,
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["get", "point_count"],
+        1,
+        20,
+        100,
+        30,
+        750,
+        40,
+      ],
+      "circle-stroke-width": symbology.stroke.width,
+      "circle-stroke-color": symbology.stroke.color,
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
+}
+
+/** Creates the abbreviated point-count label for one cluster. */
+function _createClusterCountLayerSpec(
+  layer: MapLayer.T,
+  sourceId: string,
+): MapLayerSpec {
+  return {
+    id: MapLayerIds.toClusterCountLayerId(layer.id),
+    type: "symbol",
+    source: sourceId,
+    filter: ["has", "point_count"],
+    paint: {},
+    layout: {
+      "text-field": ["get", "point_count_abbreviated"],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": 12,
+      ...(layer.isVisible ? {} : { visibility: "none" }),
+    },
+  };
+}
+
+/** Creates the ordinary circle shown for points outside clusters. */
+function _createUnclusteredCircleLayerSpec(
+  layer: MapLayer.T,
+  sourceId: string,
+): MapLayerSpec {
+  const { symbology } = layer;
+  if (symbology.type !== "cluster") {
+    throw new Error("Cluster symbology is required");
+  }
+  return {
+    id: MapLayerIds.toUnclusteredLayerId(layer.id),
+    type: "circle",
+    source: sourceId,
+    filter: ["!", ["has", "point_count"]],
+    paint: {
+      "circle-color": symbology.color.color,
+      "circle-opacity": 0.8,
+      "circle-radius": MapLayer.defaultSymbolRadius,
+      "circle-stroke-width": symbology.stroke.width,
+      "circle-stroke-color": [
+        "case",
+        ["boolean", ["feature-state", "isSelected"], false],
+        SELECTED_STROKE_COLOR,
+        symbology.stroke.color,
+      ],
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
+}
+
+/** Creates the three paint layers backed by one clustered source. */
+function _createClusterLayerSpecs(
+  layer: MapLayer.T,
+  sourceId: string,
+): readonly MapLayerSpec[] {
+  return [
+    _createClusterCircleLayerSpec(layer, sourceId),
+    _createClusterCountLayerSpec(layer, sourceId),
+    _createUnclusteredCircleLayerSpec(layer, sourceId),
+  ];
+}
+
+/** Builds an evenly spaced density expression from a heatmap ramp. */
+function _buildHeatmapColor(ramp: readonly string[]): ExpressionSpecification {
+  return [
+    "interpolate",
+    ["linear"],
+    ["heatmap-density"],
+    0,
+    "rgba(0, 0, 0, 0)",
+    ...ramp.flatMap((color, index) => {
+      return [(index + 1) / ramp.length, color];
+    }),
+  ] as ExpressionSpecification;
+}
+
+/** Creates a density layer from the configured radius, weight, and ramp. */
+function _createHeatmapLayerSpec({
+  layer,
+  valueColumnName,
+  sourceId,
+}: Readonly<CreateMapLayerSpecInput>): MapLayerSpec {
+  const { symbology } = layer;
+  if (symbology.type !== "heatmap") {
+    throw new Error("Heatmap symbology is required");
+  }
+  return {
+    id: MapLayerIds.toLayerId(layer.id),
+    type: "heatmap",
+    source: sourceId,
+    paint: {
+      "heatmap-weight":
+        symbology.weight && valueColumnName ?
+          ["to-number", ["get", valueColumnName], 0]
+        : 1,
+      "heatmap-radius": symbology.radiusPx,
+      "heatmap-color": _buildHeatmapColor(symbology.ramp),
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
+}
+
 /** Creates the paint layers matching the configured geometry symbology. */
 function _createMapLayerSpecs(
   options: Readonly<CreateMapLayerSpecInput>,
@@ -249,6 +386,12 @@ function _createMapLayerSpecs(
   }
   if (options.layer.symbology.type === "line") {
     return [_createLineLayerSpec(options.layer, options.sourceId)];
+  }
+  if (options.layer.symbology.type === "cluster") {
+    return _createClusterLayerSpecs(options.layer, options.sourceId);
+  }
+  if (options.layer.symbology.type === "heatmap") {
+    return [_createHeatmapLayerSpec(options)];
   }
   return [_createCircleLayerSpec(options)];
 }
@@ -264,7 +407,7 @@ function _createMapLayerSpecs(
  * @param params.featureCollection The layer's features, already converted from
  * query rows.
  * @param params.stats Value domain used by data-driven paint expressions.
- * @param params.valueColumnName Result column backing a proportional symbol,
+ * @param params.valueColumnName Result column backing data-driven point paint,
  * looked up by the caller from the symbology's column id.
  * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
@@ -292,7 +435,18 @@ export function makeLayerSpecFromMapLayer({
   });
 
   return {
-    sources: { [sourceId]: { type: "geojson", data: featureCollection } },
+    sources: {
+      [sourceId]:
+        layer.symbology.type === "cluster" ?
+          {
+            type: "geojson",
+            data: featureCollection,
+            cluster: true,
+            clusterRadius: layer.symbology.radiusPx,
+            clusterMaxZoom: 14,
+          }
+        : { type: "geojson", data: featureCollection },
+    },
     layers: layerSpecs,
   };
 }

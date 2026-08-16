@@ -16,9 +16,9 @@ import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/n
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import { makeSizeLegendStops } from "@/views/GisApp/layers/makeSizeLegendStops/makeSizeLegendStops";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
+import { makeSizeLegendStops } from "@/views/GisApp/layers/makeSizeLegendStops/makeSizeLegendStops";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { buildLayerLegendFingerprint } from "@/views/GisApp/layers/usePersistedLayerLegends/usePersistedLayerLegends";
 import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
@@ -60,7 +60,7 @@ type MakeLayerViewStateInput = {
 type LayerRender = {
   layerId: MapLayer.Id;
   layerSpec: MapSpec | undefined;
-  interactiveLayerId: string | undefined;
+  interactiveLayerIds: string[];
   viewState: MapLayerViewState;
   bounds: MapBounds | undefined;
   legendUpdate: LayerLegendUpdate | undefined;
@@ -169,11 +169,15 @@ function _getAggregateFeatureCounts(
   return { contributorCount, noDataCount, suppressedCount };
 }
 
-/** Gets the result-column name driving proportional symbol sizing. */
-function _getValueColumnName(layer: MapLayer.T): string | undefined {
+/** Gets the result-column name driving data-dependent point paint. */
+function _getPaintValueColumnName(layer: MapLayer.T): string | undefined {
+  const valueColumnId =
+    layer.symbology.type === "proportionalSymbol" ? layer.symbology.value
+    : layer.symbology.type === "heatmap" ? layer.symbology.weight
+    : undefined;
   const valueColumn =
-    layer.symbology.type === "proportionalSymbol" ?
-      layer.source.queryColumns.find(propEq("id", layer.symbology.value))
+    valueColumnId ?
+      layer.source.queryColumns.find(propEq("id", valueColumnId))
     : undefined;
   return valueColumn ?
       QueryColumn.getDerivedColumnName(valueColumn)
@@ -293,12 +297,12 @@ function _makeSizeStops(
   if (layer.symbology.type !== "proportionalSymbol") {
     return [];
   }
-  const valueColumnName = _getValueColumnName(layer);
+  const valueColumnName = _getPaintValueColumnName(layer);
   const values = features
     .map((feature) => {
-      return (
-        valueColumnName ? feature.properties?.[valueColumnName] : undefined
-      );
+      return valueColumnName ?
+          feature.properties?.[valueColumnName]
+        : undefined;
     })
     .filter((value): value is number => {
       return typeof value === "number";
@@ -406,7 +410,7 @@ function _makeRenderedLayerSpec(
   if (!isRendered) {
     return undefined;
   }
-  const valueColumnName = _getValueColumnName(layer);
+  const valueColumnName = _getPaintValueColumnName(layer);
   return makeLayerSpecFromMapLayer({
     layer,
     featureCollection: geometry.featureCollection,
@@ -416,6 +420,23 @@ function _makeRenderedLayerSpec(
     }),
     valueColumnName,
   });
+}
+
+/** Gets the hit-testable MapLibre ids produced by a rendered map layer. */
+function _getInteractiveLayerIds(
+  layer: MapLayer.T,
+  isRendered: boolean,
+): string[] {
+  if (!isRendered || layer.symbology.type === "heatmap") {
+    return [];
+  }
+  if (layer.symbology.type === "cluster") {
+    return [
+      MapLayerIds.toLayerId(layer.id),
+      MapLayerIds.toUnclusteredLayerId(layer.id),
+    ];
+  }
+  return [MapLayerIds.toLayerId(layer.id)];
 }
 
 /** Derives all rendering state for one configured map layer. */
@@ -451,8 +472,7 @@ function _makeLayerRender({
   return {
     layerId: layer.id,
     layerSpec: _makeRenderedLayerSpec({ layer, geometry, isRendered }),
-    interactiveLayerId:
-      isRendered ? MapLayerIds.toLayerId(layer.id) : undefined,
+    interactiveLayerIds: _getInteractiveLayerIds(layer, isRendered),
     viewState,
     bounds: getBoundsFromFeatureCollection(geometry.featureCollection),
     legendUpdate,
@@ -510,9 +530,7 @@ export function useAvaMapRender({
       spec: makeMapSpecFromLayerSpecs(
         renderedLayers.map(prop("layerSpec")).filter(isDefined),
       ),
-      interactiveLayerIds: renderedLayers
-        .map(prop("interactiveLayerId"))
-        .filter(isDefined),
+      interactiveLayerIds: renderedLayers.flatMap(prop("interactiveLayerIds")),
       layerViewStates: makeMap(renderedLayers, {
         key: "layerId",
         valueKey: "viewState",

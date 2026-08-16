@@ -14,4 +14,14 @@ export const MapLayerIds = {
   toLayerId: (layerId: string): string => {
     return `ava-map-layer-${layerId}`;
   },
+
+  /** The MapLibre layer id for an unclustered point. */
+  toUnclusteredLayerId: (layerId: string): string => {
+    return `ava-map-layer-${layerId}-unclustered`;
+  },
+
+  /** The MapLibre layer id for a cluster's count label. */
+  toClusterCountLayerId: (layerId: string): string => {
+    return `ava-map-layer-${layerId}-count`;
+  },
 };
