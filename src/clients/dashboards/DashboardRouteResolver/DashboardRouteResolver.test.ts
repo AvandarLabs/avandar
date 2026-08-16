@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { DashboardRouteResolver } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
-import type { DashboardRouteDeps } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
+import type { IDashboardRouteUtils } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -36,8 +36,8 @@ function _createDashboard(
 }
 
 function _createDeps(
-  overrides: Readonly<Partial<DashboardRouteDeps>> = {},
-): DashboardRouteDeps {
+  overrides: Readonly<Partial<IDashboardRouteUtils>> = {},
+): IDashboardRouteUtils {
   return {
     getById: vi.fn().mockResolvedValue(undefined),
     findBySlug: vi.fn().mockResolvedValue([]),

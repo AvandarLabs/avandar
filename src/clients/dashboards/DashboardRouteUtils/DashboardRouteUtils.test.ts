@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { dashboardRouteDeps } from "./dashboardRouteDeps";
+import { DashboardRouteUtils } from "./DashboardRouteUtils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -58,7 +58,7 @@ describe("dashboardRouteDeps", () => {
   it("binds an ID lookup to the dashboard client", async () => {
     getByIdMock.mockResolvedValue(undefined);
 
-    await dashboardRouteDeps.getById(DASHBOARD_ID);
+    await DashboardRouteUtils.getById(DASHBOARD_ID);
 
     expect(getByIdMock).toHaveBeenCalledWith({ id: DASHBOARD_ID });
   });
@@ -66,7 +66,7 @@ describe("dashboardRouteDeps", () => {
   it("keeps public slug reads in the public namespace", async () => {
     getAllMock.mockResolvedValue([]);
 
-    await dashboardRouteDeps.findBySlug({ slug: "q3", visibility: "public" });
+    await DashboardRouteUtils.findBySlug({ slug: "q3", visibility: "public" });
 
     expect(getAllMock).toHaveBeenCalledWith({
       where: {
@@ -79,7 +79,7 @@ describe("dashboardRouteDeps", () => {
   it("scopes workspace slug reads to their workspace", async () => {
     getAllMock.mockResolvedValue([]);
 
-    await dashboardRouteDeps.findBySlug({
+    await DashboardRouteUtils.findBySlug({
       slug: "q3",
       visibility: "workspace",
       workspaceId: WORKSPACE_ID,
@@ -100,7 +100,7 @@ describe("dashboardRouteDeps", () => {
     getViewerWorkspacesMock.mockResolvedValue(staleWorkspaces);
     getFreshViewerWorkspacesMock.mockResolvedValue(freshWorkspaces);
 
-    await expect(dashboardRouteDeps.getViewerWorkspaces()).resolves.toEqual(
+    await expect(DashboardRouteUtils.getViewerWorkspaces()).resolves.toEqual(
       freshWorkspaces,
     );
 
@@ -113,10 +113,10 @@ describe("dashboardRouteDeps", () => {
   it("derives authentication from the current session user", async () => {
     getCurrentSessionMock.mockResolvedValue({ user: { id: "user-id" } });
 
-    await expect(dashboardRouteDeps.isAuthenticated()).resolves.toBe(true);
+    await expect(DashboardRouteUtils.isAuthenticated()).resolves.toBe(true);
 
     getCurrentSessionMock.mockResolvedValue(undefined);
 
-    await expect(dashboardRouteDeps.isAuthenticated()).resolves.toBe(false);
+    await expect(DashboardRouteUtils.isAuthenticated()).resolves.toBe(false);
   });
 });

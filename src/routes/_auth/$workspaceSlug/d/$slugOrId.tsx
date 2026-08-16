@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { dashboardRouteDeps } from "@/clients/dashboards/dashboardRouteDeps/dashboardRouteDeps";
+import { DashboardRouteUtils } from "@/clients/dashboards/dashboardRouteDeps/DashboardRouteUtils";
 import { DashboardRouteResolver } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/d/$slugOrId")({
       await DashboardRouteResolver.makeDashboardRouteOutcomeFromWorkspaceRoute({
         slugOrId: params.slugOrId,
         workspaceSlug: params.workspaceSlug,
-        deps: dashboardRouteDeps,
+        deps: DashboardRouteUtils,
       });
 
     return match<typeof outcome, LoaderResult>(outcome)

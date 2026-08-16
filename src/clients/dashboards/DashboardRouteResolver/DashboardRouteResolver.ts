@@ -29,7 +29,7 @@ type WorkspaceRouteOutcomeOptions = {
 };
 
 /** The data reads required by dashboard viewer-route resolution. */
-export type DashboardRouteDeps = {
+export type IDashboardRouteUtils = {
   getById: (id: Dashboard.Id) => Promise<Dashboard.T | undefined>;
   findBySlug: (
     params: Readonly<{
@@ -49,7 +49,7 @@ function _getDashboardIdFromSlugOrId(slugOrId: string): Dashboard.Id {
 async function _buildWorkspaceRedirect(
   params: Readonly<{
     dashboard: Dashboard.T;
-    deps: DashboardRouteDeps;
+    deps: IDashboardRouteUtils;
   }>,
 ): Promise<DashboardRouteOutcome> {
   const { dashboard, deps } = params;
@@ -73,7 +73,7 @@ async function _buildWorkspaceRedirect(
 async function _buildPublicMissOutcome(
   params: Readonly<{
     slugOrId: string;
-    deps: DashboardRouteDeps;
+    deps: IDashboardRouteUtils;
   }>,
 ): Promise<DashboardRouteOutcome> {
   const { slugOrId, deps } = params;
@@ -107,7 +107,7 @@ async function _buildPublicMissOutcome(
 
 /** Resolves the canonical public dashboard URL, `/d/<slugOrId>`. */
 async function _makeDashboardRouteOutcomeFromPublicRoute(
-  params: Readonly<{ slugOrId: string; deps: DashboardRouteDeps }>,
+  params: Readonly<{ slugOrId: string; deps: IDashboardRouteUtils }>,
 ): Promise<DashboardRouteOutcome> {
   const { slugOrId, deps } = params;
   const candidate =
@@ -140,7 +140,7 @@ async function _getWorkspaceRouteCandidate(
   params: Readonly<{
     slugOrId: string;
     workspace: ViewerWorkspace;
-    deps: DashboardRouteDeps;
+    deps: IDashboardRouteUtils;
   }>,
 ): Promise<Dashboard.T | undefined> {
   const { slugOrId, workspace, deps } = params;
@@ -201,7 +201,7 @@ async function _makeDashboardRouteOutcomeFromWorkspaceRoute(
   params: Readonly<{
     slugOrId: string;
     workspaceSlug: string;
-    deps: DashboardRouteDeps;
+    deps: IDashboardRouteUtils;
   }>,
 ): Promise<DashboardRouteOutcome> {
   const { slugOrId, workspaceSlug, deps } = params;
