@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactElement } from "react";
@@ -19,8 +19,39 @@ const mocks = vi.hoisted(() => {
     normalisedSlug: "",
     hasPendingSlugCheck: false,
     isSlugRejected: false,
+    isPlanBlocked: false,
   };
 });
+
+vi.mock(
+  "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit",
+  () => {
+    return {
+      useShareableDashboardLimit: () => {
+        return {
+          isBlocked: mocks.isPlanBlocked,
+          maxAllowed: 1,
+          subscription: undefined,
+        };
+      },
+    };
+  },
+);
+
+vi.mock(
+  "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal",
+  () => {
+    return {
+      ShareableLimitReachedModal: ({
+        isOpened,
+      }: {
+        isOpened: boolean;
+      }): ReactElement | null => {
+        return isOpened ? <div>Shared dashboard limit reached</div> : null;
+      },
+    };
+  },
+);
 
 vi.mock(
   "@/components/permissions/ShareResourceModal/ShareResourceModal",
@@ -108,6 +139,7 @@ describe("DashboardShareModal", () => {
     mocks.normalisedSlug = "";
     mocks.hasPendingSlugCheck = false;
     mocks.isSlugRejected = false;
+    mocks.isPlanBlocked = false;
   });
 
   it("enables publishing when saved and online", () => {
@@ -204,5 +236,48 @@ describe("DashboardShareModal", () => {
     expect(
       screen.getByRole("button", { name: "Publish to workspace" }),
     ).toBeEnabled();
+  });
+
+  // The database refuses this publish, so the button must say so before the
+  // user spends a click on a failure toast.
+  it("blocks publishing when the plan's shareable limit is reached", () => {
+    mocks.isPlanBlocked = true;
+
+    renderModal();
+
+    expect(
+      screen.getByRole("button", { name: "Publish to workspace" }),
+    ).toBeDisabled();
+  });
+
+  // A disabled button cannot open anything, so the upgrade needs its own
+  // button. It stays out of the footer until the plan is the thing blocking.
+  it("offers the upgrade only when the plan is what blocks publishing", () => {
+    renderModal();
+
+    expect(screen.queryByRole("button", { name: "Upgrade plan" })).toBeNull();
+  });
+
+  it("opens the upgrade modal from the footer rather than on render", () => {
+    mocks.isPlanBlocked = true;
+
+    renderModal();
+
+    expect(screen.queryByText("Shared dashboard limit reached")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Upgrade plan" }));
+    expect(
+      screen.getByText("Shared dashboard limit reached"),
+    ).toBeInTheDocument();
+  });
+
+  // Offline is not something an upgrade fixes, so the plan message and its
+  // upgrade button must not appear over the top of a higher-priority block.
+  it("keeps the offline reason ahead of the plan limit", () => {
+    mocks.isOnline = false;
+    mocks.isPlanBlocked = true;
+
+    renderModal();
+
+    expect(screen.queryByRole("button", { name: "Upgrade plan" })).toBeNull();
   });
 });

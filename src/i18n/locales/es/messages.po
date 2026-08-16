@@ -1838,6 +1838,12 @@ msgstr "Eliminar"
 msgid "Failed to save dataset: {0}"
 msgstr "Error al guardar el conjunto de datos: {0}"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your workspace is on the Free plan, which lets you share or publish one "
+"dashboard. Upgrade to our Starter or Impact plan to share as many "
+"dashboards as you like."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "Formulario de consulta"
@@ -2431,6 +2437,12 @@ msgstr "Relleno"
 msgid "Theme"
 msgstr "Tema"
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Contact us to raise the limit for your workspace."
+msgstr ""
+
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Registrar"
@@ -2947,6 +2959,11 @@ msgstr "No se pudieron cargar algunos conjuntos de datos publicados. Por favor, 
 msgid "First point"
 msgstr "Primer punto"
 
+#. placeholder {0}: limit.maxAllowed
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan allows {0} shared or public dashboard(s)."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
 msgstr "menos de un minuto"
@@ -3462,6 +3479,10 @@ msgstr "Crear espacio de trabajo"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "Intenta de nuevo"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Upgrade plan"
+msgstr ""
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
@@ -4491,6 +4512,10 @@ msgstr "Explorador de datos"
 msgid "Sign in again"
 msgstr "Iniciar sesión nuevamente"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Shared dashboard limit reached"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -4791,6 +4816,13 @@ msgstr "Este conjunto de datos es grande, por lo que aplicamos un límite de 100
 msgid "Anyone with the link"
 msgstr ""
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Starter or Impact plan to share as many dashboards as you "
+"like."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "Este conjunto de datos se puede almacenar en la nube."
@@ -4815,6 +4847,10 @@ msgstr "Tipo de visualización"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Eliminar conjunto de datos"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan does not allow sharing more dashboards."
+msgstr ""
 
 #: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6389,6 +6425,12 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr "La cláusula WHERE usa BETWEEN en \"{columnName}\" con un valor que el "
 "formulario no puede representar."
+
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Impact plan to share as many dashboards as you like."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"

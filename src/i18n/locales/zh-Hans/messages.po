@@ -1761,6 +1761,12 @@ msgstr "删除"
 msgid "Failed to save dataset: {0}"
 msgstr "保存数据集失败：{0}"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your workspace is on the Free plan, which lets you share or publish one "
+"dashboard. Upgrade to our Starter or Impact plan to share as many "
+"dashboards as you like."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "查询表单"
@@ -2331,6 +2337,12 @@ msgstr "内边距"
 msgid "Theme"
 msgstr "主题"
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Contact us to raise the limit for your workspace."
+msgstr ""
+
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "注册"
@@ -2824,6 +2836,11 @@ msgstr "某些已发布的数据集无法加载。请稍后再试。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
 msgstr "第一个点"
+
+#. placeholder {0}: limit.maxAllowed
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan allows {0} shared or public dashboard(s)."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -3325,6 +3342,10 @@ msgstr "创建工作区"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "再试一次"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Upgrade plan"
+msgstr ""
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
@@ -4322,6 +4343,10 @@ msgstr "数据探索器"
 msgid "Sign in again"
 msgstr "再次登录"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Shared dashboard limit reached"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -4609,6 +4634,13 @@ msgstr "此数据集较大，因此我们应用了 100 行限制。您可以随�
 msgid "Anyone with the link"
 msgstr ""
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Starter or Impact plan to share as many dashboards as you "
+"like."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "此数据集可以存储在云中。"
@@ -4633,6 +4665,10 @@ msgstr "可视化类型"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "删除数据集"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan does not allow sharing more dashboards."
+msgstr ""
 
 #: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6140,6 +6176,12 @@ msgstr "散点图"
 msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form "
 "cannot represent."
 msgstr "WHERE 子句对“{columnName}”使用了 BETWEEN，但其值无法由表单表示。"
+
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Impact plan to share as many dashboards as you like."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"

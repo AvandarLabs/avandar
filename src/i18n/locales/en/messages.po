@@ -1814,6 +1814,14 @@ msgstr "Delete"
 msgid "Failed to save dataset: {0}"
 msgstr "Failed to save dataset: {0}"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your workspace is on the Free plan, which lets you share or publish one "
+"dashboard. Upgrade to our Starter or Impact plan to share as many "
+"dashboards as you like."
+msgstr "Your workspace is on the Free plan, which lets you share or publish one "
+"dashboard. Upgrade to our Starter or Impact plan to share as many "
+"dashboards as you like."
+
 #: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
 msgid "Query form"
 msgstr "Query form"
@@ -2403,6 +2411,13 @@ msgstr "Padding"
 msgid "Theme"
 msgstr "Theme"
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Contact us to raise the limit for your workspace."
+msgstr "Your current plan only lets you share or publish {0} dashboard(s). "
+"Contact us to raise the limit for your workspace."
+
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Register"
@@ -2908,6 +2923,11 @@ msgstr "Some published datasets could not be loaded. Please try again later."
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "First point"
 msgstr "First point"
+
+#. placeholder {0}: limit.maxAllowed
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan allows {0} shared or public dashboard(s)."
+msgstr "Your plan allows {0} shared or public dashboard(s)."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -3417,6 +3437,10 @@ msgstr "Create Workspace"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "Try again"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+msgid "Upgrade plan"
+msgstr "Upgrade plan"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
@@ -4440,6 +4464,10 @@ msgstr "Data Explorer"
 msgid "Sign in again"
 msgstr "Sign in again"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Shared dashboard limit reached"
+msgstr "Shared dashboard limit reached"
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -4735,6 +4763,15 @@ msgstr "This dataset is large, so we applied a 100-row limit. You can change it 
 msgid "Anyone with the link"
 msgstr "Anyone with the link"
 
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Starter or Impact plan to share as many dashboards as you "
+"like."
+msgstr "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Starter or Impact plan to share as many dashboards as "
+"you like."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "This dataset can be stored in the cloud. "
@@ -4759,6 +4796,10 @@ msgstr "Visualization Type"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Delete dataset"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan does not allow sharing more dashboards."
+msgstr "Your plan does not allow sharing more dashboards."
 
 #: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6313,6 +6354,13 @@ msgid "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the form 
 "cannot represent."
 msgstr "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the "
 "form cannot represent."
+
+#. placeholder {0}: subscription.maxShareableDashboardsAllowed
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Impact plan to share as many dashboards as you like."
+msgstr "Your current plan only lets you share or publish {0} dashboard(s). "
+"Upgrade to our Impact plan to share as many dashboards as you like."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
