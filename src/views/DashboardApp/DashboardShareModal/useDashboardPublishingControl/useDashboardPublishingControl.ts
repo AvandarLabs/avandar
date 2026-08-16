@@ -1,57 +1,17 @@
-import { matchLiteral } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { useCallback, useState } from "react";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
-import { makeDashboardPublishAnalyticsEventFromDashboards } from "@/views/DashboardApp/DashboardShareModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards";
 import { makeShareUrlsFromPublishTarget } from "@/views/DashboardApp/DashboardShareModal/makeShareUrlsFromPublishTarget/makeShareUrlsFromPublishTarget";
 import { makeVanitySlugFromText } from "@/views/DashboardApp/DashboardShareModal/makeVanitySlugFromText/makeVanitySlugFromText";
+import { usePublishDashboardMutation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation";
+import { useSlugValidation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation";
+import { useUnpublishDashboardMutation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation";
 import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
-import type { I18n } from "@lingui/core";
-import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
+import type { SlugValidationState } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dispatch, RefObject, SetStateAction } from "react";
-
-const SLUG_VALIDATION_DEBOUNCE_MS = 500;
-
-type SlugValidationResult = { isValid: true } | DashboardSlugValidationFailure;
-
-type SlugValidationState = {
-  hasPendingSlugCheck: boolean;
-  isSlugAccepted: boolean;
-  isSlugRejected: boolean;
-  slugErrorMessage: string | undefined;
-};
-
-/**
- * Which slug check the hook is currently waiting on. Recorded at dispatch and
- * compared in `onSuccess` so a response that a later keystroke has already
- * superseded is dropped instead of overwriting the newer answer.
- */
-type SlugValidationRequest = {
-  slug: string;
-  visibility: Dashboard.Visibility;
-};
-
-type DebouncedSlugValidationOptions = {
-  dashboardId: Dashboard.Id;
-  normalisedSlug: string;
-  targetVisibility: Dashboard.Visibility;
-  latestRequestRef: RefObject<SlugValidationRequest | undefined>;
-  setLastValidatedSlug: Dispatch<SetStateAction<string | undefined>>;
-  setSlugValidationResult: Dispatch<
-    SetStateAction<SlugValidationResult | undefined>
-  >;
-  validateSlug: ReturnType<typeof DashboardClient.useValidateDashboardSlug>[0];
-};
 
 type DashboardPublishingControl = SlugValidationState & {
   currentDashboard: Dashboard.T;
@@ -68,175 +28,6 @@ type DashboardPublishingControl = SlugValidationState & {
   onGeneralAccessChange: (value: GeneralAccessValue) => void;
   onPrimaryAction: () => void;
 };
-
-function _slugFailureMessage(
-  options: Readonly<{ failure: DashboardSlugValidationFailure; i18n: I18n }>,
-): string {
-  return matchLiteral(options.failure.reason, {
-    empty: options.i18n._(msg`The custom URL cannot be empty`),
-    spaces: options.i18n._(msg`The custom URL cannot contain spaces`),
-    invalid_characters: options.i18n._(
-      msg`The custom URL can only contain lowercase letters, numbers, and hyphens`,
-    ),
-    too_short: options.i18n._(
-      msg`The custom URL must be at least ${options.failure.limit ?? 3} characters`,
-    ),
-    too_long: options.i18n._(
-      msg`The custom URL cannot exceed ${options.failure.limit ?? 64} characters`,
-    ),
-    taken: options.i18n._(msg`This custom URL is already taken`),
-    reserved: options.i18n._(
-      msg`This custom URL is reserved. Try adding a word to it.`,
-    ),
-  });
-}
-
-/**
- * Debounces the slug check against the namespace the target audience implies.
- *
- * `targetVisibility` is a dependency because the two audiences have separate
- * slug namespaces: a name free among public dashboards can be taken among the
- * workspace's, so moving the target has to re-run the check.
- */
-function useDebouncedSlugValidation(
-  options: Readonly<DebouncedSlugValidationOptions>,
-): void {
-  const {
-    dashboardId,
-    normalisedSlug,
-    targetVisibility,
-    latestRequestRef,
-    setLastValidatedSlug,
-    setSlugValidationResult,
-    validateSlug,
-  } = options;
-  useEffect(
-    function validateNormalisedSlug() {
-      if (!normalisedSlug) {
-        latestRequestRef.current = undefined;
-        setSlugValidationResult(undefined);
-        setLastValidatedSlug(undefined);
-        return;
-      }
-      const timeoutId = window.setTimeout(() => {
-        if (targetVisibility === "draft") {
-          // A draft has no URL, so it has no namespace to collide in.
-          return;
-        }
-        // Recorded BEFORE the request goes out, so `onSuccess` can tell this
-        // response from one the user has already typed past. The cleanup below
-        // only cancels a request that has not fired yet; one already in flight
-        // still resolves, and without this it could land after a newer answer
-        // and leave the field spinning on a slug nobody is waiting for.
-        latestRequestRef.current = {
-          slug: normalisedSlug,
-          visibility: targetVisibility,
-        };
-        validateSlug({
-          slug: normalisedSlug,
-          dashboardId,
-          visibility: targetVisibility,
-        });
-      }, SLUG_VALIDATION_DEBOUNCE_MS);
-      return () => {
-        window.clearTimeout(timeoutId);
-      };
-    },
-    [
-      dashboardId,
-      normalisedSlug,
-      targetVisibility,
-      latestRequestRef,
-      setLastValidatedSlug,
-      setSlugValidationResult,
-      validateSlug,
-    ],
-  );
-}
-
-function useSlugValidation(
-  options: Readonly<{
-    dashboardId: Dashboard.Id;
-    normalisedSlug: string;
-    targetVisibility: Dashboard.Visibility;
-  }>,
-): SlugValidationState {
-  const { i18n } = useLingui();
-  const [slugValidationResult, setSlugValidationResult] = useState<
-    SlugValidationResult | undefined
-  >();
-  const [lastValidatedSlug, setLastValidatedSlug] = useState<string>();
-  const [lastValidatedVisibility, setLastValidatedVisibility] =
-    useState<Dashboard.Visibility>();
-  const latestRequestRef = useRef<SlugValidationRequest | undefined>(undefined);
-  const [validateSlug, isValidatingSlug] =
-    DashboardClient.useValidateDashboardSlug({
-      onSuccess: (result, variables) => {
-        // Every dispatched check gets its own `onSuccess`, and the network is
-        // free to answer them out of order. Writing a superseded answer would
-        // point `lastValidatedSlug` at a slug the field no longer holds, which
-        // makes `hasCurrentResult` false with nothing left in flight to make
-        // it true again: the spinner never clears and `onPrimaryAction`
-        // silently refuses to publish.
-        const latestRequest = latestRequestRef.current;
-        if (
-          latestRequest === undefined ||
-          variables.slug !== latestRequest.slug ||
-          variables.visibility !== latestRequest.visibility
-        ) {
-          return;
-        }
-        setSlugValidationResult(result);
-        setLastValidatedSlug(variables.slug);
-        setLastValidatedVisibility(variables.visibility);
-      },
-    });
-  useDebouncedSlugValidation({
-    dashboardId: options.dashboardId,
-    normalisedSlug: options.normalisedSlug,
-    targetVisibility: options.targetVisibility,
-    latestRequestRef,
-    setLastValidatedSlug,
-    setSlugValidationResult,
-    validateSlug,
-  });
-
-  // A draft has no URL, so there is nothing to check and nothing to report.
-  // Without this the flags would report a check that the debounced effect
-  // deliberately never runs, leaving a spinner that can never resolve.
-  const isSlugCheckable = options.targetVisibility !== "draft";
-
-  // The two audiences have separate slug namespaces, so an answer is only
-  // current when it was given for BOTH this slug and this namespace. Matching
-  // on the slug alone would report a public "taken" verdict as authoritative
-  // for the workspace namespace, where the slug may be free.
-  const hasCurrentResult =
-    lastValidatedSlug === options.normalisedSlug &&
-    lastValidatedVisibility === options.targetVisibility;
-  const hasPendingSlugCheck =
-    isSlugCheckable &&
-    !!options.normalisedSlug &&
-    (isValidatingSlug || !hasCurrentResult);
-  const isSlugRejected =
-    isSlugCheckable &&
-    !!options.normalisedSlug &&
-    hasCurrentResult &&
-    slugValidationResult?.isValid === false;
-  const isSlugAccepted =
-    isSlugCheckable &&
-    !!options.normalisedSlug &&
-    hasCurrentResult &&
-    slugValidationResult?.isValid === true;
-  return {
-    hasPendingSlugCheck,
-    isSlugAccepted,
-    isSlugRejected,
-    slugErrorMessage:
-      isSlugRejected && slugValidationResult?.isValid === false ?
-        _slugFailureMessage({ failure: slugValidationResult, i18n })
-      : undefined,
-  };
-}
 
 /**
  * Owns everything about a dashboard's publication that the share modal needs.
@@ -259,7 +50,6 @@ export function useDashboardPublishingControl(
     onShareableLimitReached: () => void;
   }>,
 ): DashboardPublishingControl {
-  const { t } = useLingui();
   const { onShareableLimitReached } = options;
   const workspace = useCurrentWorkspace();
   const [currentDashboard, setCurrentDashboard] = useState(options.dashboard);
@@ -279,76 +69,23 @@ export function useDashboardPublishingControl(
       targetVisibility,
     });
 
-  const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
-    onSuccess: (updatedDashboard) => {
-      notifySuccess(
-        currentDashboard.visibility === "draft" ?
-          t`Dashboard published!`
-        : t`Dashboard share settings updated.`,
-      );
-      void AnalyticsClient.logEvent({
-        ...makeDashboardPublishAnalyticsEventFromDashboards({
-          previousDashboard: currentDashboard,
-          updatedDashboard,
-        }),
-        workspaceId: updatedDashboard.workspaceId,
-        app: "dashboards",
-      });
+  const [publishDashboard, isPublishing] = usePublishDashboardMutation({
+    currentDashboard,
+    onPublished: (updatedDashboard) => {
       setCurrentDashboard(updatedDashboard);
       setSlugInput(updatedDashboard.slug ?? "");
       setTargetVisibility(updatedDashboard.visibility);
     },
-    onError: (error: Error) => {
-      console.error(error);
-      // The UI gate in `DashboardShareModal` is deliberately optimistic while
-      // its permission query is in flight, and the answer it caches counts the
-      // whole workspace while the exemption is per dashboard, so a publish
-      // elsewhere in the workspace can leave the gate stale. In that window the
-      // database trigger is the only thing that stops the publish, and the
-      // generic toast would tell the user to "try again" at something that can
-      // never succeed on this plan.
-      //
-      // The upgrade modal rather than a toast, because it is the SAME surface
-      // the gate offers when it does manage to answer in time. The two paths
-      // are the same refusal found at different moments, and answering them
-      // differently would make an upgrade reachable or not depending on how
-      // fast a query returned. The modal also names the plan and its limit,
-      // which a toast cannot do without restating that copy a third time.
-      if (isShareableDashboardLimitError(error)) {
-        onShareableLimitReached();
-        return;
-      }
-      notifyError({
-        title: t`Could not publish dashboard`,
-        message: t`Please try again. Your dashboard has not been published.`,
-      });
-    },
+    onShareableLimitReached,
   });
 
-  const [unpublishDashboard, isUnpublishing] =
-    DashboardClient.useUnpublishDashboard({
-      onSuccess: (updatedDashboard) => {
-        notifySuccess(t`Dashboard unpublished.`);
-        void AnalyticsClient.logEvent({
-          event: "dashboard.unpublished",
-          payload: {
-            dashboardId: updatedDashboard.id,
-            priorVisibility: currentDashboard.visibility,
-          },
-          workspaceId: updatedDashboard.workspaceId,
-          app: "dashboards",
-        });
-        setCurrentDashboard(updatedDashboard);
-        setTargetVisibility(updatedDashboard.visibility);
-      },
-      onError: (error: Error) => {
-        console.error(error);
-        notifyError({
-          title: t`Could not unpublish dashboard`,
-          message: t`Please try again. Your dashboard is still published.`,
-        });
-      },
-    });
+  const [unpublishDashboard, isUnpublishing] = useUnpublishDashboardMutation({
+    currentDashboard,
+    onUnpublished: (updatedDashboard) => {
+      setCurrentDashboard(updatedDashboard);
+      setTargetVisibility(updatedDashboard.visibility);
+    },
+  });
 
   // Called unconditionally and before the return: spreading a hook call inside
   // the returned object literal works but hides a hook in an expression, which

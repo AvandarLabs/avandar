@@ -393,7 +393,7 @@ msgid "Export annotated PDF"
 msgstr "تصدير PDF معلق"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "لا يمكن أن يتجاوز عنوان URL المخصص {0} حرفًا"
 
@@ -851,7 +851,7 @@ msgstr "تم الوصول إلى حد المقاعد"
 msgid "Pipeline"
 msgstr "خط الأنابيب"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr ""
 
@@ -1380,7 +1380,7 @@ msgstr "التحويل إلى خطة مجانية"
 msgid "Parsed {0} rows"
 msgstr "تم تحليل {0} صفوف"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "يمكن أن يحتوي عنوان URL المخصص على أحرف صغيرة وأرقام وواصلات فقط"
 
@@ -1874,7 +1874,7 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور "
 "X (\"{axisKeyValue}\")."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
 msgstr ""
 
@@ -2229,7 +2229,7 @@ msgid "Manual form shows an approximation"
 msgstr "تظهر النموذج اليدوي تقريبًا"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "يجب ألا يقل عنوان URL المخصص عن {0} أحرف"
 
@@ -3051,7 +3051,7 @@ msgstr ""
 msgid "Continue to your workspace"
 msgstr "تابع إلى مساحة العمل الخاصة بك"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسافات"
 
@@ -4028,7 +4028,7 @@ msgstr "تحويل"
 msgid "X axis label"
 msgstr "تسمية المحور X"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "عنوان URL مخصص محجوز. جرّب إضافة كلمة إليه."
 
@@ -4119,7 +4119,7 @@ msgstr "نوع"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard share settings updated."
 msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
 
@@ -4249,7 +4249,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا "
 "بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "يرجى المحاولة مرة أخرى. لم يتم نشر لوحة التحكم الخاصة بك."
 
@@ -4622,7 +4622,7 @@ msgstr "جارٍ تسجيل دخولك مرة أخرى…"
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "يمكن لـ {0} عرض ما يصل إلى {1} {2} فقط، لذا يتم عرض أول {3} فقط."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot be empty"
 msgstr "لا يمكن أن يكون عنوان URL المخصص فارغًا"
 
@@ -4959,7 +4959,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "تحتوي جملة WHERE على عقدة من النوع \"{nodeType}\" لا يدعمها النموذج."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
 
@@ -5160,7 +5160,7 @@ msgstr "الاسم مطلوب"
 msgid "User group saved"
 msgstr "تم حفظ مجموعة المستخدمين"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "تعذر نشر لوحة التحكم"
 
@@ -5573,7 +5573,7 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 msgid "Make \"{resourceName}\" private?"
 msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
 
@@ -5962,7 +5962,7 @@ msgstr "تحميل مجموعة بيانات"
 msgid "Invalid column type"
 msgstr "نوع العمود غير صالح"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr ""
 

@@ -397,7 +397,7 @@ msgid "Export annotated PDF"
 msgstr "Export PDF iliyo na maelezo"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "URL maalum haiwezi kuzidi herufi {0}"
 
@@ -861,7 +861,7 @@ msgstr "Kikomo cha viti kimefikiwa"
 msgid "Pipeline"
 msgstr "Pipeline"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr ""
 
@@ -1395,7 +1395,7 @@ msgstr "Badilisha kuwa mpango wa Bure"
 msgid "Parsed {0} rows"
 msgstr "Imepangwa {0} safu"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
 
@@ -1896,7 +1896,7 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 "Thamani zimegawanywa kwa mhimili wa X (\"{axisKeyValue}\")."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
 msgstr ""
 
@@ -2257,7 +2257,7 @@ msgid "Manual form shows an approximation"
 msgstr "Fomu ya Manual inaonyesha makadirio"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "URL maalum lazima iwe na angalau herufi {0}"
 
@@ -3090,7 +3090,7 @@ msgstr ""
 msgid "Continue to your workspace"
 msgstr "Endelea kwenye ofisi yako"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
 
@@ -4079,7 +4079,7 @@ msgstr "Geuza"
 msgid "X axis label"
 msgstr "Lebo ya mhimili wa X"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
 
@@ -4170,7 +4170,7 @@ msgstr "aina"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard share settings updated."
 msgstr "Mipangilio ya kushiriki dashibodi imeboreshwa."
 
@@ -4302,7 +4302,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 "inaonyesha makadirio bora; SQL iliyo juu ndiyo inayoendesha."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
 
@@ -4680,7 +4680,7 @@ msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} inaweza kuonyesha hadi {1} {2} pekee, kwa hivyo inaonyesha {3} za "
 "kwanza pekee."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot be empty"
 msgstr "URL maalum haiwezi kuwa tupu"
 
@@ -5021,7 +5021,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 msgstr "Kifungu cha WHERE kina nodi ya \"{nodeType}\" ambayo fomu haiungi "
 "mkono."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard published!"
 msgstr "Dashibodi imechapishwa!"
 
@@ -5224,7 +5224,7 @@ msgstr "Jina linahitajika"
 msgid "User group saved"
 msgstr "Kikundi cha mtumiaji kimehifadhiwa"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "Haiwezekani kuchapisha dashibodi"
 
@@ -5641,7 +5641,7 @@ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 msgid "Make \"{resourceName}\" private?"
 msgstr "Uweke \"{resourceName}\" kuwa ya faragha?"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "URL hii maalum tayari inatumika"
 
@@ -6033,7 +6033,7 @@ msgstr "Pakia seti ya data"
 msgid "Invalid column type"
 msgstr "Aina ya safu isiyo sahihi"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr ""
 

@@ -399,7 +399,7 @@ msgid "Export annotated PDF"
 msgstr "Exportar PDF anotado"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "La URL personalizada no puede superar los {0} caracteres"
 
@@ -862,7 +862,7 @@ msgstr "Límite de asientos alcanzado"
 msgid "Pipeline"
 msgstr "Canalización"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr ""
 
@@ -1399,7 +1399,7 @@ msgstr "Cambiar a plan gratuito"
 msgid "Parsed {0} rows"
 msgstr "Se analizaron {0} filas"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "La URL personalizada solo puede contener letras minúsculas, números y "
 "guiones"
@@ -1905,7 +1905,7 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "Cada serie es una columna numérica trazada en el eje Y. Los valores se "
 "agrupan por el eje X (\"{axisKeyValue}\")."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
 msgstr ""
 
@@ -2268,7 +2268,7 @@ msgid "Manual form shows an approximation"
 msgstr "El formulario manual muestra una aproximación"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "La URL personalizada debe tener al menos {0} caracteres"
 
@@ -3103,7 +3103,7 @@ msgstr ""
 msgid "Continue to your workspace"
 msgstr "Continúa a tu espacio de trabajo"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "La URL personalizada no puede contener espacios"
 
@@ -4098,7 +4098,7 @@ msgstr "Turno"
 msgid "X axis label"
 msgstr "Etiqueta del eje X"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "Esta URL personalizada está reservada. Intente agregarle una palabra."
 
@@ -4190,7 +4190,7 @@ msgstr "tipo"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard share settings updated."
 msgstr "Configuraciones de compartición del tablero actualizadas."
 
@@ -4323,7 +4323,7 @@ msgstr "Partes de este SQL no pudieron ser representadas en la forma Manual. La 
 "forma muestra una aproximación de mejor esfuerzo; el SQL anterior es lo "
 "que realmente se ejecuta."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Por favor, inténtelo de nuevo. Su tablero no ha sido publicado."
 
@@ -4703,7 +4703,7 @@ msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} solo puede representar hasta {1} {2}, por lo que solo se muestran "
 "los primeros {3}."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot be empty"
 msgstr "La URL personalizada no puede estar vacía"
 
@@ -5046,7 +5046,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 msgstr "La cláusula WHERE contiene un nodo \"{nodeType}\" que el formulario no "
 "admite."
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard published!"
 msgstr "¡Tablero publicado!"
 
@@ -5249,7 +5249,7 @@ msgstr "Nombre requerido"
 msgid "User group saved"
 msgstr "Grupo de usuarios guardado"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "No se pudo publicar el tablero"
 
@@ -5671,7 +5671,7 @@ msgstr "No se pudo preparar el modelo de chat offline."
 msgid "Make \"{resourceName}\" private?"
 msgstr "¿Hacer privado «{resourceName}»?"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "Esta URL personalizada ya está en uso"
 
@@ -6064,7 +6064,7 @@ msgstr "Subir un conjunto de datos"
 msgid "Invalid column type"
 msgstr "Tipo de columna inválido"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr ""
 
