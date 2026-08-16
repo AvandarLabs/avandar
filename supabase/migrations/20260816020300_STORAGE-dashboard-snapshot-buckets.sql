@@ -1,3 +1,27 @@
+-- Storage for dashboard snapshots: the two buckets and their nine policies.
+--
+-- This is the fold of seven drafting `_STORAGE` migrations that each dropped
+-- and recreated overlapping subsets of the same nine policies; the last of them
+-- fully superseded the other six. Each policy is written once, in its final
+-- form.
+--
+-- Storage-only by rule, so it is safe to replay: it is listed in
+-- `[db.seed] sql_paths`, which re-runs it AFTER the migration pass and makes it
+-- the last word on the storage schema for a local database. Every statement is
+-- therefore idempotent (`on conflict`, `drop policy if exists`). The `public`
+-- and `private` helpers these policies call are defined in the non-storage
+-- migrations before it.
+--
+-- `published` holds snapshots of dashboards published to the open internet;
+-- `published-private` holds snapshots published only to a workspace. Both
+-- buckets are PRIVATE, because a bucket created with `public = true` is served
+-- through a path that never consults storage.objects RLS at all. The `on
+-- conflict do update` re-asserts that on a database where an earlier run
+-- created either bucket public.
+--
+-- "Anyone can SELECT published datasets" is dropped and deliberately not
+-- recreated: it was the pre-revision policy that exposed every object in
+-- `published` to `anon` with no dashboard-state check at all.
 insert into
   storage.buckets (
     id,
@@ -195,7 +219,7 @@ select
             )
         ) and
         public.util__auth_user_may_select_dashboard (
-          public.util__storage_object_dashboard_id (name)
+          public.util__storage_object_dashboard_id (storage.objects.name)
         )
       )
     )

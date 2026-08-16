@@ -2,6 +2,11 @@
 -- bring `is_public` back as a stored generated column so every existing
 -- read-side consumer keeps working untouched.
 --
+-- `public.util__storage_object_dashboard_id`, the parser the snapshot storage
+-- policies use to get from an object name back to a dashboard, is folded in at
+-- the bottom. It arrives with the visibility model because that is what first
+-- needed a dashboard-scoped snapshot bucket.
+--
 -- This migration includes two operations a schema diff cannot infer:
 --
 --   1. The `update` backfill below. `db diff` compares schema, never data, so
@@ -61,3 +66,28 @@ create unique index dashboards__slug_unique_per_workspace_when_internal on publi
 where
   visibility = 'workspace'::public.dashboard_visibility and
   slug is not null;
+
+-- Folded in from the former `20260814181933_add_util_storage_object_dashboard_id`
+-- migration, stated once in its final form. Snapshot objects are named
+-- `dashboards/<dashboardId>/revisions/<revision>/datasets/<datasetId>.parquet`,
+-- and the unversioned `dashboards/<dashboardId>/datasets/<datasetId>.parquet`
+-- shape is what pre-revision snapshots used. Returns null rather than raising
+-- on an unrecognised name, so a malformed path is a policy DENIAL instead of a
+-- storage error.
+set
+  check_function_bodies = off;
+
+create or replace function public.util__storage_object_dashboard_id (
+  p_object_name text
+) returns uuid language sql immutable
+set
+  search_path to 'public' as $function$
+  select case
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+      or p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then split_part(p_object_name, '/', 2)::uuid
+    else null
+  end;
+$function$;
