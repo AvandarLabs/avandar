@@ -167,6 +167,62 @@ function _applyLatestUpdate(
 }
 
 describe("StyleSection", () => {
+  it.each(["circle", "proportionalSymbol"] as const)(
+    "opens classification from %s point style",
+    (symbologyType) => {
+      const onOpenClassification = vi.fn();
+      const layer = MapLayer.makeEmpty("Cities");
+      const symbology =
+        symbologyType === "circle" ?
+          layer.symbology
+        : {
+            type: "proportionalSymbol" as const,
+            value: queryColumn.id,
+            minRadius: 4,
+            maxRadius: 24,
+            scale: "sqrt" as const,
+            color: layer.symbology.color,
+            stroke: layer.symbology.stroke,
+          };
+      render(
+        <StyleSection
+          layer={{ ...layer, symbology }}
+          onLayerChange={vi.fn()}
+          onOpenClassification={onOpenClassification}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Edit classification" }),
+      );
+
+      expect(onOpenClassification).toHaveBeenCalledOnce();
+    },
+  );
+
+  it("does not offer classification for cluster style", () => {
+    const layer = MapLayer.makeEmpty("Cities");
+    render(
+      <StyleSection
+        layer={{
+          ...layer,
+          symbology: {
+            type: "cluster",
+            radiusPx: 50,
+            color: { type: "single", color: "#228be6" },
+            stroke: layer.symbology.stroke,
+          },
+        }}
+        onLayerChange={vi.fn()}
+        onOpenClassification={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Edit classification" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("opens classification from polygon fill style", () => {
     const onOpenClassification = vi.fn();
     render(

@@ -29,7 +29,8 @@ function _getDefaultValue(layer: MapLayer.T): MapLayer.LayerValue | undefined {
   const binding = layer.geoBinding;
   if (
     binding?.type === "joinToBoundaries" ||
-    binding?.type === "aggregatePointsToBoundaries"
+    binding?.type === "aggregatePointsToBoundaries" ||
+    binding?.type === "binPointsToGrid"
   ) {
     return {
       type: "areaAggregation",

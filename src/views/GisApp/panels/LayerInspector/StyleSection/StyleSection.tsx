@@ -43,7 +43,12 @@ export function StyleSection(props: Props): ReactNode {
           }}
         />
       : null}
-      {symbology.type === "fill" && props.onOpenClassification ?
+      {(
+        props.onOpenClassification &&
+        (symbology.type === "fill" ||
+          symbology.type === "circle" ||
+          symbology.type === "proportionalSymbol")
+      ) ?
         <Button variant="subtle" onClick={props.onOpenClassification}>
           {t`Edit classification`}
         </Button>

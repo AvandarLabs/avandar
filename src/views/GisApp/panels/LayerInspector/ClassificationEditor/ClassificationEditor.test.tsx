@@ -72,6 +72,117 @@ function _createLayer(): MapLayer.T {
 }
 
 describe("ClassificationEditor", () => {
+  it("uses the grid aggregation output when enabling graduated color", () => {
+    const layer = _createLayer();
+    const outputValueId = uuid<MapLayer.AreaAggregationOutputId>();
+    const gridLayer: MapLayer.T = {
+      ...layer,
+      geoBinding: {
+        type: "binPointsToGrid",
+        grid: "hex",
+        sizeMeters: 10_000,
+        points: {
+          type: "geometryColumn",
+          column: layer.source.queryColumns[0]!.id,
+          encoding: "wkt",
+          family: "point",
+          simplification: undefined,
+          sourceCrs: undefined,
+        },
+        aggregation: { operation: "count", outputValueId },
+      },
+      symbology: {
+        ...layer.symbology,
+        color: { type: "single", color: "#228be6" },
+      },
+    };
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={gridLayer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Color mode" }));
+    fireEvent.click(
+      screen.getByRole("option", { name: "Graduated", hidden: true }),
+    );
+
+    const updated = onLayerChange.mock.calls[0]![0](gridLayer);
+    expect(updated.symbology.color).toMatchObject({
+      type: "graduated",
+      value: { type: "areaAggregation", outputValueId },
+    });
+  });
+
+  it("offers query columns but not boundary columns for grid bins", () => {
+    const layer = _createLayer();
+    const now = new Date().toISOString();
+    const boundaryDatasetId = uuid<Dataset.Id>();
+    const populationColumn = Model.make("DatasetColumn", {
+      id: uuid<DatasetColumn.Id>(),
+      datasetId: boundaryDatasetId,
+      workspaceId: uuid<Workspace.Id>(),
+      createdAt: now,
+      updatedAt: now,
+      name: "Population",
+      originalName: "Population",
+      originalDataType: "DOUBLE",
+      dataType: "double",
+      detectedDataType: "DOUBLE",
+      description: undefined,
+      columnIdx: 0,
+    });
+    boundarySourceState.options = [
+      {
+        dataset: { id: boundaryDatasetId },
+        columns: [populationColumn],
+        label: "Boundaries",
+      },
+    ];
+    const gridLayer: MapLayer.T = {
+      ...layer,
+      geoBinding: {
+        type: "binPointsToGrid",
+        grid: "hex",
+        sizeMeters: 10_000,
+        points: {
+          type: "geometryColumn",
+          column: layer.source.queryColumns[0]!.id,
+          encoding: "wkt",
+          family: "point",
+          simplification: undefined,
+          sourceCrs: undefined,
+        },
+        aggregation: {
+          operation: "count",
+          outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+        },
+      },
+    };
+    render(
+      <ClassificationEditor
+        layer={gridLayer}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Normalize by" }));
+
+    expect(
+      screen.getByRole("option", { name: "Cases", hidden: true }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", {
+        name: "Population (boundary)",
+        hidden: true,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   it("offers numeric boundary columns as normalization denominators", () => {
     const layer = _createLayer();
     const now = new Date().toISOString();
