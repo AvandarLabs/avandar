@@ -285,6 +285,33 @@ describe("getBoundsFromFeatureCollection", () => {
     ).toBeUndefined();
   });
 
+  it("returns undefined when every coordinate is outside WGS 84", () => {
+    expect(
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [
+          _createPoint({ longitude: 1_113_195, latitude: 1_118_890 }),
+          _createPoint({ longitude: 1_224_514, latitude: 1_235_089 }),
+        ],
+      }),
+    ).toBeUndefined();
+  });
+
+  it("spans only the coordinates that are inside WGS 84", () => {
+    expect(
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [
+          _createPoint({ longitude: 15, latitude: -4 }),
+          _createPoint({ longitude: 1_113_195, latitude: 1_118_890 }),
+        ],
+      }),
+    ).toEqual([
+      [15, -4],
+      [15, -4],
+    ]);
+  });
+
   it("walks a geometry collection nested inside another", () => {
     const nested: GeoJSON.Feature = {
       type: "Feature",
