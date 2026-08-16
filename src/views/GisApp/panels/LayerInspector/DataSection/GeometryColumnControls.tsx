@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { CrsOverrideField } from "@/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField";
 import { SimplificationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -94,6 +95,14 @@ export function GeometryColumnControls(props: Props): ReactNode {
               current,
               family as MapLayer.GeometryFamily,
             );
+          });
+        }}
+      />
+      <CrsOverrideField
+        sourceCrs={binding.sourceCrs}
+        onChange={(sourceCrs) => {
+          props.onLayerChange((current) => {
+            return MapLayerUpdates.withGeometrySourceCrs(current, sourceCrs);
           });
         }}
       />

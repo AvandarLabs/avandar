@@ -389,6 +389,7 @@ export const MapLayerUpdates = {
         encoding: "wkt",
         family,
         simplification: _getDefaultSimplification(family),
+        sourceCrs: undefined,
       },
       symbology: _withGeometryFamilySymbology(layer, family),
     } as MapLayer.T;
@@ -471,6 +472,21 @@ export const MapLayerUpdates = {
     return {
       ...layer,
       geoBinding: { ...binding, simplification },
+    } as MapLayer.T;
+  },
+
+  /** Sets the EPSG code used to reproject a geometry column to WGS 84. */
+  withGeometrySourceCrs: (
+    layer: MapLayer.T,
+    sourceCrs: number | undefined,
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "geometryColumn" || binding.sourceCrs === sourceCrs) {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: { ...binding, sourceCrs },
     } as MapLayer.T;
   },
 

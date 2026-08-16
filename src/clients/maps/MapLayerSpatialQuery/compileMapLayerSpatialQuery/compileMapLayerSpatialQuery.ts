@@ -7,6 +7,7 @@ import {
 import { buildGeometryExpression } from "../buildGeometryExpression/buildGeometryExpression";
 import { buildGridCellExpressions } from "../buildGridCellExpressions/buildGridCellExpressions";
 import { buildNormalizedBoundaryKey } from "../buildNormalizedBoundaryKey/buildNormalizedBoundaryKey";
+import { buildSourceCrsTransform } from "../buildSourceCrsTransform/buildSourceCrsTransform";
 import { getSimplificationTolerance } from "../getSimplificationTolerance/getSimplificationTolerance";
 import {
   MapLayerSpatialFeatureProperties,
@@ -385,9 +386,12 @@ function _compileGeometryColumn(
   const family = quoteSqlIdentifier(FAMILY_COLUMN);
   const properties = _getPropertyColumnNames(options.layer, options.metadata);
   const parser = _buildSimplifiedGeometry(
-    buildGeometryExpression(
-      quoteSqlIdentifier(geometryColumnName),
-      binding.encoding,
+    buildSourceCrsTransform(
+      buildGeometryExpression(
+        quoteSqlIdentifier(geometryColumnName),
+        binding.encoding,
+      ),
+      binding.sourceCrs,
     ),
     binding.family === "point" ? undefined : binding.simplification,
     options,
@@ -432,7 +436,10 @@ function _buildPointExpression(
     if (!name) {
       throw new Error("The point geometry column could not be resolved");
     }
-    return buildGeometryExpression(quoteSqlIdentifier(name), points.encoding);
+    return buildSourceCrsTransform(
+      buildGeometryExpression(quoteSqlIdentifier(name), points.encoding),
+      points.sourceCrs,
+    );
   }
   const latitude =
     points.latitude ?

@@ -96,6 +96,7 @@ function _createFixture() {
 function _createGridBinFixture(options: {
   grid: "hex" | "square";
   minCellCount?: number;
+  sourceCrs?: number;
 }) {
   const fixture = _createFixture();
   const pointColumn = fixture.layer.source.queryColumns[0]!;
@@ -119,7 +120,7 @@ function _createGridBinFixture(options: {
         encoding: "wkt" as const,
         family: "point" as const,
         simplification: undefined,
-        sourceCrs: undefined,
+        sourceCrs: options.sourceCrs,
       },
       aggregation: {
         operation: "count" as const,
@@ -137,6 +138,16 @@ function _getCellMathSql(rawSql: string): string {
   const end = rawSql.indexOf("cell_values AS (");
   if (start < 0 || end <= start) {
     throw new Error("The compiled bin SQL has no cell math section");
+  }
+  return rawSql.slice(start, end);
+}
+
+/** Returns the direct geometry parser CTE without later simplification SQL. */
+function _getParsedRowsSql(rawSql: string): string {
+  const start = rawSql.indexOf("parsed_rows AS (");
+  const end = rawSql.indexOf("typed_rows AS (");
+  if (start < 0 || end <= start) {
+    throw new Error("The compiled geometry SQL has no parser section");
   }
   return rawSql.slice(start, end);
 }
@@ -250,6 +261,60 @@ describe("compileMapLayerSpatialQuery", () => {
     });
 
     expect(rawSql).not.toContain("ST_SimplifyPreserveTopology");
+  });
+
+  it("reprojects a direct geometry column from its configured source CRS", () => {
+    const fixture = _createFixture();
+    const binding = fixture.layer.geoBinding;
+    if (binding?.type !== "geometryColumn") {
+      throw new Error("Expected a geometry-column fixture");
+    }
+    const layer = {
+      ...fixture.layer,
+      geoBinding: {
+        ...binding,
+        family: "point" as const,
+        simplification: undefined,
+        sourceCrs: 32_633,
+      },
+    } as MapLayer.T;
+
+    const { rawSql } = compileMapLayerSpatialQuery({
+      layer,
+      metadata: fixture.metadata,
+      zoomBand: 4,
+      simplificationReferenceLatitude: 0,
+    });
+
+    expect(_getParsedRowsSql(rawSql)).toContain(
+      "TRY(ST_Transform(TRY(ST_GeomFromText",
+    );
+    expect(_getParsedRowsSql(rawSql)).toContain("'EPSG:32633'");
+  });
+
+  it("does not transform an unset direct geometry source CRS", () => {
+    const fixture = _createFixture();
+    const binding = fixture.layer.geoBinding;
+    if (binding?.type !== "geometryColumn") {
+      throw new Error("Expected a geometry-column fixture");
+    }
+    const layer = {
+      ...fixture.layer,
+      geoBinding: {
+        ...binding,
+        family: "point" as const,
+        simplification: undefined,
+      },
+    } as MapLayer.T;
+
+    const { rawSql } = compileMapLayerSpatialQuery({
+      layer,
+      metadata: fixture.metadata,
+      zoomBand: 4,
+      simplificationReferenceLatitude: 0,
+    });
+
+    expect(_getParsedRowsSql(rawSql)).not.toContain("ST_Transform");
   });
 
   it.each([
@@ -394,6 +459,7 @@ describe("compileMapLayerSpatialQuery", () => {
           encoding: "wkt" as const,
           family: "point" as const,
           simplification: undefined,
+          sourceCrs: 3857,
         },
         aggregation: {
           operation: "count" as const,
@@ -431,6 +497,8 @@ describe("compileMapLayerSpatialQuery", () => {
     });
 
     expect(rawSql).toContain("ST_Within");
+    expect(rawSql).toContain("TRY(ST_Transform(TRY(ST_GeomFromText");
+    expect(rawSql).toContain("'EPSG:3857'");
     expect(rawSql).toContain("point_match_counts AS (");
     expect(rawSql).toContain("outside_boundary_count");
     expect(rawSql).toContain("overlap_count");
@@ -522,6 +590,21 @@ describe("compileMapLayerSpatialQuery", () => {
 
     expect(rawSql).toContain(quotedName);
     expect(rawSql.replaceAll(quotedName, "")).not.toContain(hostileName);
+  });
+
+  it("reprojects a geometry-column point before grid binning", () => {
+    const fixture = _createGridBinFixture({
+      grid: "square",
+      sourceCrs: 4258,
+    });
+    const { rawSql } = compileMapLayerSpatialQuery({
+      ...fixture,
+      zoomBand: 3,
+      simplificationReferenceLatitude: 0,
+    });
+
+    expect(rawSql).toContain("TRY(ST_Transform(TRY(ST_GeomFromText");
+    expect(rawSql).toContain("'EPSG:4258'");
   });
 
   it("suppresses below-threshold cells without any reportable count", () => {

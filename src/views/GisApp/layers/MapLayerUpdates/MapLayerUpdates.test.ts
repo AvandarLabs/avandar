@@ -200,6 +200,7 @@ describe("geometry-column updates", () => {
       encoding: "wkt",
       family: "point",
       simplification: undefined,
+      sourceCrs: undefined,
     });
     expect(updatedLayer.source.queryColumns).toContain(geometry);
   });
@@ -264,6 +265,28 @@ describe("geometry-column updates", () => {
     expect(MapLayerUpdates.withGeometrySimplification(layer, undefined)).toBe(
       layer,
     );
+  });
+
+  it("sets and clears a geometry column source CRS", () => {
+    const geometry = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("shape"),
+    );
+    const layer = MapLayerUpdates.withGeometryBindingType(
+      _createBoundLayer(),
+      "geometryColumn",
+      geometry,
+    );
+
+    const withSourceCrs = MapLayerUpdates.withGeometrySourceCrs(layer, 3857);
+    const withoutSourceCrs = MapLayerUpdates.withGeometrySourceCrs(
+      withSourceCrs,
+      undefined,
+    );
+
+    expect(withSourceCrs.geoBinding).toMatchObject({ sourceCrs: 3857 });
+    expect(withoutSourceCrs.geoBinding).toMatchObject({
+      sourceCrs: undefined,
+    });
   });
 });
 
