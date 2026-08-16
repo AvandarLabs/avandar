@@ -4,13 +4,11 @@ import {
   FreePlanLimitsConfig,
   PremiumPlanLimitsConfig,
 } from "$/config/FeaturePlansConfig.ts";
-import {
-  canAddDatasets,
-  canInviteMembers,
-  canPublishShareableDashboard,
-  doesSubscriptionGrantEntitlements,
-  getEffectiveEntitlementLimits,
-} from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements.ts";
+import { canAddDatasets } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canAddDatasets.ts";
+import { canInviteMembers } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canInviteMembers.ts";
+import { canPublishShareableDashboard } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canPublishShareableDashboard.ts";
+import { doesSubscriptionGrantEntitlements } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/doesSubscriptionGrantEntitlements.ts";
+import { getEffectiveEntitlementLimits } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/getEffectiveEntitlementLimits.ts";
 import type {
   FeaturePlanType,
   PolarCustomerId,
@@ -63,7 +61,7 @@ export const SubscriptionModule = {
   /**
    * The entitlement questions: which caps apply to this subscription, and
    * whether the workspace is still under each of them. Documented on the
-   * functions themselves in `subscriptionEntitlements.ts`.
+   * functions themselves in `subscriptionEntitlements/`.
    */
   doesSubscriptionGrantEntitlements,
   getEffectiveEntitlementLimits,

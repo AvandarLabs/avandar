@@ -78,11 +78,11 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Hii itaruhusu dataset kuhifadhiwa mtandaoni ili iweze kufikiwa kwenye "
 "vifaa vingine."
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "Fanya swali ili kuona matokeo."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Anza (mfano: 2024-01-01)"
 
@@ -232,7 +232,7 @@ msgstr "H4"
 msgid "Query"
 msgstr "Swali"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "Filtria za safu"
 
@@ -450,7 +450,7 @@ msgstr "Hifadhi: {0}"
 msgid "Free"
 msgstr "Bure"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "Mwangaza wa meza haina mipangilio ya ziada."
 
@@ -601,7 +601,7 @@ msgstr "Maudhui"
 msgid "Use suggestion"
 msgstr "Tumia pendekezo"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
 msgstr "Acha kuchapisha"
 
@@ -668,7 +668,7 @@ msgid "Remove User"
 msgstr "Ondoa Mtumiaji"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "Imesasishwa {0}"
@@ -770,7 +770,7 @@ msgstr "Hifadhi kama seti mpya ya data"
 msgid "From derived dataset"
 msgstr "Kutoka kwa seti ya data iliyotokana"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Imechapishwa kwenye workspace"
 
@@ -961,7 +961,7 @@ msgstr "Kuunda kumeshindikana"
 msgid "Natural"
 msgstr "Asili"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Public"
 msgstr "Hadharani"
 
@@ -1009,7 +1009,7 @@ msgstr "Kurekebisha nenosiri kumeshindikana"
 msgid "New role group"
 msgstr "Kundi jipya la jukumu"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
 "below to apply your change."
 msgstr "Nakala iliyochapishwa bado inahudumia hadhira ya awali. Tumia kitufe "
@@ -1207,7 +1207,7 @@ msgstr "Vichujio vya chati hii"
 msgid "Align"
 msgstr "Pangilia"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
 msgstr "Chapisha kila safu, mistari yote. Ufanisi mkubwa kwa watazamaji, "
@@ -1518,7 +1518,7 @@ msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
 msgid "Suggested:"
 msgstr "Ilipendekezwa:"
 
-#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DuckDbTablesContent.tsx
 msgid "No tables found"
 msgstr "Hakuna majedwali yaliyopatikana"
 
@@ -1760,7 +1760,7 @@ msgstr "Sasisho linapatikana"
 msgid "Step"
 msgstr "Hatua"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "Max"
@@ -1817,7 +1817,7 @@ msgstr "Futa"
 msgid "Failed to save dataset: {0}"
 msgstr "Imeshindikana kuhifadhi dataset: {0}"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboard. Upgrade to our Starter or Impact plan to share as many "
 "dashboards as you like."
@@ -1847,7 +1847,7 @@ msgstr "Kitambulisho cha eneo la kazi"
 msgid "{numUsers} people"
 msgstr "Watu {numUsers}"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "Buni query ili kuunda picha hii."
 
@@ -1965,7 +1965,7 @@ msgstr "Chaguo lenye katalogi kubwa zaidi. Uwezo wa juu zaidi wa offline wakati 
 msgid "Enter a name for this dataset"
 msgstr "Ingiza jina la dataset hii"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "Chaguo maalum"
 
@@ -2052,7 +2052,8 @@ msgstr "Tafadhali ingia tena ili uendelee. Ikiwa kuingia hakufanyi kazi, weka "
 "upya programu ili kufuta data iliyohifadhiwa kwenye akiba kisha ujaribu "
 "tena."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
 msgid "to"
 msgstr "kwa"
 
@@ -2122,7 +2123,7 @@ msgstr "Maandishi tupu"
 msgid "Ocean"
 msgstr "Bahari"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "Not published yet. Nobody can open this dashboard from a link until you "
 "publish it."
 msgstr "Bado haijachapishwa. Hakuna mtu anayeweza kufungua dashibodi hii "
@@ -2188,7 +2189,7 @@ msgstr "Hakuna"
 msgid "You'll be asked to confirm your current password."
 msgstr "Utatazamiwa kuthibitisha nenosiri lako la sasa."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
 msgstr "Chapisha"
 
@@ -2305,7 +2306,7 @@ msgstr "Hakuna seti ya data iliyochaguliwa"
 msgid "description"
 msgstr "maelezo"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "Min"
@@ -2431,7 +2432,7 @@ msgstr "Dashibodi imehifadhiwa kwa mafanikio!"
 msgid "N/A"
 msgstr "S/H"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "Chapisha tu safu ambazo dashibodi yako inasoma. Nyembamba zaidi, "
 "binafsi zaidi."
@@ -2486,7 +2487,7 @@ msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "Chagua safu na ongeza vikwazo vya mistari (enum, anuwai ya nambari, "
 "anuwai ya tarehe)."
@@ -2539,7 +2540,7 @@ msgstr "Ongeza watu au vikundi vya watumiaji"
 msgid "Size column"
 msgstr "Safu ya ukubwa"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "Thamani"
 
@@ -2924,7 +2925,7 @@ msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgid "Tab"
 msgstr "Kichupo"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Seti kadhaa za data zilizochapishwa hazikuweza kupakiwa. Tafadhali "
 "jaribu tena baadaye."
@@ -3043,7 +3044,7 @@ msgstr "Sasisho limefeli"
 msgid "Back"
 msgstr "Rudi"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Contact us to raise the limit "
 "for your workspace."
@@ -3117,7 +3118,7 @@ msgstr "Ni nini wastani wa {averageColumn} katika {datasetName}?"
 msgid "Drop to import"
 msgstr "Angusha ili kuagiza"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "Muda wa tarehe"
 
@@ -3222,12 +3223,12 @@ msgstr "Uwezo wa kufikiri ni bora kuliko 1.5B kwa upakuaji wa wastani. Hatua "
 msgid "Starting…"
 msgstr "Kuanza…"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Muda wa nambari"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Columns"
 msgstr "Safu"
 
@@ -3248,7 +3249,7 @@ msgstr "Kifungu cha WHERE kinalinganisha \"{columnName}\" na usemi usio wa "
 msgid "Add to your workspace"
 msgstr "Ongeza kwenye eneo lako la kazi"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
 msgstr "Haiwezekani kupakia dashibodi"
 
@@ -3345,7 +3346,7 @@ msgstr "Kutoka kwenye dataset"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "Profaili inaweza kuwa na safu zinazotoka kwenye datasets tofauti."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "Mwisho (mfano. 2024-12-31)"
 
@@ -3572,7 +3573,7 @@ msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
 msgstr "\"{resourceName}\" bado itakuwa ya hadharani: mtu yeyote aliye na "
 "kiungo ataendelea kupata ufikiaji hadi utakapoacha kuichapisha."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
 "it until you press the button below."
 msgstr "Dashibodi hii bado iko hadharani kwenye wavuti. Mtu yeyote aliye na "
@@ -3765,7 +3766,7 @@ msgstr "Chaguzi (zinazo tengwa kwa koma, kwa njia za kuchagua)"
 msgid "Owner"
 msgstr "Mmiliki"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it, with "
 "no Avandar account."
 msgstr "Dashibodi hii ni <0>ya hadharani</0>. Mtu yeyote aliye na kiungo "
@@ -3859,7 +3860,7 @@ msgstr "Hizi ni safu za kwanza {0} za seti yako ya data."
 msgid "Reassign failed"
 msgstr "Uhamishaji wa umiliki umeshindikana"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
 "Impact plan to share as many dashboards as you like."
@@ -3919,7 +3920,7 @@ msgstr "Kiungo cha moja kwa moja (tumia kwa misimbo ya QR)"
 msgid "Column 4"
 msgstr "Safu wima ya 4"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "Inatayarisha data kwa ajili ya uonyeshaji…"
 
@@ -3973,7 +3974,7 @@ msgid "By default we use a direct UUID-based link. Add a custom path below for "
 msgstr "Kwa chaguo-msingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 "UUID. Ongeza njia maalum hapa chini kwa URL nzuri zaidi."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "Fanya iwe ya ndani"
 
@@ -4028,7 +4029,7 @@ msgstr "SQL"
 msgid "Ordered"
 msgstr "Yenye mpangilio"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "Hakuna vichujio vya safu. Sehemu itajumuisha kila safu katika dataset "
@@ -4238,7 +4239,7 @@ msgstr "Kuongeza"
 msgid "Ask about your data"
 msgstr "Uliza kuhusu data yako"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "Ingiza thamani; bonyeza Enter baada ya kila moja"
 
@@ -4286,7 +4287,7 @@ msgstr "Rangi ya alama za mhimili wa Y"
 msgid "{0} · run {1}"
 msgstr "{0} · endesha {1}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Process data again"
 msgstr "Process data again"
 
@@ -4463,7 +4464,7 @@ msgstr "Uhusishaji"
 msgid "Column types updated"
 msgstr "Aina za safu zimeboreshwa"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "Sehemu ya mtandaoni"
 
@@ -4484,7 +4485,7 @@ msgid "Sign in again"
 msgstr "Ingia tena"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr "Kikomo cha dashibodi zilizoshirikiwa kimefikiwa"
 
@@ -4661,7 +4662,7 @@ msgstr "Inapakua {0} kwa mazungumzo ya mtandaoni"
 msgid "Open chat panel"
 msgstr "Fungua paneli ya mazungumzo"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Ondoa kichujio cha safu"
 
@@ -4786,7 +4787,7 @@ msgstr "Seti hii ya data ni kubwa, hivyo tumetumia kikomo cha safu 100. Unaweza 
 msgid "Anyone with the link"
 msgstr "Mtu yeyote aliye na kiungo"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "Seti hii ya data inaweza kuhifadhiwa kwenye wingu."
 
@@ -4868,7 +4869,7 @@ msgstr "Mpangilio"
 msgid "Role for {displayName}"
 msgstr "Jukumu la {displayName}"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is published to your workspace. Only people you have "
 "given access can open the link below."
 msgstr "Dashibodi hii imechapishwa kwenye workspace yako. Ni watu uliowapa "
@@ -4951,7 +4952,7 @@ msgstr "Imefungwa"
 msgid "Contains (free-text)"
 msgstr "Inajumuisha (maneno ya bure)"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "This dashboard is not published yet. Use the button below to publish it "
 "to the audience you picked."
 msgstr "Dashibodi hii bado haijachapishwa. Tumia kitufe kilicho hapa chini "
@@ -4961,7 +4962,7 @@ msgstr "Dashibodi hii bado haijachapishwa. Tumia kitufe kilicho hapa chini "
 msgid "Send feedback"
 msgstr "Tuma maoni"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "Inapakia seti za data za dashibodi"
 
@@ -5151,7 +5152,7 @@ msgstr "Tuma jibu"
 msgid "... and {remainingCount} more"
 msgstr "... na {remainingCount} zaidi"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "Tu kile kilichoulizwa"
 
@@ -5258,7 +5259,7 @@ msgstr "Watu wenye ufikiaji"
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
@@ -5276,7 +5277,7 @@ msgstr "Pakua mfano tofauti wa mazungumzo ya mtandaoni"
 msgid "Edit permissions"
 msgstr "Hariri ruhusa"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "iliyoulizwa"
 
@@ -5444,7 +5445,7 @@ msgstr "Maandishi mbadala"
 msgid "Switch Workspace"
 msgstr "Badilisha Nafasi ya Kazi"
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Unaweza kuona dashibodi hii kwa sababu ilishirikiwa nawe."
 
@@ -5756,7 +5757,7 @@ msgstr "Hariri kundi la jukumu"
 msgid "Profiles"
 msgstr "Profaili"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "Sasisha & chapisha tena"
 
@@ -5884,7 +5885,7 @@ msgstr "Uko kwenye mpango wa Bure"
 msgid "Count"
 msgstr "Idadi"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
 "share as many dashboards as you like."
@@ -5921,11 +5922,11 @@ msgid "Recommended"
 msgstr "Inapendekezwa"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Select all"
 msgstr "Chagua yote"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "Tu kile kinachoulizwa (inapendekezwa)"
 
@@ -6212,7 +6213,7 @@ msgstr "Ufikiaji wa jumla"
 msgid "Media"
 msgstr "Midia"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "Ongeza kichocheo na tengeneza SQL ili kuunda picha hii."
 
@@ -6303,7 +6304,7 @@ msgstr "Tafadhali angalia data na uhakikishe ni sahihi. Mara tu "
 msgid "Stroke ({strokeWidth}px)"
 msgstr "Mchoro ({strokeWidth}px)"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish to workspace"
 msgstr "Chapisha kwenye nafasi ya kazi"
 
@@ -6412,8 +6413,8 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "Mahali pako pa kazi umekamilisha {currentSeatUsage} ya {totalSeats} "
 "viti vyake."
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "Imeshirikiwa nawe"
@@ -6457,7 +6458,7 @@ msgstr "Inapakia..."
 msgid "Share"
 msgstr "Shiriki"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "Dataset nzima"
 
@@ -6545,7 +6546,7 @@ msgstr "Kutoka safu: <0>{columnName}</0>"
 msgid "Bottom"
 msgstr "Chini"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "Iko tayari mtandaoni"
 

@@ -78,11 +78,11 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "سيسمح ذلك بتخزين مجموعة البيانات على الإنترنت بحيث يمكن الوصول إليها من "
 "أجهزة أخرى."
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "قم بتشغيل استعلام لرؤية النتائج."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
@@ -230,7 +230,7 @@ msgstr "H4"
 msgid "Query"
 msgstr "استعلام"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "فلاتر الصفوف"
 
@@ -445,7 +445,7 @@ msgstr "حفظ: {0}"
 msgid "Free"
 msgstr "مجاني"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
 
@@ -595,7 +595,7 @@ msgstr "المحتوى"
 msgid "Use suggestion"
 msgstr "استخدام الاقتراح"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
 msgstr "إلغاء النشر"
 
@@ -662,7 +662,7 @@ msgid "Remove User"
 msgstr "إزالة المستخدم"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
@@ -762,7 +762,7 @@ msgstr "احفظ كمجموعة بيانات جديدة"
 msgid "From derived dataset"
 msgstr "من مجموعة البيانات المشتقة"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "تم النشر في مساحة العمل"
 
@@ -950,7 +950,7 @@ msgstr "فشل الإنشاء"
 msgid "Natural"
 msgstr "طبيعي"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Public"
 msgstr "عام"
 
@@ -998,7 +998,7 @@ msgstr "فشل إعادة تعيين كلمة المرور"
 msgid "New role group"
 msgstr "مجموعة أدوار جديدة"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
 "below to apply your change."
 msgstr "لا تزال النسخة المنشورة متاحة للجمهور السابق. استخدم الزر أدناه لتطبيق "
@@ -1194,7 +1194,7 @@ msgstr "الفلاتر لهذا الرسم البياني"
 msgid "Align"
 msgstr "محاذاة"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
 msgstr "نشر كل عمود، جميع الصفوف. أقصى مرونة للمشاهدين، أقصى تعرض."
@@ -1503,7 +1503,7 @@ msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspa
 msgid "Suggested:"
 msgstr "مقترح:"
 
-#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView.tsx
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DuckDbTablesContent.tsx
 msgid "No tables found"
 msgstr "لم يتم العثور على جداول"
 
@@ -1739,7 +1739,7 @@ msgstr "يتوفر تحديث"
 msgid "Step"
 msgstr "خطوة"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "الأقصى"
@@ -1795,7 +1795,7 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboard. Upgrade to our Starter or Impact plan to share as many "
 "dashboards as you like."
@@ -1824,7 +1824,7 @@ msgstr "معرّف مساحة العمل"
 msgid "{numUsers} people"
 msgstr "{numUsers} أشخاص"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
@@ -1940,7 +1940,7 @@ msgstr "الخيار ذو أكبر كتالوج. أقصى قدرة للعمل د
 msgid "Enter a name for this dataset"
 msgstr "أدخل اسمًا لهذه المجموعة من البيانات"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "اختيار مخصص"
 
@@ -2026,7 +2026,8 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة. إذا لم ينجح تسجيل الدخول، فأعد ضبط "
 "التطبيق لمسح البيانات المخزنة مؤقتًا وحاول مرة أخرى."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
 msgid "to"
 msgstr "إلى"
 
@@ -2096,7 +2097,7 @@ msgstr "نص فارغ"
 msgid "Ocean"
 msgstr "المحيط"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "Not published yet. Nobody can open this dashboard from a link until you "
 "publish it."
 msgstr "لم يتم النشر بعد. لا يمكن لأي شخص فتح لوحة المعلومات هذه من رابط حتى "
@@ -2161,7 +2162,7 @@ msgstr "لا شيء"
 msgid "You'll be asked to confirm your current password."
 msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
 msgstr "نشر"
 
@@ -2277,7 +2278,7 @@ msgstr "لم يتم اختيار مجموعة بيانات"
 msgid "description"
 msgstr "الوصف"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "الأدنى"
@@ -2402,7 +2403,7 @@ msgstr "تم حفظ اللوحة بنجاح!"
 msgid "N/A"
 msgstr "غير متوفر"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "نشر فقط الأعمدة التي تقرأها لوحة التحكم الخاصة بك. أضيق، وأكثر خصوصية."
 
@@ -2456,7 +2457,7 @@ msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة الع
 msgid "Please check your email"
 msgstr "يرجى التحقق من بريدك الإلكتروني"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "اختر الأعمدة وأضف قيود الصفوف (تعداد، نطاق الأرقام، نطاق التاريخ)."
 
@@ -2507,7 +2508,7 @@ msgstr "إضافة أشخاص أو مجموعات مستخدمين"
 msgid "Size column"
 msgstr "عمود الحجم"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "القيم"
 
@@ -2885,7 +2886,7 @@ msgstr "{description} {recommendedIf} (~{approxSizeMb} MB للتنزيل)."
 msgid "Tab"
 msgstr "علامة تبويب"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة "
 "أخرى لاحقًا."
@@ -3002,7 +3003,7 @@ msgstr "فشل التحديث"
 msgid "Back"
 msgstr "عودة"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Contact us to raise the limit "
 "for your workspace."
@@ -3076,7 +3077,7 @@ msgstr "ما هو المتوسط {averageColumn} في {datasetName}؟"
 msgid "Drop to import"
 msgstr "اسحب للاستيراد"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "نطاق التاريخ"
 
@@ -3179,12 +3180,12 @@ msgstr "استدلال أقوى من 1.5B مع تنزيل متوسط الحجم.
 msgid "Starting…"
 msgstr "جارٍ البدء…"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "نطاق الأرقام"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Columns"
 msgstr "الأعمدة"
 
@@ -3204,7 +3205,7 @@ msgstr "تقارن جملة WHERE ‏\"{columnName}\" بتعبير غير حرف
 msgid "Add to your workspace"
 msgstr "أضف إلى مساحة العمل الخاصة بك"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
 msgstr "غير قادر على تحميل لوحة التحكم"
 
@@ -3301,7 +3302,7 @@ msgstr "من مجموعة البيانات"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "يمكن أن يتكون الملف الشخصي من أعمدة تأتي من مجموعات بيانات مختلفة."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "النهاية (على سبيل المثال 2024-12-31)"
 
@@ -3522,7 +3523,7 @@ msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
 msgstr "ستظل \"{resourceName}\" عامة: سيحتفظ أي شخص لديه الرابط بإمكانية الوصول "
 "حتى تلغي نشرها."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "This dashboard is still public on the web. Anyone with the link can view "
 "it until you press the button below."
 msgstr "لا تزال لوحة المعلومات هذه عامة على الويب. يمكن لأي شخص لديه الرابط "
@@ -3713,7 +3714,7 @@ msgstr "خيارات (مفصولة بفواصل، لوضع الاختيار)"
 msgid "Owner"
 msgstr "مالك"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it, with "
 "no Avandar account."
 msgstr "لوحة المعلومات هذه <0>عامة</0>. يمكن لأي شخص لديه الرابط عرضها من دون "
@@ -3806,7 +3807,7 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيان
 msgid "Reassign failed"
 msgstr "فشلت إعادة التعيين"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
 "Impact plan to share as many dashboards as you like."
@@ -3864,7 +3865,7 @@ msgstr "الرابط المباشر (يُستخدم لرموز QR)"
 msgid "Column 4"
 msgstr "العمود 4"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "تحضير البيانات للتصورات…"
 
@@ -3918,7 +3919,7 @@ msgid "By default we use a direct UUID-based link. Add a custom path below for "
 msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إلى UUID. أضف مسارًا مخصصًا أدناه "
 "للحصول على عنوان URL أفضل."
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "جعله داخليًا"
 
@@ -3973,7 +3974,7 @@ msgstr "SQL"
 msgid "Ordered"
 msgstr "مرتّب"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة "
@@ -4181,7 +4182,7 @@ msgstr "تصاعدي"
 msgid "Ask about your data"
 msgstr "اسأل عن بياناتك"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "أدخل القيم؛ اضغط على Enter بعد كل واحدة"
 
@@ -4229,7 +4230,7 @@ msgstr "لون تدريجات المحور Y"
 msgid "{0} · run {1}"
 msgstr "{0} · تشغيل {1}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Process data again"
 msgstr "معالجة البيانات مرة أخرى"
 
@@ -4405,7 +4406,7 @@ msgstr "الإسناد"
 msgid "Column types updated"
 msgstr "تم تحديث أنواع الأعمدة"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "غير متصل جزئيًا"
 
@@ -4426,7 +4427,7 @@ msgid "Sign in again"
 msgstr "تسجيل الدخول مرة أخرى"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr "تم بلوغ حد لوحات المعلومات المشتركة"
 
@@ -4599,7 +4600,7 @@ msgstr "تحميل {0} للدردشة غير المتصلة"
 msgid "Open chat panel"
 msgstr "فتح لوحة الدردشة"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "إزالة فلتر الصف"
 
@@ -4722,7 +4723,7 @@ msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتط
 msgid "Anyone with the link"
 msgstr "أي شخص لديه الرابط"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "يمكن تخزين مجموعة البيانات هذه في السحابة."
 
@@ -4803,7 +4804,7 @@ msgstr "التخطيط"
 msgid "Role for {displayName}"
 msgstr "الدور لـ {displayName}"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is published to your workspace. Only people you have "
 "given access can open the link below."
 msgstr "تم نشر لوحة المعلومات هذه في مساحة العمل لديك. لا يمكن فتح الرابط أدناه "
@@ -4886,7 +4887,7 @@ msgstr "مقيد"
 msgid "Contains (free-text)"
 msgstr "يحتوي على (نص حر)"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "This dashboard is not published yet. Use the button below to publish it "
 "to the audience you picked."
 msgstr "لم يتم نشر لوحة المعلومات هذه بعد. استخدم الزر أدناه لنشرها للجمهور "
@@ -4896,7 +4897,7 @@ msgstr "لم يتم نشر لوحة المعلومات هذه بعد. استخد
 msgid "Send feedback"
 msgstr "إرسال ملاحظات"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "جارٍ تحميل مجموعات بيانات اللوحة"
 
@@ -5083,7 +5084,7 @@ msgstr "إرسال الإجابة"
 msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "فقط ما تم استعلامه"
 
@@ -5188,7 +5189,7 @@ msgstr "الأشخاص الذين لديهم وصول"
 msgid "Google Sheets"
 msgstr "جداول بيانات Google"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
@@ -5206,7 +5207,7 @@ msgstr "تحميل نموذج دردشة غير متصل مختلف"
 msgid "Edit permissions"
 msgstr "تحرير الأذونات"
 
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "تم الاستعلام"
 
@@ -5373,7 +5374,7 @@ msgstr "النص البديل"
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
 
@@ -5682,7 +5683,7 @@ msgstr "تحرير مجموعة الأدوار"
 msgid "Profiles"
 msgstr "الملفات الشخصية"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
 
@@ -5810,7 +5811,7 @@ msgstr "أنت على الخطة المجانية"
 msgid "Count"
 msgstr "العدد"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
 "share as many dashboards as you like."
@@ -5847,11 +5848,11 @@ msgid "Recommended"
 msgstr "موصى به"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Select all"
 msgstr "تحديد الكل"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "فقط ما تم استعلامه (موصى به)"
 
@@ -6133,7 +6134,7 @@ msgstr "الوصول العام"
 msgid "Media"
 msgstr "الوسائط"
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "أضف موجهًا وأنشئ SQL لتكوين هذه التصوير."
 
@@ -6224,7 +6225,7 @@ msgstr "يرجى إلقاء نظرة على البيانات والتأكد من
 msgid "Stroke ({strokeWidth}px)"
 msgstr "سمك الخط ({strokeWidth}px)"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish to workspace"
 msgstr "النشر إلى مساحة العمل"
 
@@ -6331,8 +6332,8 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} "
 "مقعد."
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "مشارك معك"
@@ -6376,7 +6377,7 @@ msgstr "جارٍ التحميل..."
 msgid "Share"
 msgstr "مشاركة"
 
-#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
@@ -6463,7 +6464,7 @@ msgstr "من العمود: <0>{columnName}</0>"
 msgid "Bottom"
 msgstr "الأسفل"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "جاهز للعمل دون اتصال"
 

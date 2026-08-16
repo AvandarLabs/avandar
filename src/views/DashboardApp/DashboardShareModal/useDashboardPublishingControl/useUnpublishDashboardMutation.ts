@@ -9,6 +9,11 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
  *
  * The caller owns the dashboard state, so a success is reported through
  * `onUnpublished` rather than written here.
+ *
+ * TODO(jpsyx): AVA-314. This hook exists mostly to hold a `useLingui` call so
+ * the toast text can be translated. Once `useMutation` takes `successText`,
+ * `errorText` and an analytics payload, the calling component can pass
+ * translated strings directly and this wrapper goes away.
  */
 export function useUnpublishDashboardMutation(
   options: Readonly<{

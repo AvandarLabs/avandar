@@ -47,28 +47,22 @@ function _getGeneralAccessValueFromShareState(
 
 /**
  * Resolves the value the dropdown shows for a resource that may also have a
- * published form.
+ * published form. Public outranks the share-derived value, because public
+ * reads never consult `resource_shares`.
  *
- * "Anyone with the link" outranks whatever the share rows derive to, because
- * public reads never consult `resource_shares`: the anon policy and the
- * `is_public` short-circuit in `util__auth_user_may_select_dashboard` both fire
- * first. Showing the derived share value instead would tell an owner their
- * dashboard is Restricted while the whole internet can read it.
- *
- * `isPublicSelected` is deliberately NOT named for the database. Callers pass
- * the PENDING selection, so the dropdown keeps showing what the user picked
- * rather than snapping back while a publish is in flight. It is therefore the
- * wrong input for any warning about real exposure, which must read the
- * persisted visibility instead; see `useGeneralAccessControl`, which keeps the
- * two as separate options for exactly that reason. Do not "correct" a caller
- * that passes a target here.
- *
- * It is a boolean rather than a visibility so this module stays
- * resource-generic; datasets have no published form and pass `false`.
+ * @param options.isPublicSelected The PENDING selection, not the persisted
+ *   visibility, so the dropdown keeps showing what the user picked while a
+ *   publish is in flight. Anything warning about real exposure must read the
+ *   persisted visibility instead. A boolean rather than a visibility keeps
+ *   this module resource-generic; datasets pass `false`.
  */
 function _getGeneralAccessValueFromResourceState(
   options: Readonly<GeneralAccessShareState & { isPublicSelected: boolean }>,
 ): GeneralAccessValue {
+  // Showing the derived share value while public would tell an owner their
+  // dashboard is Restricted when the whole internet can read it: the anon
+  // policy and the `is_public` short-circuit in
+  // `util__auth_user_may_select_dashboard` both fire before shares are read.
   return options.isPublicSelected ? "public" : (
       _getGeneralAccessValueFromShareState(options)
     );

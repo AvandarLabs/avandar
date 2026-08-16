@@ -28,15 +28,10 @@ export type ShareableDashboardLimit = {
  * Whether this dashboard ALREADY counts against the allowance, in which case
  * republishing it consumes nothing.
  *
- * Answered by `countShareableDashboards`, the same helper the entitlement
- * backend uses, rather than by restating the rule here: the rule is already
- * written twice (TypeScript and the SQL trigger it mirrors) and a third copy
- * would be a third thing to keep in step.
- *
- * @param options.sharingState The live share rows, preferred over the
- *   `dashboard` row wherever both carry the same field: the general-access
- *   dropdown writes restriction immediately, while `dashboard` is the row as
- *   it was when the modal opened.
+ * @param options.sharingState The live share rows. Preferred over the
+ *   `dashboard` row wherever both carry the same field, because the
+ *   general-access dropdown writes restriction immediately while `dashboard`
+ *   is the row as it was when the modal opened.
  */
 function _getAlreadyCountsAsShareable(
   options: Readonly<{
@@ -45,6 +40,9 @@ function _getAlreadyCountsAsShareable(
   }>,
 ): boolean {
   const { dashboard, sharingState } = options;
+  // Delegates to `countShareableDashboards` rather than restating the rule.
+  // It is already written twice, in TypeScript and in the SQL trigger it
+  // mirrors, and a third copy would be a third thing to keep in step.
   return (
     countShareableDashboards({
       dashboards: [
@@ -63,17 +61,14 @@ function _getAlreadyCountsAsShareable(
 /**
  * Whether the plan blocks publishing this dashboard.
  *
- * Returns `isBlocked: false` in the two cases where no allowance is consumed:
- * the target is `draft` (unpublishing is always free, and a workspace that is
- * over its cap must always have a way back under it), and the dashboard
- * ALREADY counts as shareable, since republishing it changes no count. The
- * second is what lets a free workspace keep updating the one dashboard it is
- * entitled to.
+ * `isBlocked` is false whenever no allowance is consumed: unpublishing to
+ * `draft`, so a workspace over its cap always has a way back under it, and
+ * republishing a dashboard that already counts, so a free workspace can keep
+ * updating the one dashboard it is entitled to.
  *
- * The verdict is optimistic while EITHER backend answer is in flight or
- * missing: the share rows the exemption is computed from, and the plan verdict
- * itself. The database trigger is the real gate, so a slow query must leave
- * the button live rather than disable it on a guess.
+ * Optimistic while either backend answer is in flight. The database trigger is
+ * the real gate, so a slow query leaves the button live rather than disabling
+ * it on a guess.
  */
 export function useShareableDashboardLimit(
   options: Readonly<{

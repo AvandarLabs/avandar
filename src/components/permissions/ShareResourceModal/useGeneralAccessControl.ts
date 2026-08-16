@@ -38,26 +38,19 @@ type UseGeneralAccessControlOptions = {
     options: Parameters<typeof ResourceShareClient.setResourceRestricted>[0],
   ) => void;
   /**
-   * Whether "Anyone with the link" is the PENDING selection. Public reads
-   * never consult `resource_shares`, so this outranks the derived share value
-   * in the dropdown; it is `false` for every resource type with no published
-   * form.
-   *
-   * Display only. It has to follow the pick rather than the database so the
-   * user's selection does not snap back while the publish is in flight, which
-   * is precisely why it must never decide a warning about real exposure.
+   * Whether "Anyone with the link" is the PENDING selection. Display only, so
+   * the pick does not snap back while a publish is in flight. `false` for
+   * resource types with no published form.
    */
   isPublicPublishTargeted: boolean;
   /**
-   * Whether the resource is publicly published RIGHT NOW, which is a fact
-   * about the database rather than about the dropdown.
+   * Whether the resource is publicly published RIGHT NOW. Only this may drive
+   * a warning about real exposure, such as the "Make private" confirmation.
    *
-   * Kept separate from `isPublicPublishTargeted` because the two disagree in
-   * both directions, and both disagreements are user-visible: a draft someone
-   * has merely selected "Anyone with the link" on would raise a false alarm,
-   * and a live public dashboard someone has since selected "Restricted" on
-   * would suppress the alarm that matters. Only this flag may drive the
-   * "Make private" confirmation.
+   * Separate from `isPublicPublishTargeted` because the two disagree in both
+   * directions: a draft merely selected as public would raise a false alarm,
+   * and a live public dashboard since selected "Restricted" would suppress the
+   * alarm that matters.
    */
   isPubliclyPublished: boolean;
 };
