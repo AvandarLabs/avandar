@@ -1,9 +1,29 @@
 import { describe, expect, it } from "vitest";
 import {
+  _roundHalfAwayFromZero,
   buildGridCellExpressions,
   getPointyTopAxialCell,
   getSquareCellId,
 } from "./buildGridCellExpressions";
+
+function _roundCubeCoordinatesWithDuckDbRounding(
+  q: number,
+  r: number,
+): { q: number; r: number } {
+  const cubeY = -q - r;
+  let roundedQ = _roundHalfAwayFromZero(q);
+  const roundedY = _roundHalfAwayFromZero(cubeY);
+  let roundedR = _roundHalfAwayFromZero(r);
+  const qDifference = Math.abs(roundedQ - q);
+  const yDifference = Math.abs(roundedY - cubeY);
+  const rDifference = Math.abs(roundedR - r);
+  if (qDifference > yDifference && qDifference > rDifference) {
+    roundedQ = -roundedY - roundedR;
+  } else if (yDifference <= rDifference) {
+    roundedR = -roundedQ - roundedY;
+  }
+  return { q: roundedQ, r: roundedR };
+}
 
 describe("buildGridCellExpressions", () => {
   it("builds a square envelope from floored coordinates and a quoted size", () => {
@@ -51,5 +71,21 @@ describe("buildGridCellExpressions", () => {
     expect(getPointyTopAxialCell(0, 0, 10_000)).not.toEqual(
       getPointyTopAxialCell(50_000, 50_000, 10_000),
     );
+  });
+
+  it("matches DuckDB round() at negative half-cell boundaries", () => {
+    const sizeMeters = 10_000;
+    const x = -sizeMeters / 2;
+    const y = 0;
+    const fractionalQ = x / sizeMeters - y / (Math.sqrt(3) * sizeMeters);
+    const fractionalR = (2 * y) / (Math.sqrt(3) * sizeMeters);
+
+    // Fractional axial q is -0.5; DuckDB round(-0.5) = -1 (half away from zero).
+    expect(_roundHalfAwayFromZero(fractionalQ)).toBe(-1);
+    expect(_roundCubeCoordinatesWithDuckDbRounding(fractionalQ, fractionalR)).toEqual({
+      q: -1,
+      r: 0,
+    });
+    expect(getPointyTopAxialCell(x, y, sizeMeters)).toEqual({ q: -1, r: 0 });
   });
 });

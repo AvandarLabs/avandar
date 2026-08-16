@@ -85,11 +85,16 @@ function _buildHexExpressions(
   };
 }
 
+/** Rounds half away from zero, matching DuckDB `round()` on .5 ties. */
+export function _roundHalfAwayFromZero(value: number): number {
+  return Math.sign(value) * Math.floor(Math.abs(value) + 0.5);
+}
+
 function _roundCubeCoordinates(q: number, r: number): { q: number; r: number } {
   const cubeY = -q - r;
-  let roundedQ = Math.round(q);
-  const roundedY = Math.round(cubeY);
-  let roundedR = Math.round(r);
+  let roundedQ = _roundHalfAwayFromZero(q);
+  const roundedY = _roundHalfAwayFromZero(cubeY);
+  let roundedR = _roundHalfAwayFromZero(r);
   const qDifference = Math.abs(roundedQ - q);
   const yDifference = Math.abs(roundedY - cubeY);
   const rDifference = Math.abs(roundedR - r);
