@@ -1,7 +1,7 @@
 import { assertIsDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnapshotTransition/DashboardSnapshotTransition";
-import { updateDashboardWithSnapshotCompareAndSwap } from "@/clients/dashboards/updateDashboardWithSnapshotCompareAndSwap";
+import { updateDashboardRowIfUnchanged } from "@/clients/dashboards/updateDashboardRowIfUnchanged";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { DashboardMutationContext } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
@@ -36,10 +36,11 @@ export const CLEAR_SNAPSHOT_TRANSITION = {
 } as const;
 
 /**
- * Applies a model update only while the dashboard's snapshot pointer and row
- * version still match the caller's read.
+ * Applies a model update, but only while the dashboard is still the one the
+ * caller read. Returns the updated model, or `undefined` when another writer
+ * got there first.
  */
-export async function updateDashboardModelWithCompareAndSwap(
+export async function updateDashboardModelIfUnchanged(
   options: Readonly<{
     context: DashboardMutationContext;
     dashboard: Dashboard.T;
@@ -49,7 +50,7 @@ export async function updateDashboardModelWithCompareAndSwap(
   const dbUpdate = options.context.parsers.fromModelUpdateToDBUpdate(
     options.updateModel,
   );
-  const updatedDashboard = await updateDashboardWithSnapshotCompareAndSwap({
+  const updatedDashboard = await updateDashboardRowIfUnchanged({
     dbClient: options.context.dbClient,
     dashboard: options.dashboard,
     dbUpdate,
@@ -117,7 +118,7 @@ export async function createTransitionClaim(
   const transitionRevision = uuid<"DashboardSnapshotTransition">();
   const claimedDashboard = await (async () => {
     try {
-      return await updateDashboardModelWithCompareAndSwap({
+      return await updateDashboardModelIfUnchanged({
         ...options,
         updateModel: {
           ...(options.kind === "publish" ? {} : { visibility: "draft" }),
@@ -221,7 +222,7 @@ export async function finishCleanupTransition(
   let cleanupDashboard = options.dashboard;
   await DashboardSnapshotTransition.clearAllSnapshotBuckets({
     assertCanDelete: async () => {
-      const validatedDashboard = await updateDashboardModelWithCompareAndSwap({
+      const validatedDashboard = await updateDashboardModelIfUnchanged({
         ...options,
         dashboard: cleanupDashboard,
         updateModel: { snapshotTransitionRevision: cleanupRevision },
@@ -242,7 +243,7 @@ export async function finishCleanupTransition(
     });
     return undefined;
   }
-  const updatedDashboard = await updateDashboardModelWithCompareAndSwap({
+  const updatedDashboard = await updateDashboardModelIfUnchanged({
     ...options,
     dashboard: cleanupDashboard,
     updateModel: {
@@ -270,7 +271,7 @@ async function _fencePublishTransitionForAbort(
     throw new Error("Dashboard is not aborting a publish transition.");
   }
   try {
-    const fencedDashboard = await updateDashboardModelWithCompareAndSwap({
+    const fencedDashboard = await updateDashboardModelIfUnchanged({
       ...options,
       updateModel: { snapshotTransitionKind: "abort_publish" },
     });
@@ -322,7 +323,7 @@ export async function abortPublishTransition(
   if (!didDelete) {
     throw new Error("Staged snapshot cleanup failed.");
   }
-  const clearedDashboard = await updateDashboardModelWithCompareAndSwap({
+  const clearedDashboard = await updateDashboardModelIfUnchanged({
     ...options,
     dashboard: abortingDashboard,
     updateModel: { ...CLEAR_SNAPSHOT_TRANSITION },

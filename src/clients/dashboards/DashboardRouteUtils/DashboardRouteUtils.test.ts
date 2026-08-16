@@ -54,7 +54,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("dashboardRouteDeps", () => {
+describe("DashboardRouteUtils", () => {
   it("binds an ID lookup to the dashboard client", async () => {
     getByIdMock.mockResolvedValue(undefined);
 

@@ -2,10 +2,14 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /**
- * Conditionally updates a dashboard whose snapshot pointer and row version
- * still match the caller's read.
+ * Updates a dashboard row, but only while its `updatedAt` and its three
+ * `snapshot*` columns still hold the values the caller read.
+ *
+ * Returns the updated row, or `undefined` when another writer changed one of
+ * those columns first. An `undefined` therefore means "your copy is stale",
+ * not "no such dashboard".
  */
-export async function updateDashboardWithSnapshotCompareAndSwap(
+export async function updateDashboardRowIfUnchanged(
   options: Readonly<{
     dbClient: AvaSupabaseDBClient;
     dashboard: Pick<

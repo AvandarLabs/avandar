@@ -9,7 +9,7 @@ import {
   createTransitionClaim,
   deletePriorSnapshotBestEffort,
   recoverTransition,
-  updateDashboardModelWithCompareAndSwap,
+  updateDashboardModelIfUnchanged,
 } from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardSnapshotTransitions";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnapshotTransition/DashboardSnapshotTransition";
@@ -212,7 +212,7 @@ async function _commitPublishTransition(
   >,
 ): Promise<Dashboard.T> {
   try {
-    const updatedDashboard = await updateDashboardModelWithCompareAndSwap({
+    const updatedDashboard = await updateDashboardModelIfUnchanged({
       context: options.context,
       dashboard: options.claimedDashboard,
       updateModel: options.updateModel,

@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { DashboardRouteUtils } from "@/clients/dashboards/dashboardRouteDeps/DashboardRouteUtils";
 import { DashboardRouteResolver } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
+import { DashboardRouteUtils } from "@/clients/dashboards/DashboardRouteUtils/DashboardRouteUtils";
 import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";

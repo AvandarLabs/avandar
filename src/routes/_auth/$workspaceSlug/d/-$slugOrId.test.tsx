@@ -14,7 +14,7 @@ const { makeDashboardRouteOutcomeFromWorkspaceRouteMock, routeDepsSentinel } =
   vi.hoisted(() => {
     // The resolver is mocked, so no dep is ever called here. A sentinel is what
     // makes the wiring observable: the route must hand the resolver the deps
-    // that `dashboardRouteDeps` holds, not deps of its own.
+    // that `DashboardRouteUtils` holds, not deps of its own.
     const sentinel = { sentinel: "workspace-dashboard-route-deps" };
     return {
       makeDashboardRouteOutcomeFromWorkspaceRouteMock: vi.fn<
@@ -42,8 +42,8 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/dashboards/dashboardRouteDeps/dashboardRouteDeps", () => {
-  return { dashboardRouteDeps: routeDepsSentinel };
+vi.mock("@/clients/dashboards/DashboardRouteUtils/DashboardRouteUtils", () => {
+  return { DashboardRouteUtils: routeDepsSentinel };
 });
 
 vi.mock(
