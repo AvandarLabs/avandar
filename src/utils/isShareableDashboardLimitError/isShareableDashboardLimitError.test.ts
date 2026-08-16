@@ -29,7 +29,8 @@ describe("isShareableDashboardLimitError", () => {
       isShareableDashboardLimitError(
         makePostgrestError({
           code: "42501",
-          message: "This workspace's plan allows 1 shared or public dashboard(s)",
+          message:
+            "This workspace's plan allows 1 shared or public dashboard(s)",
           details: null,
           hint: "shareable_dashboard_limit",
         }),
