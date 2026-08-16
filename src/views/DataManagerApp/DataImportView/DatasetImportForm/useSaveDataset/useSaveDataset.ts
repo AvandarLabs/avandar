@@ -14,7 +14,7 @@ import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedP
 import type {
   DatasetImportFormValues,
   DataSourceMetadata,
-} from "../DatasetImportForm";
+} from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

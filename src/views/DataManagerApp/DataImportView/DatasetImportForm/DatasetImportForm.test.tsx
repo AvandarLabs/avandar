@@ -10,7 +10,7 @@ import { DatasetImportForm } from "./DatasetImportForm";
 import type {
   CsvDataSourceMetadata,
   DataSourceMetadata,
-} from "./DatasetImportForm";
+} from "./DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 const CSV_DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
