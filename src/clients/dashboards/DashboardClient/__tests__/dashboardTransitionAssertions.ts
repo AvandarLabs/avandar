@@ -11,14 +11,14 @@ import {
   operationLog,
   persistedVisibilityState,
   uploadDatasetMock,
-} from "@/clients/dashboards/DashboardClient/DashboardClient.transitions.fixtures";
+} from "@/clients/dashboards/DashboardClient/__tests__/DashboardClient.transitions.fixtures";
 import {
   DASHBOARD,
   DASHBOARD_ID,
   DATASET_IDS,
   PREVIOUS_REVISION,
   SNAPSHOT_REVISION,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**

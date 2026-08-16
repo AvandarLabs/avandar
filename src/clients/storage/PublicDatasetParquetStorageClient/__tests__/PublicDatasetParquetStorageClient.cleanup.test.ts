@@ -11,7 +11,7 @@ import {
   removeMock,
   SNAPSHOT_REVISION,
   STALE_DATASET_ID,
-} from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.fixtures";
+} from "@/clients/storage/PublicDatasetParquetStorageClient/__tests__/PublicDatasetParquetStorageClient.fixtures";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 afterEach(() => {

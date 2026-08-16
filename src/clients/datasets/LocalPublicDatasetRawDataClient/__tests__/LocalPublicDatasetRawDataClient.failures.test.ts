@@ -14,7 +14,7 @@ import {
   SECOND_REVISION,
   setUpRawDataMocks,
   tearDownRawDataMocks,
-} from "@/clients/datasets/LocalPublicDatasetRawDataClient/LocalPublicDatasetRawDataClient.fixtures";
+} from "@/clients/datasets/LocalPublicDatasetRawDataClient/__tests__/LocalPublicDatasetRawDataClient.fixtures";
 
 beforeEach(() => {
   setUpRawDataMocks();

@@ -10,12 +10,12 @@ import {
   operationLog,
   persistedVisibilityState,
   uploadDatasetMock,
-} from "@/clients/dashboards/DashboardClient/DashboardClient.transitions.fixtures";
+} from "@/clients/dashboards/DashboardClient/__tests__/DashboardClient.transitions.fixtures";
 import {
   assertFailedVisibilityUpdateCleanup,
   assertOldGenerationRevoked,
   canReadPublishedSnapshotUnderDatabasePolicy,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionAssertions";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionAssertions";
 import {
   DASHBOARD,
   DASHBOARD_ID,
@@ -23,12 +23,12 @@ import {
   PREVIOUS_REVISION,
   SNAPSHOT_REVISION,
   WINNING_REVISION,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import {
   configureVisibilityUpdateFailure,
   makePublishConfig,
   setUpDashboardTransitionMocks,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionScenarios";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionScenarios";
 
 beforeEach(() => {
   setUpDashboardTransitionMocks();

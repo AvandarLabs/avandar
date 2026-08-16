@@ -10,20 +10,20 @@ import {
   operationLog,
   reconcileSnapshotsMock,
   uploadDatasetMock,
-} from "@/clients/dashboards/DashboardClient/DashboardClient.transitions.fixtures";
-import { assertPublishTransition } from "@/clients/dashboards/DashboardClient/dashboardTransitionAssertions";
+} from "@/clients/dashboards/DashboardClient/__tests__/DashboardClient.transitions.fixtures";
+import { assertPublishTransition } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionAssertions";
 import {
   DASHBOARD,
   DASHBOARD_ID,
   DATASET_IDS,
   PREVIOUS_REVISION,
   SNAPSHOT_REVISION,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import {
   makeCsvDataset,
   makePublishConfig,
   setUpDashboardTransitionMocks,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionScenarios";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionScenarios";
 
 beforeEach(() => {
   setUpDashboardTransitionMocks();

@@ -3,7 +3,7 @@
  * They hold no shared state, so they live apart from the mock bundle.
  */
 import { vi } from "vitest";
-import { DATASET_IDS } from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+import { DATASET_IDS } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 

@@ -15,18 +15,18 @@ import {
   persistedVisibilityState,
   uploadDatasetMock,
   uuidMock,
-} from "@/clients/dashboards/DashboardClient/DashboardClient.transitions.fixtures";
+} from "@/clients/dashboards/DashboardClient/__tests__/DashboardClient.transitions.fixtures";
 import {
   CLEANUP_REVISION,
   DASHBOARD,
   DASHBOARD_ID,
   PREVIOUS_REVISION,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import {
   configurePausedBroadCleanup,
   makePublishConfig,
   setUpDashboardTransitionMocks,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionScenarios";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionScenarios";
 
 beforeEach(() => {
   setUpDashboardTransitionMocks();

@@ -17,7 +17,7 @@ import {
   reconcileSnapshotsMock,
   uploadDatasetMock,
   uuidMock,
-} from "@/clients/dashboards/DashboardClient/DashboardClient.transitions.fixtures";
+} from "@/clients/dashboards/DashboardClient/__tests__/DashboardClient.transitions.fixtures";
 import {
   CLEANUP_REVISION,
   DASHBOARD,
@@ -26,7 +26,7 @@ import {
   PREVIOUS_REVISION,
   SNAPSHOT_REVISION,
   WORKSPACE_ID,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 

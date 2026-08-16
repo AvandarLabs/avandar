@@ -92,3 +92,55 @@ Recommend driving the action through the UI. If a mutation is only needed to
 reach a precondition, move it into setup before the page loads; if a distinct
 label is only needed to disambiguate, make the entity the only one of its kind
 and select it by position/id instead of renaming it mid-test.
+
+- Always move a module's test files into a `__tests__/` directory once two or
+  more of them share a module name in the same directory. A module keeps its
+  test beside it while there is one file; a split suite scattered across the
+  module directory buries the production files among its own tests. The module
+  name is the filename up to the first dot, so `DuckDbClient.test.ts` and
+  `DuckDbClient.leasing.test.ts` are two files for `DuckDbClient`.
+
+  Anything used **exclusively** by those tests moves in with them: fixtures,
+  stubs, scenario builders, custom assertions. Exceptions: 1) a helper with
+  even one non-test importer stays outside, because it is production code; 2) a single test file stays colocated with its module.
+
+  **Find candidates** (a directory with 2+ split tests for one module):
+
+  ```bash
+  find . -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
+    -not -path '*/node_modules/*' -not -path '*/__tests__/*' \
+  | awk -F/ '{ dir=""; for(i=1;i<NF;i++) dir=dir $i "/";
+               split($NF, p, "."); print dir "\t" p[1] }' \
+  | sort | uniq -c | awk '$1 > 1'
+  ```
+
+  Every row this prints is a violation. A directory holding one test file each
+  for two different modules is not a match, since the module names differ.
+
+- Never put test files for two different modules in one `__tests__/`
+  directory. `__tests__/` groups the split suite of a single module; two module
+  names inside it means the second module wants its own directory, pairing it
+  with its own test the way a component directory pairs with its children.
+
+  This is bad:
+
+  ```txt
+  clients/__tests__/DuckDbClient.test.ts
+  clients/__tests__/QetlClient.test.ts
+  ```
+
+  This is good:
+
+  ```txt
+  clients/DuckDbClient/DuckDbClient.ts
+  clients/DuckDbClient/DuckDbClient.test.ts
+  clients/QetlClient/QetlClient.ts
+  clients/QetlClient/QetlClient.test.ts
+  ```
+
+- Place an integration test at the lowest directory containing every module it
+  exercises. It covers several modules by definition, so it cannot belong to
+  any one module's `__tests__/`, and putting it under one of them implies an
+  ownership that is not real. If that lowest common directory is the
+  application root, the test is too broad to be an integration test: recommend
+  an e2e test instead.

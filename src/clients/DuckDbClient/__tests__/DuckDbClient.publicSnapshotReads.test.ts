@@ -4,7 +4,7 @@ import {
   PUBLIC_OWNER,
   queryMock,
   resetDuckDbOwnershipMocks,
-} from "@/clients/DuckDbClient/DuckDbClient.ownership.fixtures";
+} from "@/clients/DuckDbClient/__tests__/DuckDbClient.ownership.fixtures";
 
 afterEach(() => {
   resetDuckDbOwnershipMocks();

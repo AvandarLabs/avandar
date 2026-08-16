@@ -9,7 +9,7 @@ import {
   PublicDatasetParquetStorageClient,
   SNAPSHOT_REVISION,
   uploadMock,
-} from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.fixtures";
+} from "@/clients/storage/PublicDatasetParquetStorageClient/__tests__/PublicDatasetParquetStorageClient.fixtures";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 afterEach(() => {

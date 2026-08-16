@@ -11,7 +11,7 @@ import {
   registerFileHandleMock,
   resetDuckDbOwnershipMocks,
   stubWorker,
-} from "@/clients/DuckDbClient/DuckDbClient.ownership.fixtures";
+} from "@/clients/DuckDbClient/__tests__/DuckDbClient.ownership.fixtures";
 
 afterEach(() => {
   resetDuckDbOwnershipMocks();

@@ -4,12 +4,12 @@
  * files reach the client through this module so the ordering holds.
  */
 import { vi } from "vitest";
-import "@/clients/dashboards/DashboardClient/dashboardTransitionStubs";
+import "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionStubs";
 import {
   DASHBOARD,
   SNAPSHOT_REVISION,
-} from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
-import type { VisibilityState } from "@/clients/dashboards/DashboardClient/dashboardTransitionConstants";
+} from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
+import type { VisibilityState } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type MockClientConfig = {

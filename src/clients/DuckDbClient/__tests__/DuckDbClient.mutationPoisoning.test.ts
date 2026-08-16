@@ -5,7 +5,7 @@ import {
   queryMock,
   resetDuckDbOwnershipMocks,
   SECOND_DATASET_ID,
-} from "@/clients/DuckDbClient/DuckDbClient.ownership.fixtures";
+} from "@/clients/DuckDbClient/__tests__/DuckDbClient.ownership.fixtures";
 
 afterEach(() => {
   resetDuckDbOwnershipMocks();

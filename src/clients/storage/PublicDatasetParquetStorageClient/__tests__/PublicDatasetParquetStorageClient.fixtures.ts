@@ -43,7 +43,7 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 });
 
 export const { PublicDatasetParquetStorageClient } =
-  await import("./PublicDatasetParquetStorageClient");
+  await import("../PublicDatasetParquetStorageClient");
 
 export const DASHBOARD_ID =
   "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
