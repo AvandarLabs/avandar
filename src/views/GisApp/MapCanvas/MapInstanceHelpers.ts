@@ -57,6 +57,40 @@ function _createMapLibreInstance({
   return map;
 }
 
+/** Returns whether a rendered feature represents a MapLibre point cluster. */
+function _isClusterFeature(feature: GeoJSON.Feature): boolean {
+  const properties = feature.properties;
+  if (!properties) {
+    return false;
+  }
+  return "cluster_id" in properties || "point_count" in properties;
+}
+
+/** Zooms the map into one cluster instead of opening the feature inspector. */
+function _expandClusterOnClick(
+  map: MapLibreMap,
+  feature: maplibregl.MapGeoJSONFeature,
+): void {
+  const clusterId = feature.properties?.cluster_id;
+  if (typeof clusterId !== "number") {
+    return;
+  }
+  const source = map.getSource(feature.source);
+  if (!source || !("getClusterExpansionZoom" in source)) {
+    return;
+  }
+  void source.getClusterExpansionZoom(clusterId).then((zoom) => {
+    const { geometry } = feature;
+    if (geometry.type !== "Point") {
+      return;
+    }
+    map.easeTo({
+      center: geometry.coordinates as [number, number],
+      zoom,
+    });
+  });
+}
+
 /** Creates the single map-level click handler used by every rendered layer. */
 function _createMapClickHandler(
   options: Readonly<{
@@ -77,12 +111,17 @@ function _createMapClickHandler(
     const [feature] = map.queryRenderedFeatures(event.point, {
       layers: layerIds,
     });
-    if (feature) {
-      latestValues.onFeatureClickRef.current(
-        feature as GeoJSON.Feature,
-        feature.layer.id,
-      );
+    if (!feature) {
+      return;
     }
+    if (_isClusterFeature(feature)) {
+      _expandClusterOnClick(map, feature);
+      return;
+    }
+    latestValues.onFeatureClickRef.current(
+      feature as GeoJSON.Feature,
+      feature.layer.id,
+    );
   };
 }
 
