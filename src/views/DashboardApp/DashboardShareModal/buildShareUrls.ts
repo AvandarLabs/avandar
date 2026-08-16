@@ -33,11 +33,11 @@ type Options = {
 /**
  * Builds the canonical and optional vanity URLs for a published dashboard.
  *
- * The two audiences have separate URL namespaces (P2 D-P2-3): a public
- * dashboard resolves at `/d/<slugOrId>` for a visitor with no workspace
- * context, and a workspace-only one at `/<workspaceSlug>/d/<slugOrId>`.
+ * The two audiences have separate URL namespaces: a public dashboard resolves
+ * at `/d/<slugOrId>` for a visitor with no workspace context, and a
+ * workspace-only one at `/<workspaceSlug>/d/<slugOrId>`.
  *
- * `canonical` is what the QR affordance encodes. It points at the P2 routes
+ * `canonical` is what the QR affordance encodes. It points at those routes
  * rather than the legacy `/public/dashboards/...` path, which survives only as
  * a redirect for QR codes already in circulation.
  */

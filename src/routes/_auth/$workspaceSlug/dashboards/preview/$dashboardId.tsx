@@ -27,10 +27,8 @@ export const Route = createFileRoute(
       minRole: "editor",
     });
 
-    // A viewer may open a dashboard only once it is published. `draft` is the
-    // state in which a dashboard is not ready for anyone but the people who
-    // can edit it; P2 shipped the state and P3 shipped the control that
-    // leaves it, so the rule can finally bind. See the P3 design, section 7.
+    // A draft is not ready for anyone but the people who can edit it, so a
+    // viewer may open a dashboard only once it is published.
     const isAccessDenied = !canEdit && dashboard.visibility === "draft";
 
     return { dashboard, canEdit, isAccessDenied };

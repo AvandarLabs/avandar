@@ -1,19 +1,19 @@
 import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types.ts";
 
 /** The minimum a dashboard row must carry for the count to judge it. */
-type ShareableDashboardCandidate = Readonly<{
+type ShareableDashboardCandidate = {
   id: string;
   ownerId: string;
   visibility: DashboardVisibility;
   isRestricted: boolean;
-}>;
+};
 
 /** The minimum a `resource_shares` row must carry for the count to judge it. */
-type ShareableDashboardShare = Readonly<{
+type ShareableDashboardShare = {
   resourceId: string;
   principalType: string;
   principalId: string | null;
-}>;
+};
 
 /**
  * How many of the given dashboards count against
@@ -80,12 +80,10 @@ export function countShareableDashboards(
   );
 
   return dashboards.filter((dashboard) => {
-    if (dashboard.visibility === "public") {
-      return true;
-    }
-    if (dashboard.visibility !== "workspace") {
-      return false;
-    }
-    return !dashboard.isRestricted || nonOwnerSharedIds.has(dashboard.id);
+    return (
+      dashboard.visibility === "public" ||
+      (dashboard.visibility === "workspace" &&
+        (!dashboard.isRestricted || nonOwnerSharedIds.has(dashboard.id)))
+    );
   }).length;
 }

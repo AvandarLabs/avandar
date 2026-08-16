@@ -16,7 +16,10 @@ describe("sortDashboardsForList", () => {
     const mine2 = makeDashboard("b", "me", "2026-03-01T00:00:00Z");
     const theirs = makeDashboard("c", "them", "2026-06-01T00:00:00Z");
     expect(
-      sortDashboardsForList([theirs, mine1, mine2], "me").map((d) => {
+      sortDashboardsForList({
+        dashboards: [theirs, mine1, mine2],
+        currentUserId: "me",
+      }).map((d) => {
         return d.id;
       }),
     ).toEqual(["b", "a", "c"]);
@@ -28,7 +31,10 @@ describe("sortDashboardsForList", () => {
     const older = makeDashboard("a", "me", "2026-01-01T00:00:00Z");
     const newer = makeDashboard("b", "them", "2026-06-01T00:00:00Z");
     expect(
-      sortDashboardsForList([older, newer], undefined).map((d) => {
+      sortDashboardsForList({
+        dashboards: [older, newer],
+        currentUserId: undefined,
+      }).map((d) => {
         return d.id;
       }),
     ).toEqual(["b", "a"]);
@@ -41,7 +47,10 @@ describe("sortDashboardsForList", () => {
       makeDashboard("a", "them", "2026-01-01T00:00:00Z"),
       makeDashboard("b", "me", "2026-03-01T00:00:00Z"),
     ];
-    const result = sortDashboardsForList(input, "me");
+    const result = sortDashboardsForList({
+      dashboards: input,
+      currentUserId: "me",
+    });
     expect(
       input.map((d) => {
         return d.id;
@@ -57,7 +66,10 @@ describe("sortDashboardsForList", () => {
     const second = makeDashboard("b", "me", "2026-05-01T00:00:00Z");
     const third = makeDashboard("c", "me", "2026-05-01T00:00:00Z");
     expect(
-      sortDashboardsForList([first, second, third], "me").map((d) => {
+      sortDashboardsForList({
+        dashboards: [first, second, third],
+        currentUserId: "me",
+      }).map((d) => {
         return d.id;
       }),
     ).toEqual(["a", "b", "c"]);
@@ -73,7 +85,10 @@ describe("sortDashboardsForList", () => {
     );
     const laterInstant = makeDashboard("b", "me", "2026-05-01T06:00:00Z");
     expect(
-      sortDashboardsForList([earlierInstant, laterInstant], "me").map((d) => {
+      sortDashboardsForList({
+        dashboards: [earlierInstant, laterInstant],
+        currentUserId: "me",
+      }).map((d) => {
         return d.id;
       }),
     ).toEqual(["b", "a"]);

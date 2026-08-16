@@ -6,6 +6,10 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
+/**
+ * The plan's verdict on making one more dashboard shareable, plus the numbers
+ * the upgrade prompt needs to explain it.
+ */
 export type ShareableDashboardLimit = {
   /** Whether the plan refuses to let this publish go through. */
   isBlocked: boolean;

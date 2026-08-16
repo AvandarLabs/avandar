@@ -10,6 +10,11 @@ export type SubscriptionPolarId = UUID<"PolarSubscription">;
 /** Primary key of the `subscriptions` table in Supabase. */
 export type SubscriptionId = UUID<"Subscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
+/**
+ * A capability a workspace's subscription either grants or withholds. Each one
+ * names a `subscriptions` column the plan gates, so the UI and the database
+ * refer to the same set of gates.
+ */
 export type SubscriptionPermission =
   | "can_add_datasets"
   | "can_invite_users"

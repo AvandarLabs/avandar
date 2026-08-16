@@ -7,8 +7,7 @@ import type { ReactNode } from "react";
  *
  * `ShareResourceModal` renders datasets too, so publishing arrives as an
  * optional prop rather than an internal branch on `resourceType`. When it is
- * absent the modal behaves exactly as it did before dashboards could be
- * published to a workspace.
+ * absent the modal renders no publishing UI.
  *
  * The modal reads `targetVisibility` for one purpose only: deciding whether
  * the dropdown shows "Anyone with the link". It never writes it.

@@ -18,17 +18,15 @@ type Props = {
 /**
  * Opens the merged share and publish modal.
  *
- * This is the toolbar's only sharing control: the separate Publish button was
- * removed when publishing moved inside the modal, so a dashboard's audience is
- * chosen in exactly one place.
+ * This is the toolbar's only sharing control: publishing lives inside the
+ * modal, so a dashboard's audience is chosen in exactly one place.
  *
  * It opens at `editor`, not `admin`: publishing to your own workspace is
  * ordinary editing work. The modal itself renders the sharing half read-only
  * for anyone below admin.
  *
- * The filled variant carries what the old Publish button's "Published" label
- * carried, so a draft is still distinguishable from a live dashboard without
- * opening the modal.
+ * The filled variant signals that the dashboard is published, so a draft is
+ * distinguishable from a live dashboard without opening the modal.
  */
 export function DashboardShareButton({
   dashboard,

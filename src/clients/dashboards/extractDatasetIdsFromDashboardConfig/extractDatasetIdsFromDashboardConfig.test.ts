@@ -78,6 +78,20 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
     ]);
   });
 
+  it("skips a DataViz node whose props carry no nlQuery", () => {
+    const config = {
+      content: [
+        { type: "DataViz", props: { title: "Untitled" } },
+        {
+          type: "DataViz",
+          props: { nlQuery: { rawSql: `SELECT * FROM "${DATASET_ID}"` } },
+        },
+      ],
+    };
+
+    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+  });
+
   it("rejects dynamic and mutating SQL during publication extraction", () => {
     const dynamicConfig = _createDashboardConfigFromSql(
       "SELECT * FROM query_table(dataset_name)",

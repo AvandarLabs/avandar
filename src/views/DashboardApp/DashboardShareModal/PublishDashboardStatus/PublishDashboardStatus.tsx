@@ -27,10 +27,8 @@ type Props = {
  * Neither case claims the access change "is saved": selecting "Anyone with the
  * link" deliberately writes nothing at all.
  */
-function _renderDivergenceAlert(
-  options: Readonly<{ visibility: Dashboard.Visibility }>,
-): ReactNode {
-  if (options.visibility === "public") {
+function _renderDivergenceAlert(visibility: Dashboard.Visibility): ReactNode {
+  if (visibility === "public") {
     return (
       <Alert color="red" icon={<IconWorld size={18} />} variant="light">
         <Text size="sm">
@@ -45,7 +43,7 @@ function _renderDivergenceAlert(
   return (
     <Alert color="yellow" icon={<IconInfoCircle size={18} />} variant="light">
       <Text size="sm">
-        {options.visibility === "draft" ?
+        {visibility === "draft" ?
           <Trans>
             This dashboard is not published yet. Use the button below to publish
             it to the audience you picked.
@@ -128,7 +126,7 @@ export function PublishDashboardStatus({
         },
       })}
       {targetVisibility !== visibility ?
-        _renderDivergenceAlert({ visibility })
+        _renderDivergenceAlert(visibility)
       : null}
       <Stack gap={6}>
         <Text size="sm" fw={500}>

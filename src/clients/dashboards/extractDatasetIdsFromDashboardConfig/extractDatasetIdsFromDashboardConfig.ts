@@ -16,10 +16,11 @@ function _extractDataVizSqlStrings(dashboardConfig: unknown): string[] {
     if (node["type"] !== "DataViz" || !isPlainObject(props)) {
       return;
     }
-    const dataVizProps = props as {
-      nlQuery: { rawSql: unknown; prompt: unknown };
-    };
-    const sql = _toTrimmedString(dataVizProps.nlQuery.rawSql);
+    const nlQuery: unknown = props["nlQuery"];
+    if (!isPlainObject(nlQuery)) {
+      return;
+    }
+    const sql = _toTrimmedString(nlQuery["rawSql"]);
     if (sql.length > 0) {
       sqlStrings.push(sql);
     }

@@ -5,10 +5,10 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactElement } from "react";
 
 /**
- * The gates the toolbar's old Publish button carried now live here, so these
- * are the tests that keep them alive. Only the actions slot is rendered: the
- * publishing section pulls the whole dataset-slice tree in, and none of it is
- * what a gate test is about.
+ * The modal owns every gate on publishing, so these are the tests that keep
+ * them alive. Only the actions slot is rendered: the publishing section pulls
+ * the whole dataset-slice tree in, and none of it is what a gate test is
+ * about.
  */
 const mocks = vi.hoisted(() => {
   return {

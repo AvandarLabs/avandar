@@ -3,9 +3,15 @@ import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { validateDashboardSlug } from "@sbfn/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts";
 import { z } from "zod";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-import type { DashboardsApi } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts";
+import type {
+  DashboardsApi,
+  DashboardSlugValidationFailure,
+} from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts";
 
-const TAKEN_SLUG = { isValid: false, reason: "taken" as const };
+const TAKEN_SLUG: DashboardSlugValidationFailure = {
+  isValid: false,
+  reason: "taken",
+};
 
 async function _getAuthorizedWorkspaceId(
   options: Readonly<{

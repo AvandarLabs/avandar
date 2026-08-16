@@ -22,12 +22,10 @@ type ShareButtonState = {
 };
 
 function _hasAtLeastRole(
-  role: RoleLevel | null | undefined,
-  minRole: RoleLevel,
+  options: Readonly<{ role: RoleLevel | undefined; minRole: RoleLevel }>,
 ): boolean {
-  return role !== null && role !== undefined ?
-      _ROLE_RANK[role] >= _ROLE_RANK[minRole]
-    : false;
+  const { role, minRole } = options;
+  return role !== undefined ? _ROLE_RANK[role] >= _ROLE_RANK[minRole] : false;
 }
 
 /**
@@ -49,11 +47,17 @@ export function useShareButtonState(
   const { t } = useLingui();
   const minRole = options.minRole ?? "admin";
   const [effectiveRole, isLoadingRole] = useResourceRole(options);
-  const isAllowed = _hasAtLeastRole(effectiveRole, minRole);
+  const isAllowed = _hasAtLeastRole({
+    role: effectiveRole ?? undefined,
+    minRole,
+  });
   const resourceLabel = resourceTypeLabel(options.resourceType);
   return {
     isDisabled: !options.resourceId || isLoadingRole || !isAllowed,
-    canManageShares: _hasAtLeastRole(effectiveRole, "admin"),
+    canManageShares: _hasAtLeastRole({
+      role: effectiveRole ?? undefined,
+      minRole: "admin",
+    }),
     tooltip:
       isAllowed || isLoadingRole ?
         minRole === "admin" ?

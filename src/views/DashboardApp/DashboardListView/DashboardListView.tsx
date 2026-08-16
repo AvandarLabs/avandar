@@ -94,7 +94,10 @@ export function DashboardListView({
   );
 
   const orderedDashboards = useMemo(() => {
-    return sortDashboardsForList(dashboards, userProfile?.userId);
+    return sortDashboardsForList({
+      dashboards,
+      currentUserId: userProfile?.userId,
+    });
   }, [dashboards, userProfile?.userId]);
 
   const isEmpty = dashboards.length === 0;

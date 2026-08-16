@@ -29,9 +29,9 @@ const SHAREABLE_DASHBOARD_LIMIT_HINT = "shareable_dashboard_limit";
  * what supabase-js actually puts on the wire.
  */
 export function isShareableDashboardLimitError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) {
-    return false;
-  }
-  const hint = (error as { hint?: unknown }).hint;
-  return hint === SHAREABLE_DASHBOARD_LIMIT_HINT;
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { hint?: unknown }).hint === SHAREABLE_DASHBOARD_LIMIT_HINT
+  );
 }

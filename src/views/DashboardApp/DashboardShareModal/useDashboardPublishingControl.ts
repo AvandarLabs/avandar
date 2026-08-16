@@ -206,7 +206,7 @@ function useSlugValidation(
  * makes a public dashboard open showing "Anyone with the link" and makes any
  * later divergence a visible pending change rather than a silent one.
  *
- * The dropdown never writes visibility (umbrella D5): it moves the target, and
+ * The dropdown never writes visibility: it moves the target, and
  * `onPrimaryAction` is the only thing that calls the mutations.
  */
 export function useDashboardPublishingControl(

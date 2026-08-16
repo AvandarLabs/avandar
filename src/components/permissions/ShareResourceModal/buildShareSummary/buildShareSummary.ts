@@ -7,6 +7,7 @@ import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
@@ -34,7 +35,7 @@ type BuildShareSummaryOptions = {
    * resource has no published form at all, which is every type except
    * dashboards today, and produces no publication span.
    */
-  publication?: "draft" | "workspace" | "public";
+  publication?: Dashboard.Visibility;
 };
 
 /**
@@ -73,7 +74,10 @@ export function buildShareSummary(
 
   const publicationSpans =
     opts.publication ?
-      buildPublicationSpans(opts.publication, opts.workspaceName)
+      _buildPublicationSpans({
+        publication: opts.publication,
+        workspaceName: opts.workspaceName,
+      })
     : [];
 
   if (!hasAnyShares) {
@@ -181,10 +185,13 @@ function buildGeneralAccessFragment(
  * That is the one place the two axes of this modal stop being independent, and
  * it is worth a sentence rather than a footnote.
  */
-function buildPublicationSpans(
-  publication: "draft" | "workspace" | "public",
-  workspaceName: string,
+function _buildPublicationSpans(
+  options: Readonly<{
+    publication: Dashboard.Visibility;
+    workspaceName: string;
+  }>,
 ): SummarySpan[] {
+  const { publication, workspaceName } = options;
   if (publication === "draft") {
     return [{ kind: "text", text: t` Not published yet.` }];
   }

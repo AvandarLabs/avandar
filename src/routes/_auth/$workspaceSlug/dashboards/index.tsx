@@ -12,8 +12,7 @@ function DashboardsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
 
   // No `owner_id` filter: RLS decides what this user may see, which is what
-  // makes a dashboard shared with you appear in your list at all. See the P3
-  // design, section 6.
+  // makes a dashboard shared with you appear in your list at all.
   //
   // The `workspace_id` filter is load-bearing, not cosmetic. RLS alone will
   // not scope this list: `util__auth_user_may_select_dashboard` returns true

@@ -1,5 +1,5 @@
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /** Dataset metadata needed by publication-slice controls. */

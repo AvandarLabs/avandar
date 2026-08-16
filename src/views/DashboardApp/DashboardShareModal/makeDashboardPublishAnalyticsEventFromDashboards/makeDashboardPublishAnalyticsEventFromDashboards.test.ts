@@ -103,8 +103,9 @@ describe("makeDashboardPublishAnalyticsEventFromDashboards", () => {
   );
 
   it("reports a republish of a workspace dashboard as a settings update", () => {
-    // Before P2 this branched on isPublic, which is false for a workspace
-    // dashboard, so every internal republish looked like a first publish.
+    // This must branch on the previous visibility, not on whether the
+    // dashboard is public: a public check is false for a workspace dashboard,
+    // which would make every internal republish look like a first publish.
     const event = makeDashboardPublishAnalyticsEventFromDashboards({
       previousDashboard: _makeDashboard({ visibility: "workspace" }),
       updatedDashboard: _makeDashboard({ visibility: "workspace" }),

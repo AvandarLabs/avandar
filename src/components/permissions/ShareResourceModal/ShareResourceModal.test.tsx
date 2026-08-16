@@ -368,8 +368,8 @@ describe("ShareResourceModal", () => {
   });
 
   it("renders no publishing section for a resource that has none", async () => {
-    // Datasets pass no `publishing` prop, so the modal must look exactly as it
-    // did before dashboards grew one.
+    // Datasets pass no `publishing` prop, so the modal must render no
+    // publishing UI.
     renderModal({ resourceType: "dataset" });
 
     await waitFor(() => {
@@ -382,8 +382,8 @@ describe("ShareResourceModal", () => {
   it("summarises what is published, not what the user has just picked", async () => {
     // The summary states what IS true of the resource. A draft whose owner has
     // picked "Anyone with the link" is not on the web yet, and saying it is
-    // would be the same false reassurance the Only me confirmation was fixed
-    // for. The pending change is the status alert's job to report.
+    // would be false reassurance. The pending change is the status alert's job
+    // to report.
     renderModal({
       resourceType: "dashboard",
       publishing: _makePublishing({

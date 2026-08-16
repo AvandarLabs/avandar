@@ -23,12 +23,15 @@ function _doesNonOwnerHaveAccess(
   });
 }
 
+/** The persisted sharing state a General access value is derived from. */
+type GeneralAccessShareState = {
+  isRestricted: boolean;
+  shares: readonly ResourceShareRow[];
+  ownerId: string;
+};
+
 function _getGeneralAccessValueFromShareState(
-  options: Readonly<{
-    isRestricted: boolean;
-    shares: readonly ResourceShareRow[];
-    ownerId: string;
-  }>,
+  options: Readonly<GeneralAccessShareState>,
 ): GeneralAccessValue {
   const restrictedValue =
     (
@@ -64,17 +67,11 @@ function _getGeneralAccessValueFromShareState(
  * resource-generic; datasets have no published form and pass `false`.
  */
 function _getGeneralAccessValueFromResourceState(
-  options: Readonly<{
-    isRestricted: boolean;
-    shares: readonly ResourceShareRow[];
-    ownerId: string;
-    isPublicSelected: boolean;
-  }>,
+  options: Readonly<GeneralAccessShareState & { isPublicSelected: boolean }>,
 ): GeneralAccessValue {
-  if (options.isPublicSelected) {
-    return "public";
-  }
-  return _getGeneralAccessValueFromShareState(options);
+  return options.isPublicSelected ? "public" : (
+      _getGeneralAccessValueFromShareState(options)
+    );
 }
 
 function _makeDropdownOptionsFromLabels(
