@@ -16,6 +16,7 @@ import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/n
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import { makeSizeLegendStops } from "@/views/GisApp/layers/makeSizeLegendStops/makeSizeLegendStops";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
@@ -69,6 +70,10 @@ type ClassifiedGeometry = {
   geometry: LayerGeometry;
   legendUpdate: LayerLegendUpdate | undefined;
 };
+
+const SIZE_LABEL_FORMATTER = new Intl.NumberFormat(undefined, {
+  maximumFractionDigits: 2,
+});
 
 /** The largest single drop reason, or `undefined` when nothing was dropped. */
 function _getLargestDropReason(
@@ -280,29 +285,53 @@ function _makeClassifiedFeatures(
   });
 }
 
-/** Adds derived class indexes and the exact legend produced from them. */
-function _classifyGeometry(
+function _makeSizeStops(
   layer: MapLayer.T,
-  geometry: LayerGeometry,
-  hasQueryData: boolean,
-): ClassifiedGeometry {
-  const color = layer.symbology.color;
-  if (color.type === "single" || !hasQueryData) {
-    return { geometry, legendUpdate: undefined };
+  features: readonly GeoJSON.Feature[],
+): readonly MapLayer.SizeLegendStop[] {
+  if (layer.symbology.type !== "proportionalSymbol") {
+    return [];
   }
-  const reportableFeatures = geometry.featureCollection.features.filter(
-    (feature) => {
+  const valueColumnName = _getValueColumnName(layer);
+  const values = features
+    .map((feature) => {
       return (
-        feature.properties?.[MapLayerSpatialFeatureProperties.state] !==
-        "suppressed"
+        valueColumnName ? feature.properties?.[valueColumnName] : undefined
       );
+    })
+    .filter((value): value is number => {
+      return typeof value === "number";
+    });
+  return makeSizeLegendStops({
+    values,
+    minRadius: layer.symbology.minRadius,
+    maxRadius: layer.symbology.maxRadius,
+    scale: layer.symbology.scale,
+    formatLabel: (value) => {
+      return SIZE_LABEL_FORMATTER.format(value);
     },
-  );
-  const classification =
-    color.type === "categorical" ?
-      _classifyCategories(layer, reportableFeatures, color)
+  });
+}
+
+function _classifyLegend(
+  layer: MapLayer.T,
+  features: readonly GeoJSON.Feature[],
+): {
+  breaks: readonly MapLayer.LegendBreak[];
+  classIndexByFeatureId: ReadonlyMap<string, number>;
+  entries: readonly MapLayer.LegendEntry[];
+} {
+  if (layer.symbology.type === "heatmap") {
+    return { breaks: [], classIndexByFeatureId: new Map(), entries: [] };
+  }
+  const color = layer.symbology.color;
+  if (color.type === "single") {
+    return { breaks: [], classIndexByFeatureId: new Map(), entries: [] };
+  }
+  return color.type === "categorical" ?
+      _classifyCategories(layer, features, color)
     : classifyLayerValues(
-        reportableFeatures.map((feature, index) => {
+        features.map((feature, index) => {
           return {
             featureId: _getFeatureId(feature, index),
             value: _getFeatureColorValue(layer, feature.properties),
@@ -314,6 +343,26 @@ function _classifyGeometry(
           noData: color.noData,
         },
       );
+}
+
+/** Adds derived class indexes and the exact legend produced from them. */
+function _classifyGeometry(
+  layer: MapLayer.T,
+  geometry: LayerGeometry,
+  hasQueryData: boolean,
+): ClassifiedGeometry {
+  if (!hasQueryData) {
+    return { geometry, legendUpdate: undefined };
+  }
+  const reportableFeatures = geometry.featureCollection.features.filter(
+    (feature) => {
+      return (
+        feature.properties?.[MapLayerSpatialFeatureProperties.state] !==
+        "suppressed"
+      );
+    },
+  );
+  const classification = _classifyLegend(layer, reportableFeatures);
   const suppressedCount =
     geometry.featureCollection.features.length - reportableFeatures.length;
   const entries = [...classification.entries];
@@ -340,6 +389,7 @@ function _classifyGeometry(
       layerFingerprint: buildLayerLegendFingerprint(layer),
       breaks: classification.breaks,
       entries,
+      sizeStops: _makeSizeStops(layer, reportableFeatures),
     },
   };
 }

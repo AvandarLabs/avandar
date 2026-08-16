@@ -6,6 +6,7 @@ export type LayerLegendUpdate = {
   layerFingerprint: string;
   breaks: readonly MapLayer.LegendBreak[];
   entries: readonly MapLayer.LegendEntry[];
+  sizeStops: readonly MapLayer.SizeLegendStop[];
 };
 
 type Options = {
@@ -27,7 +28,9 @@ export function buildLayerLegendFingerprint(layer: MapLayer.T): string {
 function _isLegendEqual(layer: MapLayer.T, update: LayerLegendUpdate): boolean {
   return (
     JSON.stringify(layer.legend.breaks) === JSON.stringify(update.breaks) &&
-    JSON.stringify(layer.legend.entries) === JSON.stringify(update.entries)
+    JSON.stringify(layer.legend.entries) === JSON.stringify(update.entries) &&
+    JSON.stringify(layer.legend.sizeStops) ===
+      JSON.stringify(update.sizeStops)
   );
 }
 
@@ -68,6 +71,7 @@ export function usePersistedLayerLegends(options: Options): void {
             ...layer.legend,
             breaks: update.breaks,
             entries: update.entries,
+            sizeStops: update.sizeStops,
           },
         } as MapLayer.T;
       });
