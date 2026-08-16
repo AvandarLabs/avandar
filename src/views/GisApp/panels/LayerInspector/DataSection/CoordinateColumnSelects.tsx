@@ -4,6 +4,7 @@ import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerU
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { Model } from "@avandar/models";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { ReactNode } from "react";
 
@@ -23,9 +24,7 @@ export function CoordinateColumnSelects({
   const binding =
     layer.geoBinding?.type === "latLngColumns" ? layer.geoBinding : undefined;
   const selectAxis = (axis: "latitude" | "longitude") => {
-    return (
-      column: Parameters<typeof MapLayerUpdates.withGeoBindingAxis>[2] | null,
-    ) => {
+    return (column: QueryColumn.T | null) => {
       onLayerChange((current) => {
         return MapLayerUpdates.withGeoBindingAxis({
           layer: current,

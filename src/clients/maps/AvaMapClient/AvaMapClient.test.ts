@@ -1,4 +1,5 @@
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
 import { describe, expect, it, vi } from "vitest";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
@@ -51,7 +52,7 @@ function _createQuery(
 
 function _createMapRow(updatedAt: string): AvaMap.T<"DBRead"> {
   return {
-    config: AvaMapConfig.makeEmpty(),
+    config: AvaMapConfigSchema.toJson(AvaMapConfig.makeEmpty()),
     created_at: "2026-08-14T00:00:00.000Z",
     description: null,
     id: "00000000-0000-4000-8000-000000000001",

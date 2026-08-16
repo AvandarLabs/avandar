@@ -147,7 +147,9 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
         layer: MapLayer.T;
         columnId: QueryColumn.Id | undefined;
       }>) => {
-        return layer.source.queryColumns.find(propEq("id", columnId));
+        return columnId ?
+            layer.source.queryColumns.find(propEq("id", columnId))
+          : undefined;
       },
       withDataSource: ({
         layer,

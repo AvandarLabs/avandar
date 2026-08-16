@@ -43,7 +43,7 @@ function _createDatasetColumn(): DatasetColumn.T {
     name: "boundary_key",
     originalName: "boundary_key",
     originalDataType: "VARCHAR",
-    dataType: "string",
+    dataType: "varchar",
     detectedDataType: "VARCHAR",
     description: undefined,
     columnIdx: 0,

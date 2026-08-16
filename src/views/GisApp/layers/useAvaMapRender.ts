@@ -80,7 +80,9 @@ function _getLargestDropReason(
   drops: readonly GeometryDropReport[],
 ): DropReason | undefined {
   return sortObjList(drops, {
-    sortBy: prop("count"),
+    sortBy: (drop) => {
+      return drop.count;
+    },
     comparator: (firstCount, secondCount) => {
       return secondCount - firstCount;
     },

@@ -73,7 +73,10 @@ function useGisAppLayerSelection(mapConfig: AvaMapConfig.T): {
     MapLayer.Id | undefined
   >(mapConfig.layers[mapConfig.layers.length - 1]?.id);
   const rows = AvaMapConfig.toStackOrder(mapConfig);
-  const selectedLayer = mapConfig.layers.find(propEq("id", selectedLayerId));
+  const selectedLayer =
+    selectedLayerId ?
+      mapConfig.layers.find(propEq("id", selectedLayerId))
+    : undefined;
 
   return { rows, selectedLayer, selectedLayerId, setSelectedLayerId };
 }
