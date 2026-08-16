@@ -1,164 +1,24 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SnapshotStorageUtils } from "./SnapshotStorageUtils/SnapshotStorageUtils";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
-const { downloadMock, fromMock, listMock, removeMock, uploadMock } = vi.hoisted(
-  () => {
-    const mockedUpload = vi.fn();
-    const mockedDownload = vi.fn();
-    const mockedList = vi.fn();
-    const mockedRemove = vi.fn();
-    const mockedFrom = vi.fn(() => {
-      return {
-        upload: mockedUpload,
-        download: mockedDownload,
-        list: mockedList,
-        remove: mockedRemove,
-      };
-    });
-
-    return {
-      downloadMock: mockedDownload,
-      fromMock: mockedFrom,
-      listMock: mockedList,
-      removeMock: mockedRemove,
-      uploadMock: mockedUpload,
-    };
-  },
-);
-
-vi.mock("$/db/supabase/AvaSupabase", () => {
-  return {
-    AvaSupabase: {
-      db: () => {
-        return { storage: { from: fromMock } };
-      },
-    },
-  };
-});
-
-const { PublicDatasetParquetStorageClient } =
-  await import("./PublicDatasetParquetStorageClient");
-
-const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
-const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
-const STALE_DATASET_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;
-const SNAPSHOT_REVISION = "44444444-4444-4444-8444-444444444444";
-const OLD_SNAPSHOT_REVISION = "55555555-5555-4555-8555-555555555555";
-const DATASET_PATH = `dashboards/${DASHBOARD_ID}/revisions/${SNAPSHOT_REVISION}/datasets/${DATASET_ID}.parquet`;
-
-function _configureSuccessfulRemove(): void {
-  removeMock.mockImplementation(async (objectPaths: readonly string[]) => {
-    return {
-      data: objectPaths.map((name) => {
-        return { name };
-      }),
-      error: null,
-    };
-  });
-}
+import {
+  configureSuccessfulRemove,
+  DASHBOARD_ID,
+  DATASET_ID,
+  DATASET_PATH,
+  fromMock,
+  listMock,
+  OLD_SNAPSHOT_REVISION,
+  PublicDatasetParquetStorageClient,
+  removeMock,
+  SNAPSHOT_REVISION,
+  STALE_DATASET_ID,
+} from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.fixtures";
+import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("PublicDatasetParquetStorageClient", () => {
-  it("uploads a dashboard snapshot to its explicit private bucket", async () => {
-    uploadMock.mockResolvedValue({ error: null });
-
-    await PublicDatasetParquetStorageClient.uploadDataset({
-      bucket: SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-      dashboardId: DASHBOARD_ID,
-      datasetId: DATASET_ID,
-      snapshotRevision: SNAPSHOT_REVISION,
-      parquetBlob: new Blob(["parquet"]),
-    });
-
-    expect(fromMock).toHaveBeenCalledWith(
-      SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-    );
-    expect(uploadMock).toHaveBeenCalledWith(
-      DATASET_PATH,
-      expect.any(Blob),
-      expect.objectContaining({ upsert: true }),
-    );
-  });
-
-  it("downloads a dashboard snapshot from its explicit public bucket", async () => {
-    const parquetBlob = new Blob(["parquet"]);
-    downloadMock.mockResolvedValue({ data: parquetBlob, error: null });
-
-    const result = await PublicDatasetParquetStorageClient.downloadDataset({
-      bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
-      dashboardId: DASHBOARD_ID,
-      datasetId: DATASET_ID,
-      snapshotRevision: SNAPSHOT_REVISION,
-      throwIfNotFound: true,
-    });
-
-    expect(result).toBe(parquetBlob);
-    expect(fromMock).toHaveBeenCalledWith(
-      SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
-    );
-    expect(downloadMock).toHaveBeenCalledWith(DATASET_PATH);
-  });
-
-  it("downloads the reserved legacy generation from its legacy path", async () => {
-    const parquetBlob = new Blob(["parquet"]);
-    downloadMock.mockResolvedValue({ data: parquetBlob, error: null });
-
-    await PublicDatasetParquetStorageClient.downloadDataset({
-      bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
-      dashboardId: DASHBOARD_ID,
-      datasetId: DATASET_ID,
-      snapshotRevision: SnapshotStorageUtils.LEGACY_SNAPSHOT_REVISION,
-      throwIfNotFound: true,
-    });
-
-    expect(downloadMock).toHaveBeenCalledWith(
-      `dashboards/${DASHBOARD_ID}/datasets/${DATASET_ID}.parquet`,
-    );
-  });
-
-  it("lists a dashboard's snapshot datasets from its explicit bucket", async () => {
-    listMock.mockResolvedValue({
-      data: [{ name: `${DATASET_ID}.parquet` }],
-      error: null,
-    });
-
-    const datasetIds =
-      await PublicDatasetParquetStorageClient.listDatasetIdsForDashboard({
-        bucket: SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-        dashboardId: DASHBOARD_ID,
-        snapshotRevision: SNAPSHOT_REVISION,
-      });
-
-    expect(datasetIds).toEqual([DATASET_ID]);
-    expect(fromMock).toHaveBeenCalledWith(
-      SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-    );
-    expect(listMock).toHaveBeenCalledWith(
-      `dashboards/${DASHBOARD_ID}/revisions/${SNAPSHOT_REVISION}/datasets`,
-      expect.objectContaining({ limit: 1000 }),
-    );
-  });
-
-  it("lists the reserved legacy generation from its legacy folder", async () => {
-    listMock.mockResolvedValue({ data: [], error: null });
-
-    await PublicDatasetParquetStorageClient.listDatasetIdsForDashboard({
-      bucket: SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-      dashboardId: DASHBOARD_ID,
-      snapshotRevision: SnapshotStorageUtils.LEGACY_SNAPSHOT_REVISION,
-    });
-
-    expect(listMock).toHaveBeenCalledWith(
-      `dashboards/${DASHBOARD_ID}/datasets`,
-      expect.objectContaining({ limit: 1000 }),
-    );
-  });
-
+describe("PublicDatasetParquetStorageClient cleanup", () => {
   it("removes every dashboard generation from its explicit bucket", async () => {
     listMock
       .mockResolvedValueOnce({
@@ -173,7 +33,7 @@ describe("PublicDatasetParquetStorageClient", () => {
         data: [{ name: `${STALE_DATASET_ID}.parquet` }],
         error: null,
       });
-    _configureSuccessfulRemove();
+    configureSuccessfulRemove();
 
     await PublicDatasetParquetStorageClient.deleteDatasetsForDashboard({
       assertCanDelete: vi.fn().mockResolvedValue(undefined),
@@ -226,7 +86,7 @@ describe("PublicDatasetParquetStorageClient", () => {
         error: null,
       };
     });
-    _configureSuccessfulRemove();
+    configureSuccessfulRemove();
 
     await PublicDatasetParquetStorageClient.deleteDatasetsForDashboard({
       assertCanDelete: vi.fn().mockResolvedValue(undefined),
@@ -317,7 +177,7 @@ describe("PublicDatasetParquetStorageClient", () => {
       ],
       error: null,
     });
-    _configureSuccessfulRemove();
+    configureSuccessfulRemove();
 
     await PublicDatasetParquetStorageClient.reconcileDatasetsForDashboard({
       bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
@@ -379,7 +239,7 @@ describe("PublicDatasetParquetStorageClient", () => {
       ],
       error: null,
     });
-    _configureSuccessfulRemove();
+    configureSuccessfulRemove();
 
     await PublicDatasetParquetStorageClient.deleteSnapshotGeneration({
       bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
@@ -403,7 +263,7 @@ describe("PublicDatasetParquetStorageClient", () => {
       data: [{ name: `${STALE_DATASET_ID}.parquet` }],
       error: null,
     });
-    _configureSuccessfulRemove();
+    configureSuccessfulRemove();
 
     await PublicDatasetParquetStorageClient.deleteSnapshotGeneration({
       bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
