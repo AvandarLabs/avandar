@@ -4,6 +4,9 @@ import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 const MANTINE_RED_6 = "#f03e3e";
+// Mantine darkens yellow for the light variant's foreground, so
+// `color="yellow"` resolves to yellow-7, not the yellow-6 of the palette.
+const MANTINE_YELLOW_LIGHT = "#f59f00";
 
 function renderStatus(
   visibility: Dashboard.Visibility,
@@ -62,5 +65,25 @@ describe("PublishDashboardStatus", () => {
       `--alert-color: ${MANTINE_RED_6}`,
     );
     expect(screen.queryByText(/published copy still serves/)).toBeNull();
+  });
+
+  it("warns in yellow that a widened dashboard still serves its old audience", () => {
+    // The published snapshot only moves when the footer button is pressed, so
+    // a workspace dashboard whose owner picked "Anyone with the link" is still
+    // workspace-only. Telling this owner it is "not published yet" would be
+    // wrong: a published copy exists, it just serves the previous audience.
+    renderStatus("workspace", "public");
+
+    const alert = screen
+      .getByText(/The published copy still serves the previous audience/)
+      .closest("div[class*='Alert-root']");
+    expect(alert).not.toBeNull();
+    // Yellow, not the red reserved for a live public exposure being narrowed:
+    // widening a workspace dashboard leaks nothing until the button is pressed.
+    expect(alert?.getAttribute("style")).toContain(
+      `--alert-color: ${MANTINE_YELLOW_LIGHT}`,
+    );
+    expect(alert?.getAttribute("style")).not.toContain(MANTINE_RED_6);
+    expect(screen.queryByText(/not published yet/i)).toBeNull();
   });
 });

@@ -8,9 +8,18 @@ import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
 
-const { navigateMock, puckRenderMock } = vi.hoisted(() => {
-  return { navigateMock: vi.fn(), puckRenderMock: vi.fn() };
-});
+const { navigateMock, puckRenderMock, publishedDatasetsState } = vi.hoisted(
+  () => {
+    return {
+      navigateMock: vi.fn(),
+      puckRenderMock: vi.fn(),
+      publishedDatasetsState: {
+        isLoadingDatasets: false,
+        error: undefined as Error | undefined,
+      },
+    };
+  },
+);
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const WORKSPACE_ID = "44444444-4444-4444-8444-444444444444" as Workspace.Id;
@@ -61,8 +70,15 @@ vi.mock(
   "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets/useEnsurePublishedDashboardDatasets",
   () => {
     return {
-      useEnsurePublishedDashboardDatasets: (): [boolean, undefined] => {
-        return [false, undefined];
+      // The real hook returns an object that the view destructures by name. A
+      // tuple would type-check here (`vi.mock` factories are not checked
+      // against the real module) but hand the view `undefined` for every
+      // field, silently disabling its loading and error branches.
+      useEnsurePublishedDashboardDatasets: (): {
+        isLoadingDatasets: boolean;
+        error: Error | undefined;
+      } => {
+        return { ...publishedDatasetsState };
       },
     };
   },
@@ -133,6 +149,21 @@ describe("DashboardViewerView", () => {
   beforeEach(() => {
     navigateMock.mockClear();
     puckRenderMock.mockClear();
+    publishedDatasetsState.isLoadingDatasets = false;
+    publishedDatasetsState.error = undefined;
+  });
+
+  it("holds back the dashboard until its published datasets have loaded", () => {
+    publishedDatasetsState.isLoadingDatasets = true;
+    _renderViewer({
+      dashboard: _createDashboard({ visibility: "public" }),
+      mode: "published",
+    });
+
+    expect(screen.getByText("Loading dashboard datasets")).toBeInTheDocument();
+    // Rendering the blocks before their data exists would show a dashboard of
+    // empty visualizations that looks like a published dashboard with no data.
+    expect(screen.queryByTestId("dashboard-render")).not.toBeInTheDocument();
   });
 
   it("denies a draft that reaches a published viewer", () => {

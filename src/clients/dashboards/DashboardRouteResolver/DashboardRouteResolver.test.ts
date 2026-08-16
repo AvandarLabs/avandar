@@ -132,6 +132,9 @@ describe("DashboardRouteResolver.makeDashboardRouteOutcomeFromPublicRoute", () =
   });
 
   it("makes anonymous missing and inaccessible links indistinguishable", async () => {
+    // The inaccessible case must really exist as a workspace dashboard,
+    // otherwise both halves would take the same missing-dashboard path and the
+    // comparison below would only prove that a code path equals itself.
     const inaccessibleDashboard = _createDashboard({
       visibility: "workspace",
       slug: "q3",
@@ -143,7 +146,15 @@ describe("DashboardRouteResolver.makeDashboardRouteOutcomeFromPublicRoute", () =
     });
     const inaccessibleDeps = _createDeps({
       getById: vi.fn().mockResolvedValue(undefined),
-      findBySlug: vi.fn().mockResolvedValue([]),
+      findBySlug: vi
+        .fn()
+        .mockImplementation(
+          async (params: Readonly<{ visibility: "public" | "workspace" }>) => {
+            return params.visibility === "workspace" ?
+                [inaccessibleDashboard]
+              : [];
+          },
+        ),
       isAuthenticated: vi.fn().mockResolvedValue(false),
     });
 
@@ -159,6 +170,7 @@ describe("DashboardRouteResolver.makeDashboardRouteOutcomeFromPublicRoute", () =
     ]);
 
     expect(missingOutcome).toEqual({ kind: "signIn" });
+    expect(inaccessibleOutcome).toEqual({ kind: "signIn" });
     expect(inaccessibleOutcome).toEqual(missingOutcome);
   });
 

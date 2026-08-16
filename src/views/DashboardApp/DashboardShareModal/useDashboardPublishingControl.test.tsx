@@ -249,6 +249,9 @@ describe("useDashboardPublishingControl", () => {
       vi.advanceTimersByTime(600);
     });
     expect(result.current.isSlugRejected).toBe(true);
+    // The rejection has to reach the user as words, not just as a disabled
+    // button: without the reason, the field simply refuses to work.
+    expect(result.current.slugErrorMessage).toMatch(/taken/i);
 
     act(() => {
       result.current.onPrimaryAction();

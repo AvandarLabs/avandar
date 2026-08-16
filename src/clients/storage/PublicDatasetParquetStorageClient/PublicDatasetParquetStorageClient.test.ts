@@ -370,8 +370,13 @@ describe("PublicDatasetParquetStorageClient", () => {
   });
 
   it("deletes one exact obsolete generation without touching the committed one", async () => {
+    // The committed generation holds the same dataset IDs as the obsolete one,
+    // so only the revision segment separates the two sets of objects.
     listMock.mockResolvedValueOnce({
-      data: [{ name: `${STALE_DATASET_ID}.parquet` }],
+      data: [
+        { name: `${DATASET_ID}.parquet` },
+        { name: `${STALE_DATASET_ID}.parquet` },
+      ],
       error: null,
     });
     _configureSuccessfulRemove();
@@ -383,10 +388,13 @@ describe("PublicDatasetParquetStorageClient", () => {
     });
 
     expect(removeMock).toHaveBeenCalledWith([
+      `dashboards/${DASHBOARD_ID}/revisions/${OLD_SNAPSHOT_REVISION}/datasets/${DATASET_ID}.parquet`,
       `dashboards/${DASHBOARD_ID}/revisions/${OLD_SNAPSHOT_REVISION}/datasets/${STALE_DATASET_ID}.parquet`,
     ]);
     expect(removeMock).not.toHaveBeenCalledWith(
-      expect.arrayContaining([DATASET_PATH]),
+      expect.arrayContaining([
+        expect.stringContaining(`/revisions/${SNAPSHOT_REVISION}/`),
+      ]),
     );
   });
 

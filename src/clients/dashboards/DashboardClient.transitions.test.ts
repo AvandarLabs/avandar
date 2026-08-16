@@ -207,6 +207,7 @@ const { createUpdateMock } = vi.hoisted(() => {
 
 const {
   apiPostMock,
+  bulkDeleteDashboardsMock,
   dbDeleteEqMock,
   dbDeleteMock,
   dbDeleteSelectMock,
@@ -228,6 +229,8 @@ const {
   persistedVisibilityState,
   reconcileSnapshotsMock,
   uploadDatasetMock,
+  useBulkDeleteDashboardsMock,
+  useDeleteDashboardMock,
   uuidMock,
 } = vi.hoisted(() => {
   const operationHistory: string[] = [];
@@ -263,6 +266,7 @@ const {
 
   return {
     apiPostMock: vi.fn(),
+    bulkDeleteDashboardsMock: vi.fn(),
     dbFromMock: vi.fn(() => {
       return { delete: deleteMock, update: updateMock };
     }),
@@ -286,6 +290,8 @@ const {
     persistedVisibilityState: visibilityState,
     reconcileSnapshotsMock: vi.fn(),
     uploadDatasetMock: vi.fn(),
+    useBulkDeleteDashboardsMock: vi.fn(),
+    useDeleteDashboardMock: vi.fn(),
     uuidMock: vi.fn(() => {
       return SNAPSHOT_REVISION;
     }),
@@ -325,10 +331,16 @@ vi.mock("$/RdbCrudClient/createRdbCrudClient", () => {
           },
         },
       });
+      // The real CRUD client exposes the whole delete surface. The stand-in
+      // has to expose it too, otherwise the API-surface guards below would
+      // pass on absence rather than on production's `omit` list.
       return {
         ...mutations,
+        bulkDelete: bulkDeleteDashboardsMock,
         delete: deleteDashboardMock,
         getById: getDashboardByIdMock,
+        useBulkDelete: useBulkDeleteDashboardsMock,
+        useDelete: useDeleteDashboardMock,
       };
     },
   };
@@ -1332,6 +1344,10 @@ describe("DashboardClient.unpublishDashboard", () => {
 
 describe("DashboardClient.fullDelete", () => {
   it("does not expose raw delete mutations that bypass snapshot cleanup", () => {
+    // A positive control: the CRUD stand-in really does hand these keys over,
+    // so the absences below are production's `omit` list and not a gap in the
+    // mock.
+    expect(DashboardClient).toHaveProperty("getById");
     expect(DashboardClient).not.toHaveProperty("delete");
     expect(DashboardClient).not.toHaveProperty("bulkDelete");
     expect(DashboardClient).not.toHaveProperty("useDelete");

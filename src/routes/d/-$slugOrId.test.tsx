@@ -10,8 +10,27 @@ import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ComponentType } from "react";
 
-const { makeDashboardRouteOutcomeFromPublicRouteMock } = vi.hoisted(() => {
-  return { makeDashboardRouteOutcomeFromPublicRouteMock: vi.fn() };
+const {
+  makeDashboardRouteDepsMock,
+  makeDashboardRouteOutcomeFromPublicRouteMock,
+  routeDepsSentinel,
+} = vi.hoisted(() => {
+  // The resolver is mocked, so no dep is ever called here. A sentinel is what
+  // makes the wiring observable: the route must hand the resolver the deps
+  // that `makeDashboardRouteDeps` built, not deps of its own.
+  const sentinel = { sentinel: "public-dashboard-route-deps" };
+  return {
+    makeDashboardRouteDepsMock: vi.fn(() => {
+      return sentinel;
+    }),
+    makeDashboardRouteOutcomeFromPublicRouteMock:
+      vi.fn<
+        (
+          params: Readonly<{ slugOrId: string; deps: unknown }>,
+        ) => Promise<DashboardRouteOutcome>
+      >(),
+    routeDepsSentinel: sentinel,
+  };
 });
 
 vi.mock(
@@ -23,6 +42,13 @@ vi.mock(
           makeDashboardRouteOutcomeFromPublicRouteMock,
       },
     };
+  },
+);
+
+vi.mock(
+  "@/clients/dashboards/makeDashboardRouteDeps/makeDashboardRouteDeps",
+  () => {
+    return { makeDashboardRouteDeps: makeDashboardRouteDepsMock };
   },
 );
 
@@ -158,13 +184,11 @@ describe("/d/$slugOrId", () => {
     expect(result).toEqual({ kind: "render", dashboard });
     expect(makeDashboardRouteOutcomeFromPublicRouteMock).toHaveBeenCalledWith({
       slugOrId: DASHBOARD_SLUG,
-      deps: expect.objectContaining({
-        findBySlug: expect.any(Function),
-        getById: expect.any(Function),
-        getViewerWorkspaces: expect.any(Function),
-        isAuthenticated: expect.any(Function),
-      }),
+      deps: routeDepsSentinel,
     });
+    expect(
+      makeDashboardRouteOutcomeFromPublicRouteMock.mock.calls[0]?.[0].deps,
+    ).toBe(routeDepsSentinel);
     expect(screen.getByTestId("dashboard-viewer")).toHaveTextContent(
       `${dashboard.id}:published`,
     );
