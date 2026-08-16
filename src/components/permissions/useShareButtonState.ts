@@ -15,16 +15,13 @@ type ShareButtonState = {
   tooltip: string;
   /**
    * Whether the user may write share rows. Always the `admin` bar, even when
-   * the button itself opens at a lower one, because a dashboard editor may
-   * publish without being allowed to hand out access.
+   * the button opens at a lower one.
    */
   canManageShares: boolean;
   /**
-   * Whether the role answer is still in flight. `canManageShares` reads
-   * `false` until it lands, which is the safe default for a button but the
-   * wrong thing to render as a verdict: a surface that draws itself
-   * differently for an admin has to wait rather than draw the read-only form
-   * and then flip.
+   * Whether the role answer is still in flight. `canManageShares` is `false`
+   * until it lands, so a surface that renders differently for an admin must
+   * wait rather than draw the read-only form and flip.
    */
   isLoadingRole: boolean;
 };
@@ -37,13 +34,13 @@ function _hasAtLeastRole(
 }
 
 /**
- * The "may I open the share modal" gate, shared by the generic share button and
- * the dashboard one so the role rule lives in one place.
+ * Whether the current user may open the share modal for a resource, with the
+ * tooltip explaining a refusal.
  *
- * `minRole` defaults to `admin` because managing shares is admin-tier work,
- * stricter than editing the resource. Dashboards pass `editor` instead:
- * publishing to your own workspace is ordinary editor work, and the modal
- * disables the share-writing controls on its own via `canManageShares`.
+ * `minRole` defaults to `admin` because managing shares is stricter than
+ * editing the resource. Dashboards pass `editor` so publishing to your own
+ * workspace stays ordinary editor work; the modal still withholds the
+ * share-writing controls through `canManageShares`.
  */
 export function useShareButtonState(
   options: Readonly<{

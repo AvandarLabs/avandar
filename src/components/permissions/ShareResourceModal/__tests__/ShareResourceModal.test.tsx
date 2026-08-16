@@ -2,42 +2,42 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { render, screen, waitFor } from "@/test-utils";
-import { renderShareResourceModal } from "./ShareResourceModalTestHelpers";
-import { ShareResourceModalTestMocks } from "./ShareResourceModalTestMocks";
+import { renderShareResourceModal } from "./ShareResourceModal.testHelpers";
+import { ShareResourceModalTestMocks } from "./ShareResourceModal.testMocks";
 
 vi.mock("@/utils/notifications/notify", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makeNotifyModule();
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makeCurrentWorkspaceModule();
 });
 
 vi.mock("@/clients/permissions/ResourceShareClient", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makeResourceShareClientModule();
 });
 
 vi.mock("@/clients/WorkspaceClient", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makeWorkspaceClientModule();
 });
 
 vi.mock("@/hooks/users/useCurrentUser", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makeCurrentUserModule();
 });
 
 vi.mock("@/clients/permissions/PermissionsClient", async () => {
   const { ShareResourceModalTestMocks: testMocks } =
-    await import("./ShareResourceModalTestMocks");
+    await import("./ShareResourceModal.testMocks");
   return testMocks.makePermissionsClientModule();
 });
 
