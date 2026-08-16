@@ -330,6 +330,9 @@ async function _deleteDatasetsForDashboard(
   const { assertCanDelete, bucket, dashboardId } = options;
   const revisions = await _listSnapshotRevisions({ bucket, dashboardId });
   for (const snapshotRevision of revisions) {
+    // Generations are deleted one at a time: every `_deleteSnapshotGeneration`
+    // re-checks the caller's transition claim through `assertCanDelete` and
+    // advances it, so concurrent deletes would fence each other out.
     await _deleteSnapshotGeneration({
       assertCanDelete,
       bucket,

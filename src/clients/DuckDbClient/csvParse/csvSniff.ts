@@ -133,28 +133,28 @@ export function getCsvSniffResult(
   const { lastSniffRow, parseOptions, rejectedScans, tableColumns, tableName } =
     options;
   const scan = rejectedScans[0];
-  if (scan) {
-    return buildDuckDbCsvSniffResultFromRejectScan({
-      tableName,
-      scan,
-      commentChar: parseOptions.commentChar,
-    });
-  }
-  if (lastSniffRow) {
-    return buildDuckDbCsvSniffResultFromSniffRow({
-      tableName,
-      sniffRow: lastSniffRow,
-      parseOptions,
-    });
-  }
-  return buildDuckDbCsvSniffResultFromResolved({
-    tableName,
-    parseOptions,
-    columns: tableColumns.map((column) => {
-      return { name: column.column_name, type: column.column_type };
-    }),
-    userArguments: buildReadCsvArgList({ parseOptions, mode: "load" }).join(
-      ", ",
-    ),
-  });
+  return (
+    scan ?
+      buildDuckDbCsvSniffResultFromRejectScan({
+        tableName,
+        scan,
+        commentChar: parseOptions.commentChar,
+      })
+    : lastSniffRow ?
+      buildDuckDbCsvSniffResultFromSniffRow({
+        tableName,
+        sniffRow: lastSniffRow,
+        parseOptions,
+      })
+    : buildDuckDbCsvSniffResultFromResolved({
+        tableName,
+        parseOptions,
+        columns: tableColumns.map((column) => {
+          return { name: column.column_name, type: column.column_type };
+        }),
+        userArguments: buildReadCsvArgList({ parseOptions, mode: "load" }).join(
+          ", ",
+        ),
+      })
+  );
 }

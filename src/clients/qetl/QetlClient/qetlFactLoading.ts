@@ -151,6 +151,8 @@ export async function fetchDiceFacts(
 ): Promise<ExtractedFact[]> {
   return options.extractors.reduce<Promise<ExtractedFact[]>>(
     async (priorFactsPromise, extractor) => {
+      // Chaining on the prior promise is what keeps the fetches sequential:
+      // one extractor's nested query can load tables the next one reads.
       const priorFacts = await priorFactsPromise;
       const extractedFact = await _fetchExtractor({ ...options, extractor });
       return priorFacts.concat(extractedFact);

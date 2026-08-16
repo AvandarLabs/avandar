@@ -66,13 +66,13 @@ function _isPublicSnapshotDatasetOwner(
     owner: PublicSnapshotDuckDbOwner;
   }>,
 ): boolean {
-  if (invalidDatasetTableIds.has(options.datasetId)) {
-    return false;
-  }
-  return _isSameOwner({
-    leftOwner: loadedSnapshotOwnerByDatasetId.get(options.datasetId),
-    rightOwner: options.owner,
-  });
+  return (
+    !invalidDatasetTableIds.has(options.datasetId) &&
+    _isSameOwner({
+      leftOwner: loadedSnapshotOwnerByDatasetId.get(options.datasetId),
+      rightOwner: options.owner,
+    })
+  );
 }
 
 /** Returns whether any public snapshot currently owns the dataset table. */
@@ -150,6 +150,39 @@ function _assertPublicSnapshotDatasetOwners(
 }
 
 /**
+ * Puts this operation at the back of every listed dataset's queue and returns
+ * the prior work to wait on plus the teardown that releases the queue slots.
+ */
+function _enqueueDatasetOperation(datasetIds: readonly string[]): {
+  priorOperations: Array<Promise<void>>;
+  releaseQueueSlots: () => void;
+} {
+  const priorOperations = datasetIds.map((datasetId) => {
+    return operationCompletionByDatasetId.get(datasetId) ?? Promise.resolve();
+  });
+  let completeOperation = () => {};
+  const operationCompletion = new Promise<void>((resolve) => {
+    completeOperation = resolve;
+  });
+  datasetIds.forEach((datasetId) => {
+    operationCompletionByDatasetId.set(datasetId, operationCompletion);
+  });
+  return {
+    priorOperations,
+    releaseQueueSlots: () => {
+      completeOperation();
+      datasetIds.forEach((datasetId) => {
+        if (
+          operationCompletionByDatasetId.get(datasetId) === operationCompletion
+        ) {
+          operationCompletionByDatasetId.delete(datasetId);
+        }
+      });
+    },
+  };
+}
+
+/**
  * Runs an operation after prior work on the same dataset IDs has settled.
  * Unrelated dataset IDs use independent queues.
  */
@@ -175,29 +208,13 @@ async function _runCoordinatedDatasetDuckDbOperation<Result>(
     return await options.operation(options.lease);
   }
 
-  const priorOperations = datasetIds.map((datasetId) => {
-    return operationCompletionByDatasetId.get(datasetId) ?? Promise.resolve();
-  });
-  let completeOperation = () => {};
-  const operationCompletion = new Promise<void>((resolve) => {
-    completeOperation = resolve;
-  });
-  datasetIds.forEach((datasetId) => {
-    operationCompletionByDatasetId.set(datasetId, operationCompletion);
-  });
-
+  const { priorOperations, releaseQueueSlots } =
+    _enqueueDatasetOperation(datasetIds);
   await Promise.all(priorOperations);
   try {
     return await options.operation(_createLease(datasetIds));
   } finally {
-    completeOperation();
-    datasetIds.forEach((datasetId) => {
-      if (
-        operationCompletionByDatasetId.get(datasetId) === operationCompletion
-      ) {
-        operationCompletionByDatasetId.delete(datasetId);
-      }
-    });
+    releaseQueueSlots();
   }
 }
 

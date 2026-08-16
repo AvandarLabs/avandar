@@ -92,14 +92,13 @@ export async function upsertRowByPrimaryKey<
     message: "Could not extract primary key for upsert.",
   });
   const existing = await options.context.table.get(key);
-  if (options.ignoreDuplicates && existing) {
-    return existing;
-  }
-  return putAndGet({
-    context: options.context,
-    data: options.data,
-    action: "upsert put",
-  });
+  return options.ignoreDuplicates && existing ?
+      existing
+    : putAndGet({
+        context: options.context,
+        data: options.data,
+        action: "upsert put",
+      });
 }
 
 /** Upserts one row against a conflict on non-primary indexed columns. */

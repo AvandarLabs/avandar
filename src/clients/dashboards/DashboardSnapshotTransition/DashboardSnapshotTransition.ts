@@ -1,3 +1,4 @@
+import { isDefined, promiseMapSequential } from "@avandar/utils";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type {
   PublishedVisibility,
@@ -33,23 +34,31 @@ async function _clearAllSnapshotBuckets(
 ): Promise<void> {
   const { assertCanDelete, dashboardId, deleteDatasetsForDashboard } = options;
 
-  const cleanupErrors: unknown[] = [];
-  for (const bucket of [
-    SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
-    SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
-  ] as const) {
-    try {
-      await deleteDatasetsForDashboard({
-        assertCanDelete,
-        bucket,
-        dashboardId,
-      });
-    } catch (error: unknown) {
-      cleanupErrors.push(error);
-    }
-  }
+  // The buckets are cleared one at a time: `assertCanDelete` re-checks the
+  // transition claim and advances it, so a second concurrent clear would
+  // fence the first out.
+  const cleanupErrors = (
+    await promiseMapSequential(
+      [
+        SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
+        SnapshotStorageUtils.PRIVATE_BUCKET_NAME,
+      ] as const,
+      async (bucket) => {
+        try {
+          await deleteDatasetsForDashboard({
+            assertCanDelete,
+            bucket,
+            dashboardId,
+          });
+          return undefined;
+        } catch (error: unknown) {
+          return { error };
+        }
+      },
+    )
+  ).filter(isDefined);
   if (cleanupErrors.length > 0) {
-    throw cleanupErrors[0];
+    throw cleanupErrors[0]!.error;
   }
 }
 
