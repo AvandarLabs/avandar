@@ -115,7 +115,7 @@ type RenderDataVizContentOptions = {
   localFilterState: ReturnType<typeof useLocalFilterState>;
 };
 
-function _DataVizEmptyState(
+function _getDataVizEmptyState(
   options: Readonly<{ prompt: string; rawSql: string }>,
 ): ReactElement | undefined {
   const message =
@@ -138,7 +138,7 @@ function _DataVizEmptyState(
 function _renderDataVizContent(
   options: Readonly<RenderDataVizContentOptions>,
 ): ReactElement {
-  const emptyState = _DataVizEmptyState(options);
+  const emptyState = _getDataVizEmptyState(options);
   if (emptyState) {
     return emptyState;
   }

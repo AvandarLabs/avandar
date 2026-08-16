@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { useCallback, useState } from "react";
@@ -10,8 +11,11 @@ import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/Publ
 import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal";
 import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
+import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
+
+type PublishingControl = ReturnType<typeof useDashboardPublishingControl>;
 
 type Props = {
   dashboard: Dashboard.T;
@@ -19,6 +23,100 @@ type Props = {
   hasUnsavedChanges: boolean;
   onClose: () => void;
 };
+
+/**
+ * Every sentence `_getPublishBlockedReason` may return. Localised by the
+ * component, because a module-level helper cannot call `useLingui`.
+ */
+type PublishBlockedCopy = {
+  offline: string;
+  unsavedChanges: string;
+  slugChecking: string;
+  slugRejected: string;
+  planLimit: string;
+};
+
+type PublishBlockedReason = {
+  /** The sentence to show, or `undefined` when nothing blocks publishing. */
+  reason: string | undefined;
+  /**
+   * Whether the PLAN is what blocks it, which is the only case where offering
+   * an upgrade would actually unblock the button.
+   */
+  isBlockedByPlan: boolean;
+};
+
+/**
+ * Why the primary publish action is unavailable, if it is.
+ *
+ * Mirrors the guard in `onPrimaryAction`: a slug that is still being checked,
+ * or that the server has already rejected, would otherwise leave the button
+ * enabled and clicking it silently do nothing.
+ *
+ * The plan comes last: offline and unsaved changes block whatever the plan
+ * says, and offering an upgrade against those would be misleading, since
+ * buying one would not unblock the button.
+ */
+function _getPublishBlockedReason(
+  options: Readonly<{
+    isOffline: boolean;
+    hasUnsavedChanges: boolean;
+    isBlockedByLimit: boolean;
+    publishing: PublishingControl;
+    copy: PublishBlockedCopy;
+  }>,
+): PublishBlockedReason {
+  const { isOffline, hasUnsavedChanges, isBlockedByLimit, publishing, copy } =
+    options;
+
+  const otherBlockedReason =
+    isOffline ? copy.offline
+    : hasUnsavedChanges ? copy.unsavedChanges
+    : publishing.normalisedSlug && publishing.hasPendingSlugCheck ?
+      copy.slugChecking
+    : publishing.normalisedSlug && publishing.isSlugRejected ? copy.slugRejected
+    : undefined;
+
+  const isBlockedByPlan = otherBlockedReason === undefined && isBlockedByLimit;
+
+  return {
+    reason:
+      otherBlockedReason ?? (isBlockedByPlan ? copy.planLimit : undefined),
+    isBlockedByPlan,
+  };
+}
+
+/** The dashboard-only half of the generic share modal. */
+function _getPublishingProps(
+  options: Readonly<{
+    publishing: PublishingControl;
+    blocked: PublishBlockedReason;
+    publicOptionDisabledReason: string | undefined;
+    onUpgrade: () => void;
+  }>,
+): ShareResourcePublishing {
+  const { publishing, blocked, publicOptionDisabledReason, onUpgrade } =
+    options;
+  return {
+    targetVisibility: publishing.targetVisibility,
+    currentVisibility: publishing.currentDashboard.visibility,
+    publicOptionDisabledReason,
+    section: <PublishingSection publishing={publishing} />,
+    actions: (
+      <PublishingActions
+        actionKind={publishing.actionKind}
+        isBusy={publishing.isBusy}
+        isBlockedReason={blocked.reason}
+        // Offered only when the plan is what is in the way, and only as a
+        // button: opening the upgrade modal on render would interrupt someone
+        // who came here to change a person's role.
+        onUpgrade={blocked.isBlockedByPlan ? onUpgrade : undefined}
+        onPrimaryAction={publishing.onPrimaryAction}
+      />
+    ),
+    onGeneralAccessChange: publishing.onGeneralAccessChange,
+  };
+}
 
 /**
  * The dashboard flavour of the share modal: the resource-generic modal plus
@@ -64,28 +162,26 @@ export function DashboardShareModal({
     dashboard: publishing.currentDashboard,
     targetVisibility: publishing.targetVisibility,
   });
-  const planLimitMessage =
-    limit.maxAllowed === undefined ?
-      t`Your plan does not allow sharing more dashboards.`
-    : t`Your plan allows ${limit.maxAllowed} shared or public dashboard(s).`;
-  // Mirrors the guard in `onPrimaryAction`: a slug that is still being
-  // checked, or that the server has already rejected, would otherwise leave
-  // the button enabled and clicking it silently do nothing.
-  const otherBlockedReason =
-    offline.isBlocked ? t`Unavailable offline`
-    : hasUnsavedChanges ?
-      t`You cannot publish while there are unsaved changes. Save first.`
-    : publishing.normalisedSlug && publishing.hasPendingSlugCheck ?
-      t`Checking whether that custom URL is available.`
-    : publishing.normalisedSlug && publishing.isSlugRejected ?
-      t`Fix the custom URL before publishing.`
-    : undefined;
-  // The plan comes last: offline and unsaved changes block whatever the plan
-  // says, and offering an upgrade against those would be misleading, since
-  // buying one would not unblock the button.
-  const isBlockedByPlan = otherBlockedReason === undefined && limit.isBlocked;
-  const isBlockedReason =
-    otherBlockedReason ?? (isBlockedByPlan ? planLimitMessage : undefined);
+  const maxAllowed = limit.maxAllowed;
+  const blocked = _getPublishBlockedReason({
+    isOffline: offline.isBlocked,
+    hasUnsavedChanges,
+    isBlockedByLimit: limit.isBlocked,
+    publishing,
+    copy: {
+      offline: t`Unavailable offline`,
+      unsavedChanges: t`You cannot publish while there are unsaved changes. Save first.`,
+      slugChecking: t`Checking whether that custom URL is available.`,
+      slugRejected: t`Fix the custom URL before publishing.`,
+      planLimit:
+        maxAllowed === undefined ?
+          t`Your plan does not allow sharing more dashboards.`
+        : plural(maxAllowed, {
+            one: "Your plan allows # shared or public dashboard.",
+            other: "Your plan allows # shared or public dashboards.",
+          }),
+    },
+  });
 
   // "Not an admin" and "we have not asked yet" are different answers, and
   // `canManageShares` collapses them into `false`. Rendering on the unknown
@@ -118,34 +214,17 @@ export function DashboardShareModal({
         resourceId={dashboard.id}
         canManageShares={canManageShares}
         onClose={onClose}
-        publishing={{
-          targetVisibility: publishing.targetVisibility,
-          currentVisibility: publishing.currentDashboard.visibility,
+        publishing={_getPublishingProps({
+          publishing,
+          blocked,
           publicOptionDisabledReason:
             canPublishPublicly ? undefined : (
               t`Only workspace admins can publish to the web.`
             ),
-          section: <PublishingSection publishing={publishing} />,
-          actions: (
-            <PublishingActions
-              actionKind={publishing.actionKind}
-              isBusy={publishing.isBusy}
-              isBlockedReason={isBlockedReason}
-              onUpgrade={
-                // Offered only when the plan is what is in the way, and only as
-                // a button: opening the upgrade modal on render would interrupt
-                // someone who came here to change a person's role.
-                isBlockedByPlan ?
-                  () => {
-                    setIsUpgradeModalOpened(true);
-                  }
-                : undefined
-              }
-              onPrimaryAction={publishing.onPrimaryAction}
-            />
-          ),
-          onGeneralAccessChange: publishing.onGeneralAccessChange,
-        }}
+          onUpgrade: () => {
+            setIsUpgradeModalOpened(true);
+          },
+        })}
       />
     </>
   );

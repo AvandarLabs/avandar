@@ -4,6 +4,7 @@ import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -24,6 +25,42 @@ export type ShareableDashboardLimit = {
 };
 
 /**
+ * Whether this dashboard ALREADY counts against the allowance, in which case
+ * republishing it consumes nothing.
+ *
+ * Answered by `countShareableDashboards`, the same helper the entitlement
+ * backend uses, rather than by restating the rule here: the rule is already
+ * written twice (TypeScript and the SQL trigger it mirrors) and a third copy
+ * would be a third thing to keep in step.
+ *
+ * @param options.sharingState The live share rows, preferred over the
+ *   `dashboard` row wherever both carry the same field: the general-access
+ *   dropdown writes restriction immediately, while `dashboard` is the row as
+ *   it was when the modal opened.
+ */
+function _getAlreadyCountsAsShareable(
+  options: Readonly<{
+    dashboard: Dashboard.T;
+    sharingState: ResourceSharingState | undefined;
+  }>,
+): boolean {
+  const { dashboard, sharingState } = options;
+  return (
+    countShareableDashboards({
+      dashboards: [
+        {
+          id: dashboard.id,
+          ownerId: sharingState?.ownerId ?? dashboard.ownerId,
+          visibility: dashboard.visibility,
+          isRestricted: sharingState?.isRestricted ?? dashboard.isRestricted,
+        },
+      ],
+      shares: sharingState?.shares ?? [],
+    }) > 0
+  );
+}
+
+/**
  * Whether the plan blocks publishing this dashboard.
  *
  * Returns `isBlocked: false` in the two cases where no allowance is consumed:
@@ -32,11 +69,6 @@ export type ShareableDashboardLimit = {
  * ALREADY counts as shareable, since republishing it changes no count. The
  * second is what lets a free workspace keep updating the one dashboard it is
  * entitled to.
- *
- * "Already counts" is answered by `countShareableDashboards`, the same helper
- * the entitlement backend uses, rather than by restating the rule here: the
- * rule is already written twice (TypeScript and the SQL trigger it mirrors)
- * and a third copy would be a third thing to keep in step.
  *
  * The verdict is optimistic while EITHER backend answer is in flight or
  * missing: the share rows the exemption is computed from, and the plan verdict
@@ -70,24 +102,9 @@ export function useShareableDashboardLimit(
       useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
 
-  const alreadyCountsAsShareable =
-    countShareableDashboards({
-      dashboards: [
-        {
-          id: dashboard.id,
-          ownerId: sharingState?.ownerId ?? dashboard.ownerId,
-          visibility: dashboard.visibility,
-          // The sharing state is the live value: the general-access dropdown
-          // writes restriction immediately, while `dashboard` is the row as it
-          // was when the modal opened.
-          isRestricted: sharingState?.isRestricted ?? dashboard.isRestricted,
-        },
-      ],
-      shares: sharingState?.shares ?? [],
-    }) > 0;
-
   const wouldConsumeAllowance =
-    targetVisibility !== "draft" && !alreadyCountsAsShareable;
+    targetVisibility !== "draft" &&
+    !_getAlreadyCountsAsShareable({ dashboard, sharingState });
 
   const [permission] =
     SubscriptionPermissionsClient.useCanPublishShareableDashboard({

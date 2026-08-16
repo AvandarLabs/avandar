@@ -16,6 +16,40 @@ type Props = {
 };
 
 /**
+ * Opens the merged share and publish modal for one dashboard.
+ *
+ * The modal id is derived from the dashboard id so a second click on the same
+ * button reuses the open modal instead of stacking another copy on top of it.
+ *
+ * @param options.title Localised, because a module-level helper cannot call
+ *   `useLingui`.
+ */
+function _openDashboardShareModal(
+  options: Readonly<{
+    dashboard: Dashboard.T;
+    hasUnsavedChanges: boolean;
+    title: string;
+  }>,
+): void {
+  const { dashboard, hasUnsavedChanges, title } = options;
+  const modalId = `share-dashboard-${dashboard.id}`;
+  modals.open({
+    modalId,
+    title,
+    size: "lg",
+    children: (
+      <DashboardShareModal
+        dashboard={dashboard}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onClose={() => {
+          modals.close(modalId);
+        }}
+      />
+    ),
+  });
+}
+
+/**
  * Opens the merged share and publish modal.
  *
  * This is the toolbar's only sharing control: publishing lives inside the
@@ -61,20 +95,10 @@ export function DashboardShareButton({
             event.preventDefault();
             return;
           }
-          const modalId = `share-dashboard-${dashboard.id}`;
-          modals.open({
-            modalId,
+          _openDashboardShareModal({
+            dashboard,
+            hasUnsavedChanges,
             title: t`Share`,
-            size: "lg",
-            children: (
-              <DashboardShareModal
-                dashboard={dashboard}
-                hasUnsavedChanges={hasUnsavedChanges}
-                onClose={() => {
-                  modals.close(modalId);
-                }}
-              />
-            ),
           });
         }}
       >

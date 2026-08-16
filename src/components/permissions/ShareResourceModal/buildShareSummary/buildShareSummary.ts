@@ -22,6 +22,9 @@ export type SummarySpan =
       variant: "user" | "group" | "workspace" | "app" | "role";
     };
 
+/** A share row already narrowed to one that names a principal. */
+type IdentifiedShare = ResourceShareRow & { principalId: string };
+
 type BuildShareSummaryOptions = {
   shares: ResourceShareRow[];
   isRestricted: boolean;
@@ -50,6 +53,128 @@ export function hasPrincipalId(
 }
 
 /**
+ * The sentence for a resource nobody holds a direct share on: either the
+ * general-access rule covers everyone, or the owner is alone on it.
+ */
+function _makeNoDirectSharesSpans(
+  options: Readonly<{
+    resource: string;
+    app: string;
+    hasGeneralAccess: boolean;
+    generalAccessRole: RoleLevel;
+  }>,
+): SummarySpan[] {
+  const { resource, app, hasGeneralAccess, generalAccessRole } = options;
+  if (hasGeneralAccess) {
+    return buildGeneralAccessOnlySummary(resource, app, generalAccessRole);
+  }
+  return [{ kind: "text", text: t`Only you have access to this ${resource}.` }];
+}
+
+/**
+ * Every named user as one comma-joined fragment, so the sentence reads as a
+ * single "list" item separated from the group fragments beside it.
+ */
+function _makeUserFragment(
+  options: Readonly<{
+    userShares: readonly IdentifiedShare[];
+    userById: Record<string, string>;
+  }>,
+): SummarySpan[] {
+  const { userShares, userById } = options;
+  return userShares.flatMap((share, shareIndex) => {
+    const name = userById[share.principalId] ?? t`Unknown user`;
+    return [
+      ...(shareIndex > 0 ? [{ kind: "text" as const, text: ", " }] : []),
+      { kind: "pill" as const, label: name, variant: "user" as const },
+    ];
+  });
+}
+
+/** One fragment per shared group, each its own item in the sentence. */
+function _makeGroupFragments(
+  options: Readonly<{
+    groupShares: readonly IdentifiedShare[];
+    groupById: Record<string, string>;
+    app: string;
+  }>,
+): SummarySpan[][] {
+  const { groupShares, groupById, app } = options;
+  return groupShares.map((share): SummarySpan[] => {
+    const groupName = groupById[share.principalId] ?? t`Unknown group`;
+    return [
+      { kind: "text", text: t`all members of ` },
+      { kind: "pill", label: groupName, variant: "group" },
+      ...(share.requiresAppAccess ?
+        [
+          { kind: "text" as const, text: t` who also have ` },
+          { kind: "pill" as const, label: app, variant: "app" as const },
+          { kind: "text" as const, text: t` access` },
+        ]
+      : []),
+    ];
+  });
+}
+
+/**
+ * Fragments joined with commas. With two or more, the final separator becomes
+ * ", and " (Oxford-style for readability).
+ */
+function _makeJoinedFragmentSpans(
+  fragments: readonly SummarySpan[][],
+): SummarySpan[] {
+  return fragments.flatMap((fragment, fragmentIndex) => {
+    const separator =
+      fragmentIndex === 0 ? undefined
+      : fragmentIndex === fragments.length - 1 ? t`, and `
+      : ", ";
+    return [
+      ...(separator ? [{ kind: "text" as const, text: separator }] : []),
+      ...fragment,
+    ];
+  });
+}
+
+/** The sentence listing every direct share, then the general-access rule. */
+function _makeSharedWithSpans(
+  options: Readonly<{
+    resource: string;
+    app: string;
+    userShares: readonly IdentifiedShare[];
+    groupShares: readonly IdentifiedShare[];
+    userById: Record<string, string>;
+    groupById: Record<string, string>;
+    hasGeneralAccess: boolean;
+    generalAccessRole: RoleLevel;
+  }>,
+): SummarySpan[] {
+  const { resource, app, hasGeneralAccess, generalAccessRole } = options;
+
+  const userFragment = _makeUserFragment({
+    userShares: options.userShares,
+    userById: options.userById,
+  });
+
+  const fragments = [
+    ...(userFragment.length > 0 ? [userFragment] : []),
+    ..._makeGroupFragments({
+      groupShares: options.groupShares,
+      groupById: options.groupById,
+      app,
+    }),
+    ...(hasGeneralAccess ?
+      [buildGeneralAccessFragment(app, generalAccessRole)]
+    : []),
+  ];
+
+  return [
+    { kind: "text", text: t`This ${resource} is shared with: ` },
+    ..._makeJoinedFragmentSpans(fragments),
+    { kind: "text", text: "." },
+  ];
+}
+
+/**
  * Pure builder: turns the modal's current state into a list of summary
  * spans that the `ShareSummaryLine` component renders as a human-readable
  * sentence with inline pills. No React, no side effects.
@@ -67,86 +192,37 @@ export function buildShareSummary(
     .filter(hasPrincipalId)
     .filter(propEq("principalType", "user_group"));
 
-  const hasAnyShares = userShares.length + groupShares.length > 0;
   const hasGeneralAccess =
     !opts.isRestricted || opts.workspaceShareRole !== null;
   const generalAccessRole = opts.workspaceShareRole ?? "viewer";
 
-  const publicationSpans =
-    opts.publication ?
+  const accessSpans =
+    userShares.length + groupShares.length === 0 ?
+      _makeNoDirectSharesSpans({
+        resource,
+        app,
+        hasGeneralAccess,
+        generalAccessRole,
+      })
+    : _makeSharedWithSpans({
+        resource,
+        app,
+        userShares,
+        groupShares,
+        userById: opts.userById,
+        groupById: opts.groupById,
+        hasGeneralAccess,
+        generalAccessRole,
+      });
+
+  return [
+    ...accessSpans,
+    ...(opts.publication ?
       _buildPublicationSpans({
         publication: opts.publication,
         workspaceName: opts.workspaceName,
       })
-    : [];
-
-  if (!hasAnyShares) {
-    if (hasGeneralAccess) {
-      return [
-        ...buildGeneralAccessOnlySummary(resource, app, generalAccessRole),
-        ...publicationSpans,
-      ];
-    }
-    return [
-      {
-        kind: "text",
-        text: t`Only you have access to this ${resource}.`,
-      },
-      ...publicationSpans,
-    ];
-  }
-
-  // Combine user shares into a single comma-joined fragment so the
-  // sentence reads as one "list" item separated from group shares.
-  const userFragment = userShares.flatMap((share, shareIndex) => {
-    const name = opts.userById[share.principalId] ?? t`Unknown user`;
-    return [
-      ...(shareIndex > 0 ? [{ kind: "text" as const, text: ", " }] : []),
-      { kind: "pill" as const, label: name, variant: "user" as const },
-    ];
-  });
-
-  const groupFragments = groupShares.map((share): SummarySpan[] => {
-    const groupName = opts.groupById[share.principalId] ?? t`Unknown group`;
-    return [
-      { kind: "text", text: t`all members of ` },
-      { kind: "pill", label: groupName, variant: "group" },
-      ...(share.requiresAppAccess ?
-        [
-          { kind: "text" as const, text: t` who also have ` },
-          { kind: "pill" as const, label: app, variant: "app" as const },
-          { kind: "text" as const, text: t` access` },
-        ]
-      : []),
-    ];
-  });
-
-  const fragments = [
-    ...(userFragment.length > 0 ? [userFragment] : []),
-    ...groupFragments,
-    ...(hasGeneralAccess ?
-      [buildGeneralAccessFragment(app, generalAccessRole)]
     : []),
-  ];
-
-  // Join fragments with commas; if there are 2+ fragments, the final
-  // separator becomes ", and " (Oxford-style for readability).
-  const joinedFragments = fragments.flatMap((fragment, fragmentIndex) => {
-    const separator =
-      fragmentIndex === 0 ? undefined
-      : fragmentIndex === fragments.length - 1 ? t`, and `
-      : ", ";
-    return [
-      ...(separator ? [{ kind: "text" as const, text: separator }] : []),
-      ...fragment,
-    ];
-  });
-
-  return [
-    { kind: "text", text: t`This ${resource} is shared with: ` },
-    ...joinedFragments,
-    { kind: "text", text: "." },
-    ...publicationSpans,
   ];
 }
 

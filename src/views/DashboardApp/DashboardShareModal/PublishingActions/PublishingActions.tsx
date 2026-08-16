@@ -20,20 +20,13 @@ type Props = {
 };
 
 /**
- * The publish footer.
- *
- * Every kind except `unpublish` calls the same client method; the labels differ
- * because "Publish", "Update & republish", and "Make internal" describe very
- * different intentions to the person clicking them.
+ * The primary button's label. Every kind except `unpublish` calls the same
+ * client method; the labels differ because "Publish", "Update & republish",
+ * and "Make internal" describe very different intentions to the person
+ * clicking them.
  */
-export function PublishingActions({
-  actionKind,
-  isBusy,
-  isBlockedReason,
-  onUpgrade,
-  onPrimaryAction,
-}: Readonly<Props>): ReactNode {
-  const label = matchLiteral(actionKind, {
+function _renderPrimaryActionLabel(actionKind: PublishActionKind): ReactNode {
+  return matchLiteral(actionKind, {
     publish_workspace: () => {
       return <Trans>Publish to workspace</Trans>;
     },
@@ -53,6 +46,16 @@ export function PublishingActions({
       return <Trans>Publish</Trans>;
     },
   });
+}
+
+/** The publish footer: the primary action, plus the upgrade way out. */
+export function PublishingActions({
+  actionKind,
+  isBusy,
+  isBlockedReason,
+  onUpgrade,
+  onPrimaryAction,
+}: Readonly<Props>): ReactNode {
   const isDisabled =
     actionKind === "disabled_no_audience" || isBlockedReason !== undefined;
   return (
@@ -73,7 +76,7 @@ export function PublishingActions({
             actionKind === "unpublish" ? undefined : <IconWorld size={16} />
           }
         >
-          {label}
+          {_renderPrimaryActionLabel(actionKind)}
         </Button>
       </Tooltip>
     </Group>
