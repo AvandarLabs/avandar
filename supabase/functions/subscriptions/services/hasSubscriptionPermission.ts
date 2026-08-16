@@ -1,4 +1,4 @@
-import { matchLiteral } from "@avandar/utils";
+import { camelCaseKeysShallow, matchLiteral, prop } from "@avandar/utils";
 import { countShareableDashboards } from "$/models/Dashboard/countShareableDashboards/countShareableDashboards.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
@@ -66,111 +66,145 @@ export async function hasSubscriptionPermission(
   const subscription = Subscription.fromDbRowToRead(dbSubscription);
 
   return matchLiteral(permissionType, {
-    can_add_datasets: async () => {
-      const { count } = await supabaseAdminClient
-        .from("datasets")
+    can_add_datasets: () => {
+      return _canAddDatasets({ supabaseAdminClient, subscription });
+    },
+    can_invite_users: () => {
+      return _canInviteUsers({ supabaseAdminClient, subscription });
+    },
+    can_publish_shareable_dashboard: () => {
+      return _canPublishShareableDashboard({
+        supabaseAdminClient,
+        subscription,
+      });
+    },
+  });
+}
+
+/** Whether the workspace is still under its plan's dataset allowance. */
+async function _canAddDatasets(
+  options: Readonly<{
+    supabaseAdminClient: AvaSupabaseClient;
+    subscription: Subscription.T;
+  }>,
+): Promise<boolean> {
+  const { supabaseAdminClient, subscription } = options;
+
+  const { count } = await supabaseAdminClient
+    .from("datasets")
+    .select("id", { count: "exact" })
+    .eq("workspace_id", subscription.workspaceId)
+    .throwOnError();
+
+  if (count === null) {
+    return false;
+  }
+
+  return Subscription.canAddDatasets({
+    subscription,
+    numDatasetsInWorkspace: count,
+  });
+}
+
+/**
+ * Whether the workspace is still under its plan's seat allowance. Pending
+ * invites count as seats: accepting one must never push the workspace over.
+ */
+async function _canInviteUsers(
+  options: Readonly<{
+    supabaseAdminClient: AvaSupabaseClient;
+    subscription: Subscription.T;
+  }>,
+): Promise<boolean> {
+  const { supabaseAdminClient, subscription } = options;
+
+  const [{ count: numMembers }, { count: numPendingInvites }] =
+    await Promise.all([
+      supabaseAdminClient
+        .from("workspace_memberships")
         .select("id", { count: "exact" })
         .eq("workspace_id", subscription.workspaceId)
-        .throwOnError();
-      if (count === null) {
-        return false;
-      }
-      return Subscription.canAddDatasets({
-        subscription,
-        numDatasetsInWorkspace: count,
-      });
-    },
-
-    can_invite_users: async () => {
-      const [{ count: numMembers }, { count: numPendingInvites }] =
-        await Promise.all([
-          supabaseAdminClient
-            .from("workspace_memberships")
-            .select("id", { count: "exact" })
-            .eq("workspace_id", subscription.workspaceId)
-            .throwOnError(),
-          supabaseAdminClient
-            .from("workspace_invites")
-            .select("id", { count: "exact" })
-            .eq("workspace_id", subscription.workspaceId)
-            .eq("invite_status", "pending")
-            .throwOnError(),
-        ]);
-
-      if (numMembers === null || numPendingInvites === null) {
-        return false;
-      }
-
-      return Subscription.canInviteMembers({
-        subscription,
-        numMembersInWorkspace: numMembers + numPendingInvites,
-      });
-    },
-
-    can_publish_shareable_dashboard: async () => {
-      // The counting rule itself lives in `countShareableDashboards`, in
-      // `shared/`, because nothing type-checks, lints or tests this file. Only
-      // the two queries belong here.
-      const { data: dashboards } = await supabaseAdminClient
-        .from("dashboards")
-        .select("id, owner_id, visibility, is_restricted")
+        .throwOnError(),
+      supabaseAdminClient
+        .from("workspace_invites")
+        .select("id", { count: "exact" })
         .eq("workspace_id", subscription.workspaceId)
-        .neq("visibility", "draft")
-        .throwOnError();
+        .eq("invite_status", "pending")
+        .throwOnError(),
+    ]);
 
-      if (dashboards === null) {
-        return false;
-      }
+  if (numMembers === null || numPendingInvites === null) {
+    return false;
+  }
 
-      // Only restricted workspace dashboards need the share lookup; public
-      // ones count regardless, and unrestricted workspace ones are reachable
-      // by every tag-based app role by default.
-      const candidateIds = dashboards
-        .filter((dashboard) => {
-          return (
-            dashboard.visibility === "workspace" && dashboard.is_restricted
-          );
-        })
-        .map((dashboard) => {
-          return dashboard.id;
-        });
+  return Subscription.canInviteMembers({
+    subscription,
+    numMembersInWorkspace: numMembers + numPendingInvites,
+  });
+}
 
-      const { data: shares } = await supabaseAdminClient
-        .from("resource_shares")
-        .select("resource_id, principal_type, principal_id")
-        .eq("resource_type", "dashboard")
-        // Mirrors the `rs.workspace_id = p_workspace_id` predicate in
-        // `util__has_non_owner_share`. Not redundant with the resource_id
-        // filter: without it a share row carrying a mismatched workspace_id
-        // would count here but not in SQL, so this gate would let a user
-        // through the UI only for the trigger to refuse the write.
-        .eq("workspace_id", subscription.workspaceId)
-        .in("resource_id", candidateIds.length > 0 ? candidateIds : [""])
-        .throwOnError();
+/**
+ * Whether the workspace is still under its plan's allowance of dashboards that
+ * somebody other than their owner can reach.
+ */
+async function _canPublishShareableDashboard(
+  options: Readonly<{
+    supabaseAdminClient: AvaSupabaseClient;
+    subscription: Subscription.T;
+  }>,
+): Promise<boolean> {
+  const { supabaseAdminClient, subscription } = options;
 
-      const numShareable = countShareableDashboards({
-        dashboards: dashboards.map((dashboard) => {
-          return {
-            id: dashboard.id,
-            ownerId: dashboard.owner_id,
-            visibility: dashboard.visibility,
-            isRestricted: dashboard.is_restricted,
-          };
-        }),
-        shares: (shares ?? []).map((share) => {
-          return {
-            resourceId: share.resource_id,
-            principalType: share.principal_type,
-            principalId: share.principal_id,
-          };
-        }),
-      });
+  // The counting rule itself lives in `countShareableDashboards`, in
+  // `shared/`, because nothing type-checks, lints or tests this file. Only
+  // the two queries belong here.
+  const { data: dashboards } = await supabaseAdminClient
+    .from("dashboards")
+    .select("id, owner_id, visibility, is_restricted")
+    .eq("workspace_id", subscription.workspaceId)
+    .neq("visibility", "draft")
+    .throwOnError();
 
-      return Subscription.canPublishShareableDashboard({
-        subscription,
-        numShareableDashboardsInWorkspace: numShareable,
-      });
-    },
+  if (dashboards === null) {
+    return false;
+  }
+
+  // Only restricted workspace dashboards need the share lookup; public
+  // ones count regardless, and unrestricted workspace ones are reachable
+  // by every tag-based app role by default.
+  const candidateIds = dashboards
+    .filter((dashboard) => {
+      return dashboard.visibility === "workspace" && dashboard.is_restricted;
+    })
+    .map(prop("id"));
+
+  const { data: shares } = await supabaseAdminClient
+    .from("resource_shares")
+    .select("resource_id, principal_type, principal_id")
+    .eq("resource_type", "dashboard")
+    // Mirrors the `rs.workspace_id = p_workspace_id` predicate in
+    // `util__has_non_owner_share`. Not redundant with the resource_id
+    // filter: without it a share row carrying a mismatched workspace_id
+    // would count here but not in SQL, so this gate would let a user
+    // through the UI only for the trigger to refuse the write.
+    .eq("workspace_id", subscription.workspaceId)
+    .in("resource_id", candidateIds.length > 0 ? candidateIds : [""])
+    .throwOnError();
+
+  // Both selects name exactly the columns the counter's two row shapes
+  // declare, so camel-casing the keys is the whole conversion.
+  const numShareable = countShareableDashboards({
+    dashboards: dashboards.map((dashboard) => {
+      return camelCaseKeysShallow(dashboard);
+    }),
+    shares: (shares ?? []).map((share) => {
+      return camelCaseKeysShallow(share);
+    }),
+  });
+
+  return Subscription.canPublishShareableDashboard({
+    subscription,
+    numShareableDashboardsInWorkspace: numShareable,
   });
 }
 

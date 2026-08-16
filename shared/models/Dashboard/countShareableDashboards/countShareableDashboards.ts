@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types.ts";
 
 /** The minimum a dashboard row must carry for the count to judge it. */
@@ -74,9 +75,7 @@ export function countShareableDashboards(
           share.principalId !== ownerIdByDashboardId.get(share.resourceId)
         );
       })
-      .map((share) => {
-        return share.resourceId;
-      }),
+      .map(prop("resourceId")),
   );
 
   return dashboards.filter((dashboard) => {

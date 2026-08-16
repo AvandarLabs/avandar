@@ -1,5 +1,5 @@
 .publishDashboardStatusTargetUrl {
-  font-size: 0.9em;
+  font-size: var(--mantine-font-size-xs);
   overflow-wrap: anywhere;
-  padding: 8px 12px;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
 }

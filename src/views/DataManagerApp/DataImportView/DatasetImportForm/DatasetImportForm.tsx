@@ -440,7 +440,7 @@ function _renderErrorSummary(
   }
   return (
     <Callout color="error" title={options.title} message={options.message}>
-      <Stack component="ul" className={classes.errorList} gap="xs" mt="xs">
+      <Stack component="ul" className={classes.datasetImportFormErrorList} gap="xs" mt="xs">
         {options.items.map((item) => {
           return (
             <Text component="li" key={item.field} size="sm" c="red.8">
