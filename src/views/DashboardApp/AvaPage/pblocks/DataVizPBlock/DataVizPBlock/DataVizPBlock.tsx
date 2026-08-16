@@ -91,12 +91,16 @@ function useDataVizQuery(
     rawSql: options.filteredSql,
     ...queryAuth,
   });
-  return {
-    columns: queryResults?.columns ?? [],
-    data: queryResults?.data ?? [],
-    emptyStructuredQuery,
-    isLoading,
-  };
+  // Memoized separately rather than returned as fresh literals: both are
+  // dependencies of the `displayVizConfig` memo and props of
+  // `VisualizationContainer`, so a new `[]` on every render would defeat both.
+  const columns = useMemo(() => {
+    return queryResults?.columns ?? [];
+  }, [queryResults?.columns]);
+  const data = useMemo(() => {
+    return queryResults?.data ?? [];
+  }, [queryResults?.data]);
+  return { columns, data, emptyStructuredQuery, isLoading };
 }
 
 type RenderDataVizContentOptions = {
@@ -187,17 +191,22 @@ function useDataVizDisplayState(
     puck: options.puck,
   });
   const dateColumns = getDateColumns(queryState.columns, queryState.data);
+  // Depends on the individual stable values, not on `queryState`: that object
+  // is rebuilt on every render, so depending on it would recompute the memo
+  // every render and hand `VisualizationContainer` a new `VizConfig.T` each
+  // time.
+  const { columns, emptyStructuredQuery } = queryState;
   const displayVizConfig = useMemo(() => {
-    if (queryState.columns.length === 0) {
+    if (columns.length === 0) {
       return options.vizConfig;
     }
     return applyVizConfigFromQueryResult({
       vizConfig: options.vizConfig,
       rawSql: options.rawSql,
-      query: queryState.emptyStructuredQuery,
-      columns: queryState.columns,
+      query: emptyStructuredQuery,
+      columns,
     });
-  }, [options.rawSql, options.vizConfig, queryState]);
+  }, [options.rawSql, options.vizConfig, emptyStructuredQuery, columns]);
   return { ...queryState, dateColumns, displayVizConfig };
 }
 

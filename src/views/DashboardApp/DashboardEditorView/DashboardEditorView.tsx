@@ -90,18 +90,22 @@ function useSaveDashboard(
       options.dispatch.markSaved();
     },
   });
+  // Depends on the primitives, not on `options`: the caller builds that object
+  // inline, so a new identity arrives on every render and the callback would
+  // memoize nothing.
+  const dashboardId = options.dashboard.id;
+  const { dashboardTitle } = options;
   return useCallback(
     (savedData: AvaPageData): void => {
       saveDashboard({
-        id: options.dashboard.id,
+        id: dashboardId,
         data: {
-          name:
-            getDashboardTitleFromPuckData(savedData) ?? options.dashboardTitle,
+          name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
           config: savedData as Dashboard.T["config"],
         },
       });
     },
-    [options, saveDashboard],
+    [dashboardId, dashboardTitle, saveDashboard],
   );
 }
 

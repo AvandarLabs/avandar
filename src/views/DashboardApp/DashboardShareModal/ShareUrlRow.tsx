@@ -61,6 +61,12 @@ export function ShareUrlRow({
 
   useEffect(
     function generateQrCode() {
+      // Dropped before anything else, and again on failure. The caption under
+      // the image always reads the CURRENT `url`, so keeping the previous
+      // code around would pair one dashboard's QR with another's caption, and
+      // a generation that never succeeds would leave that pairing on screen
+      // for as long as the modal stays open.
+      setQrDataUrl(undefined);
       if (!qrOpen) {
         return;
       }
