@@ -311,7 +311,7 @@ msgstr "Sidebar layout"
 msgid "Delete failed"
 msgstr "Delete failed"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr "Your plan does not allow sharing this dashboard with anyone else. "
@@ -1682,7 +1682,7 @@ msgstr "or"
 msgid "Items"
 msgstr "Items"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "Restriction update failed"
 
@@ -3337,7 +3337,7 @@ msgstr "JOIN ON clause uses a non-column reference; the form will keep it via "
 msgid "dataset"
 msgstr "dataset"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "Remove failed"
@@ -4130,7 +4130,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "Collapse drawer"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "Share failed"
 
@@ -4500,7 +4500,7 @@ msgstr "Data Explorer"
 msgid "Sign in again"
 msgstr "Sign in again"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr "Shared dashboard limit reached"
@@ -5503,8 +5503,7 @@ msgstr "Single-select"
 msgid "(clean)"
 msgstr "(clean)"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+#: src/components/permissions/ShareResourceModal/SharingSettingsLoading.tsx
 msgid "Loading sharing settings…"
 msgstr "Loading sharing settings…"
 

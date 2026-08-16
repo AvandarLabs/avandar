@@ -313,7 +313,7 @@ msgstr "Mpangilio wa upau wa pembeni"
 msgid "Delete failed"
 msgstr "Kufuta kumeshindwa"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr ""
@@ -1696,7 +1696,7 @@ msgstr "au"
 msgid "Items"
 msgstr "Vipengee"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "Sasisho la vizuizi limefeli"
 
@@ -3357,7 +3357,7 @@ msgstr "Kifungu cha JOIN ON kinatumia rejeleo lisilo la safu; fomu italihifadhi 
 msgid "dataset"
 msgstr "seti ya data"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "Ondoa iliyo fail"
@@ -4149,7 +4149,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "Kunja paneli ya pembeni"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "Kushiriki kumeshindwa"
 
@@ -4520,7 +4520,7 @@ msgstr "Mchambuzi wa Data"
 msgid "Sign in again"
 msgstr "Ingia tena"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""
@@ -5525,8 +5525,7 @@ msgstr "Chaguo moja"
 msgid "(clean)"
 msgstr "(safi)"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+#: src/components/permissions/ShareResourceModal/SharingSettingsLoading.tsx
 msgid "Loading sharing settings…"
 msgstr "Inapakua mipangilio ya kushiriki…"
 

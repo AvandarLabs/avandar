@@ -1,8 +1,8 @@
 import { plural } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
+import { SharingSettingsLoading } from "@/components/permissions/ShareResourceModal/SharingSettingsLoading";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
@@ -12,6 +12,7 @@ import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareM
 import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
 import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";
+import type { ShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
 
@@ -84,6 +85,42 @@ function _getPublishBlockedReason(
       otherBlockedReason ?? (isBlockedByPlan ? copy.planLimit : undefined),
     isBlockedByPlan,
   };
+}
+
+/**
+ * `_getPublishBlockedReason` with its sentences localised. A hook rather than
+ * arguments at the call site, so the component states WHAT blocks publishing
+ * without also carrying every way of saying so.
+ */
+function usePublishBlockedReason(
+  options: Readonly<{
+    isOffline: boolean;
+    hasUnsavedChanges: boolean;
+    limit: ShareableDashboardLimit;
+    publishing: PublishingControl;
+  }>,
+): PublishBlockedReason {
+  const { t } = useLingui();
+  const maxAllowed = options.limit.maxAllowed;
+  return _getPublishBlockedReason({
+    isOffline: options.isOffline,
+    hasUnsavedChanges: options.hasUnsavedChanges,
+    isBlockedByLimit: options.limit.isBlocked,
+    publishing: options.publishing,
+    copy: {
+      offline: t`Unavailable offline`,
+      unsavedChanges: t`You cannot publish while there are unsaved changes. Save first.`,
+      slugChecking: t`Checking whether that custom URL is available.`,
+      slugRejected: t`Fix the custom URL before publishing.`,
+      planLimit:
+        maxAllowed === undefined ?
+          t`Your plan does not allow sharing more dashboards.`
+        : plural(maxAllowed, {
+            one: "Your plan allows # shared or public dashboard.",
+            other: "Your plan allows # shared or public dashboards.",
+          }),
+    },
+  });
 }
 
 /** The dashboard-only half of the generic share modal. */
@@ -162,25 +199,11 @@ export function DashboardShareModal({
     dashboard: publishing.currentDashboard,
     targetVisibility: publishing.targetVisibility,
   });
-  const maxAllowed = limit.maxAllowed;
-  const blocked = _getPublishBlockedReason({
+  const blocked = usePublishBlockedReason({
     isOffline: offline.isBlocked,
     hasUnsavedChanges,
-    isBlockedByLimit: limit.isBlocked,
+    limit,
     publishing,
-    copy: {
-      offline: t`Unavailable offline`,
-      unsavedChanges: t`You cannot publish while there are unsaved changes. Save first.`,
-      slugChecking: t`Checking whether that custom URL is available.`,
-      slugRejected: t`Fix the custom URL before publishing.`,
-      planLimit:
-        maxAllowed === undefined ?
-          t`Your plan does not allow sharing more dashboards.`
-        : plural(maxAllowed, {
-            one: "Your plan allows # shared or public dashboard.",
-            other: "Your plan allows # shared or public dashboards.",
-          }),
-    },
   });
 
   // "Not an admin" and "we have not asked yet" are different answers, and
@@ -190,13 +213,7 @@ export function DashboardShareModal({
   // the user is allowed to do. This is the same line `ShareResourceModal`
   // shows while its own lookups are in flight.
   if (isLoadingRole) {
-    return (
-      <Stack gap="md">
-        <Text>
-          <Trans>Loading sharing settings…</Trans>
-        </Text>
-      </Stack>
-    );
+    return <SharingSettingsLoading />;
   }
 
   return (

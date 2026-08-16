@@ -303,7 +303,7 @@ msgstr "侧边栏布局"
 msgid "Delete failed"
 msgstr "删除失败"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr ""
@@ -1635,7 +1635,7 @@ msgstr "或"
 msgid "Items"
 msgstr "项目"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "限制更新失败"
 
@@ -3238,7 +3238,7 @@ msgstr "JOIN ON 子句使用了非列引用；表单将通过原始 SQL 保留�
 msgid "dataset"
 msgstr "数据集"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "删除失败"
@@ -4008,7 +4008,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "收起抽屉"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "分享失败"
 
@@ -4372,7 +4372,7 @@ msgstr "数据探索器"
 msgid "Sign in again"
 msgstr "再次登录"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""
@@ -5342,8 +5342,7 @@ msgstr "单选"
 msgid "(clean)"
 msgstr "(清理)"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+#: src/components/permissions/ShareResourceModal/SharingSettingsLoading.tsx
 msgid "Loading sharing settings…"
 msgstr "加载共享设置中…"
 

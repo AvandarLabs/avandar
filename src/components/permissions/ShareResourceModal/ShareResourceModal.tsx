@@ -5,6 +5,7 @@ import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareResourceModalFooter } from "./ShareResourceModalFooter";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
+import { SharingSettingsLoading } from "./SharingSettingsLoading";
 import { useShareResourceModalState } from "./useShareResourceModalState/useShareResourceModalState";
 import type { ShareResourcePublishing } from "./ShareResourceModal.types";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
@@ -47,13 +48,7 @@ export function ShareResourceModal({
   });
 
   if (state.isLoading) {
-    return (
-      <Stack gap="md">
-        <Text>
-          <Trans>Loading sharing settings…</Trans>
-        </Text>
-      </Stack>
-    );
+    return <SharingSettingsLoading />;
   }
 
   return (

@@ -310,7 +310,7 @@ msgstr "تخطيط الشريط الجانبي"
 msgid "Delete failed"
 msgstr "فشل الحذف"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr ""
@@ -1677,7 +1677,7 @@ msgstr "أو"
 msgid "Items"
 msgstr "العناصر"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "فشل تحديث القيود"
 
@@ -3315,7 +3315,7 @@ msgstr "تستخدم جملة JOIN ON مرجعًا غير معتمد على عم
 msgid "dataset"
 msgstr "مجموعة البيانات"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "إزالة فاشلة"
@@ -4098,7 +4098,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "طي لوحة السحب"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "فشل المشاركة"
 
@@ -4466,7 +4466,7 @@ msgstr "مستكشف البيانات"
 msgid "Sign in again"
 msgstr "تسجيل الدخول مرة أخرى"
 
-#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""
@@ -5458,8 +5458,7 @@ msgstr "تحديد فردي"
 msgid "(clean)"
 msgstr "(نظيف)"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
-#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+#: src/components/permissions/ShareResourceModal/SharingSettingsLoading.tsx
 msgid "Loading sharing settings…"
 msgstr "جارٍ تحميل إعدادات المشاركة…"
 
