@@ -145,6 +145,27 @@ function _createSpatialLayer(): MapLayer.Standard {
       encoding: "wkt",
       family: "point",
       simplification: undefined,
+      sourceCrs: undefined,
+    },
+  };
+}
+
+/** A grid-bin layer whose points come from the given binding. */
+function _createGridBinLayer(
+  layer: MapLayer.T,
+  points: MapLayer.PointBinding,
+): MapLayer.T {
+  return {
+    ...layer,
+    geoBinding: {
+      type: "binPointsToGrid",
+      grid: "hex",
+      sizeMeters: 10_000,
+      points,
+      aggregation: {
+        operation: "count",
+        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+      },
     },
   };
 }
@@ -371,6 +392,56 @@ describe("MapLayerData.isQueryable", () => {
       source: { ...layer.source, dataSource: _createDataset() },
     };
     expect(MapLayerData.isQueryable(withSource)).toBe(false);
+  });
+
+  it("is true for a grid bin bound to both coordinate columns", () => {
+    const base = _createQueryableLayer();
+    const [latitude, longitude] = base.source.queryColumns;
+    const layer = _createGridBinLayer(base, {
+      type: "latLngColumns",
+      latitude: latitude?.id,
+      longitude: longitude?.id,
+    });
+
+    expect(MapLayerData.isQueryable(layer)).toBe(true);
+  });
+
+  it("is false for a grid bin missing one coordinate column", () => {
+    const base = _createQueryableLayer();
+    const layer = _createGridBinLayer(base, {
+      type: "latLngColumns",
+      latitude: base.source.queryColumns[0]?.id,
+      longitude: undefined,
+    });
+
+    expect(MapLayerData.isQueryable(layer)).toBe(false);
+  });
+
+  it("is true for a grid bin bound to a point geometry column", () => {
+    const base = _createSpatialLayer();
+    const layer = _createGridBinLayer(base, {
+      type: "geometryColumn",
+      column: base.source.queryColumns[0]!.id,
+      encoding: "wkt",
+      family: "point",
+      simplification: undefined,
+      sourceCrs: undefined,
+    });
+
+    expect(MapLayerData.isQueryable(layer)).toBe(true);
+  });
+
+  it("is false for a grid bin whose point geometry column is gone", () => {
+    const layer = _createGridBinLayer(_createSpatialLayer(), {
+      type: "geometryColumn",
+      column: uuid<QueryColumn.Id>(),
+      encoding: "wkt",
+      family: "point",
+      simplification: undefined,
+      sourceCrs: undefined,
+    });
+
+    expect(MapLayerData.isQueryable(layer)).toBe(false);
   });
 });
 

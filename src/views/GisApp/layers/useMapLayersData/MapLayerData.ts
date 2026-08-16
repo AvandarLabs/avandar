@@ -1,4 +1,23 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+/** True when the layer's query returns every column a point binding names. */
+function _isPointBindingComplete(
+  layer: MapLayer.T,
+  points: MapLayer.PointBinding,
+): boolean {
+  const hasColumn = (columnId: QueryColumn.Id | undefined): boolean => {
+    return (
+      columnId !== undefined &&
+      layer.source.queryColumns.some((column) => {
+        return column.id === columnId;
+      })
+    );
+  };
+  return points.type === "geometryColumn" ?
+      hasColumn(points.column)
+    : hasColumn(points.latitude) && hasColumn(points.longitude);
+}
 
 /** Queryability and cache-key helpers for map-layer data. */
 export const MapLayerData = {
@@ -12,6 +31,9 @@ export const MapLayerData = {
       return layer.source.queryColumns.some((column) => {
         return column.id === binding.column;
       });
+    }
+    if (binding?.type === "binPointsToGrid") {
+      return _isPointBindingComplete(layer, binding.points);
     }
     if (
       binding?.type === "joinToBoundaries" ||

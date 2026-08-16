@@ -97,6 +97,41 @@ function _createBoundaryLayer(options: {
   };
 }
 
+/** A grid-bin layer that sums one numeric query column per cell. */
+function _createGridBinLayer(options: {
+  sourceDataset: Dataset.T;
+  points: QueryColumn.T;
+  measureColumn: QueryColumn.T;
+}): MapLayer.T {
+  const layer = MapLayer.createArea("Cases by hex");
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      dataSource: options.sourceDataset,
+      queryColumns: [options.points, options.measureColumn],
+    },
+    geoBinding: {
+      type: "binPointsToGrid",
+      grid: "hex",
+      sizeMeters: 10_000,
+      points: {
+        type: "geometryColumn",
+        column: options.points.id,
+        encoding: "wkt",
+        family: "point",
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+      aggregation: {
+        operation: "sum",
+        measureColumn: options.measureColumn.id,
+        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+      },
+    },
+  };
+}
+
 function _createResolvedFixture(
   measureDataType: DatasetColumn.T["dataType"] = "double",
 ) {
@@ -246,6 +281,91 @@ describe("getResolvedMapLayerMetadata", () => {
     });
   });
 
+  it("resolves a grid bin aggregation measure without a boundary", () => {
+    const sourceDataset = _createDataset("Cases");
+    const pointsColumn = _createColumn({
+      dataset: sourceDataset,
+      name: "location",
+    });
+    const measureDatasetColumn = _createColumn({
+      dataset: sourceDataset,
+      name: "case_count",
+      dataType: "double",
+    });
+    const layer = _createGridBinLayer({
+      sourceDataset,
+      points: QueryColumn.makeFromDatasetColumn(pointsColumn),
+      measureColumn: QueryColumn.makeFromDatasetColumn(measureDatasetColumn),
+    });
+
+    expect(
+      getResolvedMapLayerMetadata({
+        layer,
+        datasets: [sourceDataset],
+        datasetColumns: [pointsColumn, measureDatasetColumn],
+      }),
+    ).toMatchObject({
+      type: "resolved",
+      boundary: undefined,
+      aggregationMeasureColumnName: "case_count",
+    });
+  });
+
+  it("requires a grid bin with a boundary denominator to be rebound", () => {
+    const sourceDataset = _createDataset("Cases");
+    const pointsColumn = _createColumn({
+      dataset: sourceDataset,
+      name: "location",
+    });
+    const measureDatasetColumn = _createColumn({
+      dataset: sourceDataset,
+      name: "case_count",
+      dataType: "double",
+    });
+    const denominatorColumnId = uuid<DatasetColumn.Id>();
+    const measureColumn =
+      QueryColumn.makeFromDatasetColumn(measureDatasetColumn);
+    const binLayer = _createGridBinLayer({
+      sourceDataset,
+      points: QueryColumn.makeFromDatasetColumn(pointsColumn),
+      measureColumn,
+    });
+    const layer: MapLayer.T = {
+      ...binLayer,
+      symbology: {
+        type: "fill",
+        opacity: 0.65,
+        stroke: { color: "#1864ab", width: 1 },
+        color: {
+          type: "graduated",
+          value: { type: "queryColumn", column: measureColumn.id },
+          ramp: ["#f1f5f9", "#1d4ed8"],
+          classification: { method: "quantile", classCount: 5 },
+          normalization: {
+            denominator: {
+              type: "boundaryColumn",
+              column: denominatorColumnId,
+            },
+            multiplier: 1,
+          },
+          noData: { color: "#e5e7eb", label: "No data" },
+        },
+      },
+    };
+
+    expect(
+      getResolvedMapLayerMetadata({
+        layer,
+        datasets: [sourceDataset],
+        datasetColumns: [pointsColumn, measureDatasetColumn],
+      }),
+    ).toEqual({
+      type: "rebindRequired",
+      reason: "unsupportedNormalizationDenominator",
+      referenceId: denominatorColumnId,
+    });
+  });
+
   it("requires a deleted direct geometry column to be rebound", () => {
     const sourceDataset = _createDataset("Geometry");
     const missingColumnId = uuid<QueryColumn.Id>();
@@ -259,6 +379,7 @@ describe("getResolvedMapLayerMetadata", () => {
         encoding: "wkt",
         family: "polygon",
         simplification: { tolerancePixels: 0.75 },
+        sourceCrs: undefined,
       },
     };
 

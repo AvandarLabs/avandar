@@ -1,6 +1,11 @@
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import {
+  PolarEpsg,
+  UtmEpsgBase,
+} from "@/views/GisApp/layers/getUtmEpsgFromLongitudeLatitude/getUtmEpsgFromLongitudeLatitude";
 import { buildGeometryExpression } from "../buildGeometryExpression/buildGeometryExpression";
+import { buildGridCellExpressions } from "../buildGridCellExpressions/buildGridCellExpressions";
 import { buildNormalizedBoundaryKey } from "../buildNormalizedBoundaryKey/buildNormalizedBoundaryKey";
 import { getSimplificationTolerance } from "../getSimplificationTolerance/getSimplificationTolerance";
 import {
@@ -22,6 +27,16 @@ type CompileOptions = {
 
 const GEOMETRY_COLUMN = "__avandar_geometry";
 const FAMILY_COLUMN = "__avandar_geometry_family";
+
+/**
+ * Screen-space tolerance used to simplify grid-cell outlines.
+ *
+ * Cell size is fixed in meters, so a bin binding persists no simplification of
+ * its own; only the drawn outline follows the zoom band.
+ */
+const GRID_CELL_SIMPLIFICATION: MapLayer.GeometrySimplification = {
+  tolerancePixels: 0.75,
+};
 
 /** Applies topology-preserving Web Mercator simplification when configured. */
 function _buildSimplifiedGeometry(
@@ -409,29 +424,23 @@ ${_buildFinalSelect()}`;
 
 /** Builds point geometry from coordinate or encoded-geometry input. */
 function _buildPointExpression(
-  binding: Extract<
-    MapLayer.GeoBinding,
-    { type: "aggregatePointsToBoundaries" }
-  >,
+  points: MapLayer.PointBinding,
   metadata: ResolvedMapLayerMetadata,
 ): string {
-  if (binding.points.type === "geometryColumn") {
-    const name = metadata.sourceColumnNames.get(binding.points.column);
+  if (points.type === "geometryColumn") {
+    const name = metadata.sourceColumnNames.get(points.column);
     if (!name) {
       throw new Error("The point geometry column could not be resolved");
     }
-    return buildGeometryExpression(
-      quoteSqlIdentifier(name),
-      binding.points.encoding,
-    );
+    return buildGeometryExpression(quoteSqlIdentifier(name), points.encoding);
   }
   const latitude =
-    binding.points.latitude ?
-      metadata.sourceColumnNames.get(binding.points.latitude)
+    points.latitude ?
+      metadata.sourceColumnNames.get(points.latitude)
     : undefined;
   const longitude =
-    binding.points.longitude ?
-      metadata.sourceColumnNames.get(binding.points.longitude)
+    points.longitude ?
+      metadata.sourceColumnNames.get(points.longitude)
     : undefined;
   if (!latitude || !longitude) {
     throw new Error("Both point coordinate columns are required");
@@ -441,20 +450,17 @@ function _buildPointExpression(
 
 /** Builds the selected point aggregation metric. */
 function _buildPointAggregateValue(
-  binding: Extract<
-    MapLayer.GeoBinding,
-    { type: "aggregatePointsToBoundaries" }
-  >,
+  aggregation: MapLayer.AreaAggregation,
   metadata: ResolvedMapLayerMetadata,
 ): string {
-  if (binding.aggregation.operation === "count") {
+  if (aggregation.operation === "count") {
     return "count(*)";
   }
   const measure = metadata.aggregationMeasureColumnName;
   if (!measure) {
     throw new Error("The point aggregation measure is unresolved");
   }
-  return `${binding.aggregation.operation}(${quoteSqlIdentifier(measure)})`;
+  return `${aggregation.operation}(${quoteSqlIdentifier(measure)})`;
 }
 
 /** Compiles privacy-safe point assignment and per-boundary aggregation. */
@@ -476,7 +482,7 @@ function _compilePointAggregation(
     boundary.simplification,
     options,
   );
-  const pointParser = _buildPointExpression(binding, options.metadata);
+  const pointParser = _buildPointExpression(binding.points, options.metadata);
   const displayName =
     boundary.displayNameColumnName ?
       quoteSqlIdentifier(boundary.displayNameColumnName)
@@ -524,7 +530,7 @@ assigned_points AS (
 ),
 area_values AS (
   SELECT boundary_feature_id, count(*) AS contributor_count,
-    ${_buildPointAggregateValue(binding, options.metadata)} AS aggregate_value
+    ${_buildPointAggregateValue(binding.aggregation, options.metadata)} AS aggregate_value
   FROM assigned_points GROUP BY boundary_feature_id
 ),
 classified_areas AS (
@@ -581,6 +587,172 @@ FROM diagnostic_summary CROSS JOIN spatial_diagnostics`;
   };
 }
 
+/**
+ * Derives the analysis CRS for a grid from the point set's centroid.
+ *
+ * `sizeMeters` cannot be applied in EPSG:4326, and Web Mercator meters shrink
+ * toward the poles, so cells there would not share one ground size. The CASE
+ * mirrors `getUtmEpsgFromLongitudeLatitude`, whose constants it reuses.
+ */
+function _buildMetersCrsExpression(): string {
+  const zone =
+    "least(60, greatest(1, CAST(floor((centroid_longitude + 180) / 6) AS BIGINT) + 1))";
+  const epsg =
+    `CASE WHEN centroid_latitude >= 84 THEN ${PolarEpsg.north} ` +
+    `WHEN centroid_latitude <= -80 THEN ${PolarEpsg.south} ` +
+    `WHEN centroid_latitude >= 0 THEN ${UtmEpsgBase.north} + ${zone} ` +
+    `ELSE ${UtmEpsgBase.south} + ${zone} END`;
+  return `concat('EPSG:', CAST(${epsg} AS BIGINT))`;
+}
+
+/** Builds point parsing, the analysis CRS, cell assignment, and aggregation. */
+function _buildGridCellCtes(
+  options: Readonly<CompileOptions>,
+  sourceSql: string,
+  binding: MapLayer.GridBinBinding,
+): string {
+  const family = quoteSqlIdentifier(FAMILY_COLUMN);
+  const pointParser = _buildPointExpression(binding.points, options.metadata);
+  const cell = buildGridCellExpressions({
+    grid: binding.grid,
+    xExpression: "projected_x",
+    yExpression: "projected_y",
+    sizeMeters: binding.sizeMeters,
+  });
+  const denominator = options.metadata.normalizationDenominator;
+  if (denominator?.type === "boundaryColumn") {
+    throw new Error("Grid bins cannot use a boundary denominator");
+  }
+  const summedDenominator =
+    denominator ?
+      `,\n    sum(${quoteSqlIdentifier(denominator.columnName)}) AS ${quoteSqlIdentifier(MapLayerSpatialFeatureProperties.denominator)}`
+    : "";
+  return `source_rows AS (${sourceSql}),
+parsed_points AS (
+  SELECT source_rows.*, ${pointParser} AS point_geometry FROM source_rows
+),
+typed_points AS (
+  SELECT parsed_points.*, ${_buildFamilyExpression("point_geometry")} AS ${family}
+  FROM parsed_points
+),
+point_rows AS (
+  SELECT * FROM typed_points
+  WHERE point_geometry IS NOT NULL AND ${family} = 'point'
+),
+grid_crs AS (
+  SELECT ${_buildMetersCrsExpression()} AS meters_crs
+  FROM (
+    SELECT avg(ST_X(point_geometry)) AS centroid_longitude,
+      avg(ST_Y(point_geometry)) AS centroid_latitude
+    FROM point_rows
+  ) centroid
+),
+projected_points AS (
+  SELECT point_rows.*, meters_crs,
+    ST_Transform(point_geometry, 'EPSG:4326', meters_crs, always_xy := true) AS projected_geometry
+  FROM point_rows CROSS JOIN grid_crs
+),
+projected_coordinates AS (
+  SELECT projected_points.*, ST_X(projected_geometry) AS projected_x,
+    ST_Y(projected_geometry) AS projected_y
+  FROM projected_points
+),
+binned_points AS (
+  SELECT projected_coordinates.*, ${cell.cellIdExpression} AS cell_id,
+    ${cell.geometryExpression} AS cell_geometry
+  FROM projected_coordinates
+),
+cell_values AS (
+  SELECT cell_id, any_value(cell_geometry) AS cell_geometry,
+    any_value(meters_crs) AS meters_crs, count(*) AS contributor_count,
+    ${_buildPointAggregateValue(binding.aggregation, options.metadata)} AS aggregate_value${summedDenominator}
+  FROM binned_points GROUP BY cell_id
+)`;
+}
+
+/** Builds cell classification, suppression, features, and diagnostics. */
+function _buildGridBinOutput(options: Readonly<CompileOptions>): string {
+  const properties = MapLayerSpatialFeatureProperties;
+  const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
+  const family = quoteSqlIdentifier(FAMILY_COLUMN);
+  const minimumCount =
+    options.layer.sensitivity.mode === "aggregateOnly" ?
+      options.layer.sensitivity.minCellCount
+    : 0;
+  const hasDenominator =
+    options.metadata.normalizationDenominator !== undefined;
+  const denominatorAlias = quoteSqlIdentifier(properties.denominator);
+  return `classified_cells AS (
+  SELECT row_number() OVER (ORDER BY cell_id) AS cell_feature_id, cell_id,
+    contributor_count,${hasDenominator ? ` ${denominatorAlias},` : ""}
+    CASE WHEN contributor_count < ${minimumCount} THEN 'suppressed'
+      WHEN aggregate_value IS NULL THEN 'noData' ELSE 'value' END AS state,
+    CASE WHEN contributor_count < ${minimumCount} THEN NULL
+      ELSE aggregate_value END AS reportable_value,
+    ${_buildSimplifiedGeometry(
+      "ST_Transform(cell_geometry, meters_crs, 'EPSG:4326', always_xy := true)",
+      GRID_CELL_SIMPLIFICATION,
+      options,
+    )} AS ${geometry}
+  FROM cell_values
+),
+feature_rows AS (
+  SELECT json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(${geometry})),
+    'properties', CASE WHEN state = 'suppressed' THEN json_object(
+        '${properties.featureId}', cell_feature_id,
+        '${properties.boundaryName}', cell_id,
+        '${properties.state}', state)
+      ELSE json_object(
+        '${properties.featureId}', cell_feature_id,
+        '${properties.boundaryName}', cell_id,
+        '${properties.state}', state,
+        '${properties.value}', reportable_value,
+        '${properties.denominator}', ${hasDenominator ? denominatorAlias : "NULL"},
+        '${properties.contributorCount}', contributor_count)
+      END) AS feature
+  FROM classified_cells
+),
+diagnostic_summary AS (
+  SELECT count(*) AS source_count, count(point_geometry) AS parsed_count,
+    count(*) FILTER (WHERE point_geometry IS NULL) AS invalid_count,
+    list_distinct(list(${family}) FILTER (WHERE ${family} IS NOT NULL)) AS observed_families,
+    count(DISTINCT ${family}) FILTER (WHERE ${family} IS NOT NULL) > 1 AS has_mixed_families,
+    count(*) FILTER (WHERE point_geometry IS NOT NULL AND ${family} <> 'point') AS non_point_count
+  FROM typed_points
+)
+SELECT json_object('type', 'FeatureCollection',
+    'features', coalesce((SELECT json_group_array(feature) FROM feature_rows), json('[]')))
+    AS ${quoteSqlIdentifier(MapLayerSpatialQueryColumns.featureCollection)},
+  json_object('sourceCount', source_count, 'parsedCount', parsed_count,
+    'invalidCount', invalid_count,
+    'observedFamilies', coalesce(to_json(observed_families), json('[]')),
+    'hasMixedFamilies', has_mixed_families, 'nonPointCount', non_point_count,
+    'suppressedCount', (SELECT count(*) FROM classified_cells WHERE state = 'suppressed'),
+    'isEmptyAfterDrops', (SELECT count(*) FROM point_rows) = 0)
+    AS ${quoteSqlIdentifier(MapLayerSpatialQueryColumns.diagnostics)}
+FROM diagnostic_summary`;
+}
+
+/** Compiles fixed-size grid binning of source points in a meters CRS. */
+function _compileGridBin(
+  options: Readonly<CompileOptions>,
+  sourceSql: string,
+): MapLayerSpatialQueryPlan {
+  const binding = options.layer.geoBinding;
+  if (binding?.type !== "binPointsToGrid") {
+    throw new Error("A grid-bin binding is required");
+  }
+  return {
+    rawSql:
+      `WITH ${_buildGridCellCtes(options, sourceSql, binding)},\n` +
+      _buildGridBinOutput(options),
+    family: "polygon",
+    sourcePropertyColumnNames: [],
+    zoomBand: options.zoomBand,
+    simplificationReferenceLatitude: options.simplificationReferenceLatitude,
+  };
+}
+
 /** Compiles one supported spatial layer to a one-row result envelope. */
 export function compileMapLayerSpatialQuery(
   options: Readonly<CompileOptions>,
@@ -598,6 +770,9 @@ export function compileMapLayerSpatialQuery(
   }
   if (binding?.type === "aggregatePointsToBoundaries") {
     return _compilePointAggregation(options, sourceSql);
+  }
+  if (binding?.type === "binPointsToGrid") {
+    return _compileGridBin(options, sourceSql);
   }
   throw new Error("The spatial binding is not supported by this compiler");
 }

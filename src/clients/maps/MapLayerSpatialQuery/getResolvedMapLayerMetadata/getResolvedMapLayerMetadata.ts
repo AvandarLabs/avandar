@@ -23,6 +23,8 @@ type BoundaryBinding = Extract<
   { type: "joinToBoundaries" | "aggregatePointsToBoundaries" }
 >;
 
+type AggregatingBinding = BoundaryBinding | MapLayer.GridBinBinding;
+
 type ResolvedDenominator = NonNullable<
   Extract<
     MapLayerMetadataResolution,
@@ -49,6 +51,16 @@ function _getBoundaryBinding(layer: MapLayer.T): BoundaryBinding | undefined {
     : undefined;
 }
 
+/** Returns the binding form that aggregates source rows into areas. */
+function _getAggregatingBinding(
+  layer: MapLayer.T,
+): AggregatingBinding | undefined {
+  const { geoBinding } = layer;
+  return geoBinding?.type === "binPointsToGrid" ?
+      geoBinding
+    : _getBoundaryBinding(layer);
+}
+
 /** Returns every source column persisted by a geometry binding. */
 function _getRequiredSourceColumnIds(
   binding: MapLayer.GeoBinding | undefined,
@@ -71,6 +83,9 @@ function _getRequiredSourceColumnIds(
       return [dataKeyColumn];
     })
     .with({ type: "aggregatePointsToBoundaries" }, ({ points }) => {
+      return _getRequiredSourceColumnIds(points);
+    })
+    .with({ type: "binPointsToGrid" }, ({ points }) => {
       return _getRequiredSourceColumnIds(points);
     })
     .exhaustive();
@@ -164,7 +179,7 @@ function _getResolvedBoundaryWithGeometry(options: {
 /** Resolves and validates an optional non-count aggregation measure. */
 function _getAggregationMeasure(
   layer: MapLayer.T,
-  binding: BoundaryBinding,
+  binding: AggregatingBinding,
 ): string | MapLayerMetadataResolution | undefined {
   const { aggregation } = binding;
   if (aggregation.operation === "count") {
@@ -191,11 +206,12 @@ function _getAggregationMeasure(
 /** Resolves the optional denominator used by graduated symbology. */
 function _getNormalizationDenominator(
   options: Readonly<ResolveOptions>,
-  binding: BoundaryBinding | undefined,
+  binding: AggregatingBinding | undefined,
 ): ResolvedDenominator | MapLayerRebindRequired | undefined {
-  const color = options.layer.symbology.color;
+  const { symbology } = options.layer;
+  const color = "color" in symbology ? symbology.color : undefined;
   const normalization =
-    color.type === "graduated" ? color.normalization : undefined;
+    color?.type === "graduated" ? color.normalization : undefined;
   if (!normalization) {
     return undefined;
   }
@@ -224,7 +240,9 @@ function _getNormalizationDenominator(
       columnName: QueryColumn.getDerivedColumnName(column),
     };
   }
-  if (!binding) {
+  const boundary =
+    binding && "boundary" in binding ? binding.boundary : undefined;
+  if (!boundary) {
     return _createRebindRequired(
       "unsupportedNormalizationDenominator",
       denominator.column,
@@ -232,7 +250,7 @@ function _getNormalizationDenominator(
   }
   const column = _findBoundaryColumn(
     options.datasetColumns,
-    binding.boundary.datasetId,
+    boundary.datasetId,
     denominator.column,
   );
   if (!column) {
@@ -268,10 +286,10 @@ export function getResolvedMapLayerMetadata(
   if (missingSourceColumnId) {
     return _createRebindRequired("missingSourceColumn", missingSourceColumnId);
   }
-  const binding = _getBoundaryBinding(options.layer);
+  const aggregatingBinding = _getAggregatingBinding(options.layer);
   const normalizationDenominator = _getNormalizationDenominator(
     options,
-    binding,
+    aggregatingBinding,
   );
   if (
     normalizationDenominator &&
@@ -280,12 +298,20 @@ export function getResolvedMapLayerMetadata(
   ) {
     return normalizationDenominator;
   }
+  const aggregationMeasure =
+    aggregatingBinding ?
+      _getAggregationMeasure(options.layer, aggregatingBinding)
+    : undefined;
+  if (typeof aggregationMeasure !== "string" && aggregationMeasure) {
+    return aggregationMeasure;
+  }
+  const binding = _getBoundaryBinding(options.layer);
   if (!binding) {
     return {
       type: "resolved",
       sourceColumnNames,
       boundary: undefined,
-      aggregationMeasureColumnName: undefined,
+      aggregationMeasureColumnName: aggregationMeasure,
       normalizationDenominator,
     };
   }
@@ -303,10 +329,6 @@ export function getResolvedMapLayerMetadata(
   );
   if ("type" in boundary) {
     return boundary;
-  }
-  const aggregationMeasure = _getAggregationMeasure(options.layer, binding);
-  if (typeof aggregationMeasure !== "string" && aggregationMeasure) {
-    return aggregationMeasure;
   }
   return {
     type: "resolved",
