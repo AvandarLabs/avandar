@@ -55,6 +55,7 @@ export async function getCsvPreviewData(
   );
   // Both reads share one DuckDB connection, which serializes queries anyway,
   // so running them concurrently would buy nothing and interleave their state.
+  // react-doctor-disable-next-line
   const previewResult = await options.runRawQuery<UnknownRow>(
     `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${options.maxPreviewRows}`,
     queryOptions,

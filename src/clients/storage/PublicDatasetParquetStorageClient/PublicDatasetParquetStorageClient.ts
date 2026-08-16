@@ -333,6 +333,7 @@ async function _deleteDatasetsForDashboard(
     // Generations are deleted one at a time: every `_deleteSnapshotGeneration`
     // re-checks the caller's transition claim through `assertCanDelete` and
     // advances it, so concurrent deletes would fence each other out.
+    // react-doctor-disable-next-line
     await _deleteSnapshotGeneration({
       assertCanDelete,
       bucket,

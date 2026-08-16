@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { openSqliteDatabase, runMigrations } from "../SqliteService/Sqlite";
-import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap";
+import { openSqliteDatabase, runMigrations } from "../../SqliteService/Sqlite";
+import { bootstrapSnapshotIfNeeded } from "../SnapshotBootstrap";
 import { makeRest } from "./SnapshotBootstrap.fixtures";
 
 describe("bootstrapSnapshotIfNeeded transactions", () => {

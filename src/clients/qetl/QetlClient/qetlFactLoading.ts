@@ -153,7 +153,9 @@ export async function fetchDiceFacts(
     async (priorFactsPromise, extractor) => {
       // Chaining on the prior promise is what keeps the fetches sequential:
       // one extractor's nested query can load tables the next one reads.
+      // react-doctor-disable-next-line
       const priorFacts = await priorFactsPromise;
+      // react-doctor-disable-next-line
       const extractedFact = await _fetchExtractor({ ...options, extractor });
       return priorFacts.concat(extractedFact);
     },
