@@ -1938,7 +1938,7 @@ msgstr "Le nom du jeu de données est requis"
 msgid "Main"
 msgstr "Principal"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "Impossible de publier le tableau de bord"
 
@@ -4255,7 +4255,7 @@ msgstr "Demander une fonctionnalité"
 msgid "Description"
 msgstr "Description"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "Certains jeux de données ne sont pas encore synchronisés en ligne ou "

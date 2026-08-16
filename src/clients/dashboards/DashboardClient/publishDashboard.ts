@@ -2,7 +2,7 @@ import { assertIsDefined } from "@avandar/utils";
 import {
   preparePublishSnapshot,
   uploadPreparedSnapshots,
-} from "@/clients/dashboards/DashboardClient/dashboardPublishSnapshots";
+} from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots";
 import {
   abortPublishTransition,
   CLEAR_SNAPSHOT_TRANSITION,
@@ -10,7 +10,7 @@ import {
   deletePriorSnapshotBestEffort,
   recoverTransition,
   updateDashboardModelWithCompareAndSwap,
-} from "@/clients/dashboards/DashboardClient/dashboardSnapshotTransitions";
+} from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardSnapshotTransitions";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnapshotTransition/DashboardSnapshotTransition";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";

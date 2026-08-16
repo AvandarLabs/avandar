@@ -1911,7 +1911,7 @@ msgstr "Jina la dataset linahitajika"
 msgid "Main"
 msgstr "Kuu"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "Imeshindikana kuchapisha dashibodi"
 
@@ -4205,7 +4205,7 @@ msgstr "Omba kipengele"
 msgid "Description"
 msgstr "Maelezo"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "Baadhi ya seti za data bado hazijasawazishwa mtandaoni au zimeshindwa "

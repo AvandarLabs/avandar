@@ -3,7 +3,7 @@ import {
   createTransitionClaim,
   finishCleanupTransition,
   recoverTransition,
-} from "@/clients/dashboards/DashboardClient/dashboardSnapshotTransitions";
+} from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardSnapshotTransitions";
 import type { DashboardMutationContext } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 

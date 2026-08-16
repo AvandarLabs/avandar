@@ -1888,7 +1888,7 @@ msgstr "اسم مجموعة البيانات مطلوب"
 msgid "Main"
 msgstr "رئيسي"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "تعذّر نشر لوحة المعلومات"
 
@@ -4148,7 +4148,7 @@ msgstr "طلب ميزة"
 msgid "Description"
 msgstr "الوصف"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو فشل نشرها. "

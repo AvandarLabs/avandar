@@ -1888,7 +1888,7 @@ msgstr "Dataset name is required"
 msgid "Main"
 msgstr "Main"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "Unable to publish dashboard"
 
@@ -4157,7 +4157,7 @@ msgstr "Request a feature"
 msgid "Description"
 msgstr "Description"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "Some datasets are not synced online yet or failed to publish. "

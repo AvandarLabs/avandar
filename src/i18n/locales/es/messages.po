@@ -1921,7 +1921,7 @@ msgstr "Se requiere el nombre del conjunto de datos"
 msgid "Main"
 msgstr "Principal"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "No se puede publicar el panel"
 
@@ -4226,7 +4226,7 @@ msgstr "Solicitar una función"
 msgid "Description"
 msgstr "Descripción"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "Algunos conjuntos de datos aún no se han sincronizado en línea o no se "

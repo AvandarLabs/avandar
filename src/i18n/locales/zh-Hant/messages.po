@@ -1836,7 +1836,7 @@ msgstr "數據集名稱為必填項"
 msgid "Main"
 msgstr "主要"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "無法發佈儀表板"
 
@@ -4047,7 +4047,7 @@ msgstr "請求功能"
 msgid "Description"
 msgstr "描述"
 
-#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "部分資料集尚未同步至線上，或發布失敗。{errorMessage}"
