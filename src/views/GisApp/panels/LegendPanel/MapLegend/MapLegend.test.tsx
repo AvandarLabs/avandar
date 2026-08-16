@@ -55,12 +55,13 @@ describe("MapLegend", () => {
         showNoData: false,
       },
       symbology: {
-        ...MapLayer.makeEmpty("Second layer").symbology,
         type: "proportionalSymbol" as const,
         value: uuid<QueryColumn.Id>(),
         minRadius: 4,
         maxRadius: 24,
         scale: "sqrt" as const,
+        color: { type: "single" as const, color: "#1563fe" },
+        stroke: { width: 1, color: "#ffffff" },
       },
     };
     const layers = [
@@ -158,5 +159,121 @@ describe("MapLegend", () => {
     ).toEqual(["< 103", "Not reported2", "Suppressed1"]);
     expect(screen.getByText("per 100,000")).toBeInTheDocument();
     expect(screen.getByLabelText("Suppressed")).toBeInTheDocument();
+  });
+
+  it("renders classified color keys beside a proportional-symbol size graphic", () => {
+    const layer = MapLayer.makeEmpty("Population");
+    const sizedLayer = {
+      ...layer,
+      symbology: {
+        type: "proportionalSymbol" as const,
+        value: uuid<QueryColumn.Id>(),
+        minRadius: 4,
+        maxRadius: 24,
+        scale: "sqrt" as const,
+        color: {
+          type: "categorical" as const,
+          value: {
+            type: "queryColumn" as const,
+            column: uuid<QueryColumn.Id>(),
+          },
+          categories: [],
+          other: { color: "#999", label: "Other" },
+          noData: { color: "#ccc", label: "Not reported" },
+        },
+        stroke: { width: 1, color: "#fff" },
+      },
+      legend: {
+        ...layer.legend,
+        showNoData: false,
+        sizeStops: [
+          { value: 4, radiusPx: 4, label: "4" },
+          { value: 100, radiusPx: 24, label: "100" },
+        ],
+        entries: [
+          {
+            type: "value" as const,
+            color: "#123456",
+            label: "Urban",
+            count: 7,
+          },
+          {
+            type: "value" as const,
+            color: "#abcdef",
+            label: "Rural",
+            count: 3,
+          },
+        ],
+      },
+    } satisfies MapLayer.T;
+
+    render(
+      <MapLegend
+        layers={[sizedLayer]}
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("img", { name: "Symbol sizes from 4 to 100" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Urban")).toBeInTheDocument();
+    expect(screen.getByText("Rural")).toBeInTheDocument();
+  });
+
+  it("renders a cluster as one color swatch without a count label", () => {
+    const layer = MapLayer.makeEmpty("Incidents");
+    const clusterLayer = {
+      ...layer,
+      symbology: {
+        type: "cluster" as const,
+        radiusPx: 50,
+        color: { type: "single" as const, color: "#9b5802" },
+        stroke: { width: 1, color: "#fff" },
+      },
+    } satisfies MapLayer.T;
+
+    render(
+      <MapLegend
+        layers={[clusterLayer]}
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    const group = screen.getByRole("heading", {
+      name: "Incidents",
+    }).parentElement;
+
+    expect(group?.querySelectorAll("li")).toHaveLength(1);
+    expect(group?.textContent).toBe("IncidentsIncidents");
+    expect(group?.textContent).not.toContain("50");
+  });
+
+  it("selects the qualitative heatmap legend without numeric stops", () => {
+    const layer = MapLayer.makeEmpty("Density");
+    const heatmapLayer = {
+      ...layer,
+      symbology: {
+        type: "heatmap" as const,
+        radiusPx: 30,
+        weight: undefined,
+        ramp: ["#ffd4af", "#9b5802", "#7e3500"],
+      },
+    } satisfies MapLayer.T;
+
+    render(
+      <MapLegend
+        layers={[heatmapLayer]}
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("img", { name: "Low to High" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Not reported")).not.toBeInTheDocument();
   });
 });

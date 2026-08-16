@@ -25,6 +25,13 @@
   padding: 0;
 }
 
+.mapLegendGroupSized {
+  align-items: start;
+  display: grid;
+  gap: var(--mantine-spacing-sm);
+  grid-template-columns: minmax(140px, 1fr) auto;
+}
+
 .mapLegendGroupItem {
   align-items: center;
   display: flex;

@@ -16,9 +16,7 @@ type Props = {
 /**
  * Renders one legend group per layer whose persisted position is not hidden.
  *
- * A single-color point layer gets one key and one label and no units row,
- * because there is nothing to scale. A proportional symbol layer gets its
- * value label; its nested-circle size legend is not available here yet.
+ * Each group selects the legend form for its active layer symbology.
  */
 export function MapLegend({
   layers,
