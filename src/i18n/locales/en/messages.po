@@ -97,6 +97,10 @@ msgstr "Start (e.g. 2024-01-01)"
 msgid "Save the current view"
 msgstr "Save the current view"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Cell size (meters)"
+msgstr "Cell size (meters)"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Open dataset"
@@ -317,6 +321,10 @@ msgstr "Callout"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
 msgstr "Style"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Square"
+msgstr "Square"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -2555,6 +2563,10 @@ msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 msgstr "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Grid shape"
+msgstr "Grid shape"
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
@@ -3385,6 +3397,10 @@ msgstr "{0} was deleted from this browser."
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Hex"
+msgstr "Hex"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
@@ -6908,6 +6924,10 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
 msgstr "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+msgid "Bin into a grid"
+msgstr "Bin into a grid"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Handling"

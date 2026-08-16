@@ -99,6 +99,10 @@ msgstr "Inicio (por ejemplo, 2024-01-01)"
 msgid "Save the current view"
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Cell size (meters)"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Abrir conjunto de datos"
@@ -319,6 +323,10 @@ msgstr "Destacado"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
 msgstr "Estilo"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Square"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -2573,6 +2581,10 @@ msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Grid shape"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
@@ -3409,6 +3421,10 @@ msgstr "{0} fue eliminado de este navegador."
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB de descarga)."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Hex"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
@@ -6969,6 +6985,10 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 msgstr "Elige un ajuste preestablecido de espacio de trabajo o personaliza por "
 "aplicación. Los grupos de usuarios controlan las intersecciones de "
 "acceso a conjuntos de datos y paneles."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+msgid "Bin into a grid"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Handling"

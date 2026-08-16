@@ -51,6 +51,11 @@ export function GeometryBindingTypeSelect(props: Props): ReactNode {
           disabled: availability !== "available",
         },
         {
+          value: "binPointsToGrid",
+          label: t`Bin into a grid`,
+          disabled: availability !== "available",
+        },
+        {
           value: "joinToBoundaries",
           label: t`Join to boundaries`,
           disabled:
@@ -75,6 +80,8 @@ export function GeometryBindingTypeSelect(props: Props): ReactNode {
           "joinToBoundaries"
         : props.layer.geoBinding?.type === "aggregatePointsToBoundaries" ?
           "aggregatePointsToBoundaries"
+        : props.layer.geoBinding?.type === "binPointsToGrid" ?
+          "binPointsToGrid"
         : "latLngColumns"
       }
       allowDeselect={false}
@@ -84,6 +91,9 @@ export function GeometryBindingTypeSelect(props: Props): ReactNode {
           return;
         }
         props.onLayerChange((current) => {
+          if (value === "binPointsToGrid") {
+            return MapLayerUpdates.withGridBin(current);
+          }
           if (value === "joinToBoundaries") {
             const boundaryOption = props.boundaryOptions.find(({ columns }) => {
               return columns.length >= 2;
@@ -125,6 +135,7 @@ export function GeometryBindingTypeSelect(props: Props): ReactNode {
                   encoding: currentBinding.encoding,
                   family: "point",
                   simplification: undefined,
+                  sourceCrs: currentBinding.sourceCrs,
                 }
               : {
                   type: "latLngColumns",

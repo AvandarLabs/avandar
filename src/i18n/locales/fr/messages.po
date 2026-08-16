@@ -102,6 +102,10 @@ msgstr "Début (par ex. 2024-01-01)"
 msgid "Save the current view"
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Cell size (meters)"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Ouvrir l'ensemble de données"
@@ -322,6 +326,10 @@ msgstr "Encadré"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
 msgstr "Style"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Square"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -2589,6 +2597,10 @@ msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Grid shape"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
@@ -3430,6 +3442,10 @@ msgstr "{0} a été supprimé de ce navigateur."
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
 "Mo)."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Hex"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
@@ -7004,6 +7020,10 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 msgstr "Choisissez un préréglage d'espace de travail ou personnalisez par "
 "application. Les groupes d'utilisateurs contrôlent les intersections "
 "d'accès aux ensembles de données et aux tableaux de bord."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+msgid "Bin into a grid"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Handling"

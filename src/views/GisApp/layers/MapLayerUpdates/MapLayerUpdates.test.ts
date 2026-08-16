@@ -345,6 +345,92 @@ describe("boundary join updates", () => {
   });
 });
 
+describe("grid-bin updates", () => {
+  it("copies coordinate points and starts a default hex count bin", () => {
+    const layer = _createBoundLayer();
+
+    const updatedLayer = MapLayerUpdates.withGridBin(layer);
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "binPointsToGrid",
+      grid: "hex",
+      sizeMeters: MapLayer.defaultGridSizeMeters,
+      points: layer.geoBinding,
+      aggregation: { operation: "count" },
+    });
+    expect(updatedLayer.symbology.type).toBe("fill");
+  });
+
+  it("keeps an aggregate-only layer when selecting a grid bin", () => {
+    const layer = MapLayer.withSensitivity(MapLayer.createArea("Cases"), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "hex",
+    });
+
+    const updatedLayer = MapLayerUpdates.withGridBin(layer);
+
+    expect(updatedLayer.sensitivity.mode).toBe("aggregateOnly");
+    expect(updatedLayer.geoBinding?.type).toBe("binPointsToGrid");
+    expect(updatedLayer.symbology.type).toBe("fill");
+  });
+
+  it("copies a point geometry column into the grid source", () => {
+    const geometryColumn = QueryColumn.makeFromDatasetColumn(
+      _createTextColumn("geometry"),
+    );
+    const layer = {
+      ..._createBoundLayer(),
+      geoBinding: {
+        type: "geometryColumn" as const,
+        column: geometryColumn.id,
+        encoding: "wkt" as const,
+        family: "point" as const,
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+    };
+
+    const updatedLayer = MapLayerUpdates.withGridBin(layer);
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "binPointsToGrid",
+      points: layer.geoBinding,
+    });
+  });
+
+  it("switches a grid bin from hexagons to squares", () => {
+    const layer = MapLayerUpdates.withGridBin(_createBoundLayer());
+
+    const updatedLayer = MapLayerUpdates.withGridType(layer, "square");
+
+    expect(updatedLayer.geoBinding).toMatchObject({
+      type: "binPointsToGrid",
+      grid: "square",
+    });
+  });
+
+  it.each([
+    { sizeMeters: 50, expected: 100 },
+    { sizeMeters: 2_000_000, expected: 1_000_000 },
+  ])(
+    "clamps $sizeMeters meter cells to $expected",
+    ({ sizeMeters, expected }) => {
+      const layer = MapLayerUpdates.withGridBin(_createBoundLayer());
+
+      const updatedLayer = MapLayerUpdates.withGridSizeMeters(
+        layer,
+        sizeMeters,
+      );
+
+      expect(updatedLayer.geoBinding).toMatchObject({
+        type: "binPointsToGrid",
+        sizeMeters: expected,
+      });
+    },
+  );
+});
+
 describe("withDefaultPopupColumns", () => {
   it("materializes the source's columns the first time geometry binds", () => {
     const bound = _createBoundLayer();

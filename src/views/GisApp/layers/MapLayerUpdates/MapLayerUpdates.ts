@@ -53,6 +53,18 @@ function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       binding?.type === "latLngColumns" ? binding.latitude : undefined,
       binding?.type === "latLngColumns" ? binding.longitude : undefined,
       binding?.type === "geometryColumn" ? binding.column : undefined,
+      binding?.type === "binPointsToGrid" &&
+      binding.points.type === "latLngColumns" ?
+        binding.points.latitude
+      : undefined,
+      binding?.type === "binPointsToGrid" &&
+      binding.points.type === "latLngColumns" ?
+        binding.points.longitude
+      : undefined,
+      binding?.type === "binPointsToGrid" &&
+      binding.points.type === "geometryColumn" ?
+        binding.points.column
+      : undefined,
       layer.symbology.type === "proportionalSymbol" ?
         layer.symbology.value
       : undefined,
@@ -201,6 +213,28 @@ function _withProportionalSymbology(
       stroke: _getStroke(layer),
     },
   } as MapLayer.Standard;
+}
+
+function _getPointBindingFromLayer(layer: MapLayer.T): MapLayer.PointBinding {
+  const binding = layer.geoBinding;
+  if (binding?.type === "latLngColumns") {
+    return binding;
+  }
+  if (binding?.type === "geometryColumn" && binding.family === "point") {
+    return {
+      type: "geometryColumn",
+      column: binding.column,
+      encoding: binding.encoding,
+      family: "point",
+      simplification: undefined,
+      sourceCrs: binding.sourceCrs,
+    };
+  }
+  return {
+    type: "latLngColumns",
+    latitude: undefined,
+    longitude: undefined,
+  };
 }
 
 /**
@@ -493,6 +527,61 @@ export const MapLayerUpdates = {
     } as MapLayer.T;
   },
 
+  /** Bins the layer's current point source into a fixed-meter grid. */
+  withGridBin: (layer: MapLayer.T): MapLayer.T => {
+    if (layer.geoBinding?.type === "binPointsToGrid") {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: {
+        type: "binPointsToGrid",
+        grid: "hex",
+        sizeMeters: MapLayer.defaultGridSizeMeters,
+        points: _getPointBindingFromLayer(layer),
+        aggregation: {
+          operation: "count",
+          outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+        },
+      },
+      symbology:
+        layer.symbology.type === "fill" ?
+          layer.symbology
+        : MapLayer.createDefaultFillSymbology(),
+    } as MapLayer.T;
+  },
+
+  /** Selects the polygon grid shape used for point bins. */
+  withGridType: (
+    layer: MapLayer.T,
+    grid: MapLayer.GridBinBinding["grid"],
+  ): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "binPointsToGrid" || binding.grid === grid) {
+      return layer;
+    }
+    return { ...layer, geoBinding: { ...binding, grid } } as MapLayer.T;
+  },
+
+  /** Sets and clamps the fixed cell size used for point bins. */
+  withGridSizeMeters: (layer: MapLayer.T, sizeMeters: number): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (binding?.type !== "binPointsToGrid" || !Number.isFinite(sizeMeters)) {
+      return layer;
+    }
+    const clampedSizeMeters = Math.min(
+      1_000_000,
+      Math.max(100, sizeMeters),
+    );
+    if (binding.sizeMeters === clampedSizeMeters) {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: { ...binding, sizeMeters: clampedSizeMeters },
+    } as MapLayer.T;
+  },
+
   /** Changes an area aggregation while preserving its stable output id. */
   withAreaAggregation: (
     layer: MapLayer.T,
@@ -501,7 +590,8 @@ export const MapLayerUpdates = {
     const binding = layer.geoBinding;
     if (
       binding?.type !== "joinToBoundaries" &&
-      binding?.type !== "aggregatePointsToBoundaries"
+      binding?.type !== "aggregatePointsToBoundaries" &&
+      binding?.type !== "binPointsToGrid"
     ) {
       return layer;
     }

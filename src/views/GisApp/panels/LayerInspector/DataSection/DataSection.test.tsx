@@ -288,6 +288,54 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
           symbology: MapLayer.createDefaultFillSymbology(),
         } as MapLayer.T;
       },
+      withGridBin: (layer: MapLayer.T) => {
+        const points =
+          layer.geoBinding?.type === "latLngColumns" ?
+            layer.geoBinding
+          : {
+              type: "latLngColumns" as const,
+              latitude: undefined,
+              longitude: undefined,
+            };
+        return {
+          ...layer,
+          geoBinding: {
+            type: "binPointsToGrid" as const,
+            grid: "hex" as const,
+            sizeMeters: MapLayer.defaultGridSizeMeters,
+            points,
+            aggregation: {
+              operation: "count" as const,
+              outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+            },
+          },
+          symbology: MapLayer.createDefaultFillSymbology(),
+        } as MapLayer.T;
+      },
+      withGridSizeMeters: (layer: MapLayer.T, sizeMeters: number) => {
+        return {
+          ...layer,
+          geoBinding: {
+            ...(layer.geoBinding as MapLayer.GridBinBinding),
+            sizeMeters: Math.min(1_000_000, Math.max(100, sizeMeters)),
+          },
+        } as MapLayer.T;
+      },
+      withGridType: (
+        layer: MapLayer.T,
+        grid: MapLayer.GridBinBinding["grid"],
+      ) => {
+        return {
+          ...layer,
+          geoBinding: {
+            ...(layer.geoBinding as MapLayer.GridBinBinding),
+            grid,
+          },
+        } as MapLayer.T;
+      },
+      withAreaAggregation: (layer: MapLayer.T) => {
+        return layer;
+      },
     },
   };
 });
@@ -388,6 +436,28 @@ function _createGeometryLayer(): MapLayer.T {
       encoding: "wkt",
       family: "polygon",
       simplification: { tolerancePixels: 0.75 },
+    },
+    symbology: MapLayer.createDefaultFillSymbology(),
+  };
+}
+
+function _createGridBinLayer(): MapLayer.Standard {
+  const layer = _createBoundLayer();
+  return {
+    ...layer,
+    geoBinding: {
+      type: "binPointsToGrid",
+      grid: "hex",
+      sizeMeters: MapLayer.defaultGridSizeMeters,
+      points: {
+        type: "latLngColumns",
+        latitude: fixtures.latitudeColumn.id,
+        longitude: fixtures.longitudeColumn.id,
+      },
+      aggregation: {
+        operation: "count",
+        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+      },
     },
     symbology: MapLayer.createDefaultFillSymbology(),
   };
@@ -606,6 +676,43 @@ describe("DataSection", () => {
     ).toBeInTheDocument();
   });
 
+  it("allows aggregate-only layers to select grid binning", () => {
+    const layer = MapLayer.withSensitivity(MapLayer.createArea("Cases"), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "hex",
+    });
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    render(<DataSection layer={layer} onLayerChange={onLayerChange} />);
+    onLayerChange.mockClear();
+    const geometrySelect = screen
+      .getAllByRole("combobox", { name: "Geometry" })
+      .at(-1)!;
+
+    fireEvent.click(geometrySelect);
+    fireEvent.click(
+      screen.getByRole("option", { name: "Bin into a grid", hidden: true }),
+    );
+
+    const updatedLayer = onLayerChange.mock.calls[0]![0](layer);
+    expect(updatedLayer.geoBinding?.type).toBe("binPointsToGrid");
+    expect(updatedLayer.sensitivity.mode).toBe("aggregateOnly");
+  });
+
+  it("clamps grid cell size to the supported meter range", () => {
+    const layer = _createGridBinLayer();
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    render(<DataSection layer={layer} onLayerChange={onLayerChange} />);
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Cell size (meters)" }),
+      { target: { value: "50" } },
+    );
+
+    const updatedLayer = onLayerChange.mock.calls[0]![0](layer);
+    expect(updatedLayer.geoBinding).toMatchObject({ sizeMeters: 100 });
+  });
+
   it("keeps geometry columns visible but disabled while Spatial loads", () => {
     spatialAvailability.value = "loading";
     render(<DataSection layer={_createBoundLayer()} onLayerChange={vi.fn()} />);
@@ -616,6 +723,9 @@ describe("DataSection", () => {
     fireEvent.click(geometrySelect);
     expect(
       screen.getAllByText("Geometry column").at(-1)?.closest('[role="option"]'),
+    ).toHaveAttribute("data-combobox-disabled", "true");
+    expect(
+      screen.getByText("Bin into a grid").closest('[role="option"]'),
     ).toHaveAttribute("data-combobox-disabled", "true");
     expect(
       screen.getByText(

@@ -22,7 +22,8 @@ export function AreaAggregationControls(props: Props): ReactNode {
   const binding = props.layer.geoBinding;
   if (
     binding?.type !== "joinToBoundaries" &&
-    binding?.type !== "aggregatePointsToBoundaries"
+    binding?.type !== "aggregatePointsToBoundaries" &&
+    binding?.type !== "binPointsToGrid"
   ) {
     return null;
   }

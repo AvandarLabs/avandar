@@ -98,6 +98,10 @@ msgstr "Anza (mfano: 2024-01-01)"
 msgid "Save the current view"
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Cell size (meters)"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "Fungua dataset"
@@ -317,6 +321,10 @@ msgstr "Wito wa kuzingatia"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
 msgstr "Mtindo"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Square"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -2562,6 +2570,10 @@ msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
 msgstr ""
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Grid shape"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
 msgid "Publish"
@@ -3396,6 +3408,10 @@ msgstr "{0} imefutwa kutoka kivinjari hiki."
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+msgid "Hex"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
@@ -6939,6 +6955,10 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 msgstr "Chagua preset ya eneo la kazi au ubinafsishe kwa kila programu. Vikundi "
 "vya watumiaji vinadhibiti muunganisho wa ufikiaji wa dataset na "
 "dashibodi."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+msgid "Bin into a grid"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Handling"

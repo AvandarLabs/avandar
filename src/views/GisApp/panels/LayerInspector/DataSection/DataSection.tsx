@@ -6,6 +6,7 @@ import { BoundaryJoinControls } from "@/views/GisApp/panels/LayerInspector/DataS
 import { CoordinateBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingControls";
 import { GeometryBindingTypeSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect";
 import { GeometryColumnControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls";
+import { GridBinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GridBinControls";
 import { PointAggregationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
@@ -59,6 +60,12 @@ export function DataSection({ layer, onLayerChange }: Props): ReactNode {
         <PointAggregationControls
           layer={layer}
           options={boundarySources.options}
+          sourceColumns={sourceColumns}
+          onLayerChange={onLayerChange}
+        />
+      : layer.geoBinding?.type === "binPointsToGrid" ?
+        <GridBinControls
+          layer={layer}
           sourceColumns={sourceColumns}
           onLayerChange={onLayerChange}
         />
