@@ -72,6 +72,23 @@ describe("parseMapLayerSpatialResult", () => {
     ).toEqual(featureCollection);
   });
 
+  it("preserves bin diagnostics from the spatial result envelope", () => {
+    const featureCollection = { type: "FeatureCollection", features: [] };
+    const binDiagnostics = {
+      ...diagnostics,
+      nonPointCount: 2,
+      suppressedCount: 3,
+      isEmptyAfterDrops: true,
+    };
+
+    expect(
+      parseMapLayerSpatialResult(
+        _createResult(featureCollection, JSON.stringify(binDiagnostics)),
+        "polygon",
+      ).diagnostics,
+    ).toEqual(binDiagnostics);
+  });
+
   it.each([
     ["malformed JSON", "{", diagnostics],
     ["a missing envelope row", undefined, undefined],

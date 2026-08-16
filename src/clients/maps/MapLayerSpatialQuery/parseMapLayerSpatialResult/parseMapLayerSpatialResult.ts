@@ -58,6 +58,7 @@ function _parseDiagnostics(value: unknown): MapLayerSpatialDiagnostics {
     observedFamilies,
     hasMixedFamilies: diagnostics.hasMixedFamilies,
     ..._parseMatchDiagnostics(diagnostics),
+    ..._parseBinDiagnostics(diagnostics),
   };
 }
 
@@ -94,6 +95,23 @@ function _parseMatchDiagnostics(
       result[key] = value;
     }
   });
+  return result;
+}
+
+/** Parses optional drop and suppression fields added by bin queries. */
+function _parseBinDiagnostics(
+  diagnostics: Record<string, unknown>,
+): Partial<MapLayerSpatialDiagnostics> {
+  const result: Partial<MapLayerSpatialDiagnostics> = {};
+  if (typeof diagnostics.nonPointCount === "number") {
+    result.nonPointCount = diagnostics.nonPointCount;
+  }
+  if (typeof diagnostics.suppressedCount === "number") {
+    result.suppressedCount = diagnostics.suppressedCount;
+  }
+  if (typeof diagnostics.isEmptyAfterDrops === "boolean") {
+    result.isEmptyAfterDrops = diagnostics.isEmptyAfterDrops;
+  }
   return result;
 }
 

@@ -73,4 +73,7 @@ export type MapLayerSpatialDiagnostics = {
   unmatchedSourceKeySamples?: readonly string[];
   duplicateBoundaryKeySamples?: readonly string[];
   ambiguousSourceKeySamples?: readonly string[];
+  nonPointCount?: number;
+  suppressedCount?: number;
+  isEmptyAfterDrops?: boolean;
 };
