@@ -1,9 +1,8 @@
-import { Model } from "@avandar/models";
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput, Select } from "@mantine/core";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
@@ -32,10 +31,9 @@ function _getRampName(ramp: readonly string[]): keyof typeof HEATMAP_RAMPS {
 /** Edits a heatmap's radius, optional weight, and sequential color ramp. */
 export function HeatmapControls({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
-    : undefined;
+  const numericColumns = layer.source.queryColumns.filter(
+    QueryColumn.isNumeric,
+  );
   return (
     <>
       <NumberInput
@@ -56,21 +54,25 @@ export function HeatmapControls({ layer, onLayerChange }: Props): ReactNode {
           });
         }}
       />
-      <QueryColumnSingleSelect
+      <Select
         label={t`Weight by`}
         placeholder={t`Unweighted`}
-        dataSourceId={dataSourceId}
-        value={
-          MapLayerUpdates.getQueryColumnFromLayer({
-            layer,
-            columnId: layer.symbology.weight,
-          }) ?? null
-        }
-        onChange={(column) => {
+        clearable
+        data={numericColumns.map((column) => {
+          return {
+            value: column.id,
+            label: QueryColumn.getDerivedColumnName(column),
+          };
+        })}
+        value={layer.symbology.weight ?? null}
+        onChange={(columnId) => {
+          const column = numericColumns.find(({ id }) => {
+            return id === columnId;
+          });
           onLayerChange((current) => {
             return MapLayerUpdates.withHeatmapWeight({
               layer: current,
-              column: column ?? undefined,
+              column,
             });
           });
         }}

@@ -30,6 +30,25 @@ function _createNumericColumn(name: string): DatasetColumn.T {
   });
 }
 
+/** An honest non-numeric `DatasetColumn`, built without a cast. */
+function _createTextColumn(name: string): DatasetColumn.T {
+  const now = new Date().toISOString();
+  return Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: uuid<Dataset.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    name,
+    originalName: name,
+    originalDataType: "VARCHAR",
+    dataType: "text",
+    detectedDataType: "VARCHAR",
+    description: undefined,
+    columnIdx: 0,
+  });
+}
+
 /** An honest `Dataset`, built through `Model.make` with no cast. */
 function _createDataset(): Dataset.T {
   const now = new Date().toISOString();
@@ -590,6 +609,28 @@ describe("withSymbology", () => {
       weight: weightColumn.id,
       ramp: ["#000000", "#ffffff"],
     });
+  });
+
+  it("rejects a non-numeric heatmap weight column", () => {
+    const heatmapLayer = MapLayerUpdates.withSymbologyType({
+      layer: MapLayer.makeEmpty("Cases"),
+      change: {
+        nextType: "heatmap",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+    const textColumn = QueryColumn.makeFromDatasetColumn(
+      _createTextColumn("category"),
+    );
+
+    const updatedLayer = MapLayerUpdates.withHeatmapWeight({
+      layer: heatmapLayer,
+      column: textColumn,
+    });
+
+    expect(updatedLayer).toBe(heatmapLayer);
+    expect(updatedLayer.source.queryColumns).not.toContain(textColumn);
   });
 
   it("maps a circle's radius onto the proportional symbol's largest radius", () => {

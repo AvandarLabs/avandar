@@ -27,7 +27,8 @@ export function StyleSection(props: Props): ReactNode {
     symbology.type === "circle" ||
     symbology.type === "proportionalSymbol" ||
     symbology.type === "cluster" ||
-    symbology.type === "heatmap";
+    symbology.type === "heatmap" ||
+    symbology.type === "fill";
   return (
     <InspectorSection title={t`Style`} defaultOpen>
       {isPoint ?

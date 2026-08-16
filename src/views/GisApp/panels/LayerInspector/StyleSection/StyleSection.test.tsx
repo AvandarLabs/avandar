@@ -6,7 +6,6 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
-import { SymbologyTypeControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -27,6 +26,24 @@ function _createNumericColumn(name: string): DatasetColumn.T {
     detectedDataType: "DOUBLE",
     description: undefined,
     columnIdx: 0,
+  });
+}
+
+function _createTextColumn(name: string): DatasetColumn.T {
+  const now = new Date().toISOString();
+  return Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: uuid<Dataset.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    name,
+    originalName: name,
+    originalDataType: "VARCHAR",
+    dataType: "text",
+    detectedDataType: "VARCHAR",
+    description: undefined,
+    columnIdx: 1,
   });
 }
 
@@ -321,13 +338,17 @@ describe("StyleSection", () => {
       minCellCount: 5,
       minGeoLevel: "district",
     });
-    render(<SymbologyTypeControl layer={layer} onLayerChange={vi.fn()} />);
+    render(<StyleSection layer={layer} onLayerChange={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: "Point" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
     expect(screen.getByRole("button", { name: "Cluster" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Heat" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
@@ -368,10 +389,17 @@ describe("StyleSection", () => {
 
   it("renders heatmap radius, weight, and ramp controls", () => {
     const layer = MapLayer.makeEmpty("Cities");
+    const textColumn = QueryColumn.makeFromDatasetColumn(
+      _createTextColumn("Category"),
+    );
     render(
       <StyleSection
         layer={{
           ...layer,
+          source: {
+            ...layer.source,
+            queryColumns: [queryColumn, textColumn],
+          },
           geoBinding: {
             type: "latLngColumns",
             latitude: queryColumn.id,
@@ -389,9 +417,13 @@ describe("StyleSection", () => {
     );
 
     expect(screen.getByLabelText("Heat radius")).toHaveValue("30 px");
+    fireEvent.click(screen.getByRole("combobox", { name: "Weight by" }));
     expect(
-      screen.getByRole("button", { name: "Weight by" }),
+      screen.getByRole("option", { name: "Population", hidden: true }),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("option", { name: "Category", hidden: true }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("combobox", { name: "Color ramp" }),
     ).toBeInTheDocument();

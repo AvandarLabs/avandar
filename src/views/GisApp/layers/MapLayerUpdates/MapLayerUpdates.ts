@@ -8,8 +8,8 @@ import {
 } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { match } from "ts-pattern";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 /** True when `column` is already in the layer's selected query columns. */
@@ -827,7 +827,10 @@ export const MapLayerUpdates = {
     }>,
   ): MapLayer.T => {
     const { layer, column } = options;
-    if (layer.symbology.type !== "heatmap") {
+    if (
+      layer.symbology.type !== "heatmap" ||
+      (column && !QueryColumn.isNumeric(column))
+    ) {
       return layer;
     }
     const withColumn = column ? _withQueryColumn({ layer, column }) : layer;
