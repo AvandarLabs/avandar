@@ -76,6 +76,45 @@ export const GIS_WAVE_B_BOUNDARY_ROW_COUNT = 4;
 export const GIS_WAVE_B_POINT_ROW_COUNT = 8;
 export const GIS_WAVE_B_SUMMARY_ROW_COUNT = 7;
 
+const GIS_WAVE_C_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-c");
+
+/**
+ * Points with two tight groups a degree apart, so a fitted map clusters each
+ * group into a single symbol. `cases` is the first numeric column, so a
+ * graduated classification defaults to it, and `population` is a second
+ * numeric column available as a normalization denominator.
+ */
+export const GIS_WAVE_C_POINTS_CSV_PATH = path.join(
+  GIS_WAVE_C_DATA_DIR,
+  "gis-wave-c-points.csv",
+);
+
+/** Two valid rows plus two whose latitude only fits as a longitude. */
+export const GIS_WAVE_C_SWAPPED_POINTS_CSV_PATH = path.join(
+  GIS_WAVE_C_DATA_DIR,
+  "gis-wave-c-swapped-points.csv",
+);
+
+/**
+ * Four points sharing one coordinate and one point a degree away, so any
+ * fixed-meter grid puts them in exactly two cells with counts four and one.
+ */
+export const GIS_WAVE_C_BIN_POINTS_CSV_PATH = path.join(
+  GIS_WAVE_C_DATA_DIR,
+  "gis-wave-c-bin-points.csv",
+);
+
+/** Point WKT in EPSG:3857 whose WGS 84 equivalents sit near 10E 10N. */
+export const GIS_WAVE_C_WEB_MERCATOR_CSV_PATH = path.join(
+  GIS_WAVE_C_DATA_DIR,
+  "gis-wave-c-web-mercator.csv",
+);
+
+export const GIS_WAVE_C_POINT_ROW_COUNT = 8;
+export const GIS_WAVE_C_SWAPPED_POINT_ROW_COUNT = 4;
+export const GIS_WAVE_C_BIN_POINT_ROW_COUNT = 5;
+export const GIS_WAVE_C_WEB_MERCATOR_ROW_COUNT = 3;
+
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),
