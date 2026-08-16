@@ -36,6 +36,24 @@ const DEFAULT_MIN_SYMBOL_RADIUS = 4;
 /** Fallback largest radius of a proportional symbol, in pixels. */
 const DEFAULT_MAX_SYMBOL_RADIUS = 24;
 
+/** Fallback cluster radius, in pixels. */
+const DEFAULT_CLUSTER_RADIUS_PX = 50;
+
+/** Fallback heatmap radius, in pixels. */
+const DEFAULT_HEATMAP_RADIUS_PX = 30;
+
+/** Fallback grid-cell size, in meters. */
+const DEFAULT_GRID_SIZE_METERS = 10_000;
+
+/** Fallback sequential heatmap color ramp. */
+const DEFAULT_HEATMAP_RAMP = [
+  "#ffd4af",
+  "#daa475",
+  "#b97c44",
+  "#9b5802",
+  "#7e3500",
+] as const;
+
 /** Fallback polygon opacity when the author has not picked one. */
 const DEFAULT_FILL_OPACITY = 0.72;
 
@@ -56,6 +74,7 @@ function _isAreaGeoBinding(
   return (
     binding?.type === "joinToBoundaries" ||
     binding?.type === "aggregatePointsToBoundaries" ||
+    binding?.type === "binPointsToGrid" ||
     (binding?.type === "geometryColumn" && binding.family === "polygon")
   );
 }
@@ -73,6 +92,18 @@ export const MapLayerModule = {
 
   /** Fallback largest radius of a proportional symbol, in pixels. */
   defaultMaxSymbolRadius: DEFAULT_MAX_SYMBOL_RADIUS,
+
+  /** Fallback cluster radius, in pixels. */
+  defaultClusterRadiusPx: DEFAULT_CLUSTER_RADIUS_PX,
+
+  /** Fallback heatmap radius, in pixels. */
+  defaultHeatmapRadiusPx: DEFAULT_HEATMAP_RADIUS_PX,
+
+  /** Fallback grid-cell size, in meters. */
+  defaultGridSizeMeters: DEFAULT_GRID_SIZE_METERS,
+
+  /** Fallback sequential heatmap color ramp. */
+  defaultHeatmapRamp: DEFAULT_HEATMAP_RAMP,
 
   /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
@@ -102,6 +133,7 @@ export const MapLayerModule = {
         position: "bottomRight",
         breaks: [],
         entries: [],
+        sizeStops: [],
       },
     } as const);
   },

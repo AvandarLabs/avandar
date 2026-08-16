@@ -9,12 +9,15 @@ import type {
   GeometryEncoding as GeometryEncodingType,
   GeometryFamily as GeometryFamilyType,
   GeometrySimplification as GeometrySimplificationType,
+  GridBinBinding as GridBinBindingType,
   PointBinding as PointBindingType,
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
   ClassificationConfig as ClassificationConfigType,
+  ClusterSymbology as ClusterSymbologyType,
   ColorSpec as ColorSpecType,
   FillSymbology as FillSymbologyType,
+  HeatmapSymbology as HeatmapSymbologyType,
   LayerSymbology, // prettier-ignore
   LayerValueRef as LayerValueRefType,
   NormalizationConfig as NormalizationConfigType,
@@ -23,6 +26,7 @@ import type {
   LegendBreak as LegendBreakType,
   LegendConfig, // prettier-ignore
   LegendEntry as LegendEntryType,
+  SizeLegendStop as SizeLegendStopType,
 } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
 import type {
   AggregateOnlyMapLayerRead,
@@ -50,6 +54,7 @@ export namespace MapLayer {
   export type GeoBindingColumnNames = GeoBindingColumnNamesType;
   export type AreaGeoBinding = AreaGeoBindingType;
   export type PointBinding = PointBindingType;
+  export type GridBinBinding = GridBinBindingType;
   export type BoundarySource = BoundarySourceRefType;
   export type GeometryEncoding = GeometryEncodingType;
   export type GeometryFamily = GeometryFamilyType;
@@ -58,6 +63,8 @@ export namespace MapLayer {
   export type AreaAggregationOutputId = AreaAggregationOutputIdType;
   export type Symbology = LayerSymbology;
   export type FillSymbology = FillSymbologyType;
+  export type ClusterSymbology = ClusterSymbologyType;
+  export type HeatmapSymbology = HeatmapSymbologyType;
   export type Color = ColorSpecType;
   export type LayerValue = LayerValueRefType;
   export type Classification = ClassificationConfigType;
@@ -66,6 +73,7 @@ export namespace MapLayer {
   export type Legend = LegendConfig;
   export type LegendBreak = LegendBreakType;
   export type LegendEntry = LegendEntryType;
+  export type SizeLegendStop = SizeLegendStopType;
   export type Popup = PopupConfig;
   /** A configured action link shown in a map layer popup. */
   export type PopupAction = PopupLinkAction;

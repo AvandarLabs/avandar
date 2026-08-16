@@ -51,7 +51,7 @@ function _createDataset(): Dataset.T {
 }
 
 /** A layer with a data source and a geo binding that resolves. */
-function _createBoundLayer(): MapLayer.T {
+function _createBoundLayer(): MapLayer.Standard {
   const layer = MapLayer.makeEmpty("Cases");
   const latitude = QueryColumn.makeFromDatasetColumn(
     _createNumericColumn("lat"),
@@ -75,6 +75,51 @@ function _createBoundLayer(): MapLayer.T {
   };
 }
 
+/** An exact layer whose points are aggregated into fixed hexagonal cells. */
+function _makeGridBinLayer(): MapLayer.T {
+  const layer = MapLayer.createArea("Cases by hex");
+  const latitude = QueryColumn.makeFromDatasetColumn(
+    _createNumericColumn("lat"),
+  );
+  const longitude = QueryColumn.makeFromDatasetColumn(
+    _createNumericColumn("lon"),
+  );
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      queryColumns: [latitude, longitude],
+    },
+    geoBinding: {
+      type: "binPointsToGrid",
+      grid: "hex",
+      sizeMeters: 10_000,
+      points: {
+        type: "latLngColumns",
+        latitude: latitude.id,
+        longitude: longitude.id,
+      },
+      aggregation: {
+        operation: "count",
+        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+      },
+    },
+  };
+}
+
+/** An exact point layer drawn with cluster paint. */
+function _makeClusterLayer(): MapLayer.T {
+  return {
+    ..._createBoundLayer(),
+    symbology: {
+      type: "cluster",
+      radiusPx: 50,
+      color: { type: "single", color: "#3b82f6" },
+      stroke: { width: 1, color: "#ffffff" },
+    },
+  };
+}
+
 describe("MapLayer.makeEmpty", () => {
   it("is visible, unbound, and exact by default", () => {
     const layer = MapLayer.makeEmpty("Cases");
@@ -90,6 +135,10 @@ describe("MapLayer.makeEmpty", () => {
     expect(layer.legend.breaks).toEqual([]);
     expect(layer.legend.entries).toEqual([]);
   });
+
+  it("starts legends with empty size stops", () => {
+    expect(MapLayer.makeEmpty("Cases").legend.sizeStops).toEqual([]);
+  });
 });
 
 describe("MapLayer.createArea", () => {
@@ -104,6 +153,26 @@ describe("MapLayer.createArea", () => {
 });
 
 describe("MapLayer.withSensitivity", () => {
+  it("keeps a grid-bin binding when switching to aggregate only", () => {
+    const layer = MapLayer.withSensitivity(_makeGridBinLayer(), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "hex",
+    });
+    expect(layer.geoBinding?.type).toBe("binPointsToGrid");
+    expect(layer.symbology.type).toBe("fill");
+  });
+
+  it("clears cluster paint when switching to aggregate only", () => {
+    const layer = MapLayer.withSensitivity(_makeClusterLayer(), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+    expect(layer.symbology.type).toBe("fill");
+    expect(layer.geoBinding).toBeUndefined();
+  });
+
   it("removes a point binding before applying aggregate-only", () => {
     const layer = MapLayer.withSensitivity(_createBoundLayer(), {
       mode: "aggregateOnly",
@@ -136,6 +205,7 @@ describe("MapLayer.withSensitivity", () => {
         encoding: "wkt",
         family: "polygon",
         simplification: { tolerancePixels: 0.75 },
+        sourceCrs: undefined,
       },
     };
 
@@ -147,6 +217,21 @@ describe("MapLayer.withSensitivity", () => {
 
     expect(protectedLayer.geoBinding).toEqual(layerWithPolygon.geoBinding);
     expect(protectedLayer.symbology.type).toBe("fill");
+  });
+});
+
+describe("MapLayer Wave C defaults", () => {
+  it("uses the approved density defaults", () => {
+    expect(MapLayer.defaultClusterRadiusPx).toBe(50);
+    expect(MapLayer.defaultHeatmapRadiusPx).toBe(30);
+    expect(MapLayer.defaultGridSizeMeters).toBe(10_000);
+    expect(MapLayer.defaultHeatmapRamp).toEqual([
+      "#ffd4af",
+      "#daa475",
+      "#b97c44",
+      "#9b5802",
+      "#7e3500",
+    ]);
   });
 });
 

@@ -19,6 +19,13 @@ export type LegendEntry = {
   count: number;
 };
 
+/** One frozen value and radius displayed by a proportional-symbol legend. */
+export type SizeLegendStop = {
+  value: number;
+  radiusPx: number;
+  label: string;
+};
+
 /**
  * A layer's legend. Persisted rather than derived at render time so that the
  * live map, a dashboard embed, and an exported PDF cannot disagree.
@@ -30,4 +37,5 @@ export type LegendConfig = {
   position: LegendPosition;
   breaks: readonly LegendBreak[];
   entries: readonly LegendEntry[];
+  sizeStops: readonly SizeLegendStop[];
 };

@@ -95,9 +95,30 @@ export type FillSymbology = {
   opacity: number;
 };
 
+/** A clustered point style with count-driven symbol sizing. */
+export type ClusterSymbology = {
+  type: "cluster";
+  radiusPx: number;
+  color: { type: "single"; color: string };
+  stroke: StrokeSpec;
+};
+
+/** A point-density heatmap style with an optional numeric weight. */
+export type HeatmapSymbology = {
+  type: "heatmap";
+  radiusPx: number;
+  weight: QueryColumn.Id | undefined;
+  ramp: readonly string[];
+};
+
 /**
  * How a layer's geometry is painted. `proportionalSymbol` defaults to `sqrt`
  * scaling so that symbol *area*, not radius, tracks the value: radius-linear
  * scaling visually exaggerates large values.
  */
-export type LayerSymbology = PointSymbology | LineSymbology | FillSymbology;
+export type LayerSymbology =
+  | PointSymbology
+  | LineSymbology
+  | FillSymbology
+  | ClusterSymbology
+  | HeatmapSymbology;

@@ -50,6 +50,7 @@ export type GeometryColumnBinding = {
   encoding: GeometryEncoding;
   family: GeometryFamily;
   simplification: GeometrySimplification | undefined;
+  sourceCrs: number | undefined;
 };
 
 /** Source rows grouped onto workspace boundaries by matching keys. */
@@ -70,6 +71,7 @@ export type PointBinding =
       encoding: GeometryEncoding;
       family: "point";
       simplification: undefined;
+      sourceCrs: number | undefined;
     };
 
 /** Point rows grouped by the polygon that spatially contains them. */
@@ -80,11 +82,21 @@ export type PointAggregationBinding = {
   aggregation: AreaAggregation;
 };
 
+/** Point rows grouped into fixed-size grid cells. */
+export type GridBinBinding = {
+  type: "binPointsToGrid";
+  grid: "hex" | "square";
+  sizeMeters: number;
+  points: PointBinding;
+  aggregation: AreaAggregation;
+};
+
 /** A binding whose output is safe to render as an area. */
 export type AreaGeoBinding =
   | (GeometryColumnBinding & { family: "polygon" })
   | BoundaryJoinBinding
-  | PointAggregationBinding;
+  | PointAggregationBinding
+  | GridBinBinding;
 
 /**
  * How a layer's rows become geometry.
@@ -103,7 +115,8 @@ export type GeoBinding =
   | LatLngColumnsBinding
   | GeometryColumnBinding
   | BoundaryJoinBinding
-  | PointAggregationBinding;
+  | PointAggregationBinding
+  | GridBinBinding;
 
 /**
  * A {@link GeoBinding} whose column ids have been replaced with the column
