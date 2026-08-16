@@ -103,6 +103,25 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
       };
 
       /**
+       * Names of object stores to physically delete in this version.
+       *
+       * `models` can only create or re-index a store, so a store whose
+       * *primary key* changed cannot be expressed there. IndexedDB cannot
+       * re-key a store in place and Dexie aborts the entire upgrade with
+       * "Not yet support for changing primary key" when it sees one. Naming a
+       * store here emits a `null` entry in Dexie's `stores()` spec, which is
+       * how Dexie is told to drop the physical store.
+       *
+       * Dexie cannot drop and recreate the same store within a single
+       * version, so a re-key takes two versions: delete the store here, then
+       * declare it again under `models` in the NEXT version.
+       *
+       * Every row in a deleted store is destroyed, so only delete stores
+       * whose contents can be derived again (for example a download cache).
+       */
+      modelsToDelete?: readonly string[];
+
+      /**
        * The upgrader function to run when the Dexie DB is upgraded.
        * Refer to Dexie's Database Versioning docs for more information.
        * @see {@link https://dexie.org/docs/Tutorial/Design#database-versioning Dexie Database Versioning}
@@ -229,7 +248,13 @@ function _registerDexieVersion<
     config: DBSchemaConfig<CurrentSchema>;
   }>,
 ): DexieDBType<CurrentSchema["models"][number]> {
-  const tableDefinitions: Record<string, string> = { meta: "&key" };
+  // `null` is Dexie's instruction to drop a physical object store. Deletions
+  // are applied before the live models so that a name appearing in both is
+  // resolved in favour of the model that this version actually declares.
+  const tableDefinitions: Record<string, string | null> = { meta: "&key" };
+  options.config.modelsToDelete?.forEach((modelName) => {
+    tableDefinitions[modelName] = null;
+  });
   objectKeys(options.config.models).forEach((modelName) => {
     const model = options.config.models[modelName]!;
     tableDefinitions[modelName] = _getDexieTableDefinition({
