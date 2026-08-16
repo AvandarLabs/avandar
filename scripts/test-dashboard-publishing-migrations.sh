@@ -27,12 +27,12 @@ run_migration_replay() {
 # while replacing the legacy is_public column with the generated equivalent.
 run_migration_replay \
   "$repo_root/supabase/tests/migration-replay/dashboard_visibility.prelude.sql" \
-  "$repo_root/supabase/migrations/20260814175823_dashboard_visibility_model.sql" \
+  "$repo_root/supabase/migrations/20260816020000_dashboard_visibility_model.sql" \
   "$repo_root/supabase/tests/migration-replay/dashboard_visibility.assertions.sql"
 
 # Dashboard snapshot revision migration: backfill published dashboards while
 # leaving draft dashboards without a snapshot revision.
 run_migration_replay \
   "$repo_root/supabase/tests/migration-replay/dashboard_snapshot_revision.prelude.sql" \
-  "$repo_root/supabase/migrations/20260815022608_add_dashboard_snapshot_revision.sql" \
+  "$repo_root/supabase/migrations/20260816020100_add_dashboard_snapshot_revision.sql" \
   "$repo_root/supabase/tests/migration-replay/dashboard_snapshot_revision.assertions.sql"
