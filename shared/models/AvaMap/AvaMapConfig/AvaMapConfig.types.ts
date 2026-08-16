@@ -69,6 +69,6 @@ type AvaMapConfigBody = {
  */
 export type AvaMapConfigRead = Model.Versioned<
   "AvaMapConfig",
-  2,
+  3,
   AvaMapConfigBody
 >;

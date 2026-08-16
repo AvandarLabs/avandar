@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 describe("AvaMapConfig.makeEmpty", () => {
   it("starts with no layers and the avandar basemap", () => {
     const mapConfig = AvaMapConfig.makeEmpty();
+    expect(mapConfig.version).toBe(3);
     expect(mapConfig.layers).toEqual([]);
     expect(mapConfig.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(mapConfig.view).toEqual(AvaMapConfig.defaultViewState);

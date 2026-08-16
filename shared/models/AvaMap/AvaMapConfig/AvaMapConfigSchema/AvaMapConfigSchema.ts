@@ -481,46 +481,191 @@ const ConfigV2Schema = z
   })
   .strict();
 
+const V3GeometryColumnBindingSchema = GeometryColumnBindingSchema.extend({
+  sourceCrs: z.number().int().positive().optional(),
+}).strict();
+const V3PointGeometryBindingSchema = PointGeometryBindingSchema.extend({
+  sourceCrs: z.number().int().positive().optional(),
+}).strict();
+const V3PointBindingSchema = z.discriminatedUnion("type", [
+  LatLngColumnsBindingSchema,
+  V3PointGeometryBindingSchema,
+]);
+const V3PointAggregationBindingSchema = PointAggregationBindingSchema.extend({
+  points: V3PointBindingSchema,
+}).strict();
+const GridBinBindingSchema = z
+  .object({
+    type: z.literal("binPointsToGrid"),
+    grid: z.enum(["hex", "square"]),
+    sizeMeters: z.number().min(100).max(1_000_000),
+    points: V3PointBindingSchema,
+    aggregation: AreaAggregationSchema,
+  })
+  .strict();
+const V3GeoBindingSchema = z.discriminatedUnion("type", [
+  LatLngColumnsBindingSchema,
+  V3GeometryColumnBindingSchema,
+  BoundaryJoinBindingSchema,
+  V3PointAggregationBindingSchema,
+  GridBinBindingSchema,
+]);
+const V3PolygonGeometryBindingSchema = V3GeometryColumnBindingSchema.extend({
+  family: z.literal("polygon"),
+}).strict();
+const V3AreaGeoBindingSchema = z.discriminatedUnion("type", [
+  V3PolygonGeometryBindingSchema,
+  BoundaryJoinBindingSchema,
+  V3PointAggregationBindingSchema,
+  GridBinBindingSchema,
+]);
+
+const ClusterSymbologySchema = z
+  .object({
+    type: z.literal("cluster"),
+    radiusPx: z.number(),
+    color: SingleColorSpecSchema,
+    stroke: StrokeSpecSchema,
+  })
+  .strict();
+const HeatmapSymbologySchema = z
+  .object({
+    type: z.literal("heatmap"),
+    radiusPx: z.number(),
+    weight: uuidType<"QueryColumn">().optional(),
+    ramp: z.array(z.string()).readonly(),
+  })
+  .strict();
+const V3SymbologySchema = z.discriminatedUnion("type", [
+  CircleSymbologySchema,
+  ProportionalSymbolSchema,
+  LineSymbologySchema,
+  FillSymbologySchema,
+  ClusterSymbologySchema,
+  HeatmapSymbologySchema,
+]);
+
+const V3LegendSchema = LegendSchema.extend({
+  sizeStops: z
+    .array(
+      z
+        .object({
+          value: z.number(),
+          radiusPx: z.number(),
+          label: z.string(),
+        })
+        .strict(),
+    )
+    .readonly(),
+}).strict();
+const V3LayerCommonShape = {
+  ...LayerCommonShape,
+  legend: V3LegendSchema,
+} as const;
+const V3StandardLayerSchema = z
+  .object({
+    ...V3LayerCommonShape,
+    geoBinding: V3GeoBindingSchema.optional(),
+    symbology: V3SymbologySchema,
+    sensitivity: z.discriminatedUnion("mode", [
+      ExactSensitivitySchema,
+      JitterSensitivitySchema,
+    ]),
+  })
+  .strict();
+const V3AggregateOnlyLayerSchema = z
+  .object({
+    ...V3LayerCommonShape,
+    geoBinding: V3AreaGeoBindingSchema.optional(),
+    symbology: FillSymbologySchema,
+    sensitivity: AggregateOnlySensitivitySchema,
+  })
+  .strict();
+const V3LayerSchema = z.union([
+  V3StandardLayerSchema,
+  V3AggregateOnlyLayerSchema,
+]);
+const ConfigV3Schema = ConfigV2Schema.extend({
+  version: z.literal(3),
+  layers: z.array(V3LayerSchema).readonly(),
+}).strict();
+
 type ConfigV1 = z.infer<typeof ConfigV1Schema>;
 type ConfigV1Layer = z.infer<typeof V1LayerSchema>;
+type ConfigV2 = z.infer<typeof ConfigV2Schema>;
+type ConfigV2Layer = z.infer<typeof LayerSchema>;
 
 /** Migrates one version 1 layer without weakening its sensitivity. */
-function _migrateVersion1Layer(layer: ConfigV1Layer): MapLayer.T {
-  const legend: MapLayer.Legend = {
+function _migrateVersion1Layer(layer: ConfigV1Layer): ConfigV2Layer {
+  const legend = {
     ...layer.legend,
     units: layer.legend.units,
     breaks: [],
     entries: [],
   };
   if (layer.sensitivity.mode !== "aggregateOnly") {
-    return {
+    return LayerSchema.parse({
       ...layer,
       popup: { ...layer.popup, action: layer.popup.action },
       legend,
-    } as MapLayer.Standard;
+    });
   }
-  return {
+  return LayerSchema.parse({
     ...layer,
     popup: { ...layer.popup, action: layer.popup.action },
     geoBinding: undefined,
     symbology: MapLayer.createDefaultFillSymbology(),
     legend,
-  } as MapLayer.AggregateOnly;
+  });
 }
 
-/** Migrates a valid version 1 config into the current strict representation. */
-function _migrateVersion1(config: ConfigV1): AvaMapConfigRead {
+/** Migrates a valid version 1 config into the version 2 representation. */
+function _migrateVersion1(config: ConfigV1): ConfigV2 {
   return ConfigV2Schema.parse({
     ...config,
     version: 2,
     layers: config.layers.map(_migrateVersion1Layer),
+  });
+}
+
+/** Adds version 3 fields to a version 2 point aggregation binding. */
+function _migrateVersion2GeoBinding(
+  binding: ConfigV2Layer["geoBinding"],
+): z.infer<typeof V3GeoBindingSchema> | undefined {
+  if (binding?.type === "geometryColumn") {
+    return V3GeoBindingSchema.parse({ ...binding, sourceCrs: undefined });
+  }
+  if (
+    binding?.type === "aggregatePointsToBoundaries" &&
+    binding.points.type === "geometryColumn"
+  ) {
+    return V3GeoBindingSchema.parse({
+      ...binding,
+      points: { ...binding.points, sourceCrs: undefined },
+    });
+  }
+  return V3GeoBindingSchema.optional().parse(binding);
+}
+
+/** Migrates a valid version 2 config into the current strict representation. */
+function _migrateVersion2(config: ConfigV2): AvaMapConfigRead {
+  return ConfigV3Schema.parse({
+    ...config,
+    version: 3,
+    layers: config.layers.map((layer) => {
+      return {
+        ...layer,
+        geoBinding: _migrateVersion2GeoBinding(layer.geoBinding),
+        legend: { ...layer.legend, sizeStops: [] },
+      };
+    }),
   }) as AvaMapConfigRead;
 }
 
 /** Reads and writes the persisted JSON representation of a map config. */
 export const AvaMapConfigSchema = {
   /** The Zod schema used to validate current persisted map configuration. */
-  schema: ConfigV2Schema,
+  schema: ConfigV3Schema,
 
   /** Validates and migrates a raw JSON value to the current config shape. */
   fromJson: (json: unknown): AvaMapConfigRead => {
@@ -529,13 +674,16 @@ export const AvaMapConfigSchema = {
       .passthrough()
       .parse(json).version;
     if (version === 1) {
-      return _migrateVersion1(ConfigV1Schema.parse(json));
+      return _migrateVersion2(_migrateVersion1(ConfigV1Schema.parse(json)));
     }
-    return ConfigV2Schema.parse(json) as AvaMapConfigRead;
+    if (version === 2) {
+      return _migrateVersion2(ConfigV2Schema.parse(json));
+    }
+    return ConfigV3Schema.parse(json) as AvaMapConfigRead;
   },
 
   /** Serializes a current map config into plain JSON for persistence. */
   toJson: (config: AvaMapConfigRead): Json => {
-    return JSON.parse(JSON.stringify(ConfigV2Schema.parse(config)));
+    return JSON.parse(JSON.stringify(ConfigV3Schema.parse(config)));
   },
 };

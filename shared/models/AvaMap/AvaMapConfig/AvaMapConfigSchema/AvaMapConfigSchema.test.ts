@@ -18,10 +18,17 @@ describe("AvaMapConfigSchema", () => {
     } as const;
   }
 
-  it("migrates an empty version 1 config to version 2", () => {
-    expect(AvaMapConfigSchema.fromJson(createVersion1Json())).toEqual({
+  function createVersion2Json() {
+    return {
       ...createVersion1Json(),
       version: 2,
+    } as const;
+  }
+
+  it("migrates an empty version 1 config to version 3", () => {
+    expect(AvaMapConfigSchema.fromJson(createVersion1Json())).toEqual({
+      ...createVersion1Json(),
+      version: 3,
     });
   });
 
@@ -30,6 +37,7 @@ describe("AvaMapConfigSchema", () => {
     const {
       breaks: _breaks,
       entries: _entries,
+      sizeStops: _sizeStops,
       ...version1Legend
     } = currentLayer.legend;
     const parsed = AvaMapConfigSchema.fromJson({
@@ -37,14 +45,19 @@ describe("AvaMapConfigSchema", () => {
       layers: [{ ...currentLayer, legend: version1Legend }],
     });
 
-    expect(parsed.version).toBe(2);
+    expect(parsed.version).toBe(3);
     expect(parsed.layers[0]).toMatchObject({
       id: currentLayer.id,
       name: "Cases",
       geoBinding: undefined,
       sensitivity: { mode: "exact" },
       symbology: currentLayer.symbology,
-      legend: { ...version1Legend, breaks: [], entries: [] },
+      legend: {
+        ...version1Legend,
+        breaks: [],
+        entries: [],
+        sizeStops: [],
+      },
     });
   });
 
@@ -53,6 +66,7 @@ describe("AvaMapConfigSchema", () => {
     const {
       breaks: _breaks,
       entries: _entries,
+      sizeStops: _sizeStops,
       ...version1Legend
     } = currentLayer.legend;
     const queryColumnId = uuid<QueryColumn.Id>();
@@ -79,6 +93,82 @@ describe("AvaMapConfigSchema", () => {
     expect(parsed.layers[0]?.sensitivity.mode).toBe("aggregateOnly");
     expect(parsed.layers[0]?.geoBinding).toBeUndefined();
     expect(parsed.layers[0]?.symbology.type).toBe("fill");
+  });
+
+  it("migrates version 2 without changing wave b symbology", () => {
+    const currentLayer = MapLayer.makeEmpty("Cases");
+    const { sizeStops: _sizeStops, ...version2Legend } = currentLayer.legend;
+    const parsed = AvaMapConfigSchema.fromJson({
+      ...createVersion2Json(),
+      layers: [{ ...currentLayer, legend: version2Legend }],
+    });
+
+    expect(parsed.version).toBe(3);
+    expect(parsed.layers[0]?.legend.sizeStops).toEqual([]);
+    expect(parsed.layers[0]?.symbology).toEqual(currentLayer.symbology);
+  });
+
+  it("rejects aggregate-only cluster paint at the json boundary", () => {
+    const layer = MapLayer.makeEmpty("Protected cases");
+    const json = {
+      ...(AvaMapConfigSchema.toJson(AvaMapConfig.makeEmpty()) as Record<
+        string,
+        unknown
+      >),
+      layers: [
+        {
+          ...layer,
+          sensitivity: {
+            mode: "aggregateOnly",
+            minCellCount: 5,
+            minGeoLevel: "district",
+          },
+          symbology: {
+            type: "cluster",
+            radiusPx: 50,
+            color: { type: "single", color: "#3b82f6" },
+            stroke: { width: 1, color: "#ffffff" },
+          },
+        },
+      ],
+    };
+
+    expect(() => {
+      return AvaMapConfigSchema.fromJson(json);
+    }).toThrow();
+  });
+
+  it("round trips a hex-bin layer", () => {
+    const queryColumnId = uuid<QueryColumn.Id>();
+    const areaLayer = MapLayer.createArea("Hex bins");
+    const gridBinLayer = MapLayer.withSensitivity(
+      {
+        ...areaLayer,
+        geoBinding: {
+          type: "binPointsToGrid",
+          grid: "hex",
+          sizeMeters: 10_000,
+          points: {
+            type: "latLngColumns",
+            latitude: queryColumnId,
+            longitude: queryColumnId,
+          },
+          aggregation: {
+            operation: "count",
+            outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+          },
+        },
+      },
+      { mode: "aggregateOnly", minCellCount: 5, minGeoLevel: "hex" },
+    );
+    const config = AvaMapConfig.withLayerAdded({
+      config: AvaMapConfig.makeEmpty(),
+      layer: gridBinLayer,
+    });
+
+    expect(
+      AvaMapConfigSchema.fromJson(AvaMapConfigSchema.toJson(config)),
+    ).toEqual(config);
   });
 
   it("round trips an empty config", () => {
@@ -108,7 +198,7 @@ describe("AvaMapConfigSchema", () => {
   it("rejects a config written by a future version", () => {
     const config = AvaMapConfig.makeEmpty();
     const json = AvaMapConfigSchema.toJson(config) as Record<string, unknown>;
-    const future = { ...json, version: 3 };
+    const future = { ...json, version: 4 };
     expect(() => {
       return AvaMapConfigSchema.fromJson(future);
     }).toThrow();
