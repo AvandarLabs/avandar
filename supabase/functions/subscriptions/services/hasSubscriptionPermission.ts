@@ -105,6 +105,74 @@ export async function hasSubscriptionPermission(
         numMembersInWorkspace: numMembers + numPendingInvites,
       });
     },
+
+    can_publish_shareable_dashboard: async () => {
+      // Mirrors util__dashboard_counts_as_shareable. A dashboard counts when
+      // someone other than its owner can reach it: public always, workspace
+      // only when it is not private to its owner. Drafts never count.
+      const { data: dashboards } = await supabaseAdminClient
+        .from("dashboards")
+        .select("id, owner_id, visibility, is_restricted")
+        .eq("workspace_id", subscription.workspaceId)
+        .neq("visibility", "draft")
+        .throwOnError();
+
+      if (dashboards === null) {
+        return false;
+      }
+
+      // Only restricted workspace dashboards need the share lookup; public
+      // ones count regardless, and unrestricted workspace ones are reachable
+      // by every tag-based app role by default.
+      const restrictedWorkspaceDashboards = dashboards.filter((dashboard) => {
+        return dashboard.visibility === "workspace" && dashboard.is_restricted;
+      });
+      const candidateIds = restrictedWorkspaceDashboards.map((dashboard) => {
+        return dashboard.id;
+      });
+
+      const { data: shares } = await supabaseAdminClient
+        .from("resource_shares")
+        .select("resource_id, principal_type, principal_id")
+        .eq("resource_type", "dashboard")
+        .in("resource_id", candidateIds.length > 0 ? candidateIds : [""])
+        .throwOnError();
+
+      // util__has_non_owner_share ignores a share whose principal IS the
+      // resource's owner (resource_shares can hold such a row; nothing in the
+      // schema forbids it), so a dashboard only counts as shared here if at
+      // least one share row names a principal other than its own owner.
+      const ownerIdByDashboardId = new Map(
+        restrictedWorkspaceDashboards.map((dashboard) => {
+          return [dashboard.id, dashboard.owner_id];
+        }),
+      );
+
+      const nonOwnerSharedIds = new Set(
+        (shares ?? [])
+          .filter((share) => {
+            const ownerId = ownerIdByDashboardId.get(share.resource_id);
+            return (
+              share.principal_type !== "user" || share.principal_id !== ownerId
+            );
+          })
+          .map((share) => {
+            return share.resource_id;
+          }),
+      );
+
+      const numShareable = dashboards.filter((dashboard) => {
+        if (dashboard.visibility === "public") {
+          return true;
+        }
+        return !dashboard.is_restricted || nonOwnerSharedIds.has(dashboard.id);
+      }).length;
+
+      return Subscription.canPublishShareableDashboard({
+        subscription,
+        numShareableDashboardsInWorkspace: numShareable,
+      });
+    },
   });
 }
 
