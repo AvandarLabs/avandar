@@ -11,19 +11,14 @@ type Props = {
 /**
  * The alert shown when the picked audience has not reached the published copy.
  *
- * It branches on the PERSISTED visibility because the three cases are three
- * different facts. A draft has no published copy to be stale, so claiming one
- * would contradict the "Not published yet" alert directly above it. A public
- * dashboard being narrowed is the dangerous case: the dropdown already reads
- * "Restricted" while `is_public` is still true and the anon policy still
- * serves the whole internet, so this alert has to name that exposure in red
- * rather than describe a tidy pending change.
- *
- * Neither case claims the access change "is saved": selecting "Anyone with the
- * link" deliberately writes nothing at all.
+ * `visibility` is the PERSISTED value, not the selection: what the reader
+ * needs is what the world can still see.
  */
 export function DivergenceAlert({ visibility }: Readonly<Props>): ReactNode {
   if (visibility === "public") {
+    // Live exposure, not a tidy pending change: the dropdown already reads
+    // "Restricted" while `is_public` is still true and the anon policy still
+    // serves the whole internet.
     return (
       <Alert color="red" icon={<IconWorld size={18} />} variant="light">
         <Text size="sm">
@@ -38,6 +33,8 @@ export function DivergenceAlert({ visibility }: Readonly<Props>): ReactNode {
   return (
     <Alert color="yellow" icon={<IconInfoCircle size={18} />} variant="light">
       <Text size="sm">
+        {/* A draft has no published copy to be stale, so it must not claim one:
+            the "Not published yet" alert sits directly above this. */}
         {visibility === "draft" ?
           <Trans>
             This dashboard is not published yet. Use the button below to publish

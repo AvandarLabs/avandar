@@ -109,9 +109,9 @@ export function useShareableDashboardLimit(
         // user just bought in `ShareableLimitReachedModal`: the entry stays
         // fresh for the whole default `staleTime`, so the publish button keeps
         // its Upgrade prompt with nothing on screen able to refresh it. The
-        // plan change also drops this key (see `planChangeQueries`); this
-        // covers the reload that happens before that invalidation is
-        // persisted.
+        // plan change also drops this key (see
+        // `getPlanChangeQueriesToInvalidate`); this covers the reload that
+        // happens before that invalidation is persisted.
         ...ALWAYS_REFETCH_ON_MOUNT,
         enabled: wouldConsumeAllowance && !!subscription?.id,
       },

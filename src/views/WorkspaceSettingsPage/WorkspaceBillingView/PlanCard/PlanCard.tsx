@@ -19,13 +19,13 @@ import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
+import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
 import css from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
 import { PlanSwitch } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
-import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planChangeQueries";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
   calculateYearlyDiscount,
