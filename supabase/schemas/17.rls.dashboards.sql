@@ -26,9 +26,7 @@
  */
 create policy "Anon can read public dashboards" on public.dashboards for
 select
-  to anon using (
-    public.dashboards.is_public = true
-  );
+  to anon using (public.dashboards.is_public = true);
 
 -- The inline owner short-circuit lets the row owner pass SELECT RLS without the
 -- helper re-fetching the row. Required so `INSERT ... RETURNING *` works for
@@ -41,9 +39,7 @@ select
       select
         auth.uid ()
     ) or
-    public.util__auth_user_may_select_dashboard (
-      public.dashboards.id
-    )
+    public.util__auth_user_may_select_dashboard (public.dashboards.id)
   );
 
 create policy "Users with editor app role can insert dashboards" on public.dashboards for insert to authenticated
@@ -95,9 +91,7 @@ with
     public.dashboards.owner_id = any (
       array(
         select
-          public.util__get_workspace_members (
-            public.dashboards.workspace_id
-          )
+          public.util__get_workspace_members (public.dashboards.workspace_id)
       )
     )
   );

@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, SimpleGrid, Stack } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
@@ -13,7 +13,7 @@ import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
-import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
+import { DashboardGrid } from "@/views/DashboardApp/DashboardListView/DashboardGrid";
 import { DashboardListEmptyState } from "@/views/DashboardApp/DashboardListView/DashboardListEmptyState";
 import { getDashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/getDashboardOfflineStatus";
 import { sortDashboardsForList } from "@/views/DashboardApp/DashboardListView/sortDashboardsForList/sortDashboardsForList";
@@ -60,44 +60,6 @@ function _makeNewDashboard(
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   });
-}
-
-/** Every dashboard the workspace can show, as a responsive card grid. */
-function _renderDashboardGrid(
-  options: Readonly<{
-    dashboards: readonly Dashboard.T[];
-    currentUserId: UserId | undefined;
-    getOfflineStatus: (dashboard: Dashboard.T) => DashboardOfflineStatus;
-    onOpenDashboard: (dashboardId: string) => void;
-  }>,
-): ReactNode {
-  const { dashboards, currentUserId, getOfflineStatus, onOpenDashboard } =
-    options;
-  return (
-    <Stack gap="lg">
-      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
-        {dashboards.map((dashboard) => {
-          return (
-            <DashboardCard
-              key={dashboard.id}
-              dashboard={dashboard}
-              // Until the profile lands there is no owner to compare
-              // against, and the ambiguous answer has to be the quiet
-              // one: `false` would badge every card on the grid,
-              // including your own, and then un-badge them a tick later.
-              isOwnedByCurrentUser={
-                currentUserId ? dashboard.ownerId === currentUserId : true
-              }
-              offlineStatus={getOfflineStatus(dashboard)}
-              onClick={() => {
-                onOpenDashboard(dashboard.id);
-              }}
-            />
-          );
-        })}
-      </SimpleGrid>
-    </Stack>
-  );
 }
 
 /** Queries, ordering and callbacks behind the dashboards grid. */
@@ -210,12 +172,12 @@ export function DashboardListView({
           isCreateDisabled={state.isCreateDisabled}
           onCreateDashboard={state.onCreateDashboard}
         />
-      : _renderDashboardGrid({
-          dashboards: state.orderedDashboards,
-          currentUserId: state.currentUserId,
-          getOfflineStatus: state.getOfflineStatus,
-          onOpenDashboard: state.onOpenDashboard,
-        })
+      : <DashboardGrid
+          dashboards={state.orderedDashboards}
+          currentUserId={state.currentUserId}
+          getOfflineStatus={state.getOfflineStatus}
+          onOpenDashboard={state.onOpenDashboard}
+        />
       }
     </AppLayout>
   );

@@ -1,7 +1,4 @@
-create type public.entity_field_configs__value_extractor_type as enum(
-  'dataset_column_value',
-  'manual_entry'
-);
+create type public.entity_field_configs__value_extractor_type as enum('dataset_column_value', 'manual_entry');
 
 create table public.entity_field_configs (
   -- Primary key
@@ -144,7 +141,4 @@ update on public.entity_field_configs for each row
 execute function public.entity_field_configs__validate_title_and_id_fields ();
 
 -- Indexes to improve performance
-create index idx_entity_field_configs__entity_config_id_workspace_id on public.entity_field_configs (
-  entity_config_id,
-  workspace_id
-);
+create index idx_entity_field_configs__entity_config_id_workspace_id on public.entity_field_configs (entity_config_id, workspace_id);

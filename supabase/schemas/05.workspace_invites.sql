@@ -1,7 +1,4 @@
-create type public.workspace_invites__status as enum(
-  'pending',
-  'accepted'
-);
+create type public.workspace_invites__status as enum('pending', 'accepted');
 
 create table public.workspace_invites (
   -- Primary key: the invite ID
@@ -36,9 +33,7 @@ create table public.workspace_invites (
   updated_at timestamptz not null default now()
 );
 
-create index idx_workspace_invites__pending_email on public.workspace_invites (
-  lower(email)
-)
+create index idx_workspace_invites__pending_email on public.workspace_invites (lower(email))
 where
   invite_status = 'pending';
 

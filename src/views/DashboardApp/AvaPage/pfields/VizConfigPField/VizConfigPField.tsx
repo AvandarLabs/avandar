@@ -1,12 +1,10 @@
-import { Trans } from "@lingui/react/macro";
-import { Box, Text } from "@mantine/core";
 import { createUsePuck } from "@puckeditor/core";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
-import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
@@ -32,46 +30,6 @@ type Props = {
   /** Revision of the published snapshot used by public-page queries. */
   snapshotRevision: string;
 };
-
-type RenderVizConfigContentOptions = Pick<Props, "value" | "onChange"> & {
-  rawSql: string;
-  columns: Parameters<typeof VizSettingsFormBody>[0]["columns"];
-  data: Parameters<typeof VizSettingsFormBody>[0]["data"];
-};
-
-function _renderVizConfigContent(
-  options: Readonly<RenderVizConfigContentOptions>,
-): ReactElement {
-  const { value, onChange, rawSql, columns, data } = options;
-  if (value.vizType === "table") {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>The table visualization has no extra settings.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-  if (rawSql.trim().length === 0) {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>Generate a query to configure this visualization.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-  return (
-    <Box>
-      <VizSettingsFormBody
-        columns={columns}
-        data={data}
-        vizConfig={value}
-        onVizConfigChange={onChange}
-      />
-    </Box>
-  );
-}
 
 /**
  * Puck custom field that renders the per-viz-type controls for a `VizConfig`.
@@ -116,11 +74,13 @@ export function VizConfigPField({
       }),
   });
 
-  return _renderVizConfigContent({
-    value,
-    onChange,
-    rawSql,
-    columns: queryResults?.columns ?? [],
-    data: queryResults?.data ?? [],
-  });
+  return (
+    <VizConfigContent
+      value={value}
+      onChange={onChange}
+      rawSql={rawSql}
+      columns={queryResults?.columns ?? []}
+      data={queryResults?.data ?? []}
+    />
+  );
 }

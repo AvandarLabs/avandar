@@ -1,18 +1,16 @@
-import { Tooltip } from "@avandar/ui";
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Group, Select, Stack, Text } from "@mantine/core";
-import { IconBuilding } from "@tabler/icons-react";
+import { Group, Stack, Text } from "@mantine/core";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { appForResource } from "../copy/appForResource";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import { GeneralAccessSelect } from "./GeneralAccessSelect";
 import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
-import type { ComboboxData } from "@mantine/core";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { ReactNode } from "react";
 
@@ -79,41 +77,6 @@ function _getGeneralAccessTooltip(
   });
 }
 
-/** The General access dropdown itself, wrapped in its explanatory tooltip. */
-function _renderGeneralAccessSelect(
-  options: Readonly<{
-    value: GeneralAccessValue;
-    isBusy: boolean;
-    generalOptions: ComboboxData;
-    tooltip: string;
-    ariaLabel: string;
-    describedById: string | undefined;
-    onChange: (nextValue: GeneralAccessValue) => void;
-  }>,
-): ReactNode {
-  const { value, isBusy, generalOptions, tooltip, ariaLabel, describedById } =
-    options;
-  return (
-    <Tooltip label={tooltip} multiline w={320}>
-      <Select
-        flex={1}
-        disabled={isBusy}
-        leftSection={<IconBuilding size={16} aria-hidden />}
-        data={generalOptions}
-        value={value}
-        allowDeselect={false}
-        onChange={(nextValue) => {
-          if (nextValue && GeneralAccessModule.isValidAccessValue(nextValue)) {
-            options.onChange(nextValue);
-          }
-        }}
-        aria-label={ariaLabel}
-        aria-describedby={describedById}
-      />
-    </Tooltip>
-  );
-}
-
 /**
  * "General access" section: a single dropdown over the three access shapes
  * (`Only me`, `Restricted`, and `Anyone in {AppLabel}`), plus a role picker
@@ -142,10 +105,10 @@ export function ShareGeneralAccess({
         <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        {_renderGeneralAccessSelect({
-          value,
-          isBusy,
-          generalOptions: GeneralAccessModule.makeDropdownOptionsFromLabels({
+        <GeneralAccessSelect
+          value={value}
+          isBusy={isBusy}
+          generalOptions={GeneralAccessModule.makeDropdownOptionsFromLabels({
             isOwner,
             labels: {
               private: t`Only me`,
@@ -155,21 +118,22 @@ export function ShareGeneralAccess({
             },
             isPublicOptionAvailable,
             isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
-          }),
-          tooltip: _getGeneralAccessTooltip({
+          })}
+          tooltip={_getGeneralAccessTooltip({
             value,
             isOwner,
             app,
             resource,
             i18n,
-          }),
-          ariaLabel: t`General access`,
-          describedById:
+          })}
+          ariaLabel={t`General access`}
+          describedById={
             showPublicOptionDisabledReason ?
               _PUBLIC_OPTION_DISABLED_REASON_ID
-            : undefined,
-          onChange,
-        })}
+            : undefined
+          }
+          onChange={onChange}
+        />
         {value === "workspace" ?
           <ShareWorkspaceRoleSelect
             role={workspaceShareRole}

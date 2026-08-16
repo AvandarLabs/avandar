@@ -77,6 +77,4 @@ update on public.entity_configs for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-create index idx_entity_configs__workspace_id on public.entity_configs (
-  workspace_id
-);
+create index idx_entity_configs__workspace_id on public.entity_configs (workspace_id);

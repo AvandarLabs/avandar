@@ -8,7 +8,7 @@ import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPer
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions";
 import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/PublishingSection";
-import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal";
+import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal";
 import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
 import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";

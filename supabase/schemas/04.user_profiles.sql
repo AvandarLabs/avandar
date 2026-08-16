@@ -54,7 +54,4 @@ update on public.user_profiles for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-create index idx_user_profiles__user_id_workspace_id on public.user_profiles (
-  user_id,
-  workspace_id
-);
+create index idx_user_profiles__user_id_workspace_id on public.user_profiles (user_id, workspace_id);

@@ -12,21 +12,15 @@ create or replace view analytics.activation as
 select
   w.id as workspace_id,
   w.created_at as workspace_created_at,
-  min(
-    e.created_at
-  ) filter (
+  min(e.created_at) filter (
     where
       e.event_name = 'dataset.imported'
   ) as first_dataset_at,
-  min(
-    e.created_at
-  ) filter (
+  min(e.created_at) filter (
     where
       e.event_name = 'query.ran'
   ) as first_query_at,
-  min(
-    e.created_at
-  ) filter (
+  min(e.created_at) filter (
     where
       e.event_name = 'dashboard.published'
   ) as first_dashboard_published_at,
@@ -34,9 +28,7 @@ select
     epoch
     from
       (
-        min(
-          e.created_at
-        ) filter (
+        min(e.created_at) filter (
           where
             e.event_name = 'dataset.imported'
         ) - w.created_at
@@ -46,9 +38,7 @@ select
     epoch
     from
       (
-        min(
-          e.created_at
-        ) filter (
+        min(e.created_at) filter (
           where
             e.event_name = 'query.ran'
         ) - w.created_at
@@ -58,9 +48,7 @@ select
     epoch
     from
       (
-        min(
-          e.created_at
-        ) filter (
+        min(e.created_at) filter (
           where
             e.event_name = 'dashboard.published'
         ) - w.created_at

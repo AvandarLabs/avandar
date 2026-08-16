@@ -1,15 +1,11 @@
-import { Paper } from "@avandar/ui";
-import { Trans } from "@lingui/react/macro";
-import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
-import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
+import { DataVizContent } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
 import { useLocalFilterState } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
@@ -101,74 +97,6 @@ function useDataVizQuery(
     return queryResults?.data ?? [];
   }, [queryResults?.data]);
   return { columns, data, emptyStructuredQuery, isLoading };
-}
-
-type RenderDataVizContentOptions = {
-  prompt: string;
-  rawSql: string;
-  isLoading: boolean;
-  columns: QueryResult.Column[];
-  data: UnknownDataFrame;
-  dateColumns: ReadonlySet<string>;
-  displayVizConfig: VizConfig.T;
-  filterProps: DataVizFilterProps;
-  localFilterState: ReturnType<typeof useLocalFilterState>;
-};
-
-function _getDataVizEmptyState(
-  options: Readonly<{ prompt: string; rawSql: string }>,
-): ReactElement | undefined {
-  const message =
-    options.prompt.length === 0 ?
-      <Trans>
-        Add a prompt and generate SQL to configure this visualization.
-      </Trans>
-    : options.rawSql.trim().length === 0 ?
-      <Trans>Run a query to see results.</Trans>
-    : undefined;
-  return message === undefined ? undefined : (
-      <Paper withBorder p="md">
-        <Text c="dimmed" fz="sm">
-          {message}
-        </Text>
-      </Paper>
-    );
-}
-
-function _renderDataVizContent(
-  options: Readonly<RenderDataVizContentOptions>,
-): ReactElement {
-  const emptyState = _getDataVizEmptyState(options);
-  if (emptyState) {
-    return emptyState;
-  }
-  return (
-    <Paper
-      withBorder
-      p="lg"
-      radius="md"
-      style={{
-        boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
-        backgroundColor: "var(--mantine-color-white)",
-      }}
-    >
-      <Stack gap="sm">
-        <DataVizLocalFilters
-          localFilters={options.filterProps.localFilters}
-          state={options.localFilterState}
-        />
-        <Box pos="relative" w="100%" h={420}>
-          <LoadingOverlay visible={options.isLoading} zIndex={10} />
-          <VisualizationContainer
-            columns={options.columns}
-            data={options.data}
-            dateColumns={options.dateColumns}
-            vizConfig={options.displayVizConfig}
-          />
-        </Box>
-      </Stack>
-    </Paper>
-  );
 }
 
 type DataVizDisplayState = DataVizQueryState & {
@@ -267,15 +195,17 @@ export function DataVizPBlock({
       rawSql,
     });
 
-  return _renderDataVizContent({
-    prompt,
-    rawSql,
-    isLoading,
-    columns,
-    data,
-    dateColumns,
-    displayVizConfig,
-    filterProps,
-    localFilterState,
-  });
+  return (
+    <DataVizContent
+      prompt={prompt}
+      rawSql={rawSql}
+      isLoading={isLoading}
+      columns={columns}
+      data={data}
+      dateColumns={dateColumns}
+      displayVizConfig={displayVizConfig}
+      filterProps={filterProps}
+      localFilterState={localFilterState}
+    />
+  );
 }

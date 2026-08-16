@@ -1,18 +1,17 @@
 import { useQuery } from "@avandar/query-hooks";
-import { ObjectDescriptionList } from "@avandar/ui";
 import { promiseMap, propEq, where } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
-import { Loader, Stack, Text } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { DuckDbTablesContent } from "@/components/spotlight-modals/DevDuckDbTableSchemaView/DuckDbTablesContent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type { ReactNode } from "react";
 
-type DevDuckDbTable = {
+export type DevDuckDbTable = {
   tableName: string;
   tableType: string;
   sourceName: string;
@@ -50,51 +49,13 @@ function useDevDuckDbTables(): UseQueryResultTuple<DevDuckDbTable[]> {
   });
 }
 
-function _renderDuckDbTablesContent(
-  options: Readonly<{
-    tables: ReturnType<typeof useDevDuckDbTables>[0];
-    isLoading: boolean;
-  }>,
-): ReactNode {
-  if (options.isLoading) {
-    return <Loader />;
-  }
-  if (!options.tables || options.tables.length === 0) {
-    return (
-      <Text>
-        <Trans>No tables found</Trans>
-      </Text>
-    );
-  }
-  return (
-    <ObjectDescriptionList<DevDuckDbTable[]>
-      data={options.tables}
-      defaultExpanded={true}
-      titleKey="tableName"
-      renderUndefinedString="undefined"
-      renderNullString="null"
-      itemRenderOptions={{
-        keyRenderOptions: {
-          schema: {
-            renderAsTable: true,
-            itemRenderOptions: { renderObjectKeyTransform: "none" },
-          },
-        },
-      }}
-    />
-  );
-}
-
 /** Displays schemas for the datasets currently loaded into local DuckDB. */
 export function DevDuckDbTableSchemaView(): ReactNode {
   const [tables = [], isLoadingSchemas] = useDevDuckDbTables();
 
   return (
     <Stack>
-      {_renderDuckDbTablesContent({
-        tables,
-        isLoading: isLoadingSchemas,
-      })}
+      <DuckDbTablesContent tables={tables} isLoading={isLoadingSchemas} />
     </Stack>
   );
 }

@@ -1,19 +1,14 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Box, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
-import { Render as PuckPageRender } from "@puckeditor/core";
+import { useLingui } from "@lingui/react/macro";
 import { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import "@puckeditor/core/puck.css";
-import { Paper } from "@avandar/ui";
 import { notifyError } from "@/utils/notifications/notify";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView";
-import { DashboardPreviewBanner } from "@/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner";
+import { DashboardViewerContent } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerContent";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -80,71 +75,6 @@ type RenderDashboardViewerOptions = {
   data: ReturnType<typeof upgradeAvaPageData>;
   metadata: ReturnType<typeof getAvaPageMetadataFromDashboard> | undefined;
 };
-
-function _renderDashboardViewer(
-  options: Readonly<RenderDashboardViewerOptions>,
-): ReactNode {
-  if (!options.metadata) {
-    return <DashboardAccessDeniedView />;
-  }
-  if (options.isLoadingDatasets) {
-    return _renderDashboardLoadingState();
-  }
-  if (options.loadingDatasetsError) {
-    return _renderDashboardLoadErrorState();
-  }
-  return (
-    <DashboardFilterStateManager.Provider>
-      <Box>
-        {options.mode === "preview" && options.workspaceSlug ?
-          <DashboardPreviewBanner
-            dashboard={options.dashboard}
-            workspaceSlug={options.workspaceSlug}
-            canEdit={options.canEdit}
-          />
-        : null}
-        <PuckPageRender
-          config={options.config}
-          data={options.data}
-          metadata={options.metadata}
-        />
-      </Box>
-    </DashboardFilterStateManager.Provider>
-  );
-}
-
-function _renderDashboardLoadingState(): ReactNode {
-  return (
-    <Paper p="xxl" maw={720} mx="auto" pos="relative">
-      <LoadingOverlay visible />
-      <Stack gap="xs">
-        <Title order={2} fw={650}>
-          <Trans>Loading dashboard datasets</Trans>
-        </Title>
-        <Text c="dimmed">
-          <Trans>Preparing data for the visualizations…</Trans>
-        </Text>
-      </Stack>
-    </Paper>
-  );
-}
-
-function _renderDashboardLoadErrorState(): ReactNode {
-  return (
-    <Paper p="xxl" maw={720} mx="auto">
-      <Stack gap="xs">
-        <Title order={2} fw={650}>
-          <Trans>Unable to load dashboard</Trans>
-        </Title>
-        <Text c="dimmed">
-          <Trans>
-            Some published datasets could not be loaded. Please try again later.
-          </Trans>
-        </Text>
-      </Stack>
-    </Paper>
-  );
-}
 
 function useDashboardViewerMetadata(
   options: Readonly<{
@@ -220,11 +150,13 @@ export function DashboardViewerView({
   canEdit = false,
 }: Readonly<Props>): ReactNode {
   const state = useDashboardViewerState({ dashboard, mode });
-  return _renderDashboardViewer({
-    dashboard,
-    mode,
-    workspaceSlug,
-    canEdit,
-    ...state,
-  });
+  return (
+    <DashboardViewerContent
+      dashboard={dashboard}
+      mode={mode}
+      workspaceSlug={workspaceSlug}
+      canEdit={canEdit}
+      {...state}
+    />
+  );
 }

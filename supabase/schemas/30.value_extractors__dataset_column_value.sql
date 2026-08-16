@@ -84,7 +84,4 @@ update on public.value_extractors__dataset_column_value for each row
 execute function public.util__set_updated_at ();
 
 -- Index for entity field + workspace filtering
-create index idx_dataset_column_value_extractors__efc_id_workspace_id on public.value_extractors__dataset_column_value (
-  entity_field_config_id,
-  workspace_id
-);
+create index idx_dataset_column_value_extractors__efc_id_workspace_id on public.value_extractors__dataset_column_value (entity_field_config_id, workspace_id);

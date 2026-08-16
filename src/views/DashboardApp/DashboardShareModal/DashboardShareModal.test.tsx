@@ -40,7 +40,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal",
+  "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal",
   () => {
     return {
       ShareableLimitReachedModal: ({

@@ -3,9 +3,7 @@
  *
  * @returns Array of user_group ids (possibly empty).
  */
-create or replace function public.util__get_auth_user_user_group_ids (
-  p_workspace_id uuid
-) returns uuid[] language sql security definer stable
+create or replace function public.util__get_auth_user_user_group_ids (p_workspace_id uuid) returns uuid[] language sql security definer stable
 set
   search_path = public as $$
   select coalesce(
@@ -59,12 +57,7 @@ set
 $$;
 
 revoke
-execute on function public.util__has_non_owner_share (
-  public.resource_type,
-  uuid,
-  uuid,
-  uuid
-)
+execute on function public.util__has_non_owner_share (public.resource_type, uuid, uuid, uuid)
 from
   public,
   anon,
@@ -136,10 +129,7 @@ end;
 $$;
 
 revoke
-execute on function public.util__is_resource_private_to_owner (
-  public.resource_type,
-  uuid
-)
+execute on function public.util__is_resource_private_to_owner (public.resource_type, uuid)
 from
   public,
   anon,
@@ -398,9 +388,7 @@ $$;
 /**
  * App catalog entry for a dashboard or dataset resource type.
  */
-create or replace function public.util__resource_type_to_app_type (
-  p_resource_type public.resource_type
-) returns public.app_type language sql immutable
+create or replace function public.util__resource_type_to_app_type (p_resource_type public.resource_type) returns public.app_type language sql immutable
 set
   search_path = public as $$
   select case p_resource_type
@@ -494,9 +482,7 @@ $$;
  * @param p_dataset_id Primary key of `public.datasets`.
  * @returns True when the row should be visible to `auth.uid()`.
  */
-create or replace function public.util__auth_user_may_select_dataset (
-  p_dataset_id uuid
-) returns boolean language plpgsql security definer stable
+create or replace function public.util__auth_user_may_select_dataset (p_dataset_id uuid) returns boolean language plpgsql security definer stable
 set
   search_path = public as $$
 declare
@@ -635,9 +621,7 @@ $$;
  * @param p_dashboard_id Primary key of `public.dashboards`.
  * @returns True when the row should be visible to `auth.uid()`.
  */
-create or replace function public.util__auth_user_may_select_dashboard (
-  p_dashboard_id uuid
-) returns boolean language plpgsql security definer stable
+create or replace function public.util__auth_user_may_select_dashboard (p_dashboard_id uuid) returns boolean language plpgsql security definer stable
 set
   search_path = public as $$
 declare
@@ -804,9 +788,7 @@ $$;
  *
  * @returns The dataset id, or null when the name is not a dataset parquet path.
  */
-create or replace function public.util__storage_object_dataset_id (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_dataset_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
@@ -822,9 +804,7 @@ $$;
  *
  * @returns The UUID, or NULL when the path segment is not a UUID.
  */
-create or replace function public.util__storage_object_workspace_id (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_workspace_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
@@ -851,9 +831,7 @@ $$;
  * @param p_object_name The `storage.objects.name` value.
  * @returns The dashboard UUID, or NULL when the path is not a snapshot path.
  */
-create or replace function public.util__storage_object_dashboard_id (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_dashboard_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
@@ -876,9 +854,7 @@ $$;
  * @param p_object_name The `storage.objects.name` value.
  * @returns The snapshot revision, or NULL when the path is not exact.
  */
-create or replace function public.util__storage_object_snapshot_revision (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_snapshot_revision (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
@@ -918,10 +894,7 @@ $$;
  * @returns True only for an editor, the active staged revision, and its bucket,
  *   and additionally only for a dashboards admin when the bucket is public.
  */
-create or replace function private.util__auth_user_can_write_dashboard_snapshot_object (
-  p_bucket_id text,
-  p_object_name text
-) returns boolean language plpgsql security definer volatile
+create or replace function private.util__auth_user_can_write_dashboard_snapshot_object (p_bucket_id text, p_object_name text) returns boolean language plpgsql security definer volatile
 set
   search_path = '' as $$
 declare
@@ -962,10 +935,7 @@ begin
 end;
 $$;
 
-revoke all on function private.util__auth_user_can_write_dashboard_snapshot_object (
-  text,
-  text
-)
+revoke all on function private.util__auth_user_can_write_dashboard_snapshot_object (text, text)
 from
   public,
   anon,
@@ -973,10 +943,7 @@ from
   service_role;
 
 grant
-execute on function private.util__auth_user_can_write_dashboard_snapshot_object (
-  text,
-  text
-) to authenticated;
+execute on function private.util__auth_user_can_write_dashboard_snapshot_object (text, text) to authenticated;
 
 /**
  * Whether the auth user may delete a dashboard snapshot object.
@@ -995,10 +962,7 @@ execute on function private.util__auth_user_can_write_dashboard_snapshot_object 
  * @param p_object_name The exact `storage.objects.name` value.
  * @returns True only with the required role and matching durable cleanup claim.
  */
-create or replace function private.util__auth_user_can_delete_dashboard_snapshot_object (
-  p_bucket_id text,
-  p_object_name text
-) returns boolean language sql security definer stable
+create or replace function private.util__auth_user_can_delete_dashboard_snapshot_object (p_bucket_id text, p_object_name text) returns boolean language sql security definer stable
 set
   search_path = '' as $$
   select coalesce(
@@ -1050,10 +1014,7 @@ set
   );
 $$;
 
-revoke all on function private.util__auth_user_can_delete_dashboard_snapshot_object (
-  text,
-  text
-)
+revoke all on function private.util__auth_user_can_delete_dashboard_snapshot_object (text, text)
 from
   public,
   anon,
@@ -1061,7 +1022,4 @@ from
   service_role;
 
 grant
-execute on function private.util__auth_user_can_delete_dashboard_snapshot_object (
-  text,
-  text
-) to authenticated;
+execute on function private.util__auth_user_can_delete_dashboard_snapshot_object (text, text) to authenticated;

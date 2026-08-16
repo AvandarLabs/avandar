@@ -13,8 +13,4 @@
 --
 -- Keep new values at the end: moving one is not a rename, it forces a full
 -- rebuild of the type and a rewrite of every column using it.
-create type public.dashboard_visibility as enum(
-  'draft',
-  'workspace',
-  'public'
-);
+create type public.dashboard_visibility as enum('draft', 'workspace', 'public');

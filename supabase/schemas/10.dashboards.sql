@@ -53,10 +53,7 @@ create table public.dashboards (
       snapshot_revision is null
     ) or
     (
-      visibility in (
-        'workspace',
-        'public'
-      ) and
+      visibility in ('workspace', 'public') and
       snapshot_revision is not null
     )
   ),
@@ -76,22 +73,13 @@ create table public.dashboards (
       snapshot_transition_prior_visibility is not null and
       (
         (
-          snapshot_transition_kind in (
-            'publish',
-            'abort_publish'
-          ) and
-          snapshot_transition_target_visibility in (
-            'workspace',
-            'public'
-          ) and
+          snapshot_transition_kind in ('publish', 'abort_publish') and
+          snapshot_transition_target_visibility in ('workspace', 'public') and
           visibility = snapshot_transition_prior_visibility and
           snapshot_revision is not distinct from snapshot_transition_prior_revision
         ) or
         (
-          snapshot_transition_kind in (
-            'unpublish',
-            'delete'
-          ) and
+          snapshot_transition_kind in ('unpublish', 'delete') and
           snapshot_transition_target_visibility is null and
           visibility = 'draft' and
           snapshot_revision is not distinct from snapshot_transition_prior_revision
@@ -285,40 +273,28 @@ begin
 end;
 $$;
 
-revoke all on function private.dashboards__snapshot_state_is_unchanged (
-  public.dashboards,
-  public.dashboards
-)
+revoke all on function private.dashboards__snapshot_state_is_unchanged (public.dashboards, public.dashboards)
 from
   public,
   anon,
   authenticated,
   service_role;
 
-revoke all on function private.dashboards__snapshot_claim_is_valid (
-  public.dashboards,
-  public.dashboards
-)
+revoke all on function private.dashboards__snapshot_claim_is_valid (public.dashboards, public.dashboards)
 from
   public,
   anon,
   authenticated,
   service_role;
 
-revoke all on function private.dashboards__snapshot_progress_is_valid (
-  public.dashboards,
-  public.dashboards
-)
+revoke all on function private.dashboards__snapshot_progress_is_valid (public.dashboards, public.dashboards)
 from
   public,
   anon,
   authenticated,
   service_role;
 
-revoke all on function private.dashboards__snapshot_settlement_is_valid (
-  public.dashboards,
-  public.dashboards
-)
+revoke all on function private.dashboards__snapshot_settlement_is_valid (public.dashboards, public.dashboards)
 from
   public,
   anon,
@@ -461,10 +437,7 @@ execute function public.util__set_updated_at ();
 -- Indexes to improve performance
 create index idx_dashboards__slug on public.dashboards (slug);
 
-create index idx_dashboards__workspace_owner on public.dashboards (
-  workspace_id,
-  owner_id
-);
+create index idx_dashboards__workspace_owner on public.dashboards (workspace_id, owner_id);
 
 -- Vanity slugs live in two namespaces because they are served from two URLs.
 --
@@ -479,10 +452,7 @@ where
 -- only need to be unique inside their workspace. Scoping them here rather than
 -- globally stops a dashboard nobody outside the workspace can see from
 -- squatting a name every other tenant then cannot use.
-create unique index dashboards__slug_unique_per_workspace_when_internal on public.dashboards (
-  workspace_id,
-  slug
-)
+create unique index dashboards__slug_unique_per_workspace_when_internal on public.dashboards (workspace_id, slug)
 where
   visibility = 'workspace'::public.dashboard_visibility and
   slug is not null;

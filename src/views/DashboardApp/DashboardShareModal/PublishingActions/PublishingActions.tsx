@@ -1,8 +1,8 @@
 import { Tooltip } from "@avandar/ui";
-import { matchLiteral } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
 import { IconWorld } from "@tabler/icons-react";
+import { PrimaryActionLabel } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel";
 import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 import type { ReactNode } from "react";
 
@@ -25,28 +25,6 @@ type Props = {
  * and "Make internal" describe very different intentions to the person
  * clicking them.
  */
-function _renderPrimaryActionLabel(actionKind: PublishActionKind): ReactNode {
-  return matchLiteral(actionKind, {
-    publish_workspace: () => {
-      return <Trans>Publish to workspace</Trans>;
-    },
-    publish_public: () => {
-      return <Trans>Publish</Trans>;
-    },
-    republish: () => {
-      return <Trans>Update &amp; republish</Trans>;
-    },
-    make_internal: () => {
-      return <Trans>Make internal</Trans>;
-    },
-    unpublish: () => {
-      return <Trans>Unpublish</Trans>;
-    },
-    disabled_no_audience: () => {
-      return <Trans>Publish</Trans>;
-    },
-  });
-}
 
 /** The publish footer: the primary action, plus the upgrade way out. */
 export function PublishingActions({
@@ -76,7 +54,7 @@ export function PublishingActions({
             actionKind === "unpublish" ? undefined : <IconWorld size={16} />
           }
         >
-          {_renderPrimaryActionLabel(actionKind)}
+          <PrimaryActionLabel actionKind={actionKind} />
         </Button>
       </Tooltip>
     </Group>

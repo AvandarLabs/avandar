@@ -2,9 +2,7 @@
  * Ensures built-in role groups and their per-app matrices exist for one
  * workspace. Idempotent (safe on every workspace create).
  */
-create or replace function public.util__seed_builtin_role_groups_for_workspace (
-  p_workspace_id uuid
-) returns void language plpgsql security definer
+create or replace function public.util__seed_builtin_role_groups_for_workspace (p_workspace_id uuid) returns void language plpgsql security definer
 set
   search_path = '' as $$
 begin

@@ -50,9 +50,7 @@ create policy "Users can SELECT workspace datasets" on storage.objects for
 select
   to authenticated using (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -60,9 +58,7 @@ select
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -77,9 +73,7 @@ create policy "Users can UPLOAD workspace datasets" on storage.objects for inser
 with
   check (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -87,9 +81,7 @@ with
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -104,9 +96,7 @@ create policy "Users can UPDATE workspace datasets" on storage.objects
 for update
   to authenticated using (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -114,9 +104,7 @@ for update
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -129,9 +117,7 @@ for update
 with
   check (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -139,9 +125,7 @@ with
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -154,9 +138,7 @@ with
 
 create policy "Users can DELETE workspace datasets" on storage.objects for delete to authenticated using (
   bucket_id = 'workspaces' and
-  (
-    storage.foldername (name)
-  ) [1] = any (
+  (storage.foldername (name)) [1] = any (
     array(
       select
         unnest(
@@ -164,9 +146,7 @@ create policy "Users can DELETE workspace datasets" on storage.objects for delet
         )::text
     )
   ) and
-  (
-    storage.foldername (name)
-  ) [2] = 'datasets' and
+  (storage.foldername (name)) [2] = 'datasets' and
   public.util__storage_object_dataset_id (name) is not null and
   public.util__storage_object_workspace_id (name) is not null and
   public.util__auth_user_can_access_resource_in_workspace (
@@ -198,13 +178,9 @@ select
       from
         public.dashboards
       where
-        dashboards.id = public.util__storage_object_dashboard_id (
-          storage.objects.name
-        ) and
+        dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
         dashboards.visibility = 'public'::public.dashboard_visibility and
-        dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (
-          storage.objects.name
-        )
+        dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
     )
   );
 
@@ -219,24 +195,15 @@ select
         from
           public.dashboards
         where
-          dashboards.id = public.util__storage_object_dashboard_id (
-            storage.objects.name
-          ) and
-          dashboards.snapshot_transition_kind in (
-            'publish',
-            'abort_publish'
-          ) and
-          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (
-            storage.objects.name
-          ) and
+          dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+          dashboards.snapshot_transition_kind in ('publish', 'abort_publish') and
+          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (storage.objects.name) and
           dashboards.snapshot_transition_target_visibility = 'public' and
           public.util__auth_user_can_update_resource (
             'dashboard'::public.resource_type,
             dashboards.id
           ) and
-          public.util__auth_user_may_select_dashboard (
-            dashboards.id
-          )
+          public.util__auth_user_may_select_dashboard (dashboards.id)
       ) or
       (
         exists (
@@ -245,18 +212,12 @@ select
           from
             public.dashboards
           where
-            dashboards.id = public.util__storage_object_dashboard_id (
-              storage.objects.name
-            ) and
+            dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
             dashboards.visibility = 'public'::public.dashboard_visibility and
-            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (
-              storage.objects.name
-            )
+            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
         ) and
         public.util__auth_user_may_select_dashboard (
-          public.util__storage_object_dashboard_id (
-            storage.objects.name
-          )
+          public.util__storage_object_dashboard_id (storage.objects.name)
         )
       )
     )
@@ -315,24 +276,15 @@ select
         from
           public.dashboards
         where
-          dashboards.id = public.util__storage_object_dashboard_id (
-            storage.objects.name
-          ) and
-          dashboards.snapshot_transition_kind in (
-            'publish',
-            'abort_publish'
-          ) and
-          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (
-            storage.objects.name
-          ) and
+          dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+          dashboards.snapshot_transition_kind in ('publish', 'abort_publish') and
+          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (storage.objects.name) and
           dashboards.snapshot_transition_target_visibility = 'workspace' and
           public.util__auth_user_can_update_resource (
             'dashboard'::public.resource_type,
             dashboards.id
           ) and
-          public.util__auth_user_may_select_dashboard (
-            dashboards.id
-          )
+          public.util__auth_user_may_select_dashboard (dashboards.id)
       ) or
       (
         exists (
@@ -341,18 +293,12 @@ select
           from
             public.dashboards
           where
-            dashboards.id = public.util__storage_object_dashboard_id (
-              storage.objects.name
-            ) and
+            dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
             dashboards.visibility = 'workspace'::public.dashboard_visibility and
-            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (
-              storage.objects.name
-            )
+            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
         ) and
         public.util__auth_user_may_select_dashboard (
-          public.util__storage_object_dashboard_id (
-            storage.objects.name
-          )
+          public.util__storage_object_dashboard_id (storage.objects.name)
         )
       )
     )
@@ -401,22 +347,14 @@ create policy "Users can DELETE private published datasets" on storage.objects f
 create policy "Anyone can select open data datasets" on storage.objects for
 select
   to authenticated,
-  anon using (
-    bucket_id = 'opendata'
-  );
+  anon using (bucket_id = 'opendata');
 
 create policy "Auth users can upload open data datasets" on storage.objects for insert to authenticated
 with
-  check (
-    bucket_id = 'opendata'
-  );
+  check (bucket_id = 'opendata');
 
 create policy "Auth users can update open data datasets" on storage.objects
 for update
-  to authenticated using (
-    bucket_id = 'opendata'
-  )
+  to authenticated using (bucket_id = 'opendata')
 with
-  check (
-    bucket_id = 'opendata'
-  );
+  check (bucket_id = 'opendata');

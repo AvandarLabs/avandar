@@ -35,9 +35,11 @@ orthogonal gate: how MANY dashboards this workspace may make reachable at all.
 3. **Use `pnpm db:reset`**, not a bare `supabase db reset`: the bare one skips
    the custom seed script and makes some pgTAP fixtures silently no-op into
    passing.
-4. **Run the DB suite as `npx supabase test db supabase/tests/database`.**
-   `pnpm test:db` globs migration-replay fragments that fail standalone for
-   reasons that predate this work.
+4. **Run the DB suite as `pnpm test:db`.** It runs the pgTAP suites and then
+   the migration upgrade tests. The old workaround of calling
+   `supabase test db supabase/tests/database` directly is no longer needed:
+   the fragments that failed standalone have moved to
+   `supabase/migration-upgrade-tests/`, outside the pgTAP glob.
 
 **Baselines to measure against**
 

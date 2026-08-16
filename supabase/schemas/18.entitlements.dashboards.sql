@@ -24,9 +24,7 @@
  *
  * @returns False for an unknown id, so a deleted row is never counted.
  */
-create or replace function public.util__dashboard_counts_as_shareable (
-  p_dashboard_id uuid
-) returns boolean language sql security definer stable
+create or replace function public.util__dashboard_counts_as_shareable (p_dashboard_id uuid) returns boolean language sql security definer stable
 set
   search_path = public as $$
   select coalesce(
@@ -82,9 +80,7 @@ from
  *
  * @returns The cap, or null when the workspace may publish without limit.
  */
-create or replace function public.util__workspace_max_shareable_dashboards (
-  p_workspace_id uuid
-) returns integer language plpgsql security definer stable
+create or replace function public.util__workspace_max_shareable_dashboards (p_workspace_id uuid) returns integer language plpgsql security definer stable
 set
   search_path = public as $$
 declare
@@ -148,9 +144,7 @@ from
  * member's restricted-but-shared dashboard, undercount, and wave the write
  * through.
  */
-create or replace function private.dashboards__assert_shareable_within_limit (
-  p_dashboard_id uuid
-) returns void language plpgsql security definer
+create or replace function private.dashboards__assert_shareable_within_limit (p_dashboard_id uuid) returns void language plpgsql security definer
 set
   search_path = public as $$
 declare
