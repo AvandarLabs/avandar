@@ -1,13 +1,18 @@
 import type {
   CircleLayerSpecification,
   FillLayerSpecification,
+  HeatmapLayerSpecification,
   LineLayerSpecification,
+  SymbolLayerSpecification,
 } from "maplibre-gl";
 
 /** A MapLibre GeoJSON source, as plain JSON. */
 export type MapSourceSpec = {
   type: "geojson";
   data: GeoJSON.FeatureCollection;
+  cluster?: boolean;
+  clusterRadius?: number;
+  clusterMaxZoom?: number;
 };
 
 /**
@@ -21,11 +26,15 @@ export type CircleRadiusValue = NonNullable<
 
 type MapLayerPaint = NonNullable<CircleLayerSpecification["paint"]> &
   NonNullable<LineLayerSpecification["paint"]> &
-  NonNullable<FillLayerSpecification["paint"]>;
+  NonNullable<FillLayerSpecification["paint"]> &
+  NonNullable<HeatmapLayerSpecification["paint"]> &
+  NonNullable<SymbolLayerSpecification["paint"]>;
 
 type MapLayerLayout = NonNullable<CircleLayerSpecification["layout"]> &
   NonNullable<LineLayerSpecification["layout"]> &
-  NonNullable<FillLayerSpecification["layout"]>;
+  NonNullable<FillLayerSpecification["layout"]> &
+  NonNullable<HeatmapLayerSpecification["layout"]> &
+  NonNullable<SymbolLayerSpecification["layout"]>;
 
 /** A MapLibre layer, as plain JSON. */
 export type MapLayerSpec = {
@@ -33,7 +42,14 @@ export type MapLayerSpec = {
   source: string;
   paint: MapLayerPaint;
   layout?: MapLayerLayout;
-} & ({ type: "circle" } | { type: "line" } | { type: "fill" });
+  filter?: unknown;
+} & (
+  | { type: "circle" }
+  | { type: "line" }
+  | { type: "fill" }
+  | { type: "heatmap" }
+  | { type: "symbol" }
+);
 
 /**
  * Everything a map should be showing, as data. Producing this is pure, so

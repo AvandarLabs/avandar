@@ -188,6 +188,75 @@ describe("syncMap", () => {
     expect(map.sourcesById.get("source-a")?.setData).not.toHaveBeenCalled();
   });
 
+  it("re-adds a source and its layers when clustering changes", () => {
+    const map = _createFakeMap();
+    const spec = _createSpec(["a", "b"]);
+    syncMap({
+      map: _asMapLibreMap(map),
+      previousSpec: emptySpec,
+      nextSpec: spec,
+    });
+    const clustered: MapSpec = {
+      ...spec,
+      sources: {
+        ...spec.sources,
+        "source-a": {
+          ...spec.sources["source-a"]!,
+          cluster: true,
+          clusterRadius: 40,
+          clusterMaxZoom: 14,
+        },
+      },
+    };
+    map.calls.length = 0;
+    map.addSource.mockClear();
+
+    syncMap({
+      map: _asMapLibreMap(map),
+      previousSpec: spec,
+      nextSpec: clustered,
+    });
+
+    expect(map.calls).toEqual([
+      "removeLayer:layer-a",
+      "removeSource:source-a",
+      "addSource:source-a",
+      "addLayer:layer-a",
+      "moveLayer:layer-a",
+      "moveLayer:layer-b",
+    ]);
+    expect(map.addSource).toHaveBeenCalledWith(
+      "source-a",
+      clustered.sources["source-a"],
+    );
+    expect(map.sourcesById.get("source-a")?.setData).not.toHaveBeenCalled();
+  });
+
+  it("adds heatmap layer specs as heatmap layers", () => {
+    const map = _createFakeMap();
+    const spec: MapSpec = {
+      sources: {
+        density: { type: "geojson", data: emptyCollection },
+      },
+      layers: [
+        {
+          id: "density-heatmap",
+          type: "heatmap",
+          source: "density",
+          paint: { "heatmap-radius": 20 },
+        },
+      ],
+    };
+
+    syncMap({
+      map: _asMapLibreMap(map),
+      previousSpec: emptySpec,
+      nextSpec: spec,
+    });
+
+    expect(map.addLayer).toHaveBeenCalledWith(spec.layers[0]);
+  });
+
   it("updates paint in place when only paint changed", () => {
     const map = _createFakeMap();
     const spec = _createSpec(["a"]);
