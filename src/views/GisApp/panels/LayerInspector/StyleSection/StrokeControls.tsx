@@ -7,7 +7,7 @@ import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 
 type Props = {
-  stroke: MapLayer.Symbology["stroke"];
+  stroke: MapLayer.Stroke;
   onLayerChange: LayerChangeHandler;
 };
 

@@ -10,10 +10,11 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 /** Edits up to three named categories plus the Other fallback. */
 export function CategoricalControls(props: Props): ReactNode {
   const { t } = useLingui();
-  const color = props.layer.symbology.color;
-  if (color.type !== "categorical") {
+  const { symbology } = props.layer;
+  if (symbology.type === "heatmap" || symbology.color.type !== "categorical") {
     return null;
   }
+  const color = symbology.color;
   const update = (nextColor: typeof color): void => {
     props.onLayerChange((current) => {
       return MapLayerUpdates.withLayerColor(current, nextColor);

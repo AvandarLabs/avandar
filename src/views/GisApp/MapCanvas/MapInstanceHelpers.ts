@@ -75,7 +75,7 @@ function _expandClusterOnClick(
   if (typeof clusterId !== "number") {
     return;
   }
-  const source = map.getSource(feature.source);
+  const source = map.getSource<maplibregl.GeoJSONSource>(feature.source);
   if (!source || !("getClusterExpansionZoom" in source)) {
     return;
   }

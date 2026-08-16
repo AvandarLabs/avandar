@@ -14,13 +14,14 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 /** Selects an optional numeric source denominator and per-unit multiplier. */
 export function NormalizationControls(props: Props): ReactNode {
   const { t } = useLingui();
-  const color = props.layer.symbology.color;
+  const { symbology } = props.layer;
   const boundarySources = useBoundarySourceOptions(
     props.layer.source.dataSource?.workspaceId,
   );
-  if (color.type !== "graduated") {
+  if (symbology.type === "heatmap" || symbology.color.type !== "graduated") {
     return null;
   }
+  const color = symbology.color;
   const columns = props.layer.source.queryColumns.filter(QueryColumn.isNumeric);
   const binding = props.layer.geoBinding;
   const boundaryDatasetId =
@@ -41,6 +42,9 @@ export function NormalizationControls(props: Props): ReactNode {
   const denominator = color.normalization?.denominator;
   const setNormalization = (selection: string | null): void => {
     props.onLayerChange((current) => {
+      if (current.symbology.type === "heatmap") {
+        return current;
+      }
       const currentColor = current.symbology.color;
       if (currentColor.type !== "graduated") {
         return current;
@@ -108,6 +112,9 @@ export function NormalizationControls(props: Props): ReactNode {
               return;
             }
             props.onLayerChange((current) => {
+              if (current.symbology.type === "heatmap") {
+                return current;
+              }
               const currentColor = current.symbology.color;
               if (
                 currentColor.type !== "graduated" ||

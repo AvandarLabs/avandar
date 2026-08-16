@@ -436,6 +436,7 @@ function _createGeometryLayer(): MapLayer.T {
       encoding: "wkt",
       family: "polygon",
       simplification: { tolerancePixels: 0.75 },
+      sourceCrs: undefined,
     },
     symbology: MapLayer.createDefaultFillSymbology(),
   };

@@ -89,6 +89,7 @@ export function PointAggregationControls(props: Props): ReactNode {
                 encoding: "wkt",
                 family: "point",
                 simplification: undefined,
+                sourceCrs: undefined,
               }
             : {
                 type: "latLngColumns",

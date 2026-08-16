@@ -47,7 +47,7 @@ function _createLayer(): MapLayer.T {
     ...layer,
     source: { ...layer.source, queryColumns: [column] },
     symbology: {
-      ...layer.symbology,
+      ...MapLayer.createDefaultFillSymbology(),
       color: {
         type: "graduated",
         value: { type: "queryColumn", column: column.id },
@@ -92,7 +92,7 @@ describe("ClassificationEditor", () => {
         aggregation: { operation: "count", outputValueId },
       },
       symbology: {
-        ...layer.symbology,
+        ...MapLayer.createDefaultFillSymbology(),
         color: { type: "single", color: "#228be6" },
       },
     };

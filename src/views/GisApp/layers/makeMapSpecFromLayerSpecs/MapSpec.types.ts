@@ -1,6 +1,7 @@
 import type {
   CircleLayerSpecification,
   FillLayerSpecification,
+  FilterSpecification,
   HeatmapLayerSpecification,
   LineLayerSpecification,
   SymbolLayerSpecification,
@@ -42,7 +43,7 @@ export type MapLayerSpec = {
   source: string;
   paint: MapLayerPaint;
   layout?: MapLayerLayout;
-  filter?: unknown;
+  filter?: FilterSpecification;
 } & (
   | { type: "circle" }
   | { type: "line" }

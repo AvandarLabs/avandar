@@ -47,7 +47,7 @@ const DEFAULT_POPUP_COLUMN_LIMIT = 12;
 function _getAreaAggregationMeasureColumnId(
   aggregation: MapLayer.AreaAggregation | undefined,
 ): QueryColumn.Id | undefined {
-  return aggregation?.operation === "count" ?
+  return !aggregation || aggregation.operation === "count" ?
       undefined
     : aggregation.measureColumn;
 }

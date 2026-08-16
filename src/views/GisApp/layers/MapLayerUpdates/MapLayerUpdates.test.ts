@@ -42,7 +42,7 @@ function _createTextColumn(name: string): DatasetColumn.T {
     name,
     originalName: name,
     originalDataType: "VARCHAR",
-    dataType: "text",
+    dataType: "varchar",
     detectedDataType: "VARCHAR",
     description: undefined,
     columnIdx: 0,

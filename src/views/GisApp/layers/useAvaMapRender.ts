@@ -201,6 +201,9 @@ function _getFeatureColorValue(
   layer: MapLayer.T,
   properties: GeoJSON.GeoJsonProperties,
 ): unknown {
+  if (layer.symbology.type === "heatmap") {
+    return undefined;
+  }
   const color = layer.symbology.color;
   if (color.type === "single" || !properties) {
     return undefined;

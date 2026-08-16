@@ -45,6 +45,9 @@ function _createColor(
   layer: MapLayer.T,
   mode: "single" | "categorical" | "graduated",
 ): MapLayer.Color | undefined {
+  if (layer.symbology.type === "heatmap") {
+    return undefined;
+  }
   const current = layer.symbology.color;
   if (mode === "single") {
     const color =
@@ -87,7 +90,11 @@ function _createColor(
 /** Focused editor for polygon color classification and normalization. */
 export function ClassificationEditor(props: Props): ReactNode {
   const { t } = useLingui();
-  const color = props.layer.symbology.color;
+  const { symbology } = props.layer;
+  if (symbology.type === "heatmap") {
+    return null;
+  }
+  const color = symbology.color;
   const manualBreaks =
     color.type === "graduated" && color.classification.method === "manual" ?
       color.classification.breaks

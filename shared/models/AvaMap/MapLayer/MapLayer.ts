@@ -21,6 +21,7 @@ import type {
   LayerSymbology, // prettier-ignore
   LayerValueRef as LayerValueRefType,
   NormalizationConfig as NormalizationConfigType,
+  StrokeSpec as StrokeSpecType,
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
   LegendBreak as LegendBreakType,
@@ -66,6 +67,7 @@ export namespace MapLayer {
   export type ClusterSymbology = ClusterSymbologyType;
   export type HeatmapSymbology = HeatmapSymbologyType;
   export type Color = ColorSpecType;
+  export type Stroke = StrokeSpecType;
   export type LayerValue = LayerValueRefType;
   export type Classification = ClassificationConfigType;
   export type Normalization = NormalizationConfigType;

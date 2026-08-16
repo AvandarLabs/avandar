@@ -10,12 +10,16 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 /** Edits the no-data color and optional label override. */
 export function NoDataControls(props: Props): ReactNode {
   const { t } = useLingui();
-  const color = props.layer.symbology.color;
-  if (color.type === "single") {
+  const { symbology } = props.layer;
+  if (symbology.type === "heatmap" || symbology.color.type === "single") {
     return null;
   }
+  const color = symbology.color;
   const update = (noData: typeof color.noData): void => {
     props.onLayerChange((current) => {
+      if (current.symbology.type === "heatmap") {
+        return current;
+      }
       const currentColor = current.symbology.color;
       return currentColor.type === "single" ?
           current

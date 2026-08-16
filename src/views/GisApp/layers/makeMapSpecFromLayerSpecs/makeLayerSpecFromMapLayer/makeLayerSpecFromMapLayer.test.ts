@@ -282,7 +282,7 @@ describe("makeLayerSpecFromMapLayer", () => {
     const layer = {
       ...base,
       symbology: {
-        ...base.symbology,
+        ...MapLayer.createDefaultFillSymbology(),
         color: {
           type: "graduated" as const,
           value: {
