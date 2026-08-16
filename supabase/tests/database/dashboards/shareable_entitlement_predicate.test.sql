@@ -83,7 +83,31 @@ values (
   'viewer'::public.role_level
 );
 
-select plan(6);
+-- The limit resolver reads one subscription row per workspace, and
+-- `subscriptions.workspace_id` is unique, so each case below needs a workspace
+-- of its own. None of them holds a dashboard: what is under test here is the
+-- resolution of the cap, not what is counted against it.
+insert into public.workspaces (id, owner_id, name, slug)
+values
+  ('f1001002-0000-4000-8000-000000000002'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1 no subscription', 'f1-no-subscription-ws'),
+  ('f1001003-0000-4000-8000-000000000003'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1 active free', 'f1-active-free-ws'),
+  ('f1001004-0000-4000-8000-000000000004'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1 active paid', 'f1-active-paid-ws'),
+  ('f1001005-0000-4000-8000-000000000005'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'f1 canceled paid', 'f1-canceled-paid-ws');
+
+-- The two paid rows are identical except for `subscription_status`. That is
+-- what isolates the collapse: a lapsed paid row still carries
+-- `max_shareable_dashboards_allowed = null`, and reading the column directly
+-- would hand unlimited publishing to a workspace that stopped paying.
+insert into public.subscriptions (
+  id, workspace_id, subscription_owner_id, feature_plan_type,
+  subscription_status, max_seats_allowed, max_shareable_dashboards_allowed
+)
+values
+  ('f1007003-0000-4000-8000-000000000003'::uuid, 'f1001003-0000-4000-8000-000000000003'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'free'::public.subscriptions__feature_plan_type, 'active'::public.subscriptions__status, 1, 1),
+  ('f1007004-0000-4000-8000-000000000004'::uuid, 'f1001004-0000-4000-8000-000000000004'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'premium'::public.subscriptions__feature_plan_type, 'active'::public.subscriptions__status, 10, null),
+  ('f1007005-0000-4000-8000-000000000005'::uuid, 'f1001005-0000-4000-8000-000000000005'::uuid, 'f1000001-0000-4000-8000-000000000001'::uuid, 'premium'::public.subscriptions__feature_plan_type, 'canceled'::public.subscriptions__status, 10, null);
+
+select plan(10);
 
 -- The predicate -----------------------------------------------------------
 
@@ -125,6 +149,35 @@ select is(
   public.util__dashboard_counts_as_shareable ('f1005099-0000-4000-8000-000000000099'::uuid),
   false,
   'an unknown dashboard id does not count rather than raising'
+);
+
+-- The limit resolver ------------------------------------------------------
+
+-- No subscription row at all: free tier, not deny-all.
+select is(
+  public.util__workspace_max_shareable_dashboards ('f1001002-0000-4000-8000-000000000002'::uuid),
+  1,
+  'a workspace with no subscription row falls back to the free limit'
+);
+
+select is(
+  public.util__workspace_max_shareable_dashboards ('f1001003-0000-4000-8000-000000000003'::uuid),
+  1,
+  'an active free subscription uses its stored limit'
+);
+
+select is(
+  public.util__workspace_max_shareable_dashboards ('f1001004-0000-4000-8000-000000000004'::uuid),
+  null,
+  'an active paid subscription with a null column is unlimited'
+);
+
+-- The case that matters most. Reading the stored column directly would return
+-- null here, which means unlimited.
+select is(
+  public.util__workspace_max_shareable_dashboards ('f1001005-0000-4000-8000-000000000005'::uuid),
+  1,
+  'a canceled paid subscription collapses to the free limit'
 );
 
 select * from finish();

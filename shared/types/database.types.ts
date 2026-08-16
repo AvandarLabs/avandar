@@ -1751,6 +1751,10 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: boolean
       }
+      util__dashboard_counts_as_shareable: {
+        Args: { p_dashboard_id: string }
+        Returns: boolean
+      }
       util__email_domain: { Args: { p_email: string }; Returns: string }
       util__get_auth_user_app_role: {
         Args: {
@@ -1843,6 +1847,10 @@ export type Database = {
         Args: {
           p_plan: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
         }
+        Returns: number
+      }
+      util__workspace_max_shareable_dashboards: {
+        Args: { p_workspace_id: string }
         Returns: number
       }
     }
