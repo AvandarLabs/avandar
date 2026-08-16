@@ -1735,6 +1735,10 @@ msgstr "Sign Out"
 msgid "Section"
 msgstr "Section"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Scale"
+msgstr "Scale"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
@@ -3461,6 +3465,10 @@ msgstr "Decision"
 msgid "Update failed"
 msgstr "Update failed"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Linear"
+msgstr "Linear"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
@@ -4711,6 +4719,10 @@ msgstr "Rename layer"
 msgid "Request a feature"
 msgstr "Request a feature"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low"
+msgstr "Low"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
@@ -5269,6 +5281,10 @@ msgstr "Import dataset"
 msgid "Pick google sheet"
 msgstr "Pick google sheet"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol sizes from {firstLabel} to {lastLabel}"
+msgstr "Symbol sizes from {firstLabel} to {lastLabel}"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl.tsx
 msgid "Basemap"
 msgstr "Basemap"
@@ -5606,6 +5622,10 @@ msgstr "Choose the first value we see"
 msgid "Data processed successfully"
 msgstr "Data processed successfully"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Smallest radius"
+msgstr "Smallest radius"
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
@@ -5717,6 +5737,10 @@ msgstr "User group deleted"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Monthly billing)"
 msgstr "(Monthly billing)"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol size {firstLabel}"
+msgstr "Symbol size {firstLabel}"
 
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
@@ -6687,6 +6711,10 @@ msgstr "You are currently subscribed to this plan."
 msgid "Upload a dataset"
 msgstr "Upload a dataset"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Square root"
+msgstr "Square root"
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr "Popup"
@@ -6804,6 +6832,10 @@ msgid "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 msgstr "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low to High"
+msgstr "Low to High"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -7184,6 +7216,10 @@ msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} and {groupClause}"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "High"
+msgstr "High"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx

@@ -1744,6 +1744,10 @@ msgstr "Toka"
 msgid "Section"
 msgstr "Sehemu"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Scale"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
@@ -3476,6 +3480,10 @@ msgstr "Uamuzi"
 msgid "Update failed"
 msgstr "Sasisho limefeli"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Linear"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
@@ -4734,6 +4742,10 @@ msgstr ""
 msgid "Request a feature"
 msgstr "Omba kipengele"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
@@ -5292,6 +5304,10 @@ msgstr "Ingiza seti ya data"
 msgid "Pick google sheet"
 msgstr "Chagua karatasi ya google"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol sizes from {firstLabel} to {lastLabel}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl.tsx
 msgid "Basemap"
 msgstr ""
@@ -5634,6 +5650,10 @@ msgstr "Chagua thamani ya kwanza tunayoona"
 msgid "Data processed successfully"
 msgstr "Data imechakatwa kwa mafanikio"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Smallest radius"
+msgstr ""
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
@@ -5748,6 +5768,10 @@ msgstr "Kikundi cha mtumiaji kimefutwa"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Monthly billing)"
 msgstr "(Malipo ya kila mwezi)"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol size {firstLabel}"
+msgstr ""
 
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
@@ -6721,6 +6745,10 @@ msgstr "Kwa sasa umejiandikisha kwa mpango huu."
 msgid "Upload a dataset"
 msgstr "Pakia seti ya data"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Square root"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr ""
@@ -6838,6 +6866,10 @@ msgid "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 msgstr "Kwa kila dataset uliyoongeza, tafadhali eleza ni safu zipi zinapaswa "
 "kutumika kutambulisha {entityConfigName} kipekee."
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low to High"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -7218,6 +7250,10 @@ msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} na {groupClause}"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "High"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx

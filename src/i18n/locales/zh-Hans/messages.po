@@ -1694,6 +1694,10 @@ msgstr "注销"
 msgid "Section"
 msgstr "分区"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Scale"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
@@ -3367,6 +3371,10 @@ msgstr "决策"
 msgid "Update failed"
 msgstr "更新失败"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Linear"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
@@ -4593,6 +4601,10 @@ msgstr ""
 msgid "Request a feature"
 msgstr "请求功能"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
@@ -5141,6 +5153,10 @@ msgstr "导入数据集"
 msgid "Pick google sheet"
 msgstr "选择 Google 表格"
 
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol sizes from {firstLabel} to {lastLabel}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl.tsx
 msgid "Basemap"
 msgstr ""
@@ -5468,6 +5484,10 @@ msgstr "选择我们看到的第一个值"
 msgid "Data processed successfully"
 msgstr "数据处理成功"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Smallest radius"
+msgstr ""
+
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
@@ -5576,6 +5596,10 @@ msgstr "用户组已删除"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Monthly billing)"
 msgstr "（按月计费）"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
+msgid "Symbol size {firstLabel}"
+msgstr ""
 
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
@@ -6526,6 +6550,10 @@ msgstr "您当前已订阅此计划。"
 msgid "Upload a dataset"
 msgstr "上传数据集"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+msgid "Square root"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr ""
@@ -6639,6 +6667,10 @@ msgstr "数据集已保存"
 msgid "For each dataset you've added, please specify which columns should be "
 "used to uniquely identify a {entityConfigName}."
 msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {entityConfigName}。"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "Low to High"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -7005,6 +7037,10 @@ msgstr "要确认，请在下面输入 <0>{confirmationTarget}</0>："
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
+
+#: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
+msgid "High"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
