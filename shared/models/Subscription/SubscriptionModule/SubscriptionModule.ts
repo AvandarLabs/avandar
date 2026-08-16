@@ -36,6 +36,7 @@ export const SubscriptionModule = {
   Permissions: registry<SubscriptionPermission>().keys(
     "can_add_datasets",
     "can_invite_users",
+    "can_publish_shareable_dashboard",
   ),
 
   /**
@@ -117,17 +118,22 @@ export const SubscriptionModule = {
   ): {
     maxSeatsAllowed: number;
     maxDatasetsAllowed: number | undefined;
+    maxShareableDashboardsAllowed: number | undefined;
   } => {
     if (SubscriptionModule.doesSubscriptionGrantEntitlements(subscription)) {
       return {
         maxSeatsAllowed: subscription.maxSeatsAllowed,
         maxDatasetsAllowed: subscription.maxDatasetsAllowed,
+        maxShareableDashboardsAllowed:
+          subscription.maxShareableDashboardsAllowed,
       };
     }
 
     return {
       maxSeatsAllowed: FreePlanLimitsConfig.maxSeatsAllowed,
       maxDatasetsAllowed: FreePlanLimitsConfig.maxDatasetsAllowed,
+      maxShareableDashboardsAllowed:
+        FreePlanLimitsConfig.maxShareableDashboardsAllowed,
     };
   },
 
@@ -238,6 +244,35 @@ export const SubscriptionModule = {
       return (
         maxDatasetsAllowed === undefined ||
         numDatasetsInWorkspace < maxDatasetsAllowed
+      );
+    }
+    return false;
+  },
+
+  /**
+   * Whether the workspace may make one MORE dashboard shareable.
+   *
+   * "Shareable" means reachable by someone other than the owner: published
+   * publicly, or published to the workspace without being private to its
+   * owner. The Postgres mirror of this rule is
+   * `util__dashboard_counts_as_shareable`, and the two are pinned separately.
+   *
+   * Callers must not ask this for a dashboard that ALREADY counts, since
+   * republishing consumes no new allowance.
+   */
+  canPublishShareableDashboard: ({
+    subscription,
+    numShareableDashboardsInWorkspace,
+  }: {
+    subscription: SubscriptionRead | undefined;
+    numShareableDashboardsInWorkspace: number;
+  }): boolean => {
+    if (subscription) {
+      const { maxShareableDashboardsAllowed } =
+        SubscriptionModule.getEffectiveEntitlementLimits(subscription);
+      return (
+        maxShareableDashboardsAllowed === undefined ||
+        numShareableDashboardsInWorkspace < maxShareableDashboardsAllowed
       );
     }
     return false;

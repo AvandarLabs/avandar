@@ -172,6 +172,7 @@ describe("SubscriptionModule billing lifecycle", () => {
     ).toEqual({
       maxSeatsAllowed: 2,
       maxDatasetsAllowed: 5,
+      maxShareableDashboardsAllowed: 1,
     });
 
     expect(
@@ -246,6 +247,66 @@ describe("SubscriptionModule subscription permission access", () => {
       SubscriptionModule.canQuerySubscriptionPermission({
         subscriptionFound: false,
         isWorkspaceMember: false,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("canPublishShareableDashboard", () => {
+  it("allows the first shareable dashboard on the free plan", () => {
+    expect(
+      SubscriptionModule.canPublishShareableDashboard({
+        subscription: _subscription({
+          subscriptionStatus: "active",
+          maxShareableDashboardsAllowed: 1,
+        }),
+        numShareableDashboardsInWorkspace: 0,
+      }),
+    ).toBe(true);
+  });
+
+  it("refuses the second", () => {
+    expect(
+      SubscriptionModule.canPublishShareableDashboard({
+        subscription: _subscription({
+          subscriptionStatus: "active",
+          maxShareableDashboardsAllowed: 1,
+        }),
+        numShareableDashboardsInWorkspace: 1,
+      }),
+    ).toBe(false);
+  });
+
+  it("treats an undefined limit as unlimited", () => {
+    expect(
+      SubscriptionModule.canPublishShareableDashboard({
+        subscription: _subscription({
+          subscriptionStatus: "active",
+          maxShareableDashboardsAllowed: undefined,
+        }),
+        numShareableDashboardsInWorkspace: 99,
+      }),
+    ).toBe(true);
+  });
+
+  it("collapses a lapsed paid subscription to the free limit", () => {
+    // The stored column still says unlimited; the status is what decides.
+    expect(
+      SubscriptionModule.canPublishShareableDashboard({
+        subscription: _subscription({
+          subscriptionStatus: "canceled",
+          maxShareableDashboardsAllowed: undefined,
+        }),
+        numShareableDashboardsInWorkspace: 1,
+      }),
+    ).toBe(false);
+  });
+
+  it("refuses when there is no subscription at all", () => {
+    expect(
+      SubscriptionModule.canPublishShareableDashboard({
+        subscription: undefined,
+        numShareableDashboardsInWorkspace: 0,
       }),
     ).toBe(false);
   });

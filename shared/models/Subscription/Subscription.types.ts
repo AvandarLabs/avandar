@@ -10,7 +10,10 @@ export type SubscriptionPolarId = UUID<"PolarSubscription">;
 /** Primary key of the `subscriptions` table in Supabase. */
 export type SubscriptionId = UUID<"Subscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
-export type SubscriptionPermission = "can_add_datasets" | "can_invite_users";
+export type SubscriptionPermission =
+  | "can_add_datasets"
+  | "can_invite_users"
+  | "can_publish_shareable_dashboard";
 
 /**
  * Workspace feature plan resolution. `no_subscription` means the workspace
