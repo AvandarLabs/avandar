@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => {
     isOnline: true,
     canPublishPublicly: true,
     resourceRole: "admin" as string,
+    isLoadingResourceRole: false,
     canManageShares: undefined as boolean | undefined,
     normalisedSlug: "",
     hasPendingSlugCheck: false,
@@ -71,10 +72,12 @@ vi.mock(
   },
 );
 
+// Mocked at the role hook rather than at `useShareButtonState`, so the rule
+// the modal shares with the Share button stays under test here too.
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {
     useResourceRole: (): readonly [string, boolean] => {
-      return [mocks.resourceRole, false] as const;
+      return [mocks.resourceRole, mocks.isLoadingResourceRole] as const;
     },
   };
 });
@@ -135,6 +138,7 @@ describe("DashboardShareModal", () => {
     mocks.isOnline = true;
     mocks.canPublishPublicly = true;
     mocks.resourceRole = "admin";
+    mocks.isLoadingResourceRole = false;
     mocks.canManageShares = undefined;
     mocks.normalisedSlug = "";
     mocks.hasPendingSlugCheck = false;
@@ -184,6 +188,22 @@ describe("DashboardShareModal", () => {
     renderModal();
 
     expect(mocks.canManageShares).toBe(true);
+  });
+
+  // "Not an admin" and "we have not asked yet" are different answers. Passing
+  // the unknown one through as `false` renders the sharing half read-only and
+  // then flips it editable when the role RPC lands, which reads as the modal
+  // changing its mind about what the user may do.
+  it("renders nothing sharing-related until the role answer arrives", () => {
+    mocks.isLoadingResourceRole = true;
+
+    renderModal();
+
+    expect(mocks.canManageShares).toBeUndefined();
+    expect(
+      screen.queryByRole("button", { name: "Publish to workspace" }),
+    ).toBeNull();
+    expect(screen.getByText("Loading sharing settings…")).toBeInTheDocument();
   });
 
   it("blocks publishing while offline", () => {

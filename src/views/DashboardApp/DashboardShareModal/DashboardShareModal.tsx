@@ -1,8 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Stack, Text } from "@mantine/core";
 import { useCallback, useState } from "react";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
+import { useShareButtonState } from "@/components/permissions/useShareButtonState/useShareButtonState";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
-import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions";
 import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/PublishingSection";
@@ -36,22 +37,28 @@ export function DashboardShareModal({
   const canPublishPublicly = useHasPermission(
     "dashboards__can_publish_publicly",
   );
-  // The button opens at `editor` so an editor can publish, but writing share
-  // rows stays admin-tier: the modal renders its sharing half read-only rather
-  // than refusing to open.
-  const [effectiveRole] = useResourceRole({
+  // The same hook the Share button uses, so the "may I write share rows" rule
+  // lives in one place. It opens at `editor` so an editor can publish, but
+  // writing share rows stays admin-tier: the modal renders its sharing half
+  // read-only rather than refusing to open.
+  const { canManageShares, isLoadingRole } = useShareButtonState({
     resourceType: "dashboard",
     resourceId: dashboard.id,
+    minRole: "editor",
   });
   // Declared before the publishing hook because that hook needs the setter:
   // when the database refuses a publish the UI gate let through, the refusal
   // opens the same modal the gate's own Upgrade button opens.
   const [isUpgradeModalOpened, setIsUpgradeModalOpened] = useState(false);
+  // Hoisted rather than written inline in the argument object: `useCallback`
+  // called inside a literal still runs every render, and the literal is new
+  // every render anyway, so inline buys no memoization at all.
+  const onShareableLimitReached = useCallback(() => {
+    setIsUpgradeModalOpened(true);
+  }, []);
   const publishing = useDashboardPublishingControl({
     dashboard,
-    onShareableLimitReached: useCallback(() => {
-      setIsUpgradeModalOpened(true);
-    }, []),
+    onShareableLimitReached,
   });
   const limit = useShareableDashboardLimit({
     dashboard: publishing.currentDashboard,
@@ -80,6 +87,22 @@ export function DashboardShareModal({
   const isBlockedReason =
     otherBlockedReason ?? (isBlockedByPlan ? planLimitMessage : undefined);
 
+  // "Not an admin" and "we have not asked yet" are different answers, and
+  // `canManageShares` collapses them into `false`. Rendering on the unknown
+  // one would draw the sharing half read-only and then flip it editable when
+  // the role RPC lands, which reads as the modal changing its mind about what
+  // the user is allowed to do. This is the same line `ShareResourceModal`
+  // shows while its own lookups are in flight.
+  if (isLoadingRole) {
+    return (
+      <Stack gap="md">
+        <Text>
+          <Trans>Loading sharing settings…</Trans>
+        </Text>
+      </Stack>
+    );
+  }
+
   return (
     <>
       <ShareableLimitReachedModal
@@ -93,7 +116,7 @@ export function DashboardShareModal({
         resourceName={dashboard.name}
         resourceType="dashboard"
         resourceId={dashboard.id}
-        canManageShares={effectiveRole === "admin"}
+        canManageShares={canManageShares}
         onClose={onClose}
         publishing={{
           targetVisibility: publishing.targetVisibility,
