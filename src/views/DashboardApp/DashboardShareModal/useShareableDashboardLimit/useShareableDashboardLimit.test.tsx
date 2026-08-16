@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
-import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit";
+import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
 import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Subscription } from "$/models/Subscription/Subscription";

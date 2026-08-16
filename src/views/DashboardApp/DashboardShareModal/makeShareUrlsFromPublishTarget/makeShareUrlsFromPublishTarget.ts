@@ -41,7 +41,9 @@ type Options = {
  * rather than the legacy `/public/dashboards/...` path, which survives only as
  * a redirect for QR codes already in circulation.
  */
-export function buildShareUrls(args: Readonly<Options>): ShareUrls {
+export function makeShareUrlsFromPublishTarget(
+  args: Readonly<Options>,
+): ShareUrls {
   const base = _origin().replace(/\/$/, "");
   const prefix =
     args.visibility === "public" ?

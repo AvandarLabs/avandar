@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
-import { useShareButtonState } from "@/components/permissions/useShareButtonState/useShareButtonState";
+import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
 import type { ButtonProps } from "@mantine/core";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

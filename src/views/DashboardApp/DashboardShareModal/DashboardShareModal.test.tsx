@@ -25,7 +25,7 @@ const mocks = vi.hoisted(() => {
 });
 
 vi.mock(
-  "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit",
+  "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit",
   () => {
     return {
       useShareableDashboardLimit: () => {
@@ -99,7 +99,7 @@ vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
 });
 
 vi.mock(
-  "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl",
+  "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl",
   () => {
     return {
       useDashboardPublishingControl: () => {

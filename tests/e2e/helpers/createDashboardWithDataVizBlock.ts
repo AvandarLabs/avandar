@@ -98,7 +98,7 @@ export async function createDashboardWithDataVizBlock(
     ownerEmail,
     workspaceId,
   });
-  const config = DashboardSeedHelpers.makeConfig({
+  const config = DashboardSeedHelpers.makeDashboardConfigFromContent({
     title: dashboardName,
     content: _makeDataVizContent({ blockId, rawSql, vizConfig }),
   });

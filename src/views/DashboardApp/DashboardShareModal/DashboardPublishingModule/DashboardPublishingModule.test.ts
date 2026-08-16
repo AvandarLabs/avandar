@@ -1,33 +1,41 @@
 import { describe, expect, it } from "vitest";
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 
-describe("targetVisibilityFor", () => {
+describe("getTargetVisibilityFromGeneralAccessValue", () => {
   it("maps Only me to draft, because a published copy for an audience of one is pure cost", () => {
-    expect(DashboardPublishingModule.targetVisibilityFor("private")).toBe(
-      "draft",
-    );
+    expect(
+      DashboardPublishingModule.getTargetVisibilityFromGeneralAccessValue(
+        "private",
+      ),
+    ).toBe("draft");
   });
 
   it("maps Restricted to workspace, which is the internal-report shape", () => {
-    expect(DashboardPublishingModule.targetVisibilityFor("restricted")).toBe(
-      "workspace",
-    );
+    expect(
+      DashboardPublishingModule.getTargetVisibilityFromGeneralAccessValue(
+        "restricted",
+      ),
+    ).toBe("workspace");
   });
 
   it("maps the workspace-wide value to workspace", () => {
-    expect(DashboardPublishingModule.targetVisibilityFor("workspace")).toBe(
-      "workspace",
-    );
+    expect(
+      DashboardPublishingModule.getTargetVisibilityFromGeneralAccessValue(
+        "workspace",
+      ),
+    ).toBe("workspace");
   });
 
   it("maps Anyone with the link to public", () => {
-    expect(DashboardPublishingModule.targetVisibilityFor("public")).toBe(
-      "public",
-    );
+    expect(
+      DashboardPublishingModule.getTargetVisibilityFromGeneralAccessValue(
+        "public",
+      ),
+    ).toBe("public");
   });
 });
 
-describe("getPublishActionKind", () => {
+describe("getPublishActionKindFromVisibilities", () => {
   const cases = [
     { visibility: "draft", target: "draft", expected: "disabled_no_audience" },
     { visibility: "draft", target: "workspace", expected: "publish_workspace" },
@@ -44,7 +52,7 @@ describe("getPublishActionKind", () => {
     "$visibility -> $target is $expected",
     ({ visibility, target, expected }) => {
       expect(
-        DashboardPublishingModule.getPublishActionKind({
+        DashboardPublishingModule.getPublishActionKindFromVisibilities({
           visibility,
           targetVisibility: target,
         }),

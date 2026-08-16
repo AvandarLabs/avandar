@@ -10,7 +10,7 @@
  * Returns an empty string when the input collapses to nothing: callers
  * should treat empty-string as "no vanity, publish without a slug".
  */
-export function toVanitySlug(input: string): string {
+export function makeVanitySlugFromText(input: string): string {
   return input
     .toLowerCase()
     .normalize("NFKD")

@@ -46,7 +46,10 @@ export async function seedDashboard(
   });
   const dashboardSeed = {
     admin,
-    config: DashboardSeedHelpers.makeConfig({ content: [], title: name }),
+    config: DashboardSeedHelpers.makeDashboardConfigFromContent({
+      content: [],
+      title: name,
+    }),
     failureMessage: "Failed to seed dashboard",
     isRestricted,
     missingRowMessage: "Dashboard seed returned no row",

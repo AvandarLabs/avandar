@@ -2,14 +2,14 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { useCallback, useState } from "react";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
-import { useShareButtonState } from "@/components/permissions/useShareButtonState/useShareButtonState";
+import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
-import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions";
+import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions";
 import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/PublishingSection";
 import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal";
-import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl";
-import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit";
+import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
+import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
 

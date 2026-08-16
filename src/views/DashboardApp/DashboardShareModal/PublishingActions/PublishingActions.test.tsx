@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
-import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions";
+import { PublishingActions } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions";
 
 const noop = vi.fn();
 

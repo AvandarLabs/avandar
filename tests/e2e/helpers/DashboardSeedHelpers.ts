@@ -58,7 +58,7 @@ async function _getOwner(
   return { profileId: profile.id, userId };
 }
 
-function _makeConfig(
+function _makeDashboardConfigFromContent(
   options: Readonly<{ content: readonly unknown[]; title: string }>,
 ): Record<string, unknown> {
   return {
@@ -119,5 +119,5 @@ export const DashboardSeedHelpers = {
   /** Insert a dashboard row for a browser test fixture. */
   insertDashboard: _insertDashboard,
   /** Build the persisted dashboard config for seeded content. */
-  makeConfig: _makeConfig,
+  makeDashboardConfigFromContent: _makeDashboardConfigFromContent,
 };

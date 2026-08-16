@@ -8,10 +8,10 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 import { makeDashboardPublishAnalyticsEventFromDashboards } from "@/views/DashboardApp/DashboardShareModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards";
-import { toVanitySlug } from "@/views/DashboardApp/DashboardShareModal/toVanitySlug/toVanitySlug";
+import { makeShareUrlsFromPublishTarget } from "@/views/DashboardApp/DashboardShareModal/makeShareUrlsFromPublishTarget/makeShareUrlsFromPublishTarget";
+import { makeVanitySlugFromText } from "@/views/DashboardApp/DashboardShareModal/makeVanitySlugFromText/makeVanitySlugFromText";
 import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
@@ -58,7 +58,7 @@ type DashboardPublishingControl = SlugValidationState & {
   targetVisibility: Dashboard.Visibility;
   actionKind: PublishActionKind;
   isBusy: boolean;
-  shareUrls: ReturnType<typeof buildShareUrls>;
+  shareUrls: ReturnType<typeof makeShareUrlsFromPublishTarget>;
   urlPrefix: string;
   slugInput: string;
   normalisedSlug: string;
@@ -266,17 +266,18 @@ export function useDashboardPublishingControl(
   const [targetVisibility, setTargetVisibility] =
     useState<Dashboard.Visibility>(options.dashboard.visibility);
   const [slugInput, setSlugInput] = useState(currentDashboard.slug ?? "");
-  const normalisedSlug = toVanitySlug(slugInput);
+  const normalisedSlug = makeVanitySlugFromText(slugInput);
   const [publishConfig, setPublishConfig] = useState(() => {
     return DashboardSliceBuilder.readDashboardPublishConfig(
       currentDashboard.config,
     );
   });
 
-  const actionKind = DashboardPublishingModule.getPublishActionKind({
-    visibility: currentDashboard.visibility,
-    targetVisibility,
-  });
+  const actionKind =
+    DashboardPublishingModule.getPublishActionKindFromVisibilities({
+      visibility: currentDashboard.visibility,
+      targetVisibility,
+    });
 
   const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
     onSuccess: (updatedDashboard) => {
@@ -401,7 +402,7 @@ export function useDashboardPublishingControl(
   ]);
 
   const urlVisibility = targetVisibility === "public" ? "public" : "workspace";
-  const shareUrls = buildShareUrls({
+  const shareUrls = makeShareUrlsFromPublishTarget({
     workspaceSlug: workspace.slug,
     dashboardId: currentDashboard.id,
     slug: normalisedSlug || currentDashboard.slug,
@@ -421,7 +422,11 @@ export function useDashboardPublishingControl(
     onSlugInputChange: setSlugInput,
     onPublishConfigChange: setPublishConfig,
     onGeneralAccessChange: (value) => {
-      setTargetVisibility(DashboardPublishingModule.targetVisibilityFor(value));
+      setTargetVisibility(
+        DashboardPublishingModule.getTargetVisibilityFromGeneralAccessValue(
+          value,
+        ),
+      );
     },
     onPrimaryAction,
     ...slugValidation,

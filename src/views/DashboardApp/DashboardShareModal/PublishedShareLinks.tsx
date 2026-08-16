@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack, Title } from "@mantine/core";
 import { ShareUrlRow } from "@/views/DashboardApp/DashboardShareModal/ShareUrlRow";
-import type { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
+import type { makeShareUrlsFromPublishTarget } from "@/views/DashboardApp/DashboardShareModal/makeShareUrlsFromPublishTarget/makeShareUrlsFromPublishTarget";
 import type { ReactNode } from "react";
 
 type Props = {
-  shareUrls: ReturnType<typeof buildShareUrls>;
+  shareUrls: ReturnType<typeof makeShareUrlsFromPublishTarget>;
 };
 
 /** Renders copy and QR controls for published dashboard URLs. */

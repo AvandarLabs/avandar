@@ -15,7 +15,7 @@ import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/P
 import type {
   FilterableColumn,
   PublishSliceDataset,
-} from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
+} from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

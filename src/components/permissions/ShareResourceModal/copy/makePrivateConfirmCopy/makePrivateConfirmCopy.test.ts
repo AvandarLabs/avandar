@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makePrivateConfirmCopy } from "@/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy";
+import { makePrivateConfirmCopy } from "@/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy";
 
 describe("makePrivateConfirmCopy", () => {
   it("warns that a public dashboard stays readable until it is unpublished", () => {

@@ -18,11 +18,31 @@ export type PublishActionKind =
   | "unpublish"
   | "disabled_no_audience";
 
-function _targetVisibilityFor(value: GeneralAccessValue): Dashboard.Visibility {
+/**
+ * Which publication state a General access value asks for.
+ *
+ * "Only me" targets `draft` on purpose: publishing keeps a snapshot object and
+ * a live URL alive, and doing that for an audience of one is storage and risk
+ * with no reader. "Restricted" targets `workspace` because a restricted but
+ * published dashboard is exactly the internal-report-for-three-people shape
+ * this feature was asked for.
+ */
+function _getTargetVisibilityFromGeneralAccessValue(
+  value: GeneralAccessValue,
+): Dashboard.Visibility {
   return _TARGET_VISIBILITY_BY_ACCESS_VALUE[value];
 }
 
-function _getPublishActionKind(
+/**
+ * Resolves the primary action from what is persisted and what the dropdown
+ * currently asks for.
+ *
+ * Every kind except `unpublish` and `disabled_no_audience` calls
+ * `publishDashboard` with the target visibility; the kinds differ only in the
+ * label, because "Publish", "Update & republish", and "Make internal" are three
+ * very different sentences for the same call.
+ */
+function _getPublishActionKindFromVisibilities(
   options: Readonly<{
     visibility: Dashboard.Visibility;
     targetVisibility: Dashboard.Visibility;
@@ -55,7 +75,8 @@ export const DashboardPublishingModule = {
    * but published dashboard is exactly the
    * internal-report-for-three-people shape this feature was asked for.
    */
-  targetVisibilityFor: _targetVisibilityFor,
+  getTargetVisibilityFromGeneralAccessValue:
+    _getTargetVisibilityFromGeneralAccessValue,
 
   /**
    * Resolves the primary action from what is persisted and what the dropdown
@@ -66,5 +87,5 @@ export const DashboardPublishingModule = {
    * label, because "Publish", "Update & republish", and "Make internal" are
    * three very different sentences for the same call.
    */
-  getPublishActionKind: _getPublishActionKind,
+  getPublishActionKindFromVisibilities: _getPublishActionKindFromVisibilities,
 } as const;

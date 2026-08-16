@@ -4,7 +4,7 @@ import { Radio, Stack } from "@mantine/core";
 import { CustomSliceEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor";
 import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardShareModal/QueriedSlicePreview";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection.types";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {

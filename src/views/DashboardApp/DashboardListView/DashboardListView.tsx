@@ -23,7 +23,7 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
-import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
+import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import { sortDashboardsForList } from "@/views/DashboardApp/DashboardListView/sortDashboardsForList/sortDashboardsForList";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { UserId } from "$/models/User/User.types";
