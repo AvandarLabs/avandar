@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ClassificationEditor } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
 import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSection/FilterSection";
@@ -9,6 +10,7 @@ import { MatchReport } from "@/views/GisApp/panels/LayerInspector/MatchReport/Ma
 import { PopupSection } from "@/views/GisApp/panels/LayerInspector/PopupSection/PopupSection";
 import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
+import { CoordinateValidationReport } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type {
   LayerChangeHandler,
@@ -61,6 +63,17 @@ export function LayerInspectorBody({
         layer={layer}
         onLayerChange={onLayerChange}
         onBack={onCloseMatchReport}
+      />
+    );
+  }
+  if (inspectorView.type === "validationReport") {
+    return (
+      <CoordinateValidationReport
+        drops={viewState?.drops ?? []}
+        onBack={onCloseMatchReport}
+        onSwapLatLng={() => {
+          onLayerChange(MapLayerUpdates.swapLatLngColumns);
+        }}
       />
     );
   }

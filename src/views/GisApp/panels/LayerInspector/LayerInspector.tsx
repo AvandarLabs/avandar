@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
@@ -18,6 +18,8 @@ type Props = {
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
   onLayerChange: LayerChangeHandler;
+  inspectorView: LayerInspectorView;
+  onInspectorViewChange: (view: LayerInspectorView) => void;
   filterFocusRequest?: number;
 };
 
@@ -25,7 +27,8 @@ type Props = {
 export type LayerInspectorView =
   | { type: "sections" }
   | { type: "matchReport" }
-  | { type: "classification" };
+  | { type: "classification" }
+  | { type: "validationReport" };
 
 /** The selected layer's editor, sectioned by the model's axes. */
 export function LayerInspector({
@@ -34,12 +37,11 @@ export function LayerInspector({
   isCollapsed,
   onToggleCollapsed,
   onLayerChange,
+  inspectorView,
+  onInspectorViewChange,
   filterFocusRequest,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const [inspectorView, setInspectorView] = useState<LayerInspectorView>({
-    type: "sections",
-  });
   const openedFingerprints = useRef(new Set<string>());
   const autoOpenEligibleLayerIds = useRef(
     new Set<MapLayer.Id>(
@@ -67,9 +69,9 @@ export function LayerInspector({
     const fingerprint = `${layer.id}:${JSON.stringify(diagnostics)}`;
     if (!openedFingerprints.current.has(fingerprint)) {
       openedFingerprints.current.add(fingerprint);
-      setInspectorView({ type: "matchReport" });
+      onInspectorViewChange({ type: "matchReport" });
     }
-  }, [diagnostics, layer]);
+  }, [diagnostics, layer, onInspectorViewChange]);
   return (
     <MapChromePanel
       variant="inspector"
@@ -88,13 +90,13 @@ export function LayerInspector({
         filterFocusRequest={filterFocusRequest}
         inspectorView={inspectorView}
         onOpenMatchReport={() => {
-          setInspectorView({ type: "matchReport" });
+          onInspectorViewChange({ type: "matchReport" });
         }}
         onOpenClassification={() => {
-          setInspectorView({ type: "classification" });
+          onInspectorViewChange({ type: "classification" });
         }}
         onCloseMatchReport={() => {
-          setInspectorView({ type: "sections" });
+          onInspectorViewChange({ type: "sections" });
         }}
       />
     </MapChromePanel>

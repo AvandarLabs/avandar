@@ -1,5 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
+import { Button } from "@mantine/core";
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { I18n } from "@lingui/core";
@@ -10,6 +11,7 @@ type Props = {
   totalRowCount: number;
   largestDropReason: MapLayerViewState["largestDropReason"];
   i18n: I18n;
+  onSeeWhy: () => void;
 };
 
 /** Renders the partial mapping message for the selected layer. */
@@ -18,6 +20,7 @@ export function MapPartialMappingStatus({
   totalRowCount,
   largestDropReason,
   i18n,
+  onSeeWhy,
 }: Props): ReactNode {
   const reasonMessage = matchLiteral(largestDropReason ?? "nullCoordinate", {
     suspectedLatLngSwap: msg`Some rows look like their latitude and longitude are swapped.`,
@@ -34,6 +37,9 @@ export function MapPartialMappingStatus({
         )}
       </span>
       <span className={css.mapStatusCardBody}>{i18n._(reasonMessage)}</span>
+      <Button size="compact-xs" variant="default" onClick={onSeeWhy}>
+        {i18n._(msg`See why`)}
+      </Button>
     </>
   );
 }

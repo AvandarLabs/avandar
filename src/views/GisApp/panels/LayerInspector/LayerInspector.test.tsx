@@ -43,11 +43,15 @@ function _layer(geoBinding: MapLayer.GeoBinding | undefined): MapLayer.T {
 function _renderInspector(options: {
   layer: MapLayer.T;
   viewState?: MapLayerViewState;
+  inspectorView?: { type: "sections" | "validationReport" };
+  onInspectorViewChange?: (view: { type: string }) => void;
 }) {
   return render(
     <LayerInspector
       layer={options.layer}
       viewState={options.viewState}
+      inspectorView={options.inspectorView ?? { type: "sections" }}
+      onInspectorViewChange={options.onInspectorViewChange ?? vi.fn()}
       isCollapsed={false}
       onToggleCollapsed={vi.fn()}
       onLayerChange={vi.fn()}
@@ -56,12 +60,18 @@ function _renderInspector(options: {
 }
 
 it("does not interrupt a newly configured boundary join", async () => {
-  const { rerender } = _renderInspector({ layer: _layer(undefined) });
+  const onInspectorViewChange = vi.fn();
+  const { rerender } = _renderInspector({
+    layer: _layer(undefined),
+    onInspectorViewChange,
+  });
 
   rerender(
     <LayerInspector
       layer={_layer({ type: "joinToBoundaries" } as MapLayer.GeoBinding)}
       viewState={FULLY_UNMATCHED_STATE}
+      inspectorView={{ type: "sections" }}
+      onInspectorViewChange={onInspectorViewChange}
       isCollapsed={false}
       onToggleCollapsed={vi.fn()}
       onLayerChange={vi.fn()}
@@ -69,17 +79,28 @@ it("does not interrupt a newly configured boundary join", async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByText("sections")).toBeInTheDocument();
+    expect(onInspectorViewChange).not.toHaveBeenCalled();
   });
 });
 
 it("opens the report for a fully unmatched persisted boundary join", async () => {
+  const onInspectorViewChange = vi.fn();
   _renderInspector({
     layer: _layer({ type: "joinToBoundaries" } as MapLayer.GeoBinding),
     viewState: FULLY_UNMATCHED_STATE,
+    onInspectorViewChange,
   });
 
   await waitFor(() => {
-    expect(screen.getByText("matchReport")).toBeInTheDocument();
+    expect(onInspectorViewChange).toHaveBeenCalledWith({ type: "matchReport" });
   });
+});
+
+it("renders the coordinate validation view supplied by the app", () => {
+  _renderInspector({
+    layer: _layer({ type: "latLngColumns" } as MapLayer.GeoBinding),
+    inspectorView: { type: "validationReport" },
+  });
+
+  expect(screen.getByText("validationReport")).toBeInTheDocument();
 });

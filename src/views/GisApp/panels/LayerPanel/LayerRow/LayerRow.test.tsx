@@ -21,6 +21,7 @@ const VIEW_STATE: MapLayerViewState = {
   error: undefined,
   featureCount: 1,
   droppedRowCount: 0,
+  drops: [],
   largestDropReason: undefined,
   filterCount: 0,
   onRetry: vi.fn(),

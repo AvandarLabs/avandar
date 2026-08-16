@@ -15,6 +15,9 @@ type Props = {
 
   /** Opens the selected layer's Filter section. */
   onReviewFilter: () => void;
+
+  /** Opens the selected layer's coordinate validation report. */
+  onSeeWhy: () => void;
 };
 
 /** The selected layer's status, when it needs an action. */
@@ -22,6 +25,7 @@ export function MapStatusCard({
   layer,
   viewState,
   onReviewFilter,
+  onSeeWhy,
 }: Props): ReactNode {
   const { i18n } = useLingui();
   const [areDetailsOpen, setAreDetailsOpen] = useState(false);
@@ -72,6 +76,7 @@ export function MapStatusCard({
             });
           }}
           onReviewFilter={onReviewFilter}
+          onSeeWhy={onSeeWhy}
         />
       </span>
     </div>

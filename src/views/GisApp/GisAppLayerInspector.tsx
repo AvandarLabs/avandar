@@ -21,6 +21,8 @@ export function GisAppLayerInspector({
           app.layerViewStates.get(app.selectedLayerId)
         : undefined
       }
+      inspectorView={app.inspectorView}
+      onInspectorViewChange={app.onInspectorViewChange}
       isCollapsed={app.panelState.inspector}
       onToggleCollapsed={() => {
         app.togglePanel("inspector");

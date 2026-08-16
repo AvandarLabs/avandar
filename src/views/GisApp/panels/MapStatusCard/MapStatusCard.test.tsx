@@ -16,6 +16,7 @@ function _makeViewState(
     status: "ready",
     error: undefined,
     featureCount: 3,
+    drops: [],
     droppedRowCount: 0,
     largestDropReason: undefined,
     filterCount: 0,
@@ -30,6 +31,7 @@ describe("MapStatusCard", () => {
       <MapStatusCard
         layer={_makeLayer()}
         viewState={_makeViewState({ status: "ready" })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={vi.fn()}
       />,
     );
@@ -47,6 +49,7 @@ describe("MapStatusCard", () => {
           error: new Error("Dataset is offline"),
           onRetry,
         })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={vi.fn()}
       />,
     );
@@ -66,6 +69,7 @@ describe("MapStatusCard", () => {
           status: "error",
           error: new SensitivityViolationError("aggregateOnly"),
         })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={vi.fn()}
       />,
     );
@@ -85,6 +89,7 @@ describe("MapStatusCard", () => {
       <MapStatusCard
         layer={_makeLayer()}
         viewState={_makeViewState({ status: "empty", filterCount: 2 })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={onReviewFilter}
       />,
     );
@@ -100,6 +105,7 @@ describe("MapStatusCard", () => {
   });
 
   it("explains why rows were dropped from a partial mapping", () => {
+    const onSeeWhy = vi.fn();
     render(
       <MapStatusCard
         layer={_makeLayer()}
@@ -109,6 +115,7 @@ describe("MapStatusCard", () => {
           droppedRowCount: 2,
           largestDropReason: "nullIsland",
         })}
+        onSeeWhy={onSeeWhy}
         onReviewFilter={vi.fn()}
       />,
     );
@@ -117,6 +124,8 @@ describe("MapStatusCard", () => {
       screen.getByText("2 of 5 rows could not be mapped"),
     ).toBeInTheDocument();
     expect(screen.getByText("Some coordinates are 0, 0.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "See why" }));
+    expect(onSeeWhy).toHaveBeenCalledOnce();
   });
 
   it("explains suppressed areas without exposing exact counts", () => {
@@ -124,6 +133,7 @@ describe("MapStatusCard", () => {
       <MapStatusCard
         layer={_makeLayer()}
         viewState={_makeViewState({ suppressedCount: 2 })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={vi.fn()}
       />,
     );
@@ -146,6 +156,7 @@ describe("MapStatusCard", () => {
             "DuckDB Spatial is unavailable for this geometry layer",
           ),
         })}
+        onSeeWhy={vi.fn()}
         onReviewFilter={vi.fn()}
       />,
     );

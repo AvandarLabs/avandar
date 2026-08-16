@@ -14,6 +14,9 @@ export function GisAppStatusCard({ app }: Props): ReactNode {
           app.layerViewStates.get(app.selectedLayerId)
         : undefined
       }
+      onSeeWhy={() => {
+        app.onInspectorViewChange({ type: "validationReport" });
+      }}
       onReviewFilter={app.onReviewFilter}
     />
   );

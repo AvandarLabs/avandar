@@ -131,6 +131,7 @@ function _makeLayerViewState({
     error,
     featureCount: geometry.featureCollection.features.length,
     droppedRowCount,
+    drops: geometry.drops,
     largestDropReason: _getLargestDropReason(geometry.drops),
     spatialDiagnostics:
       queryState?.data?.type === "spatial" ?

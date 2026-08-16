@@ -8,6 +8,7 @@ function _state(overrides: Partial<MapLayerViewState>): MapLayerViewState {
     error: undefined,
     featureCount: 3,
     droppedRowCount: 0,
+    drops: [],
     largestDropReason: undefined,
     filterCount: 0,
     onRetry: vi.fn(),

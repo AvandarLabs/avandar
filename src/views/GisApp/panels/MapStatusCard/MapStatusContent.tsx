@@ -21,6 +21,7 @@ type Props = {
   areDetailsOpen: boolean;
   onToggleDetails: () => void;
   onReviewFilter: () => void;
+  onSeeWhy: () => void;
 };
 
 /** Renders the selected layer's status-specific content. */
@@ -33,6 +34,7 @@ export function MapStatusContent({
   areDetailsOpen,
   onToggleDetails,
   onReviewFilter,
+  onSeeWhy,
 }: Props): ReactNode {
   const operationalState = getMapLayerOperationalState(viewState);
   if (operationalState.type === "rebindRequired") {
@@ -129,6 +131,7 @@ export function MapStatusContent({
             totalRowCount={totalRowCount}
             largestDropReason={viewState.largestDropReason}
             i18n={i18n}
+            onSeeWhy={onSeeWhy}
           />
         : null;
     },

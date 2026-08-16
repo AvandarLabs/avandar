@@ -1,5 +1,8 @@
 import type { MapLayerSpatialDiagnostics } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.types";
-import type { DropReason } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import type {
+  DropReason,
+  GeometryDropReport,
+} from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 
 /** The data health state shared by every surface that reports one map layer. */
 export type MapLayerViewState = {
@@ -12,6 +15,9 @@ export type MapLayerViewState = {
 
   /** Rows the geometry conversion could not place. */
   droppedRowCount: number;
+
+  /** Coordinate validation reports for rows the layer could not place. */
+  drops: readonly GeometryDropReport[];
 
   /** The most frequent reason rows were dropped, when any were dropped. */
   largestDropReason: DropReason | undefined;

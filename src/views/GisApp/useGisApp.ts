@@ -14,6 +14,7 @@ import { ChromePanelState } from "@/views/GisApp/shell/ChromePanelState/ChromePa
 import { useMapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
+import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dispatch, SetStateAction } from "react";
@@ -32,6 +33,33 @@ function useGisAppInspectorFocus(expandPanel: (panel: "inspector") => void): {
   };
 
   return { filterFocusRequest, onReviewFilter };
+}
+
+/** Shares inspector navigation across the inspector and status card. */
+function useGisAppInspectorNavigation(
+  chrome: ReturnType<typeof useGisAppChrome>,
+): {
+  inspectorView: LayerInspectorView;
+  onInspectorViewChange: (view: LayerInspectorView) => void;
+} {
+  const [inspectorView, setInspectorView] = useState<LayerInspectorView>({
+    type: "sections",
+  });
+  const onInspectorViewChange = useCallback(
+    (view: LayerInspectorView) => {
+      const isFocusedEditor =
+        view.type === "classification" || view.type === "validationReport";
+      if (isFocusedEditor) {
+        chrome.expandPanel("inspector");
+        if (chrome.panelState.layers === false) {
+          chrome.togglePanel("layers");
+        }
+      }
+      setInspectorView(view);
+    },
+    [chrome],
+  );
+  return { inspectorView, onInspectorViewChange };
 }
 
 /** Keeps the selected layer valid independently from the current map config. */
@@ -213,6 +241,7 @@ function useGisAppState(
   ReturnType<typeof useAvaMapEditor> &
   ReturnType<typeof useFeatureInspector> &
   ReturnType<typeof useGisAppInspectorFocus> &
+  ReturnType<typeof useGisAppInspectorNavigation> &
   ReturnType<typeof useGisAppRendering> &
   ReturnType<typeof useGisAppLayerSelection> & { avaMap: AvaMap.T } {
   const editor = useAvaMapEditor(avaMap);
@@ -220,6 +249,7 @@ function useGisAppState(
   const featureInspector = useFeatureInspector();
   const chrome = useGisAppChrome();
   const inspectorFocus = useGisAppInspectorFocus(chrome.expandPanel);
+  const inspectorNavigation = useGisAppInspectorNavigation(chrome);
   const rendering = useGisAppRendering({ avaMap, chrome, editor });
   const callbacks = useGisAppMapCallbacks({
     editor,
@@ -236,6 +266,7 @@ function useGisAppState(
     ...editor,
     ...featureInspector,
     ...inspectorFocus,
+    ...inspectorNavigation,
     ...rendering,
     ...selection,
     avaMap,
