@@ -53,7 +53,7 @@ msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr "1 個群組"
 
@@ -303,7 +303,7 @@ msgstr "側邊欄版面配置"
 msgid "Delete failed"
 msgstr "刪除失敗"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr ""
@@ -386,7 +386,7 @@ msgid "Export annotated PDF"
 msgstr "導出註解 PDF"
 
 #. placeholder {0}: options.failure.limit ?? 64
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "自訂 URL 不得超過 {0} 個字元"
 
@@ -424,7 +424,7 @@ msgstr "要更好地控制您的訂閱，您可以在您的訂閱中進行管理
 msgid "Extra large"
 msgstr "特大"
 
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
 "track key metrics and insights."
 msgstr ""
@@ -461,7 +461,7 @@ msgstr "等寬標題"
 msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "如果您有 4 GB RAM，或需要最精簡的下載內容，建議使用此選項。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "1 人"
 
@@ -587,7 +587,7 @@ msgstr "內容"
 msgid "Use suggestion"
 msgstr "使用建議"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Unpublish"
 msgstr ""
 
@@ -618,7 +618,7 @@ msgstr "表格"
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr "{shareClause} 將失去存取權限。"
 
@@ -656,7 +656,7 @@ msgid "Remove User"
 msgstr "移除用戶"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "已更新 {0}"
@@ -694,7 +694,7 @@ msgstr "窄"
 msgid "Column info"
 msgstr "列信息"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
@@ -751,7 +751,7 @@ msgstr "另存為新數據集"
 msgid "From derived dataset"
 msgstr "來自衍生數據集"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Published to workspace"
 msgstr ""
 
@@ -764,7 +764,7 @@ msgid "However, we are not allowing new registrations at the moment."
 msgstr "不過，我們目前不允許新的註冊。"
 
 #. placeholder {0}: options.numPreviewRows
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
 "on the first row or the CSV uses a different delimiter. Try adjusting "
@@ -815,7 +815,7 @@ msgid "Unable to delete the offline chat model from cache."
 msgstr "無法從快取中刪除離線聊天模型。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown user"
 msgstr "未知用戶"
 
@@ -831,7 +831,7 @@ msgstr "已達到座位限制"
 msgid "Pipeline"
 msgstr "管道"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Could not unpublish dashboard"
 msgstr ""
 
@@ -937,7 +937,7 @@ msgstr "創建失敗"
 msgid "Natural"
 msgstr "自然"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Public"
 msgstr ""
 
@@ -1008,7 +1008,7 @@ msgstr "等於..."
 msgid "Profile Designer"
 msgstr "設定檔設計器"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} 個群組"
 
@@ -1029,6 +1029,7 @@ msgstr "無法導出 PDF"
 msgid "Label"
 msgstr "標籤"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
 msgstr "創建儀表板"
@@ -1079,7 +1080,7 @@ msgstr "漏斗圖"
 msgid "Invalid name column selected"
 msgstr "所選名稱欄位無效"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "自定義"
@@ -1141,7 +1142,7 @@ msgstr "Phi 3.5 Mini"
 msgid " Published to "
 msgstr ""
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "所有列"
 
@@ -1278,7 +1279,7 @@ msgstr "從列表中選擇一個資料集以查看其元資料。"
 msgid "Medium"
 msgstr "中"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "{app} 中的所有人都將失去存取權限。"
 
@@ -1314,7 +1315,7 @@ msgstr "按群組"
 msgid "Please select a file to import"
 msgstr "請選擇一個檔案以導入"
 
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 msgid "Role for everyone in the workspace"
 msgstr "工作區中的每個人都有角色"
 
@@ -1348,7 +1349,7 @@ msgstr "切換到免費計劃"
 msgid "Parsed {0} rows"
 msgstr "解析了 {0} 行"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
 
@@ -1396,7 +1397,7 @@ msgstr "授予其他成員存取權限"
 msgid "avg"
 msgstr "平均"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Generating…"
 msgstr "生成中…"
 
@@ -1507,7 +1508,7 @@ msgid "No rows could be mapped"
 msgstr "沒有列可繪製於地圖上"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown group"
 msgstr "未知群組"
 
@@ -1583,7 +1584,7 @@ msgstr "SELECT 中不支援彙總函式「{funcName}」；已略過。"
 msgid "Private datasets"
 msgstr "私人資料集"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Scans to:"
 msgstr "掃描至："
 
@@ -1636,7 +1637,7 @@ msgstr "或"
 msgid "Items"
 msgstr "項目"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
 msgid "Restriction update failed"
 msgstr "限制更新失敗"
 
@@ -1791,7 +1792,7 @@ msgstr "PDF 已下載。"
 msgid "Workspace ID"
 msgstr "工作區 ID"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} 人"
 
@@ -1827,7 +1828,7 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Dashboard unpublished."
 msgstr ""
 
@@ -1858,7 +1859,7 @@ msgstr "數據集名稱為必填項"
 msgid "Main"
 msgstr "主要"
 
-#: src/clients/dashboards/DashboardClient.ts
+#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "無法發佈儀表板"
 
@@ -1883,7 +1884,7 @@ msgstr "，和"
 msgid "Password updated successfully"
 msgstr "密碼更新成功"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
 msgstr "最窄"
 
@@ -1971,7 +1972,7 @@ msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "無法總結此列。查詢可能因不支持的值或格式錯誤的單元格而失敗。"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "數據範圍"
 
@@ -2004,7 +2005,7 @@ msgstr "下載離線聊天模型 (WebLLM)"
 msgid "Create new profile type"
 msgstr "創建新的配置文件類型"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
 
@@ -2117,7 +2118,7 @@ msgstr "前往數據探索器"
 msgid "Radar Chart"
 msgstr "雷達圖"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
 msgstr "向上滾動至上方的字段，或使用下面的列表。"
 
@@ -2132,7 +2133,7 @@ msgstr "無"
 msgid "You'll be asked to confirm your current password."
 msgstr "系統將要求您確認當前密碼。"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Publish"
 msgstr "發布"
 
@@ -2173,7 +2174,7 @@ msgid "Manual form shows an approximation"
 msgstr "手動表單顯示近似值"
 
 #. placeholder {0}: options.failure.limit ?? 3
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "自訂 URL 至少必須包含 {0} 個字元"
 
@@ -2319,7 +2320,7 @@ msgstr "確認操作"
 msgid "Data Preview"
 msgstr "數據預覽"
 
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr ""
 
@@ -2346,9 +2347,9 @@ msgstr "主題"
 
 #. placeholder {0}: subscription.maxShareableDashboardsAllowed
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-"Contact us to raise the limit for your workspace."
-msgstr ""
+#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+#~ "Contact us to raise the limit for your workspace."
+#~ msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -2402,7 +2403,7 @@ msgstr "澄清 {turnNumber} / 3"
 msgid "Back to editor"
 msgstr "返回編輯器"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Among signed-in people, only you will be able to open it. You can share "
 "it again at any time."
 msgstr ""
@@ -2453,7 +2454,7 @@ msgstr "X 軸刻度間隔"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "請再試一次。"
 
@@ -2533,7 +2534,7 @@ msgstr "與我們一起開始您的旅程"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B（離線）"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "QR code"
 msgstr "QR 碼"
 
@@ -2561,6 +2562,11 @@ msgstr "Open 模型"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
 msgstr "邀請已發送"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "{maxAllowed, plural, one {Your plan allows # shared or public "
+"dashboard.} other {Your plan allows # shared or public dashboards.}}"
+msgstr ""
 
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
@@ -2669,7 +2675,7 @@ msgid "Select your plan"
 msgstr "選擇您的計劃"
 
 #. placeholder {0}: value.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
 "{0})."
 msgstr "數據集名稱必須少於 {maxDatasetNameLength} 個字符（當前：{0}）。"
@@ -2851,8 +2857,8 @@ msgstr "第一個點"
 
 #. placeholder {0}: limit.maxAllowed
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
-msgid "Your plan allows {0} shared or public dashboard(s)."
-msgstr ""
+#~ msgid "Your plan allows {0} shared or public dashboard(s)."
+#~ msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -2933,7 +2939,7 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY 使用非欄位運算式。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "設為私人"
 
@@ -2964,11 +2970,17 @@ msgstr "更新失敗"
 msgid "Back"
 msgstr "返回"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Contact us to raise the limit "
+"for your workspace."
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "繼續進入您的工作區"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
 
@@ -3158,8 +3170,8 @@ msgstr "添加到您的工作區"
 
 #. placeholder {0}: options.numRows.toLocaleString()
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Parsed {0} rows successfully"
-msgstr "已成功解析 {0} 列"
+#~ msgid "Parsed {0} rows successfully"
+#~ msgstr "已成功解析 {0} 列"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 msgid "Unable to load dashboard"
@@ -3228,7 +3240,7 @@ msgstr "JOIN ON 子句使用非欄位參照；表單將透過原始 SQL 保留�
 msgid "dataset"
 msgstr "資料集"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "移除失敗"
@@ -3355,7 +3367,7 @@ msgstr "創建工作區"
 msgid "Try again"
 msgstr "再試一次"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
 msgstr ""
 
@@ -3466,7 +3478,7 @@ msgstr "重試查詢"
 msgid "Clarifications"
 msgstr "澄清"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
 "access until you unpublish it."
 msgstr ""
@@ -3712,7 +3724,7 @@ msgid "For dataset <0>{0}</0>, choose the column to use as the "
 msgstr "對於數據集 <0>{0}</0>，選擇用作 {entityConfigName} ID 的欄位"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Viewer"
@@ -3754,7 +3766,13 @@ msgstr "這是您的數據集的前 {0} 行。"
 msgid "Reassign failed"
 msgstr "重新指派失敗"
 
-#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
+"Impact plan to share as many dashboards as you like."
+msgstr ""
+
+#: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
 msgstr ""
 
@@ -3856,7 +3874,7 @@ msgid "By default we use a direct UUID-based link. Add a custom path below for "
 "a nicer URL."
 msgstr ""
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Make internal"
 msgstr ""
 
@@ -3923,7 +3941,7 @@ msgstr "轉換"
 msgid "X axis label"
 msgstr "X 軸標籤"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "此自訂 URL 已被保留。請嘗試在其中加入一個字詞。"
 
@@ -3980,7 +3998,7 @@ msgstr "多重選擇"
 msgid "Unable to load dashboard datasets"
 msgstr "無法加載儀表板資料集"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "No description has been added yet."
 msgstr "尚未添加描述。"
 
@@ -3992,7 +4010,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "收合抽屜"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
 msgid "Share failed"
 msgstr "分享失敗"
 
@@ -4013,7 +4031,7 @@ msgstr "類型"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Dashboard share settings updated."
 msgstr "儀表板分享設定已更新。"
 
@@ -4038,7 +4056,7 @@ msgstr "複製代碼"
 msgid "{0}s"
 msgstr "{0}秒"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Please fix the highlighted fields."
 msgstr "請修正標示的欄位。"
 
@@ -4077,11 +4095,12 @@ msgid "Request a feature"
 msgstr "請求功能"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "描述"
 
-#: src/clients/dashboards/DashboardClient.ts
+#: src/clients/dashboards/DashboardClient/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "部分資料集尚未同步至線上，或發布失敗。{errorMessage}"
@@ -4140,7 +4159,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努力的近似值；上面的 SQL 是實際執行的內容。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
@@ -4161,7 +4180,7 @@ msgstr "Y 軸刻度顏色"
 msgid "{0} · run {1}"
 msgstr "{0} · 執行 {1}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
 msgid "Process data again"
 msgstr "重新處理數據"
 
@@ -4237,7 +4256,7 @@ msgstr "通過探索您的工作區或上傳您的第一個數據集開始。"
 msgid "Stacked"
 msgstr "堆疊"
 
-#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+#: src/components/permissions/useShareButtonState.ts
 msgid "Share this {resourceLabel}"
 msgstr "分享這個 {resourceLabel}"
 
@@ -4335,7 +4354,7 @@ msgstr "署名"
 msgid "Column types updated"
 msgstr "列類型已更新"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Partially offline"
 msgstr "部分離線"
 
@@ -4355,7 +4374,7 @@ msgstr "數據探索器"
 msgid "Sign in again"
 msgstr "再次登入"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useShareResourceModalState.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""
@@ -4406,7 +4425,7 @@ msgstr "已複製！"
 msgid "date"
 msgstr "日期"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此儀表板未引用任何數據集：無法發布。"
 
@@ -4509,7 +4528,7 @@ msgstr "正在重新登入…"
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "{0} 最多只能呈現 {1} 個 {2}，因此僅顯示前 {3} 個。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "The custom URL cannot be empty"
 msgstr "自訂 URL 不得為空白"
 
@@ -4538,7 +4557,7 @@ msgstr "資料集已刪除"
 msgid "Discovery clarification"
 msgstr "發現澄清"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
 msgstr "無法儲存資料集"
 
@@ -4630,7 +4649,7 @@ msgstr "視覺化設定"
 msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini（離線）"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
 msgstr "資料處理失敗"
 
@@ -4649,12 +4668,12 @@ msgstr ""
 
 #. placeholder {0}: subscription.maxShareableDashboardsAllowed
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-"Upgrade to our Starter or Impact plan to share as many dashboards as you "
-"like."
-msgstr ""
+#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+#~ "Upgrade to our Starter or Impact plan to share as many dashboards as you "
+#~ "like."
+#~ msgstr ""
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "此資料集可以儲存在雲端。"
 
@@ -4839,7 +4858,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "WHERE 子句包含表單不支援的「{nodeType}」節點。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Dashboard published!"
 msgstr "儀表板已發佈！"
 
@@ -4848,7 +4867,7 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr "只有您能開啟此項目。您可以隨時再次分享。"
 
@@ -4881,7 +4900,7 @@ msgstr "正在載入私人資源"
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processed successfully"
 msgstr "數據處理成功"
 
@@ -4900,7 +4919,7 @@ msgid "If each {0} can only have one {fieldName} value, check this box."
 msgstr "如果每個 {0} 只能有一個 {fieldName} 值，請勾選此框。"
 
 #. placeholder {0}: value.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
 "(current: {0})."
 msgstr "描述必須少於 {maxDatasetDescriptionLength} 個字符（當前：{0}）。"
@@ -5004,7 +5023,7 @@ msgstr "... 和 {remainingCount} 個更多"
 msgid "Just what's queried"
 msgstr "僅查詢的內容"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
 msgstr "無法生成 QR 碼"
 
@@ -5033,7 +5052,7 @@ msgstr "需要名稱"
 msgid "User group saved"
 msgstr "使用者群組已儲存"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Could not publish dashboard"
 msgstr "無法發布儀表板"
 
@@ -5105,7 +5124,7 @@ msgstr "有訪問權限的人"
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
@@ -5148,7 +5167,7 @@ msgstr "保存數據集時出錯"
 msgid "Save"
 msgstr "保存"
 
-#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+#: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr ""
 
@@ -5182,7 +5201,7 @@ msgstr "您尚未選擇名稱欄位"
 msgid "Grouped"
 msgstr "分組"
 
-#: src/components/permissions/useShareButtonState/useShareButtonState.ts
+#: src/components/permissions/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
 msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 
@@ -5299,7 +5318,7 @@ msgid "Pick user groups for this member"
 msgstr "為此成員選擇使用者群組"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Admin"
@@ -5342,7 +5361,7 @@ msgid "Tone"
 msgstr "語氣"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
@@ -5392,7 +5411,7 @@ msgstr "當前計劃"
 #~ msgid "Using your custom URL. The permanent UUID link below also still works."
 #~ msgstr "使用您的自定義 URL。下面的永久 UUID 鏈接仍然有效。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
 msgstr "未成功讀取任何行"
@@ -5435,15 +5454,15 @@ msgstr "數據集欄位"
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "要將「{resourceName}」設為私人嗎？"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "This custom URL is already taken"
 msgstr "此自訂 URL 已被使用"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
 msgstr "此資料集將僅限離線使用"
 
@@ -5581,7 +5600,7 @@ msgstr "輸入評論"
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "尚無條目。當聊天面板要求同意時，日誌會填寫。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name"
 msgstr "資料集名稱"
 
@@ -5602,7 +5621,7 @@ msgstr "編輯角色群組"
 msgid "Profiles"
 msgstr "個人資料"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Update & republish"
 msgstr "更新並重新發布"
 
@@ -5728,6 +5747,12 @@ msgstr "您目前使用的是免費方案"
 msgid "Count"
 msgstr "計數"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
+"share as many dashboards as you like."
+msgstr ""
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
 "some may still be under construction. We appreciate your patience and "
@@ -5783,6 +5808,11 @@ msgstr "無值"
 msgid "Shape"
 msgstr "形狀"
 
+#. placeholder {0}: options.numRows
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
+msgid "Parsed {0, plural, one {# row} other {# rows}} successfully"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
@@ -5809,7 +5839,7 @@ msgstr "上傳數據集"
 msgid "Invalid column type"
 msgstr "無效的欄位類型"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr ""
 
@@ -5912,7 +5942,7 @@ msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the 
 "predicate as a label."
 msgstr "HAVING 使用複雜引數上的彙總函式 {funcName}；映射將述詞保留為標籤。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/SaveDatasetButton.tsx
 msgid "Save Dataset"
 msgstr "儲存資料集"
 
@@ -5957,7 +5987,7 @@ msgid "No workspace was found"
 msgstr "未找到工作區"
 
 #. placeholder {0}: options.numColumns
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
 "click Upload again."
@@ -6120,7 +6150,7 @@ msgstr "請查看數據並確保其正確。一旦確認，數據集將與此數
 msgid "Stroke ({strokeWidth}px)"
 msgstr "筆劃 ({strokeWidth}px)"
 
-#: src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Publish to workspace"
 msgstr ""
 
@@ -6174,7 +6204,7 @@ msgstr "無標題儀表板"
 msgid "Limit"
 msgstr "限制"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "在保存之前修正這些問題"
 
@@ -6194,9 +6224,9 @@ msgstr "WHERE 子句對「{columnName}」使用 BETWEEN，且其值無法由表�
 
 #. placeholder {0}: subscription.maxShareableDashboardsAllowed
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
-msgid "Your current plan only lets you share or publish {0} dashboard(s). "
-"Upgrade to our Impact plan to share as many dashboards as you like."
-msgstr ""
+#~ msgid "Your current plan only lets you share or publish {0} dashboard(s). "
+#~ "Upgrade to our Impact plan to share as many dashboards as you like."
+#~ msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Fill opacity"
@@ -6206,7 +6236,7 @@ msgstr "填色不透明度"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
 
@@ -6240,7 +6270,7 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "與您共享"
@@ -6371,11 +6401,11 @@ msgstr "來自欄位：<0>{columnName}</0>"
 msgid "Bottom"
 msgstr "底端"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "Offline ready"
 msgstr "已準備離線"
 
-#: src/views/DashboardApp/DashboardShareModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
 msgstr "下載 PNG"
 
