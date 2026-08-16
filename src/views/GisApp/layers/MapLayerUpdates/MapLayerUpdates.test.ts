@@ -429,6 +429,24 @@ describe("grid-bin updates", () => {
       });
     },
   );
+
+  it("keeps a non-count grid measure column when deselected from popup", () => {
+    const measureColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const gridLayer = MapLayerUpdates.withGridBin(_createBoundLayer());
+    const aggregatedLayer = MapLayerUpdates.withAreaAggregation(gridLayer, {
+      operation: "sum",
+      measureColumn,
+    });
+
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: aggregatedLayer,
+      columns: [],
+    });
+
+    expect(updatedLayer.source.queryColumns).toContain(measureColumn);
+  });
 });
 
 describe("withDefaultPopupColumns", () => {

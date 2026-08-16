@@ -43,11 +43,26 @@ function _withQueryColumn(
 /** How many source columns the default popup selects. */
 const DEFAULT_POPUP_COLUMN_LIMIT = 12;
 
+/** Measure column id when an area aggregation is not a count. */
+function _getAreaAggregationMeasureColumnId(
+  aggregation: MapLayer.AreaAggregation | undefined,
+): QueryColumn.Id | undefined {
+  return aggregation?.operation === "count" ?
+      undefined
+    : aggregation.measureColumn;
+}
+
 /** Column ids the layer needs regardless of what the popup shows. */
 function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
   const binding = layer.geoBinding;
   const color =
     layer.symbology.type === "heatmap" ? undefined : layer.symbology.color;
+  const areaAggregationMeasureColumnId =
+    binding?.type === "joinToBoundaries" ||
+    binding?.type === "aggregatePointsToBoundaries" ||
+    binding?.type === "binPointsToGrid" ?
+      _getAreaAggregationMeasureColumnId(binding.aggregation)
+    : undefined;
   return makeSet(
     [
       binding?.type === "latLngColumns" ? binding.latitude : undefined,
@@ -65,6 +80,7 @@ function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       binding.points.type === "geometryColumn" ?
         binding.points.column
       : undefined,
+      areaAggregationMeasureColumnId,
       layer.symbology.type === "proportionalSymbol" ?
         layer.symbology.value
       : undefined,
