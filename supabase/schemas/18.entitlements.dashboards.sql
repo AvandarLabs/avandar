@@ -15,8 +15,12 @@
  * publish unlimited dashboards to the open internet. See the umbrella design
  * section 4.2.
  *
- * Mirrored in TypeScript by the count in `hasSubscriptionPermission`; the two
- * are pinned by pgTAP and by vitest respectively.
+ * Mirrored in TypeScript by `countShareableDashboards` in
+ * `shared/models/Dashboard/countShareableDashboards/countShareableDashboards.ts`,
+ * which is what the `can_publish_shareable_dashboard` branch of the
+ * subscriptions edge function calls. The two definitions exist because Postgres
+ * cannot call TypeScript; they are pinned by pgTAP and by vitest respectively,
+ * and a change to either arm of the table above must be made in both.
  *
  * @returns False for an unknown id, so a deleted row is never counted.
  */

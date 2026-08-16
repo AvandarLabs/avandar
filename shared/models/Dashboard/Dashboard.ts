@@ -14,6 +14,8 @@ export { DashboardParsers } from "$/models/Dashboard/DashboardParsers.ts";
 
 export { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds.ts";
 
+export { countShareableDashboards } from "$/models/Dashboard/countShareableDashboards/countShareableDashboards.ts";
+
 export namespace Dashboard {
   /** All persisted publication states. */
   export const visibilities = DASHBOARD_VISIBILITIES;
