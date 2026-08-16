@@ -27,6 +27,25 @@ values (
   'd3-publish-publicly-ws'
 );
 
+-- This file publishes four dashboards in one workspace, which the
+-- shareable-dashboard cap would refuse on the free tier. The subject here is
+-- WHO may publish publicly, not HOW MANY may be published, so the workspace is
+-- given an unlimited paid plan to keep the entitlement trigger out of the way.
+-- See `shareable_entitlement_triggers.test.sql` for the cap itself.
+insert into public.subscriptions (
+  id, workspace_id, subscription_owner_id, feature_plan_type,
+  subscription_status, max_seats_allowed, max_shareable_dashboards_allowed
+)
+values (
+  'd3007001-0000-4000-8000-000000000001'::uuid,
+  'd3001001-0000-4000-8000-000000000001'::uuid,
+  'd3000003-0000-4000-8000-000000000003'::uuid,
+  'premium'::public.subscriptions__feature_plan_type,
+  'active'::public.subscriptions__status,
+  10,
+  null
+);
+
 -- `d3 owner group` deliberately carries NO dashboards app role. The workspace
 -- owner's authority has to come from the owner short-circuit in
 -- `util__auth_user_meets_min_app_role`, which is what the last case pins down.
