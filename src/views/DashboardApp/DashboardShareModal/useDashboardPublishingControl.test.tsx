@@ -8,6 +8,12 @@ import type { ReactNode } from "react";
 
 type SlugVerdict = { isValid: true } | { isValid: false; reason: "taken" };
 
+type SlugValidationVariables = {
+  slug: string;
+  dashboardId: string;
+  visibility: Dashboard.Visibility;
+};
+
 const publish = vi.fn();
 const unpublish = vi.fn();
 /**
@@ -32,16 +38,33 @@ let publishOnError: ((error: Error) => void) | undefined;
  */
 let nextSlugVerdict: SlugVerdict = { isValid: true };
 let onSlugValidated:
-  | ((verdict: SlugVerdict, variables: { slug: string }) => void)
+  | ((verdict: SlugVerdict, variables: SlugValidationVariables) => void)
   | undefined;
+
+/**
+ * Withheld responses, in dispatch order, when `isDeferringSlugResponses` is
+ * on. Calling them in another order is the only way to reproduce a network
+ * that answers two in-flight checks out of order, which is what the
+ * superseded-answer guard exists for.
+ */
+let deferredSlugResponses: Array<() => void> = [];
+let isDeferringSlugResponses = false;
 
 /**
  * Resolves synchronously so a test can observe the derived slug flags. The
  * real hook resolves asynchronously, but the flags under test depend only on
  * which slug and namespace the answer was given for, not on the timing.
  */
-const validateSlug = vi.fn((variables: { slug: string }) => {
-  onSlugValidated?.(nextSlugVerdict, variables);
+const validateSlug = vi.fn((variables: SlugValidationVariables) => {
+  const verdict = nextSlugVerdict;
+  const respond = (): void => {
+    onSlugValidated?.(verdict, variables);
+  };
+  if (isDeferringSlugResponses) {
+    deferredSlugResponses.push(respond);
+    return;
+  }
+  respond();
 });
 
 vi.mock("@/clients/dashboards/DashboardClient", () => {
@@ -55,7 +78,10 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
         return [unpublish, false] as const;
       },
       useValidateDashboardSlug: (options: {
-        onSuccess: (verdict: SlugVerdict, variables: { slug: string }) => void;
+        onSuccess: (
+          verdict: SlugVerdict,
+          variables: SlugValidationVariables,
+        ) => void;
       }) => {
         onSlugValidated = options.onSuccess;
         return [validateSlug, false] as const;
@@ -108,6 +134,8 @@ function renderControl(visibility: Dashboard.Visibility) {
 describe("useDashboardPublishingControl", () => {
   beforeEach(() => {
     nextSlugVerdict = { isValid: true };
+    isDeferringSlugResponses = false;
+    deferredSlugResponses = [];
     publish.mockClear();
     unpublish.mockClear();
     validateSlug.mockClear();
@@ -269,6 +297,48 @@ describe("useDashboardPublishingControl", () => {
     // slug may well be taken, so the honest state here is pending.
     expect(result.current.isSlugAccepted).toBe(false);
     expect(result.current.hasPendingSlugCheck).toBe(true);
+    vi.useRealTimers();
+  });
+
+  // Two checks in flight and the network answers the OLDER one last. Writing
+  // that superseded answer would point `lastValidatedSlug` at a slug the field
+  // no longer holds, and nothing is left in flight to correct it: the field
+  // spins forever and `onPrimaryAction` silently refuses to publish.
+  it("ignores a slug answer that a later keystroke has superseded", () => {
+    vi.useFakeTimers();
+    isDeferringSlugResponses = true;
+    const { result } = renderControl("draft");
+
+    act(() => {
+      result.current.onGeneralAccessChange("workspace");
+      result.current.onSlugInputChange("q3-rev");
+    });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    act(() => {
+      result.current.onSlugInputChange("q3-revenue");
+    });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    expect(validateSlug).toHaveBeenCalledTimes(2);
+
+    // Newest answer first, then the one it superseded.
+    act(() => {
+      deferredSlugResponses[1]?.();
+    });
+    expect(result.current.isSlugAccepted).toBe(true);
+    act(() => {
+      deferredSlugResponses[0]?.();
+    });
+
+    expect(result.current.isSlugAccepted).toBe(true);
+    expect(result.current.hasPendingSlugCheck).toBe(false);
+    act(() => {
+      result.current.onPrimaryAction();
+    });
+    expect(publish).toHaveBeenCalledTimes(1);
     vi.useRealTimers();
   });
 

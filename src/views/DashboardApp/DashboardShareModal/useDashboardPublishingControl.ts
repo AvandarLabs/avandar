@@ -1,7 +1,7 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -18,7 +18,7 @@ import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal
 import type { I18n } from "@lingui/core";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
 const SLUG_VALIDATION_DEBOUNCE_MS = 500;
 
@@ -31,10 +31,21 @@ type SlugValidationState = {
   slugErrorMessage: string | undefined;
 };
 
+/**
+ * Which slug check the hook is currently waiting on. Recorded at dispatch and
+ * compared in `onSuccess` so a response that a later keystroke has already
+ * superseded is dropped instead of overwriting the newer answer.
+ */
+type SlugValidationRequest = {
+  slug: string;
+  visibility: Dashboard.Visibility;
+};
+
 type DebouncedSlugValidationOptions = {
   dashboardId: Dashboard.Id;
   normalisedSlug: string;
   targetVisibility: Dashboard.Visibility;
+  latestRequestRef: RefObject<SlugValidationRequest | undefined>;
   setLastValidatedSlug: Dispatch<SetStateAction<string | undefined>>;
   setSlugValidationResult: Dispatch<
     SetStateAction<SlugValidationResult | undefined>
@@ -94,6 +105,7 @@ function useDebouncedSlugValidation(
     dashboardId,
     normalisedSlug,
     targetVisibility,
+    latestRequestRef,
     setLastValidatedSlug,
     setSlugValidationResult,
     validateSlug,
@@ -101,6 +113,7 @@ function useDebouncedSlugValidation(
   useEffect(
     function validateNormalisedSlug() {
       if (!normalisedSlug) {
+        latestRequestRef.current = undefined;
         setSlugValidationResult(undefined);
         setLastValidatedSlug(undefined);
         return;
@@ -110,6 +123,15 @@ function useDebouncedSlugValidation(
           // A draft has no URL, so it has no namespace to collide in.
           return;
         }
+        // Recorded BEFORE the request goes out, so `onSuccess` can tell this
+        // response from one the user has already typed past. The cleanup below
+        // only cancels a request that has not fired yet; one already in flight
+        // still resolves, and without this it could land after a newer answer
+        // and leave the field spinning on a slug nobody is waiting for.
+        latestRequestRef.current = {
+          slug: normalisedSlug,
+          visibility: targetVisibility,
+        };
         validateSlug({
           slug: normalisedSlug,
           dashboardId,
@@ -124,6 +146,7 @@ function useDebouncedSlugValidation(
       dashboardId,
       normalisedSlug,
       targetVisibility,
+      latestRequestRef,
       setLastValidatedSlug,
       setSlugValidationResult,
       validateSlug,
@@ -145,9 +168,24 @@ function useSlugValidation(
   const [lastValidatedSlug, setLastValidatedSlug] = useState<string>();
   const [lastValidatedVisibility, setLastValidatedVisibility] =
     useState<Dashboard.Visibility>();
+  const latestRequestRef = useRef<SlugValidationRequest | undefined>(undefined);
   const [validateSlug, isValidatingSlug] =
     DashboardClient.useValidateDashboardSlug({
       onSuccess: (result, variables) => {
+        // Every dispatched check gets its own `onSuccess`, and the network is
+        // free to answer them out of order. Writing a superseded answer would
+        // point `lastValidatedSlug` at a slug the field no longer holds, which
+        // makes `hasCurrentResult` false with nothing left in flight to make
+        // it true again: the spinner never clears and `onPrimaryAction`
+        // silently refuses to publish.
+        const latestRequest = latestRequestRef.current;
+        if (
+          latestRequest === undefined ||
+          variables.slug !== latestRequest.slug ||
+          variables.visibility !== latestRequest.visibility
+        ) {
+          return;
+        }
         setSlugValidationResult(result);
         setLastValidatedSlug(variables.slug);
         setLastValidatedVisibility(variables.visibility);
@@ -157,6 +195,7 @@ function useSlugValidation(
     dashboardId: options.dashboardId,
     normalisedSlug: options.normalisedSlug,
     targetVisibility: options.targetVisibility,
+    latestRequestRef,
     setLastValidatedSlug,
     setSlugValidationResult,
     validateSlug,
