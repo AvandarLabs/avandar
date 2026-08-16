@@ -56,12 +56,17 @@ export function makePrivateConfirmCopy({
   const sentences = [
     isDefined(shareClause) ? t`${shareClause} will lose access.` : undefined,
     losesWorkspaceAccess ? t`Everyone in ${app} will lose access.` : undefined,
-    t`Only you will be able to open it. You can share it again at any time.`,
-    ...(isPubliclyPublished ?
-      [
-        t`"${resourceName}" will still be public: anyone with the link keeps access until you unpublish it.`,
-      ]
-    : []),
+    // The publication warning comes BEFORE the exclusivity sentence, and the
+    // exclusivity sentence narrows itself to signed-in people when it applies.
+    // Revoking shares does not unpublish, so "only you will be able to open
+    // it" is simply false for a public resource, and stating it first would
+    // make the true sentence read as a correction of the one above it.
+    isPubliclyPublished ?
+      t`"${resourceName}" will still be public: anyone with the link keeps access until you unpublish it.`
+    : undefined,
+    isPubliclyPublished ?
+      t`Among signed-in people, only you will be able to open it. You can share it again at any time.`
+    : t`Only you will be able to open it. You can share it again at any time.`,
   ].filter(isDefined);
 
   return {
