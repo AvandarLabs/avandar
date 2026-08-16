@@ -424,6 +424,27 @@ describe("makeLayerSpecFromMapLayer", () => {
     ]);
   });
 
+  it("refuses a configured heatmap weight without a resolved value column name", () => {
+    const base = MapLayer.makeEmpty("Cases");
+    const layer = {
+      ...base,
+      symbology: {
+        type: "heatmap" as const,
+        radiusPx: 30,
+        weight: valueColumnId,
+        ramp: ["#111111", "#eeeeee"],
+      },
+    };
+
+    expect(() => {
+      return makeLayerSpecFromMapLayer({
+        layer,
+        featureCollection,
+        stats: { valueDomain: undefined },
+      });
+    }).toThrow(/value column/i);
+  });
+
   it("coerces a configured heatmap weight to a number", () => {
     const base = MapLayer.makeEmpty("Cases");
     const layer = {

@@ -361,15 +361,21 @@ function _createHeatmapLayerSpec({
   if (symbology.type !== "heatmap") {
     throw new Error("Heatmap symbology is required");
   }
+  let heatmapWeight: ExpressionSpecification | 1;
+  if (symbology.weight) {
+    if (!valueColumnName) {
+      throw new Error("Heatmap weight requires a resolved value column name");
+    }
+    heatmapWeight = ["to-number", ["get", valueColumnName], 0];
+  } else {
+    heatmapWeight = 1;
+  }
   return {
     id: MapLayerIds.toLayerId(layer.id),
     type: "heatmap",
     source: sourceId,
     paint: {
-      "heatmap-weight":
-        symbology.weight && valueColumnName ?
-          ["to-number", ["get", valueColumnName], 0]
-        : 1,
+      "heatmap-weight": heatmapWeight,
       "heatmap-radius": symbology.radiusPx,
       "heatmap-color": _buildHeatmapColor(symbology.ramp),
     },
