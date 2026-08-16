@@ -17,7 +17,6 @@ import { useState } from "react";
 import { match } from "ts-pattern";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
@@ -26,6 +25,7 @@ import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBilli
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
 import css from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
 import { PlanSwitch } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
+import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planChangeQueries";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
   calculateYearlyDiscount,
@@ -124,7 +124,7 @@ export function PlanCard(props: Props): JSX.Element {
           t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
         );
       },
-      queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+      queriesToInvalidate: getPlanChangeQueriesToInvalidate(),
     });
   const selectedPlan =
     type === "free" ?

@@ -2402,6 +2402,11 @@ msgstr "澄清 {turnNumber} / 3"
 msgid "Back to editor"
 msgstr "返回編輯器"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Among signed-in people, only you will be able to open it. You can share "
+"it again at any time."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
 msgstr "約一分鐘"
@@ -5322,6 +5327,7 @@ msgid "(clean)"
 msgstr "(乾淨)"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Loading sharing settings…"
 msgstr "加載共享設置中…"
 

@@ -2,9 +2,10 @@ import { countShareableDashboards } from "$/models/Dashboard/Dashboard";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * The plan's verdict on making one more dashboard shareable, plus the numbers
@@ -37,9 +38,10 @@ export type ShareableDashboardLimit = {
  * rule is already written twice (TypeScript and the SQL trigger it mirrors)
  * and a third copy would be a third thing to keep in step.
  *
- * The verdict is optimistic while the backend answer is in flight or missing.
- * The database trigger is the real gate, so a slow query must leave the button
- * live rather than disable it on a guess.
+ * The verdict is optimistic while EITHER backend answer is in flight or
+ * missing: the share rows the exemption is computed from, and the plan verdict
+ * itself. The database trigger is the real gate, so a slow query must leave
+ * the button live rather than disable it on a guess.
  */
 export function useShareableDashboardLimit(
   options: Readonly<{
@@ -51,14 +53,22 @@ export function useShareableDashboardLimit(
   const workspace = useCurrentWorkspace();
   const subscription = workspace.subscription;
 
-  // Same query key the share modal itself uses, so this is a cache read rather
-  // than a second request, and it stays current as shares are added or
-  // revoked in the modal above it.
-  const [sharingState] = ResourceShareClient.useGetResourceSharingState({
-    workspaceId: workspace.id as WorkspaceId,
-    resourceType: "dashboard",
-    resourceId: dashboard.id,
-  });
+  // Same query key and same options the share modal itself uses, so this is a
+  // cache read rather than a second request, and it stays current as shares
+  // are added or revoked in the modal above it.
+  //
+  // `ALWAYS_REFETCH_ON_MOUNT` because the cache is persisted to IndexedDB and
+  // the persister throttles its writes: a reload right after a share write can
+  // restore the PRE-mutation rows, which count as fresh for the whole default
+  // `staleTime`. Reading those would answer "already shareable" for a
+  // dashboard whose last non-owner share has just been revoked.
+  const [sharingState, , sharingStateQuery] =
+    ResourceShareClient.useGetResourceSharingState({
+      workspaceId: workspace.id as Workspace.Id,
+      resourceType: "dashboard",
+      resourceId: dashboard.id,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
 
   const alreadyCountsAsShareable =
     countShareableDashboards({
@@ -83,12 +93,28 @@ export function useShareableDashboardLimit(
     SubscriptionPermissionsClient.useCanPublishShareableDashboard({
       subscriptionId: subscription?.id ?? "",
       useQueryOptions: {
+        // Without this, a persisted `allowed: false` outlives the upgrade the
+        // user just bought in `ShareableLimitReachedModal`: the entry stays
+        // fresh for the whole default `staleTime`, so the publish button keeps
+        // its Upgrade prompt with nothing on screen able to refresh it. The
+        // plan change also drops this key (see `planChangeQueries`); this
+        // covers the reload that happens before that invalidation is
+        // persisted.
+        ...ALWAYS_REFETCH_ON_MOUNT,
         enabled: wouldConsumeAllowance && !!subscription?.id,
       },
     });
 
   return {
-    isBlocked: wouldConsumeAllowance && permission?.allowed === false,
+    // Optimistic while the share rows are in flight, for the same reason the
+    // permission answer is: the exemption is computed FROM those rows, so
+    // blocking on a snapshot that is about to be replaced would put an Upgrade
+    // prompt on a dashboard that turns out to need no allowance at all. The
+    // database trigger is the real gate.
+    isBlocked:
+      !sharingStateQuery.isFetching &&
+      wouldConsumeAllowance &&
+      permission?.allowed === false,
     maxAllowed:
       subscription ?
         Subscription.getEffectiveEntitlementLimits(subscription)

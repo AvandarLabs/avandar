@@ -2502,6 +2502,11 @@ msgstr "Aclaración {turnNumber} de 3"
 msgid "Back to editor"
 msgstr "Volver al editor"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+msgid "Among signed-in people, only you will be able to open it. You can share "
+"it again at any time."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
 msgstr "alrededor de un minuto"
@@ -5531,6 +5536,7 @@ msgid "(clean)"
 msgstr "(limpio)"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Loading sharing settings…"
 msgstr "Cargando configuraciones de uso compartido…"
 

@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit";
 import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -25,8 +26,15 @@ const mocks = vi.hoisted(() => {
         }
       | undefined,
     sharingState: undefined as ResourceSharingState | undefined,
+    isSharingStateFetching: false,
     permissionQueryArgs: undefined as
-      | { subscriptionId: string; useQueryOptions?: { enabled?: boolean } }
+      | {
+          subscriptionId: string;
+          useQueryOptions?: { enabled?: boolean; refetchOnMount?: unknown };
+        }
+      | undefined,
+    sharingStateQueryArgs: undefined as
+      | { useQueryOptions?: { refetchOnMount?: unknown } }
       | undefined,
   };
 });
@@ -42,8 +50,15 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
 vi.mock("@/clients/permissions/ResourceShareClient", () => {
   return {
     ResourceShareClient: {
-      useGetResourceSharingState: () => {
-        return [mocks.sharingState, false] as const;
+      useGetResourceSharingState: (args: {
+        useQueryOptions?: { refetchOnMount?: unknown };
+      }) => {
+        mocks.sharingStateQueryArgs = args;
+        return [
+          mocks.sharingState,
+          false,
+          { isFetching: mocks.isSharingStateFetching },
+        ] as const;
       },
     },
   };
@@ -54,7 +69,7 @@ vi.mock("@/clients/SubscriptionPermissionsClient", () => {
     SubscriptionPermissionsClient: {
       useCanPublishShareableDashboard: (args: {
         subscriptionId: string;
-        useQueryOptions?: { enabled?: boolean };
+        useQueryOptions?: { enabled?: boolean; refetchOnMount?: unknown };
       }) => {
         mocks.permissionQueryArgs = args;
         // A disabled query never resolves, so the double must answer
@@ -115,7 +130,9 @@ describe("useShareableDashboardLimit", () => {
   beforeEach(() => {
     mocks.isAllowed = false;
     mocks.sharingState = undefined;
+    mocks.isSharingStateFetching = false;
     mocks.permissionQueryArgs = undefined;
+    mocks.sharingStateQueryArgs = undefined;
     mocks.subscription = {
       id: "sub-1",
       featurePlanType: "free",
@@ -274,6 +291,54 @@ describe("useShareableDashboardLimit", () => {
     });
 
     expect(mocks.permissionQueryArgs?.useQueryOptions?.enabled).toBe(false);
+  });
+
+  // The React Query cache is persisted to IndexedDB and the persister
+  // throttles its writes, so a reload straight after a share write can restore
+  // the PRE-mutation rows. A restored entry counts as fresh for the whole
+  // default `staleTime`, so without this option the exemption would be
+  // computed from shares that no longer exist and never corrected.
+  it("forces a fresh read of the share rows on mount", () => {
+    renderLimit({
+      dashboard: makeDashboard({ visibility: "draft", isRestricted: true }),
+      targetVisibility: "workspace",
+    });
+
+    expect(mocks.sharingStateQueryArgs?.useQueryOptions).toMatchObject(
+      ALWAYS_REFETCH_ON_MOUNT,
+    );
+  });
+
+  // Same story for the plan verdict, which is what makes an upgrade bought in
+  // `ShareableLimitReachedModal` take effect: a persisted `allowed: false`
+  // would otherwise keep the publish button disabled behind an Upgrade prompt
+  // that nothing on that screen can clear.
+  it("forces a fresh read of the plan verdict on mount", () => {
+    renderLimit({
+      dashboard: makeDashboard({ visibility: "draft", isRestricted: true }),
+      targetVisibility: "workspace",
+    });
+
+    expect(mocks.permissionQueryArgs?.useQueryOptions).toMatchObject(
+      ALWAYS_REFETCH_ON_MOUNT,
+    );
+    // The refresh must not cost the exemption its skip.
+    expect(mocks.permissionQueryArgs?.useQueryOptions?.enabled).toBe(true);
+  });
+
+  // The exemption is derived FROM the share rows, so while those are being
+  // refetched the answer is unknown. Blocking on the snapshot that is about to
+  // be replaced would put an Upgrade prompt on a dashboard that may well need
+  // no allowance at all; the database trigger is the real gate.
+  it("does not block while the share rows are being refetched", () => {
+    mocks.isSharingStateFetching = true;
+
+    const { result } = renderLimit({
+      dashboard: makeDashboard({ visibility: "draft", isRestricted: true }),
+      targetVisibility: "workspace",
+    });
+
+    expect(result.current.isBlocked).toBe(false);
   });
 
   it("reports the plan's shareable-dashboard allowance", () => {
