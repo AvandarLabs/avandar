@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { makeDashboardRouteDeps } from "./makeDashboardRouteDeps";
+import { dashboardRouteDeps } from "./dashboardRouteDeps";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -54,21 +54,19 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("makeDashboardRouteDeps", () => {
+describe("dashboardRouteDeps", () => {
   it("binds an ID lookup to the dashboard client", async () => {
     getByIdMock.mockResolvedValue(undefined);
-    const deps = makeDashboardRouteDeps();
 
-    await deps.getById(DASHBOARD_ID);
+    await dashboardRouteDeps.getById(DASHBOARD_ID);
 
     expect(getByIdMock).toHaveBeenCalledWith({ id: DASHBOARD_ID });
   });
 
   it("keeps public slug reads in the public namespace", async () => {
     getAllMock.mockResolvedValue([]);
-    const deps = makeDashboardRouteDeps();
 
-    await deps.findBySlug({ slug: "q3", visibility: "public" });
+    await dashboardRouteDeps.findBySlug({ slug: "q3", visibility: "public" });
 
     expect(getAllMock).toHaveBeenCalledWith({
       where: {
@@ -80,9 +78,8 @@ describe("makeDashboardRouteDeps", () => {
 
   it("scopes workspace slug reads to their workspace", async () => {
     getAllMock.mockResolvedValue([]);
-    const deps = makeDashboardRouteDeps();
 
-    await deps.findBySlug({
+    await dashboardRouteDeps.findBySlug({
       slug: "q3",
       visibility: "workspace",
       workspaceId: WORKSPACE_ID,
@@ -102,9 +99,10 @@ describe("makeDashboardRouteDeps", () => {
     const freshWorkspaces: Workspace.T[] = [];
     getViewerWorkspacesMock.mockResolvedValue(staleWorkspaces);
     getFreshViewerWorkspacesMock.mockResolvedValue(freshWorkspaces);
-    const deps = makeDashboardRouteDeps();
 
-    await expect(deps.getViewerWorkspaces()).resolves.toEqual(freshWorkspaces);
+    await expect(dashboardRouteDeps.getViewerWorkspaces()).resolves.toEqual(
+      freshWorkspaces,
+    );
 
     expect(getFreshViewerWorkspacesMock).toHaveBeenCalledOnce();
     expect(withCacheMock).not.toHaveBeenCalled();
@@ -114,13 +112,11 @@ describe("makeDashboardRouteDeps", () => {
 
   it("derives authentication from the current session user", async () => {
     getCurrentSessionMock.mockResolvedValue({ user: { id: "user-id" } });
-    const authenticatedDeps = makeDashboardRouteDeps();
 
-    await expect(authenticatedDeps.isAuthenticated()).resolves.toBe(true);
+    await expect(dashboardRouteDeps.isAuthenticated()).resolves.toBe(true);
 
     getCurrentSessionMock.mockResolvedValue(undefined);
-    const anonymousDeps = makeDashboardRouteDeps();
 
-    await expect(anonymousDeps.isAuthenticated()).resolves.toBe(false);
+    await expect(dashboardRouteDeps.isAuthenticated()).resolves.toBe(false);
   });
 });

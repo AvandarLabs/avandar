@@ -10,31 +10,25 @@ import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ComponentType } from "react";
 
-const {
-  makeDashboardRouteDepsMock,
-  makeDashboardRouteOutcomeFromWorkspaceRouteMock,
-  routeDepsSentinel,
-} = vi.hoisted(() => {
-  // The resolver is mocked, so no dep is ever called here. A sentinel is what
-  // makes the wiring observable: the route must hand the resolver the deps
-  // that `makeDashboardRouteDeps` built, not deps of its own.
-  const sentinel = { sentinel: "workspace-dashboard-route-deps" };
-  return {
-    makeDashboardRouteDepsMock: vi.fn(() => {
-      return sentinel;
-    }),
-    makeDashboardRouteOutcomeFromWorkspaceRouteMock: vi.fn<
-      (
-        params: Readonly<{
-          slugOrId: string;
-          workspaceSlug: string;
-          deps: unknown;
-        }>,
-      ) => Promise<DashboardRouteOutcome>
-    >(),
-    routeDepsSentinel: sentinel,
-  };
-});
+const { makeDashboardRouteOutcomeFromWorkspaceRouteMock, routeDepsSentinel } =
+  vi.hoisted(() => {
+    // The resolver is mocked, so no dep is ever called here. A sentinel is what
+    // makes the wiring observable: the route must hand the resolver the deps
+    // that `dashboardRouteDeps` holds, not deps of its own.
+    const sentinel = { sentinel: "workspace-dashboard-route-deps" };
+    return {
+      makeDashboardRouteOutcomeFromWorkspaceRouteMock: vi.fn<
+        (
+          params: Readonly<{
+            slugOrId: string;
+            workspaceSlug: string;
+            deps: unknown;
+          }>,
+        ) => Promise<DashboardRouteOutcome>
+      >(),
+      routeDepsSentinel: sentinel,
+    };
+  });
 
 vi.mock(
   "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver",
@@ -48,12 +42,9 @@ vi.mock(
   },
 );
 
-vi.mock(
-  "@/clients/dashboards/makeDashboardRouteDeps/makeDashboardRouteDeps",
-  () => {
-    return { makeDashboardRouteDeps: makeDashboardRouteDepsMock };
-  },
-);
+vi.mock("@/clients/dashboards/dashboardRouteDeps/dashboardRouteDeps", () => {
+  return { dashboardRouteDeps: routeDepsSentinel };
+});
 
 vi.mock(
   "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView",
