@@ -205,9 +205,18 @@ begin
     public.util__dashboard_counts_as_shareable (d.id);
 
   if v_count >= v_max then
+    -- The `hint` is a CONTRACT with the client and must not be reworded.
+    -- PostgREST passes `hint` through to the JSON error body, so
+    -- `isShareableDashboardLimitError` in
+    -- `src/utils/isShareableDashboardLimitError/isShareableDashboardLimitError.ts`
+    -- matches on this exact string to tell the plan limit apart from every
+    -- other rejection. Matching on the message instead would break the moment
+    -- the copy is edited, and `42501` alone is raised by other policies
+    -- (`dashboards__enforce_publish_publicly` among them), so neither the
+    -- message nor the code is usable as the marker on its own.
     raise exception
       'This workspace''s plan allows % shared or public dashboard(s)', v_max
-    using errcode = '42501';
+    using errcode = '42501', hint = 'shareable_dashboard_limit';
   end if;
 end;
 $$;

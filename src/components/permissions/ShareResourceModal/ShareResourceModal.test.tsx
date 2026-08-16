@@ -39,7 +39,17 @@ const mocks = vi.hoisted(() => {
     makeResourcePrivate: vi.fn(),
     setRestricted: vi.fn(),
     upsertShare: vi.fn(),
+    notifyError: vi.fn(),
+    /**
+     * The upsert mutation's `onError`, captured so the rejection branch can be
+     * driven without a real PostgREST round trip.
+     */
+    upsertOnError: undefined as ((error: Error) => void) | undefined,
   };
+});
+
+vi.mock("@/utils/notifications/notify", () => {
+  return { notifyError: mocks.notifyError, notifySuccess: vi.fn() };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -74,7 +84,10 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
       useMakeResourcePrivate: () => {
         return [mocks.makeResourcePrivate, false] as const;
       },
-      useUpsertResourceShare: () => {
+      useUpsertResourceShare: (options: {
+        onError: (error: Error) => void;
+      }) => {
+        mocks.upsertOnError = options.onError;
         return [mocks.upsertShare, false] as const;
       },
       useDeleteResourceShare: () => {
@@ -177,6 +190,7 @@ describe("ShareResourceModal", () => {
     mocks.getResourceSharingStateOptions.mockClear();
     mocks.makeResourcePrivate.mockClear();
     mocks.setRestricted.mockClear();
+    mocks.notifyError.mockClear();
     mocks.upsertShare.mockClear();
   });
 
@@ -473,5 +487,42 @@ describe("ShareResourceModal", () => {
     await _selectGeneralAccess("Only me");
 
     expect(await screen.findByText(/will still be public/)).toBeInTheDocument();
+  });
+
+  // The share path has no gate in front of it: adding the first non-owner
+  // reader to a published, self-only dashboard is a plain PostgREST write, and
+  // the entitlement trigger is where the user meets the plan limit.
+  it("explains the plan limit when the database refuses the share", async () => {
+    renderModal();
+    await screen.findByText(/Give access to additional members/);
+
+    mocks.upsertOnError?.(
+      Object.assign(
+        new Error(
+          "This workspace's plan allows 1 shared or public dashboard(s)",
+        ),
+        {
+          name: "PostgrestError",
+          code: "42501",
+          details: null,
+          hint: "shareable_dashboard_limit",
+        },
+      ),
+    );
+
+    expect(mocks.notifyError).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Shared dashboard limit reached" }),
+    );
+  });
+
+  it("keeps the generic message for any other share failure", async () => {
+    renderModal();
+    await screen.findByText(/Give access to additional members/);
+
+    mocks.upsertOnError?.(new Error("network unreachable"));
+
+    expect(mocks.notifyError).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Share failed" }),
+    );
   });
 });

@@ -107,7 +107,28 @@ values (
   'viewer'::public.role_level
 );
 
-select plan(19);
+-- `throws_ok` can assert the SQLSTATE and the message but not the HINT, and the
+-- hint is the part the frontend actually matches on. This captures it.
+--
+-- Deliberately not `security definer`: the guard exempts every caller whose
+-- `role` GUC is not `authenticated`, so a definer wrapper would run the
+-- statement under an exempt identity and the guard would never fire. Created
+-- here, before the role switch, because `authenticated` may not create
+-- functions.
+create function pg_temp.f2_hint_of(p_sql text) returns text language plpgsql as $fn$
+declare
+  v_hint text;
+begin
+  execute p_sql;
+  return null;
+exception
+  when others then
+    get stacked diagnostics v_hint = pg_exception_hint;
+    return v_hint;
+end;
+$fn$;
+
+select plan(20);
 
 -- The free workspace, publish path ------------------------------------------
 
@@ -238,6 +259,28 @@ select throws_ok(
   '42501',
   'This workspace''s plan allows 1 shared or public dashboard(s)',
   'sharing a published self-only dashboard is refused at the limit'
+);
+
+-- The hint is a contract with the client:
+-- `isShareableDashboardLimitError` matches on it so the share and publish
+-- paths can explain the plan limit instead of showing a generic failure. This
+-- assertion exists so rewording the hint breaks a test rather than silently
+-- turning both messages back into "Share failed".
+select is(
+  pg_temp.f2_hint_of(
+    $$insert into public.resource_shares
+        (workspace_id, resource_type, resource_id, principal_type, principal_id, role)
+      values (
+        'f2001001-0000-4000-8000-000000000001'::uuid,
+        'dashboard'::public.resource_type,
+        'f2005003-0000-4000-8000-000000000003'::uuid,
+        'user'::public.share_principal_type,
+        'f2000002-0000-4000-8000-000000000002'::uuid,
+        'viewer'::public.role_level
+      )$$
+  ),
+  'shareable_dashboard_limit',
+  'the refusal carries the hint the client matches on'
 );
 
 -- Property 2, at the cap: retracting exposure is always available.

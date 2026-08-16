@@ -10,6 +10,21 @@ type SlugVerdict = { isValid: true } | { isValid: false; reason: "taken" };
 
 const publish = vi.fn();
 const unpublish = vi.fn();
+/**
+ * Hoisted because `vi.mock`'s factory runs before the module body: a plain
+ * `const` would still be in its temporal dead zone when the factory reads it.
+ */
+const { notifyError } = vi.hoisted(() => {
+  return { notifyError: vi.fn() };
+});
+const onShareableLimitReached = vi.fn();
+
+/**
+ * The publish mutation's `onError`, captured from the mocked client so the
+ * failure branch can be driven directly. The real path to it runs through
+ * PostgREST and a snapshot transition, neither of which this hook owns.
+ */
+let publishOnError: ((error: Error) => void) | undefined;
 
 /**
  * The verdict the mocked server returns for the next slug check. Tests that
@@ -32,7 +47,8 @@ const validateSlug = vi.fn((variables: { slug: string }) => {
 vi.mock("@/clients/dashboards/DashboardClient", () => {
   return {
     DashboardClient: {
-      usePublishDashboard: () => {
+      usePublishDashboard: (options: { onError: (error: Error) => void }) => {
+        publishOnError = options.onError;
         return [publish, false] as const;
       },
       useUnpublishDashboard: () => {
@@ -46,6 +62,10 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
       },
     },
   };
+});
+
+vi.mock("@/utils/notifications/notify", () => {
+  return { notifyError, notifySuccess: vi.fn() };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -78,6 +98,7 @@ function renderControl(visibility: Dashboard.Visibility) {
     () => {
       return useDashboardPublishingControl({
         dashboard: makeDashboard(visibility),
+        onShareableLimitReached,
       });
     },
     { wrapper: TestWrapper },
@@ -90,6 +111,8 @@ describe("useDashboardPublishingControl", () => {
     publish.mockClear();
     unpublish.mockClear();
     validateSlug.mockClear();
+    notifyError.mockClear();
+    onShareableLimitReached.mockClear();
   });
 
   it("starts with the target equal to the persisted visibility", () => {
@@ -247,5 +270,48 @@ describe("useDashboardPublishingControl", () => {
     expect(result.current.isSlugAccepted).toBe(false);
     expect(result.current.hasPendingSlugCheck).toBe(true);
     vi.useRealTimers();
+  });
+
+  // The UI gate is optimistic while its permission query is in flight, and the
+  // count it caches is workspace-wide while the exemption is per dashboard, so
+  // a publish elsewhere can leave it stale. These two pin what happens when the
+  // database is therefore the thing that says no.
+  it("reports the plan limit to its caller instead of a generic failure", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    renderControl("draft");
+    act(() => {
+      publishOnError?.(
+        Object.assign(
+          new Error(
+            "This workspace's plan allows 1 shared or public dashboard(s)",
+          ),
+          {
+            name: "PostgrestError",
+            code: "42501",
+            details: null,
+            hint: "shareable_dashboard_limit",
+          },
+        ),
+      );
+    });
+    expect(onShareableLimitReached).toHaveBeenCalledTimes(1);
+    // "Please try again" would be false: no retry succeeds on this plan.
+    expect(notifyError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it("still shows the generic failure for any other publish error", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    renderControl("draft");
+    act(() => {
+      publishOnError?.(new Error("network unreachable"));
+    });
+    expect(onShareableLimitReached).not.toHaveBeenCalled();
+    expect(notifyError).toHaveBeenCalledTimes(1);
+    consoleError.mockRestore();
   });
 });

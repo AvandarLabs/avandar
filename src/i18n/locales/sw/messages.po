@@ -313,6 +313,11 @@ msgstr "Mpangilio wa upau wa pembeni"
 msgid "Delete failed"
 msgstr "Kufuta kumeshindwa"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Your plan does not allow sharing this dashboard with anyone else. "
+"Upgrade your plan, or unshare another dashboard, and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Fungua"
@@ -4491,6 +4496,7 @@ msgstr "Mchambuzi wa Data"
 msgid "Sign in again"
 msgstr "Ingia tena"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""

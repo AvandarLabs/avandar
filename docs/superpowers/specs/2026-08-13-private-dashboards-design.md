@@ -1,6 +1,8 @@
 # Private dashboards - design (umbrella)
 
-**Status:** Draft for implementation
+**Status:** Complete. P1, P1.5, P2, P3 and P4 have all landed, which finishes
+the private-dashboards project. Each phase's own design document, named in the
+phase table in section 8, is the authority on what that phase shipped.
 **Author:** pablo@avandarlabs.com (brainstormed with Claude)
 **Date:** 2026-08-13
 **Related:** `docs/permissions-architecture.md`,
@@ -569,7 +571,7 @@ Applies to datasets as well as dashboards: `ShareResourceModal` is shared, and
 | **P1.5** The "Only me" control | J | Landed. `2026-08-13-private-dashboards-only-me-control-design.md` | Gives users a way to *ask for* the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2. |
 | **P2** Private publishing core | A, B, D | Landed. `2026-08-14-private-dashboards-publishing-core-design.md` | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal. |
 | **P3** Merged share surface | C, E, G | Landed. `2026-08-15-private-dashboards-merged-share-surface-design.md` | Flips the flag on. The Drive-style modal is the only way to *set* workspace visibility, so it lands after P2. |
-| **P4** Entitlements | H | Not started | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
+| **P4** Entitlements | H | Landed. `2026-08-16-private-dashboards-entitlement-enforcement-design.md` | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
 
 Each phase gets its own spec, plan, and implementation cycle. Phase specs live
 in `docs/superpowers/specs/`; where a phase spec and this document disagree,

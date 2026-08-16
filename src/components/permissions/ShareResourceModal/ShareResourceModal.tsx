@@ -8,6 +8,7 @@ import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError } from "@/utils/notifications/notify";
 import {
   buildShareSummary,
@@ -112,6 +113,23 @@ export function ShareResourceModal({
     {
       queriesToInvalidate: invalidateKeys,
       onError: (error: Error) => {
+        // Adding the first non-owner reader to a published, self-only
+        // dashboard makes it reachable by somebody else, which is exactly what
+        // the plan caps. Nothing gates this write in the UI, so the database
+        // trigger is where the user meets the limit, and the generic message
+        // would leave them with no idea why.
+        //
+        // A toast rather than the upgrade modal: the person is in the middle
+        // of handing out access, and the design puts the upgrade offer on the
+        // publish action, which is where the limit is actually about to be
+        // spent.
+        if (isShareableDashboardLimitError(error)) {
+          notifyError({
+            title: t`Shared dashboard limit reached`,
+            message: t`Your plan does not allow sharing this dashboard with anyone else. Upgrade your plan, or unshare another dashboard, and try again.`,
+          });
+          return;
+        }
         notifyError({ title: t`Share failed`, message: error.message });
       },
     },

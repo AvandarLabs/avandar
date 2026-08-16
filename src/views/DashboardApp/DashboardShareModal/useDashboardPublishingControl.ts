@@ -6,6 +6,7 @@ import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardShareModal/buildShareUrls";
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
@@ -209,9 +210,18 @@ function useSlugValidation(
  * `onPrimaryAction` is the only thing that calls the mutations.
  */
 export function useDashboardPublishingControl(
-  options: Readonly<{ dashboard: Dashboard.T }>,
+  options: Readonly<{
+    dashboard: Dashboard.T;
+    /**
+     * Called when the database, not the UI gate, is what refused the publish.
+     * The caller owns the upgrade modal, so the hook reports the refusal
+     * rather than rendering anything itself.
+     */
+    onShareableLimitReached: () => void;
+  }>,
 ): DashboardPublishingControl {
   const { t } = useLingui();
+  const { onShareableLimitReached } = options;
   const workspace = useCurrentWorkspace();
   const [currentDashboard, setCurrentDashboard] = useState(options.dashboard);
   const [targetVisibility, setTargetVisibility] =
@@ -250,6 +260,24 @@ export function useDashboardPublishingControl(
     },
     onError: (error: Error) => {
       console.error(error);
+      // The UI gate in `DashboardShareModal` is deliberately optimistic while
+      // its permission query is in flight, and the answer it caches counts the
+      // whole workspace while the exemption is per dashboard, so a publish
+      // elsewhere in the workspace can leave the gate stale. In that window the
+      // database trigger is the only thing that stops the publish, and the
+      // generic toast would tell the user to "try again" at something that can
+      // never succeed on this plan.
+      //
+      // The upgrade modal rather than a toast, because it is the SAME surface
+      // the gate offers when it does manage to answer in time. The two paths
+      // are the same refusal found at different moments, and answering them
+      // differently would make an upgrade reachable or not depending on how
+      // fast a query returned. The modal also names the plan and its limit,
+      // which a toast cannot do without restating that copy a third time.
+      if (isShareableDashboardLimitError(error)) {
+        onShareableLimitReached();
+        return;
+      }
       notifyError({
         title: t`Could not publish dashboard`,
         message: t`Please try again. Your dashboard has not been published.`,

@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
@@ -43,12 +43,20 @@ export function DashboardShareModal({
     resourceType: "dashboard",
     resourceId: dashboard.id,
   });
-  const publishing = useDashboardPublishingControl({ dashboard });
+  // Declared before the publishing hook because that hook needs the setter:
+  // when the database refuses a publish the UI gate let through, the refusal
+  // opens the same modal the gate's own Upgrade button opens.
+  const [isUpgradeModalOpened, setIsUpgradeModalOpened] = useState(false);
+  const publishing = useDashboardPublishingControl({
+    dashboard,
+    onShareableLimitReached: useCallback(() => {
+      setIsUpgradeModalOpened(true);
+    }, []),
+  });
   const limit = useShareableDashboardLimit({
     dashboard: publishing.currentDashboard,
     targetVisibility: publishing.targetVisibility,
   });
-  const [isUpgradeModalOpened, setIsUpgradeModalOpened] = useState(false);
   const planLimitMessage =
     limit.maxAllowed === undefined ?
       t`Your plan does not allow sharing more dashboards.`

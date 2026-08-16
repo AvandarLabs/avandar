@@ -303,6 +303,11 @@ msgstr "侧边栏布局"
 msgid "Delete failed"
 msgstr "删除失败"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Your plan does not allow sharing this dashboard with anyone else. "
+"Upgrade your plan, or unshare another dashboard, and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "打开"
@@ -4343,6 +4348,7 @@ msgstr "数据探索器"
 msgid "Sign in again"
 msgstr "再次登录"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""

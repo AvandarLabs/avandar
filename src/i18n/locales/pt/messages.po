@@ -315,6 +315,11 @@ msgstr "Layout da barra lateral"
 msgid "Delete failed"
 msgstr "Exclusão falhou"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Your plan does not allow sharing this dashboard with anyone else. "
+"Upgrade your plan, or unshare another dashboard, and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Abrir"
@@ -4499,6 +4504,7 @@ msgstr "Explorador de Dados"
 msgid "Sign in again"
 msgstr "Entrar novamente"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""

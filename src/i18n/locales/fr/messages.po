@@ -318,6 +318,11 @@ msgstr "Mise en page avec barre latérale"
 msgid "Delete failed"
 msgstr "Échec de la suppression"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+msgid "Your plan does not allow sharing this dashboard with anyone else. "
+"Upgrade your plan, or unshare another dashboard, and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "Ouvrir"
@@ -4537,6 +4542,7 @@ msgstr "Explorateur de données"
 msgid "Sign in again"
 msgstr "Se reconnecter"
 
+#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr ""
