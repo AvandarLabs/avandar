@@ -246,6 +246,27 @@ export const MapLayerUpdates = {
     } as MapLayer.T;
   },
 
+  /** Exchanges complete latitude and longitude column bindings. */
+  swapLatLngColumns: (layer: MapLayer.T): MapLayer.T => {
+    const binding = layer.geoBinding;
+    if (
+      binding?.type !== "latLngColumns" ||
+      !isDefined(binding.latitude) ||
+      !isDefined(binding.longitude) ||
+      binding.latitude === binding.longitude
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      geoBinding: {
+        ...binding,
+        latitude: binding.longitude,
+        longitude: binding.latitude,
+      },
+    } as MapLayer.T;
+  },
+
   /** Switches between coordinate and encoded-geometry bindings. */
   withGeometryBindingType: (
     layer: MapLayer.T,
@@ -511,9 +532,16 @@ export const MapLayerUpdates = {
       symbology: {
         type: "proportionalSymbol",
         value: column.id,
-        minRadius: MapLayer.defaultMinSymbolRadius,
-        maxRadius: MapLayer.defaultMaxSymbolRadius,
-        scale: "sqrt",
+        minRadius:
+          symbology.type === "proportionalSymbol" ?
+            symbology.minRadius
+          : MapLayer.defaultMinSymbolRadius,
+        maxRadius:
+          symbology.type === "proportionalSymbol" ?
+            symbology.maxRadius
+          : MapLayer.defaultMaxSymbolRadius,
+        scale:
+          symbology.type === "proportionalSymbol" ? symbology.scale : "sqrt",
         color: symbology.color,
         stroke: symbology.stroke,
       },
@@ -699,6 +727,43 @@ export const MapLayerUpdates = {
     return {
       ...layer,
       symbology: { ...layer.symbology, maxRadius },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets a proportional symbol's smallest radius, in pixels. */
+  withMinSymbolRadius: (
+    options: Readonly<{ layer: MapLayer.T; minRadius: number }>,
+  ): MapLayer.T => {
+    const { layer, minRadius } = options;
+    if (
+      layer.symbology.type !== "proportionalSymbol" ||
+      layer.symbology.minRadius === minRadius
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, minRadius },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets how proportional symbol values map to radii. */
+  withSymbolScale: (
+    options: Readonly<{
+      layer: MapLayer.T;
+      scale: "sqrt" | "linear";
+    }>,
+  ): MapLayer.T => {
+    const { layer, scale } = options;
+    if (
+      layer.symbology.type !== "proportionalSymbol" ||
+      layer.symbology.scale === scale
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, scale },
     } as MapLayer.Standard;
   },
 

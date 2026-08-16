@@ -49,7 +49,7 @@ function _createDataset(): Dataset.T {
 }
 
 /** A layer with a data source and a geo binding that resolves. */
-function _createBoundLayer(): MapLayer.T {
+function _createBoundLayer(): MapLayer.Standard {
   const layer = MapLayer.makeEmpty("Cases");
   const latitude = QueryColumn.makeFromDatasetColumn(
     _createNumericColumn("lat"),
@@ -356,6 +356,51 @@ describe("withDefaultPopupColumns", () => {
 });
 
 describe("withSymbology", () => {
+  it("swaps latitude and longitude column ids", () => {
+    const layer = _createBoundLayer();
+    const binding = layer.geoBinding;
+    if (binding?.type !== "latLngColumns") {
+      throw new Error("Expected latitude and longitude columns");
+    }
+
+    const updated = MapLayerUpdates.swapLatLngColumns(layer);
+
+    expect(updated.geoBinding).toMatchObject({
+      type: "latLngColumns",
+      latitude: binding.longitude,
+      longitude: binding.latitude,
+    });
+  });
+
+  it("does not swap incomplete latitude and longitude bindings", () => {
+    const layer = {
+      ..._createBoundLayer(),
+      geoBinding: {
+        type: "latLngColumns" as const,
+        latitude: undefined,
+        longitude: undefined,
+      },
+    };
+
+    expect(MapLayerUpdates.swapLatLngColumns(layer)).toBe(layer);
+  });
+
+  it("preserves identity when swapping would not change the binding", () => {
+    const layer = _createBoundLayer();
+    const binding = layer.geoBinding;
+    if (binding?.type !== "latLngColumns" || !binding.latitude) {
+      throw new Error("Expected latitude and longitude columns");
+    }
+    const sameColumnLayer = {
+      ...layer,
+      geoBinding: { ...binding, longitude: binding.latitude },
+    };
+
+    expect(MapLayerUpdates.swapLatLngColumns(sameColumnLayer)).toBe(
+      sameColumnLayer,
+    );
+  });
+
   it("carries a single color from a circle to a proportional symbol", () => {
     const column = QueryColumn.makeFromDatasetColumn(
       _createNumericColumn("cases"),
@@ -416,6 +461,84 @@ describe("withSymbology", () => {
       },
     });
     expect(updatedLayer.symbology).toEqual(remembered);
+  });
+
+  it("sets minimum radius and linear scale on a sized layer", () => {
+    const column = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const sizedLayer = MapLayerUpdates.withSymbologyType({
+      layer: MapLayer.makeEmpty("Cases"),
+      change: {
+        nextType: "proportionalSymbol",
+        valueColumn: column,
+        remembered: undefined,
+      },
+    });
+
+    const withRadius = MapLayerUpdates.withMinSymbolRadius({
+      layer: sizedLayer,
+      minRadius: 6,
+    });
+    const updated = MapLayerUpdates.withSymbolScale({
+      layer: withRadius,
+      scale: "linear",
+    });
+
+    expect(
+      updated.symbology.type === "proportionalSymbol" &&
+        updated.symbology.minRadius,
+    ).toBe(6);
+    expect(
+      updated.symbology.type === "proportionalSymbol" &&
+        updated.symbology.scale,
+    ).toBe("linear");
+  });
+
+  it("keeps sized settings when changing the value column", () => {
+    const firstColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const secondColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("population"),
+    );
+    const sizedLayer = MapLayerUpdates.withSymbolScale({
+      layer: MapLayerUpdates.withMinSymbolRadius({
+        layer: MapLayerUpdates.withSymbologyType({
+          layer: MapLayer.makeEmpty("Cases"),
+          change: {
+            nextType: "proportionalSymbol",
+            valueColumn: firstColumn,
+            remembered: undefined,
+          },
+        }),
+        minRadius: 7,
+      }),
+      scale: "linear",
+    });
+
+    const updated = MapLayerUpdates.withSymbolSizeColumn({
+      layer: sizedLayer,
+      column: secondColumn,
+    });
+
+    expect(updated.symbology).toMatchObject({
+      type: "proportionalSymbol",
+      value: secondColumn.id,
+      minRadius: 7,
+      scale: "linear",
+    });
+  });
+
+  it("does not apply sized settings to a flat circle", () => {
+    const layer = MapLayer.makeEmpty("Cases");
+
+    expect(MapLayerUpdates.withMinSymbolRadius({ layer, minRadius: 6 })).toBe(
+      layer,
+    );
+    expect(MapLayerUpdates.withSymbolScale({ layer, scale: "linear" })).toBe(
+      layer,
+    );
   });
 });
 

@@ -112,6 +112,12 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
       withMaxSymbolRadius: vi.fn(({ layer, maxRadius }) => {
         return { ...layer, symbology: { ...layer.symbology, maxRadius } };
       }),
+      withMinSymbolRadius: vi.fn(({ layer, minRadius }) => {
+        return { ...layer, symbology: { ...layer.symbology, minRadius } };
+      }),
+      withSymbolScale: vi.fn(({ layer, scale }) => {
+        return { ...layer, symbology: { ...layer.symbology, scale } };
+      }),
       withStroke: vi.fn(({ layer, stroke }) => {
         return {
           ...layer,
@@ -297,7 +303,7 @@ describe("StyleSection", () => {
     expect(updatedLayer.symbology.stroke.width).toBe(2);
   });
 
-  it("renders sized controls and forwards size and radius changes", () => {
+  it("renders sized controls and forwards size, radius, and scale changes", () => {
     const onLayerChange = vi.fn();
     const layer = MapLayer.makeEmpty("Cities");
     const { rerender } = render(
@@ -321,10 +327,45 @@ describe("StyleSection", () => {
     fireEvent.change(screen.getByLabelText("Largest radius"), {
       target: { value: "48" },
     });
-    const resizedLayer = _applyLatestUpdate({
+    let resizedLayer = _applyLatestUpdate({
       onLayerChange: onLayerChange,
       layer: selectedLayer,
     });
     expect(resizedLayer.symbology).toMatchObject({ maxRadius: 48 });
+
+    fireEvent.change(screen.getByLabelText("Smallest radius"), {
+      target: { value: "6" },
+    });
+    resizedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: resizedLayer,
+    });
+    expect(resizedLayer.symbology).toMatchObject({ minRadius: 6 });
+
+    expect(
+      screen.getByText(
+        "Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.",
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("combobox", { name: "Scale" }));
+    fireEvent.click(
+      screen.getByRole("option", { name: "Linear", hidden: true }),
+    );
+    const linearlyScaledLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: resizedLayer,
+    });
+    expect(linearlyScaledLayer.symbology).toMatchObject({ scale: "linear" });
+    rerender(
+      <StyleSection
+        layer={linearlyScaledLayer}
+        onLayerChange={onLayerChange}
+      />,
+    );
+    expect(
+      screen.queryByText(
+        "Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.",
+      ),
+    ).not.toBeInTheDocument();
   });
 });

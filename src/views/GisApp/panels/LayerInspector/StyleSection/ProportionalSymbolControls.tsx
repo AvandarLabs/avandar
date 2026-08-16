@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { Callout } from "@avandar/ui";
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { NumberInput } from "@mantine/core";
+import { NumberInput, Select } from "@mantine/core";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
@@ -16,7 +16,7 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
-/** Edits the value column and largest radius for sized symbols. */
+/** Edits the value column, radius range, and scale for sized symbols. */
 export function ProportionalSymbolControls({
   layer,
   onLayerChange,
@@ -48,6 +48,24 @@ export function ProportionalSymbolControls({
         }}
       />
       <NumberInput
+        label={t`Smallest radius`}
+        suffix=" px"
+        min={2}
+        max={80}
+        value={layer.symbology.minRadius}
+        onChange={(value) => {
+          if (!isNumber(value)) {
+            return;
+          }
+          onLayerChange((current) => {
+            return MapLayerUpdates.withMinSymbolRadius({
+              layer: current,
+              minRadius: value,
+            });
+          });
+        }}
+      />
+      <NumberInput
         label={t`Largest radius`}
         suffix=" px"
         min={2}
@@ -65,9 +83,31 @@ export function ProportionalSymbolControls({
           });
         }}
       />
-      <Callout>
-        {t`Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.`}
-      </Callout>
+      <Select
+        label={t`Scale`}
+        data={[
+          { value: "sqrt", label: t`Square root` },
+          { value: "linear", label: t`Linear` },
+        ]}
+        value={layer.symbology.scale}
+        allowDeselect={false}
+        onChange={(scale) => {
+          if (scale !== "sqrt" && scale !== "linear") {
+            return;
+          }
+          onLayerChange((current) => {
+            return MapLayerUpdates.withSymbolScale({
+              layer: current,
+              scale,
+            });
+          });
+        }}
+      />
+      {layer.symbology.scale === "sqrt" ?
+        <Callout>
+          {t`Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.`}
+        </Callout>
+      : null}
     </>
   );
 }
