@@ -11,7 +11,7 @@ set search_path to extensions, public;
 -- access rules apply. It returns null rather than raising on a path it does not
 -- recognise, so a malformed name is a policy DENIAL instead of a storage error.
 --
-select plan(59);
+select plan(60);
 
 select is(
   public.util__storage_object_dashboard_id (
@@ -660,6 +660,20 @@ select throws_ok(
   '42501',
   'new row violates row-level security policy for table "objects"',
   'a non-owner editor cannot insert a published object'
+);
+
+-- Control first. An UPDATE returning zero rows only proves the UPDATE policy if
+-- the row is visible to this session at this moment, and the SELECT proof for
+-- it sits hundreds of lines away behind several claim-state mutations.
+select is(
+  (
+    select count(*)::int
+    from storage.objects
+    where bucket_id = 'published'
+      and name = 'dashboards/d2004004-0000-4000-8000-000000000004/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007027-0000-4000-8000-000000000027.parquet'
+  ),
+  1,
+  'the editor can see the staged public object it is about to fail to update'
 );
 
 select results_eq(

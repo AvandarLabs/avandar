@@ -650,6 +650,7 @@ declare
   v_app_role public.role_level;
   v_editor_rank int := public.util__role_level_rank ('editor'::public.role_level);
   v_user_rank int;
+  v_eff_rank int;
   v_has_share boolean;
 begin
   if v_uid is null then
@@ -687,11 +688,24 @@ begin
     return false;
   end if;
 
-  if not public.util__auth_user_can_access_resource (
-    'dashboard'::public.resource_type,
-    p_dashboard_id,
-    'viewer'::public.role_level
-  ) then
+  -- The effective role is resolved ONCE and reused by both the viewer gate
+  -- below and the `draft` gate further down. `util__auth_user_can_access_resource`
+  -- is exactly `rank(effective_role) >= rank(min_role)` with a null effective
+  -- role meaning "no access", so ranking it here is behaviour-identical to two
+  -- calls, but it avoids re-entering `util__resource_effective_role` (a second
+  -- dashboards fetch, settings-admin join, share aggregate and app-role probe)
+  -- for every draft row the caller does not own. `stable` does not memoize
+  -- across rows, so the duplicate call would double per-row cost on the whole
+  -- dashboards index.
+  v_eff_rank := coalesce(
+    public.util__role_level_rank (
+      public.util__resource_effective_role (
+        'dashboard'::public.resource_type,
+        p_dashboard_id
+      )
+    ), 0);
+
+  if v_eff_rank < public.util__role_level_rank ('viewer'::public.role_level) then
     return false;
   end if;
 
@@ -709,11 +723,7 @@ begin
   -- above; what remains here is share holders and workspace app roles, and for
   -- a draft those need edit rights rather than mere read access.
   if v_visibility = 'draft'::public.dashboard_visibility
-    and not public.util__auth_user_can_access_resource (
-      'dashboard'::public.resource_type,
-      p_dashboard_id,
-      'editor'::public.role_level
-    ) then
+    and v_eff_rank < v_editor_rank then
     return false;
   end if;
 

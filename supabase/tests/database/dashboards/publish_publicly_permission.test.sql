@@ -83,7 +83,7 @@ values
   ('d3005005-0000-4000-8000-000000000005'::uuid, 'd3001001-0000-4000-8000-000000000001'::uuid, 'd3000002-0000-4000-8000-000000000002'::uuid, 'd3003002-0000-4000-8000-000000000002'::uuid, 'd3 admin owned', '{}'::jsonb, 'workspace', 'd3005005-0000-4000-8000-000000000005'::uuid, null, null, null, null, null),
   ('d3005006-0000-4000-8000-000000000006'::uuid, 'd3001001-0000-4000-8000-000000000001'::uuid, 'd3000003-0000-4000-8000-000000000003'::uuid, 'd3003003-0000-4000-8000-000000000003'::uuid, 'd3 owner owned', '{}'::jsonb, 'workspace', 'd3005006-0000-4000-8000-000000000006'::uuid, null, null, null, null, null);
 
-select plan(14);
+select plan(16);
 
 -- A dashboard never moves straight into a reader boundary: it acquires a
 -- durable publish claim that stages `snapshot_transition_target_visibility`,
@@ -200,6 +200,43 @@ select lives_ok(
              snapshot_transition_target_visibility
      where id = 'd3005004-0000-4000-8000-000000000004'::uuid$$,
   'an editor CAN abort a publish claim that already targets public'
+);
+
+-- The rule is one-directional. Only the move INTO `public` takes the admin bar;
+-- retracting exposure is ordinary editor work, and the same path is what lets
+-- an editor pull back a dashboard an admin published. The delete-tier decision
+-- in the storage policies rests on this staying editor-tier: if unpublishing
+-- needed an admin, an editor's own retraction would strand published bytes.
+select lives_ok(
+  $$update public.dashboards
+       set visibility = 'draft',
+           snapshot_transition_kind = 'unpublish',
+           snapshot_transition_revision = 'd3006008-0000-4000-8000-000000000008'::uuid,
+           snapshot_transition_prior_revision = snapshot_revision,
+           snapshot_transition_prior_visibility = visibility,
+           snapshot_transition_target_visibility = null
+     where id = 'd3005003-0000-4000-8000-000000000003'::uuid;
+
+    update public.dashboards
+       set visibility = 'draft',
+           snapshot_revision = null,
+           snapshot_transition_kind = null,
+           snapshot_transition_revision = null,
+           snapshot_transition_prior_revision = null,
+           snapshot_transition_prior_visibility = null,
+           snapshot_transition_target_visibility = null
+     where id = 'd3005003-0000-4000-8000-000000000003'::uuid$$,
+  'an editor CAN unpublish a public dashboard back to draft'
+);
+
+select is(
+  (
+    select visibility
+    from public.dashboards
+    where id = 'd3005003-0000-4000-8000-000000000003'::uuid
+  ),
+  'draft'::public.dashboard_visibility,
+  'the dashboard the editor unpublished really is back to draft'
 );
 
 -- The viewer and the non-member ---------------------------------------------
