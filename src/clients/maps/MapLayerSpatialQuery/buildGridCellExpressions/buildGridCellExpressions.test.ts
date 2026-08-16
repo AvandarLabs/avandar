@@ -80,12 +80,11 @@ describe("buildGridCellExpressions", () => {
     const fractionalQ = x / sizeMeters - y / (Math.sqrt(3) * sizeMeters);
     const fractionalR = (2 * y) / (Math.sqrt(3) * sizeMeters);
 
-    // Fractional axial q is -0.5; DuckDB round(-0.5) = -1 (half away from zero).
+    // Fractional axial q is -0.5, and DuckDB rounds half away from zero.
     expect(_roundHalfAwayFromZero(fractionalQ)).toBe(-1);
-    expect(_roundCubeCoordinatesWithDuckDbRounding(fractionalQ, fractionalR)).toEqual({
-      q: -1,
-      r: 0,
-    });
+    expect(
+      _roundCubeCoordinatesWithDuckDbRounding(fractionalQ, fractionalR),
+    ).toEqual({ q: -1, r: 0 });
     expect(getPointyTopAxialCell(x, y, sizeMeters)).toEqual({ q: -1, r: 0 });
   });
 });
