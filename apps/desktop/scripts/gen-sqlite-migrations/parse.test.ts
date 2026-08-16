@@ -101,6 +101,25 @@ describe("classifyStatement", () => {
     );
   });
 
+  it("classifies CREATE / DROP VIEW as drop", () => {
+    expect(
+      classifyStatement(
+        'create or replace view "analytics"."active_users" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('create view "analytics"."v" as select 1;')).toBe(
+      "drop",
+    );
+    expect(
+      classifyStatement(
+        'create materialized view "analytics"."m" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('drop view if exists "analytics"."v";')).toBe(
+      "drop",
+    );
+  });
+
   it("classifies a leading keyword it does not know as unknown", () => {
     expect(classifyStatement("reindex table public.x;")).toBe("unknown");
     expect(classifyStatement("vacuum analyze public.x;")).toBe("unknown");

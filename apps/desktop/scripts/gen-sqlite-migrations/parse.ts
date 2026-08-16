@@ -118,6 +118,16 @@ export function classifyStatement(sql: string): StatementKind {
   if (/^create\s+schema\b/.test(t)) {
     return "drop";
   }
+  // Views are derived read models, not schema shape. Today they are all
+  // reporting views in the `analytics` schema, defined over
+  // `usage_analytics_events` and other tables the mirror excludes, so
+  // none of them could resolve locally even though SQLite does have
+  // views. Dropped for the same reason functions are.
+  if (
+    /^(create|alter|drop)\s+(or\s+replace\s+)?(materialized\s+)?view\b/.test(t)
+  ) {
+    return "drop";
+  }
   if (/^comment\s+on\b/.test(t)) {
     return "drop";
   }

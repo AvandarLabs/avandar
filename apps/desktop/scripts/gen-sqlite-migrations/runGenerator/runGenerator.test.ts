@@ -109,9 +109,65 @@ function _assertSnapshotRevisionMigration(generatedPath: string): void {
   ]);
 }
 
+/*
+ * The transitions override is a merge: two drafting migrations (one adding
+ * the columns, one restating the CHECK) folded onto a single Postgres file.
+ * Assert the merged body is the final state rather than a replay - the five
+ * columns once each, in Postgres order, and no constraint DDL.
+ */
+function _assertTransitionsMigration(generatedPath: string): void {
+  const generated = readFileSync(generatedPath, "utf8");
+  const columns = [
+    "snapshot_transition_kind",
+    "snapshot_transition_revision",
+    "snapshot_transition_prior_revision",
+    "snapshot_transition_prior_visibility",
+    "snapshot_transition_target_visibility",
+  ];
+  // Comments are excluded deliberately: the override's prose explains why
+  // ADD CONSTRAINT is absent, so matching the raw text would self-trip.
+  const executableSql = generated
+    .split("\n")
+    .filter((line) => {
+      return line.trim() !== "" && !line.trim().startsWith("--");
+    })
+    .join("\n");
+  expect(executableSql).toBe(
+    columns
+      .map((column) => {
+        return `alter table "dashboards" add column "${column}" text;`;
+      })
+      .join("\n"),
+  );
+
+  const sqliteResult = _runGeneratedMigration({
+    generatedPath,
+    sqliteScript: `import { Database } from "bun:sqlite";
+     import { readFileSync } from "node:fs";
+     const db = new Database(":memory:");
+     db.exec("create table dashboards (id text primary key, visibility text not null, snapshot_revision text)");
+     db.exec("insert into dashboards values ('idle', 'draft', null)");
+     db.exec(readFileSync(process.argv[1], "utf8"));
+     console.log(JSON.stringify(db.query("select * from dashboards").all()));`,
+  });
+  expect(sqliteResult.status, sqliteResult.stderr).toBe(0);
+  expect(JSON.parse(sqliteResult.stdout)).toEqual([
+    {
+      id: "idle",
+      visibility: "draft",
+      snapshot_revision: null,
+      snapshot_transition_kind: null,
+      snapshot_transition_revision: null,
+      snapshot_transition_prior_revision: null,
+      snapshot_transition_prior_visibility: null,
+      snapshot_transition_target_visibility: null,
+    },
+  ]);
+}
+
 describe("runGenerator", () => {
   it("applies the dashboard visibility override to the historical schema", () => {
-    const sourceFile = "20260814175823_dashboard_visibility_model.sql";
+    const sourceFile = "20260816020000_dashboard_visibility_model.sql";
     const generatedPath = _generateMigration({
       migrationSql: `create type public.dashboard_visibility as enum ('draft', 'workspace', 'public');
 
@@ -136,7 +192,7 @@ add column is_public boolean generated always as (
   });
 
   it("backfills the legacy snapshot revision in generated SQLite", () => {
-    const sourceFile = "20260815022608_add_dashboard_snapshot_revision.sql";
+    const sourceFile = "20260816020100_add_dashboard_snapshot_revision.sql";
     const generatedPath = _generateMigration({
       migrationSql: `alter table public.dashboards add column snapshot_revision uuid;
 
@@ -147,5 +203,43 @@ where visibility <> 'draft'::public.dashboard_visibility
       sourceFile,
     });
     _assertSnapshotRevisionMigration(generatedPath);
+  });
+
+  it("mirrors the folded snapshot transition columns and drops the CHECKs", () => {
+    const sourceFile = "20260816020200_dashboard_snapshot_transitions.sql";
+    const generatedPath = _generateMigration({
+      migrationSql: `create type "public"."dashboard_snapshot_transition_kind" as enum ('publish', 'abort_publish', 'unpublish', 'delete');
+
+alter table "public"."dashboards"
+add column "snapshot_transition_kind" public.dashboard_snapshot_transition_kind;
+
+alter table "public"."dashboards"
+add column "snapshot_transition_revision" uuid;
+
+alter table "public"."dashboards"
+add column "snapshot_transition_prior_revision" uuid;
+
+alter table "public"."dashboards"
+add column "snapshot_transition_prior_visibility" public.dashboard_visibility;
+
+alter table "public"."dashboards"
+add column "snapshot_transition_target_visibility" public.dashboard_visibility;
+
+alter table "public"."dashboards"
+add constraint "dashboards__snapshot_transition_consistent" check (
+  snapshot_transition_kind is null
+) not valid;
+
+alter table "public"."dashboards" validate constraint "dashboards__snapshot_transition_consistent";
+
+alter table "public"."dashboards"
+add constraint "dashboards__settled_snapshot_consistent" check (
+  snapshot_transition_kind is not null
+) not valid;
+
+alter table "public"."dashboards" validate constraint "dashboards__settled_snapshot_consistent";`,
+      sourceFile,
+    });
+    _assertTransitionsMigration(generatedPath);
   });
 });

@@ -1,8 +1,8 @@
--- Generated from supabase/migrations/20260814175823_dashboard_visibility_model.sql by
+-- Generated from supabase/migrations/20260816020000_dashboard_visibility_model.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 6
--- Statements dropped (RLS/funcs/triggers/data/etc.): 4
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 6
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
 -- SQLite override. Two constructs do not survive the Postgres -> SQLite transpile:

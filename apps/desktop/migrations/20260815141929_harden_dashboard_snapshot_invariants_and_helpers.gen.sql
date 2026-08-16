@@ -1,8 +1,0 @@
--- Generated from supabase/migrations/20260815141929_harden_dashboard_snapshot_invariants_and_helpers.sql by
--- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
--- unless the matching `needs hand-edit` warning calls for it.
--- Schema-shape statements emitted: 0
--- Statements dropped (RLS/funcs/triggers/data/etc.): 11
--- FK constraints dropped (target not synced to SQLite): 0
--- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
--- No schema-shape changes: every statement was RLS / GRANT / function / trigger / type / data backfill, none of which has a SQLite equivalent.

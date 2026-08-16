@@ -111,6 +111,12 @@ export const SYNCABLE_TABLES = [
  * Tables that the desktop intentionally does not mirror. Listed explicitly
  * so the migration generator can distinguish "deliberately excluded" from
  * "unhandled new table" and hard-error on the latter.
+ *
+ * Same rule as {@link DEPRECATED_TABLES}: an entry stays here even after the
+ * table is dropped from the live schema. The generator walks the full Postgres
+ * history one file at a time, so a name that disappears from this list makes
+ * every historical CREATE / ALTER / CREATE INDEX for it partition as
+ * "uncategorised table" and hard-errors the whole run.
  */
 export const EXCLUDED_TABLES = [
   "dexie_dbs",
@@ -118,6 +124,10 @@ export const EXCLUDED_TABLES = [
   "tokens__google",
   "usage_analytics_events",
   "user_roles",
+  // Dropped by 20260815141744 ("analytics growth events and waitlist
+  // removal"). Retained because 20251120033342, 20251122032910 and
+  // 20251124021247 still contain its DDL.
+  "waitlist_signups",
   "workspace_invites",
   "role_groups",
   "role_group_app_roles",

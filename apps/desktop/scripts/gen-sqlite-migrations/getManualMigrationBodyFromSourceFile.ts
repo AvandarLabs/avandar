@@ -1,5 +1,5 @@
 const _MANUAL_MIGRATION_BODIES: Record<string, string> = {
-  "20260814175823_dashboard_visibility_model.sql": `-- SQLite override. Two constructs do not survive the Postgres -> SQLite transpile:
+  "20260816020000_dashboard_visibility_model.sql": `-- SQLite override. Two constructs do not survive the Postgres -> SQLite transpile:
 --
 --   * \`create type ... as enum\`. SQLite has no enums, so \`visibility\` is TEXT.
 --     The values are still constrained upstream by Postgres, and the mirror is
@@ -32,7 +32,7 @@ create unique index "dashboards__slug_unique_per_workspace_when_internal"
 on "dashboards" ("workspace_id", "slug")
 where "visibility" = 'workspace' and "slug" is not null;
 `,
-  "20260815022608_add_dashboard_snapshot_revision.sql": `-- SQLite override. The Postgres migration backfills a reserved legacy revision with
+  "20260816020100_add_dashboard_snapshot_revision.sql": `-- SQLite override. The Postgres migration backfills a reserved legacy revision with
 -- UPDATE, which the schema-only generator intentionally drops. Desktop must
 -- apply the same data transition so existing published rows keep reading their
 -- unversioned snapshot objects after the revision column is introduced.
@@ -43,18 +43,29 @@ update "dashboards"
 set "snapshot_revision" = '00000000-0000-0000-0000-000000000000'
 where "visibility" <> 'draft' and "snapshot_revision" is null;
 `,
-  "20260815042008_durable_dashboard_snapshot_transitions.sql": `-- SQLite override. SQLite has no enum types, and the desktop dashboard mirror is
+  "20260816020200_dashboard_snapshot_transitions.sql": `-- SQLite override. SQLite has no enum types, and the desktop dashboard mirror is
 -- read-only. The five nullable TEXT columns preserve the durable transition
--- state exactly; historical rows remain deterministically idle as NULL.
+-- state exactly; historical rows remain deterministically idle as NULL. Column
+-- order follows the Postgres migration.
+--
+-- \`snapshot_transition_kind\` mirrors the \`dashboard_snapshot_transition_kind\`
+-- enum and the two \`..._visibility\` columns mirror \`dashboard_visibility\`;
+-- all three are TEXT here for the same reason \`visibility\` is.
+--
+-- The Postgres migration also adds two CHECK constraints,
+-- \`dashboards__snapshot_transition_consistent\` and
+-- \`dashboards__settled_snapshot_consistent\` (each \`not valid\`, then a
+-- \`validate constraint\` pass). Neither is mirrored, for two reasons: SQLite
+-- cannot ALTER TABLE ADD CONSTRAINT at all, and the mirror has no write path,
+-- so there is no INSERT or UPDATE for either invariant to constrain. Rows only
+-- ever arrive from a Postgres that already enforced both. The \`validate
+-- constraint\` statements are likewise dropped; they have no SQLite meaning.
 --
 alter table "dashboards" add column "snapshot_transition_kind" text;
+alter table "dashboards" add column "snapshot_transition_revision" text;
 alter table "dashboards" add column "snapshot_transition_prior_revision" text;
 alter table "dashboards" add column "snapshot_transition_prior_visibility" text;
-alter table "dashboards" add column "snapshot_transition_revision" text;
 alter table "dashboards" add column "snapshot_transition_target_visibility" text;
-`,
-  "20260815042815_strengthen_dashboard_snapshot_transition_boundary.sql": `-- SQLite override. The desktop dashboard mirror is read-only, so the Postgres
--- transition consistency CHECK has no SQLite write path to constrain.
 `,
 };
 

@@ -1,8 +1,8 @@
--- Generated from supabase/migrations/20260815015354_STORAGE-gate-private-snapshot-reads-during-transition.sql by
+-- Generated from supabase/migrations/20260815213000_revoke_public_execute_on_get_user_id_by_email.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0
--- Statements dropped (RLS/funcs/triggers/data/etc.): 2
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 4
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
 -- No schema-shape changes: every statement was RLS / GRANT / function / trigger / type / data backfill, none of which has a SQLite equivalent.
