@@ -25,7 +25,7 @@ vi.mock("@avandar/modules", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient", () => {
+vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
   return {
     QetlClientFactory: { create: createMock },
   };

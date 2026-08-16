@@ -23,10 +23,10 @@ vi.mock("@avandar/query-hooks", () => {
 });
 
 vi.mock(
-  "@/clients/dashboards/extractDatasetIdsFromDashboardConfig/extractDatasetIdsFromDashboardConfig",
+  "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig",
   () => {
     return {
-      extractDatasetIdsFromDashboardConfig: () => {
+      getDatasetIdsFromDashboardConfig: () => {
         return [DATASET_ID];
       },
     };

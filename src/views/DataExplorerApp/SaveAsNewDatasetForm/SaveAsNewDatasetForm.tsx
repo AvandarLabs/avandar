@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Stack, TextInput } from "@mantine/core";
 import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";

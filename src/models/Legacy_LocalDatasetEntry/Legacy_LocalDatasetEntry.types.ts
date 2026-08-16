@@ -1,4 +1,4 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**

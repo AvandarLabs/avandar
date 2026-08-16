@@ -7,7 +7,7 @@ const { useGetAllMock, listViewMock } = vi.hoisted(() => {
   return { useGetAllMock: vi.fn(), listViewMock: vi.fn() };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return { DashboardClient: { useGetAll: useGetAllMock } };
 });
 

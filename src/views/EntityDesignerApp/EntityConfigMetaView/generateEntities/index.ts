@@ -12,7 +12,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { Logger } from "@/utils/Logger";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { BuildableEntityConfig } from "$/models/EntityConfig/EntityConfig.types";

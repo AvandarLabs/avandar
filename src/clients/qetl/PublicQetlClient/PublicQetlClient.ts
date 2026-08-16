@@ -1,12 +1,12 @@
 import { createModule } from "@avandar/modules";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient/LocalPublicDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import { QetlClientFactory } from "@/clients/qetl/QetlClient";
+import { QetlClientFactory } from "@/clients/qetl/QetlClient/QetlClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { IQetlClient } from "@/clients/qetl/QetlClient";
+import type { IQetlClient } from "@/clients/qetl/QetlClient/QetlClient";
 import type {
   PublishedVisibility,
   SnapshotBucketName,

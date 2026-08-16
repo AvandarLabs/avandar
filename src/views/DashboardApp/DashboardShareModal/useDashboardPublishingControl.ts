@@ -2,7 +2,7 @@ import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";

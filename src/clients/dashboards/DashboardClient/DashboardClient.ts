@@ -15,14 +15,14 @@ import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { APIClient } from "@/clients/APIClient";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnapshotTransition/DashboardSnapshotTransition";
-import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig/extractDatasetIdsFromDashboardConfig";
-import { updateDashboardWithSnapshotCas } from "@/clients/dashboards/updateDashboardWithSnapshotCas";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
+import { updateDashboardWithSnapshotCompareAndSwap } from "@/clients/dashboards/updateDashboardWithSnapshotCompareAndSwap";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
@@ -247,7 +247,7 @@ async function _uploadDatasetSnapshot(
 async function _getPublishDatasets(
   dashboard: Readonly<Dashboard.T>,
 ): Promise<PublishDatasets> {
-  const candidateIds = extractDatasetIdsFromDashboardConfig(dashboard.config);
+  const candidateIds = getDatasetIdsFromDashboardConfig(dashboard.config);
   const datasets =
     candidateIds.length === 0 ?
       []
@@ -380,7 +380,7 @@ async function _updateDashboardModelWithCas(
   const dbUpdate = options.config.parsers.fromModelUpdateToDBUpdate(
     options.updateModel,
   );
-  const updatedDashboard = await updateDashboardWithSnapshotCas({
+  const updatedDashboard = await updateDashboardWithSnapshotCompareAndSwap({
     dbClient: options.config.dbClient,
     dashboard: options.dashboard,
     dbUpdate,

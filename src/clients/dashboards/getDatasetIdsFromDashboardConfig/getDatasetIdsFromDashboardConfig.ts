@@ -6,7 +6,7 @@ function _toTrimmedString(value: unknown): string {
   return isString(value) ? value.trim() : "";
 }
 
-function _extractDataVizSqlStrings(dashboardConfig: unknown): string[] {
+function _getDataVizSqlStrings(dashboardConfig: unknown): string[] {
   const sqlStrings: string[] = [];
   traverse(dashboardConfig, (node) => {
     if (!isPlainObject(node)) {
@@ -29,18 +29,18 @@ function _extractDataVizSqlStrings(dashboardConfig: unknown): string[] {
 }
 
 /**
- * Extracts dataset ID candidates referenced by DataViz SQL in a dashboard.
+ * Gets dataset ID candidates referenced by DataViz SQL in a dashboard.
  *
  * Candidates remain unresolved until the publisher checks them against the
  * eligible workspace datasets. Dangling UUID references must not disappear
  * from the snapshot dependency check.
  */
-export function extractDatasetIdsFromDashboardConfig(
+export function getDatasetIdsFromDashboardConfig(
   dashboardConfig: unknown,
 ): Array<Dataset.Id | string> {
   return Array.from(
     new Set(
-      _extractDataVizSqlStrings(dashboardConfig).flatMap(
+      _getDataVizSqlStrings(dashboardConfig).flatMap(
         DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences,
       ),
     ),

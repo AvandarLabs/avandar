@@ -5,7 +5,7 @@ const { getByIdMock } = vi.hoisted(() => {
   return { getByIdMock: vi.fn() };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return { DashboardClient: { getById: getByIdMock } };
 });
 

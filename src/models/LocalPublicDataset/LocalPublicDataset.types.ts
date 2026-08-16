@@ -1,4 +1,4 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

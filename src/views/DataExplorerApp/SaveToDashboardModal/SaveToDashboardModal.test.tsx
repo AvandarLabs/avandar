@@ -54,7 +54,7 @@ vi.mock("@/hooks/users/useCurrentUserProfile", () => {
   };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       QueryKeys: {

@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 
 type VersionKeyTestModel = DexieCrudModelSpec<{
   modelName: "VersionKeyTest";

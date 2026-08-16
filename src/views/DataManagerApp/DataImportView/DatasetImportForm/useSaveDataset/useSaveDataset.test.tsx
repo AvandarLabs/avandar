@@ -88,7 +88,7 @@ const {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       QueryKeys: {

@@ -172,7 +172,7 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       useUpdate: (config: {

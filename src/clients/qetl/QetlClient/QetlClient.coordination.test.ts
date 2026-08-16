@@ -69,7 +69,7 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       withCache: () => {
@@ -264,7 +264,8 @@ describe("QetlClient DuckDB coordination", () => {
       await queryMayFinish.promise;
       return { data: [{ value: "workspace" }] };
     });
-    const { QetlClientFactory } = await import("@/clients/qetl/QetlClient");
+    const { QetlClientFactory } =
+      await import("@/clients/qetl/QetlClient/QetlClient");
     const qetlClient = QetlClientFactory.create({
       getDiceFromSql: async () => {
         return [DATASET_ID];
@@ -285,7 +286,8 @@ describe("QetlClient DuckDB coordination", () => {
   it("reuses an outer lease while materializing a virtual dependency", async () => {
     const workspaceId = "11111111-1111-4111-8111-111111111111";
     _configureVirtualDependencyMocks(workspaceId);
-    const { QetlClientFactory } = await import("@/clients/qetl/QetlClient");
+    const { QetlClientFactory } =
+      await import("@/clients/qetl/QetlClient/QetlClient");
     const qetlClient = QetlClientFactory.create({
       getDiceFromSql: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID) ?
@@ -326,7 +328,8 @@ describe("QetlClient DuckDB coordination", () => {
       firstQueryMayFinish,
       state: queryState,
     });
-    const { QetlClientFactory } = await import("@/clients/qetl/QetlClient");
+    const { QetlClientFactory } =
+      await import("@/clients/qetl/QetlClient/QetlClient");
     const qetlClient = QetlClientFactory.create({
       getDiceFromSql: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID) ?

@@ -5,7 +5,7 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
  * Conditionally updates a dashboard whose snapshot pointer and row version
  * still match the caller's read.
  */
-export async function updateDashboardWithSnapshotCas(
+export async function updateDashboardWithSnapshotCompareAndSwap(
   options: Readonly<{
     dbClient: AvaSupabaseDBClient;
     dashboard: Pick<

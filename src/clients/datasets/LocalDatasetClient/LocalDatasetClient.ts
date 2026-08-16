@@ -1,6 +1,6 @@
 import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
-import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";

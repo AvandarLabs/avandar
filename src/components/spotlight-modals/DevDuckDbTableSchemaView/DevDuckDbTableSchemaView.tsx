@@ -3,7 +3,7 @@ import { ObjectDescriptionList } from "@avandar/ui";
 import { promiseMap, propEq, where } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Loader, Stack, Text } from "@mantine/core";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

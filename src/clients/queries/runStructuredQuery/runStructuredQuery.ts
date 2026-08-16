@@ -13,7 +13,7 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { match } from "ts-pattern";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient/PublicQetlClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";

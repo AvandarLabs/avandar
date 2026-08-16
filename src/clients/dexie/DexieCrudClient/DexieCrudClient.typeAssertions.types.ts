@@ -1,4 +1,4 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 
 /** Valid scalar model primary keys name a database read field. */
 type ValidScalarModelPrimaryKey = DexieCrudModelSpec<{

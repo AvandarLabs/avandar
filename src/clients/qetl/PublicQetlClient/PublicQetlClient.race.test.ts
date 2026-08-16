@@ -120,7 +120,7 @@ vi.mock("@avandar/utils", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient", () => {
+vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
   return { QetlClientFactory: { create: createQetlClientMock } };
 });
 

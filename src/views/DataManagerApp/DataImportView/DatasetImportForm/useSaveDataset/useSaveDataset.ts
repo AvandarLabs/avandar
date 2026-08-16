@@ -3,7 +3,7 @@ import { snakeCaseKeysShallow, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks";

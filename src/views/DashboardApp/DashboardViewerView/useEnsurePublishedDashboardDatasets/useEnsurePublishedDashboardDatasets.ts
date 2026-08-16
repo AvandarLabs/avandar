@@ -1,6 +1,6 @@
 import { useQuery } from "@avandar/query-hooks";
 import { useMemo } from "react";
-import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig/extractDatasetIdsFromDashboardConfig";
+import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
 import { LocalPublicDatasetRawDataClient } from "@/clients/datasets/LocalPublicDatasetRawDataClient/LocalPublicDatasetRawDataClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
@@ -19,7 +19,7 @@ function _getDatasetIdsFromDashboard(
   dashboard: Readonly<Dashboard.T> | undefined,
 ): Dataset.Id[] {
   return dashboard && dashboard.visibility !== "draft" ?
-      (extractDatasetIdsFromDashboardConfig(dashboard.config) as Dataset.Id[])
+      (getDatasetIdsFromDashboardConfig(dashboard.config) as Dataset.Id[])
     : [];
 }
 

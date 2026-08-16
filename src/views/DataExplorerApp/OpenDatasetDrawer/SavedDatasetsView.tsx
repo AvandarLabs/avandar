@@ -17,7 +17,7 @@ import { IconSearch, IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";

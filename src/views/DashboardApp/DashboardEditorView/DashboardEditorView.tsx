@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Flex, Text } from "@mantine/core";
 import { Data, Puck } from "@puckeditor/core";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { notifySuccess } from "@/utils/notifications/notify";

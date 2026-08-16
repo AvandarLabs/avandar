@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { buildSqlDisplayCatalog } from "@/components/sql/sql-helpers/buildSqlDisplayCatalog/buildSqlDisplayCatalog";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

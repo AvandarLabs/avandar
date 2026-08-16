@@ -25,7 +25,7 @@ const {
   };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return { DashboardClient: { getById: getByIdMock } };
 });
 

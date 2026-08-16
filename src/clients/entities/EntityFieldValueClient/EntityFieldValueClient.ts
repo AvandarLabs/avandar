@@ -28,7 +28,7 @@ import { singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import type { ServiceClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";

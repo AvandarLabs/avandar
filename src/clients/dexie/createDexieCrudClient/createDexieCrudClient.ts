@@ -11,7 +11,7 @@ import {
   buildFilteredDexieCollection,
   findFirstConflictingRowByIndexedColumns,
 } from "@/clients/dexie/dexieFilteredCollection";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,

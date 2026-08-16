@@ -1,4 +1,4 @@
-import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalPublicDatasetParsers } from "@/models/LocalPublicDataset/LocalPublicDatasetParsers";

@@ -1,15 +1,15 @@
 import { createModule } from "@avandar/modules";
 import { prop, where } from "@avandar/utils";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { QetlClientFactory } from "@/clients/qetl/QetlClient";
+import { QetlClientFactory } from "@/clients/qetl/QetlClient/QetlClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { IQetlClient } from "@/clients/qetl/QetlClient";
+import type { IQetlClient } from "@/clients/qetl/QetlClient/QetlClient";
 import type { Module } from "@avandar/modules";
 import type { EmptyObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

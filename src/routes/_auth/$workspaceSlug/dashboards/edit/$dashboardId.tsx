@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { UserClient } from "@/clients/UserClient";
 import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

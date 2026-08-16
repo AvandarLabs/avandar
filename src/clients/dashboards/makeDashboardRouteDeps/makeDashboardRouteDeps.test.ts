@@ -37,7 +37,7 @@ vi.mock("@/clients/AuthClient/AuthClient", () => {
   return { AuthClient: { getCurrentSession: getCurrentSessionMock } };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return { DashboardClient: { getAll: getAllMock, getById: getByIdMock } };
 });
 

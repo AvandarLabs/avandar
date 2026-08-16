@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig/extractDatasetIdsFromDashboardConfig";
+import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
 
 const DATASET_ID = "33333333-3333-4333-8333-333333333333";
 const JOINED_DATASET_ID = "55555555-5555-4555-8555-555555555555";
@@ -16,13 +16,13 @@ function _createDashboardConfigFromSql(rawSql: string): unknown {
   };
 }
 
-describe("extractDatasetIdsFromDashboardConfig", () => {
+describe("getDatasetIdsFromDashboardConfig", () => {
   it("extracts UUID table references but ignores UUID value literals", () => {
     const config = _createDashboardConfigFromSql(
       `SELECT * FROM "${DATASET_ID}" WHERE customer_id = '${UUID_LITERAL}'`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
   });
 
   it("extracts dangling UUID table references from joins and CTEs", () => {
@@ -32,7 +32,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
        JOIN "${JOINED_DATASET_ID}" AS joined ON true`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([
       DATASET_ID,
       JOINED_DATASET_ID,
     ]);
@@ -45,7 +45,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
        QUALIFY row_number() OVER () = 1`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
   });
 
   it("extracts the base dataset from DuckDB PIVOT syntax", () => {
@@ -53,7 +53,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
       `PIVOT "${DATASET_ID}" ON category USING sum(value)`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
   });
 
   it("excludes a UUID-shaped CTE alias while retaining its base dataset", () => {
@@ -64,7 +64,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
        SELECT * FROM "${UUID_LITERAL}"`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
   });
 
   it("extracts constant query_table and recursive query dependencies", () => {
@@ -72,7 +72,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
       `SELECT * FROM query('SELECT * FROM "${DATASET_ID}" JOIN query_table(''${JOINED_DATASET_ID}'') ON true')`,
     );
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([
       DATASET_ID,
       JOINED_DATASET_ID,
     ]);
@@ -89,7 +89,7 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
       ],
     };
 
-    expect(extractDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
+    expect(getDatasetIdsFromDashboardConfig(config)).toEqual([DATASET_ID]);
   });
 
   it("rejects dynamic and mutating SQL during publication extraction", () => {
@@ -101,10 +101,10 @@ describe("extractDatasetIdsFromDashboardConfig", () => {
     );
 
     expect(() => {
-      extractDatasetIdsFromDashboardConfig(dynamicConfig);
+      getDatasetIdsFromDashboardConfig(dynamicConfig);
     }).toThrow(/dynamic/i);
     expect(() => {
-      extractDatasetIdsFromDashboardConfig(mutatingConfig);
+      getDatasetIdsFromDashboardConfig(mutatingConfig);
     }).toThrow(/mutating/i);
   });
 });

@@ -1,5 +1,5 @@
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import type { DashboardRouteDeps } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 

@@ -6,7 +6,7 @@ import { Button, Card, FileButton, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconUpload } from "@tabler/icons-react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";

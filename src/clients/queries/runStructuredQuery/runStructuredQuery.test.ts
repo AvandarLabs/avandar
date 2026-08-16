@@ -24,7 +24,7 @@ const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
     };
   });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   return { WorkspaceQetlClient: { runQuery: runQueryMock } };
 });
 vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {

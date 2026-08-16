@@ -359,10 +359,10 @@ vi.mock("@/clients/APIClient", () => {
 });
 
 vi.mock(
-  "@/clients/dashboards/extractDatasetIdsFromDashboardConfig/extractDatasetIdsFromDashboardConfig",
+  "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig",
   () => {
     return {
-      extractDatasetIdsFromDashboardConfig: () => {
+      getDatasetIdsFromDashboardConfig: () => {
         return DATASET_IDS;
       },
     };
@@ -394,7 +394,7 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return { DatasetClient: { getAll: getDatasetsMock } };
 });
 
@@ -421,7 +421,7 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   return {
     WorkspaceQetlClient: {
       runQuery: vi.fn().mockResolvedValue(new Blob(["query-parquet"])),

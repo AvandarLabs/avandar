@@ -34,7 +34,7 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/dexie/createDexieCrudClient", () => {
+vi.mock("@/clients/dexie/createDexieCrudClient/createDexieCrudClient", () => {
   return {
     createDexieCrudClient: (config: {
       mutations: (options: { logger: typeof loggerMock }) => object;

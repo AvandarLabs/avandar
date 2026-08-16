@@ -28,7 +28,7 @@ vi.mock("@/clients/AuthClient/AuthClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       withCache: () => {
@@ -54,7 +54,7 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient", () => {
+vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
   return {
     QetlClientFactory: {
       create: (options: {
@@ -114,7 +114,7 @@ beforeEach(() => {
 describe("WorkspaceQetlClient DuckDB coordination", () => {
   it("ignores eligible dataset IDs used only as literals or CTE aliases", async () => {
     const { WorkspaceQetlClient } =
-      await import("@/clients/qetl/WorkspaceQetlClient");
+      await import("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient");
 
     await expect(
       WorkspaceQetlClient.runQuery({
@@ -140,7 +140,7 @@ describe("WorkspaceQetlClient DuckDB coordination", () => {
       },
     });
     const { WorkspaceQetlClient } =
-      await import("@/clients/qetl/WorkspaceQetlClient");
+      await import("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient");
 
     await expect(
       WorkspaceQetlClient.runQuery({

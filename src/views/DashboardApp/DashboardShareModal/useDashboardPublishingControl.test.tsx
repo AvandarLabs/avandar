@@ -67,7 +67,7 @@ const validateSlug = vi.fn((variables: SlugValidationVariables) => {
   respond();
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       usePublishDashboard: (options: { onError: (error: Error) => void }) => {
