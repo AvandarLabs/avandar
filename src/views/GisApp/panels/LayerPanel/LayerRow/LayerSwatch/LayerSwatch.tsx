@@ -11,6 +11,15 @@ export function LayerSwatch({ symbology }: Props): ReactNode {
     symbology.type === "circle" ? css["layerSwatch--point"]
     : symbology.type === "proportionalSymbol" ? css["layerSwatch--sized"]
     : undefined;
+  if (symbology.type === "heatmap") {
+    return (
+      <span
+        aria-hidden
+        className={clsx(css.layerSwatch, variantClassName)}
+        style={{ backgroundColor: symbology.ramp.at(-1) }}
+      />
+    );
+  }
   const color = symbology.color;
   const swatchColor =
     color.type === "single" ? color.color

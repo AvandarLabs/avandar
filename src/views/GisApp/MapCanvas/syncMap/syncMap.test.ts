@@ -17,7 +17,7 @@ type FakeMap = {
   getSource: (id: string) => FakeSource | undefined;
   addSource: ReturnType<typeof vi.fn>;
   removeSource: ReturnType<typeof vi.fn>;
-  getLayer: (id: string) => { id: string } | undefined;
+  getLayer: (id: string) => { id: string; type: string } | undefined;
   addLayer: ReturnType<typeof vi.fn>;
   removeLayer: ReturnType<typeof vi.fn>;
   moveLayer: ReturnType<typeof vi.fn>;
@@ -31,7 +31,7 @@ type FakeMap = {
  */
 function _createFakeMap(): FakeMap {
   const sourcesById = new Map<string, FakeSource>();
-  const layers = new Set<string>();
+  const layersById = new Map<string, { id: string; type: string }>();
   const calls: string[] = [];
   return {
     calls,
@@ -55,14 +55,14 @@ function _createFakeMap(): FakeMap {
       calls.push(`removeSource:${id}`);
     }),
     getLayer: (id: string) => {
-      return layers.has(id) ? { id } : undefined;
+      return layersById.get(id);
     },
-    addLayer: vi.fn((layer: { id: string }) => {
-      layers.add(layer.id);
+    addLayer: vi.fn((layer: { id: string; type: string }) => {
+      layersById.set(layer.id, layer);
       calls.push(`addLayer:${layer.id}`);
     }),
     removeLayer: vi.fn((id: string) => {
-      layers.delete(id);
+      layersById.delete(id);
       calls.push(`removeLayer:${id}`);
     }),
     moveLayer: vi.fn((id: string) => {
@@ -255,6 +255,44 @@ describe("syncMap", () => {
     });
 
     expect(map.addLayer).toHaveBeenCalledWith(spec.layers[0]);
+  });
+
+  it("replaces an existing layer when its type changes", () => {
+    const map = _createFakeMap();
+    const circleSpec = _createSpec(["density"]);
+    syncMap({
+      map: _asMapLibreMap(map),
+      previousSpec: emptySpec,
+      nextSpec: circleSpec,
+    });
+    const heatmapSpec: MapSpec = {
+      ...circleSpec,
+      layers: [
+        {
+          id: "layer-density",
+          type: "heatmap",
+          source: "source-density",
+          paint: { "heatmap-radius": 20 },
+        },
+      ],
+    };
+    map.calls.length = 0;
+
+    syncMap({
+      map: _asMapLibreMap(map),
+      previousSpec: circleSpec,
+      nextSpec: heatmapSpec,
+    });
+
+    expect(map.calls).toEqual([
+      "removeLayer:layer-density",
+      "addLayer:layer-density",
+    ]);
+    expect(map.setPaintProperty).not.toHaveBeenCalledWith(
+      "layer-density",
+      "heatmap-radius",
+      20,
+    );
   });
 
   it("updates paint in place when only paint changed", () => {

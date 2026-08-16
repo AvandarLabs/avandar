@@ -212,6 +212,10 @@ function _applyLayers(
 
   nextSpec.layers.forEach((layerSpec) => {
     const previousLayerSpec = _findLayerSpec(previousSpec, layerSpec.id);
+    const existingLayer = map.getLayer(layerSpec.id);
+    if (existingLayer && existingLayer.type !== layerSpec.type) {
+      map.removeLayer(layerSpec.id);
+    }
     if (!map.getLayer(layerSpec.id)) {
       map.addLayer(layerSpec);
     } else {

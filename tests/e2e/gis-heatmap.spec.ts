@@ -48,18 +48,7 @@ async function _projectHottestPoint(
   }, HOTTEST_COORDINATE);
 }
 
-// Switching a layer to Heat currently crashes the GIS app into its error
-// boundary, so this spec cannot pass yet. Two defects have to be fixed, and
-// this spec passes once both are:
-//   1. `LayerSwatch` reads `symbology.color`, which `HeatmapSymbology` does
-//      not have, throwing "Cannot read properties of undefined (reading
-//      'type')" while the layer row re-renders.
-//   2. `syncMap` reuses a MapLibre layer whenever its id already exists, but
-//      the heatmap spec reuses `MapLayerIds.toLayerId`. Repainting a `circle`
-//      layer with `heatmap-*` paint keys throws inside MapLibre's
-//      `getPaintProperty`. It needs to drop and re-add a layer whose type
-//      changed.
-test.fixme("draws a heatmap whose paint does not open the feature inspector", async ({
+test("draws a heatmap whose paint does not open the feature inspector", async ({
   page,
   e2eWorkerDb,
 }) => {
