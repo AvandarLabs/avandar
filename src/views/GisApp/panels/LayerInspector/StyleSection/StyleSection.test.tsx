@@ -6,6 +6,7 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
+import { SymbologyTypeControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -32,6 +33,15 @@ function _createNumericColumn(name: string): DatasetColumn.T {
 const queryColumn = QueryColumn.makeFromDatasetColumn(
   _createNumericColumn("Population"),
 );
+
+function _getCircleSymbology(
+  layer: MapLayer.T,
+): Extract<MapLayer.Symbology, { type: "circle" }> {
+  if (layer.symbology.type !== "circle") {
+    throw new Error("Expected circle symbology");
+  }
+  return layer.symbology;
+}
 
 vi.mock(
   "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection",
@@ -172,18 +182,19 @@ describe("StyleSection", () => {
     (symbologyType) => {
       const onOpenClassification = vi.fn();
       const layer = MapLayer.makeEmpty("Cities");
+      const circleSymbology = _getCircleSymbology(layer);
       const symbology =
-        symbologyType === "circle" ?
-          layer.symbology
-        : {
+        symbologyType === "circle" ? circleSymbology : (
+          {
             type: "proportionalSymbol" as const,
             value: queryColumn.id,
             minRadius: 4,
             maxRadius: 24,
             scale: "sqrt" as const,
-            color: layer.symbology.color,
-            stroke: layer.symbology.stroke,
-          };
+            color: circleSymbology.color,
+            stroke: circleSymbology.stroke,
+          }
+        );
       render(
         <StyleSection
           layer={{ ...layer, symbology }}
@@ -202,6 +213,7 @@ describe("StyleSection", () => {
 
   it("does not offer classification for cluster style", () => {
     const layer = MapLayer.makeEmpty("Cities");
+    const circleSymbology = _getCircleSymbology(layer);
     render(
       <StyleSection
         layer={{
@@ -210,7 +222,7 @@ describe("StyleSection", () => {
             type: "cluster",
             radiusPx: 50,
             color: { type: "single", color: "#228be6" },
-            stroke: layer.symbology.stroke,
+            stroke: circleSymbology.stroke,
           },
         }}
         onLayerChange={vi.fn()}
@@ -239,7 +251,7 @@ describe("StyleSection", () => {
     expect(onOpenClassification).toHaveBeenCalledOnce();
   });
 
-  it("keeps unavailable symbology options focusable and explains why", () => {
+  it("keeps unavailable symbology options focusable without point bindings", () => {
     render(
       <StyleSection
         layer={MapLayer.makeEmpty("Cities")}
@@ -262,9 +274,128 @@ describe("StyleSection", () => {
     );
     expect(
       screen.getByText(
-        "Cluster and Heat are unavailable: they arrive in a later release.",
+        "Cluster and Heat require a complete point-producing binding.",
       ),
     ).toBeInTheDocument();
+  });
+
+  it.each([
+    {
+      type: "latLngColumns" as const,
+      latitude: queryColumn.id,
+      longitude: queryColumn.id,
+    },
+    {
+      type: "geometryColumn" as const,
+      column: queryColumn.id,
+      encoding: "wkt" as const,
+      family: "point" as const,
+      simplification: undefined,
+      sourceCrs: undefined,
+    },
+  ])("enables density styles for a complete $type point binding", (binding) => {
+    const layer = MapLayer.makeEmpty("Cities");
+    render(
+      <StyleSection
+        layer={{ ...layer, geoBinding: binding }}
+        onLayerChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Cluster" })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    expect(screen.getByRole("button", { name: "Heat" })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    expect(
+      screen.queryByText(
+        "Cluster and Heat require a complete point-producing binding.",
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it("locks point styles for aggregate-only sensitivity", () => {
+    const layer = MapLayer.withSensitivity(MapLayer.createArea("Districts"), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+    render(<SymbologyTypeControl layer={layer} onLayerChange={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Point" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Cluster" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(
+      screen.getByText(
+        "Aggregate-only layers require an area-producing binding.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("renders cluster radius, color, and outline controls", () => {
+    const layer = MapLayer.makeEmpty("Cities");
+    const circleSymbology = _getCircleSymbology(layer);
+    render(
+      <StyleSection
+        layer={{
+          ...layer,
+          geoBinding: {
+            type: "latLngColumns",
+            latitude: queryColumn.id,
+            longitude: queryColumn.id,
+          },
+          symbology: {
+            type: "cluster",
+            radiusPx: 50,
+            color: { type: "single", color: "#228be6" },
+            stroke: circleSymbology.stroke,
+          },
+        }}
+        onLayerChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Cluster radius")).toHaveValue("50 px");
+    expect(screen.getByLabelText("Color")).toBeInTheDocument();
+    expect(screen.getByLabelText("Outline")).toBeInTheDocument();
+  });
+
+  it("renders heatmap radius, weight, and ramp controls", () => {
+    const layer = MapLayer.makeEmpty("Cities");
+    render(
+      <StyleSection
+        layer={{
+          ...layer,
+          geoBinding: {
+            type: "latLngColumns",
+            latitude: queryColumn.id,
+            longitude: queryColumn.id,
+          },
+          symbology: {
+            type: "heatmap",
+            radiusPx: 30,
+            weight: undefined,
+            ramp: MapLayer.defaultHeatmapRamp,
+          },
+        }}
+        onLayerChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Heat radius")).toHaveValue("30 px");
+    expect(
+      screen.getByRole("button", { name: "Weight by" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Color ramp" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText("Outline")).not.toBeInTheDocument();
   });
 
   it("restores the previous point settings after switching from sized", () => {
@@ -326,9 +457,11 @@ describe("StyleSection", () => {
       onLayerChange: onLayerChange,
       layer: layer,
     });
-    expect(updatedLayer.symbology.color).toEqual({
-      type: "single",
-      color: "#ff0000",
+    expect(updatedLayer.symbology).toMatchObject({
+      color: {
+        type: "single",
+        color: "#ff0000",
+      },
     });
 
     fireEvent.change(screen.getByLabelText("Radius"), {
@@ -347,7 +480,9 @@ describe("StyleSection", () => {
       onLayerChange: onLayerChange,
       layer: updatedLayer,
     });
-    expect(updatedLayer.symbology.stroke.color).toBe("#000000");
+    expect(updatedLayer.symbology).toMatchObject({
+      stroke: { color: "#000000" },
+    });
 
     fireEvent.change(screen.getByLabelText("Outline width"), {
       target: { value: "2" },
@@ -356,7 +491,9 @@ describe("StyleSection", () => {
       onLayerChange: onLayerChange,
       layer: updatedLayer,
     });
-    expect(updatedLayer.symbology.stroke.width).toBe(2);
+    expect(updatedLayer.symbology).toMatchObject({
+      stroke: { width: 2 },
+    });
   });
 
   it("renders sized controls and forwards size, radius, and scale changes", () => {

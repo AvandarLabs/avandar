@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 type Props = {
   activeType: MapLayer.Symbology["type"];
   labels: Readonly<Record<(typeof SYMBOLOGY_OPTIONS)[number]["type"], string>>;
+  isOptionAvailable: (type: AvailableSymbologyType) => boolean;
   onTypeChange: (type: AvailableSymbologyType) => void;
 };
 
@@ -14,19 +15,21 @@ type Props = {
 export function SymbologyOptions({
   activeType,
   labels,
+  isOptionAvailable,
   onTypeChange,
 }: Props): ReactNode {
   return SYMBOLOGY_OPTIONS.map((option) => {
+    const isAvailable = isOptionAvailable(option.type);
     return (
       <button
         className={css.symbologyOptionsItem}
         key={option.type}
         type="button"
         aria-pressed={option.type === activeType}
-        aria-disabled={!option.isAvailable || undefined}
-        aria-describedby={option.isAvailable ? undefined : "gis-symbology-hint"}
+        aria-disabled={!isAvailable || undefined}
+        aria-describedby={isAvailable ? undefined : "gis-symbology-hint"}
         onClick={() => {
-          if (option.isAvailable) {
+          if (isAvailable) {
             onTypeChange(option.type);
           }
         }}

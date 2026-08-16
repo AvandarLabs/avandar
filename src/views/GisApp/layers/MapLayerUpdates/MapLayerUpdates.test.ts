@@ -417,9 +417,178 @@ describe("withSymbology", () => {
         remembered: undefined,
       },
     });
-    expect(updatedLayer.symbology.color).toEqual({
-      type: "single",
+    expect(updatedLayer.symbology).toMatchObject({
+      color: {
+        type: "single",
+        color: "#eb6834",
+      },
+    });
+  });
+
+  it("carries a single color from a circle to a cluster", () => {
+    const layer = MapLayerUpdates.withSymbolColor({
+      layer: MapLayer.makeEmpty("Cases"),
       color: "#eb6834",
+    });
+
+    const updatedLayer = MapLayerUpdates.withSymbologyType({
+      layer,
+      change: {
+        nextType: "cluster",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+
+    expect(updatedLayer.symbology).toMatchObject({
+      type: "cluster",
+      radiusPx: MapLayer.defaultClusterRadiusPx,
+      color: { type: "single", color: "#eb6834" },
+    });
+  });
+
+  it("flattens graduated color when switching to heatmap", () => {
+    const valueColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("cases"),
+    );
+    const emptyLayer = MapLayer.makeEmpty("Cases");
+    if (emptyLayer.symbology.type !== "circle") {
+      throw new Error("Expected default circle symbology");
+    }
+    const layer = {
+      ...emptyLayer,
+      symbology: {
+        ...emptyLayer.symbology,
+        color: {
+          type: "graduated" as const,
+          value: { type: "queryColumn" as const, column: valueColumn.id },
+          ramp: ["#123456", "#abcdef"],
+          classification: { method: "quantile" as const, classCount: 2 },
+          normalization: undefined,
+          noData: { color: "#cccccc", label: "" },
+        },
+      },
+    };
+
+    const clusterLayer = MapLayerUpdates.withSymbologyType({
+      layer,
+      change: {
+        nextType: "cluster",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+    const heatmapLayer = MapLayerUpdates.withSymbologyType({
+      layer,
+      change: {
+        nextType: "heatmap",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+
+    expect(clusterLayer.symbology).toMatchObject({
+      type: "cluster",
+      color: { type: "single", color: "#123456" },
+    });
+    expect(heatmapLayer.symbology).toEqual({
+      type: "heatmap",
+      radiusPx: MapLayer.defaultHeatmapRadiusPx,
+      weight: undefined,
+      ramp: MapLayer.defaultHeatmapRamp,
+    });
+  });
+
+  it.each([
+    {
+      categories: [{ value: "a", color: "#654321", label: "A" }],
+      expectedColor: "#654321",
+    },
+    { categories: [], expectedColor: MapLayer.defaultSymbolColor },
+  ])(
+    "flattens categorical color when switching to cluster",
+    ({ categories, expectedColor }) => {
+      const valueColumn = QueryColumn.makeFromDatasetColumn(
+        _createNumericColumn("category"),
+      );
+      const emptyLayer = MapLayer.makeEmpty("Cases");
+      if (emptyLayer.symbology.type !== "circle") {
+        throw new Error("Expected default circle symbology");
+      }
+      const layer = {
+        ...emptyLayer,
+        symbology: {
+          ...emptyLayer.symbology,
+          color: {
+            type: "categorical" as const,
+            value: { type: "queryColumn" as const, column: valueColumn.id },
+            categories,
+            other: { color: "#999999", label: "Other" },
+            noData: { color: "#cccccc", label: "No data" },
+          },
+        },
+      };
+
+      const updatedLayer = MapLayerUpdates.withSymbologyType({
+        layer,
+        change: {
+          nextType: "cluster",
+          valueColumn: undefined,
+          remembered: undefined,
+        },
+      });
+
+      expect(updatedLayer.symbology).toMatchObject({
+        type: "cluster",
+        color: { type: "single", color: expectedColor },
+      });
+    },
+  );
+
+  it("updates cluster and heatmap authoring settings", () => {
+    const weightColumn = QueryColumn.makeFromDatasetColumn(
+      _createNumericColumn("population"),
+    );
+    const clusterLayer = MapLayerUpdates.withSymbologyType({
+      layer: MapLayer.makeEmpty("Cases"),
+      change: {
+        nextType: "cluster",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+    const withClusterRadius = MapLayerUpdates.withClusterRadius({
+      layer: clusterLayer,
+      radiusPx: 64,
+    });
+    const heatmapLayer = MapLayerUpdates.withSymbologyType({
+      layer: withClusterRadius,
+      change: {
+        nextType: "heatmap",
+        valueColumn: undefined,
+        remembered: undefined,
+      },
+    });
+    const withWeight = MapLayerUpdates.withHeatmapWeight({
+      layer: heatmapLayer,
+      column: weightColumn,
+    });
+    const withRadius = MapLayerUpdates.withHeatmapRadius({
+      layer: withWeight,
+      radiusPx: 42,
+    });
+    const updatedLayer = MapLayerUpdates.withHeatmapRamp({
+      layer: withRadius,
+      ramp: ["#000000", "#ffffff"],
+    });
+
+    expect(withClusterRadius.symbology).toMatchObject({ radiusPx: 64 });
+    expect(updatedLayer.source.queryColumns).toContain(weightColumn);
+    expect(updatedLayer.symbology).toEqual({
+      type: "heatmap",
+      radiusPx: 42,
+      weight: weightColumn.id,
+      ramp: ["#000000", "#ffffff"],
     });
   });
 
@@ -569,7 +738,9 @@ describe("classification updates", () => {
       noData: { color: "#ccc", label: "" },
     });
 
-    expect(updated.symbology.color.type).toBe("graduated");
+    expect(updated.symbology).toMatchObject({
+      color: { type: "graduated" },
+    });
     expect(updated.legend.breaks).toEqual([]);
     expect(updated.legend.entries).toEqual([]);
   });

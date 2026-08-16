@@ -741,6 +741,7 @@ msgid "{shareClause} will lose access."
 msgstr "سيفقد {shareClause} إمكانية الوصول."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Orange"
 msgstr ""
 
@@ -1345,6 +1346,10 @@ msgid "Add a member or a user group to grant access. Use General access above "
 msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصول. استخدم الوصول العام أعلاه "
 "للمشاركة على نطاق أوسع."
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Heat radius"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
@@ -1842,6 +1847,10 @@ msgstr ""
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "دالة التجميع \"{funcName}\" غير مدعومة في SELECT؛ تم تخطيها."
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
+msgid "Cluster and Heat require a complete point-producing binding."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "مجموعات البيانات الخاصة"
@@ -2011,6 +2020,10 @@ msgstr "الأقصى"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Enter strictly increasing values separated by commas."
+msgstr ""
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Unweighted"
 msgstr ""
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
@@ -3942,6 +3955,7 @@ msgid "Forest"
 msgstr "غابة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Aggregate-only layers require an area-producing binding."
 msgstr ""
 
@@ -4450,6 +4464,10 @@ msgstr "المساعد يكتب"
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
 msgstr "تم حفظ مجموعة البيانات بنجاح!"
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
+msgid "Cluster radius"
+msgstr ""
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
@@ -5355,6 +5373,10 @@ msgstr ""
 msgid "File failed to load"
 msgstr "فشل تحميل الملف"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Weight by"
+msgstr ""
+
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -6139,8 +6161,8 @@ msgid "Boundary key column"
 msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
-msgid "Cluster and Heat are unavailable: they arrive in a later release."
-msgstr ""
+#~ msgid "Cluster and Heat are unavailable: they arrive in a later release."
+#~ msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -6525,6 +6547,7 @@ msgid "Cancelled"
 msgstr "تم الإلغاء"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Color ramp"
 msgstr ""
 
@@ -7080,6 +7103,10 @@ msgstr "اكتب عبارة التأكيد"
 msgid "You have not created any dashboards"
 msgstr "لم تقم بإنشاء أي لوحات معلومات"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Ochre"
+msgstr ""
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "بيتا"
@@ -7428,6 +7455,7 @@ msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "يشير ORDER BY إلى العمود \"{columnName}\" غير الموجود في قائمة SELECT."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Blue"
 msgstr ""
 

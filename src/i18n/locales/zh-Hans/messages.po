@@ -729,6 +729,7 @@ msgid "{shareClause} will lose access."
 msgstr "{shareClause} 将失去访问权限。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Orange"
 msgstr ""
 
@@ -1318,6 +1319,10 @@ msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "添加成员或用户群组以授予访问权限。使用上方的“常规访问权限”可扩大分享范围。"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Heat radius"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
@@ -1802,6 +1807,10 @@ msgstr ""
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "SELECT 中不支持聚合函数“{funcName}”；已跳过。"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
+msgid "Cluster and Heat require a complete point-producing binding."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "私有数据集"
@@ -1966,6 +1975,10 @@ msgstr "最大"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Enter strictly increasing values separated by commas."
+msgstr ""
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Unweighted"
 msgstr ""
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
@@ -3866,6 +3879,7 @@ msgid "Forest"
 msgstr "森林"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Aggregate-only layers require an area-producing binding."
 msgstr ""
 
@@ -4365,6 +4379,10 @@ msgstr "助手正在输入"
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
 msgstr "数据集保存成功！"
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
+msgid "Cluster radius"
+msgstr ""
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
@@ -5261,6 +5279,10 @@ msgstr ""
 msgid "File failed to load"
 msgstr "文件加载失败"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Weight by"
+msgstr ""
+
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -6027,8 +6049,8 @@ msgid "Boundary key column"
 msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
-msgid "Cluster and Heat are unavailable: they arrive in a later release."
-msgstr ""
+#~ msgid "Cluster and Heat are unavailable: they arrive in a later release."
+#~ msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -6406,6 +6428,7 @@ msgid "Cancelled"
 msgstr "已取消"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Color ramp"
 msgstr ""
 
@@ -6948,6 +6971,10 @@ msgstr "输入确认短语"
 msgid "You have not created any dashboards"
 msgstr "您尚未创建任何仪表板"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Ochre"
+msgstr ""
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "测试版"
@@ -7290,6 +7317,7 @@ msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY 引用了不在 SELECT 列表中的列“{columnName}”。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Blue"
 msgstr ""
 

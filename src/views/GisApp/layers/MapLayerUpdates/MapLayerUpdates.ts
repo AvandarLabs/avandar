@@ -46,7 +46,8 @@ const DEFAULT_POPUP_COLUMN_LIMIT = 12;
 /** Column ids the layer needs regardless of what the popup shows. */
 function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
   const binding = layer.geoBinding;
-  const color = layer.symbology.color;
+  const color =
+    layer.symbology.type === "heatmap" ? undefined : layer.symbology.color;
   return makeSet(
     [
       binding?.type === "latLngColumns" ? binding.latitude : undefined,
@@ -55,11 +56,12 @@ function _getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       layer.symbology.type === "proportionalSymbol" ?
         layer.symbology.value
       : undefined,
-      color.type !== "single" && color.value.type === "queryColumn" ?
+      layer.symbology.type === "heatmap" ? layer.symbology.weight : undefined,
+      color && color.type !== "single" && color.value.type === "queryColumn" ?
         color.value.column
       : undefined,
       (
-        color.type === "graduated" &&
+        color?.type === "graduated" &&
         color.normalization?.denominator.type === "queryColumn"
       ) ?
         color.normalization.denominator.column
@@ -95,10 +97,16 @@ function _withGeometryFamilySymbology(
   family: MapLayer.GeometryFamily,
 ): MapLayer.Symbology {
   const color =
-    layer.symbology.color.type === "single" ?
+    (
+      layer.symbology.type !== "heatmap" &&
+      layer.symbology.color.type === "single"
+    ) ?
       layer.symbology.color
     : { type: "single" as const, color: MapLayer.defaultSymbolColor };
-  const stroke = layer.symbology.stroke;
+  const stroke =
+    layer.symbology.type === "heatmap" ?
+      MapLayer.createDefaultFillSymbology().stroke
+    : layer.symbology.stroke;
   if (family === "polygon") {
     return { ...MapLayer.createDefaultFillSymbology(), color, stroke };
   }
@@ -120,6 +128,27 @@ function _getDefaultSimplification(
   return family === "point" ? undefined : { tolerancePixels: 0.75 };
 }
 
+function _getSingleColor(layer: MapLayer.T): string {
+  const symbology = layer.symbology;
+  if (symbology.type === "heatmap") {
+    return MapLayer.defaultSymbolColor;
+  }
+  const { color } = symbology;
+  if (color.type === "single") {
+    return color.color;
+  }
+  return (
+    (color.type === "graduated" ? color.ramp[0] : color.categories[0]?.color) ??
+    MapLayer.defaultSymbolColor
+  );
+}
+
+function _getStroke(layer: MapLayer.T): MapLayer.ClusterSymbology["stroke"] {
+  return layer.symbology.type === "heatmap" ?
+      MapLayer.createDefaultFillSymbology().stroke
+    : layer.symbology.stroke;
+}
+
 function _withCircleSymbology(layer: MapLayer.T): MapLayer.T {
   if (layer.sensitivity.mode === "aggregateOnly") {
     return layer;
@@ -133,8 +162,11 @@ function _withCircleSymbology(layer: MapLayer.T): MapLayer.T {
     symbology: {
       type: "circle",
       radius,
-      color: layer.symbology.color,
-      stroke: layer.symbology.stroke,
+      color:
+        layer.symbology.type === "heatmap" ?
+          { type: "single", color: MapLayer.defaultSymbolColor }
+        : layer.symbology.color,
+      stroke: _getStroke(layer),
     },
   } as MapLayer.Standard;
 }
@@ -162,8 +194,11 @@ function _withProportionalSymbology(
       minRadius: MapLayer.defaultMinSymbolRadius,
       maxRadius,
       scale: "sqrt",
-      color: layer.symbology.color,
-      stroke: layer.symbology.stroke,
+      color:
+        layer.symbology.type === "heatmap" ?
+          { type: "single", color: MapLayer.defaultSymbolColor }
+        : layer.symbology.color,
+      stroke: _getStroke(layer),
     },
   } as MapLayer.Standard;
 }
@@ -514,8 +549,11 @@ export const MapLayerUpdates = {
             symbology: {
               type: "circle",
               radius: MapLayer.defaultSymbolRadius,
-              color: symbology.color,
-              stroke: symbology.stroke,
+              color:
+                symbology.type === "heatmap" ?
+                  { type: "single", color: MapLayer.defaultSymbolColor }
+                : symbology.color,
+              stroke: _getStroke(layer),
             },
           } as MapLayer.Standard);
     }
@@ -542,8 +580,11 @@ export const MapLayerUpdates = {
           : MapLayer.defaultMaxSymbolRadius,
         scale:
           symbology.type === "proportionalSymbol" ? symbology.scale : "sqrt",
-        color: symbology.color,
-        stroke: symbology.stroke,
+        color:
+          symbology.type === "heatmap" ?
+            { type: "single", color: MapLayer.defaultSymbolColor }
+          : symbology.color,
+        stroke: _getStroke(layer),
       },
     } as MapLayer.Standard;
   },
@@ -553,6 +594,9 @@ export const MapLayerUpdates = {
     options: Readonly<{ layer: MapLayer.T; color: string }>,
   ): MapLayer.T => {
     const { layer, color } = options;
+    if (layer.symbology.type === "heatmap") {
+      return layer;
+    }
     if (
       layer.symbology.color.type === "single" &&
       layer.symbology.color.color === color
@@ -570,6 +614,9 @@ export const MapLayerUpdates = {
 
   /** Replaces color behavior and invalidates its derived legend output. */
   withLayerColor: (layer: MapLayer.T, color: MapLayer.Color): MapLayer.T => {
+    if (layer.symbology.type === "heatmap") {
+      return layer;
+    }
     return {
       ...layer,
       symbology: { ...layer.symbology, color },
@@ -582,6 +629,9 @@ export const MapLayerUpdates = {
     layer: MapLayer.T,
     breaks: readonly number[],
   ): MapLayer.T => {
+    if (layer.symbology.type === "heatmap") {
+      return layer;
+    }
     const color = layer.symbology.color;
     const isValid = breaks.every((value, index) => {
       return (
@@ -616,7 +666,7 @@ export const MapLayerUpdates = {
     const existingIds = makeSet(layer.source.queryColumns, { key: "id" });
     const nextQueryColumns = [
       ...layer.source.queryColumns.filter(
-        propPasses("id", (columnId) => {
+        propPasses("id", (columnId): columnId is QueryColumn.Id => {
           return requiredIds.has(columnId) || selectedIds.has(columnId);
         }),
       ),
@@ -669,7 +719,7 @@ export const MapLayerUpdates = {
     options: Readonly<{
       layer: MapLayer.T;
       change: Readonly<{
-        nextType: "circle" | "proportionalSymbol";
+        nextType: "circle" | "proportionalSymbol" | "cluster" | "heatmap";
         valueColumn: QueryColumn.T | undefined;
         remembered: MapLayer.Symbology | undefined;
       }>;
@@ -693,6 +743,28 @@ export const MapLayerUpdates = {
       .with("proportionalSymbol", () => {
         return _withProportionalSymbology({ layer, valueColumn });
       })
+      .with("cluster", () => {
+        return {
+          ...layer,
+          symbology: {
+            type: "cluster",
+            radiusPx: MapLayer.defaultClusterRadiusPx,
+            color: { type: "single", color: _getSingleColor(layer) },
+            stroke: _getStroke(layer),
+          },
+        } as MapLayer.Standard;
+      })
+      .with("heatmap", () => {
+        return {
+          ...layer,
+          symbology: {
+            type: "heatmap",
+            radiusPx: MapLayer.defaultHeatmapRadiusPx,
+            weight: undefined,
+            ramp: MapLayer.defaultHeatmapRamp,
+          },
+        } as MapLayer.Standard;
+      })
       .exhaustive();
   },
 
@@ -710,6 +782,75 @@ export const MapLayerUpdates = {
     return {
       ...layer,
       symbology: { ...layer.symbology, radius },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets a cluster's grouping radius, in pixels. */
+  withClusterRadius: (
+    options: Readonly<{ layer: MapLayer.T; radiusPx: number }>,
+  ): MapLayer.T => {
+    const { layer, radiusPx } = options;
+    if (
+      layer.symbology.type !== "cluster" ||
+      layer.symbology.radiusPx === radiusPx
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, radiusPx },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets a heatmap's influence radius, in pixels. */
+  withHeatmapRadius: (
+    options: Readonly<{ layer: MapLayer.T; radiusPx: number }>,
+  ): MapLayer.T => {
+    const { layer, radiusPx } = options;
+    if (
+      layer.symbology.type !== "heatmap" ||
+      layer.symbology.radiusPx === radiusPx
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, radiusPx },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets the optional numeric column that weights heatmap points. */
+  withHeatmapWeight: (
+    options: Readonly<{
+      layer: MapLayer.T;
+      column: QueryColumn.T | undefined;
+    }>,
+  ): MapLayer.T => {
+    const { layer, column } = options;
+    if (layer.symbology.type !== "heatmap") {
+      return layer;
+    }
+    const withColumn = column ? _withQueryColumn({ layer, column }) : layer;
+    if (layer.symbology.weight === column?.id && withColumn === layer) {
+      return layer;
+    }
+    return {
+      ...withColumn,
+      symbology: { ...layer.symbology, weight: column?.id },
+    } as MapLayer.Standard;
+  },
+
+  /** Sets the sequential colors used by a heatmap. */
+  withHeatmapRamp: (
+    options: Readonly<{ layer: MapLayer.T; ramp: readonly string[] }>,
+  ): MapLayer.T => {
+    const { layer, ramp } = options;
+    if (layer.symbology.type !== "heatmap" || layer.symbology.ramp === ramp) {
+      return layer;
+    }
+    return {
+      ...layer,
+      symbology: { ...layer.symbology, ramp },
     } as MapLayer.Standard;
   },
 
@@ -771,10 +912,13 @@ export const MapLayerUpdates = {
   withStroke: (
     options: Readonly<{
       layer: MapLayer.T;
-      stroke: Partial<MapLayer.Symbology["stroke"]>;
+      stroke: Partial<MapLayer.ClusterSymbology["stroke"]>;
     }>,
   ): MapLayer.T => {
     const { layer, stroke } = options;
+    if (layer.symbology.type === "heatmap") {
+      return layer;
+    }
     const updatedStroke = { ...layer.symbology.stroke, ...stroke };
     if (
       updatedStroke.color === layer.symbology.stroke.color &&

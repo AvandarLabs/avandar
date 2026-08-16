@@ -3,6 +3,8 @@ import { Button, ColorInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { CircleRadiusControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl";
+import { ClusterControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls";
+import { HeatmapControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls";
 import { ProportionalSymbolControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls";
 import { StrokeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls";
 import { SymbologyTypeControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl";
@@ -22,13 +24,16 @@ export function StyleSection(props: Props): ReactNode {
   const { layer, onLayerChange } = props;
   const { symbology } = layer;
   const isPoint =
-    symbology.type === "circle" || symbology.type === "proportionalSymbol";
+    symbology.type === "circle" ||
+    symbology.type === "proportionalSymbol" ||
+    symbology.type === "cluster" ||
+    symbology.type === "heatmap";
   return (
     <InspectorSection title={t`Style`} defaultOpen>
       {isPoint ?
         <SymbologyTypeControl layer={layer} onLayerChange={onLayerChange} />
       : null}
-      {symbology.color.type === "single" ?
+      {symbology.type !== "heatmap" && symbology.color.type === "single" ?
         <ColorInput
           label={t`Color`}
           format="hex"
@@ -67,8 +72,24 @@ export function StyleSection(props: Props): ReactNode {
           }
           onLayerChange={onLayerChange}
         />
+      : symbology.type === "cluster" ?
+        <ClusterControls symbology={symbology} onLayerChange={onLayerChange} />
+      : symbology.type === "heatmap" ?
+        <HeatmapControls
+          layer={
+            { ...layer, symbology } as MapLayer.T & {
+              symbology: typeof symbology;
+            }
+          }
+          onLayerChange={onLayerChange}
+        />
       : null}
-      <StrokeControls stroke={symbology.stroke} onLayerChange={onLayerChange} />
+      {symbology.type !== "heatmap" ?
+        <StrokeControls
+          stroke={symbology.stroke}
+          onLayerChange={onLayerChange}
+        />
+      : null}
     </InspectorSection>
   );
 }

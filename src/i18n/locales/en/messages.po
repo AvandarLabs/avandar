@@ -747,6 +747,7 @@ msgid "{shareClause} will lose access."
 msgstr "{shareClause} will lose access."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Orange"
 msgstr "Orange"
 
@@ -1351,6 +1352,10 @@ msgid "Add a member or a user group to grant access. Use General access above "
 msgstr "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Heat radius"
+msgstr "Heat radius"
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
@@ -1853,6 +1858,10 @@ msgstr "1 point"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
+msgid "Cluster and Heat require a complete point-producing binding."
+msgstr "Cluster and Heat require a complete point-producing binding."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "Private datasets"
@@ -2026,6 +2035,10 @@ msgstr "Max"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Enter strictly increasing values separated by commas."
 msgstr "Enter strictly increasing values separated by commas."
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Unweighted"
+msgstr "Unweighted"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -3970,6 +3983,7 @@ msgid "Forest"
 msgstr "Forest"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Aggregate-only layers require an area-producing binding."
 msgstr "Aggregate-only layers require an area-producing binding."
 
@@ -4482,6 +4496,10 @@ msgstr "Assistant is typing"
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset saved successfully!"
 msgstr "Dataset saved successfully!"
+
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
+msgid "Cluster radius"
+msgstr "Cluster radius"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
@@ -5395,6 +5413,10 @@ msgstr "Units"
 msgid "File failed to load"
 msgstr "File failed to load"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Weight by"
+msgstr "Weight by"
+
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -6182,8 +6204,8 @@ msgid "Boundary key column"
 msgstr "Boundary key column"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
-msgid "Cluster and Heat are unavailable: they arrive in a later release."
-msgstr "Cluster and Heat are unavailable: they arrive in a later release."
+#~ msgid "Cluster and Heat are unavailable: they arrive in a later release."
+#~ msgstr "Cluster and Heat are unavailable: they arrive in a later release."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -6567,6 +6589,7 @@ msgid "Cancelled"
 msgstr "Cancelled"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Color ramp"
 msgstr "Color ramp"
 
@@ -7126,6 +7149,10 @@ msgstr "Type the confirmation phrase"
 msgid "You have not created any dashboards"
 msgstr "You have not created any dashboards"
 
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+msgid "Ochre"
+msgstr "Ochre"
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "Beta"
@@ -7476,6 +7503,7 @@ msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY references column \"{columnName}\" not in the SELECT list."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Blue"
 msgstr "Blue"
 

@@ -1,13 +1,10 @@
-/** Symbology choices in authoring order, including unavailable previews. */
+/** Point symbology choices in authoring order. */
 export const SYMBOLOGY_OPTIONS = [
-  { type: "circle", isAvailable: true },
-  { type: "proportionalSymbol", isAvailable: true },
-  { type: "cluster", isAvailable: false },
-  { type: "heatmap", isAvailable: false },
+  { type: "circle" },
+  { type: "proportionalSymbol" },
+  { type: "cluster" },
+  { type: "heatmap" },
 ] as const;
 
-/** A symbology type currently available for selection. */
-export type AvailableSymbologyType = Extract<
-  (typeof SYMBOLOGY_OPTIONS)[number],
-  { isAvailable: true }
->["type"];
+/** A symbology type offered by the point-style control. */
+export type AvailableSymbologyType = (typeof SYMBOLOGY_OPTIONS)[number]["type"];
