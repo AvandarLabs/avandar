@@ -115,7 +115,7 @@ values (
 -- statement under an exempt identity and the guard would never fire. Created
 -- here, before the role switch, because `authenticated` may not create
 -- functions.
-create function pg_temp.f2_hint_of(p_sql text) returns text language plpgsql as $fn$
+create or replace function pg_temp.dashboards__f2_hint_of(p_sql text) returns text language plpgsql as $fn$
 declare
   v_hint text;
 begin
@@ -267,7 +267,7 @@ select throws_ok(
 -- assertion exists so rewording the hint breaks a test rather than silently
 -- turning both messages back into "Share failed".
 select is(
-  pg_temp.f2_hint_of(
+  pg_temp.dashboards__f2_hint_of(
     $$insert into public.resource_shares
         (workspace_id, resource_type, resource_id, principal_type, principal_id, role)
       values (

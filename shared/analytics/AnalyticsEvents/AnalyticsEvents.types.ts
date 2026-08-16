@@ -5,7 +5,7 @@ import type {
   SERVER_ANALYTICS_EVENT_NAMES,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
-import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types.ts";
+import type { Dashboard } from "$/models/Dashboard/Dashboard.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import type { DashboardFilterMode } from "$/types/dashboard.types.ts";
 import type { Database } from "$/types/database.types.ts";
@@ -109,16 +109,16 @@ export type AnalyticsEventPayloads = {
       dashboardId: string;
       blockCount: number;
       hasVanitySlug: boolean;
-      visibility: DashboardVisibility;
+      visibility: Dashboard.Visibility;
     }
   : K extends "dashboard.share_settings_updated" ?
     {
       dashboardId: string;
       slugAction: "set" | "clear" | "unchanged";
-      visibility: DashboardVisibility;
+      visibility: Dashboard.Visibility;
     }
   : K extends "dashboard.unpublished" ?
-    { dashboardId: string; priorVisibility: DashboardVisibility }
+    { dashboardId: string; priorVisibility: Dashboard.Visibility }
   : K extends "dashboard.block_added_via_chat" ?
     DashboardBlockAddedViaChatPayload
   : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload

@@ -11,7 +11,7 @@ set search_path to extensions, public;
 -- access rules apply. It returns null rather than raising on a path it does not
 -- recognise, so a malformed name is a policy DENIAL instead of a storage error.
 --
-select plan(60);
+select plan(61);
 
 select is(
   public.util__storage_object_dashboard_id (
@@ -516,6 +516,20 @@ select throws_ok(
 
 -- The Storage API sets this transaction-local flag before deleting objects.
 select set_config('storage.allow_delete_query', 'true', true);
+
+-- Control first. A DELETE returning zero rows only proves the DELETE policy if
+-- the row is visible to this session at this moment; without this, a row the
+-- SELECT policy hides would produce the same empty result.
+select is(
+  (
+    select count(*)::int
+    from storage.objects
+    where bucket_id = 'published-private'
+      and name = 'dashboards/d2004001-0000-4000-8000-000000000001/revisions/22222222-2222-4222-8222-222222222222/datasets/d2007004-0000-4000-8000-000000000004.parquet'
+  ),
+  1,
+  'the owner can see the staged private object it is about to fail to delete'
+);
 
 select results_eq(
   $$delete from storage.objects

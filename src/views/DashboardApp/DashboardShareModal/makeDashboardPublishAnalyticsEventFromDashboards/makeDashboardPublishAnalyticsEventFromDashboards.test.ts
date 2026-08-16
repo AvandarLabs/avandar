@@ -2,14 +2,13 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { makeDashboardPublishAnalyticsEventFromDashboards } from "./makeDashboardPublishAnalyticsEventFromDashboards";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types";
 
 function _makeDashboard(
   options: Readonly<{
     isPublic?: boolean;
     slug?: string | undefined;
     blockCount?: number;
-    visibility?: DashboardVisibility;
+    visibility?: Dashboard.Visibility;
   }>,
 ): Dashboard.T {
   const visibility =

@@ -54,7 +54,8 @@ execute on function public.util__dashboard_counts_as_shareable (uuid)
 from
   public,
   anon,
-  authenticated;
+  authenticated,
+  service_role;
 
 /**
  * The workspace's effective shareable-dashboard cap, or null for unlimited.
@@ -118,7 +119,8 @@ execute on function public.util__workspace_max_shareable_dashboards (uuid)
 from
   public,
   anon,
-  authenticated;
+  authenticated,
+  service_role;
 
 /**
  * Raises when the workspace has already spent its shareable-dashboard

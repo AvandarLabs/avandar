@@ -4,7 +4,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(34);
+select plan(30);
 
 insert into public.dashboards (
   id,
@@ -24,29 +24,11 @@ select
 from public.user_profiles
 limit 1;
 
-select has_type(
-  'public',
-  'dashboard_snapshot_transition_kind',
-  'dashboard snapshot transition kind is durable'
-);
-
-select has_column('public', 'dashboards', 'snapshot_transition_kind', 'has transition kind');
-select has_column('public', 'dashboards', 'snapshot_transition_revision', 'has transition revision');
-select has_column('public', 'dashboards', 'snapshot_transition_prior_revision', 'has prior revision');
-select has_column('public', 'dashboards', 'snapshot_transition_prior_visibility', 'has prior visibility');
-select has_column('public', 'dashboards', 'snapshot_transition_target_visibility', 'has target visibility');
-
-select has_check(
-  'public',
-  'dashboards',
-  'dashboards has a transition state consistency check'
-);
-
-select has_check(
-  'public',
-  'dashboards',
-  'dashboards has a settled snapshot consistency check'
-);
+-- The type, the five transition columns and the two CHECK constraints are not
+-- asserted structurally here. Every behavioural case below writes all five
+-- columns and names both constraints in its expected error, so a missing
+-- column or a dropped constraint fails those instead, with a message that says
+-- what actually broke.
 
 select has_schema(
   'private',
@@ -162,27 +144,11 @@ select has_function(
   'snapshot deletes retain durable cleanup authority'
 );
 
-select is(
-  (
-    select count(*)::integer
-    from pg_policies
-    where
-      schemaname = 'storage' and
-      tablename = 'objects' and
-      policyname in (
-        'Authenticated users can DELETE published datasets',
-        'Authenticated users can UPDATE published datasets',
-        'Authenticated users can UPLOAD published datasets',
-        'Users can DELETE private published datasets',
-        'Users can UPDATE private published datasets',
-        'Users can UPLOAD private published datasets'
-      ) and
-      coalesce(qual, '') || coalesce(with_check, '') like
-        '%private.util__auth_user_can_%dashboard_snapshot_object%'
-  ),
-  6,
-  'snapshot mutation policies qualify private helper calls'
-);
+-- Which helper the six snapshot mutation policies call is not asserted by
+-- matching their source text: that passes even when the helper is handed
+-- swapped or negated arguments. `storage_published_buckets`,
+-- `storage_published_visibility_guard` and `storage_snapshot_generations`
+-- exercise those policies against real objects instead.
 
 select ok(
   exists (
@@ -328,6 +294,100 @@ select lives_ok(
       snapshot_transition_target_visibility = null
     where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
   'cleanup recovery may heartbeat and settle a draft without a snapshot'
+);
+
+-- A `delete` claim is not terminal. Its whole point is that the row is about to
+-- disappear, but a crashed client or a storage cleanup that cannot finish would
+-- otherwise pin the row forever: the update trigger has no caller exemption, so
+-- a `delete` with no settlement arm could not be cleared by `service_role` or
+-- by a repair migration either. These four cases pin the escape hatch and its
+-- shape.
+
+select lives_ok(
+  $$update public.dashboards
+    set
+      snapshot_transition_kind = 'publish',
+      snapshot_transition_revision = 'f7005004-0000-4000-8000-000000000004'::uuid,
+      snapshot_transition_prior_revision = snapshot_revision,
+      snapshot_transition_prior_visibility = visibility,
+      snapshot_transition_target_visibility = 'workspace'
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid;
+
+    update public.dashboards
+    set
+      visibility = 'workspace'::public.dashboard_visibility,
+      snapshot_revision = 'f7005004-0000-4000-8000-000000000004'::uuid,
+      snapshot_transition_kind = null,
+      snapshot_transition_revision = null,
+      snapshot_transition_prior_revision = null,
+      snapshot_transition_prior_visibility = null,
+      snapshot_transition_target_visibility = null
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
+  'the fixture republishes to workspace so a delete claim has a boundary to lose'
+);
+
+select lives_ok(
+  $$update public.dashboards
+    set
+      visibility = 'draft'::public.dashboard_visibility,
+      snapshot_transition_kind = 'delete',
+      snapshot_transition_revision = 'f7005005-0000-4000-8000-000000000005'::uuid,
+      snapshot_transition_prior_revision = snapshot_revision,
+      snapshot_transition_prior_visibility = visibility
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
+  'a published dashboard may acquire a delete claim'
+);
+
+select throws_ok(
+  $$update public.dashboards
+    set
+      visibility = snapshot_transition_prior_visibility,
+      snapshot_revision = snapshot_transition_prior_revision,
+      snapshot_transition_kind = null,
+      snapshot_transition_revision = null,
+      snapshot_transition_prior_revision = null,
+      snapshot_transition_prior_visibility = null,
+      snapshot_transition_target_visibility = null
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
+  '23514',
+  'illegal dashboard snapshot transition',
+  'abandoning a delete cannot restore the audience whose objects it may have destroyed'
+);
+
+select lives_ok(
+  $$update public.dashboards
+    set
+      snapshot_revision = null,
+      snapshot_transition_kind = null,
+      snapshot_transition_revision = null,
+      snapshot_transition_prior_revision = null,
+      snapshot_transition_prior_visibility = null,
+      snapshot_transition_target_visibility = null
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
+  'an abandoned delete settles to a draft with no snapshot, like an unpublish'
+);
+
+select lives_ok(
+  $$update public.dashboards
+    set
+      snapshot_transition_kind = 'publish',
+      snapshot_transition_revision = 'f7005006-0000-4000-8000-000000000006'::uuid,
+      snapshot_transition_prior_revision = snapshot_revision,
+      snapshot_transition_prior_visibility = visibility,
+      snapshot_transition_target_visibility = 'public'
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid;
+
+    update public.dashboards
+    set
+      visibility = 'public'::public.dashboard_visibility,
+      snapshot_revision = 'f7005006-0000-4000-8000-000000000006'::uuid,
+      snapshot_transition_kind = null,
+      snapshot_transition_revision = null,
+      snapshot_transition_prior_revision = null,
+      snapshot_transition_prior_visibility = null,
+      snapshot_transition_target_visibility = null
+    where id = 'f7004001-0000-4000-8000-000000000001'::uuid$$,
+  'a dashboard whose delete was abandoned is publishable again, not stuck'
 );
 
 select throws_ok(

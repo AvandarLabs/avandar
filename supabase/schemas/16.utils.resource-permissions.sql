@@ -981,8 +981,6 @@ execute on function private.util__auth_user_can_write_dashboard_snapshot_object 
 /**
  * Whether the auth user may delete a dashboard snapshot object.
  *
- * @param p_bucket_id The `storage.objects.bucket_id` value.
- * @param p_object_name The exact `storage.objects.name` value.
  * Delete transitions require admin access. Other cleanup paths require editor
  * access because editors may unpublish or abort their own publication attempt.
  *
@@ -993,6 +991,8 @@ execute on function private.util__auth_user_can_write_dashboard_snapshot_object 
  * to delete would only strand staged bytes in the world-readable bucket
  * whenever the editor who uploaded them cannot clean them up.
  *
+ * @param p_bucket_id The `storage.objects.bucket_id` value.
+ * @param p_object_name The exact `storage.objects.name` value.
  * @returns True only with the required role and matching durable cleanup claim.
  */
 create or replace function private.util__auth_user_can_delete_dashboard_snapshot_object (

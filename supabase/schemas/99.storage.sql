@@ -180,7 +180,7 @@ create policy "Users can DELETE workspace datasets" on storage.objects for delet
 --
 -- Bucket `published` (private, world-readable only through RLS after the
 -- associated dashboard row has committed public visibility and the matching
--- revision. Editors can read only the exact active staged object generation so
+-- revision). Editors can read only the exact active staged object generation so
 -- Storage upsert remains retryable without exposing committed snapshots they
 -- cannot select. Keeping the bucket private prevents every other download from
 -- bypassing these SELECT gates.
@@ -350,7 +350,7 @@ select
             )
         ) and
         public.util__auth_user_may_select_dashboard (
-          public.util__storage_object_dashboard_id (name)
+          public.util__storage_object_dashboard_id (storage.objects.name)
         )
       )
     )

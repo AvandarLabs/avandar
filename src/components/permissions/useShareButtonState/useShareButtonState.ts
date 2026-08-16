@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { RoleLevel } from "$/models/Permissions/Permissions";
 
 const _ROLE_RANK = {
   viewer: 1,
@@ -19,6 +19,14 @@ type ShareButtonState = {
    * publish without being allowed to hand out access.
    */
   canManageShares: boolean;
+  /**
+   * Whether the role answer is still in flight. `canManageShares` reads
+   * `false` until it lands, which is the safe default for a button but the
+   * wrong thing to render as a verdict: a surface that draws itself
+   * differently for an admin has to wait rather than draw the read-only form
+   * and then flip.
+   */
+  isLoadingRole: boolean;
 };
 
 function _hasAtLeastRole(
@@ -58,6 +66,7 @@ export function useShareButtonState(
       role: effectiveRole ?? undefined,
       minRole: "admin",
     }),
+    isLoadingRole,
     tooltip:
       isAllowed || isLoadingRole ?
         minRole === "admin" ?

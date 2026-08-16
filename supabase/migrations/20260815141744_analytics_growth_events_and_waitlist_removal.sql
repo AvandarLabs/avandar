@@ -774,3 +774,4 @@ grant select on analytics.chat_health to service_role;
 grant select on analytics.invite_conversion to service_role;
 grant select on analytics.plan_movement to service_role;
 grant select on analytics.retention_cohorts to service_role;
+

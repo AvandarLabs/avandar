@@ -1,13 +1,28 @@
 /**
  * RLS for `dashboards`. Requires `16.utils.resource-permissions`.
  *
- *  Resource CRUD matrix (effective role on the row):
- *    viewer: SELECT
- *    editor: SELECT, INSERT (new row in workspace), UPDATE
- *    admin: SELECT, INSERT, UPDATE, DELETE
- * 
- *  SELECT also uses `util__auth_user_may_select_dashboard` so workspace editors
- * cannot read other members' unrestricted rows without an explicit share.
+ * Resource CRUD matrix (effective role on the row):
+ *   viewer: SELECT
+ *   editor: SELECT, INSERT (new row in workspace), UPDATE
+ *   admin: SELECT, INSERT, UPDATE, DELETE
+ *
+ * The role is necessary but no longer sufficient. The durable snapshot
+ * transition in `10.dashboards.sql` adds a state requirement to three of the
+ * four verbs:
+ *
+ *   SELECT - also uses `util__auth_user_may_select_dashboard`, so workspace
+ *            editors cannot read other members' unrestricted rows without an
+ *            explicit share, and a `draft` needs edit rights rather than mere
+ *            read access.
+ *   INSERT - draft-only, and with no transition claim. A dashboard can reach
+ *            `workspace` or `public` only through the guarded two-step
+ *            transition, never by being born there.
+ *   UPDATE - editor rights, EXCEPT on a row already claimed for `delete`,
+ *            which takes delete rights. Otherwise an editor could settle or
+ *            interfere with an admin's pending delete.
+ *   DELETE - admin rights AND a settled `delete` claim on the row. A dashboard
+ *            cannot be removed until its snapshot objects have been cleaned up
+ *            under that claim.
  */
 create policy "Anon can read public dashboards" on public.dashboards for
 select
@@ -57,7 +72,8 @@ for update
       public.dashboards.id
     ) and
     (
-      public.dashboards.snapshot_transition_kind is distinct from 'delete' or
+      public.dashboards.snapshot_transition_kind is distinct from
+        'delete'::public.dashboard_snapshot_transition_kind or
       public.util__auth_user_can_delete_resource (
         'dashboard'::public.resource_type,
         public.dashboards.id
@@ -71,7 +87,8 @@ with
       public.dashboards.id
     ) and
     (
-      public.dashboards.snapshot_transition_kind is distinct from 'delete' or
+      public.dashboards.snapshot_transition_kind is distinct from
+        'delete'::public.dashboard_snapshot_transition_kind or
       public.util__auth_user_can_delete_resource (
         'dashboard'::public.resource_type,
         public.dashboards.id
@@ -87,17 +104,33 @@ with
     )
   );
 
+-- Deleting a dashboard is the last step of a `delete` transition, never a
+-- standalone act. Admin rights alone are not enough: the row must already hold
+-- a well-formed `delete` claim, which is what proves the caller went through
+-- `10.dashboards.sql`'s claim path and cleaned up the snapshot objects first.
+-- Without the state requirement an admin could drop the row outright and
+-- orphan every object in `published` / `published-private`, since the storage
+-- policies identify an object's owner by parsing the dashboard id out of its
+-- path and would no longer find a row to authorise against.
+--
+-- The seven trailing conjuncts restate
+-- `dashboards__snapshot_transition_consistent`'s `delete` arm verbatim, and the
+-- duplication is deliberate defense in depth rather than an oversight. The
+-- CHECK constrains what may be WRITTEN and cannot be consulted by a policy;
+-- this restates the same shape as a precondition on the READ side of DELETE,
+-- so weakening or dropping the constraint does not silently widen who can
+-- remove a row. Keep the two in step: any change to that arm belongs here too.
 create policy "Users with admin access can delete dashboards" on public.dashboards for delete to authenticated using (
   public.util__auth_user_can_delete_resource (
     'dashboard'::public.resource_type,
     public.dashboards.id
   ) and
-  public.dashboards.snapshot_transition_kind = 'delete' and
+  public.dashboards.snapshot_transition_kind = 'delete'::public.dashboard_snapshot_transition_kind and
   public.dashboards.snapshot_transition_revision is not null and
   public.dashboards.snapshot_transition_revision <> '00000000-0000-0000-0000-000000000000'::uuid and
   public.dashboards.snapshot_transition_revision is distinct from public.dashboards.snapshot_revision and
   public.dashboards.snapshot_transition_target_visibility is null and
   public.dashboards.snapshot_transition_prior_visibility is not null and
-  public.dashboards.visibility = 'draft' and
+  public.dashboards.visibility = 'draft'::public.dashboard_visibility and
   public.dashboards.snapshot_revision is not distinct from public.dashboards.snapshot_transition_prior_revision
 );

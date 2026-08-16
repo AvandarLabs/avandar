@@ -4,7 +4,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(44);
+select plan(42);
 
 select has_column(
   'public',
@@ -507,14 +507,11 @@ select results_eq(
   'a dashboards admin can update a staged generation in the public bucket'
 );
 
-select results_eq(
-  $$update storage.objects
-    set metadata = '{"retry":true}'::jsonb
-    where name like '%f4007011-%'
-    returning name$$,
-  array[]::text[],
-  'a public publish claim cannot update the private bucket'
-);
+-- There is deliberately no UPDATE or DELETE assertion for `f4007011`. Its only
+-- INSERT is the `throws_ok` above, so the object never exists: a statement
+-- naming it returns zero rows whatever the policies say, and would pass just as
+-- happily with them removed. The INSERT denial above is the real proof that a
+-- public publish claim cannot reach the private bucket.
 
 set local "request.jwt.claims" to '{"sub":"f4000002-0000-4000-8000-000000000002"}';
 
@@ -542,14 +539,6 @@ select results_eq(
     returning name$$,
   array[]::text[],
   'an active publish claim denies deletion of its staged public generation'
-);
-
-select results_eq(
-  $$delete from storage.objects
-    where name like '%f4007011-%'
-    returning name$$,
-  array[]::text[],
-  'a public publish claim has no staged private generation to delete'
 );
 
 select * from finish();
