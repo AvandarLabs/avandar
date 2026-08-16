@@ -72,8 +72,7 @@ for update
       public.dashboards.id
     ) and
     (
-      public.dashboards.snapshot_transition_kind is distinct from
-        'delete'::public.dashboard_snapshot_transition_kind or
+      public.dashboards.snapshot_transition_kind is distinct from 'delete'::public.dashboard_snapshot_transition_kind or
       public.util__auth_user_can_delete_resource (
         'dashboard'::public.resource_type,
         public.dashboards.id
@@ -87,8 +86,7 @@ with
       public.dashboards.id
     ) and
     (
-      public.dashboards.snapshot_transition_kind is distinct from
-        'delete'::public.dashboard_snapshot_transition_kind or
+      public.dashboards.snapshot_transition_kind is distinct from 'delete'::public.dashboard_snapshot_transition_kind or
       public.util__auth_user_can_delete_resource (
         'dashboard'::public.resource_type,
         public.dashboards.id

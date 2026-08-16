@@ -350,7 +350,9 @@ select
             )
         ) and
         public.util__auth_user_may_select_dashboard (
-          public.util__storage_object_dashboard_id (storage.objects.name)
+          public.util__storage_object_dashboard_id (
+            storage.objects.name
+          )
         )
       )
     )
