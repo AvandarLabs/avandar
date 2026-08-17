@@ -1,0 +1,231 @@
+/*
+ * Compact theme for the Puck editor chrome.
+ *
+ * Puck ships a spacious default layout: 16px of padding on nearly every
+ * surface, ~290px sidebars and a 68px plugin rail. That leaves the dashboard
+ * canvas roughly 40% of the window, narrow enough that Puck auto-zooms the
+ * dashboard frame down to ~45% and table blocks turn unreadable. Everything
+ * below trades that whitespace for canvas width while keeping controls at
+ * comfortable click and read sizes.
+ *
+ * Puck hashes its class names per build as `_Name_<hash>_<line>`, so each
+ * selector matches on `_Name_` including the trailing separator. The trailing
+ * underscore matters: `[class*="_NavItem-link"]` would also match
+ * `_NavItem-linkIcon_...`. Rules are scoped under `.compactDashboardEditor`
+ * so nothing leaks to another Puck instance, and each one is kept a step above
+ * the specificity of the upstream rule it overrides so stylesheet order never
+ * decides the winner.
+ */
+.compactDashboardEditor {
+  /*
+   * Sidebar widths. Puck resolves these through
+   * `--puck-user-*-side-bar-width -> --puck-side-bar-width`, so setting the
+   * user-level variable on an ancestor both overrides the responsive default
+   * and still loses to the inline value Puck writes when a sidebar is dragged
+   * to a new width.
+   */
+  --puck-user-left-side-bar-width: 184px;
+  --puck-user-right-side-bar-width: 232px;
+
+  /*
+   * Puck's type scale, shifted down one notch (11/12/13px where Puck uses
+   * 12/14/16px). Every piece of editor chrome sizes itself from these, so the
+   * whole UI tightens from a single place. The canvas iframe is a separate
+   * document and keeps the default scale, so dashboard content is unaffected.
+   *
+   * These are the resolved sizes rather than Puck's `*-unitless` inputs: the
+   * inputs are substituted into the sizes on `:root`, where the sizes are
+   * declared, so overriding them further down the tree has no effect. The
+   * fractions keep the scale relative to the root font size, as Puck's own
+   * `calc(1rem * n / 16)` definitions are.
+   */
+  --puck-font-size-xxxs: 0.6875rem;
+  --puck-font-size-xxs: 0.75rem;
+  --puck-font-size-xs: 0.8125rem;
+  --puck-font-size-s: 0.9375rem;
+  --puck-font-size-m: 1.0625rem;
+  --puck-font-size-l: 1.25rem;
+  --puck-font-size-xl: 1.5rem;
+}
+
+/*
+ * `--puck-space-px` drives the header and canvas padding. It is declared on
+ * Puck's own root element, so it has to be overridden there rather than
+ * inherited from the wrapper. `_Puck_` only ever matches that root: the other
+ * Puck classes (`_PuckLayout_`, `_PuckHeader_`, ...) do not contain it.
+ */
+.compactDashboardEditor :global([class*="_Puck_"]) {
+  --puck-space-px: 10px;
+}
+
+/*
+ * Plugin rail ("Blocks" / "Outline"): 68px of icons and labels down to 52px.
+ * Below 638px Puck turns the rail into a bottom bar sized to its content and
+ * drops the header's offset, so both rules stay inside the same breakpoint
+ * Puck uses for the desktop layout.
+ */
+@media (width >= 638px) {
+  .compactDashboardEditor :global([class*="_PuckLayout-inner_"]) {
+    --puck-side-nav-width: 52px;
+  }
+
+  .compactDashboardEditor :global([class*="_PuckHeader_"]) {
+    padding-left: 51px;
+  }
+}
+
+.compactDashboardEditor :global([class*="_Nav-list_"]) {
+  gap: 2px;
+  padding-top: 10px;
+}
+
+.compactDashboardEditor :global([class*="_NavItem-link_"]) {
+  border-left-width: 3px;
+  border-right-width: 3px;
+  gap: 2px;
+  padding: 6px 2px;
+}
+
+.compactDashboardEditor :global([class*="_NavItem-linkIcon_"]) {
+  height: 18px;
+  width: 18px;
+}
+
+/* Header: the upstream rule pads it by `--puck-space-px` on all four sides */
+.compactDashboardEditor :global([class*="_PuckHeader-inner_"]) {
+  align-items: center;
+  gap: var(--puck-space-px);
+  padding: 5px var(--puck-space-px);
+}
+
+.compactDashboardEditor
+  :global([class*="_PuckHeader-title_"])
+  :global([class*="_Heading_"]) {
+  font-size: var(--puck-font-size-xs);
+}
+
+.compactDashboardEditor :global([class*="_PuckHeader-toggle_"]) {
+  padding-top: 0;
+}
+
+/* Canvas: the surface all of the above is buying space for */
+.compactDashboardEditor :global([class*="_PuckCanvas_"]) {
+  padding: 8px;
+}
+
+/*
+ * Upstream gives the canvas a taller top padding when the viewport controls
+ * are hidden, from a rule specific enough to outrank the one above on its own.
+ */
+.compactDashboardEditor
+  :global([class*="_PuckCanvas_"]):not(:has([class*="_PuckCanvas-controls_"])) {
+  padding-top: 8px;
+}
+
+.compactDashboardEditor :global([class*="_PuckCanvas-controls_"]) {
+  padding-bottom: 4px;
+}
+
+.compactDashboardEditor :global([class*="_ViewportButton-inner_"]) {
+  height: 26px;
+  width: 26px;
+}
+
+/* Left sidebar: block drawer and outline */
+.compactDashboardEditor :global([class*="_BlocksPlugin_"]),
+.compactDashboardEditor :global([class*="_OutlinePlugin_"]) {
+  padding: 6px 8px;
+}
+
+.compactDashboardEditor :global([class*="_ComponentList-title_"]) {
+  margin-bottom: 2px;
+  padding: 4px 6px;
+}
+
+.compactDashboardEditor
+  :global([class*="_ComponentList--isExpanded_"])
+  + :global([class*="_ComponentList_"]) {
+  margin-top: 6px;
+}
+
+.compactDashboardEditor :global([class*="_Drawer_"]) {
+  gap: 4px;
+}
+
+/*
+ * A drawer item is as tall as its drag handle, so the handle's own padding has
+ * to come down with the item's for the row height to follow.
+ */
+.compactDashboardEditor :global([class*="_DrawerItem-draggable_"]) {
+  padding: 5px 4px 5px 9px;
+}
+
+.compactDashboardEditor :global([class*="_DragIcon_"]) {
+  padding: 2px;
+}
+
+.compactDashboardEditor :global([class*="_Layer-title_"]),
+.compactDashboardEditor :global([class*="_LayerTree-zoneTitle_"]) {
+  margin: 3px 4px;
+}
+
+/*
+ * Right sidebar: section headers and the field list. The headers inherit the
+ * browser's default 16px rather than sizing from Puck's scale, which is what
+ * pushed the "Page > Data Visualization" breadcrumb onto a second line.
+ */
+.compactDashboardEditor :global([class*="_SidebarSection-title_"]),
+.compactDashboardEditor :global([class*="_FieldsPlugin-header_"]) {
+  font-size: var(--puck-font-size-xs);
+  padding: 7px 10px;
+}
+
+.compactDashboardEditor
+  :global([class*="_PuckFields--wrapFields_"])
+  :global([class*="_PuckFields-field_"]) {
+  padding: 6px 10px;
+}
+
+.compactDashboardEditor
+  :global([class*="_PuckFields--wrapFields_"])
+  :global([class*="_PuckFields-field_"])
+  + :global([class*="_PuckFields-field_"]) {
+  margin-top: 4px;
+}
+
+/* Individual controls inside a field */
+.compactDashboardEditor
+  :global([class*="_InputWrapper_"])
+  + :global([class*="_InputWrapper_"]) {
+  margin-top: 8px;
+}
+
+.compactDashboardEditor :global([class*="_Input-label_"]) {
+  padding-bottom: 3px;
+}
+
+.compactDashboardEditor :global([class*="_Input-input_"]) {
+  font-size: var(--puck-font-size-xxs);
+  padding: 5px 9px;
+}
+
+.compactDashboardEditor :global([class*="_Input-radioInner_"]) {
+  padding: 4px 10px;
+}
+
+.compactDashboardEditor :global([class*="_ObjectField-fieldset_"]),
+.compactDashboardEditor :global([class*="_ArrayFieldItem-fieldset_"]) {
+  padding: 10px;
+}
+
+.compactDashboardEditor :global([class*="_ArrayFieldItem-summary_"]) {
+  padding: 7px 10px;
+}
+
+.compactDashboardEditor :global([class*="_ArrayField-addButton_"]) {
+  padding: 7px;
+}
+
+.compactDashboardEditor :global([class*="_ExternalInput-button_"]) {
+  padding: 6px 10px;
+}
