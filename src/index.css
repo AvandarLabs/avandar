@@ -35,6 +35,7 @@
 .ag-paging-row-summary-panel {
   align-items: center;
   display: flex;
+
   /*
    * ag-grid renders the summary as inline number spans with literal
    * "to"/"of" text between them. Making the panel a flex container turns
