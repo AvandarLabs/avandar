@@ -1647,6 +1647,46 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_pdf_file_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
+          p_fill_merged_cells: boolean
+          p_fingerprint: Json
+          p_grid_x: Json
+          p_grid_y: Json
+          p_has_original_file: boolean
+          p_header_rows: number
+          p_is_in_cloud_storage: boolean
+          p_page_range_end: number
+          p_page_range_start: number
+          p_regions: Json
+          p_size_in_bytes: number
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_datasets__add_virtual_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]

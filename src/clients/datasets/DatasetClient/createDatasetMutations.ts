@@ -121,6 +121,39 @@ function _makeInsertXlsxFileDataset(
   };
 }
 
+function _makeInsertPdfFileDataset(
+  options: Readonly<DatasetMutationConfig>,
+): DatasetMutationRecord["insertPdfFileDataset"] {
+  return async (params) => {
+    const logger = options.logger.appendName("insertPdfFileDataset");
+    logger.log("Creating pdf file dataset", params);
+    const dataset = await serverApi.rpc<DatasetDBRead>(
+      "rpc_datasets__add_pdf_file_dataset",
+      {
+        p_dataset_id: params.datasetId,
+        p_workspace_id: params.workspaceId,
+        p_dataset_name: params.datasetName,
+        p_dataset_description: params.datasetDescription,
+        p_columns: _getDatabaseColumns(params.columns),
+        p_is_in_cloud_storage: params.isInCloudStorage,
+        p_size_in_bytes: params.sizeInBytes,
+        p_has_original_file: params.hasOriginalFile,
+        p_regions: params.regions,
+        p_detection_mode: params.detectionMode,
+        p_grid_x: params.gridX ?? null,
+        p_grid_y: params.gridY ?? null,
+        p_page_range_start: params.pageRangeStart ?? null,
+        p_page_range_end: params.pageRangeEnd ?? null,
+        p_header_rows: params.headerRows,
+        p_fill_merged_cells: params.fillMergedCells,
+        p_fingerprint: params.fingerprint,
+      },
+    );
+    logger.log("Successfully added pdf file dataset", dataset);
+    return options.parsers.fromDBReadToModelRead(dataset);
+  };
+}
+
 function _makeInsertGoogleSheetsDataset(
   options: Readonly<DatasetMutationConfig>,
 ): DatasetMutationRecord["insertGoogleSheetsDataset"] {
@@ -220,6 +253,7 @@ export function createDatasetMutations(
     insertVirtualDataset: _makeInsertVirtualDataset(options),
     insertCsvFileDataset: _makeInsertCsvFileDataset(options),
     insertXlsxFileDataset: _makeInsertXlsxFileDataset(options),
+    insertPdfFileDataset: _makeInsertPdfFileDataset(options),
     insertGoogleSheetsDataset: _makeInsertGoogleSheetsDataset(options),
     insertOpenDataDataset: _makeInsertOpenDataDataset(options),
     fullDelete: _makeFullDelete(options),
