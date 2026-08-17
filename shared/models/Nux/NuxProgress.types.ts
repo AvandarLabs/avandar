@@ -1,11 +1,11 @@
+import type { UUID } from "@avandar/utils";
 import type { NUX_MILESTONE_KEYS } from "$/models/Nux/NuxProgress.constants.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Database } from "$/types/database.types.ts";
-import type { UUID } from "@avandar/utils";
 
 export type NuxProgressId = UUID<"NuxProgress">;
 
-/** Mirrors the `nux_status` enum in `supabase/schemas/00.enum.nux_status.sql`. */
+/** Mirrors the `nux_status` enum in `supabase/schemas/00.enum.nux_status`. */
 export type NuxStatus = Database["public"]["Enums"]["nux_status"];
 
 /** One milestone of the `first_dashboard` tutorial. */
@@ -26,7 +26,7 @@ export type NuxProgressRead = {
   userId: UserId;
   tutorialKey: NuxTutorialKey;
   status: NuxStatus;
-  /** Only keys the current build recognises; unknown keys are dropped on read. */
+  /** Only keys this build knows; unknown keys are dropped on read. */
   completedMilestones: readonly NuxMilestoneKey[];
   createdAt: Date;
   updatedAt: Date;

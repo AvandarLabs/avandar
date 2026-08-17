@@ -6,7 +6,7 @@ import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.t
 import type { ReactNode } from "react";
 
 function renderPanel(overrides: Partial<NuxAppState>): void {
-  function Wrapper({ children }: { children: ReactNode }): JSX.Element {
+  function Wrapper({ children }: { children: ReactNode }): ReactNode {
     return (
       <NuxStateManager.Provider
         initialStateOverrides={
