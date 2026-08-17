@@ -1915,12 +1915,14 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
+      datasets__pdf_detection_mode: "tagged" | "lattice" | "stream" | "manual"
       datasets__source_type:
         | "csv_file"
         | "google_sheets"
         | "virtual"
         | "open_data"
         | "xlsx_file"
+        | "pdf_file"
       resource_type: "dashboard" | "dataset"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2155,12 +2157,14 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
+      datasets__pdf_detection_mode: ["tagged", "lattice", "stream", "manual"],
       datasets__source_type: [
         "csv_file",
         "google_sheets",
         "virtual",
         "open_data",
         "xlsx_file",
+        "pdf_file",
       ],
       resource_type: ["dashboard", "dataset"],
       role_level: ["viewer", "editor", "admin"],
