@@ -11,6 +11,7 @@ import { NuxWelcomeModal } from "@/components/Nux/NuxWelcomeModal/NuxWelcomeModa
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { ReactNode } from "react";
 
 /** Composes the tutorial's effects and surfaces. Assumes eligibility. */
@@ -23,19 +24,29 @@ function NuxRootContents(): ReactNode {
   useNuxPersistence();
   useNuxCompletionEvents();
 
-  const loggedTerminalStatusRef = useRef<string | undefined>(undefined);
+  // The status this session last observed. Seeded from whatever hydration
+  // read, so the value already sitting in the database is never mistaken for
+  // something that just happened.
+  const previousStatusRef = useRef<NuxAppState["status"]>(undefined);
   useEffect(
     function logTerminalNuxStatus() {
       if (!state.isHydrated || !state.status) {
         return;
       }
+      const previousStatus = previousStatusRef.current;
+      previousStatusRef.current = state.status;
+
+      // The first observation after hydration is history, not an outcome.
+      // A per-mount "have I logged this yet" guard is NOT enough here: a
+      // fresh mount gets a fresh ref, hydration reads `completed` back from
+      // the database, and a finished user would emit a new `nux.completed`
+      // every time they open the app. Only a transition counts.
+      if (previousStatus === undefined || previousStatus === state.status) {
+        return;
+      }
       if (state.status !== "completed" && state.status !== "dismissed") {
         return;
       }
-      if (loggedTerminalStatusRef.current === state.status) {
-        return;
-      }
-      loggedTerminalStatusRef.current = state.status;
       if (state.status === "completed") {
         void AnalyticsClient.logEvent({
           event: "nux.completed",
