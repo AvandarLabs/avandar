@@ -37,7 +37,10 @@ export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQue
 
 export function structuredQueryToSql(
   query: PartialStructuredQuery,
-  { castTimestampsToISO = false }: StructuredQueryToSqlOptions = {},
+  {
+    castTimestampsToISO = false,
+    columnTypes,
+  }: StructuredQueryToSqlOptions = {},
 ): string {
   if (query.dataSource === undefined && query.nestedSubquery === undefined) {
     return "";
@@ -67,6 +70,19 @@ export function structuredQueryToSql(
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+
+  /**
+   * Column types the filter renderer uses for typed literals. Built from the
+   * query's own columns and overlaid with any caller-supplied types.
+   */
+  const effectiveColumnTypes: Record<string, AvaDataType.T> = {
+    ...Object.fromEntries(
+      queryColumns.map((column) => {
+        return [column.baseColumn.name, column.baseColumn.dataType];
+      }),
+    ),
+    ...(columnTypes ?? {}),
+  };
   const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
     key: "id",
   });
@@ -140,7 +156,9 @@ export function structuredQueryToSql(
 
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
-    sqlQuery = applyFilters(sqlQuery, filters);
+    sqlQuery = applyFilters(sqlQuery, filters, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (groupByColumnNames.length > 0) {
@@ -150,7 +168,9 @@ export function structuredQueryToSql(
 
   // apply HAVING clause (after GROUP BY, before ORDER BY)
   if (!isEmptyQueryFilter(having)) {
-    sqlQuery = applyHaving(sqlQuery, having);
+    sqlQuery = applyHaving(sqlQuery, having, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (orderByColumnName && orderByDirection) {

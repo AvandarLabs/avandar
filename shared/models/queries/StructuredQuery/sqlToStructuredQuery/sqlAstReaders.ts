@@ -79,6 +79,7 @@ const _FILTER_OPERATOR_BY_SQL: Record<string, QueryFilterOperator> = {
   IN: "in",
   "NOT IN": "not_in",
   BETWEEN: "between",
+  "NOT BETWEEN": "not_between",
   IS: "is_null",
 };
 
@@ -98,6 +99,10 @@ export function literalValue(
     return undefined;
   }
   const obj = node as Record<string, unknown>;
+  // `CAST(<literal> AS DATE)`, which is how temporal rules are rendered.
+  if (obj.type === "cast") {
+    return literalValue(obj.expr);
+  }
   const valueType = obj.type;
   if (
     valueType === "single_quote_string" ||
@@ -139,7 +144,10 @@ export function extractValueList(
   if (!Array.isArray(items)) {
     return undefined;
   }
-  const literals = items.map(literalValue);
+  // Each element may be wrapped in `lower(...)` when the rule folds case.
+  const literals = items.map((item) => {
+    return literalValue(unwrapLowerCall(item).inner);
+  });
   const hasInvalid = literals.some((lit) => {
     return lit === undefined || lit === null || typeof lit === "boolean";
   });
@@ -147,4 +155,79 @@ export function extractValueList(
     return undefined;
   }
   return literals as Array<string | number>;
+}
+
+/** The lower-cased name of a function-call node, if it is one. */
+export function functionName(node: unknown): string | undefined {
+  if (node === null || typeof node !== "object") {
+    return undefined;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.type !== "function") {
+    return undefined;
+  }
+  const name = obj.name as { name?: Array<{ value?: unknown }> } | undefined;
+  const first = name?.name?.[0]?.value;
+  return typeof first === "string" ? first.toLowerCase() : undefined;
+}
+
+/** The argument list of a function-call node. */
+export function functionArgs(node: unknown): readonly unknown[] {
+  if (node === null || typeof node !== "object") {
+    return [];
+  }
+  const args = (node as Record<string, unknown>).args as
+    | { value?: unknown[] }
+    | undefined;
+  return Array.isArray(args?.value) ? args.value : [];
+}
+
+/**
+ * Unwraps a single `lower(...)` call. `wasLowered` is how the parser recovers
+ * whether a rule was authored case-insensitively.
+ */
+export function unwrapLowerCall(node: unknown): {
+  inner: unknown;
+  wasLowered: boolean;
+} {
+  if (functionName(node) === "lower") {
+    const [inner] = functionArgs(node);
+    return { inner, wasLowered: true };
+  }
+  return { inner: node, wasLowered: false };
+}
+
+/** True when the node is the literal empty string. */
+export function isEmptyStringLiteral(node: unknown): boolean {
+  return literalValue(node) === "";
+}
+
+/** The boolean a `bool` literal node carries, if it is one. */
+export function boolLiteral(node: unknown): boolean | undefined {
+  if (node === null || typeof node !== "object") {
+    return undefined;
+  }
+  const obj = node as Record<string, unknown>;
+  return obj.type === "bool" && typeof obj.value === "boolean" ?
+      obj.value
+    : undefined;
+}
+
+/**
+ * Matches `coalesce(trim(<column>), '')`, the shape `is_blank` renders. Returns
+ * the column name when it matches.
+ */
+export function blankCheckColumnName(node: unknown): string | undefined {
+  if (functionName(node) !== "coalesce") {
+    return undefined;
+  }
+  const [trimCall, emptyString] = functionArgs(node);
+  if (!isEmptyStringLiteral(emptyString)) {
+    return undefined;
+  }
+  if (functionName(trimCall) !== "trim") {
+    return undefined;
+  }
+  const [column] = functionArgs(trimCall);
+  return columnRefName(column);
 }

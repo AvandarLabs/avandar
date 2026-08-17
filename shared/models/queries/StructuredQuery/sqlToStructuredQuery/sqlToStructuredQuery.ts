@@ -21,6 +21,7 @@ import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter
 import {
   parseHavingNode,
   parseWhereNode,
+  stampFilterColumnTypes,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
 import { resolveFrom } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/resolveFromClause.ts";
 import {
@@ -29,6 +30,7 @@ import {
   matchAggregation,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 import { Parser } from "node-sql-parser";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
@@ -343,10 +345,24 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
+  /**
+   * Column data types keyed by name, so parsed filter rules carry the same
+   * `columnDataType` a rule authored in the form would.
+   */
+  const filterColumnTypes: Record<string, AvaDataType.T> = Object.fromEntries(
+    (dataset?.columns ?? []).map((column) => {
+      return [column.name, column.dataType];
+    }),
+  );
+
   // WHERE → filters
   let filters: QueryFilterGroup = EMPTY_QUERY_FILTER;
   if (ast.where) {
-    const parsed = parseWhereNode(ast.where, unmappedReasons);
+    const parsedRaw = parseWhereNode(ast.where, unmappedReasons);
+    const parsed =
+      parsedRaw === undefined ?
+        undefined
+      : stampFilterColumnTypes(parsedRaw, filterColumnTypes);
     if (parsed) {
       filters =
         parsed.type === "group" ?

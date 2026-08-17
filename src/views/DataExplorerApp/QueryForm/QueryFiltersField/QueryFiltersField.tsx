@@ -1,34 +1,37 @@
-import { isDefined } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
-import {
-  MantineActionElement,
-  MantineValueEditor,
-  QueryBuilderMantine,
-} from "@react-querybuilder/mantine";
+import { QueryBuilderMantine } from "@react-querybuilder/mantine";
 import { useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
-import type { ReactNode } from "react";
+import { makeQueryFilterNodeId } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import {
+  defaultOperatorForDataType,
+  operatorsForDataType,
+} from "$/models/queries/StructuredQuery/QueryFilterOperator";
 import "react-querybuilder/dist/query-builder.css";
 import classes from "./QueryFiltersField.module.css";
+import {
+  FilterAddAction,
+  FilterCombinatorSelector,
+  FilterFieldSelector,
+  FilterOperatorSelector,
+  FilterRemoveAction,
+  FilterValueEditorControl,
+} from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls";
+import { useFilterTreeState } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
-import type {
-  QueryFilterCombinator,
-  QueryFilterGroup,
-  QueryFilterOperator,
-  QueryFilterRule,
-} from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type {
-  Field,
-  RuleGroupType,
-  RuleType,
-  ValueEditorType,
-} from "react-querybuilder";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { FilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
+import type { Field, RuleGroupType } from "react-querybuilder";
+import type { ReactNode } from "react";
 
 type Props = {
   /**
-   * The columns available to filter on. Drawn from `query.queryColumns` so
-   * the user can only build filters that reference selected fields.
+   * Every column of the current data source. Filters are not limited to the
+   * columns the query displays: what you filter on and what you select are
+   * separate choices.
    */
   columns: readonly QueryColumnRead[];
   /** The current filter tree. */
@@ -37,196 +40,64 @@ type Props = {
   onChange: (next: QueryFilterGroup) => void;
 };
 
-type LibraryRule = RuleType & {
-  field: string;
-  operator: QueryFilterOperator | string;
-  value: unknown;
-};
-
-type LibraryGroup = RuleGroupType<LibraryRule, QueryFilterCombinator>;
-
 /**
- * Mapping from react-querybuilder's default operator codes to ours.
- * Unhandled operators fall through and are flagged in the form.
+ * Combinator options. The names are our own combinator values, so the select
+ * always finds a matching option; the library's defaults are lower-case, which
+ * is why this control used to render blank at every nesting level.
  */
-const _OPERATOR_TO_INTERNAL: Record<string, QueryFilterOperator> = {
-  "=": "=",
-  "!=": "!=",
-  ">": ">",
-  ">=": ">=",
-  "<": "<",
-  "<=": "<=",
-  contains: "like",
-  beginsWith: "like",
-  endsWith: "like",
-  doesNotContain: "not_like",
-  in: "in",
-  notIn: "not_in",
-  null: "is_null",
-  notNull: "is_not_null",
-  between: "between",
-  notBetween: "between",
-};
-
-const _INTERNAL_TO_OPERATOR: Record<QueryFilterOperator, string> = {
-  "=": "=",
-  "!=": "!=",
-  ">": ">",
-  ">=": ">=",
-  "<": "<",
-  "<=": "<=",
-  like: "contains",
-  not_like: "doesNotContain",
-  in: "in",
-  not_in: "notIn",
-  is_null: "null",
-  is_not_null: "notNull",
-  between: "between",
-};
-
-/**
- * Returns the localized operator labels for react-querybuilder. The `name` is
- * the library's operator code (machine identifier); `label` is user-visible.
- * Defined as a hook so the labels can use the active translation function.
- */
-function useOperatorsForLibrary(): Array<{ name: string; label: string }> {
-  const { t } = useLingui();
-  return [
-    { name: "=", label: "=" },
-    { name: "!=", label: "!=" },
-    { name: ">", label: ">" },
-    { name: ">=", label: ">=" },
-    { name: "<", label: "<" },
-    { name: "<=", label: "<=" },
-    { name: "contains", label: t`contains` },
-    { name: "doesNotContain", label: t`does not contain` },
-    { name: "in", label: t`in` },
-    { name: "notIn", label: t`not in` },
-    { name: "null", label: t`is null` },
-    { name: "notNull", label: t`is not null` },
-    { name: "between", label: t`between` },
-  ];
-}
-
-function _convertRuleFromInternal(rule: QueryFilterRule): LibraryRule {
-  const libOperator = _INTERNAL_TO_OPERATOR[rule.operator];
-  return {
-    field: rule.columnName,
-    operator: libOperator,
-    value:
-      Array.isArray(rule.value) ?
-        (rule.value as ReadonlyArray<string | number>).join(",")
-      : (rule.value as unknown),
-  };
-}
-
-function _convertGroupFromInternal(group: QueryFilterGroup): LibraryGroup {
-  return {
-    combinator: group.combinator,
-    rules: group.rules.map((child) => {
-      if (child.type === "group") {
-        return _convertGroupFromInternal(child);
-      }
-      return _convertRuleFromInternal(child);
-    }),
-  };
-}
-
-function _isGroup(value: unknown): value is LibraryGroup {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    "combinator" in (value as Record<string, unknown>) &&
-    "rules" in (value as Record<string, unknown>)
-  );
-}
-
-function _convertRuleToInternal(
-  rule: LibraryRule,
-): QueryFilterRule | undefined {
-  const internalOp = _OPERATOR_TO_INTERNAL[String(rule.operator)];
-  if (!internalOp) {
-    return undefined;
-  }
-  let value: QueryFilterRule["value"] = rule.value as QueryFilterRule["value"];
-  if (
-    internalOp === "in" ||
-    internalOp === "not_in" ||
-    internalOp === "between"
-  ) {
-    if (Array.isArray(rule.value)) {
-      value = rule.value as ReadonlyArray<string | number>;
-    } else if (typeof rule.value === "string") {
-      value = rule.value
-        .split(",")
-        .map((s) => {
-          return s.trim();
-        })
-        .filter(Boolean);
-    } else if (rule.value === undefined || rule.value === null) {
-      value = [];
-    }
-  }
-  if (internalOp === "is_null" || internalOp === "is_not_null") {
-    value = null;
-  }
-  return {
-    type: "rule",
-    columnName: String(rule.field ?? ""),
-    operator: internalOp,
-    value,
-  };
-}
-
-function _convertGroupToInternal(group: LibraryGroup): QueryFilterGroup {
-  const rules: Array<QueryFilterGroup | QueryFilterRule> = group.rules
-    .map((child) => {
-      if (_isGroup(child)) {
-        return _convertGroupToInternal(child);
-      }
-      return _convertRuleToInternal(child as LibraryRule);
-    })
-    .filter(isDefined);
-  const combinator = String(group.combinator).toUpperCase();
-  return {
-    type: "group",
-    combinator: combinator === "OR" ? "OR" : "AND",
-    rules,
-  };
-}
+const COMBINATORS = [
+  { name: "AND", label: "And" },
+  { name: "OR", label: "Or" },
+];
 
 /**
  * Recursive filter UI for the manual query form. Wraps `react-querybuilder`
- * with the Mantine adapter and translates between the library's internal
- * tree shape and our `QueryFilterGroup`.
+ * with our own controls and holds the tree locally while the user edits, so
+ * typing neither remounts the row nor runs a query per keystroke.
  */
 export function QueryFiltersField({
   columns,
   value,
   onChange,
 }: Props): ReactNode {
-  const operatorsForLibrary = useOperatorsForLibrary();
+  const { t } = useLingui();
+
+  const columnTypes: Readonly<Record<string, AvaDataType.T>> = useMemo(() => {
+    return Object.fromEntries(
+      columns.map((column) => {
+        return [column.baseColumn.name, column.baseColumn.dataType];
+      }),
+    );
+  }, [columns]);
+
   const fields: Field[] = useMemo(() => {
-    return columns.map((col) => {
+    return columns.map((column) => {
       return {
-        name: col.baseColumn.name,
-        label: col.baseColumn.name,
-        valueEditorType: "text" as ValueEditorType,
+        name: column.baseColumn.name,
+        label: column.baseColumn.name,
       };
     });
   }, [columns]);
 
-  const libraryQuery = useMemo(() => {
-    return _convertGroupFromInternal(value);
-  }, [value]);
+  const { query, matchCaseById, onQueryChange, commitNow, setMatchCase } =
+    useFilterTreeState({ value, columnTypes, onChange });
+
+  const context: FilterControlsContext = useMemo(() => {
+    return {
+      columnTypes,
+      matchCaseById,
+      setMatchCase,
+      commitNow: () => {
+        commitNow(query);
+      },
+    };
+  }, [columnTypes, matchCaseById, setMatchCase, commitNow, query]);
 
   if (columns.length === 0) {
     return (
       <Stack gap="xs">
         <Text size="sm" c="neutral.6">
-          <Trans>
-            Add columns to the query above to start defining filters.
-          </Trans>
+          <Trans>Select a data source to add filters.</Trans>
         </Text>
       </Stack>
     );
@@ -240,14 +111,37 @@ export function QueryFiltersField({
       <QueryBuilderMantine>
         <QueryBuilder
           fields={fields}
-          operators={operatorsForLibrary}
-          query={libraryQuery as RuleGroupType}
-          onQueryChange={(newQuery) => {
-            onChange(_convertGroupToInternal(newQuery as LibraryGroup));
+          combinators={COMBINATORS}
+          getOperators={(field) => {
+            return operatorsForDataType(columnTypes[field]).map((operator) => {
+              return { name: operator, label: operator };
+            });
           }}
+          getDefaultOperator={(field) => {
+            return defaultOperatorForDataType(columnTypes[String(field)]);
+          }}
+          resetOnFieldChange={false}
+          listsAsArrays
+          showCombinatorsBetweenRules
+          idGenerator={makeQueryFilterNodeId}
+          translations={{
+            addRule: { label: t`+ Condition` },
+            addGroup: { label: t`+ Group` },
+          }}
+          query={query as RuleGroupType}
+          onQueryChange={(next) => {
+            onQueryChange(next as unknown as LibraryGroup);
+          }}
+          context={context}
           controlElements={{
-            actionElement: MantineActionElement,
-            valueEditor: MantineValueEditor,
+            fieldSelector: FilterFieldSelector,
+            operatorSelector: FilterOperatorSelector,
+            combinatorSelector: FilterCombinatorSelector,
+            valueEditor: FilterValueEditorControl,
+            addRuleAction: FilterAddAction,
+            addGroupAction: FilterAddAction,
+            removeRuleAction: FilterRemoveAction,
+            removeGroupAction: FilterRemoveAction,
           }}
         />
       </QueryBuilderMantine>

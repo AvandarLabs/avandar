@@ -29,6 +29,8 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
+import { AppliedFilterSummary } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary";
+import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
@@ -374,6 +376,22 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
+        {/*
+         * A failed query used to read as "No Rows To Show", which is
+         * indistinguishable from a filter that legitimately matches nothing.
+         * The summary next to it says how many filters the results reflect.
+         */}
+        {state.lastQueryError !== undefined ?
+          <Box px="md" pb="xs" bg="white">
+            <QueryResultsError
+              message={state.lastQueryError}
+              sql={state.rawSql}
+            />
+          </Box>
+        : null}
+        <Group justify="flex-end" px="md" bg="white">
+          <AppliedFilterSummary filters={state.query.filters} />
+        </Group>
         <Box ref={chartRef} flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

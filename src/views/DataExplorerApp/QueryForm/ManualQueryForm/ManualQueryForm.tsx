@@ -1,7 +1,8 @@
+import { Model } from "@avandar/models";
 import { isDefined, matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Fieldset, Stack } from "@mantine/core";
-import { useState } from "react";
+import { Fieldset, Stack, Text } from "@mantine/core";
+import { useEffect, useMemo, useState } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { AggregationFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields";
@@ -9,7 +10,10 @@ import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/L
 import { OverwriteSqlAlert } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert";
 import { SortFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields";
 import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields";
+import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns";
+import { AppliedFilterSummary } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
+import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import classes from "./ManualQueryForm.module.css";
 import type {
@@ -171,6 +175,40 @@ function ManualQueryFormView({
     dismissLargeDatasetLimitHint,
   } = useManualQueryDataSourceChange({ query, handlers });
 
+  /**
+   * Filters address any column of the data source, not only the ones the query
+   * displays: what you filter on and what you select are separate choices.
+   */
+  const { columns: dataSourceColumns } = useQueryColumnsForDataSource(
+    dataSource ? Model.getTypedId(dataSource) : undefined,
+  );
+
+  const dataSourceColumnNames = useMemo(() => {
+    return dataSourceColumns.map((column) => {
+      return column.baseColumn.name;
+    });
+  }, [dataSourceColumns]);
+
+  const [droppedFilterColumns, setDroppedFilterColumns] = useState<
+    readonly string[]
+  >([]);
+
+  useEffect(
+    function pruneFiltersWhenColumnsChange() {
+      if (dataSourceColumnNames.length === 0) {
+        return;
+      }
+      const result = pruneFilterColumns(filters, dataSourceColumnNames);
+      if (result.removedColumnNames.length === 0) {
+        setDroppedFilterColumns([]);
+        return;
+      }
+      setDroppedFilterColumns(result.removedColumnNames);
+      handlers.onSetFilters(result.filters);
+    },
+    [dataSourceColumnNames, filters, handlers],
+  );
+
   const onFiltersChange = (nextFilters: QueryFilterGroup): void => {
     if (isStructuredQueryInSync) {
       handlers.onSetFilters(nextFilters);
@@ -216,11 +254,19 @@ function ManualQueryFormView({
   );
 
   const filterFields = (
-    <QueryFiltersField
-      columns={queryColumns}
-      value={filters}
-      onChange={onFiltersChange}
-    />
+    <Stack gap="xs">
+      {droppedFilterColumns.length > 0 ?
+        <Text size="xs" c="neutral.6">
+          {t`Removed filters that referenced columns this data source does not have: ${droppedFilterColumns.join(", ")}`}
+        </Text>
+      : null}
+      <AppliedFilterSummary filters={filters} />
+      <QueryFiltersField
+        columns={dataSourceColumns}
+        value={filters}
+        onChange={onFiltersChange}
+      />
+    </Stack>
   );
 
   const sortFields = (
@@ -252,7 +298,12 @@ function ManualQueryFormView({
         content: aggregationFields,
       }
     : undefined,
-    { id: "filters", title: t`Filters (Where)`, content: filterFields },
+    {
+      id: "filters",
+      title: t`Filters (Where)`,
+      content: filterFields,
+      span: 2,
+    },
     {
       id: "sort-limit",
       title: t`Sort & limit`,

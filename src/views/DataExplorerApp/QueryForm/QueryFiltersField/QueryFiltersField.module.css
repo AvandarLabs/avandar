@@ -1,10 +1,138 @@
 /*
- * Allow the header row (combinator + "+ Rule" / "+ Group" buttons) and each
- * rule row (field + operator + value + remove button) to wrap onto multiple
- * lines in narrow containers instead of overflowing.
+ * Layout for the react-querybuilder tree.
+ *
+ * Two hosts render this: the Data Explorer drawer (wide, `layout="columns"`)
+ * and the dashboard query panel (narrow, `layout="stacked"`). Everything below
+ * is expressed as flex behaviour with minimum widths so one rule occupies one
+ * row when there is room and wraps to two when there is not, instead of
+ * stacking one control per line.
  */
-/* stylelint-disable-next-line selector-class-pattern -- third-party react-querybuilder class name */
-.queryFiltersField :global(.ruleGroup-header),
-.queryFiltersField :global(.rule) {
+
+.queryFiltersField {
+  font-size: var(--mantine-font-size-sm);
+
+  /* Own scroll area: the tree scrolls, the rest of the drawer does not. */
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+/* stylelint-disable selector-class-pattern -- third-party react-querybuilder class names */
+
+.queryFiltersField :global(.ruleGroup) {
+  background: var(--mantine-color-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-xs);
+}
+
+/* Nested groups: indent and mark depth with a rail rather than more tint. */
+.queryFiltersField :global(.ruleGroup) :global(.ruleGroup) {
+  background: var(--mantine-color-gray-0);
+  border-left: 2px solid var(--mantine-color-blue-4);
+  margin-left: 0.75rem;
+}
+
+.queryFiltersField :global(.ruleGroup-header) {
+  align-items: center;
+  background: inherit;
+  display: flex;
   flex-wrap: wrap;
+  gap: var(--mantine-spacing-xs);
+  padding-bottom: var(--mantine-spacing-xs);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.queryFiltersField :global(.ruleGroup-body) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* One rule per row, wrapping to a second line in narrow hosts. */
+.queryFiltersField :global(.rule) {
+  align-items: center;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-xs) 0;
+}
+
+.queryFiltersField :global(.rule:last-child) {
+  border-bottom: none;
+}
+
+/* stylelint-enable selector-class-pattern */
+
+.fieldControl {
+  flex: 2 1 9rem;
+  min-width: 8rem;
+}
+
+.operatorControl {
+  flex: 1 1 8rem;
+  min-width: 7rem;
+}
+
+.combinatorControl {
+  flex: 0 0 6rem;
+}
+
+.valueSlot {
+  align-items: center;
+  display: flex;
+  flex: 3 1 12rem;
+  gap: var(--mantine-spacing-xs);
+  min-width: 10rem;
+}
+
+.valueControl {
+  flex: 1 1 auto;
+  min-width: 7rem;
+}
+
+.valuePair {
+  flex: 1 1 auto;
+  min-width: 12rem;
+}
+
+/* Show a long column name from its start, cut with an ellipsis. */
+.truncatedInput {
+  text-overflow: ellipsis;
+}
+
+/*
+ * Let a dropdown be wider than the control that opens it, so a long column name
+ * reads on one line instead of wrapping, and cap it so it cannot escape a
+ * narrow host.
+ */
+.wideDropdown {
+  max-width: min(28rem, 90vw);
+  min-width: 20rem;
+}
+
+/* Dropdown options wrap instead of clipping mid-word. */
+.wrappingOption {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.removeAction {
+  flex: 0 0 auto;
+}
+
+.addAction {
+  flex: 0 0 auto;
+}
+
+/* A rule excluded from the query: dimmed, with its reason underneath. */
+.ruleNotApplied {
+  opacity: 0.65;
+}
+
+.ruleMessage {
+  flex: 1 1 100%;
+  padding-left: 0.25rem;
 }
