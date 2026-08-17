@@ -12,7 +12,7 @@ type Props = {
   columnsMessage: string;
   dataSourceMetadata: DataSourceMetadata;
   isProcessing: boolean;
-  onColumnChange: DatasetImportFeedbackProps["onColumnChange"] | undefined;
+  onColumnChange: DatasetImportFeedbackProps["onColumnChange"];
   onDataSourceMetadataChange: DatasetImportFeedbackProps["onDataSourceMetadataChange"];
   onRequestDataReparse: DatasetImportFeedbackProps["onRequestDataReparse"];
   previewMessage: string;

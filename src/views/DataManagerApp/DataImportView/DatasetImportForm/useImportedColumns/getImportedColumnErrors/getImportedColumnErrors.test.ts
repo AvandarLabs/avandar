@@ -1,11 +1,9 @@
+import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { getImportedColumnErrors } from "./getImportedColumnErrors";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
-function _column(
-  name: string,
-  columnIdx: number,
-): DatasetColumn.Imported {
+function _column(name: string, columnIdx: number): DatasetColumn.Imported {
   return {
     originalName: `col${columnIdx}`,
     name,
@@ -20,9 +18,7 @@ function _column(
 function _columnIdxsWithErrors(
   columns: readonly DatasetColumn.Imported[],
 ): number[] {
-  return getImportedColumnErrors(columns).map((error) => {
-    return error.columnIdx;
-  });
+  return getImportedColumnErrors(columns).map(prop("columnIdx"));
 }
 
 describe("getImportedColumnErrors", () => {
@@ -33,9 +29,9 @@ describe("getImportedColumnErrors", () => {
   });
 
   it("rejects an empty name, which DuckDB cannot even parse as an identifier", () => {
-    expect(_columnIdxsWithErrors([_column("", 0), _column("city", 1)])).toEqual([
-      0,
-    ]);
+    expect(_columnIdxsWithErrors([_column("", 0), _column("city", 1)])).toEqual(
+      [0],
+    );
   });
 
   it("rejects a whitespace-only name", () => {
@@ -84,9 +80,9 @@ describe("getImportedColumnErrors", () => {
 
   it("reports an empty name once rather than also calling it a duplicate", () => {
     expect(
-      getImportedColumnErrors([_column("", 0), _column("", 1)]).map((error) => {
-        return error.kind;
-      }),
+      getImportedColumnErrors([_column("", 0), _column("", 1)]).map(
+        prop("kind"),
+      ),
     ).toEqual(["empty_name", "empty_name"]);
   });
 

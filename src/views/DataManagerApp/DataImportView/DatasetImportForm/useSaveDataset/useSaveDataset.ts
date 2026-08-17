@@ -4,7 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { toDatasetColumnInputs } from "@/clients/datasets/DatasetClient/toDatasetColumnInputs/toDatasetColumnInputs";
+import { makeDatasetColumnInputsFromImportedColumns } from "@/clients/datasets/DatasetClient/makeDatasetColumnInputsFromImportedColumns/makeDatasetColumnInputsFromImportedColumns";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -135,7 +135,9 @@ async function _saveCsvDataset(
     workspaceId: options.context.workspaceId,
     datasetName: options.context.datasetName,
     datasetDescription: options.context.datasetDescription,
-    columns: toDatasetColumnInputs(options.context.columns),
+    columns: makeDatasetColumnInputsFromImportedColumns(
+      options.context.columns,
+    ),
     isInCloudStorage: onlineStorageAllowed,
     sizeInBytes,
     parseOptions: {
@@ -163,7 +165,9 @@ async function _saveGoogleSheetsDataset(
   return DatasetClient.insertGoogleSheetsDataset({
     googleAccountId: options.payload.googleAccountId,
     googleDocumentId: options.payload.googleDocumentId,
-    columns: toDatasetColumnInputs(options.context.columns),
+    columns: makeDatasetColumnInputsFromImportedColumns(
+      options.context.columns,
+    ),
     datasetDescription: options.context.datasetDescription,
     datasetId: datasetLoadResult.datasetId,
     datasetName: options.context.datasetName,
@@ -185,7 +189,9 @@ async function _saveXlsxDataset(
     workspaceId: options.context.workspaceId,
     datasetName: options.context.datasetName,
     datasetDescription: options.context.datasetDescription,
-    columns: toDatasetColumnInputs(options.context.columns),
+    columns: makeDatasetColumnInputsFromImportedColumns(
+      options.context.columns,
+    ),
     isInCloudStorage: onlineStorageAllowed,
     sizeInBytes,
     rowsToSkip: parseOptions.numRowsToSkip ?? 0,

@@ -1,19 +1,14 @@
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { createImportedColumnsFromDuckDbSchema } from "@/clients/datasets/DatasetClient/createImportedColumnsFromDuckDbSchema/createImportedColumnsFromDuckDbSchema";
+import { makeImportedColumnsFromDuckDbSchema } from "@/clients/datasets/DatasetClient/makeImportedColumnsFromDuckDbSchema/makeImportedColumnsFromDuckDbSchema";
 import { applyImportedColumnEdits } from "./applyImportedColumnEdits/applyImportedColumnEdits";
 import { getImportedColumnErrors } from "./getImportedColumnErrors/getImportedColumnErrors";
-import type {
-  ImportedColumnEdit,
-  ImportedColumnEditsByColumnIdx,
-} from "./applyImportedColumnEdits/applyImportedColumnEdits";
-import type { ImportedColumnError } from "./getImportedColumnErrors/getImportedColumnErrors";
+import { useColumnEdits } from "./useColumnEdits/useColumnEdits";
 import type { DataSourceMetadata } from "../DatasetImportForm.types";
+import type { ImportedColumnEdit } from "./applyImportedColumnEdits/applyImportedColumnEdits";
+import type { ImportedColumnError } from "./getImportedColumnErrors/getImportedColumnErrors";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-
-/** Shared empty edit set, so an unedited import keeps a stable identity. */
-const NO_EDITS: ImportedColumnEditsByColumnIdx = {};
 
 /** The columns of a pending import, plus the means to edit them. */
 export type ImportedColumnsState = {
@@ -38,13 +33,17 @@ function _getInferredColumns(
   dataSourceMetadata: DataSourceMetadata,
 ): DatasetColumn.Imported[] {
   return match(dataSourceMetadata)
-    .with({ sourceType: "csv_file" }, { sourceType: "xlsx_file" }, (metadata) => {
-      return createImportedColumnsFromDuckDbSchema(
-        metadata.datasetLoadResult.columns,
-      );
-    })
+    .with(
+      { sourceType: "csv_file" },
+      { sourceType: "xlsx_file" },
+      (metadata) => {
+        return makeImportedColumnsFromDuckDbSchema(
+          metadata.datasetLoadResult.columns,
+        );
+      },
+    )
     .with({ sourceType: "google_sheets" }, (metadata) => {
-      return createImportedColumnsFromDuckDbSchema(
+      return makeImportedColumnsFromDuckDbSchema(
         metadata.datasetLoadResult.sheetLoadMetadata.columns,
       );
     })
@@ -58,9 +57,13 @@ function _getInferredColumns(
  */
 function _getLoadResultId(dataSourceMetadata: DataSourceMetadata): string {
   return match(dataSourceMetadata)
-    .with({ sourceType: "csv_file" }, { sourceType: "xlsx_file" }, (metadata) => {
-      return metadata.datasetLoadResult.id;
-    })
+    .with(
+      { sourceType: "csv_file" },
+      { sourceType: "xlsx_file" },
+      (metadata) => {
+        return metadata.datasetLoadResult.id;
+      },
+    )
     .with({ sourceType: "google_sheets" }, (metadata) => {
       return metadata.datasetLoadResult.sheetLoadMetadata.id;
     })
@@ -86,39 +89,15 @@ export function useImportedColumns(
   const inferredColumns = useMemo(() => {
     return _getInferredColumns(dataSourceMetadata);
   }, [dataSourceMetadata]);
-  const loadResultId = _getLoadResultId(dataSourceMetadata);
-
-  const [edits, setEdits] = useState<{
-    loadResultId: string;
-    byColumnIdx: ImportedColumnEditsByColumnIdx;
-  }>(() => {
-    return { loadResultId, byColumnIdx: NO_EDITS };
-  });
-
-  const activeEdits =
-    edits.loadResultId === loadResultId ? edits.byColumnIdx : NO_EDITS;
-
-  const updateColumn = useCallback(
-    (columnIdx: number, edit: Readonly<ImportedColumnEdit>) => {
-      setEdits((prevEdits) => {
-        const baseEdits =
-          prevEdits.loadResultId === loadResultId ?
-            prevEdits.byColumnIdx
-          : NO_EDITS;
-        return {
-          loadResultId,
-          byColumnIdx: {
-            ...baseEdits,
-            [columnIdx]: { ...baseEdits[columnIdx], ...edit },
-          },
-        };
-      });
-    },
-    [loadResultId],
+  const { activeEdits, updateColumn } = useColumnEdits(
+    _getLoadResultId(dataSourceMetadata),
   );
 
   const columns = useMemo(() => {
-    return applyImportedColumnEdits(inferredColumns, activeEdits);
+    return applyImportedColumnEdits({
+      baseColumns: inferredColumns,
+      editsByColumnIdx: activeEdits,
+    });
   }, [inferredColumns, activeEdits]);
 
   const errors = useMemo(() => {

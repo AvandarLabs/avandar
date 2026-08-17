@@ -326,6 +326,10 @@ msgstr "聚合"
 msgid "No"
 msgstr "否"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Some values do not fit the type you chose"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "無法從 FROM 子句判定基礎資料表。"
@@ -1085,6 +1089,8 @@ msgstr "所選名稱欄位無效"
 msgid "Custom"
 msgstr "自定義"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "時間戳"
@@ -1557,6 +1563,11 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "顯示詳細資料"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Boolean"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
 "will be available very soon. If there is a database or service you use "
@@ -1635,6 +1646,10 @@ msgstr "項目"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "限制更新失敗"
+
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+msgid "Data Type"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2791,6 +2806,11 @@ msgstr "儲存到儀表板"
 msgid "Label type"
 msgstr "標籤類型"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Number"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
@@ -3292,7 +3312,7 @@ msgstr "尚未發布。檢視者將無法看到此內容。"
 msgid "Pick one or more"
 msgstr "選擇一個或多個"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Column Name"
 msgstr "列名稱"
 
@@ -3563,6 +3583,8 @@ msgstr "日期格式"
 msgid "Share summary"
 msgstr "分享摘要"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "時間"
@@ -3845,6 +3867,8 @@ msgstr "刪除資料集"
 msgid "Add series"
 msgstr "添加系列"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "日期"
@@ -4019,6 +4043,11 @@ msgstr "不活躍"
 msgid "Right"
 msgstr "右"
 
+#. placeholder {0}: error.columnName
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "More than one column is named \"{0}\". Column names must be unique."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
 msgstr "所有成員的 "
@@ -4026,6 +4055,11 @@ msgstr "所有成員的 "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
+
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Integer"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4045,6 +4079,7 @@ msgstr "請求功能"
 msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
 msgstr "對於數據集 <0>{0}</0>，選擇用作 {conceptName} ID 的欄位"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -4231,6 +4266,14 @@ msgstr "私人儀表板"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上傳"
+
+#. placeholder {0}: warning.columnName
+#. placeholder {1}: warning.numUncastable
+#. placeholder {2}: warning.numValues
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
+"and would be left empty."
+msgstr ""
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4540,6 +4583,12 @@ msgstr "地圖"
 msgid "Import dataset"
 msgstr "匯入資料集"
 
+#. placeholder {0}: columns.length
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "{0} columns were detected. Correct any name or type that is wrong before "
+"saving."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
 msgstr "選擇 Google 表單"
@@ -4566,8 +4615,8 @@ msgid "Offline chat model ready"
 msgstr "離線聊天模型已準備好"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-msgid "Column description updated successfully!"
-msgstr "欄位描述已成功更新！"
+#~ msgid "Column description updated successfully!"
+#~ msgstr "欄位描述已成功更新！"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -4957,6 +5006,10 @@ msgstr "錯誤"
 msgid "Send answer"
 msgstr "發送答案"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Column {columnNumber} needs a name."
+msgstr ""
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... 和 {remainingCount} 個更多"
@@ -5331,6 +5384,10 @@ msgstr "購買 {seatsToAdd} 個席位"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
 msgstr "當前計劃"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Column updated successfully!"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -5828,8 +5885,10 @@ msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據
 msgid "Dataset saved"
 msgstr "資料集已儲存"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "文本"
@@ -5996,6 +6055,10 @@ msgstr "保存更改"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
 msgstr "Google 表單載入失敗"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Fix these column names before saving"
+msgstr ""
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

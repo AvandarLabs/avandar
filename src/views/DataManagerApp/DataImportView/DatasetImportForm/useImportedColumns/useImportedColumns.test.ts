@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
@@ -229,13 +230,20 @@ describe("useImportedColumns", () => {
   });
 
   it("marks file and sheet imports as editable", () => {
-    const metadata = _csvFileMetadata([_duckDbColumn("a", "VARCHAR")]);
+    const column = _duckDbColumn("a", "VARCHAR");
+    const editableSources = [
+      _csvFileMetadata([column]),
+      _xlsxFileMetadata([column]),
+      _googleSheetsMetadata([column]),
+    ];
 
-    const { result } = renderHook(() => {
-      return useImportedColumns(metadata);
+    editableSources.forEach((metadata) => {
+      const { result } = renderHook(() => {
+        return useImportedColumns(metadata);
+      });
+
+      expect(result.current.isEditable).toBe(true);
     });
-
-    expect(result.current.isEditable).toBe(true);
   });
 
   it("applies a rename and keeps the source name for the parquet", () => {
@@ -303,14 +311,40 @@ describe("useImportedColumns", () => {
       result.current.updateColumn(1, { name: "a" });
     });
 
-    expect(
-      result.current.errors.map((error) => {
-        return error.kind;
-      }),
-    ).toEqual(["duplicate_name", "duplicate_name"]);
+    expect(result.current.errors.map(prop("kind"))).toEqual([
+      "duplicate_name",
+      "duplicate_name",
+    ]);
   });
 
-  it("discards edits when a re-parse produces a new set of columns", () => {
+  it("keeps edits when a rerender hands over the same parse", () => {
+    const { result, rerender } = renderHook(
+      (props: { metadata: DataSourceMetadata }) => {
+        return useImportedColumns(props.metadata);
+      },
+      {
+        initialProps: {
+          metadata: _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]),
+        },
+      },
+    );
+
+    act(() => {
+      result.current.updateColumn(0, { name: "City", dataType: "date" });
+    });
+
+    // A new metadata object carrying the same load result id: the parse did not
+    // change, so the user's edits must survive.
+    rerender({
+      metadata: _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]),
+    });
+
+    expect(result.current.columns[0]?.name).toBe("City");
+    expect(result.current.columns[0]?.dataType).toBe("date");
+    expect(result.current.columns[0]?.isDataTypeUserSet).toBe(true);
+  });
+
+  it("discards edits when a re-parse mints a new load result", () => {
     const firstParse = _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]);
 
     const { result, rerender } = renderHook(

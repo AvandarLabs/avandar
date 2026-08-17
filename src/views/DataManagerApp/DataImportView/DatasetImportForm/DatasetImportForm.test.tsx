@@ -68,8 +68,12 @@ function _columnSchema(
   };
 }
 
-function _csvDataSourceMetadata(): CsvDataSourceMetadata {
-  const columns = [_columnSchema("city", "VARCHAR")];
+function _csvDataSourceMetadata(
+  columnNames: readonly string[] = ["city"],
+): CsvDataSourceMetadata {
+  const columns = columnNames.map((columnName) => {
+    return _columnSchema(columnName, "VARCHAR");
+  });
   return {
     sourceType: "csv_file",
     onlineStorageAllowed: true,
@@ -342,5 +346,54 @@ describe("DatasetImportForm", () => {
         onlineStorageAllowed: true,
       }),
     );
+  });
+  it("blocks the save while a column name would break the dataset's view", () => {
+    // Two columns sharing a name: DuckDB would silently rename the second and
+    // make it unreadable, so the form must not let the dataset be saved.
+    const metadata = _csvDataSourceMetadata(["city", "city"]);
+    render(
+      <I18nProvider i18n={i18n}>
+        <AvandarAppProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.csv"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={vi.fn()}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarAppProvider>
+      </I18nProvider>,
+    );
+
+    expect(screen.getByRole("button", { name: "Save Dataset" })).toBeDisabled();
+    expect(
+      screen.getByText("Fix these column names before saving"),
+    ).toBeInTheDocument();
+  });
+
+  it("allows the save when every column name is usable", () => {
+    const metadata = _csvDataSourceMetadata(["city", "population"]);
+    render(
+      <I18nProvider i18n={i18n}>
+        <AvandarAppProvider>
+          <DatasetImportForm
+            rows={[{ city: "LA" }]}
+            initialDatasetName="cities.csv"
+            onRequestDataReparse={vi.fn()}
+            onDataSourceMetadataChange={vi.fn()}
+            dataSourceMetadata={metadata}
+            parseOptions={metadata.parseOptions}
+          />
+        </AvandarAppProvider>
+      </I18nProvider>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Save Dataset" }),
+    ).not.toBeDisabled();
+    expect(
+      screen.queryByText("Fix these column names before saving"),
+    ).not.toBeInTheDocument();
   });
 });

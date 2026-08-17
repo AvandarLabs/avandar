@@ -1,25 +1,26 @@
 import { Callout, ObjectDescriptionList } from "@avandar/ui";
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import {
+  useDatasetColumnRenderOptions,
+  useDatasetColumnTableHeader,
+} from "@/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 /** The fields of a column this block lets the user change. */
-export type DatasetPreviewColumnEdit = {
-  name?: string;
-  dataType?: AvaDataType.T;
-  description?: string;
-};
+export type DatasetPreviewColumnEdit = Partial<
+  Pick<DatasetColumn.Imported, "name" | "dataType" | "description">
+>;
 
 type Props = {
   /** The preview rows to display in the data grid */
   previewRows: Array<Record<string, unknown>>;
 
   /** The column information to display in the details section */
-  columns: readonly ImportedDatasetColumn[];
+  columns: readonly DatasetColumn.Imported[];
 
   /**
    * Which column field the keys of `previewRows` correspond to.
@@ -33,8 +34,8 @@ type Props = {
 
   /**
    * When provided, each column row becomes editable and this is called with the
-   * column's `columnIdx` and the fields that changed. Omit it to render the
-   * columns read-only.
+   * column's `columnIdx` and the current value of every editable field, changed
+   * or not. Omit it to render the columns read-only.
    */
   onColumnChange?: (
     columnIdx: number,
@@ -83,12 +84,16 @@ export function DatasetPreviewBlock({
       t`${columns.length} columns were detected. Correct any name or type that is wrong before saving.`
     : t`${columns.length} columns were detected. Review the column info below to make sure they are correct.`);
 
+  const columnRenderOptions = useDatasetColumnRenderOptions();
+  const getColumnTableHeader = useDatasetColumnTableHeader();
+
   const columnNames = useMemo(() => {
-    return columns.map((column) => {
-      return column[previewRowKey];
-    });
+    return columns.map(prop(previewRowKey));
   }, [columns, previewRowKey]);
 
+  // Built with `Object.fromEntries` rather than `makeObject`: the keys are
+  // user-supplied column names, and assigning one named `__proto__` would set
+  // the prototype instead of adding a label.
   const columnLabels = useMemo(() => {
     return Object.fromEntries(
       columns.map((column) => {
@@ -113,34 +118,19 @@ export function DatasetPreviewBlock({
           data={columns}
           renderAsTable
           editable={isEditable}
-          renderTableHeader={(key: keyof DatasetColumn.T) => {
-            return key === "name" ? t`Column Name` : undefined;
-          }}
+          renderTableHeader={getColumnTableHeader}
           itemRenderOptions={{
             includeKeys:
               isEditable ?
                 ["name", "dataType", "description"]
               : ["name", "dataType"],
-            keyRenderOptions: {
-              description: {
-                renderAsType: "text",
-              },
-              dataType: {
-                renderAsType: {
-                  type: "text",
-                  choices: AvaDataType.Types.map((type) => {
-                    return {
-                      value: type,
-                      label: AvaDataType.toDisplayValue(type),
-                    };
-                  }),
-                },
-                renderValue: AvaDataType.toDisplayValue,
-              },
-            },
+            keyRenderOptions: columnRenderOptions,
           }}
           onSubmitChange={(value) => {
-            const editedColumn = value as ImportedDatasetColumn;
+            // Cast rather than guarded: `undefined` is only in this callback's
+            // type because the row type has an optional key, and the list never
+            // submits a row it does not have.
+            const editedColumn = value as DatasetColumn.Imported;
             onColumnChange?.(editedColumn.columnIdx, {
               name: editedColumn.name,
               dataType: editedColumn.dataType,

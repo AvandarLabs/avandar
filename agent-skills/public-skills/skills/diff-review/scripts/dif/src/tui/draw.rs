@@ -15,6 +15,7 @@ use tui_term::widget::PseudoTerminal;
 
 use crate::pty_pane::PtyPane;
 use crate::session::AgentKind;
+use crate::web::WebShell;
 
 use super::app::{App, Panel};
 use super::main_diff_view::MainDiffView;
@@ -91,16 +92,12 @@ fn draw_statusline(f: &mut Frame, area: Rect) {
 /// Draw the main diff pane: a tab strip plus the active view (log or guide).
 fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
     let focused = app.focus == Panel::Difit;
-    // difit is live from launch; "preparing guide" marks the review artifacts
-    // the LLM has not written yet, not the diff.
-    let title = if app.guide_ready {
-        format!(" difit · {} · :{} (alt+h) ", app.comparison_label, app.port)
-    } else {
-        format!(
-            " difit · {} · :{} · preparing guide (alt+h) ",
-            app.comparison_label, app.port
-        )
-    };
+    let title = main_diff_title(
+        &app.comparison_label,
+        app.port,
+        app.web_shell.as_ref().map(WebShell::port),
+        app.guide_ready,
+    );
     let block = bordered(&title, focused);
     let inner = block.inner(area);
     f.render_widget(block, area);
@@ -127,6 +124,26 @@ fn draw_main_diff(f: &mut Frame, area: Rect, app: &mut App) {
             "Press Ctrl+G to ask the LLM to generate one.",
         ),
     }
+}
+
+/// The main diff pane's title.
+///
+/// Carries both listening ports so the browser surface is reachable from the
+/// TUI alone: `:PORT` is difit itself, `shell :PORT` the web shell that wraps
+/// it (guide sidebar + per-group views) and the one a human wants. The shell
+/// port is shown only when the shell is actually up: `dif` reserves the port
+/// either way, and advertising a port nothing is bound to sends the reader to a
+/// dead URL. "preparing guide" marks the review artifacts the LLM has not
+/// written yet, not the diff: difit is live from launch.
+fn main_diff_title(
+    comparison_label: &str,
+    port: u16,
+    shell_port: Option<u16>,
+    guide_ready: bool,
+) -> String {
+    let shell = shell_port.map_or_else(String::new, |port| format!(" · shell :{port}"));
+    let preparing = if guide_ready { "" } else { " · preparing guide" };
+    format!(" difit · {comparison_label} · :{port}{shell}{preparing} (alt+h) ")
 }
 
 /// The `view · Logs · Diff guide` strip, active view bold. Mirrors `tasks`.
@@ -263,7 +280,31 @@ fn bordered(title: &str, focused: bool) -> Block<'_> {
 mod tests {
     use crate::session::AgentKind;
 
-    use super::{llm_session_ended_title, llm_title};
+    use super::{llm_session_ended_title, llm_title, main_diff_title};
+
+    #[test]
+    fn main_diff_title_shows_the_shell_port_when_the_shell_is_up() {
+        assert_eq!(
+            main_diff_title("develop", 4767, Some(4702), true),
+            " difit · develop · :4767 · shell :4702 (alt+h) "
+        );
+    }
+
+    #[test]
+    fn main_diff_title_omits_the_shell_port_when_the_shell_is_down() {
+        assert_eq!(
+            main_diff_title("develop", 4767, None, true),
+            " difit · develop · :4767 (alt+h) "
+        );
+    }
+
+    #[test]
+    fn main_diff_title_keeps_the_shell_port_while_the_guide_is_preparing() {
+        assert_eq!(
+            main_diff_title("develop", 4767, Some(4702), false),
+            " difit · develop · :4767 · shell :4702 · preparing guide (alt+h) "
+        );
+    }
 
     #[test]
     fn llm_title_uses_agent_label_without_internal_nomenclature() {

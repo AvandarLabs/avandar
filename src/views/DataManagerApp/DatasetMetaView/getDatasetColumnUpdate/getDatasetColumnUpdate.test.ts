@@ -80,7 +80,10 @@ describe("getDatasetColumnUpdate", () => {
   // type ("VARCHAR"), so comparing them against each other is always unequal
   // and would report a change on every submit.
   it("does not report a type change just because the two type fields differ in form", () => {
-    const column = _column({ dataType: "varchar", detectedDataType: "VARCHAR" });
+    const column = _column({
+      dataType: "varchar",
+      detectedDataType: "VARCHAR",
+    });
 
     expect(
       getDatasetColumnUpdate({

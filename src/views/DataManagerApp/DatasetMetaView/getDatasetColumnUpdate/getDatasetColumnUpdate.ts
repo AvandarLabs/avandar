@@ -20,7 +20,14 @@ type GetDatasetColumnUpdateOptions = {
  */
 export function getDatasetColumnUpdate(
   options: Readonly<GetDatasetColumnUpdateOptions>,
-): Partial<DatasetColumn.T> | undefined {
+):
+  | Partial<
+      Pick<
+        DatasetColumn.T,
+        "name" | "description" | "dataType" | "isDataTypeUserSet"
+      >
+    >
+  | undefined {
   const { previousColumn, editedColumn } = options;
 
   const hasNameChange = editedColumn.name !== previousColumn.name;
@@ -34,9 +41,7 @@ export function getDatasetColumnUpdate(
 
   return {
     ...(hasNameChange ? { name: editedColumn.name } : {}),
-    ...(hasDescriptionChange ?
-      { description: editedColumn.description }
-    : {}),
+    ...(hasDescriptionChange ? { description: editedColumn.description } : {}),
     ...(hasDataTypeChange ?
       {
         dataType: editedColumn.dataType,

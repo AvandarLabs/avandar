@@ -9,7 +9,7 @@ import type { Json } from "$/types/database.types";
  * @param metadata - Raw JSON from `catalog_entries__open_data.metadata`.
  * @returns Column names when present, otherwise `undefined`.
  */
-export function getColumnNamesFromOpenDataMetadata(
+function _getColumnNamesFromOpenDataMetadata(
   metadata: Json | undefined,
 ): string[] | undefined {
   if (metadata === undefined || metadata === null) {
@@ -41,13 +41,13 @@ export function getColumnNamesFromOpenDataMetadata(
 }
 
 /**
- * Builds open-data import columns from catalog column names alone.
+ * Makes open-data import columns from catalog column names alone.
  * Uses `VARCHAR` / `varchar` so Parquet loads without forced casts when types
  * match user expectations in Qetl.
  *
  * @param columnNames - Original column names from the catalog metadata.
  */
-export function buildOpenDataImportedColumns(
+function _makeImportedColumnsFromColumnNames(
   columnNames: readonly string[],
 ): DatasetColumn.Imported[] {
   return columnNames.map((originalName, columnIdx) => {
@@ -80,21 +80,21 @@ function _sortCatalogDatasetColumns(
 }
 
 /**
- * Builds open-data import columns from `catalog_entries__dataset_column` rows.
+ * Makes open-data import columns from `catalog_entries__dataset_column` rows.
  *
  * @param rows - Column rows for one open-data catalog entry.
  */
-export function buildOpenDataImportedColumnsFromCatalogRows(
+function _makeImportedColumnsFromCatalogRows(
   rows: readonly CatalogDatasetColumnRead[],
 ): DatasetColumn.Imported[] {
   const sorted = _sortCatalogDatasetColumns(rows);
-  return sorted.map((col, columnIdx) => {
+  return sorted.map((column, columnIdx) => {
     return {
-      originalName: col.columnName,
-      name: col.columnName,
-      originalDataType: col.originalDataType,
-      detectedDataType: col.castDataType,
-      dataType: DuckDbDataTypeUtils.toAvaDataType(col.castDataType),
+      originalName: column.columnName,
+      name: column.columnName,
+      originalDataType: column.originalDataType,
+      detectedDataType: column.castDataType,
+      dataType: DuckDbDataTypeUtils.toAvaDataType(column.castDataType),
       isDataTypeUserSet: false,
       columnIdx,
     };
@@ -102,28 +102,29 @@ export function buildOpenDataImportedColumnsFromCatalogRows(
 }
 
 /**
- * Resolves the columns an open-data import will persist, preferring normalized
+ * Makes the columns an open-data import will persist, preferring normalized
  * catalog column rows and falling back to legacy JSON metadata.
  *
- * These reach the insert RPC through `toDatasetColumnInputs` like every other
- * source's columns do, but open data never offers the user a column editor:
+ * These reach the insert RPC through
+ * `makeDatasetColumnInputsFromImportedColumns` like every other source's
+ * columns do, but open data never offers the user a column editor:
  * the catalog, not this workspace, owns what the columns are called and how
  * they are typed.
  *
  * @param options.catalogColumns - Rows from `catalog_entries__dataset_column`.
  * @param options.metadata - Legacy `catalog_entries__open_data.metadata` JSON.
  */
-export function resolveOpenDataImportedColumns(options: {
+export function makeImportedColumnsFromOpenDataCatalog(options: {
   catalogColumns: readonly CatalogDatasetColumnRead[] | undefined;
   metadata: Json | undefined;
 }): DatasetColumn.Imported[] | undefined {
   const { catalogColumns, metadata } = options;
   if (catalogColumns !== undefined && catalogColumns.length > 0) {
-    return buildOpenDataImportedColumnsFromCatalogRows(catalogColumns);
+    return _makeImportedColumnsFromCatalogRows(catalogColumns);
   }
-  const columnNames = getColumnNamesFromOpenDataMetadata(metadata);
+  const columnNames = _getColumnNamesFromOpenDataMetadata(metadata);
   if (!columnNames) {
     return undefined;
   }
-  return buildOpenDataImportedColumns(columnNames);
+  return _makeImportedColumnsFromColumnNames(columnNames);
 }

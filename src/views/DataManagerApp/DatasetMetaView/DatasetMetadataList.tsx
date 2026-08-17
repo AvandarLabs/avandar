@@ -1,12 +1,17 @@
 import { Model } from "@avandar/models";
 import { FloatingLoader, ObjectDescriptionList } from "@avandar/ui";
-import { assertIsDefined, matchLiteral, where } from "@avandar/utils";
+import {
+  assertIsDefined,
+  isDefined,
+  matchLiteral,
+  propEq,
+  where,
+} from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { useDatasetColumnRenderOptions } from "@/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { getDatasetColumnUpdate } from "@/views/DataManagerApp/DatasetMetaView/getDatasetColumnUpdate/getDatasetColumnUpdate";
 import type { ObjectKeyRenderOptionsMap } from "@avandar/ui";
@@ -48,6 +53,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
 // eslint-disable-next-line max-len
 function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
   const { t } = useLingui();
+  const columnRenderOptions = useDatasetColumnRenderOptions();
   return {
     createdAt: {
       renderAsType: "date",
@@ -73,23 +79,9 @@ function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWit
       editable: true,
       itemRenderOptions: {
         keyRenderOptions: {
-          description: {
-            renderAsType: "text",
-          },
+          ...columnRenderOptions,
           createdAt: {
             renderAsType: "date",
-          },
-          dataType: {
-            renderAsType: {
-              type: "text",
-              choices: AvaDataType.Types.map((type) => {
-                return {
-                  value: type,
-                  label: AvaDataType.toDisplayValue(type),
-                };
-              }),
-            },
-            renderValue: AvaDataType.toDisplayValue,
           },
         },
         includeKeys: ["name", "dataType", "description"],
@@ -138,17 +130,17 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         keyRenderOptions={datasetMetadataRenderOptions}
         onSubmitChange={async (value) => {
           if (Model.isOfModelType(value, "DatasetColumn")) {
-            const editedColumn = value as DatasetColumn.T;
-            const previousColumn = dataset.columns?.find((column) => {
-              return column.id === value.id;
-            });
+            const editedColumn = value;
+            const previousColumn = dataset.columns?.find(
+              propEq("id", editedColumn.id),
+            );
             assertIsDefined(previousColumn);
 
             const update = getDatasetColumnUpdate({
               previousColumn,
               editedColumn,
             });
-            if (update) {
+            if (isDefined(update)) {
               updateDatasetColumn({ id: editedColumn.id, data: update });
             }
           }

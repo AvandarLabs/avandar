@@ -15,6 +15,8 @@ import type { DatasetImportFeedbackProps } from "./DatasetImportFeedback/Dataset
 import type { DatasetImportFieldsProps } from "./DatasetImportFields";
 import type { DatasetImportFormProps } from "./DatasetImportForm.types";
 import type { SaveDatasetButtonProps } from "./SaveDatasetButton";
+import type { ColumnCastWarning } from "./useColumnCastWarnings/useColumnCastWarnings";
+import type { ImportedColumnsState } from "./useImportedColumns/useImportedColumns";
 import type { FormEventHandler, ReactNode } from "react";
 
 /**
@@ -35,10 +37,76 @@ type DatasetImportFormState = {
   saveButtonProps: SaveDatasetButtonProps;
 };
 
+/** The labels and placeholders of the form's own fields. */
+function useDatasetImportFieldProps(
+  validation: ReturnType<typeof useDatasetImportValidation>,
+): DatasetImportFieldsProps {
+  const { t } = useLingui();
+  return {
+    ...validation,
+    nameLabel: t`Dataset Name`,
+    namePlaceholder: t`Enter a name for this dataset`,
+    descriptionLabel: t`Description`,
+    descriptionPlaceholder: t`Enter a description for this dataset`,
+  };
+}
+
+/** Everything the feedback half of the form renders from. */
+function _getFeedbackProps(
+  options: Readonly<{
+    formOptions: Readonly<DatasetImportFormStateOptions>;
+    importedColumns: ImportedColumnsState;
+    castWarnings: readonly ColumnCastWarning[];
+    copy: DatasetImportFeedbackProps["copy"];
+    previewRows: DatasetImportFeedbackProps["previewRows"];
+    validation: DatasetImportFeedbackProps["validation"];
+  }>,
+): DatasetImportFeedbackProps {
+  const { formOptions, importedColumns } = options;
+  return {
+    castWarnings: options.castWarnings,
+    columnErrors: importedColumns.errors,
+    columns: importedColumns.columns,
+    copy: options.copy,
+    dataSourceMetadata: formOptions.dataSourceMetadata,
+    isProcessing: formOptions.isProcessing ?? false,
+    onColumnChange:
+      importedColumns.isEditable ? importedColumns.updateColumn : undefined,
+    onDataSourceMetadataChange: formOptions.onDataSourceMetadataChange,
+    onRequestDataReparse: formOptions.onRequestDataReparse,
+    previewRows: options.previewRows,
+    validation: options.validation,
+  };
+}
+
+/** Saves the dataset, with the offline gate and validation wired in. */
+function _getSubmitHandler(
+  options: Readonly<{
+    dataSourceMetadata: DatasetImportFormStateOptions["dataSourceMetadata"];
+    columns: ImportedColumnsState["columns"];
+    offline: ReturnType<typeof useOfflineGate>;
+    saveDataset: ReturnType<typeof useSaveDataset>[0];
+    validation: ReturnType<typeof useDatasetImportValidation>;
+  }>,
+): FormEventHandler<HTMLFormElement> {
+  const { validation, offline, saveDataset } = options;
+  return validation.form.onSubmit(
+    offline.guard((values) => {
+      saveDataset({
+        ...values,
+        ...options.dataSourceMetadata,
+        columns: options.columns,
+      });
+    }),
+    (errors) => {
+      return validation.onValidationFailure(errors);
+    },
+  );
+}
+
 function useDatasetImportFormState(
   options: Readonly<DatasetImportFormStateOptions>,
 ): DatasetImportFormState {
-  const { t } = useLingui();
   const validation = useDatasetImportValidation(options.initialDatasetName);
   const importedColumns = useImportedColumns(options.dataSourceMetadata);
   const [saveDataset, isSavePending] = useSaveDataset({
@@ -57,42 +125,26 @@ function useDatasetImportFormState(
     numColumns: importedColumns.columns.length,
     numPreviewRows: previewRows.length,
   });
+  const fieldProps = useDatasetImportFieldProps(validation);
   const hasColumnErrors = importedColumns.errors.length > 0;
 
   return {
-    fieldProps: {
-      ...validation,
-      nameLabel: t`Dataset Name`,
-      namePlaceholder: t`Enter a name for this dataset`,
-      descriptionLabel: t`Description`,
-      descriptionPlaceholder: t`Enter a description for this dataset`,
-    },
-    feedbackProps: {
+    fieldProps,
+    feedbackProps: _getFeedbackProps({
+      formOptions: options,
+      importedColumns,
       castWarnings,
-      columnErrors: importedColumns.errors,
-      columns: importedColumns.columns,
       copy,
-      dataSourceMetadata: options.dataSourceMetadata,
-      isProcessing: options.isProcessing ?? false,
-      onColumnChange:
-        importedColumns.isEditable ? importedColumns.updateColumn : undefined,
-      onDataSourceMetadataChange: options.onDataSourceMetadataChange,
-      onRequestDataReparse: options.onRequestDataReparse,
       previewRows,
       validation,
-    },
-    onSubmit: validation.form.onSubmit(
-      offline.guard((values) => {
-        saveDataset({
-          ...values,
-          ...options.dataSourceMetadata,
-          columns: importedColumns.columns,
-        });
-      }),
-      (errors) => {
-        return validation.onValidationFailure(errors);
-      },
-    ),
+    }),
+    onSubmit: _getSubmitHandler({
+      dataSourceMetadata: options.dataSourceMetadata,
+      columns: importedColumns.columns,
+      offline,
+      saveDataset,
+      validation,
+    }),
     saveButtonProps: {
       // A duplicate or empty column name would not fail loudly: DuckDB would
       // build the dataset's view anyway and quietly make a column unreadable.

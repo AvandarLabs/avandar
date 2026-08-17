@@ -64,7 +64,16 @@ no manual refresh. When the artifacts land, the pane logs
 The shell is split into the **main view** (the left "diff view") and the
 right **Claude/Codex** pane.
 
-- **Left: the main view**: a one-row tab strip plus one of three views. `Tab` /
+- **Left: the main view**: its title carries both listening ports —
+  `difit · <comparison> · :<difit-port> · shell :<shell-port> (alt+h)`. `:<difit-port>`
+  is difit itself; `shell :<shell-port>` is the web shell that wraps it (guide
+  sidebar + per-group views) and the address a human wants. The shell port is
+  printed only while the shell is actually up: `dif` reserves the port either way,
+  so advertising it unconditionally would point at a dead URL. Both ports are
+  deterministic per branch+scope but unrelated to each other, so the title is the
+  only place to read them off without opening the session metadata — which
+  matters whenever auto-open fails, you are on a remote machine, or you closed
+  the tab. Then a one-row tab strip plus one of three views. `Tab` /
   `Shift+Tab` cycle them in order: Logs, Test plan, Diff guide.
   - **Log view** (`Logs`): difit's server log (URL, requests, status), plus
     `dif`'s own activity lines (see below). Read-only; scroll with the mouse

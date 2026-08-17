@@ -20,8 +20,31 @@ import type {
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+/**
+ * What to write for a column whose detected type the transcode revised.
+ *
+ * The user's own choice of `dataType` wins; otherwise it follows the corrected
+ * detected type.
+ */
+function _getReconciledColumnUpdate(
+  options: Readonly<{
+    existingColumn: Pick<DatasetColumn.T, "dataType" | "isDataTypeUserSet">;
+    detectedDataType: DuckDbColumnSchema["column_type"];
+  }>,
+): Pick<DatasetColumn.T, "dataType" | "detectedDataType"> {
+  const { existingColumn, detectedDataType } = options;
+  return {
+    detectedDataType,
+    dataType:
+      existingColumn.isDataTypeUserSet ?
+        existingColumn.dataType
+      : DuckDbDataTypeUtils.toAvaDataType(detectedDataType),
+  };
+}
 
 /**
  * Reconciles the background parquet transcoding's authoritative column
@@ -32,10 +55,10 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * A column the user typed themselves keeps its `dataType`; only its
  * `detectedDataType` is corrected, so their choice survives. For every other
  * column `dataType` follows the corrected `detectedDataType`, because the
- * queryable type was only ever derived from it. Leaving `dataType` behind here
- * is what used to flatten XLSX imports to text: their sniff reports every
- * column as `VARCHAR`, so every column would keep a `varchar` queryable type
- * that no longer matched the parquet.
+ * queryable type was only ever derived from it. Both fields must move together:
+ * correcting `detectedDataType` alone flattens an XLSX import to text: its
+ * sniff reports every column as `VARCHAR`, so each unedited column would keep a
+ * `varchar` queryable type that no longer matches the parquet.
  */
 async function _reconcileColumns(params: {
   datasetId: DatasetId;
@@ -88,13 +111,10 @@ async function _reconcileColumns(params: {
       try {
         await DatasetColumnClient.update({
           id: existing.id,
-          data: {
+          data: _getReconciledColumnUpdate({
+            existingColumn: existing,
             detectedDataType: detected.column_type,
-            dataType:
-              existing.isDataTypeUserSet ?
-                existing.dataType
-              : DuckDbDataTypeUtils.toAvaDataType(detected.column_type),
-          },
+          }),
         });
         changedCount += 1;
       } catch {

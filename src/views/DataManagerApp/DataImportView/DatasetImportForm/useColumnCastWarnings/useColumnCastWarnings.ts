@@ -1,9 +1,10 @@
+import { isDefined, prop, propEq } from "@avandar/utils";
 import { useEffect, useMemo, useState } from "react";
 import { probeColumnCastLoss } from "@/clients/DuckDbClient/probeColumnCastLoss/probeColumnCastLoss";
 import { Logger } from "@/utils/Logger";
+import type { UnknownObject } from "@avandar/utils";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { UnknownObject } from "@avandar/utils";
 
 /** One column whose chosen type would discard part of the preview sample. */
 export type ColumnCastWarning = {
@@ -14,20 +15,45 @@ export type ColumnCastWarning = {
   numUncastable: number;
 };
 
+/**
+ * A probe result, before the column's current name is attached to it.
+ *
+ * The name is deliberately not stored: a rename does not change what a cast
+ * would do, so it must not cost a new probe, and a name captured when the probe
+ * ran would go stale the moment the user edits it.
+ */
+type ProbedColumnCastLoss = Omit<ColumnCastWarning, "columnName">;
+
 type UseColumnCastWarningsOptions = {
   columns: readonly DatasetColumn.Imported[];
   previewRows: readonly UnknownObject[];
 };
 
-/**
- * Identifies the columns worth probing: only the ones the user re-typed, since
- * an inferred type is by construction one every sampled value already fits.
- */
-function _getUserTypedColumns(
-  columns: readonly DatasetColumn.Imported[],
-): DatasetColumn.Imported[] {
-  return columns.filter((column) => {
-    return column.isDataTypeUserSet;
+/** Probes each re-typed column against the preview sample. */
+async function _getCastLossForColumns(
+  options: Readonly<{
+    columns: readonly DatasetColumn.Imported[];
+    previewRows: readonly UnknownObject[];
+  }>,
+): Promise<ProbedColumnCastLoss[]> {
+  const { columns, previewRows } = options;
+  const probed = await Promise.all(
+    columns.map(async (column) => {
+      const loss = await probeColumnCastLoss({
+        values: previewRows.map((row) => {
+          return row[column.originalName];
+        }),
+        targetDataType: column.dataType,
+      });
+      return {
+        columnIdx: column.columnIdx,
+        dataType: column.dataType,
+        ...loss,
+      };
+    }),
+  );
+  return probed.filter((columnLoss) => {
+    return columnLoss.numUncastable > 0;
   });
 }
 
@@ -43,10 +69,11 @@ function _getUserTypedColumns(
 export function useColumnCastWarnings(
   options: Readonly<UseColumnCastWarningsOptions>,
 ): ColumnCastWarning[] {
-  const [warnings, setWarnings] = useState<ColumnCastWarning[]>([]);
-  const userTypedColumns = useMemo(() => {
-    return _getUserTypedColumns(options.columns);
-  }, [options.columns]);
+  const [castLoss, setCastLoss] = useState<ProbedColumnCastLoss[]>([]);
+
+  // Only the columns the user re-typed are worth probing: an inferred type is
+  // by construction one every sampled value already fits.
+  const userTypedColumns = options.columns.filter(prop("isDataTypeUserSet"));
 
   // Re-probed whenever the set of re-typed columns changes, keyed by the
   // column and the type asked for so an unrelated edit does not re-run it.
@@ -61,43 +88,23 @@ export function useColumnCastWarnings(
   useEffect(
     function probeCastLossForUserTypedColumns() {
       if (userTypedColumns.length === 0) {
-        setWarnings([]);
+        setCastLoss([]);
         return undefined;
       }
 
       let isCancelled = false;
-      void Promise.all(
-        userTypedColumns.map(async (column) => {
-          const loss = await probeColumnCastLoss({
-            values: previewRows.map((row) => {
-              return row[column.originalName];
-            }),
-            targetDataType: column.dataType,
-          });
-          return {
-            columnIdx: column.columnIdx,
-            columnName: column.name,
-            dataType: column.dataType,
-            ...loss,
-          };
-        }),
-      )
+      void _getCastLossForColumns({ columns: userTypedColumns, previewRows })
         .then((probed) => {
-          if (isCancelled) {
-            return;
+          if (!isCancelled) {
+            setCastLoss(probed);
           }
-          setWarnings(
-            probed.filter((warning) => {
-              return warning.numUncastable > 0;
-            }),
-          );
         })
         .catch((error: unknown) => {
           // A failed probe must not block the import; the user simply does not
           // get the warning.
           Logger.error(error);
           if (!isCancelled) {
-            setWarnings([]);
+            setCastLoss([]);
           }
         });
 
@@ -112,5 +119,19 @@ export function useColumnCastWarnings(
     [probeKey, previewRows],
   );
 
-  return warnings;
+  // The name is resolved here rather than when the probe ran, so a rename shows
+  // up in the warning without re-probing. A column that disappeared from the
+  // list (a re-parse) drops its warning.
+  return useMemo(() => {
+    return castLoss
+      .map((columnLoss) => {
+        const column = options.columns.find(
+          propEq("columnIdx", columnLoss.columnIdx),
+        );
+        return isDefined(column) ?
+            { ...columnLoss, columnName: column.name }
+          : undefined;
+      })
+      .filter(isDefined);
+  }, [castLoss, options.columns]);
 }

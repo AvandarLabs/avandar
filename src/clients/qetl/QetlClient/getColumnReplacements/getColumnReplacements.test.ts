@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
 import { getColumnReplacements } from "./getColumnReplacements";
@@ -50,9 +51,7 @@ describe("getColumnReplacements", () => {
           isDataTypeUserSet: true,
         }),
       ]),
-    ).toEqual([
-      { originalName: "city", alias: undefined, dataType: "DATE" },
-    ]);
+    ).toEqual([{ originalName: "city", alias: undefined, dataType: "DATE" }]);
   });
 
   it("both aliases and casts when the user changed name and type", () => {
@@ -111,10 +110,6 @@ describe("getColumnReplacements", () => {
       _createColumn({ originalName: "c", name: "c" }),
     ]);
 
-    expect(
-      replacements.map((replacement) => {
-        return replacement.originalName;
-      }),
-    ).toEqual(["b"]);
+    expect(replacements.map(prop("originalName"))).toEqual(["b"]);
   });
 });

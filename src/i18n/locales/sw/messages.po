@@ -338,6 +338,10 @@ msgstr "Mkusanyiko"
 msgid "No"
 msgstr "Hapana"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Some values do not fit the type you chose"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "Haikuweza kubaini jedwali msingi kutoka kwenye kifungu cha FROM."
@@ -1126,6 +1130,8 @@ msgstr "Safu ya jina isiyo sahihi imechaguliwa"
 msgid "Custom"
 msgstr "Kawaida"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Wakati"
@@ -1616,6 +1622,11 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "Onyesha maelezo"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Boolean"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
 "will be available very soon. If there is a database or service you use "
@@ -1700,6 +1711,10 @@ msgstr "Vipengee"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "Sasisho la vizuizi limefeli"
+
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+msgid "Data Type"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2905,6 +2920,11 @@ msgstr "Hifadhi kwenye dashibodi"
 msgid "Label type"
 msgstr "Aina ya lebo"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Number"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
@@ -3421,7 +3441,7 @@ msgstr "Bado haijachapishwa. Watazamaji hawataiona."
 msgid "Pick one or more"
 msgstr "Chagua moja au zaidi"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Column Name"
 msgstr "Jina la Safu"
 
@@ -3706,6 +3726,8 @@ msgstr "Muundo wa tarehe"
 msgid "Share summary"
 msgstr "Shiriki muhtasari"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "Wakati"
@@ -3995,6 +4017,8 @@ msgstr "Futa Dataset"
 msgid "Add series"
 msgstr "Ongeza mfululizo"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "Tarehe"
@@ -4172,6 +4196,11 @@ msgstr "Haifanyi kazi"
 msgid "Right"
 msgstr "Kulia"
 
+#. placeholder {0}: error.columnName
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "More than one column is named \"{0}\". Column names must be unique."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
 msgstr "wanachama wote wa "
@@ -4179,6 +4208,11 @@ msgstr "wanachama wote wa "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
+
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Integer"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4201,6 +4235,7 @@ msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
 msgstr "Kwa seti ya data <0>{0}</0>, chagua safu ya kutumia kama {conceptName} "
 "ID"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
@@ -4392,6 +4427,14 @@ msgstr "Dashibodi za faragha"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Pakia"
+
+#. placeholder {0}: warning.columnName
+#. placeholder {1}: warning.numUncastable
+#. placeholder {2}: warning.numValues
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
+"and would be left empty."
+msgstr ""
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4708,6 +4751,12 @@ msgstr "Ramani"
 msgid "Import dataset"
 msgstr "Ingiza seti ya data"
 
+#. placeholder {0}: columns.length
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+msgid "{0} columns were detected. Correct any name or type that is wrong before "
+"saving."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
 msgstr "Chagua karatasi ya google"
@@ -4736,8 +4785,8 @@ msgid "Offline chat model ready"
 msgstr "Mfano wa mazungumzo ya mtandaoni uko tayari"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-msgid "Column description updated successfully!"
-msgstr "Maelezo ya safu yameboreshwa kwa mafanikio!"
+#~ msgid "Column description updated successfully!"
+#~ msgstr "Maelezo ya safu yameboreshwa kwa mafanikio!"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -5146,6 +5195,10 @@ msgstr "Kosa"
 msgid "Send answer"
 msgstr "Tuma jibu"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Column {columnNumber} needs a name."
+msgstr ""
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... na {remainingCount} zaidi"
@@ -5531,6 +5584,10 @@ msgstr "Nunua viti {seatsToAdd}"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
 msgstr "Mpango wa Sasa"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "Column updated successfully!"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6042,8 +6099,10 @@ msgstr "Chagua preset ya eneo la kazi au ubinafsishe kwa kila programu. Vikundi 
 msgid "Dataset saved"
 msgstr "Dataset imehifadhiwa"
 
+#: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "Maandishi"
@@ -6219,6 +6278,10 @@ msgstr "Hifadhi mabadiliko"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet failed to load"
 msgstr "Google Sheet ilishindwa kupakia"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
+msgid "Fix these column names before saving"
+msgstr ""
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

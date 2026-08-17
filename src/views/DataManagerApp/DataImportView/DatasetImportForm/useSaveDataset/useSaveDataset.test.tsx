@@ -276,9 +276,7 @@ describe("useSaveDataset", () => {
     await waitFor(() => {
       expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
     });
-    expect(
-      insertCsvFileDatasetMock.mock.calls[0]?.[0]?.columns,
-    ).toEqual([
+    expect(insertCsvFileDatasetMock.mock.calls[0]?.[0]?.columns).toEqual([
       {
         original_name: "name",
         name: "name",

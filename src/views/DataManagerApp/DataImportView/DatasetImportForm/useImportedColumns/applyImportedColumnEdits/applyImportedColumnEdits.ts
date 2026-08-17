@@ -1,16 +1,19 @@
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { isUndefined } from "@avandar/utils";
+import type { DatasetPreviewColumnEdit } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
-/** The fields of an imported column the user is allowed to change. */
-export type ImportedColumnEdit = {
-  name?: string;
-  dataType?: AvaDataType.T;
-  description?: string;
-};
+/**
+ * The fields of an imported column the user is allowed to change.
+ *
+ * The same shape the preview block hands back, so the edit the user submits
+ * needs no translation on its way into the column list.
+ */
+export type ImportedColumnEdit = DatasetPreviewColumnEdit;
 
 /** A column's pending edits, keyed by that column's `columnIdx`. */
-export type ImportedColumnEditsByColumnIdx = Readonly<
-  Record<number, ImportedColumnEdit | undefined>
+export type ImportedColumnEditsByColumnIdx = Record<
+  number,
+  ImportedColumnEdit | undefined
 >;
 
 /**
@@ -24,12 +27,15 @@ export type ImportedColumnEditsByColumnIdx = Readonly<
  * a `TRY_CAST` that would do nothing.
  */
 export function applyImportedColumnEdits(
-  baseColumns: readonly DatasetColumn.Imported[],
-  editsByColumnIdx: ImportedColumnEditsByColumnIdx,
+  options: Readonly<{
+    baseColumns: readonly DatasetColumn.Imported[];
+    editsByColumnIdx: Readonly<ImportedColumnEditsByColumnIdx>;
+  }>,
 ): DatasetColumn.Imported[] {
+  const { baseColumns, editsByColumnIdx } = options;
   return baseColumns.map((baseColumn) => {
     const edit = editsByColumnIdx[baseColumn.columnIdx];
-    if (!edit) {
+    if (isUndefined(edit)) {
       return baseColumn;
     }
     const dataType = edit.dataType ?? baseColumn.dataType;

@@ -73,10 +73,7 @@ export function DatasetImportFeedback({
         previewMessage={copy.previewMessage}
         previewRows={previewRows}
       />
-      <ColumnIssuesCallout
-        errors={columnErrors}
-        castWarnings={castWarnings}
-      />
+      <ColumnIssuesCallout errors={columnErrors} castWarnings={castWarnings} />
       <OnlineStorageAllowedCheckbox
         dataSourceMetadata={dataSourceMetadata}
         offlineOnlyTitle={copy.offlineOnlyTitle}

@@ -1,5 +1,5 @@
 import { Callout } from "@avandar/ui";
-import { where } from "@avandar/utils";
+import { isUndefined, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -21,6 +21,7 @@ import { useMemo, useState } from "react";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { makeDatasetColumnInputsFromImportedColumns } from "@/clients/datasets/DatasetClient/makeDatasetColumnInputsFromImportedColumns/makeDatasetColumnInputsFromImportedColumns";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
@@ -28,8 +29,7 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { toDatasetColumnInputs } from "@/clients/datasets/DatasetClient/toDatasetColumnInputs/toDatasetColumnInputs";
-import { resolveOpenDataImportedColumns } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataImportedColumns";
+import { makeImportedColumnsFromOpenDataCatalog } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/makeImportedColumnsFromOpenDataCatalog";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
@@ -123,12 +123,12 @@ export function OpenDataCatalogView({
       return;
     }
 
-    const importedColumns = resolveOpenDataImportedColumns({
+    const importedColumns = makeImportedColumnsFromOpenDataCatalog({
       catalogColumns: catalogDatasetColumns,
       metadata: selectedEntry.metadata,
     });
 
-    if (!importedColumns) {
+    if (isUndefined(importedColumns)) {
       notifyError({
         title: t`Cannot add dataset`,
         message: t`This catalog entry has no column metadata. It cannot be imported yet.`,
@@ -138,7 +138,7 @@ export function OpenDataCatalogView({
 
     insertOpenDataDataset({
       catalogEntryId: selectedEntry.id,
-      columns: toDatasetColumnInputs(importedColumns),
+      columns: makeDatasetColumnInputsFromImportedColumns(importedColumns),
       datasetDescription: selectedEntry.description ?? "",
       datasetId: uuid(),
       datasetName: selectedEntry.displayName,

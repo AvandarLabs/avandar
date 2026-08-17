@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toDatasetColumnInputs } from "./toDatasetColumnInputs";
+import { makeDatasetColumnInputsFromImportedColumns } from "./makeDatasetColumnInputsFromImportedColumns";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 function _importedColumn(
@@ -17,9 +17,9 @@ function _importedColumn(
   };
 }
 
-describe("toDatasetColumnInputs", () => {
+describe("makeDatasetColumnInputsFromImportedColumns", () => {
   it("keeps the source name alongside a renamed column", () => {
-    const [input] = toDatasetColumnInputs([
+    const [input] = makeDatasetColumnInputsFromImportedColumns([
       _importedColumn({ originalName: "cty", name: "City" }),
     ]);
 
@@ -28,7 +28,7 @@ describe("toDatasetColumnInputs", () => {
   });
 
   it("carries a user-set type through as the override flag", () => {
-    const [overridden, inferred] = toDatasetColumnInputs([
+    const [overridden, inferred] = makeDatasetColumnInputsFromImportedColumns([
       _importedColumn({ dataType: "date", isDataTypeUserSet: true }),
       _importedColumn({ dataType: "varchar", isDataTypeUserSet: false }),
     ]);
@@ -39,7 +39,8 @@ describe("toDatasetColumnInputs", () => {
   });
 
   it("leaves an absent description absent rather than sending an empty string", () => {
-    const [withoutDescription, withDescription] = toDatasetColumnInputs([
+    const [withoutDescription, withDescription] =
+      makeDatasetColumnInputsFromImportedColumns([
       _importedColumn(),
       _importedColumn({ description: "Where the reading was taken" }),
     ]);
@@ -49,7 +50,7 @@ describe("toDatasetColumnInputs", () => {
   });
 
   it("preserves each column's own index rather than its list position", () => {
-    const inputs = toDatasetColumnInputs([
+    const inputs = makeDatasetColumnInputsFromImportedColumns([
       _importedColumn({ name: "second", columnIdx: 1 }),
       _importedColumn({ name: "first", columnIdx: 0 }),
     ]);
@@ -65,7 +66,7 @@ describe("toDatasetColumnInputs", () => {
   });
 
   it("does not send the detected type as the queryable type", () => {
-    const [input] = toDatasetColumnInputs([
+    const [input] = makeDatasetColumnInputsFromImportedColumns([
       _importedColumn({
         detectedDataType: "BIGINT",
         dataType: "varchar",

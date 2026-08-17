@@ -1,3 +1,4 @@
+import { isDefined, makeBucketMap } from "@avandar/utils";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /** What is wrong with one edited column name. */
@@ -33,28 +34,36 @@ export function getImportedColumnErrors(
   const namedColumns = columns.filter((column) => {
     return column.name.trim().length > 0;
   });
-  const countsByCollisionKey = new Map<string, number>();
-  namedColumns.forEach((column) => {
-    const key = _toCollisionKey(column.name);
-    countsByCollisionKey.set(key, (countsByCollisionKey.get(key) ?? 0) + 1);
+  // Keyed by a Map rather than a record: the keys are user-supplied column
+  // names, and a column named `__proto__` would not survive a plain object.
+  const columnsByCollisionKey = makeBucketMap(namedColumns, {
+    keyFn: (column) => {
+      return _toCollisionKey(column.name);
+    },
+    valueKey: "columnIdx",
   });
 
-  return columns.reduce<ImportedColumnError[]>((errors, column) => {
-    if (column.name.trim().length === 0) {
-      return errors.concat({
-        columnIdx: column.columnIdx,
-        columnName: column.name,
-        kind: "empty_name",
-      });
-    }
-    const isDuplicate =
-      (countsByCollisionKey.get(_toCollisionKey(column.name)) ?? 0) > 1;
-    return isDuplicate ?
-        errors.concat({
-          columnIdx: column.columnIdx,
-          columnName: column.name,
-          kind: "duplicate_name",
-        })
-      : errors;
-  }, []);
+  return columns
+    .map((column) => {
+      const isEmptyName = column.name.trim().length === 0;
+      const isDuplicateName =
+        (columnsByCollisionKey.get(_toCollisionKey(column.name))?.length ?? 0) >
+        1;
+      return (
+        isEmptyName ?
+          {
+            columnIdx: column.columnIdx,
+            columnName: column.name,
+            kind: "empty_name" as const,
+          }
+        : isDuplicateName ?
+          {
+            columnIdx: column.columnIdx,
+            columnName: column.name,
+            kind: "duplicate_name" as const,
+          }
+        : undefined
+      );
+    })
+    .filter(isDefined);
 }

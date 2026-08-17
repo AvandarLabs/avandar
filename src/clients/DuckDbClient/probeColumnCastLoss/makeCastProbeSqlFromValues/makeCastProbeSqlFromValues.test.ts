@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { buildCastProbeSql } from "./buildCastProbeSql";
+import { makeCastProbeSqlFromValues } from "./makeCastProbeSqlFromValues";
 
-describe("buildCastProbeSql", () => {
+describe("makeCastProbeSqlFromValues", () => {
   it("builds no query when there is nothing to probe", () => {
     expect(
-      buildCastProbeSql({ values: [], targetDataType: "DATE" }),
+      makeCastProbeSqlFromValues({ values: [], targetDataType: "DATE" }),
     ).toBeUndefined();
   });
 
   it("builds no query when every sampled value is already null", () => {
     expect(
-      buildCastProbeSql({
+      makeCastProbeSqlFromValues({
         values: [null, undefined],
         targetDataType: "DATE",
       }),
@@ -18,7 +18,7 @@ describe("buildCastProbeSql", () => {
   });
 
   it("casts to the requested type", () => {
-    const sql = buildCastProbeSql({
+    const sql = makeCastProbeSqlFromValues({
       values: ["2020-01-01"],
       targetDataType: "TIMESTAMP",
     });
@@ -28,7 +28,7 @@ describe("buildCastProbeSql", () => {
   });
 
   it("renders each sampled value as a text literal", () => {
-    const sql = buildCastProbeSql({
+    const sql = makeCastProbeSqlFromValues({
       values: ["a", 7, true],
       targetDataType: "BIGINT",
     });
@@ -39,7 +39,7 @@ describe("buildCastProbeSql", () => {
   });
 
   it("escapes a quote in a value rather than ending the literal", () => {
-    const sql = buildCastProbeSql({
+    const sql = makeCastProbeSqlFromValues({
       values: ["O'Brien"],
       targetDataType: "BIGINT",
     });
@@ -48,7 +48,7 @@ describe("buildCastProbeSql", () => {
   });
 
   it("drops null values instead of counting them as cast failures", () => {
-    const sql = buildCastProbeSql({
+    const sql = makeCastProbeSqlFromValues({
       values: ["1", null, "2"],
       targetDataType: "BIGINT",
     });
@@ -59,11 +59,11 @@ describe("buildCastProbeSql", () => {
   });
 
   it("renders a date value in a form DuckDB can read back", () => {
-    const sql = buildCastProbeSql({
+    const sql = makeCastProbeSqlFromValues({
       values: [new Date("2020-03-04T05:06:07.000Z")],
       targetDataType: "DATE",
     });
 
-    expect(sql).toContain("2020-03-04");
+    expect(sql).toContain("('2020-03-04T05:06:07.000Z')");
   });
 });

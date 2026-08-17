@@ -11,7 +11,7 @@ import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColum
  * queryable type at once, and the queryable type is marked as not user-set so
  * a later re-parse is free to revise it.
  */
-export function createImportedColumnsFromDuckDbSchema(
+export function makeImportedColumnsFromDuckDbSchema(
   columns: readonly DuckDbColumnSchema[],
 ): DatasetColumn.Imported[] {
   return columns.map((duckDbColumn, columnIndex) => {

@@ -1,8 +1,8 @@
-import { isDefined } from "@avandar/utils";
+import { isDefined, isNullish } from "@avandar/utils";
 import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
 import type { DuckDbSniffableDataType } from "@/clients/DuckDbClient/DuckDbDataType";
 
-type BuildCastProbeSqlOptions = {
+type MakeCastProbeSqlOptions = {
   /** Sampled values from the column, as the preview read them. */
   values: readonly unknown[];
   /** The DuckDB type the user wants the column cast to. */
@@ -11,13 +11,9 @@ type BuildCastProbeSqlOptions = {
 
 /** Renders one sampled value as the text DuckDB will be asked to cast. */
 function _toProbeText(value: unknown): string | undefined {
-  if (value === null || value === undefined) {
-    return undefined;
-  }
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  return String(value);
+  return isNullish(value) ? undefined
+    : value instanceof Date ? value.toISOString()
+    : String(value);
 }
 
 /**
@@ -34,8 +30,8 @@ function _toProbeText(value: unknown): string | undefined {
  * Returns `undefined` when there is nothing to ask about, since a `VALUES` list
  * needs at least one row.
  */
-export function buildCastProbeSql(
-  options: Readonly<BuildCastProbeSqlOptions>,
+export function makeCastProbeSqlFromValues(
+  options: Readonly<MakeCastProbeSqlOptions>,
 ): string | undefined {
   const probeTexts = options.values.map(_toProbeText).filter(isDefined);
   if (probeTexts.length === 0) {

@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { DatasetSourceModule } from "$/models/datasets/DatasetSource/DatasetSourceModule/DatasetSourceModule.ts";
+import { describe, expect, it } from "vitest";
 import type { DatasetSourceType } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 describe("DatasetSourceModule.supportsImportTimeColumnEditing", () => {

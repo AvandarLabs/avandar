@@ -1,7 +1,7 @@
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { buildCastProbeSql } from "@/clients/DuckDbClient/probeColumnCastLoss/buildCastProbeSql/buildCastProbeSql";
+import { makeCastProbeSqlFromValues } from "@/clients/DuckDbClient/probeColumnCastLoss/makeCastProbeSqlFromValues/makeCastProbeSqlFromValues";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 type ProbeColumnCastLossOptions = {
@@ -35,7 +35,7 @@ const NO_LOSS: ColumnCastLoss = { numValues: 0, numUncastable: 0 };
 export async function probeColumnCastLoss(
   options: Readonly<ProbeColumnCastLossOptions>,
 ): Promise<ColumnCastLoss> {
-  const sql = buildCastProbeSql({
+  const sql = makeCastProbeSqlFromValues({
     values: options.values,
     targetDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
       options.targetDataType,

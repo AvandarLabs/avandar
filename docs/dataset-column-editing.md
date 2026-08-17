@@ -52,7 +52,7 @@ because its columns are whatever its SQL projects.
 
 Whatever the source, and whether or not it was editable, the columns reach the
 insert RPCs through one funnel: `DatasetColumn.Imported[]` built per source, then
-`toDatasetColumnInputs`.
+`makeDatasetColumnInputsFromImportedColumns`.
 
 ## Why `is_data_type_user_set` exists rather than a comparison
 

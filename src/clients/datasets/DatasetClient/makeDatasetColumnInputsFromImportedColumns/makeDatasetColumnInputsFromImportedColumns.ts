@@ -10,7 +10,7 @@ import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColum
  * `DatasetColumn.Imported` and in whether they expose an editor for it; none of
  * them differ in how those columns reach the database.
  */
-export function toDatasetColumnInputs(
+export function makeDatasetColumnInputsFromImportedColumns(
   columns: readonly DatasetColumn.Imported[],
 ): DatasetColumnInput[] {
   return columns.map((column) => {

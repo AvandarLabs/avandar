@@ -47,19 +47,16 @@ function _supportsImportTimeColumnEditing(
 ): sourceType is ImportTimeColumnEditableDatasetSourceType;
 function _supportsImportTimeColumnEditing(sourceType: {
   sourceType: DatasetSourceType;
-}): sourceType is
-  | { sourceType: "csv_file" }
-  | { sourceType: "google_sheets" }
-  | { sourceType: "xlsx_file" };
+}): sourceType is { sourceType: ImportTimeColumnEditableDatasetSourceType };
 function _supportsImportTimeColumnEditing(
   sourceType: DatasetSourceType | { sourceType: DatasetSourceType },
 ): boolean {
-  const type =
+  const datasetSourceType =
     typeof sourceType === "string" ? sourceType : sourceType.sourceType;
 
   // Matched exhaustively on purpose: a source type added without an answer
   // here throws rather than silently defaulting to one behavior or the other.
-  return match(type)
+  return match(datasetSourceType)
     .with("csv_file", "google_sheets", "xlsx_file", () => {
       return true;
     })

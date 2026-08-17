@@ -1,5 +1,6 @@
+import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-import { createImportedColumnsFromDuckDbSchema } from "./createImportedColumnsFromDuckDbSchema";
+import { makeImportedColumnsFromDuckDbSchema } from "./makeImportedColumnsFromDuckDbSchema";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 function _columnSchema(
@@ -16,9 +17,9 @@ function _columnSchema(
   };
 }
 
-describe("createImportedColumnsFromDuckDbSchema", () => {
+describe("makeImportedColumnsFromDuckDbSchema", () => {
   it("translates the DuckDB type into the queryable Avandar type", () => {
-    const [bigColumn, textColumn] = createImportedColumnsFromDuckDbSchema([
+    const [bigColumn, textColumn] = makeImportedColumnsFromDuckDbSchema([
       _columnSchema("population", "HUGEINT"),
       _columnSchema("city", "VARCHAR"),
     ]);
@@ -28,7 +29,7 @@ describe("createImportedColumnsFromDuckDbSchema", () => {
   });
 
   it("records the DuckDB type as both the original and detected type", () => {
-    const [column] = createImportedColumnsFromDuckDbSchema([
+    const [column] = makeImportedColumnsFromDuckDbSchema([
       _columnSchema("measured_at", "TIMESTAMP"),
     ]);
 
@@ -37,7 +38,7 @@ describe("createImportedColumnsFromDuckDbSchema", () => {
   });
 
   it("seeds the editable name from the source name without losing it", () => {
-    const [column] = createImportedColumnsFromDuckDbSchema([
+    const [column] = makeImportedColumnsFromDuckDbSchema([
       _columnSchema("Total Population", "BIGINT"),
     ]);
 
@@ -46,29 +47,25 @@ describe("createImportedColumnsFromDuckDbSchema", () => {
   });
 
   it("marks a freshly inferred type as not user-set", () => {
-    const columns = createImportedColumnsFromDuckDbSchema([
+    const columns = makeImportedColumnsFromDuckDbSchema([
       _columnSchema("city", "VARCHAR"),
       _columnSchema("population", "BIGINT"),
     ]);
 
     expect(
-      columns.every((column) => {
-        return column.isDataTypeUserSet === false;
-      }),
+      columns.every(propEq("isDataTypeUserSet", false)),
     ).toBe(true);
   });
 
   it("numbers the columns by their position in the source schema", () => {
-    const columns = createImportedColumnsFromDuckDbSchema([
+    const columns = makeImportedColumnsFromDuckDbSchema([
       _columnSchema("a", "VARCHAR"),
       _columnSchema("b", "VARCHAR"),
       _columnSchema("c", "VARCHAR"),
     ]);
 
     expect(
-      columns.map((column) => {
-        return column.columnIdx;
-      }),
+      columns.map(prop("columnIdx")),
     ).toEqual([0, 1, 2]);
   });
 });

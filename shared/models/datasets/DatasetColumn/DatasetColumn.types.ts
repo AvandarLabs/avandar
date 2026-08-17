@@ -95,23 +95,27 @@ export type DatasetColumnRead = Model.Base<
  *
  * Every import path builds these, the user may edit the `name`, `dataType`, and
  * `description` of each one while still on the import form, and
- * `toDatasetColumnInputs` turns the final list into the rows the insert RPCs
- * take. The fields describing what the source actually contained
+ * `makeDatasetColumnInputsFromImportedColumns` turns the final list into the
+ * rows the insert RPCs take. The fields describing what the source actually
+ * contained
  * (`originalName`, `originalDataType`, `detectedDataType`) are never editable,
  * so a rename or a re-type stays reversible and the stored parquet, which keeps
  * the original names and types, stays addressable.
  */
-export type ImportedDatasetColumn = Pick<
-  DatasetColumnRead,
-  | "originalName"
-  | "name"
-  | "originalDataType"
-  | "detectedDataType"
-  | "dataType"
-  | "isDataTypeUserSet"
-  | "columnIdx"
-> &
-  Partial<Pick<DatasetColumnRead, "description">>;
+export type ImportedDatasetColumn = SetOptional<
+  Pick<
+    DatasetColumnRead,
+    | "originalName"
+    | "name"
+    | "originalDataType"
+    | "detectedDataType"
+    | "dataType"
+    | "isDataTypeUserSet"
+    | "columnIdx"
+    | "description"
+  >,
+  "description"
+>;
 
 /**
  * CRUD type definitions for the DatasetColumn model.
@@ -125,11 +129,7 @@ export type DatasetColumnModel = SupabaseCrudModelSpec<
       Read: DatasetColumnRead;
       Insert: SetOptional<
         DatasetColumnRead,
-        | "createdAt"
-        | "description"
-        | "id"
-        | "isDataTypeUserSet"
-        | "updatedAt"
+        "createdAt" | "description" | "id" | "isDataTypeUserSet" | "updatedAt"
       >;
       Update: Partial<DatasetColumnRead>;
     };

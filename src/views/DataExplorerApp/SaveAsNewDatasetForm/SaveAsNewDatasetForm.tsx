@@ -5,7 +5,7 @@ import { Box, Button, Stack, TextInput } from "@mantine/core";
 import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { toDatasetColumnInputs } from "@/clients/datasets/DatasetClient/toDatasetColumnInputs/toDatasetColumnInputs";
+import { makeDatasetColumnInputsFromImportedColumns } from "@/clients/datasets/DatasetClient/makeDatasetColumnInputsFromImportedColumns/makeDatasetColumnInputsFromImportedColumns";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -64,16 +64,16 @@ export function SaveAsNewDatasetForm({
             workspaceId: workspace.id,
             datasetName,
             datasetDescription: "",
-            columns: toDatasetColumnInputs(
-              columns.map((col, idx) => {
+            columns: makeDatasetColumnInputsFromImportedColumns(
+              columns.map((column, idx) => {
                 return {
-                  originalName: col.name,
-                  name: col.name,
-                  originalDataType: col.dataType,
+                  originalName: column.name,
+                  name: column.name,
+                  originalDataType: column.dataType,
                   detectedDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
-                    col.dataType,
+                    column.dataType,
                   ),
-                  dataType: col.dataType,
+                  dataType: column.dataType,
                   isDataTypeUserSet: false,
                   columnIdx: idx,
                 };

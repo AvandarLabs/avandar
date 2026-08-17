@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { applyImportedColumnEdits } from "./applyImportedColumnEdits";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -27,14 +28,18 @@ function _baseColumns(): DatasetColumn.Imported[] {
 
 describe("applyImportedColumnEdits", () => {
   it("returns the inferred columns unchanged when nothing was edited", () => {
-    expect(applyImportedColumnEdits(_baseColumns(), {})).toEqual(
-      _baseColumns(),
-    );
+    expect(
+      applyImportedColumnEdits({
+        baseColumns: _baseColumns(),
+        editsByColumnIdx: {},
+      }),
+    ).toEqual(_baseColumns());
   });
 
   it("applies a rename without touching the source name", () => {
-    const [column] = applyImportedColumnEdits(_baseColumns(), {
-      0: { name: "City" },
+    const [column] = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: { 0: { name: "City" } },
     });
 
     expect(column?.name).toBe("City");
@@ -42,8 +47,9 @@ describe("applyImportedColumnEdits", () => {
   });
 
   it("marks a changed type as user-set so query time casts it", () => {
-    const [column] = applyImportedColumnEdits(_baseColumns(), {
-      0: { dataType: "date" },
+    const [column] = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: { 0: { dataType: "date" } },
     });
 
     expect(column?.dataType).toBe("date");
@@ -51,8 +57,9 @@ describe("applyImportedColumnEdits", () => {
   });
 
   it("stops treating a type as user-set once it is set back to the inferred one", () => {
-    const [column] = applyImportedColumnEdits(_baseColumns(), {
-      0: { dataType: "varchar" },
+    const [column] = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: { 0: { dataType: "varchar" } },
     });
 
     expect(column?.dataType).toBe("varchar");
@@ -60,8 +67,11 @@ describe("applyImportedColumnEdits", () => {
   });
 
   it("never rewrites the fields that describe the source data", () => {
-    const [column] = applyImportedColumnEdits(_baseColumns(), {
-      0: { name: "City", dataType: "date", description: "Where" },
+    const [column] = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: {
+        0: { name: "City", dataType: "date", description: "Where" },
+      },
     });
 
     expect(column?.originalName).toBe("cty");
@@ -70,16 +80,18 @@ describe("applyImportedColumnEdits", () => {
   });
 
   it("applies a description", () => {
-    const [column] = applyImportedColumnEdits(_baseColumns(), {
-      0: { description: "Municipality of record" },
+    const [column] = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: { 0: { description: "Municipality of record" } },
     });
 
     expect(column?.description).toBe("Municipality of record");
   });
 
   it("edits one column without disturbing its siblings", () => {
-    const columns = applyImportedColumnEdits(_baseColumns(), {
-      1: { name: "Population" },
+    const columns = applyImportedColumnEdits({
+      baseColumns: _baseColumns(),
+      editsByColumnIdx: { 1: { name: "Population" } },
     });
 
     expect(columns[0]).toEqual(_baseColumns()[0]);
@@ -88,19 +100,12 @@ describe("applyImportedColumnEdits", () => {
 
   it("keys edits by column index, not list position", () => {
     const reordered = [..._baseColumns()].reverse();
-    const columns = applyImportedColumnEdits(reordered, {
-      1: { name: "Population" },
+    const columns = applyImportedColumnEdits({
+      baseColumns: reordered,
+      editsByColumnIdx: { 1: { name: "Population" } },
     });
 
-    expect(
-      columns.find((column) => {
-        return column.columnIdx === 1;
-      })?.name,
-    ).toBe("Population");
-    expect(
-      columns.find((column) => {
-        return column.columnIdx === 0;
-      })?.name,
-    ).toBe("cty");
+    expect(columns.find(propEq("columnIdx", 1))?.name).toBe("Population");
+    expect(columns.find(propEq("columnIdx", 0))?.name).toBe("cty");
   });
 });
