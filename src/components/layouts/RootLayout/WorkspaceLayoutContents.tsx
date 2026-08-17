@@ -4,6 +4,8 @@ import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
+import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
+import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { AppLinks } from "@/config/AppLinks";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -37,18 +39,21 @@ export function WorkspaceLayoutContents({
       <DataExplorerStateManager.Provider>
         <DashboardEditorStateManager.Provider>
           <ChatPanelProvider>
-            <AppDropzone>
-              <AppShell
-                title={workspace.name}
-                currentWorkspace={workspace}
-                profileLink={profileLink}
-                navbarLinks={mainNavBarLinks}
-                utilityLinks={utilityNavBarLinks}
-                spotlightActions={spotlightActions}
-              >
-                {children}
-              </AppShell>
-            </AppDropzone>
+            <NuxStateManager.Provider>
+              <AppDropzone>
+                <AppShell
+                  title={workspace.name}
+                  currentWorkspace={workspace}
+                  profileLink={profileLink}
+                  navbarLinks={mainNavBarLinks}
+                  utilityLinks={utilityNavBarLinks}
+                  spotlightActions={spotlightActions}
+                >
+                  {children}
+                </AppShell>
+                <NuxRoot />
+              </AppDropzone>
+            </NuxStateManager.Provider>
           </ChatPanelProvider>
         </DashboardEditorStateManager.Provider>
       </DataExplorerStateManager.Provider>
