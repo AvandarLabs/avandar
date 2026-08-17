@@ -10,6 +10,7 @@ import type {
 
 export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
 export { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/requiresOriginalFileRetention.ts";
+export { getOriginalFileExtension } from "$/models/datasets/DatasetSource/originalFileExtension.ts";
 
 export namespace DatasetSource {
   export type T<

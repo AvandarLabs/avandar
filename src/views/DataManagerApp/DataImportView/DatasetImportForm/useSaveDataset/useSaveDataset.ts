@@ -1,5 +1,6 @@
 import { useMutation } from "@avandar/query-hooks";
 import { snakeCaseKeysShallow, where } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
@@ -11,6 +12,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
+import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded";
 import type {
   DatasetImportFormValues,
   DataSourceMetadata,
@@ -252,6 +254,47 @@ function _startDatasetUploadIfAllowed(
   });
 }
 
+/**
+ * Kicks off the retained-original upload (e.g. the source PDF a table was
+ * extracted from) alongside the parquet upload. The two are independent:
+ * the parquet upload internally waits on the background transcode to
+ * finish, but the original is already on disk with no such dependency, so
+ * this is fired without sequencing after `_startDatasetUploadIfAllowed`.
+ *
+ * Unlike the parquet upload (which reports its own progress/error state via
+ * `DatasetUploadProgressStore`), a failed original upload has no other
+ * surface, so a failure here is routed through `notifyError` directly. The
+ * dataset itself was already saved successfully by this point, so the
+ * message is careful to say only the original failed to sync.
+ */
+function _startOriginalFileUploadIfAllowed(
+  options: Readonly<{
+    params: SaveDatasetValues;
+    savedDataset: Dataset.T;
+    workspaceId: Dataset.T["workspaceId"];
+  }>,
+): void {
+  if (
+    options.params.sourceType === "google_sheets" ||
+    !options.params.onlineStorageAllowed
+  ) {
+    return;
+  }
+  void startOriginalFileUploadIfNeeded({
+    workspaceId: options.workspaceId,
+    datasetId: options.savedDataset.id,
+    sourceType: options.params.sourceType,
+    onlineStorageAllowed: options.params.onlineStorageAllowed,
+  }).catch((error: unknown) => {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    notifyError({
+      title: t`Dataset saved, but its original file failed to upload`,
+      message: errorMessage,
+    });
+  });
+}
+
 function _logDatasetImported(
   options: Readonly<LogDatasetImportedOptions>,
 ): void {
@@ -330,6 +373,11 @@ function _createSaveDatasetMutationOptions(
         savedDataset,
       });
       _startDatasetUploadIfAllowed({
+        params,
+        savedDataset,
+        workspaceId: options.workspaceId,
+      });
+      _startOriginalFileUploadIfAllowed({
         params,
         savedDataset,
         workspaceId: options.workspaceId,

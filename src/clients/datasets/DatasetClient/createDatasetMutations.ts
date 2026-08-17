@@ -1,7 +1,12 @@
 import { createServerApiClient } from "$/ServerApiClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import {
+  getOriginalFileExtension,
+  requiresOriginalFileRetention,
+} from "$/models/datasets/DatasetSource/DatasetSource";
 import type {
   DatasetColumnInput,
   DatasetDBRead,
@@ -174,6 +179,26 @@ function _makeFullDelete(
         workspaceId: dataset.workspaceId,
         datasetId: params.id,
       });
+      if (requiresOriginalFileRetention(dataset.sourceType)) {
+        // The metadata row deletion below is the point of no return for the
+        // user (the dataset disappears from their workspace either way), so
+        // a failure to remove the retained-original blob must not strand
+        // them with a dataset they can no longer delete. Unlike the parquet
+        // deletion above, which throws and aborts the delete, we log and
+        // swallow: worst case is an orphaned blob to clean up later, not a
+        // dataset stuck in limbo.
+        await DatasetOriginalFileStorageClient.deleteOriginalFile({
+          workspaceId: dataset.workspaceId,
+          datasetId: params.id,
+          fileExtension: getOriginalFileExtension(dataset.sourceType),
+        }).catch((error: unknown) => {
+          logger.error(
+            "Failed to delete the dataset's retained original file; " +
+              "leaving the object storage blob in place",
+            { datasetId: params.id, error },
+          );
+        });
+      }
     }
     await options.client.delete(params);
     const localDataset = await LocalDatasetClient.getById(params);
