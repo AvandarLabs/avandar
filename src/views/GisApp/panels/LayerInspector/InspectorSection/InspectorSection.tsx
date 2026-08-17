@@ -30,15 +30,22 @@ export function InspectorSection({
   focusRequest,
   children,
 }: Props): ReactNode {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(
+    defaultOpen || focusRequest !== undefined,
+  );
+  const [seenFocusRequest, setSeenFocusRequest] = useState(focusRequest);
   const toggleRef = useRef<HTMLButtonElement>(null);
+
+  if (focusRequest !== undefined && focusRequest !== seenFocusRequest) {
+    setSeenFocusRequest(focusRequest);
+    setIsOpen(true);
+  }
 
   useEffect(
     function focusExternallyRequestedSection() {
       if (focusRequest === undefined) {
         return;
       }
-      setIsOpen(true);
       toggleRef.current?.focus();
     },
     [focusRequest],

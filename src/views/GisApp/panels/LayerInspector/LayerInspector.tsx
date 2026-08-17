@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
@@ -40,6 +40,35 @@ function _getOrCreateSet<T>(ref: { current: Set<T> | undefined }): Set<T> {
   return created;
 }
 
+function _isFullyUnmatchedJoin(
+  layer: MapLayer.T | undefined,
+  viewState: MapLayerViewState | undefined,
+): layer is MapLayer.T {
+  const diagnostics = viewState?.spatialDiagnostics;
+  return (
+    layer !== undefined &&
+    diagnostics !== undefined &&
+    diagnostics.sourceCount !== 0 &&
+    diagnostics.matchedSourceKeyCount === 0
+  );
+}
+
+function _trackJoinLayerEligibility(options: {
+  layer: MapLayer.T | undefined;
+  eligibleLayerIds: Set<MapLayer.Id>;
+  previousLayerIdRef: { current: MapLayer.Id | undefined | "unset" };
+}): void {
+  const { layer, eligibleLayerIds, previousLayerIdRef } = options;
+  const previousLayerId = previousLayerIdRef.current;
+  const shouldAdd =
+    layer?.geoBinding?.type === "joinToBoundaries" &&
+    (previousLayerId === "unset" || layer.id !== previousLayerId);
+  if (shouldAdd && layer) {
+    eligibleLayerIds.add(layer.id);
+  }
+  previousLayerIdRef.current = layer?.id;
+}
+
 /** The selected layer's editor, sectioned by the model's axes. */
 export function LayerInspector({
   layer,
@@ -57,41 +86,36 @@ export function LayerInspector({
   const autoOpenEligibleLayerIds = useRef<Set<MapLayer.Id> | undefined>(
     undefined,
   );
-  const shouldSeedEligibleLayerIds =
-    autoOpenEligibleLayerIds.current === undefined;
   const eligibleLayerIds = _getOrCreateSet(autoOpenEligibleLayerIds);
-  if (
-    shouldSeedEligibleLayerIds &&
-    layer?.geoBinding?.type === "joinToBoundaries"
-  ) {
-    eligibleLayerIds.add(layer.id);
-  }
-  const previousLayerIdRef = useRef(layer?.id);
-  if (layer?.id !== previousLayerIdRef.current) {
-    previousLayerIdRef.current = layer?.id;
-    if (layer?.geoBinding?.type === "joinToBoundaries") {
-      eligibleLayerIds.add(layer.id);
-    }
-  }
-  const diagnostics = viewState?.spatialDiagnostics;
+  const previousLayerIdRef = useRef<MapLayer.Id | undefined | "unset">("unset");
+  const openMatchReport = useEffectEvent(() => {
+    onInspectorViewChange({ type: "matchReport" });
+  });
   useEffect(
     function openMatchReportForUnmatchedJoin() {
+      _trackJoinLayerEligibility({
+        layer,
+        eligibleLayerIds,
+        previousLayerIdRef,
+      });
       if (
-        !layer ||
-        !eligibleLayerIds.has(layer.id) ||
-        !diagnostics ||
-        diagnostics.sourceCount === 0 ||
-        diagnostics.matchedSourceKeyCount !== 0
+        layer === undefined ||
+        viewState === undefined ||
+        !_isFullyUnmatchedJoin(layer, viewState) ||
+        !eligibleLayerIds.has(layer.id)
       ) {
         return;
       }
-      const fingerprint = `${layer.id}:${JSON.stringify(diagnostics)}`;
-      if (!fingerprints.has(fingerprint)) {
-        fingerprints.add(fingerprint);
-        onInspectorViewChange({ type: "matchReport" });
+      const fingerprint = `${layer.id}:${JSON.stringify(viewState.spatialDiagnostics)}`;
+      if (fingerprints.has(fingerprint)) {
+        return;
       }
+      fingerprints.add(fingerprint);
+      openMatchReport();
     },
-    [diagnostics, eligibleLayerIds, fingerprints, layer, onInspectorViewChange],
+    // useEffectEvent callbacks must not be listed in effect deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [eligibleLayerIds, fingerprints, layer, viewState],
   );
   return (
     <MapChromePanel

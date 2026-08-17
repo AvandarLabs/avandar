@@ -91,7 +91,7 @@ export function ClassificationBreakHandles({
             aria-label={label}
             aria-valuenow={value}
             className={css.classificationBreakHandle}
-            key={index}
+            key={value}
             role="slider"
             type="button"
             onKeyDown={(event) => {

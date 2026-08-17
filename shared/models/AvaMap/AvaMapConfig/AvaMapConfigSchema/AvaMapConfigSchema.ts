@@ -15,8 +15,10 @@ export const AvaMapConfigSchema = {
   /** Validates and migrates a raw JSON value to the current config shape. */
   fromJson: (json: unknown): AvaMapConfigRead => {
     const version = z
-      .object({ __type: z.literal("AvaMapConfig"), version: z.number().int() })
-      .passthrough()
+      .looseObject({
+        __type: z.literal("AvaMapConfig"),
+        version: z.number().int(),
+      })
       .parse(json).version;
     if (version === 1) {
       return migrateAvaMapConfig.fromV1(AvaMapConfigV1Schema.parse(json));

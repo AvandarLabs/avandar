@@ -36,15 +36,13 @@ const V3PointBindingSchema = z.discriminatedUnion("type", [
 const V3PointAggregationBindingSchema = PointAggregationBindingSchema.extend({
   points: V3PointBindingSchema,
 }).strict();
-const GridBinBindingSchema = z
-  .object({
-    type: z.literal("binPointsToGrid"),
-    grid: z.enum(["hex", "square"]),
-    sizeMeters: z.number().min(100).max(1_000_000),
-    points: V3PointBindingSchema,
-    aggregation: AreaAggregationSchema,
-  })
-  .strict();
+const GridBinBindingSchema = z.strictObject({
+  type: z.literal("binPointsToGrid"),
+  grid: z.enum(["hex", "square"]),
+  sizeMeters: z.number().min(100).max(1_000_000),
+  points: V3PointBindingSchema,
+  aggregation: AreaAggregationSchema,
+});
 
 /** Version 3 geo binding, including optional source CRS and grid bins. */
 export const V3GeoBindingSchema = z.discriminatedUnion("type", [
@@ -65,22 +63,18 @@ const V3AreaGeoBindingSchema = z.discriminatedUnion("type", [
   GridBinBindingSchema,
 ]);
 
-const ClusterSymbologySchema = z
-  .object({
-    type: z.literal("cluster"),
-    radiusPx: z.number(),
-    color: SingleColorSpecSchema,
-    stroke: StrokeSpecSchema,
-  })
-  .strict();
-const HeatmapSymbologySchema = z
-  .object({
-    type: z.literal("heatmap"),
-    radiusPx: z.number(),
-    weight: uuidType<"QueryColumn">().optional(),
-    ramp: z.array(z.string()).readonly(),
-  })
-  .strict();
+const ClusterSymbologySchema = z.strictObject({
+  type: z.literal("cluster"),
+  radiusPx: z.number(),
+  color: SingleColorSpecSchema,
+  stroke: StrokeSpecSchema,
+});
+const HeatmapSymbologySchema = z.strictObject({
+  type: z.literal("heatmap"),
+  radiusPx: z.number(),
+  weight: uuidType<"QueryColumn">().optional(),
+  ramp: z.array(z.string()).readonly(),
+});
 const V3SymbologySchema = z.discriminatedUnion("type", [
   CircleSymbologySchema,
   ProportionalSymbolSchema,
@@ -93,13 +87,11 @@ const V3SymbologySchema = z.discriminatedUnion("type", [
 const V3LegendSchema = LegendSchema.extend({
   sizeStops: z
     .array(
-      z
-        .object({
-          value: z.number(),
-          radiusPx: z.number(),
-          label: z.string(),
-        })
-        .strict(),
+      z.strictObject({
+        value: z.number(),
+        radiusPx: z.number(),
+        label: z.string(),
+      }),
     )
     .readonly(),
 }).strict();
@@ -107,25 +99,21 @@ const V3LayerCommonShape = {
   ...LayerCommonShape,
   legend: V3LegendSchema,
 } as const;
-const V3StandardLayerSchema = z
-  .object({
-    ...V3LayerCommonShape,
-    geoBinding: V3GeoBindingSchema.optional(),
-    symbology: V3SymbologySchema,
-    sensitivity: z.discriminatedUnion("mode", [
-      ExactSensitivitySchema,
-      JitterSensitivitySchema,
-    ]),
-  })
-  .strict();
-const V3AggregateOnlyLayerSchema = z
-  .object({
-    ...V3LayerCommonShape,
-    geoBinding: V3AreaGeoBindingSchema.optional(),
-    symbology: FillSymbologySchema,
-    sensitivity: AggregateOnlySensitivitySchema,
-  })
-  .strict();
+const V3StandardLayerSchema = z.strictObject({
+  ...V3LayerCommonShape,
+  geoBinding: V3GeoBindingSchema.optional(),
+  symbology: V3SymbologySchema,
+  sensitivity: z.discriminatedUnion("mode", [
+    ExactSensitivitySchema,
+    JitterSensitivitySchema,
+  ]),
+});
+const V3AggregateOnlyLayerSchema = z.strictObject({
+  ...V3LayerCommonShape,
+  geoBinding: V3AreaGeoBindingSchema.optional(),
+  symbology: FillSymbologySchema,
+  sensitivity: AggregateOnlySensitivitySchema,
+});
 const V3LayerSchema = z.union([
   V3StandardLayerSchema,
   V3AggregateOnlyLayerSchema,

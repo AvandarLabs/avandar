@@ -25,9 +25,13 @@ vi.mock("@mantine/core", async (importOriginal) => {
             {label}
             <input
               aria-label={label}
+              type="number"
               value={value}
               onChange={(event) => {
-                onChange(Number(event.target.value));
+                const parsed = event.currentTarget.valueAsNumber;
+                if (Number.isFinite(parsed)) {
+                  onChange(parsed);
+                }
               }}
             />
             {suffix}
@@ -160,7 +164,7 @@ describe("SensitivitySection", () => {
       />,
     );
 
-    expect(screen.getByLabelText("Suppress areas below")).toHaveValue("5");
+    expect(screen.getByLabelText("Suppress areas below")).toHaveValue(5);
     expect(
       screen.getByText(
         "Aggregate only draws areas after at least 5 contributing records. Areas below that minimum are shown as Not reported without revealing their exact count.",
