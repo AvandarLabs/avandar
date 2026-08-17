@@ -1,5 +1,5 @@
 /*
- * The shell is the map's substrate. It fills the app's content area, and
+ * The shell is the map's substrate. It fills the AppLayout canvas, and
  * everything except the furniture strip floats above it.
  *
  * The container query is on this element rather than the viewport because the
@@ -13,7 +13,8 @@
   container-type: inline-size;
   display: grid;
   grid-template-rows: 1fr auto;
-  height: calc(100dvh - var(--app-shell-header-offset, 0px));
+  height: 100%;
+  min-height: 0;
   min-width: 0;
   position: relative;
 }

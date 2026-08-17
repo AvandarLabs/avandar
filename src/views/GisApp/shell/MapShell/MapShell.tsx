@@ -28,7 +28,7 @@ type Props = {
   rightColumnRef: RefCallback<HTMLDivElement>;
 };
 
-/** Renders the full-bleed map with floating chrome and a furniture strip. */
+/** Renders the map inside the app canvas with floating chrome and furniture. */
 export function MapShell({
   canvas,
   topBar,

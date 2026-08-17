@@ -1,4 +1,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import css from "@/views/GisApp/GisApp.module.css";
 import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
 import { useGisApp } from "@/views/GisApp/useGisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
@@ -10,5 +12,9 @@ type Props = { avaMap: AvaMap.T };
 export function GisApp({ avaMap }: Props): ReactNode {
   const app = useGisApp(avaMap);
 
-  return <GisAppMapShell app={app} />;
+  return (
+    <AppLayout containerProps={{ className: css.canvas }}>
+      <GisAppMapShell app={app} />
+    </AppLayout>
+  );
 }
