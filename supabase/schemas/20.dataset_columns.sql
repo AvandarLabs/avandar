@@ -53,6 +53,14 @@ create table public.dataset_columns (
 -- Enable row level security
 alter table public.dataset_columns enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.dataset_columns to authenticated;
+
 -- Policies
 create policy "User can select dataset_columns in their workspace" on public.dataset_columns for
 select

@@ -136,6 +136,14 @@ $$;
 -- Enable row level security
 alter table public.resource_shares enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.resource_shares to authenticated;
+
 create trigger tr__resource_shares__01_validate_resource_workspace before insert or
 update on public.resource_shares for each row
 execute function public.resource_shares__validate_resource_workspace ();

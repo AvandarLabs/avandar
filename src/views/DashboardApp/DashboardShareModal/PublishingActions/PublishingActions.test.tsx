@@ -54,6 +54,8 @@ describe("PublishingActions", () => {
         onPrimaryAction={noop}
       />,
     );
-    expect(screen.getByRole("button", { name: "Publish" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Publish publicly" }),
+    ).toBeDisabled();
   });
 });
