@@ -13,7 +13,7 @@ import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
 import type {
   ComboboxItem,
@@ -78,23 +78,23 @@ export function QueryColumnMultiSelect({
       },
     });
 
-  const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
-    EntityFieldConfigClient.useGetAll({
-      ...where("entity_config_id", "eq", dataSourceId?.id),
+  const [conceptAttributes, isLoadingConceptAttributes] =
+    ConceptAttributeClient.useGetAll({
+      ...where("concept_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: Model.isOfModelType(dataSourceId, "EntityConfig"),
+        enabled: Model.isOfModelType(dataSourceId, "Concept"),
       },
     });
 
-  const isLoading = isLoadingDatasetColumns || isLoadingEntityFieldConfigs;
+  const isLoading = isLoadingDatasetColumns || isLoadingConceptAttributes;
 
   const { queryColumns, selectableOptions, queryColumnLookup } = useMemo(() => {
     const columns = [
       ...(datasetColumns ?? []).map((col) => {
         return QueryColumnFns.makeFromDatasetColumn(col);
       }),
-      ...(entityFieldConfigs ?? []).map((col) => {
-        return QueryColumnFns.makeFromEntityFieldConfig(col);
+      ...(conceptAttributes ?? []).map((col) => {
+        return QueryColumnFns.makeFromConceptAttribute(col);
       }),
     ];
 
@@ -106,7 +106,7 @@ export function QueryColumnMultiSelect({
       }),
       queryColumnLookup: makeIdLookupMap(columns),
     };
-  }, [datasetColumns, entityFieldConfigs]);
+  }, [datasetColumns, conceptAttributes]);
 
   const matchColumnFilter = useMemo((): OptionsFilter => {
     const filter: OptionsFilter = ({ options, search, limit }) => {

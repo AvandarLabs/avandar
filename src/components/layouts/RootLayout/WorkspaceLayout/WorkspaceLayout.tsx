@@ -1,7 +1,7 @@
 import { where } from "@avandar/utils";
 import { Outlet } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { makeMainNavbarLinksFromPermissions } from "@/components/layouts/RootLayout/makeMainNavbarLinksFromPermissions";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { WorkspaceLayoutContents } from "@/components/layouts/RootLayout/WorkspaceLayoutContents";
@@ -40,21 +40,21 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   );
   const canAccessMaps = useHasPermission("gis__can_view_map");
   const canAccessSettings = useIsGlobalAdmin();
-  const [entityConfigs] = EntityConfigClient.useGetAll(
+  const [concepts] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const spotlightActions = useSpotlightActions(workspace.slug);
 
-  const entityManagerLinks: NavbarLink[] = useMemo(() => {
-    return (entityConfigs ?? []).map((entityConfig) => {
-      const navLink = NavbarLinks.entityManagerHome({
+  const individualManagerLinks: NavbarLink[] = useMemo(() => {
+    return (concepts ?? []).map((concept) => {
+      const navLink = NavbarLinks.individualManagerHome({
         workspaceSlug: workspace.slug,
-        entityConfigId: entityConfig.id,
-        entityConfigName: entityConfig.name,
+        conceptId: concept.id,
+        conceptName: concept.name,
       });
       return navLink;
     });
-  }, [workspace.slug, entityConfigs]);
+  }, [workspace.slug, concepts]);
 
   const mainNavBarLinks = makeMainNavbarLinksFromPermissions({
     workspaceSlug: workspace.slug,
@@ -62,7 +62,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     canAccessDataExplorer,
     canAccessDashboards,
     canAccessMaps,
-    entityManagerLinks,
+    individualManagerLinks,
   });
 
   const utilityNavBarLinks = useMemo(() => {

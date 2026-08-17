@@ -37,18 +37,14 @@ create table public.maps (
 -- functions).
 alter table public.maps enable row level security;
 
+-- Data API privileges. `anon` is intentionally omitted: there is no public
+-- map route, and dashboards is the only table `anon` can reach.
 grant
 select
 ,
   insert,
 update,
 delete on table public.maps to authenticated;
-
-grant
-select
-  on table public.maps to anon;
-
-grant all on table public.maps to service_role;
 
 /** Prevents a map from being reassigned to another workspace. */
 create or replace function public.maps__prevent_workspace_id_change () returns trigger language plpgsql

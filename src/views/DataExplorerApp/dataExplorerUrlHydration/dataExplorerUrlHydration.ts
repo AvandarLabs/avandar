@@ -18,7 +18,7 @@ type DeferStructuredHydrationOptions = {
   restoredDataSource: MinimalDataSource | undefined;
   needsColumns: boolean;
   datasetColumns: readonly unknown[] | undefined;
-  entityFieldConfigs: readonly unknown[] | undefined;
+  conceptAttributes: readonly unknown[] | undefined;
   /** Workspace datasets and columns loaded (needed to parse `?sql=`). */
   sqlMappingMetadataLoaded: boolean;
 };
@@ -46,7 +46,7 @@ export function shouldDeferUrlHydrationForStructuredLoading(
     restoreStructured &&
     options.needsColumns &&
     !options.datasetColumns &&
-    !options.entityFieldConfigs
+    !options.conceptAttributes
   ) {
     return true;
   }

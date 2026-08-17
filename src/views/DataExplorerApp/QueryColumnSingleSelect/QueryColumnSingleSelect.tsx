@@ -6,7 +6,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import type { SelectProps } from "@avandar/ui";
 import type {
   QueryColumnId,
@@ -51,16 +51,16 @@ export function QueryColumnSingleSelect({
       },
     });
 
-  const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
-    EntityFieldConfigClient.useGetAll({
-      ...where("entity_config_id", "eq", dataSourceId?.id),
+  const [conceptAttributes, isLoadingConceptAttributes] =
+    ConceptAttributeClient.useGetAll({
+      ...where("concept_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: Model.isOfModelType(dataSourceId, "EntityConfig"),
+        enabled: Model.isOfModelType(dataSourceId, "Concept"),
         usePreviousDataAsPlaceholder: true,
       },
     });
 
-  const isLoading = isLoadingDatasetColumns || isLoadingEntityFieldConfigs;
+  const isLoading = isLoadingDatasetColumns || isLoadingConceptAttributes;
 
   const { selectableOptions, queryColumnLookup } = useMemo(() => {
     // TODO(jpsyx): this conversion to QueryColumn should happen in the clients
@@ -72,11 +72,11 @@ export function QueryColumnSingleSelect({
         }
         return QueryColumnModule.makeFromDatasetColumn(col);
       }),
-      ...(entityFieldConfigs ?? []).map((col) => {
+      ...(conceptAttributes ?? []).map((col) => {
         if (col.id === currentSelectedColumn?.baseColumn.id) {
           return currentSelectedColumn;
         }
-        return QueryColumnModule.makeFromEntityFieldConfig(col);
+        return QueryColumnModule.makeFromConceptAttribute(col);
       }),
     ];
 
@@ -87,7 +87,7 @@ export function QueryColumnSingleSelect({
       }),
       queryColumnLookup: makeIdLookupMap(queryColumns),
     };
-  }, [currentSelectedColumn, datasetColumns, entityFieldConfigs]);
+  }, [currentSelectedColumn, datasetColumns, conceptAttributes]);
 
   // If the available columns change (e.g. if the `dataSourceId` changed)
   // we should drop the selection if it's no longer valid.

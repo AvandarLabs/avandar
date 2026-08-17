@@ -34,6 +34,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      attribute_mappings__dataset_column: {
+        Row: {
+          concept_attribute_id: string
+          created_at: string
+          dataset_column_id: string
+          dataset_id: string
+          id: string
+          updated_at: string
+          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id: string
+        }
+        Insert: {
+          concept_attribute_id: string
+          created_at?: string
+          dataset_column_id: string
+          dataset_id: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id: string
+        }
+        Update: {
+          concept_attribute_id?: string
+          created_at?: string
+          dataset_column_id?: string
+          dataset_id?: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type?: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attribute_mappings__dataset_column_concept_attribute_id_fkey"
+            columns: ["concept_attribute_id"]
+            isOneToOne: true
+            referencedRelation: "concept_attributes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attribute_mappings__dataset_column_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attribute_mappings__manual_entry: {
+        Row: {
+          concept_attribute_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          concept_attribute_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          concept_attribute_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attribute_mappings__manual_entry_concept_attribute_id_fkey"
+            columns: ["concept_attribute_id"]
+            isOneToOne: true
+            referencedRelation: "concept_attributes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attribute_mappings__manual_entry_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catalog_entries__dataset_column: {
         Row: {
           cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
@@ -146,6 +233,110 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      concept_attributes: {
+        Row: {
+          allow_manual_edit: boolean
+          concept_id: string
+          created_at: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description: string | null
+          id: string
+          is_array: boolean
+          is_identifier: boolean
+          is_label: boolean
+          mapping_type: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_manual_edit: boolean
+          concept_id: string
+          created_at?: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description?: string | null
+          id?: string
+          is_array: boolean
+          is_identifier: boolean
+          is_label: boolean
+          mapping_type: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_manual_edit?: boolean
+          concept_id?: string
+          created_at?: string
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description?: string | null
+          id?: string
+          is_array?: boolean
+          is_identifier?: boolean
+          is_label?: boolean
+          mapping_type?: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concept_attributes_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concept_attributes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concepts: {
+        Row: {
+          allow_manual_creation: boolean
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_manual_creation: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_manual_creation?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concepts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dashboards: {
         Row: {
@@ -671,11 +862,11 @@ export type Database = {
         }
         Relationships: []
       }
-      entities: {
+      individuals: {
         Row: {
           assigned_to: string | null
+          concept_id: string
           created_at: string
-          entity_config_id: string
           external_id: string
           id: string
           name: string
@@ -685,8 +876,8 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          concept_id: string
           created_at?: string
-          entity_config_id: string
           external_id: string
           id?: string
           name: string
@@ -696,8 +887,8 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          concept_id?: string
           created_at?: string
-          entity_config_id?: string
           external_id?: string
           id?: string
           name?: string
@@ -707,118 +898,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "entities_entity_config_id_fkey"
-            columns: ["entity_config_id"]
+            foreignKeyName: "individuals_concept_id_fkey"
+            columns: ["concept_id"]
             isOneToOne: false
-            referencedRelation: "entity_configs"
+            referencedRelation: "concepts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "entities_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      entity_configs: {
-        Row: {
-          allow_manual_creation: boolean
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          owner_id: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          allow_manual_creation: boolean
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          owner_id?: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          allow_manual_creation?: boolean
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          owner_id?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "entity_configs_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      entity_field_configs: {
-        Row: {
-          allow_manual_edit: boolean
-          created_at: string
-          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description: string | null
-          entity_config_id: string
-          id: string
-          is_array: boolean
-          is_id_field: boolean
-          is_title_field: boolean
-          name: string
-          updated_at: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id: string
-        }
-        Insert: {
-          allow_manual_edit: boolean
-          created_at?: string
-          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description?: string | null
-          entity_config_id: string
-          id?: string
-          is_array: boolean
-          is_id_field: boolean
-          is_title_field: boolean
-          name: string
-          updated_at?: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id: string
-        }
-        Update: {
-          allow_manual_edit?: boolean
-          created_at?: string
-          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description?: string | null
-          entity_config_id?: string
-          id?: string
-          is_array?: boolean
-          is_id_field?: boolean
-          is_title_field?: boolean
-          name?: string
-          updated_at?: string
-          value_extractor_type?: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "entity_field_configs_entity_config_id_fkey"
-            columns: ["entity_config_id"]
-            isOneToOne: false
-            referencedRelation: "entity_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "entity_field_configs_workspace_id_fkey"
+            foreignKeyName: "individuals_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1277,93 +1364,6 @@ export type Database = {
           },
           {
             foreignKeyName: "user_profiles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      value_extractors__dataset_column_value: {
-        Row: {
-          created_at: string
-          dataset_column_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id: string
-          updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          dataset_column_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          dataset_column_id?: string
-          dataset_id?: string
-          entity_field_config_id?: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__dataset_column_va_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__dataset_column_value_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      value_extractors__manual_entry: {
-        Row: {
-          created_at: string
-          entity_field_config_id: string
-          id: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          entity_field_config_id: string
-          id?: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          entity_field_config_id?: string
-          id?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__manual_entry_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__manual_entry_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1956,6 +1956,15 @@ export type Database = {
         | "dashboards"
         | "settings"
         | "gis"
+      attribute_mappings__value_picker_rule_type:
+        | "most_frequent"
+        | "first"
+        | "sum"
+        | "avg"
+        | "count"
+        | "max"
+        | "min"
+      concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       dashboard_snapshot_transition_kind:
         | "publish"
         | "abort_publish"
@@ -2007,9 +2016,6 @@ export type Database = {
         | "virtual"
         | "open_data"
         | "xlsx_file"
-      entity_field_configs__value_extractor_type:
-        | "dataset_column_value"
-        | "manual_entry"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2031,14 +2037,6 @@ export type Database = {
         | "revenue"
         | "other"
       usage_analytics_events__client: "web" | "desktop" | "server" | "db"
-      value_extractors__value_picker_rule_type:
-        | "most_frequent"
-        | "first"
-        | "sum"
-        | "avg"
-        | "count"
-        | "max"
-        | "min"
       workspace_invites__status: "pending" | "accepted"
     }
     CompositeTypes: {
@@ -2194,6 +2192,16 @@ export const Constants = {
         "settings",
         "gis",
       ],
+      attribute_mappings__value_picker_rule_type: [
+        "most_frequent",
+        "first",
+        "sum",
+        "avg",
+        "count",
+        "max",
+        "min",
+      ],
+      concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       dashboard_snapshot_transition_kind: [
         "publish",
         "abort_publish",
@@ -2249,10 +2257,6 @@ export const Constants = {
         "open_data",
         "xlsx_file",
       ],
-      entity_field_configs__value_extractor_type: [
-        "dataset_column_value",
-        "manual_entry",
-      ],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],
@@ -2276,15 +2280,6 @@ export const Constants = {
         "other",
       ],
       usage_analytics_events__client: ["web", "desktop", "server", "db"],
-      value_extractors__value_picker_rule_type: [
-        "most_frequent",
-        "first",
-        "sum",
-        "avg",
-        "count",
-        "max",
-        "min",
-      ],
       workspace_invites__status: ["pending", "accepted"],
     },
   },

@@ -58,18 +58,18 @@ export const SpotlightLinks = {
       spotlightDescription: "Go to the data explorer app",
     };
   },
-  entityDesignerHome: (workspaceSlug: string) => {
+  ontologyDesignerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesignerHome(workspaceSlug),
-      icon: NavbarLinks.entityDesignerHome(workspaceSlug).icon,
-      spotlightDescription: "Go to the entity designer app",
+      link: AppLinks.ontologyDesignerHome(workspaceSlug),
+      icon: NavbarLinks.ontologyDesignerHome(workspaceSlug).icon,
+      spotlightDescription: "Go to the ontology designer app",
     };
   },
-  entityDesignerCreatorView: (workspaceSlug: string) => {
+  ontologyDesignerCreatorView: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesignerCreatorView(workspaceSlug),
+      link: AppLinks.ontologyDesignerCreatorView(workspaceSlug),
       icon: <IconPencilPlus size={24} stroke={1.5} />,
-      spotlightDescription: "Go to the entity creator page",
+      spotlightDescription: "Go to the individual creator page",
     };
   },
 } as const satisfies SpotlightLinkRecord;

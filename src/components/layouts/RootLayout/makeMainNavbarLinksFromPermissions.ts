@@ -8,7 +8,7 @@ type MakeMainNavbarLinksInput = {
   canAccessDataExplorer: boolean;
   canAccessDashboards: boolean;
   canAccessMaps: boolean;
-  entityManagerLinks: NavbarLink[];
+  individualManagerLinks: NavbarLink[];
 };
 
 /** Builds main workspace navigation links from access permissions. */
@@ -18,7 +18,7 @@ export function makeMainNavbarLinksFromPermissions({
   canAccessDataExplorer,
   canAccessDashboards,
   canAccessMaps,
-  entityManagerLinks,
+  individualManagerLinks,
 }: MakeMainNavbarLinksInput): NavbarLink[] {
   return [
     NavbarLinks.workspaceHome(workspaceSlug),
@@ -26,7 +26,7 @@ export function makeMainNavbarLinksFromPermissions({
     canAccessDataExplorer ? NavbarLinks.dataExplorer(workspaceSlug) : undefined,
     canAccessDashboards ? NavbarLinks.dashboards(workspaceSlug) : undefined,
     canAccessMaps ? NavbarLinks.map(workspaceSlug) : undefined,
-    NavbarLinks.entityDesignerHome(workspaceSlug),
-    ...entityManagerLinks,
+    NavbarLinks.ontologyDesignerHome(workspaceSlug),
+    ...individualManagerLinks,
   ].filter(isDefined);
 }

@@ -58,6 +58,9 @@ jobs:
 
       # Gate: never publish something that does not type-check, test, build,
       # and validate as a real tarball.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - run: pnpm type-check
       - run: pnpm --filter "./packages/**" test
       - name: Verify publishable packages

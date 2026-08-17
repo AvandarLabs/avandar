@@ -10,7 +10,7 @@ describe("workspace navigation permissions", () => {
       canAccessDataExplorer: false,
       canAccessDashboards: false,
       canAccessMaps: true,
-      entityManagerLinks: [],
+      individualManagerLinks: [],
     });
 
     expect(links.map(prop("link.to"))).toContain("/$workspaceSlug/map");
@@ -23,7 +23,7 @@ describe("workspace navigation permissions", () => {
       canAccessDataExplorer: false,
       canAccessDashboards: false,
       canAccessMaps: false,
-      entityManagerLinks: [],
+      individualManagerLinks: [],
     });
 
     expect(links.map(prop("link.to"))).not.toContain("/$workspaceSlug/map");

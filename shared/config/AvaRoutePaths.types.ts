@@ -14,10 +14,10 @@ export type AvaRoutePaths =
   | "/$workspaceSlug"
   | "/$workspaceSlug/data-manager/$datasetId"
   | "/$workspaceSlug/data-manager/data-import"
-  | "/$workspaceSlug/entity-designer/$entityConfigId"
-  | "/$workspaceSlug/entity-designer/entity-creator"
+  | "/$workspaceSlug/ontology-designer/$conceptId"
+  | "/$workspaceSlug/ontology-designer/concept-creator"
   | "/$workspaceSlug/data-manager"
-  | "/$workspaceSlug/entity-designer"
-  | "/$workspaceSlug/entity-manager"
-  | "/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
-  | "/$workspaceSlug/entity-manager/$entityConfigId";
+  | "/$workspaceSlug/ontology-designer"
+  | "/$workspaceSlug/individual-manager"
+  | "/$workspaceSlug/individual-manager/$conceptId/$individualId"
+  | "/$workspaceSlug/individual-manager/$conceptId";

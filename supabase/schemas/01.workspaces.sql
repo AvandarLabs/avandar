@@ -20,6 +20,14 @@ create table public.workspaces (
 -- RLS and policies are in `18.user_workspace_policies.sql`
 alter table public.workspaces enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.workspaces to authenticated;
+
 /**
  * Trigger the `updated_at` update.
  */
