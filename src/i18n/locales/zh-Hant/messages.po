@@ -74,13 +74,13 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 "other devices."
 msgstr "這將允許資料集在線儲存，以便在其他設備上訪問。"
 
-#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.tsx
+#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
-msgstr ""
+msgstr "其他"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu.tsx
 msgid "More actions for the layer {layerName}"
-msgstr ""
+msgstr "圖層 {layerName} 的更多動作"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
@@ -92,11 +92,11 @@ msgstr "開始日期（例如：2024-01-01）"
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
-msgstr ""
+msgstr "儲存目前檢視"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
-msgstr ""
+msgstr "儲存格大小（公尺）"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
@@ -109,7 +109,7 @@ msgstr "值欄"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "0 rows"
-msgstr ""
+msgstr "0 筆資料"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
@@ -123,9 +123,9 @@ msgstr "移除 {name} 的訪問權限。"
 msgid "Check your email for a password reset link"
 msgstr "檢查您的電子郵件以獲取重設密碼的連結"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Equal interval"
-msgstr ""
+msgstr "等距"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Invite member"
@@ -134,10 +134,6 @@ msgstr "邀請成員"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "位置 {index} 的 JOIN 項目不是純資料表參照。"
-
-#: src/config/AppLinks.tsx
-#~ msgid "Geo Explorer"
-#~ msgstr "地理探索器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -149,7 +145,7 @@ msgstr "搜尋資料集..."
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to map tools"
-msgstr ""
+msgstr "跳至地圖工具"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "The dataset failed to load. Please try again later or reach out to "
@@ -158,7 +154,7 @@ msgstr "數據集加載失敗。請稍後再試或聯繫支持。"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle.tsx
 msgid "Drag to reorder, or hold Alt and press the up or down arrow"
-msgstr ""
+msgstr "拖曳以重新排序，或按住 Alt 並按向上或向下箭頭鍵"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose chat model"
@@ -171,7 +167,7 @@ msgstr "先前的 URL 將失效且無法存取。使用舊連結的任何人將�
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "XYZ tiles"
-msgstr ""
+msgstr "XYZ 圖磚"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
@@ -255,13 +251,13 @@ msgstr "Excel 檔案"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "A saved dataset or column reference is no longer available. Choose a "
 "replacement in the layer inspector."
-msgstr ""
+msgstr "已無法使用已儲存的資料集或欄位參照。請在圖層檢查器中選擇替代項目。"
 
 #. placeholder {0}: layer.source.dataSource.name
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
 "release, so pick a different source."
-msgstr ""
+msgstr "{0} 中沒有任何欄位包含座標。邊界連接將在後續版本推出，請選擇其他來源。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
@@ -290,12 +286,12 @@ msgstr "上傳 Excel"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Go to a coordinate or P-code"
-msgstr ""
+msgstr "前往座標或 P-code"
 
 #. placeholder {0}: drop.count
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "{0, plural, one {# row} other {# rows}}"
-msgstr ""
+msgstr "{0, plural, one {# 筆資料} other {# 筆資料}}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Could not load the dataset's SQL query."
@@ -323,9 +319,9 @@ msgstr "標註框"
 msgid "Style"
 msgstr "樣式"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Square"
-msgstr ""
+msgstr "正方形"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Notes"
@@ -339,7 +335,7 @@ msgstr "在 \"{sourceFileName}\" 中檢測到 {changedCount} 列的類型與匯�
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
-msgstr ""
+msgstr "幾何圖形"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
@@ -355,7 +351,7 @@ msgstr "創建帳戶"
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Views"
-msgstr ""
+msgstr "檢視"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Second point"
@@ -363,7 +359,7 @@ msgstr "第二點"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
-msgstr ""
+msgstr "緯度和經度似乎對調了"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Cannot add dataset"
@@ -394,7 +390,7 @@ msgstr "打開"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Individual locations will be drawn on the map, and suppressed areas will "
 "show their real counts. Continue?"
-msgstr ""
+msgstr "個別位置將繪製在地圖上，隱藏區域將顯示其實際數量。要繼續嗎？"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Aggregations"
@@ -414,9 +410,9 @@ msgstr "無法從 FROM 子句判定基礎資料表。"
 msgid "Select a field"
 msgstr "選擇一個欄位"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Matching"
-msgstr ""
+msgstr "比對中"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Checking whether that custom URL is available."
@@ -425,7 +421,7 @@ msgstr "正在檢查該自訂 URL 是否可用。"
 #. placeholder {0}: error.layerName ?? ""
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Layer {0} is aggregate-only and cannot be drawn as individual symbols."
-msgstr ""
+msgstr "圖層 {0} 僅支援彙總，無法以個別符號繪製。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -443,7 +439,7 @@ msgstr "已保存為 \"{0}\"。"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
-msgstr ""
+msgstr "無法儲存。您上次的變更仍顯示在畫面上。"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Excel"
@@ -464,7 +460,7 @@ msgstr "顯示圖例"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Pan and select"
-msgstr ""
+msgstr "平移並選取"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
@@ -493,15 +489,15 @@ msgstr "自訂 URL 不得超過 {0} 個字元"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Source CRS"
-msgstr ""
+msgstr "來源 CRS"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
 msgstr "離線聊天模型"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Select a point geometry column"
-msgstr ""
+msgstr "選取點幾何圖形欄位"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
@@ -519,9 +515,9 @@ msgstr "導出 CSV"
 msgid "Do you want to import \"{fileName}\" as a new dataset?"
 msgstr "您想將 \"{fileName}\" 匯入為新資料集嗎？"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassCountControl.tsx
 msgid "Classes"
-msgstr ""
+msgstr "類別"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your "
@@ -563,7 +559,7 @@ msgstr "無法在線上同步資料集"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
-msgstr ""
+msgstr "使用此底圖"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
@@ -580,7 +576,7 @@ msgstr "1 人"
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
-msgstr ""
+msgstr "重新命名"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -592,10 +588,10 @@ msgid "A local record of every clarifying question the AI has asked in this "
 "answer."
 msgstr "在此工作區中，AI 所提出的每個澄清問題的本地記錄。僅儲存元數據 — 永遠不會儲存問題文本或您的回答。"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Symbol area is proportional to the value, not radius, so a value ten "
 "times larger draws a symbol about three times wider."
-msgstr ""
+msgstr "符號面積與數值成正比，而非半徑，因此數值大 10 倍時，符號寬度約為 3 倍。"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "Cannot display {chartName}"
@@ -631,7 +627,7 @@ msgstr "尚未添加任何資料集"
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
-msgstr ""
+msgstr "圖層名稱"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -643,7 +639,7 @@ msgstr "只有工作區管理員可以發布到網路。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/CategoricalControls.tsx
 msgid "Other color"
-msgstr ""
+msgstr "其他顏色"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -665,7 +661,7 @@ msgid "Pie Chart"
 msgstr "圓餅圖"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Average"
 msgstr "平均值"
 
@@ -680,7 +676,7 @@ msgstr "隱藏發布日期"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "Pick both a latitude and a longitude column. One on its own plots every "
 "point on a diagonal line, which looks like a result and is not."
-msgstr ""
+msgstr "請同時選取緯度和經度欄位。只選其中一個會將所有點繪製在對角線上，看似結果但其實不是。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
@@ -689,7 +685,7 @@ msgstr "開放數據"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "All fields"
-msgstr ""
+msgstr "所有欄位"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
@@ -717,7 +713,7 @@ msgstr "此儀表板為<0>公開</0>。任何取得連結的人都能查看。"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid " records"
-msgstr ""
+msgstr " 筆資料"
 
 #: shared/copy/somethingElseLabel.ts
 msgid "Something else…"
@@ -734,7 +730,7 @@ msgstr "內容"
 #. placeholder {0}: current.bookmarks.length + 1
 #: src/views/GisApp/useGisAppTopBarActions.ts
 msgid "View {0}"
-msgstr ""
+msgstr "檢視 {0}"
 
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 msgid "Use suggestion"
@@ -770,10 +766,10 @@ msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 msgid "{shareClause} will lose access."
 msgstr "{shareClause} 將失去存取權限。"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Orange"
-msgstr ""
+msgstr "橘色"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -826,10 +822,6 @@ msgstr "此數據集沒有描述。"
 msgid "Password reset requires an internet connection."
 msgstr "重設密碼需要連接到互聯網。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size"
-#~ msgstr "符號大小"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
 msgstr "Y 軸最小值"
@@ -845,7 +837,7 @@ msgstr "正在更新 {0} 的密碼"
 
 #: src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx
 msgid "No layers yet."
-msgstr ""
+msgstr "目前尚無圖層。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -869,7 +861,7 @@ msgstr "我了解這些數據將發送給 AI 提供者"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4326 - WGS 84"
-msgstr ""
+msgstr "4326 - WGS 84"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
@@ -882,9 +874,9 @@ msgid "Saved datasets"
 msgstr "已保存的數據集"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
-msgstr ""
+msgstr "無法載入"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
@@ -950,7 +942,7 @@ msgstr "此欄位不能為空"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
-msgstr ""
+msgstr "開啟地圖 {0}"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -980,7 +972,7 @@ msgstr "容器最大寬度"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Protocol"
-msgstr ""
+msgstr "通訊協定"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
@@ -995,9 +987,9 @@ msgstr "無法從快取中刪除離線聊天模型。"
 msgid "Unknown user"
 msgstr "未知用戶"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditorHeader.tsx
 msgid "Classification"
-msgstr ""
+msgstr "分類"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {displayName}"
@@ -1032,7 +1024,7 @@ msgstr "元數據"
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Retry"
-msgstr ""
+msgstr "重試"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN subquery at position {index} could not be re-serialised."
@@ -1078,7 +1070,7 @@ msgstr "歡迎來到您的第一個工作區"
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 "simplification."
-msgstr ""
+msgstr "目前縮放程度下要移除的細節像素數。設為零即可停用簡化。"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
@@ -1086,7 +1078,7 @@ msgstr "已複製"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Measure distance and area"
-msgstr ""
+msgstr "測量距離和面積"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
@@ -1121,11 +1113,11 @@ msgstr "無法連線至雲端助理。要使用您下載到裝置上的模型處
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
-msgstr ""
+msgstr "展開圖層面板"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
-msgstr ""
+msgstr "{featureCount} 個點"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -1137,7 +1129,7 @@ msgstr "創建失敗"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
-msgstr ""
+msgstr "座標為 0, 0"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
@@ -1166,7 +1158,7 @@ msgstr "輸入您的電子郵件以獲取重置連結"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
-msgstr ""
+msgstr "選取圖層以編輯其查詢和繪製方式。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
@@ -1235,9 +1227,9 @@ msgstr "某些數據應來自現有數據集"
 msgid "Couldn't export PDF"
 msgstr "無法導出 PDF"
 
-#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.tsx
+#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent.tsx
 msgid "Sized by value"
-msgstr ""
+msgstr "依值調整大小"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
@@ -1262,7 +1254,7 @@ msgstr "均值周圍的一個標準差"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Liberty"
-msgstr ""
+msgstr "Liberty"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL is empty."
@@ -1280,7 +1272,7 @@ msgstr "重新指派私人資源"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "A coordinate cannot be mapped when either latitude or longitude is "
 "empty."
-msgstr ""
+msgstr "當緯度或經度為空時，無法繪製座標。"
 
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
@@ -1301,7 +1293,7 @@ msgstr "漏斗圖"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
-msgstr ""
+msgstr "符號"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid name column selected"
@@ -1334,7 +1326,7 @@ msgstr "顯示 {datasetName} 的前 20 行"
 #. placeholder {0}: app.name
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Map of {0}"
-msgstr ""
+msgstr "{0} 的地圖"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
@@ -1345,9 +1337,9 @@ msgid "The invitation you are trying to accept is not valid. Please contact the 
 "workspace owner to get a new invitation."
 msgstr "您嘗試接受的邀請無效。請聯繫工作區擁有者以獲取新的邀請。"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "Normalize by"
-msgstr ""
+msgstr "正規化依據"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Enter a description for this profile type"
@@ -1379,9 +1371,9 @@ msgid " Published to "
 msgstr " 已發布至 "
 
 #. placeholder {0}: operationalState.featureCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
 msgid "{0} suppressed"
-msgstr ""
+msgstr "已隱藏 {0} 筆"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
@@ -1396,9 +1388,9 @@ msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "新增成員或使用者群組以授予存取權限。使用上方的「一般存取權限」即可更廣泛地分享。"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.tsx
 msgid "Heat radius"
-msgstr ""
+msgstr "熱點半徑"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
@@ -1425,7 +1417,7 @@ msgstr "對齊"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer around a layer"
-msgstr ""
+msgstr "圖層周圍的緩衝區"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
@@ -1439,15 +1431,15 @@ msgstr "查詢失敗。"
 #. placeholder {0}: code - 32700
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM south zone {0}"
-msgstr ""
+msgstr "{code} - UTM 南部區域 {0}"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Hold Alt and press the up or down arrow to move this layer."
-msgstr ""
+msgstr "按住 Alt 並按向上或向下箭頭鍵即可移動此圖層。"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
-msgstr ""
+msgstr "Positron"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
@@ -1456,11 +1448,6 @@ msgstr "撤銷"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "如果您有約 8 GB RAM（大多數使用者的預設選項），建議使用此選項。"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "{totalRowCount} 列中有 {droppedRowCount} 列因缺少座標或座標超出範圍而遭略過。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1493,7 +1480,7 @@ msgstr "保持現狀繼續"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows look like their latitude and longitude are swapped."
-msgstr ""
+msgstr "部分資料列的緯度和經度似乎對調了。"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "What are the distinct values of {groupByColumn} in {datasetName}?"
@@ -1502,7 +1489,7 @@ msgstr "{datasetName} 中 {groupByColumn} 的不重複值有哪些？"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "This point falls in the Gulf of Guinea and is almost always a missing "
 "value written as a zero."
-msgstr ""
+msgstr "此點位於幾內亞灣，幾乎總是代表以零表示的遺漏值。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
@@ -1519,7 +1506,7 @@ msgstr "在計費入口網站中管理座位 →"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
-msgstr ""
+msgstr "顯示確切位置"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
@@ -1572,7 +1559,7 @@ msgstr "公共開放資料目錄仍在 <0/><1/> "
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
-msgstr ""
+msgstr "在伺服器預期圖磚索引的位置加入 z、x 和 y 佔位符。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -1614,7 +1601,7 @@ msgstr "開放資料"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl.tsx
 msgid "Radius"
-msgstr ""
+msgstr "半徑"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort & limit"
@@ -1639,7 +1626,7 @@ msgstr "自訂 URL 只能包含小寫字母、數字和連字號"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "3857 - Web Mercator"
-msgstr ""
+msgstr "3857 - Web Mercator"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Email address"
@@ -1666,7 +1653,7 @@ msgid "Your user profile is not loaded yet. Please retry."
 msgstr "您的用戶檔案尚未加載。請重試。"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Sum"
 msgstr "總和"
 
@@ -1677,11 +1664,11 @@ msgstr "同步數據！"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Top right"
-msgstr ""
+msgstr "右上"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
-msgstr ""
+msgstr "WMS"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -1691,9 +1678,9 @@ msgstr "也有"
 msgid "Give access to additional members"
 msgstr "授予其他成員存取權限"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "GeoJSON"
-msgstr ""
+msgstr "GeoJSON"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1720,7 +1707,7 @@ msgstr "預覽 {0} 的數據"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
-msgstr ""
+msgstr "所顯示的邊界和名稱不代表官方認可或接受。"
 
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
@@ -1732,7 +1719,7 @@ msgstr "不支援的檔案類型"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
-msgstr ""
+msgstr "{totalRowCount} 筆資料列中有 {droppedRowCount} 筆無法繪製"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
@@ -1763,7 +1750,7 @@ msgstr "此欄位"
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer"
-msgstr ""
+msgstr "新增圖層"
 
 #. placeholder {0}: member.displayName
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer.tsx
@@ -1822,18 +1809,14 @@ msgstr "登出"
 msgid "Section"
 msgstr "區段"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Scale"
-msgstr ""
+msgstr "比例尺"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
-msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "No rows could be mapped"
-#~ msgstr "沒有列可繪製於地圖上"
+msgstr "僅彙總"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
@@ -1874,7 +1857,7 @@ msgstr "沒有可用的欄位"
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "{layerText} · {updatedDate}"
-msgstr ""
+msgstr "{layerText} · {updatedDate}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Untitled dataset"
@@ -1906,7 +1889,7 @@ msgstr "您在此工作區中每次批准（或取消）向 AI 提供者發送�
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "1 point"
-msgstr ""
+msgstr "1 個點"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
@@ -1914,7 +1897,7 @@ msgstr "SELECT 中不支援彙總函式「{funcName}」；已略過。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
-msgstr ""
+msgstr "叢集和熱點需要完整的點產生繫結。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
@@ -1939,7 +1922,7 @@ msgstr "使用的建議"
 #. placeholder {0}: diagnostics.duplicateBoundaryKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} duplicate boundary keys"
-msgstr ""
+msgstr "{0} 個重複的邊界鍵"
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Fix the custom URL before publishing."
@@ -1951,7 +1934,7 @@ msgstr "\"{sourceFileName}\" 處理完成，準備使用。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Manual"
 msgstr "手動"
 
@@ -1983,9 +1966,9 @@ msgstr "項目"
 msgid "Restriction update failed"
 msgstr "限制更新失敗"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
-msgstr ""
+msgstr "確切"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2007,7 +1990,7 @@ msgstr "100% 堆疊"
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
 "example https://example.org/cases/{case_id}."
-msgstr ""
+msgstr "在大括號中輸入欄位名稱，即可從點選的圖徵填入內容，例如 https://example.org/cases/{case_id}。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
@@ -2028,7 +2011,7 @@ msgstr "回報錯誤"
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Pan, zoom and tap a feature to read it. To edit layers, open this map on "
 "a tablet or a laptop."
-msgstr ""
+msgstr "平移、縮放並點選圖徵以閱讀內容。若要編輯圖層，請在平板電腦或筆記型電腦上開啟此地圖。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
@@ -2041,7 +2024,7 @@ msgstr "正在撰寫查詢…"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Their contributor counts stay hidden because they are below the layer's "
 "minimum."
-msgstr ""
+msgstr "其貢獻者數量因低於圖層的最低門檻而保持隱藏。"
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
@@ -2067,7 +2050,7 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
-msgstr ""
+msgstr "緯度超出有效範圍，但若作為經度則有效，反之亦然。"
 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
@@ -2084,11 +2067,11 @@ msgstr "最大"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Enter strictly increasing values separated by commas."
-msgstr ""
+msgstr "輸入以逗號分隔且嚴格遞增的值。"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapWeightSelect.tsx
 msgid "Unweighted"
-msgstr ""
+msgstr "未加權"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -2139,10 +2122,6 @@ msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboards as you like."
 msgstr "您的工作區使用 Free 方案，可分享或發布一個儀表板。升級至 Starter 或 Impact 方案，即可隨意分享任意數量的儀表板。"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
-#~ msgid "Query form"
-#~ msgstr "查詢表單"
-
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
@@ -2159,15 +2138,15 @@ msgstr "工作區 ID"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "The layer configuration is saved. Retry after connectivity or the "
 "Spatial extension becomes available."
-msgstr ""
+msgstr "圖層設定已儲存。請在連線恢復或 Spatial 擴充功能可用後重試。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} 人"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram/ClassificationHistogram.tsx
 msgid "No classified values are available yet."
-msgstr ""
+msgstr "目前尚無可用的分類值。"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
@@ -2178,11 +2157,11 @@ msgstr "生成查詢以配置此可視化。"
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Select a column"
 msgstr "選擇一個欄位"
 
@@ -2203,16 +2182,16 @@ msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
-msgstr ""
+msgstr "無資料顏色"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
-msgstr ""
+msgstr "最小值"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
@@ -2239,12 +2218,12 @@ msgstr "移除系列"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Collapse the layers panel"
-msgstr ""
+msgstr "收合圖層面板"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Hidden"
-msgstr ""
+msgstr "已隱藏"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Dataset name is required"
@@ -2258,9 +2237,9 @@ msgstr "主要"
 msgid "Unable to publish dashboard"
 msgstr "無法發佈儀表板"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
-msgstr ""
+msgstr "測量"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
@@ -2311,7 +2290,7 @@ msgstr "請輸入此數據集的名稱"
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "A map plots your datasets, derived datasets, and profiles as layers you "
 "can style, save, and share."
-msgstr ""
+msgstr "地圖會將您的資料集、衍生資料集和設定檔以圖層呈現，您可以設定樣式、儲存及分享這些圖層。"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Custom selection"
@@ -2319,11 +2298,11 @@ msgstr "自定義選擇"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Sensitivity"
-msgstr ""
+msgstr "敏感度"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "E"
-msgstr ""
+msgstr "東"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
@@ -2335,27 +2314,23 @@ msgstr "請輸入此數據集的描述"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
-msgstr ""
+msgstr "外框"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Standard deviation"
-msgstr ""
+msgstr "標準差"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "需要手動輸入的欄位"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
-#~ msgid "Loading map data"
-#~ msgstr "正在載入地圖資料"
-
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "您的數據集"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
-msgstr ""
+msgstr "單色"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -2409,9 +2384,9 @@ msgstr "數據範圍"
 msgid "Data preview"
 msgstr "數據預覽"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
-msgstr ""
+msgstr "需要幾何資料"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
@@ -2419,7 +2394,7 @@ msgstr "網格線顏色"
 
 #: src/views/GisApp/GisAppFurnitureBar.tsx
 msgid "MapLibre, OpenStreetMap contributors"
-msgstr ""
+msgstr "MapLibre、OpenStreetMap 貢獻者"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
@@ -2441,7 +2416,7 @@ msgstr "下載離線聊天模型 (WebLLM)"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
-msgstr ""
+msgstr "檢閱相符項目"
 
 #: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
 msgid "Create new profile type"
@@ -2457,12 +2432,12 @@ msgstr "添加欄位"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
-msgstr ""
+msgstr "圖層"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
-msgstr ""
+msgstr "已抑制 {0} 個區域"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
@@ -2519,7 +2494,7 @@ msgstr "空文本"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are outside the valid range."
-msgstr ""
+msgstr "部分座標超出有效範圍。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
@@ -2532,7 +2507,7 @@ msgstr "尚未發布。在您發布之前，沒有人可以透過連結開啟此
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some latitudes or longitudes are not numbers."
-msgstr ""
+msgstr "部分緯度或經度不是數字。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -2554,7 +2529,7 @@ msgstr "工作表名稱"
 
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "{layerName} returned no rows"
-msgstr ""
+msgstr "{layerName} 未傳回任何資料列"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "We will use those columns to merge datasets into a single "
@@ -2587,11 +2562,11 @@ msgstr "向上滾動至上方的字段，或使用下面的列表。"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Each point moves by the same amount every time this map is opened, so a "
 "reader cannot average several views back to the real location."
-msgstr ""
+msgstr "每個點在每次開啟此地圖時都會以相同的幅度移動，因此讀者無法透過平均多個檢視畫面還原真實位置。"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
-msgstr ""
+msgstr "連結至來源紀錄"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -2607,11 +2582,11 @@ msgstr "系統將要求您確認當前密碼。"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
-msgstr ""
+msgstr "按下空白鍵或 Enter 開始拖曳。使用方向鍵移動圖層，然後按下空白鍵或 Enter 放置，或按下 Escape 取消。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Grid shape"
-msgstr ""
+msgstr "網格形狀"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
@@ -2619,7 +2594,7 @@ msgstr "發布"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Rows {rowIndexes}."
-msgstr ""
+msgstr "資料列 {rowIndexes}。"
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2659,7 +2634,7 @@ msgstr "手動表單顯示近似值"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "N"
-msgstr ""
+msgstr "北"
 
 #. placeholder {0}: options.failure.limit ?? 3
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
@@ -2702,7 +2677,7 @@ msgstr "選擇要擁有此成員私人儀表板和資料集的人員。您將無
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
-msgstr ""
+msgstr "針對要列印的地圖保持開啟：否則讀者無法區分未回報資料的區域和回報為零的區域。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2746,7 +2721,7 @@ msgstr "最小"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 msgid "Duplicate"
-msgstr ""
+msgstr "複製"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Outcome"
@@ -2796,7 +2771,7 @@ msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確�
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "This tool is not available."
-msgstr ""
+msgstr "此工具無法使用。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -2804,7 +2779,7 @@ msgstr "文本"
 
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "Review filter"
-msgstr ""
+msgstr "檢閱篩選條件"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
@@ -2870,18 +2845,14 @@ msgstr "最常見的值：<0>{0}</0>（{1} 行，{2}%）。"
 msgid "Dashboard saved successfully!"
 msgstr "儀表板成功儲存！"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Method"
-msgstr ""
-
-#: src/views/GisApp/panels/FeatureInspector.tsx
-#~ msgid "N/A"
-#~ msgstr "不適用"
+msgstr "方法"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
 msgid "Longitude"
-msgstr ""
+msgstr "經度"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
@@ -2940,14 +2911,14 @@ msgstr "請檢查您的電子郵件"
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "選擇列並添加行約束（枚舉、數字範圍、日期範圍）。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "WKT"
-msgstr ""
+msgstr "WKT"
 
 #. placeholder {0}: diagnostics.unmatchedSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} unmatched source keys"
-msgstr ""
+msgstr "{0} 個來源鍵不相符"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
 msgid "Couldn't capture dashboard"
@@ -2990,7 +2961,7 @@ msgstr "考慮重新措辭"
 
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Aggregate-only layers cannot be drawn from individual coordinates."
-msgstr ""
+msgstr "僅限彙總的圖層無法從個別座標繪製。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Add people or user groups"
@@ -3014,7 +2985,7 @@ msgstr "如果您想取得存取權，請<0>寄送電子郵件給我們</0>。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private maps"
-msgstr ""
+msgstr "私人地圖"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About your workspace"
@@ -3022,7 +2993,7 @@ msgstr "關於您的工作區"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are 0, 0."
-msgstr ""
+msgstr "部分座標為 0, 0。"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -3048,12 +3019,7 @@ msgstr "WHERE 子句對「{columnName}」使用「{operator}」，但右側為�
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
-msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "None of the {totalRowCount} rows could be mapped because their "
-#~ "coordinates were missing or out of range."
-#~ msgstr "{totalRowCount} 列皆無法繪製於地圖上，因為缺少座標或座標超出範圍。"
+msgstr "URL 範本"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3061,7 +3027,7 @@ msgstr "計劃功能："
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
-msgstr ""
+msgstr "隱藏圖層 {layerName}"
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Start your journey with us"
@@ -3121,7 +3087,7 @@ msgstr "標題列"
 
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Could not load {layerName}"
-msgstr ""
+msgstr "無法載入 {layerName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Custom role groups"
@@ -3140,7 +3106,7 @@ msgstr "您確定要刪除 {0} 嗎？"
 
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
-msgstr ""
+msgstr "正在執行圖層的查詢。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
@@ -3185,12 +3151,12 @@ msgid "Straight"
 msgstr "直線"
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
-#: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
+#: src/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect.tsx
 msgid "Loading datasets..."
 msgstr "正在加載數據集..."
 
 #: src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx
-#: src/views/DataExplorerApp/QueryColumnSingleSelect.tsx
+#: src/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect.tsx
 msgid "No fields"
 msgstr "沒有字段"
 
@@ -3206,7 +3172,7 @@ msgstr "匯出"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry must be rebound"
-msgstr ""
+msgstr "必須重新繫結幾何圖形"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Create groups for your workspace members. Datasets and dashboards can be "
@@ -3233,7 +3199,7 @@ msgstr "數據集名稱必須少於 {maxDatasetNameLength} 個字符（當前：
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
-msgstr ""
+msgstr "4258 - ETRS89"
 
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Preparing model files…"
@@ -3249,7 +3215,7 @@ msgstr "最小型的離線聊天模型。處理複雜 SQL 的能力較弱，但�
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
-msgstr ""
+msgstr "將指標移到地圖上以讀取座標"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -3266,7 +3232,7 @@ msgstr "嘗試其他查詢"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
-msgstr ""
+msgstr "外框寬度"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "No values to summarize."
@@ -3311,7 +3277,7 @@ msgstr "檢測到個人數據"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Coordinate validation report"
-msgstr ""
+msgstr "座標驗證報告"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
@@ -3335,28 +3301,28 @@ msgstr "清除日誌"
 
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
-msgstr ""
+msgstr "新地圖"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
 msgstr "FROM 中的巢狀子查詢無法重新序列化；已將對應保留為預留位置。"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1,000"
-msgstr ""
+msgstr "1,000"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Expected geometry"
-msgstr ""
+msgstr "預期的幾何圖形"
 
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "Untitled map"
-msgstr ""
+msgstr "未命名地圖"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Advanced geometry settings"
-msgstr ""
+msgstr "進階幾何設定"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -3372,7 +3338,7 @@ msgstr "隱藏 X 軸"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
-msgstr ""
+msgstr "精確位置"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -3396,19 +3362,15 @@ msgstr "返回登錄頁面"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
-msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
-#~ msgid "Pick a data source and its latitude and longitude columns to plot it."
-#~ msgstr "選取資料來源及其緯度與經度欄，將資料繪製於地圖上。"
+msgstr "1 個篩選條件"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
-msgstr ""
+msgstr "顯示於地圖下方及每次匯出內容中。必填。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Sized"
-msgstr ""
+msgstr "已設定大小"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -3422,7 +3384,7 @@ msgstr "標籤類型"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
-msgstr ""
+msgstr "在範圍內位移"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -3451,9 +3413,9 @@ msgstr "{0} 已從此瀏覽器中刪除。"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf}（約 {approxSizeMb} MB 下載）。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
-msgstr ""
+msgstr "六邊形"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tab"
@@ -3482,7 +3444,7 @@ msgstr "打開 {0}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data label"
-msgstr ""
+msgstr "無資料標籤"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Dataset is now offline-only"
@@ -3491,7 +3453,7 @@ msgstr "資料集現在僅限離線使用"
 #. placeholder {0}: layer?.name ?? ""
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "{0} copy"
-msgstr ""
+msgstr "{0} 份副本"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Fields that come from datasets"
@@ -3526,11 +3488,7 @@ msgstr "您確定要刪除此資料集嗎？此操作無法撤銷。"
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
-msgstr ""
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Symbol size column must be numeric."
-#~ msgstr "符號大小欄位必須為數字。"
+msgstr "此圖層有 {filterCount} 個篩選條件正在作用中。它們可能排除了所有內容。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -3540,10 +3498,10 @@ msgstr "Avandar（預設）"
 msgid "Wide"
 msgstr "寬"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
 msgid "Boundary geometry column"
-msgstr ""
+msgstr "邊界幾何圖形欄"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -3583,13 +3541,13 @@ msgstr "決策"
 msgid "Update failed"
 msgstr "更新失敗"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Linear"
-msgstr ""
+msgstr "線性"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditorHeader.tsx
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Back"
@@ -3612,7 +3570,7 @@ msgstr "自訂 URL 不得包含空格"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Annotate the map"
-msgstr ""
+msgstr "註記地圖"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the maximum value"
@@ -3638,7 +3596,7 @@ msgstr "生成的 SQL"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid " m"
-msgstr ""
+msgstr " m"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "You need access"
@@ -3690,9 +3648,9 @@ msgstr "將資料集添加到工作區"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 msgid "Boundary display name"
-msgstr ""
+msgstr "邊界顯示名稱"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run an AI query first."
@@ -3709,7 +3667,7 @@ msgstr "返回首頁"
 
 #: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
 msgid "Print and PDF export arrives in a later release."
-msgstr ""
+msgstr "列印和 PDF 匯出功能將於後續版本推出。"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -3732,9 +3690,10 @@ msgstr "[本機探索查詢失敗。請嘗試其他欄位或查詢語句，不�
 msgid "Offline model download failed"
 msgstr "離線模型下載失敗"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls.tsx
 msgid "Point geometry column"
-msgstr ""
+msgstr "點幾何圖形欄"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
@@ -3804,7 +3763,7 @@ msgstr "列"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
-msgstr ""
+msgstr "明亮"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link can view this {resource}. People and groups below "
@@ -3823,9 +3782,9 @@ msgstr "覆蓋 SQL 嗎？"
 msgid "WHERE clause compares \"{columnName}\" against a non-literal expression."
 msgstr "WHERE 子句將「{columnName}」與非常值運算式進行比較。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "WKB"
-msgstr ""
+msgstr "WKB"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Add to your workspace"
@@ -3900,7 +3859,7 @@ msgstr "資料集"
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "{layerCount} layers"
-msgstr ""
+msgstr "{layerCount} 個圖層"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -3924,7 +3883,7 @@ msgstr "H1"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle.tsx
 msgid "Reorder layer {layerName}"
-msgstr ""
+msgstr "重新排序圖層 {layerName}"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -3980,9 +3939,9 @@ msgstr "顏色"
 msgid "Y axis label"
 msgstr "Y 軸標籤"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Quantile"
-msgstr ""
+msgstr "分位數"
 
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
@@ -3993,9 +3952,9 @@ msgstr "完成同步 {0} 數據"
 msgid "Select column"
 msgstr "選擇列"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -4025,9 +3984,9 @@ msgstr "線條寬度"
 msgid "Sent password reset email"
 msgstr "已發送密碼重置電子郵件"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Aggregation"
-msgstr ""
+msgstr "彙總"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
@@ -4038,10 +3997,10 @@ msgid "You can view this dataset because it was shared with you."
 msgstr "您可以查看此資料集，因為它已與您共享。"
 
 #. placeholder {0}: index + 1
-#. placeholder {1}: props.breaks.length
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles.tsx
+#. placeholder {1}: breaks.length
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles.tsx
 msgid "Break {0} of {1}, {value}"
-msgstr ""
+msgstr "第 {0} 個斷點，共 {1} 個，{value}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
@@ -4050,7 +4009,7 @@ msgstr "創建新儀表板"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the bbox-epsg-3857 placeholder where the server expects the "
 "bounding box."
-msgstr ""
+msgstr "在伺服器預期邊界框的位置加入 bbox-epsg-3857 佔位符。"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create Workspace"
@@ -4073,14 +4032,14 @@ msgstr "請勿刷新或關閉此標籤，否則下載將被取消。"
 msgid "Forest"
 msgstr "森林"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Aggregate-only layers require an area-producing binding."
-msgstr ""
+msgstr "僅彙總圖層需要產生區域的繫結。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
-msgstr ""
+msgstr "EPSG 代碼"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
@@ -4154,9 +4113,9 @@ msgstr "因缺少軸或系列，無法顯示 {chartName}。"
 msgid "Card"
 msgstr "卡片"
 
-#: src/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleInput.tsx
+#: src/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleEditor.tsx
 msgid "Map name"
-msgstr ""
+msgstr "地圖名稱"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -4211,10 +4170,6 @@ msgstr "在有未保存的更改時無法發布。請先保存。"
 msgid "Delete workspace"
 msgstr "刪除工作區"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Latitude column"
-#~ msgstr "緯度欄"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
 msgstr " 尚未發布。"
@@ -4225,7 +4180,7 @@ msgstr "取消網址變更"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
-msgstr ""
+msgstr "繪製要篩選的區域"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Pick a dashboard, or create a new one."
@@ -4241,7 +4196,7 @@ msgstr "輸入您的答案..."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns are available when Spatial finishes loading."
-msgstr ""
+msgstr "Spatial 完成載入後即可使用幾何欄位。"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -4318,7 +4273,7 @@ msgstr "長條圖"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureAction.tsx
 msgid "Open the record"
-msgstr ""
+msgstr "開啟記錄"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -4328,13 +4283,9 @@ msgstr "資料集已添加"
 msgid "Optional"
 msgstr "可選"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
-#~ msgid "Some rows could not be mapped"
-#~ msgstr "部分列無法繪製於地圖上"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
-msgstr ""
+msgstr "WMTS"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -4349,9 +4300,9 @@ msgstr "/月（每年支付）"
 msgid "Back to dashboards"
 msgstr "返回儀表板"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "No rows"
-msgstr ""
+msgstr "沒有資料列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "Most common"
@@ -4370,10 +4321,6 @@ msgstr "密碼不匹配"
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。值按類別軸（\"{axisKeyValue}\"）分組。"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select longitude column"
-#~ msgstr "選擇經度欄"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -4404,7 +4351,7 @@ msgstr "擁有者"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
 "and 180."
-msgstr ""
+msgstr "緯度必須介於 -90 和 90 之間，經度必須介於 -180 和 180 之間。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -4437,7 +4384,7 @@ msgstr "離線聊天模型已移除"
 
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Search data sources"
-msgstr ""
+msgstr "搜尋資料來源"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Tool"
@@ -4476,15 +4423,15 @@ msgstr "什麼是系列？"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
-msgstr ""
+msgstr "緯度或經度不是數字"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster"
-msgstr ""
+msgstr "叢集"
 
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Loading {layerName}"
-msgstr ""
+msgstr "正在載入 {layerName}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
@@ -4517,15 +4464,11 @@ msgstr "您目前的方案只能分享或發布 {maxAllowed, plural, one {# 個�
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
-msgstr ""
+msgstr "加入邊界"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
 msgstr "您需要擁有此資源的編輯權限，才能分享或發布。"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Select symbol size column"
-#~ msgstr "選擇符號大小欄"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
@@ -4538,10 +4481,6 @@ msgstr "您希望其他團隊成員看到的名稱。"
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "詢問您的數據..."
-
-#: src/views/GisApp/basemap/MapStylePicker.tsx
-#~ msgid "Theme picker"
-#~ msgstr "主題選擇器"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
@@ -4570,7 +4509,7 @@ msgstr "左側跨度"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "{filterCount} filters"
-msgstr ""
+msgstr "{filterCount} 個篩選條件"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
@@ -4580,9 +4519,9 @@ msgstr "回答時間"
 msgid "Could not remove offline chat model"
 msgstr "無法移除離線聊天模型"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Maximum"
-msgstr ""
+msgstr "最大值"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -4593,7 +4532,7 @@ msgstr "圖例"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Show the layer {layerName}"
-msgstr ""
+msgstr "顯示圖層 {layerName}"
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -4617,7 +4556,7 @@ msgstr "資料集已成功保存！"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
 msgid "Cluster radius"
-msgstr ""
+msgstr "叢集半徑"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
@@ -4625,7 +4564,7 @@ msgstr "未找到已保存的資料集。"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
-msgstr ""
+msgstr "內建"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -4660,7 +4599,7 @@ msgstr "添加系列"
 #. placeholder {0}: scale.meters / 1000
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} km"
-msgstr ""
+msgstr "{0} 公里"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
@@ -4672,7 +4611,7 @@ msgstr "最近"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Enter a positive integer for any CRS not listed above."
-msgstr ""
+msgstr "對於上方未列出的任何 CRS，請輸入正整數。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Overlapping"
@@ -4747,7 +4686,7 @@ msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語�
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
-msgstr ""
+msgstr "僅在此螢幕尺寸下檢視。"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
@@ -4755,9 +4694,9 @@ msgstr "選擇聚合"
 
 #. placeholder {0}: index + 1
 #. placeholder {1}: entry.count
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram/ClassificationHistogram.tsx
 msgid "Class {0}: {1} values"
-msgstr ""
+msgstr "類別 {0}：{1} 個值"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Ignore all global filters: this visualization is unfiltered."
@@ -4800,10 +4739,10 @@ msgstr "時間範圍"
 msgid "Failed to create dashboard: {0}"
 msgstr "無法創建儀表板：{0}"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Point"
-msgstr ""
+msgstr "點"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "kind"
@@ -4811,7 +4750,7 @@ msgstr "類型"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
-msgstr ""
+msgstr "所有變更皆已儲存"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "you@example.com"
@@ -4831,14 +4770,14 @@ msgstr "第 1 欄"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{mapped} of {total} rows mapped"
-msgstr ""
+msgstr "已對應 {mapped} / {total} 筆資料列"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
-msgstr ""
+msgstr "已根據欄名稱 {0} 和 {1} 比對緯度與經度。如果不正確，請在上方變更。"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Chat request failed"
@@ -4855,7 +4794,7 @@ msgstr "{0}秒"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 msgid "Zoom to layer"
-msgstr ""
+msgstr "縮放至圖層"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Please fix the highlighted fields."
@@ -4875,13 +4814,13 @@ msgid "Right"
 msgstr "右"
 
 #. placeholder {0}: operationalState.featureCount
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus.tsx
 msgid "{0} no data"
-msgstr ""
+msgstr "{0} 無資料"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Edit classification"
-msgstr ""
+msgstr "編輯分類"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -4902,7 +4841,7 @@ msgstr "選擇要下載的模型。您可以稍後切換模型或重新下載。
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename layer"
-msgstr ""
+msgstr "重新命名圖層"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
@@ -4910,7 +4849,7 @@ msgstr "請求功能"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low"
-msgstr ""
+msgstr "低"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -4918,9 +4857,9 @@ msgstr ""
 msgid "Description"
 msgstr "描述"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Categories"
-msgstr ""
+msgstr "類別"
 
 #: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Some datasets are not synced online yet or failed to publish. "
@@ -4985,9 +4924,9 @@ msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努�
 msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "Encoding"
-msgstr ""
+msgstr "編碼"
 
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
@@ -5062,7 +5001,7 @@ msgstr "不包含"
 
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "One filter is active on this layer. It may be excluding everything."
-msgstr ""
+msgstr "此圖層有一個作用中的篩選條件，可能會排除所有內容。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -5072,9 +5011,9 @@ msgstr "工作區名稱已更新"
 msgid "Add column as a field"
 msgstr "將列添加為字段"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.tsx
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
-msgstr ""
+msgstr "自然斷點使用了 5,000 個值的等級均勻樣本。"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
@@ -5094,10 +5033,6 @@ msgstr "堆疊"
 msgid "Share this {resourceLabel}"
 msgstr "分享這個 {resourceLabel}"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Select latitude column"
-#~ msgstr "選擇緯度列"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 與以下人員共享："
@@ -5113,11 +5048,7 @@ msgstr "上傳"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
-msgstr ""
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Something went wrong while loading this layer's data."
-#~ msgstr "載入此圖層的資料時發生錯誤。"
+msgstr "此地圖的比例尺各處不同"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -5150,12 +5081,12 @@ msgstr "更新訂閱"
 
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "The source has no rows."
-msgstr ""
+msgstr "來源沒有資料列。"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Unmapped rows are still counted in this layer's totals. They are "
 "excluded from the map only."
-msgstr ""
+msgstr "未對應的資料列仍會計入此圖層的總數。它們只會從地圖中排除。"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Get an average of the values"
@@ -5164,7 +5095,7 @@ msgstr "獲取值的平均值"
 #. placeholder {0}: code - 32600
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM north zone {0}"
-msgstr ""
+msgstr "{code} - UTM 北帶 {0}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -5172,7 +5103,7 @@ msgstr "沒有儀表板符合 “{searchQuery}”。"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List item"
@@ -5229,7 +5160,7 @@ msgstr "數據探索器"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "No basemap"
-msgstr ""
+msgstr "無底圖"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
@@ -5242,7 +5173,7 @@ msgstr "已達分享儀表板上限"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr ""
+msgstr "幾何欄位需要 DuckDB Spatial，但目前無法使用。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -5301,7 +5232,7 @@ msgstr " 已發布至網路：任何取得連結的人都能檢視，上方清�
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Row {rowIndexes}."
-msgstr ""
+msgstr "第 {rowIndexes} 列。"
 
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
@@ -5309,19 +5240,19 @@ msgstr "確認電子郵件已發送至您的電子郵件地址。"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
-msgstr ""
+msgstr "顯示精確位置？"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Expand the layer panel"
-msgstr ""
+msgstr "展開圖層面板"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
-msgstr ""
+msgstr "圖層"
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
-msgstr ""
+msgstr "1 個圖層"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -5362,11 +5293,11 @@ msgstr "SQL 的部分內容無法在手動表單中表示。"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Dark"
-msgstr ""
+msgstr "深色"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Rebind required"
-msgstr ""
+msgstr "需要重新繫結"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Import spreadsheets, connect to Google Sheets, or add data from other "
@@ -5413,14 +5344,14 @@ msgstr "儀表板快照"
 msgid "Signing you back in…"
 msgstr "正在重新登入…"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
-msgstr ""
+msgstr "自然斷點"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
 msgid "Latitude"
-msgstr ""
+msgstr "緯度"
 
 #. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
@@ -5437,7 +5368,7 @@ msgstr "自訂 URL 不得為空白"
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "The layer's query failed. This usually means the dataset has changed or "
 "is no longer available in this workspace."
-msgstr ""
+msgstr "圖層的查詢失敗。這通常表示資料集已變更，或已無法在此工作區中使用。"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
@@ -5500,11 +5431,11 @@ msgstr "選擇 Google 表單"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol sizes from {firstLabel} to {lastLabel}"
-msgstr ""
+msgstr "從 {firstLabel} 到 {lastLabel} 的符號大小"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl.tsx
 msgid "Basemap"
-msgstr ""
+msgstr "底圖"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Only workspace settings administrators can open workspace settings."
@@ -5516,7 +5447,7 @@ msgstr "選擇適用於此視覺化的全域篩選。"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 msgid "Each series is one cloud of bubbles. The size column determines bubble "
@@ -5525,7 +5456,7 @@ msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
-msgstr ""
+msgstr "新增圖層"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -5545,15 +5476,15 @@ msgstr "請先保存您的更改：PDF反映已保存的儀表板。"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
-msgstr ""
+msgstr "單位"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
 msgstr "檔案載入失敗"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapWeightSelect.tsx
 msgid "Weight by"
-msgstr ""
+msgstr "加權依據"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -5619,7 +5550,7 @@ msgstr "視覺化類型"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude must both be numbers."
-msgstr ""
+msgstr "緯度和經度都必須是數字。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -5708,7 +5639,7 @@ msgstr "重設密碼"
 
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "Boundary match report"
-msgstr ""
+msgstr "邊界比對報告"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
@@ -5725,7 +5656,7 @@ msgstr "標準網址"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
-msgstr ""
+msgstr "如果幾何已是 WGS 84，請留白。"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Chart settings appear once the query returns some columns."
@@ -5734,11 +5665,11 @@ msgstr "查詢傳回欄位後，圖表設定才會顯示。"
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
-msgstr ""
+msgstr "已隱藏 {0} 個區域"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
-msgstr ""
+msgstr "將點聚合至邊界"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Render as"
@@ -5746,10 +5677,10 @@ msgstr "呈現為"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Manual breaks"
-msgstr ""
+msgstr "手動斷點"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Line"
 msgstr "行"
 
@@ -5790,7 +5721,7 @@ msgstr "此儀表板尚未發布。請使用下方按鈕，將其發布給您選
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
-msgstr ""
+msgstr "連結 URL"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
@@ -5804,10 +5735,10 @@ msgstr "載入儀表板資料集"
 msgid "Select an Excel or CSV file from your computer to import"
 msgstr "從您的電腦選擇一個 Excel 或 CSV 檔案以匯入"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
-msgstr ""
+msgstr "邊界資料集"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -5856,9 +5787,9 @@ msgstr "正在載入私人資源"
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Smallest radius"
-msgstr ""
+msgstr "最小半徑"
 
 #: src/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -5877,7 +5808,7 @@ msgstr "如果每個 {0} 只能有一個 {fieldName} 值，請勾選此框。"
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} boundaries without data"
-msgstr ""
+msgstr "{0} 個邊界沒有資料"
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -5912,7 +5843,7 @@ msgstr "輸入數據集名稱"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
-msgstr ""
+msgstr "緯度或經度為空"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "This name only applies in {workspaceName}. Your other workspaces keep "
@@ -5922,11 +5853,11 @@ msgstr "此名稱僅適用於 {workspaceName}。您的其他工作區保持自�
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} ambiguous source keys"
-msgstr ""
+msgstr "{0} 個來源鍵不明確"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Unsaved changes"
-msgstr ""
+msgstr "未儲存的變更"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -5957,9 +5888,9 @@ msgstr "Qwen 2.5 1.5B（離線）"
 msgid "X axis"
 msgstr "X 軸"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Normalized name"
-msgstr ""
+msgstr "正規化名稱"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate references column \"{columnName}\" not present in the dataset."
@@ -5975,7 +5906,7 @@ msgstr "（每月計費）"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol size {firstLabel}"
-msgstr ""
+msgstr "符號大小 {firstLabel}"
 
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
@@ -5999,7 +5930,7 @@ msgstr "發送答案"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Simplification tolerance"
-msgstr ""
+msgstr "簡化容差"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -6037,7 +5968,7 @@ msgstr "需要名稱"
 #. placeholder {0}: columnIds.length
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "{0} fields"
-msgstr ""
+msgstr "{0} 個欄位"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "User group saved"
@@ -6049,7 +5980,7 @@ msgstr "無法發布儀表板"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Fiord"
-msgstr ""
+msgstr "峽灣"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
@@ -6083,10 +6014,6 @@ msgstr "沒有數值欄"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "服務"
-
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
-#~ msgid "Could not load map data"
-#~ msgstr "無法載入地圖資料"
 
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
@@ -6145,7 +6072,7 @@ msgstr "Qwen 2.5 3B（離線）"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Collapse the legend"
-msgstr ""
+msgstr "收合圖例"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -6188,7 +6115,7 @@ msgstr "{0, plural, one {將發布 # 列：} other {將發布 # 列：}}"
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
-msgstr ""
+msgstr "此圖層會擷取這些欄位，因此新增欄位後也能用於篩選。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
@@ -6198,7 +6125,7 @@ msgstr "默認值"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
-msgstr ""
+msgstr "{0} 個區域沒有資料"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
@@ -6218,7 +6145,7 @@ msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Displace"
-msgstr ""
+msgstr "位移"
 
 #. placeholder {0}: state.singularEntityConfigName
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
@@ -6255,9 +6182,9 @@ msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "每個系列是一個 (X, Y) 點雲。添加更多以在同一圖表上比較多個指標對。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Polygon"
-msgstr ""
+msgstr "多邊形"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
@@ -6339,14 +6266,14 @@ msgstr "為此成員選擇使用者群組"
 msgid "Admin"
 msgstr "管理員"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
 msgid "Boundary key column"
-msgstr ""
+msgstr "邊界鍵值欄"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
-msgstr ""
+msgstr "座標超出有效範圍"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Filters (Where)"
@@ -6408,7 +6335,7 @@ msgstr "文本包含"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Saving"
-msgstr ""
+msgstr "儲存中"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
@@ -6416,7 +6343,7 @@ msgstr "新共享的角色"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Map tools"
-msgstr ""
+msgstr "地圖工具"
 
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Send to AI?"
@@ -6437,7 +6364,7 @@ msgstr "未成功讀取任何行"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "map"
-msgstr ""
+msgstr "地圖"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "New user group"
@@ -6454,7 +6381,7 @@ msgstr "以上皆非"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
-msgstr ""
+msgstr "部分資料列的緯度或經度為空。"
 
 #. placeholder {0}: capitalize(role)
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
@@ -6484,7 +6411,7 @@ msgstr "無法準備離線聊天模型。"
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
 msgid "Delete the view {0}"
-msgstr ""
+msgstr "刪除檢視 {0}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -6516,7 +6443,7 @@ msgstr "發布日期"
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
-msgstr ""
+msgstr "此地圖尚未有圖層"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
@@ -6575,11 +6502,11 @@ msgstr "僅顯示數量。工作區管理員永遠無法查看私人內容。您
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "Fields"
-msgstr ""
+msgstr "欄位"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Areas with fewer records are drawn as Not reported, never as zero."
-msgstr ""
+msgstr "資料筆數較少的區域會顯示為「未回報」，不會顯示為零。"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -6598,7 +6525,7 @@ msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link label"
-msgstr ""
+msgstr "連結標籤"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Filter id (stable)"
@@ -6608,9 +6535,9 @@ msgstr "篩選器 ID（穩定）"
 msgid "No columns available"
 msgstr "沒有可用的欄位"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Size by"
-msgstr ""
+msgstr "大小依據"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Resize drawer"
@@ -6632,9 +6559,9 @@ msgstr "H2"
 msgid "Add a pull quote..."
 msgstr "新增引文…"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
-msgstr ""
+msgstr "每"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "DISTINCT is not supported in the form."
@@ -6654,7 +6581,7 @@ msgstr "輸入評論"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
-msgstr ""
+msgstr "了解原因"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
@@ -6662,7 +6589,7 @@ msgstr "尚無條目。當聊天面板要求同意時，日誌會填寫。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
-msgstr ""
+msgstr "分段值必須是有限值，且嚴格遞增。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name"
@@ -6678,13 +6605,13 @@ msgid "Number of columns"
 msgstr "欄位數量"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Latitude and longitude columns"
-msgstr ""
+msgstr "緯度與經度欄"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
-msgstr ""
+msgstr "{droppedRowCount} 筆資料列未對應"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Edit role group"
@@ -6711,10 +6638,10 @@ msgstr " · 已下載"
 msgid "Cancelled"
 msgstr "已取消"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
-msgstr ""
+msgstr "色階"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
@@ -6734,11 +6661,11 @@ msgstr "無法剖析 SQL：{message}"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "These boundaries have no reportable value for the current query."
-msgstr ""
+msgstr "這些邊界在目前的查詢中沒有可回報的值。"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "1 field"
-msgstr ""
+msgstr "1 個欄位"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
@@ -6760,7 +6687,7 @@ msgstr "新擁有者"
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "{mapLabel}. Use the layer panel to change what is shown."
-msgstr ""
+msgstr "{mapLabel}。使用圖層面板變更顯示內容。"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -6780,11 +6707,11 @@ msgstr "此數據集完全可離線使用"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Leave empty when the value has none"
-msgstr ""
+msgstr "值為空時請留白"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram/ClassificationHistogram.tsx
 msgid "Value distribution"
-msgstr ""
+msgstr "值分布"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts
 msgid "Could not read file"
@@ -6815,10 +6742,6 @@ msgstr "儀表板"
 msgid "integer"
 msgstr "整數"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
-#~ msgid "Symbol color"
-#~ msgstr "符號顏色"
-
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "自定義澄清答案"
@@ -6842,7 +6765,7 @@ msgid "You're on the Free plan"
 msgstr "您目前使用的是免費方案"
 
 #: src/views/DataExplorerApp/AggregationSelect.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Count"
 msgstr "計數"
 
@@ -6874,7 +6797,7 @@ msgstr "一般"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
-msgstr ""
+msgstr "顯示「未回報」項目"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -6918,9 +6841,9 @@ msgstr "形狀"
 msgid "Members"
 msgstr "成員"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
-msgstr ""
+msgstr "點幾何"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Value"
@@ -6934,21 +6857,17 @@ msgstr "您目前已訂閱此計劃。"
 msgid "Upload a dataset"
 msgstr "上傳數據集"
 
-#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
-#~ msgid "Invalid column type"
-#~ msgstr "無效的欄位類型"
-
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"
-msgstr ""
+msgstr "平方根"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
-msgstr ""
+msgstr "快顯視窗"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
-msgstr ""
+msgstr "分級"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
@@ -6963,9 +6882,9 @@ msgid "Add a series to choose which numeric column drives the chart."
 msgstr "添加一個系列以選擇哪個數字列驅動圖表。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
-msgstr ""
+msgstr "幾何欄"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
@@ -6980,9 +6899,9 @@ msgstr "移除本地篩選器"
 msgid "This removes the user group from members and resources that use it."
 msgstr "這將從使用該用戶群組的成員和資源中移除該用戶群組。"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Largest radius"
-msgstr ""
+msgstr "最大半徑"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
@@ -7024,12 +6943,12 @@ msgstr "進階選項"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom right"
-msgstr ""
+msgstr "右下"
 
 #. placeholder {0}: scale.meters
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} m"
-msgstr ""
+msgstr "{0} 公尺"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -7042,18 +6961,18 @@ msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
-msgstr ""
+msgstr "分箱至網格"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Handling"
-msgstr ""
+msgstr "處理方式"
 
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
 "Areas below that minimum are shown as Not reported without revealing "
 "their exact count."
-msgstr ""
+msgstr "彙總只會在至少有 {0} 筆資料參與時繪製區域。低於此最低數量的區域會顯示為「未回報」，不會透露其確切筆數。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
@@ -7066,7 +6985,7 @@ msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
-msgstr ""
+msgstr "低至高"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -7105,7 +7024,7 @@ msgstr "X 軸刻度顏色"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Continue"
-msgstr ""
+msgstr "繼續"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Search dashboards"
@@ -7120,7 +7039,7 @@ msgstr "電子郵件地址無效"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Not plotted yet"
-msgstr ""
+msgstr "尚未繪製"
 
 #. placeholder {0}: selectedDocument.name
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -7161,7 +7080,7 @@ msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座�
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Expand the legend"
-msgstr ""
+msgstr "展開圖例"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -7184,7 +7103,7 @@ msgstr "該查詢失敗"
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
 "add as many as you need and reorder them."
-msgstr ""
+msgstr "新增圖層以繪製資料集、衍生資料集或設定檔。您可以視需要新增任意數量的圖層並重新排序。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Explore your data"
@@ -7200,11 +7119,11 @@ msgstr "刪除用戶群組"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Spatial unavailable"
-msgstr ""
+msgstr "無法使用空間資料"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Collapse the layer panel"
-msgstr ""
+msgstr "收合圖層面板"
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "It's time to create your first workspace. Don't think for too long; you "
@@ -7233,7 +7152,7 @@ msgstr "媒體"
 
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
-msgstr ""
+msgstr "尚無地圖"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -7243,9 +7162,9 @@ msgstr "新增提示並生成 SQL 以配置此視覺化。"
 msgid "Copy link"
 msgstr "複製連結"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "100,000"
-msgstr ""
+msgstr "100,000"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -7273,9 +7192,9 @@ msgstr "輸入確認短語"
 msgid "Change URL"
 msgstr "變更網址"
 
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Ochre"
-msgstr ""
+msgstr "赭色"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -7301,13 +7220,13 @@ msgstr "最早"
 msgid "max"
 msgstr "最大"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Color mode"
-msgstr ""
+msgstr "色彩模式"
 
-#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.tsx
+#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Suppressed"
-msgstr ""
+msgstr "已抑制"
 
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Dataset limit reached"
@@ -7323,7 +7242,7 @@ msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
-msgstr ""
+msgstr "已位移"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -7347,7 +7266,7 @@ msgstr "請查看數據並確保其正確。一旦確認，數據集將與此數
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Choose Displace or Aggregate only when the layer holds protection or "
 "health data that must not be mapped to a household."
-msgstr ""
+msgstr "僅當圖層包含不得對應至個別家庭的保護或健康資料時，才選擇「位移」或「彙總」。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Stroke ({strokeWidth}px)"
@@ -7374,10 +7293,6 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
 
-#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
-#~ msgid "No mappable rows in this data source."
-#~ msgstr "此資料來源中沒有可繪製於地圖上的列。"
-
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "CSV 或 Excel 文件"
@@ -7387,14 +7302,14 @@ msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT 參照的欄位「{columnName}」不在資料集內。"
 
 #. placeholder {0}: column.name
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
-msgstr ""
+msgstr "{0}（邊界）"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
-msgstr ""
+msgstr "載入中"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -7408,7 +7323,7 @@ msgstr "編輯 serif"
 #. placeholder {0}: index + 1
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/CategoricalControls.tsx
 msgid "Category {0}"
-msgstr ""
+msgstr "類別 {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
@@ -7449,7 +7364,7 @@ msgstr "{peopleClause} 和 {groupClause}"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
-msgstr ""
+msgstr "高"
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -7478,17 +7393,13 @@ msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {total
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupFieldSelect.tsx
 msgid "Select the fields a reader should see"
-msgstr ""
+msgstr "選取讀者應該看到的欄位"
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "與您共享"
-
-#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
-#~ msgid "Longitude column"
-#~ msgstr "經度欄"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Run a query to configure a chart."
@@ -7520,14 +7431,15 @@ msgstr "載入中..."
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureFields.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
-#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.tsx
+#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/FlatLegendEntry.tsx
+#: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
-msgstr ""
+msgstr "未回報"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Spatial is unavailable"
-msgstr ""
+msgstr "無法使用空間資料"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -7541,11 +7453,11 @@ msgstr "整個數據集"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
-msgstr ""
+msgstr "熱度"
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to layer settings"
-msgstr ""
+msgstr "跳至圖層設定"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"
@@ -7562,7 +7474,7 @@ msgstr "Frontier 模型"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
-msgstr ""
+msgstr "左下"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -7600,7 +7512,7 @@ msgstr "因為您尚未訂閱，無法載入帳務入口網站。"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
 msgid "Add a tile service"
-msgstr ""
+msgstr "新增圖磚服務"
 
 #. placeholder {0}: top.value.length - 5
 #. placeholder {1}: top.count.toLocaleString()
@@ -7608,9 +7520,9 @@ msgstr ""
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} 個值與 {1} 行相關聯"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
-msgstr ""
+msgstr "資料鍵欄"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
@@ -7622,20 +7534,20 @@ msgstr "鬆散"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Suppress areas below"
-msgstr ""
+msgstr "抑制低於以下值的區域"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY 參照的欄位「{columnName}」不在 SELECT 清單中。"
 
-#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
-#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Blue"
-msgstr ""
+msgstr "藍色"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Select a numeric column"
-msgstr ""
+msgstr "選取數值欄"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Upgrading plan to {newPlanName} ({newPlanSubType})"
@@ -7647,7 +7559,7 @@ msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
@@ -7667,7 +7579,7 @@ msgstr "已準備離線"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Swap latitude and longitude"
-msgstr ""
+msgstr "交換緯度與經度"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
@@ -7696,7 +7608,7 @@ msgstr "成功"
 #: src/views/GisApp/panels/FeatureInspector/FeatureFields.tsx
 msgid "This layer's popup shows no fields. Choose some in the layer's Popup "
 "section."
-msgstr ""
+msgstr "此圖層的彈出視窗沒有顯示任何欄位。請在圖層的「彈出視窗」區段中選取欄位。"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
