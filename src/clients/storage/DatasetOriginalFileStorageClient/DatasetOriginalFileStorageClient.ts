@@ -2,23 +2,13 @@ import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
+import { getDatasetOriginalFileStoragePath } from "@/clients/storage/DatasetOriginalFileStorageClient/utils";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
-import { getDatasetOriginalFileStoragePath } from "@/clients/storage/DatasetOriginalFileStorageClient/utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-
-function _getFileExtension(fileName: string): string {
-  const lastDotIndex = fileName.lastIndexOf(".");
-  if (lastDotIndex === -1 || lastDotIndex === fileName.length - 1) {
-    throw new Error(
-      `Cannot determine file extension for original file "${fileName}".`,
-    );
-  }
-  return fileName.slice(lastDotIndex + 1);
-}
 
 async function _getTusHeaders(): Promise<Record<string, string>> {
   const session = await AuthClient.getCurrentSession();
@@ -125,15 +115,21 @@ async function _oneShotOriginalFileUpload(options: {
  * @param options.datasetId The ID of the dataset the original file belongs
  * to.
  * @param options.file The original file to upload.
+ * @param options.fileExtension The extension to store the original under,
+ * with or without a leading dot. Comes from
+ * `getOriginalFileExtension(sourceType)`, never from the file name: the
+ * storage path is addressed by source type, so deriving it from the file name
+ * here would let a file called `contract.pdf.bak` upload to `.bak` while
+ * `downloadOriginalFile` / `deleteOriginalFile` look for `.pdf`.
  */
 async function uploadOriginalFile(options: {
   workspaceId: Workspace.Id;
   datasetId: DatasetId;
   file: File;
+  fileExtension: string;
 }): Promise<void> {
-  const { workspaceId, datasetId, file } = options;
+  const { workspaceId, datasetId, file, fileExtension } = options;
 
-  const fileExtension = _getFileExtension(file.name);
   const objectPath = getDatasetOriginalFileStoragePath({
     workspaceId,
     datasetId,

@@ -79,7 +79,27 @@ describe("startOriginalFileUploadIfNeeded", () => {
       workspaceId,
       datasetId,
       file: expect.any(File),
+      fileExtension: "pdf",
     });
+  });
+
+  it("uploads under the source type's extension, not the file name's", async () => {
+    // The blob is addressed by source type at every one of upload / download
+    // / delete. A file the user happened to name `contract.pdf.bak` must
+    // still land at `<datasetId>.original.pdf`, otherwise the later delete
+    // silently misses and the original is orphaned in the bucket.
+    await _putPinnedPdfRow({ sourceFileName: "contract.pdf.bak" });
+
+    await startOriginalFileUploadIfNeeded({
+      workspaceId,
+      datasetId,
+      sourceType: "pdf_file",
+      onlineStorageAllowed: true,
+    });
+
+    expect(uploadOriginalFileMock).toHaveBeenCalledWith(
+      expect.objectContaining({ fileExtension: "pdf" }),
+    );
   });
 
   it("uploads nothing for an offline-only pdf dataset", async () => {

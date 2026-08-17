@@ -1,6 +1,9 @@
+import {
+  getOriginalFileExtension,
+  requiresOriginalFileRetention,
+} from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/requiresOriginalFileRetention";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -65,5 +68,9 @@ export async function startOriginalFileUploadIfNeeded(
     workspaceId,
     datasetId,
     file,
+    // The storage path is addressed by source type, not by whatever the user
+    // happened to name the file, so upload, download and delete all take the
+    // extension from the same place.
+    fileExtension: getOriginalFileExtension(sourceType),
   });
 }
