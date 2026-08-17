@@ -13,8 +13,8 @@ alter type public.datasets__source_type
 add value if not exists 'pdf_file';
 
 -- How a PDF table's structure was determined. Hand-written alongside the
--- label above so the two arrive together; a generated migration for this
--- type alone would also carry unrelated pre-existing analytics drift.
+-- label above so the two arrive together, rather than split across a
+-- hand-written migration and a generated one for a single logical change.
 create type public.datasets__pdf_detection_mode as enum(
   'tagged',
   'lattice',
