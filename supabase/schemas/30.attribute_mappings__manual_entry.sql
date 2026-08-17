@@ -10,6 +10,14 @@ create table public.attribute_mappings__manual_entry (
 -- Enable row level security
 alter table public.attribute_mappings__manual_entry enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.attribute_mappings__manual_entry to authenticated;
+
 -- Policies
 create policy "
   User can SELECT attribute_mappings__manual_entry

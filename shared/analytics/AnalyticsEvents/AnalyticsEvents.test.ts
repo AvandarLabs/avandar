@@ -1,6 +1,13 @@
 import { ANALYTICS_EVENT_NAMES } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
+import type {
+  AnalyticsEventPayloads,
+  ChatTurnErrorClass,
+  ChatTurnOutcome,
+  QueryAnalyticsSurface,
+  QueryAnalyticsTrigger,
+  QueryErrorClass,
+} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
 import type { Database } from "$/types/database.types.ts";
 
 type FeaturePlanType =
@@ -76,4 +83,63 @@ describe("analytics trigger event payloads", () => {
       Pick<AnalyticsEventPayloads, keyof TriggerEventPayloads>
     >().toEqualTypeOf<TriggerEventPayloads>();
   });
+});
+
+type ProductEventPayloads = {
+  "query.ran": {
+    trigger: QueryAnalyticsTrigger;
+    source: "rawSql" | "structured";
+    dataSourceType: "dataset" | "entity" | "none";
+    rowCount: number;
+    columnCount: number;
+    durationMs: number;
+    didAutoLimit: boolean;
+  };
+  "query.failed": {
+    surface: QueryAnalyticsSurface;
+    trigger: QueryAnalyticsTrigger;
+    errorClass: QueryErrorClass;
+    errorMessage: string;
+    isOffline: boolean;
+  };
+  "dashboard.pdf_export_opened": { dashboardId: string; blockCount: number };
+  "dashboard.pdf_exported": {
+    dashboardId: string;
+    blockCount: number;
+    durationMs: number;
+    mode: "direct" | "annotated";
+  };
+  "chat.turn_completed": {
+    modelId: string;
+    latencyMs: number;
+    attemptCount: number;
+    outcome: ChatTurnOutcome;
+    promptChars: number;
+    responseChars: number;
+    schemaDatasetCount: number;
+    wasSampled: boolean;
+    piiSeverity?: "clean" | "warning" | "critical";
+  };
+  "chat.turn_failed": {
+    modelId: string;
+    errorClass: ChatTurnErrorClass;
+    latencyMs: number;
+  };
+};
+
+describe("analytics product event payloads", () => {
+  it("documents every privacy-safe product payload shape", () => {
+    expectTypeOf<
+      Pick<AnalyticsEventPayloads, keyof ProductEventPayloads>
+    >().toEqualTypeOf<ProductEventPayloads>();
+  });
+
+  // A real guard has to cross the TypeScript/SQL boundary: parse the
+  // `payload ->> '<key>'` literals out of
+  // `supabase/schemas/91.analytics_view__chat_health.sql` and assert them
+  // against a runtime list of payload keys. No such runtime list exists yet,
+  // because payload shapes are types only.
+  it.todo(
+    "pins chat.turn_completed's keys against the reporting view's ->> literals",
+  );
 });

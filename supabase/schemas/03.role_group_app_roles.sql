@@ -15,6 +15,14 @@ create index idx_role_group_app_roles__role_group_id on public.role_group_app_ro
 
 alter table public.role_group_app_roles enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.role_group_app_roles to authenticated;
+
 create trigger tr_role_group_app_roles__set_updated_at before
 update on public.role_group_app_roles for each row
 execute function public.util__set_updated_at ();

@@ -7,9 +7,9 @@ import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilte
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
-vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
+const { useDataQueryMock } = vi.hoisted(() => {
   return {
-    useDataQuery: () => {
+    useDataQueryMock: vi.fn(() => {
       return [
         {
           id: "query-result-1",
@@ -30,8 +30,12 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
         // block reads to tell a failed query from an empty one.
         { isError: false, error: null },
       ];
-    },
+    }),
   };
+});
+
+vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
+  return { useDataQuery: useDataQueryMock };
 });
 
 vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
@@ -107,6 +111,18 @@ function renderBlock(props: {
 }
 
 describe("DataVizPBlock", () => {
+  it("runs its query under the dashboard_block analytics surface", () => {
+    renderBlock({
+      prompt: "find me data",
+      rawSql: "SELECT 1",
+      vizType: "table",
+      vizConfig: { vizType: "table" },
+    });
+    expect(useDataQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ analyticsSurface: "dashboard_block" }),
+    );
+  });
+
   it("shows the empty-prompt hint when no prompt is set", () => {
     renderBlock({
       prompt: "",
