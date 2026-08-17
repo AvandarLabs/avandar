@@ -22,9 +22,9 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-vi.mock("@/clients/entities/EntityFieldConfigClient", () => {
+vi.mock("@/clients/ontology/ConceptAttributeClient", () => {
   return {
-    EntityFieldConfigClient: {
+    ConceptAttributeClient: {
       useGetAll: () => {
         return [[], false];
       },

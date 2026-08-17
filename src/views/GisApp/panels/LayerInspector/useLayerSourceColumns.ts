@@ -3,7 +3,7 @@ import { where } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 /** Returns every column a data source offers as stable `QueryColumn` values. */
@@ -17,10 +17,10 @@ export function useLayerSourceColumns(
     },
   });
 
-  const [entityFieldConfigs] = EntityFieldConfigClient.useGetAll({
-    ...where("entity_config_id", "eq", dataSourceId?.id),
+  const [conceptAttributes] = ConceptAttributeClient.useGetAll({
+    ...where("concept_id", "eq", dataSourceId?.id),
     useQueryOptions: {
-      enabled: Model.isOfModelType(dataSourceId, "EntityConfig"),
+      enabled: Model.isOfModelType(dataSourceId, "Concept"),
     },
   });
 
@@ -31,9 +31,9 @@ export function useLayerSourceColumns(
       ...(datasetColumns ?? []).map((column) => {
         return QueryColumn.makeFromDatasetColumn(column);
       }),
-      ...(entityFieldConfigs ?? []).map((field) => {
-        return QueryColumn.makeFromEntityFieldConfig(field);
+      ...(conceptAttributes ?? []).map((attribute) => {
+        return QueryColumn.makeFromConceptAttribute(attribute);
       }),
     ];
-  }, [datasetColumns, entityFieldConfigs]);
+  }, [datasetColumns, conceptAttributes]);
 }
