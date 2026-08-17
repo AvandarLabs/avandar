@@ -10,8 +10,8 @@ import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/c
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import {
   applyQueryChange,
-  sameColumnSchema,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers/dataExplorerStateHelpers";
+  isSameColumnSchema,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type {
   DataExplorerAppState,
@@ -63,7 +63,7 @@ export const DataExplorerStateManager = createAppStateManager({
         dataSource,
         ...(options?.limit !== undefined ? { limit: options.limit } : {}),
       } as PartialStructuredQuery);
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the columns for the query. */
@@ -90,7 +90,7 @@ export const DataExplorerStateManager = createAppStateManager({
         state.vizConfig,
         newQuery,
       );
-      const next = applyQueryChange(state, newQuery);
+      const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
 
@@ -121,7 +121,7 @@ export const DataExplorerStateManager = createAppStateManager({
         aggregations: newAggregations,
       } as PartialStructuredQuery;
       const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
-      const next = applyQueryChange(state, newQuery);
+      const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
 
@@ -134,7 +134,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         orderByColumn: columnId,
       } as PartialStructuredQuery;
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the direction that we are ordering by. */
@@ -146,7 +146,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         orderByDirection: direction,
       } as PartialStructuredQuery;
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the LIMIT clause for the query. */
@@ -155,7 +155,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         limit,
       } as PartialStructuredQuery;
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -167,7 +167,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         filters,
       } as PartialStructuredQuery;
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -197,7 +197,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         filters: EMPTY_QUERY_FILTER,
       } as PartialStructuredQuery;
-      return applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -235,10 +235,10 @@ export const DataExplorerStateManager = createAppStateManager({
         columns,
       });
 
-      const columnsChanged = !sameColumnSchema(
-        state.lastResultColumns,
-        columns,
-      );
+      const columnsChanged = !isSameColumnSchema({
+        previousColumns: state.lastResultColumns,
+        currentColumns: columns,
+      });
       const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
         next,
         state.vizConfig,

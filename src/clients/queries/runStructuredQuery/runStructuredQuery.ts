@@ -1,6 +1,6 @@
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { RunStructuredQueryParams } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
+import type { RunStructuredQueryParams } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 /**

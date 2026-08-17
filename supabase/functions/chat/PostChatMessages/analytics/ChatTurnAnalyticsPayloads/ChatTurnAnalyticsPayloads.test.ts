@@ -38,8 +38,6 @@ describe("ChatTurnAnalyticsPayloads.fromCompletedTurn", () => {
     expect(payload.outcome).toBe("sql");
     expect(payload.latencyMs).toBe(1235);
     expect(payload.responseChars).toBe("Here is the SQL I ran.".length);
-    expect(payload.wasSampled).toBe(false);
-    expect(payload).not.toHaveProperty("piiSeverity");
   });
 
   it("prefers clarification over a dashboard block when both are present", () => {
@@ -47,7 +45,7 @@ describe("ChatTurnAnalyticsPayloads.fromCompletedTurn", () => {
       ...BASE_COMPLETED,
       assistantText: "Which region?",
       parsed: {
-        text: "",
+        text: "Which region did you mean?",
         clarification: CLARIFICATION,
         dashboardBlock: DASHBOARD_BLOCK,
       },
@@ -65,7 +63,7 @@ describe("ChatTurnAnalyticsPayloads.fromCompletedTurn", () => {
       ...BASE_COMPLETED,
       assistantText: "Here is the SQL I ran.",
       parsed: {
-        text: "",
+        text: "Here is the SQL I ran.",
         generatedSql: { sql: "SELECT 1", prompt: "p" },
         clarification: CLARIFICATION,
       },
@@ -136,7 +134,11 @@ describe("ChatTurnAnalyticsPayloads.fromFailedTurn", () => {
     const payload = ChatTurnAnalyticsPayloads.fromFailedTurn({
       modelId: "openai/gpt-4o-mini",
       latencyMs: 10,
-      error: new SyntaxError("Unexpected token < in JSON at position 0"),
+      // Claimed by both the parse rule and the upstream rule, so this
+      // pins which one wins rather than passing under either order.
+      error: new SyntaxError(
+        "OpenRouter API error: Unexpected token < in JSON at position 0",
+      ),
     });
 
     expect(payload.errorClass).toBe("parse");
@@ -177,4 +179,8 @@ describe("ChatTurnAnalyticsPayloads.fromFailedTurn", () => {
 
     expect(JSON.stringify(payload)).not.toContain("secret");
   });
+
+  it.todo(
+    "records wasSampled and piiSeverity once chat sampling retains turns",
+  );
 });

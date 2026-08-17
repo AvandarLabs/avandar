@@ -1,6 +1,6 @@
 import { isDefined } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
-import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ConsentAuditEntryParsers } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntryParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";

@@ -5,7 +5,7 @@ import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";

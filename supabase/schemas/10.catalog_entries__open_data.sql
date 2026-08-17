@@ -47,10 +47,7 @@ create table public.catalog_entries__open_data (
   notes text,
   -- Additional metadata about the dataset
   metadata jsonb,
-  constraint unique_parquet_file_pipeline unique (
-    parquet_file_name,
-    pipeline_name
-  )
+  constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name)
 );
 
 -- Enable row level security

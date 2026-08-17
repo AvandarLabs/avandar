@@ -115,6 +115,19 @@ export function classifyStatement(sql: string): StatementKind {
   if (/^create\s+(or\s+replace\s+)?extension\b/.test(t)) {
     return "drop";
   }
+  if (/^create\s+schema\b/.test(t)) {
+    return "drop";
+  }
+  // Views are derived read models, not schema shape. Today they are all
+  // reporting views in the `analytics` schema, defined over
+  // `usage_analytics_events` and other tables the mirror excludes, so
+  // none of them could resolve locally even though SQLite does have
+  // views. Dropped for the same reason functions are.
+  if (
+    /^(create|alter|drop)\s+(or\s+replace\s+)?(materialized\s+)?view\b/.test(t)
+  ) {
+    return "drop";
+  }
   if (/^comment\s+on\b/.test(t)) {
     return "drop";
   }
@@ -230,7 +243,7 @@ function _splitOnUnquotedSemicolons(raw: string): string[] {
  */
 const _PRIMARY_TABLE_PATTERNS: RegExp[] = [
   /^\s*(?:create|alter|drop)\s+table\s+(?:if\s+(?:not\s+)?exists\s+)?(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
-  /^\s*create\s+(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\s+)?on\s+(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
+  /^\s*create\s+(?:unique\s+)?index\s+(?:concurrently\s+)?(?:if\s+not\s+exists\s+)?(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\s+)?on\s+(?:"?[a-zA-Z_][a-zA-Z0-9_]*"?\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/i,
 ];
 
 function _findPrimaryTable(sql: string): string | undefined {

@@ -41,7 +41,7 @@ import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.ty
 import type {
   GoogleSheetsDataSourceMetadata,
   GoogleSheetsLoadResult,
-} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
 

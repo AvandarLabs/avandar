@@ -95,6 +95,31 @@ describe("classifyStatement", () => {
     expect(classifyStatement("set check_function_bodies = off;")).toBe("drop");
   });
 
+  it("classifies CREATE SCHEMA as drop", () => {
+    expect(classifyStatement('create schema if not exists "private";')).toBe(
+      "drop",
+    );
+  });
+
+  it("classifies CREATE / DROP VIEW as drop", () => {
+    expect(
+      classifyStatement(
+        'create or replace view "analytics"."active_users" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('create view "analytics"."v" as select 1;')).toBe(
+      "drop",
+    );
+    expect(
+      classifyStatement(
+        'create materialized view "analytics"."m" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('drop view if exists "analytics"."v";')).toBe(
+      "drop",
+    );
+  });
+
   it("classifies a leading keyword it does not know as unknown", () => {
     expect(classifyStatement("reindex table public.x;")).toBe("unknown");
     expect(classifyStatement("vacuum analyze public.x;")).toBe("unknown");
@@ -139,6 +164,13 @@ describe("extractStatements", () => {
       "create index idx on public.datasets using btree (workspace_id);",
     );
     expect(stmts[0]!.primaryTable).toBe("datasets");
+  });
+
+  it("identifies the primary table when a CREATE INDEX name is quoted", () => {
+    const stmts = extractStatements(
+      'create unique index "subscriptions_polar_subscription_id_key" on public.subscriptions using btree ("polar_subscription_id");',
+    );
+    expect(stmts[0]!.primaryTable).toBe("subscriptions");
   });
 
   it("does not pick up FK targets as the primary table", () => {

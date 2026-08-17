@@ -4,7 +4,7 @@ import type { Tables } from "$/types/database.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",
-  ["/validate-slug", "/:workspaceId/invite"],
+  ["/validate-slug", "/:workspaceId/invite", "/:workspaceId/delete"],
   {
     "/validate-slug": {
       POST: {
@@ -98,6 +98,22 @@ export type WorkspacesAPI = APITypeDef<
           invite: Tables<"workspace_invites">;
           membership: Tables<"workspace_memberships">;
           profile: Tables<"user_profiles">;
+        };
+      };
+    };
+
+    /**
+     * Permanently deletes a workspace and all of its contents.
+     * Only callable by the workspace owner.
+     * Revokes any active Polar subscription before deleting.
+     */
+    "/:workspaceId/delete": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        returnType: {
+          deleted: true;
         };
       };
     };

@@ -2,7 +2,6 @@ import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryA
 import type {
   AnalyticsEventPayloads,
   QueryAnalyticsSurface,
-  QueryAnalyticsTrigger,
   QueryErrorClass,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 
@@ -98,61 +97,56 @@ function _sanitizeMessage(message: string): string {
   );
 }
 
-/**
- * Builds the `query.ran` payload for a run that succeeded.
- *
- * Every field comes from the run's own record rather than from the query
- * observer, so the row and column counts always belong to the same execution
- * as the duration beside them.
- */
-function _fromResult(
-  options: Readonly<{
-    trigger: QueryAnalyticsTrigger;
-    runMetadata: DataQueryRunMetadata & { outcome: "success" };
-  }>,
-): AnalyticsEventPayloads["query.ran"] {
-  const { trigger, runMetadata } = options;
-  return {
-    trigger,
-    source: runMetadata.source,
-    dataSourceType: runMetadata.dataSourceType,
-    rowCount: runMetadata.rowCount,
-    columnCount: runMetadata.columnCount,
-    durationMs: Math.round(runMetadata.durationMs),
-    didAutoLimit: runMetadata.didAutoLimit,
-  };
-}
-
-/**
- * Builds the `query.failed` payload for a run that threw.
- *
- * The error is classified and sanitised, never carried verbatim: DuckDB and
- * PostgREST both echo submitted values into their messages.
- */
-function _fromError(
-  options: Readonly<{
-    surface: QueryAnalyticsSurface;
-    trigger: QueryAnalyticsTrigger;
-    error: unknown;
-  }>,
-): AnalyticsEventPayloads["query.failed"] {
-  const { surface, trigger, error } = options;
-  const isOffline = !navigator.onLine;
-  const message = _getTextFromError(error);
-  return {
-    surface,
-    trigger,
-    // Offline wins over the message: when the device is offline the query
-    // failed because it could not run at all, whatever DuckDB reported on the
-    // way down.
-    errorClass: isOffline ? "offline" : _getErrorClassFromMessage(message),
-    errorMessage: _sanitizeMessage(message),
-    isOffline,
-  };
-}
-
 /** Privacy-safe payload builders for query execution analytics. */
 export const QueryAnalyticsPayloads = {
-  fromResult: _fromResult,
-  fromError: _fromError,
+  /**
+   * Builds the `query.ran` payload for a run that succeeded.
+   *
+   * Every field comes from the run's own record rather than from the query
+   * observer, so the counts, timing, and trigger all describe the same
+   * execution.
+   */
+  fromResult: (
+    options: Readonly<{
+      runMetadata: Extract<DataQueryRunMetadata, { outcome: "success" }>;
+    }>,
+  ): AnalyticsEventPayloads["query.ran"] => {
+    const { runMetadata } = options;
+    return {
+      trigger: runMetadata.trigger,
+      source: runMetadata.source,
+      dataSourceType: runMetadata.dataSourceType,
+      rowCount: runMetadata.rowCount,
+      columnCount: runMetadata.columnCount,
+      durationMs: Math.round(runMetadata.durationMs),
+      didAutoLimit: runMetadata.didAutoLimit,
+    };
+  },
+
+  /**
+   * Builds the `query.failed` payload for a run that threw.
+   *
+   * The error is classified and sanitised, never carried verbatim: DuckDB and
+   * PostgREST both echo submitted values into their messages.
+   */
+  fromError: (
+    options: Readonly<{
+      surface: QueryAnalyticsSurface;
+      runMetadata: Extract<DataQueryRunMetadata, { outcome: "error" }>;
+    }>,
+  ): AnalyticsEventPayloads["query.failed"] => {
+    const { surface, runMetadata } = options;
+    const { error, isOffline } = runMetadata;
+    const message = _getTextFromError(error);
+    return {
+      surface,
+      trigger: runMetadata.trigger,
+      // Offline wins over the message: when the device is offline the query
+      // failed because it could not run at all, whatever DuckDB reported on
+      // the way down.
+      errorClass: isOffline ? "offline" : _getErrorClassFromMessage(message),
+      errorMessage: _sanitizeMessage(message),
+      isOffline,
+    };
+  },
 };

@@ -15,6 +15,14 @@ type SubscriptionPermissionQueries = {
   canAddDataset: (params: {
     subscriptionId: string;
   }) => Promise<{ allowed: boolean }>;
+
+  /**
+   * Backend permission check: whether the workspace may make one more
+   * dashboard shareable under its plan.
+   */
+  canPublishShareableDashboard: (params: {
+    subscriptionId: string;
+  }) => Promise<{ allowed: boolean }>;
 };
 
 type ISubscriptionPermissionsClient = ServiceClient &
@@ -39,6 +47,20 @@ function createSubscriptionPermissionsClient(): WithLogger<
           pathParams: {
             subscriptionId,
             permissionType: "can_add_datasets",
+          },
+        });
+      },
+
+      canPublishShareableDashboard: async ({ subscriptionId }) => {
+        const logger = clientLogger.appendName("canPublishShareableDashboard");
+        logger.log("Checking can-publish-shareable-dashboard permission", {
+          subscriptionId,
+        });
+        return APIClient.get({
+          route: "subscriptions/:subscriptionId/permissions/:permissionType",
+          pathParams: {
+            subscriptionId,
+            permissionType: "can_publish_shareable_dashboard",
           },
         });
       },

@@ -21,6 +21,12 @@ export type DataQueryRunOutcome =
        * successful result.
        */
       error: unknown;
+      /**
+       * Whether the device was offline when the run failed, sampled in the
+       * `catch` rather than at emit time. Connectivity can change between the
+       * two, and offline deliberately outranks the message when classifying.
+       */
+      isOffline: boolean;
     };
 
 /**
@@ -47,4 +53,11 @@ export type DataQueryRunMetadata = {
   durationMs: number;
   source: AnalyticsEventPayloads["query.ran"]["source"];
   dataSourceType: AnalyticsEventPayloads["query.ran"]["dataSourceType"];
+  /**
+   * The trigger in effect when the run STARTED. Captured here because the
+   * Data Explorer stamps a new trigger on actions that do not change the query
+   * key, so the value at emit time can belong to a later user action than the
+   * one that began this execution.
+   */
+  trigger: AnalyticsEventPayloads["query.ran"]["trigger"];
 } & DataQueryRunOutcome;

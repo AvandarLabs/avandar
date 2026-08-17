@@ -1,12 +1,10 @@
-import { Trans } from "@lingui/react/macro";
-import { Box, Text } from "@mantine/core";
 import { createUsePuck } from "@puckeditor/core";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
-import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
@@ -28,6 +26,9 @@ type Props = {
 
   /** Dashboard id used for public-page queries when `workspaceId` is unset. */
   dashboardId: Dashboard.Id;
+
+  /** Revision of the published snapshot used by public-page queries. */
+  snapshotRevision: string;
 };
 
 /**
@@ -45,7 +46,8 @@ export function VizConfigPField({
   onChange,
   workspaceId,
   dashboardId,
-}: Props): ReactElement {
+  snapshotRevision,
+}: Readonly<Props>): ReactElement {
   const selectedItem = usePuckSelector((state) => {
     return state.selectedItem;
   });
@@ -69,40 +71,17 @@ export function VizConfigPField({
     : {
         auth: "public" as const,
         publicAvaPageId: dashboardId,
+        snapshotRevision,
       }),
   });
 
-  const columns = queryResults?.columns ?? [];
-  const data = queryResults?.data ?? [];
-
-  if (value.vizType === "table") {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>The table visualization has no extra settings.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-
-  if (rawSql.trim().length === 0) {
-    return (
-      <Box>
-        <Text c="dimmed" fz="sm">
-          <Trans>Generate a query to configure this visualization.</Trans>
-        </Text>
-      </Box>
-    );
-  }
-
   return (
-    <Box>
-      <VizSettingsFormBody
-        columns={columns}
-        data={data}
-        vizConfig={value}
-        onVizConfigChange={onChange}
-      />
-    </Box>
+    <VizConfigContent
+      value={value}
+      onChange={onChange}
+      rawSql={rawSql}
+      columns={queryResults?.columns ?? []}
+      data={queryResults?.data ?? []}
+    />
   );
 }

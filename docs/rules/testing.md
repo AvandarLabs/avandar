@@ -62,3 +62,66 @@ integration harness that does not exist), do not ship a placeholder
 existence/`typeof` test to fill the gap. Leave an `it.todo("...")` or a comment
 describing the contract instead. A `todo` documents the missing coverage
 honestly; a passing tautology hides it behind a green check.
+
+## Split test files live in a `__tests__/` directory
+
+A module keeps its test beside it while there is one test file:
+`DuckDbClient.ts` next to `DuckDbClient.test.ts`. Once a suite grows big enough
+to be split, the pieces move into a `__tests__/` directory:
+
+```txt
+DuckDbClient/
+  DuckDbClient.ts
+  __tests__/
+    DuckDbClient.datasetLeasing.test.ts
+    DuckDbClient.mutationPoisoning.test.ts
+    DuckDbClient.publicSnapshotReads.test.ts
+    DuckDbClient.ownership.fixtures.ts
+```
+
+The trigger is two or more `{ModuleName}.*test.ts` files for the same module in
+one directory, where the module name is the filename up to the first dot.
+`DuckDbClient.test.ts` and `DuckDbClient.leasing.test.ts` are two files for
+`DuckDbClient`; they belong together.
+
+Anything used **exclusively** by those tests moves in too: fixtures, stubs,
+scenario builders, custom assertions. If a helper has even one non-test
+importer it stays outside, because it is production code.
+
+### One module per `__tests__/`
+
+A `__tests__/` directory groups the split suite of **one** module. It is not a
+bucket for unrelated test files.
+
+`__tests__/Module1.test.ts` next to `__tests__/Module2.test.ts` means
+`Module2` wants its own directory:
+
+```txt
+Module2/
+  Module2.ts
+  Module2.test.ts
+```
+
+That is the same directory-for-coupling rule components follow, applied to a
+module and its test.
+
+### Integration tests go at the highest common ancestor
+
+An integration test covers several modules by definition, so it cannot sit
+inside any one module's `__tests__/`. Put it at the lowest directory that
+contains every module it exercises.
+
+If that directory is the app root, the test is too broad to be an integration
+test. Write an e2e test under `tests/e2e/` instead.
+
+### Find violations
+
+```bash
+find src shared packages apps -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) \
+  -not -path '*/node_modules/*' -not -path '*/__tests__/*' \
+| awk -F/ '{ dir=""; for(i=1;i<NF;i++) dir=dir $i "/"; split($NF, p, "."); print dir "\t" p[1] }' \
+| sort | uniq -c | awk '$1 > 1 { print $1"  "$2"  module="$3 }'
+```
+
+Each row is a directory holding that many split test files for one module, and
+every row is a violation.

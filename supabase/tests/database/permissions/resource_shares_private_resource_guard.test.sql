@@ -55,10 +55,10 @@ values (
 );
 
 -- d_private is private to a5000001. d_open is unrestricted.
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, visibility)
 values
-  ('a5005001-0000-4000-8000-000000000001'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, false),
-  ('a5005002-0000-4000-8000-000000000002'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'open', '{}'::jsonb, false, false);
+  ('a5005001-0000-4000-8000-000000000001'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, 'draft'),
+  ('a5005002-0000-4000-8000-000000000002'::uuid, 'a5001001-0000-4000-8000-000000000001'::uuid, 'a5000001-0000-4000-8000-000000000001'::uuid, 'a5003001-0000-4000-8000-000000000001'::uuid, 'open', '{}'::jsonb, false, 'draft');
 
 insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
 values (

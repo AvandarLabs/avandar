@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";

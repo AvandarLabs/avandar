@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
@@ -25,6 +25,11 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
       },
     });
   const navigate = useNavigate();
+  const isNavigating = useRouterState({
+    select: (s) => {
+      return s.status === "pending";
+    },
+  });
 
   // after a fetch, the query cache is the source of truth if
   // we find a workspace with the necessary slug
@@ -34,8 +39,13 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
   // If the query is done and the workspace isn't found, the user
   // lost access to this workspace. Navigate in an effect to avoid
   // calling router.navigate during a render cycle.
+  // Guard on isNavigating: when we're intentionally navigating away (e.g.
+  // after workspace deletion), the workspace disappears from cache while
+  // $workspaceSlug components are still mounted. Without this guard, the
+  // effect would fire and race the intentional navigation to
+  // /invalid-workspace.
   useEffect(() => {
-    if (!isSuccess || isFetching || workspaceFromCache) {
+    if (!isSuccess || isFetching || workspaceFromCache || isNavigating) {
       return;
     }
     navigate({
@@ -45,7 +55,7 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
       },
       replace: true,
     });
-  }, [isSuccess, isFetching, workspaceFromCache, navigate]);
+  }, [isSuccess, isFetching, workspaceFromCache, navigate, isNavigating]);
 
   if (workspaceFromCache) {
     return workspaceFromCache;

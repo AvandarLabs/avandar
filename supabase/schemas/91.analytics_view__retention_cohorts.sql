@@ -14,12 +14,7 @@ with
   cohorts as (
     select
       e.user_id,
-      date_trunc(
-        'week',
-        min(
-          e.created_at
-        )
-      ) as cohort_week
+      date_trunc('week', min(e.created_at)) as cohort_week
     from
       public.usage_analytics_events e
     where
@@ -43,10 +38,7 @@ with
       cs.cohort_size,
       generate_series(
         cs.cohort_week,
-        date_trunc(
-          'week',
-          now()
-        ),
+        date_trunc('week', now()),
         interval '1 week'
       ) as active_week
     from
@@ -55,14 +47,9 @@ with
   sign_ins as (
     select
       e.user_id,
-      date_trunc(
-        'week',
-        e.created_at
-      ) as active_week,
+      date_trunc('week', e.created_at) as active_week,
       min(
-        (
-          e.payload ->> 'daysSinceLastSignIn'
-        )::numeric
+        (e.payload ->> 'daysSinceLastSignIn')::numeric
       ) as days_since_last_sign_in
     from
       public.usage_analytics_events e
@@ -79,15 +66,11 @@ select
     extract(
       epoch
       from
-        (
-          w.active_week - w.cohort_week
-        )
+        (w.active_week - w.cohort_week)
     ) / 604800
   )::int as weeks_since_registration,
   w.cohort_size,
-  count(
-    distinct s.user_id
-  ) as returning_users,
+  count(distinct s.user_id) as returning_users,
   percentile_cont(0.5) within group (
     order by
       s.days_since_last_sign_in

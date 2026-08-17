@@ -16,10 +16,7 @@ create or replace view analytics.chat_health as
 with
   daily as (
     select
-      date_trunc(
-        'day',
-        e.created_at
-      )::date as activity_date,
+      date_trunc('day', e.created_at)::date as activity_date,
       count(*) filter (
         where
           e.event_name = 'chat.message_sent'
@@ -42,27 +39,17 @@ with
         where
           e.event_name = 'chat.turn_failed'
       ) as turns_failed,
-      avg(
-        (
-          e.payload ->> 'attemptCount'
-        )::numeric
-      ) filter (
+      avg((e.payload ->> 'attemptCount')::numeric) filter (
         where
           e.event_name = 'chat.turn_completed'
       ) as avg_attempt_count,
-      max(
-        (
-          e.payload ->> 'attemptCount'
-        )::numeric
-      ) filter (
+      max((e.payload ->> 'attemptCount')::numeric) filter (
         where
           e.event_name = 'chat.turn_completed'
       ) as max_attempt_count,
       percentile_cont(0.5) within group (
         order by
-          (
-            e.payload ->> 'latencyMs'
-          )::numeric
+          (e.payload ->> 'latencyMs')::numeric
       ) filter (
         where
           e.event_name = 'chat.turn_completed'
@@ -93,14 +80,8 @@ with
   ),
   outcomes as (
     select
-      date_trunc(
-        'day',
-        e.created_at
-      )::date as activity_date,
-      coalesce(
-        e.payload ->> 'outcome',
-        'unknown'
-      ) as outcome,
+      date_trunc('day', e.created_at)::date as activity_date,
+      coalesce(e.payload ->> 'outcome', 'unknown') as outcome,
       count(*) as outcome_count
     from
       public.usage_analytics_events e
@@ -113,10 +94,7 @@ with
   outcome_mixes as (
     select
       activity_date,
-      jsonb_object_agg(
-        outcome,
-        outcome_count
-      ) as outcome_mix
+      jsonb_object_agg(outcome, outcome_count) as outcome_mix
     from
       outcomes
     group by

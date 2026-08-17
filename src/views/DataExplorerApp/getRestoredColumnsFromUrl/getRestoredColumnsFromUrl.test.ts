@@ -4,11 +4,14 @@
  * hydration.
  */
 import { Model } from "@avandar/models";
+import { prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 function _makeDatasetColumn(name: string): DatasetColumn.T {
@@ -29,7 +32,39 @@ function _makeDatasetColumn(name: string): DatasetColumn.T {
   });
 }
 
+function _makeEntityFieldConfig(name: string): EntityFieldConfig.T {
+  const now = "2026-01-01T00:00:00.000Z";
+  return Model.make("EntityFieldConfig", {
+    id: uuid<EntityFieldConfig.Id>(),
+    entityConfigId: uuid<EntityConfig.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+    name,
+    description: undefined,
+    createdAt: now,
+    updatedAt: now,
+    dataType: "varchar",
+    valueExtractorType: "manual_entry",
+    isTitleField: false,
+    isIdField: false,
+    allowManualEdit: true,
+    isArray: false,
+  });
+}
+
 describe("getRestoredColumnsFromUrl", () => {
+  it("resolves entity field names, which use a different source model", () => {
+    // An entity source supplies its columns through EntityFieldConfig rather
+    // than DatasetColumn. Without this, deleting that whole conversion from
+    // the source leaves every other test in this file green.
+    const restored = getRestoredColumnsFromUrl({
+      colNames: ["status"],
+      datasetColumns: undefined,
+      entityFieldConfigs: [_makeEntityFieldConfig("status")],
+    });
+
+    expect(restored.map(prop("baseColumn.name"))).toEqual(["status"]);
+  });
+
   it("resolves dataset column names to query columns", () => {
     const restored = getRestoredColumnsFromUrl({
       colNames: ["region", "total"],
@@ -40,11 +75,7 @@ describe("getRestoredColumnsFromUrl", () => {
       entityFieldConfigs: undefined,
     });
 
-    expect(
-      restored.map((col) => {
-        return col.baseColumn.name;
-      }),
-    ).toEqual(["region", "total"]);
+    expect(restored.map(prop("baseColumn.name"))).toEqual(["region", "total"]);
   });
 
   it("follows the URL's ordering, not the source schema's", () => {
@@ -59,11 +90,7 @@ describe("getRestoredColumnsFromUrl", () => {
       entityFieldConfigs: undefined,
     });
 
-    expect(
-      restored.map((col) => {
-        return col.baseColumn.name;
-      }),
-    ).toEqual(["total", "region"]);
+    expect(restored.map(prop("baseColumn.name"))).toEqual(["total", "region"]);
   });
 
   it("drops a name that no longer matches a column and keeps the rest", () => {
@@ -76,11 +103,7 @@ describe("getRestoredColumnsFromUrl", () => {
       entityFieldConfigs: undefined,
     });
 
-    expect(
-      restored.map((col) => {
-        return col.baseColumn.name;
-      }),
-    ).toEqual(["region", "total"]);
+    expect(restored.map(prop("baseColumn.name"))).toEqual(["region", "total"]);
   });
 
   it("returns nothing when the URL named no columns", () => {

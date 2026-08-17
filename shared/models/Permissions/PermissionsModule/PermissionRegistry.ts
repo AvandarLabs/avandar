@@ -63,6 +63,12 @@ export const PermissionRegistry = {
       "dashboards__can_view_dashboard",
       "dashboards__can_edit_dashboard",
       "dashboards__can_manage_dashboards",
+      // Server-side counterpart:
+      // util__auth_user_meets_min_app_role(workspace_id, 'dashboards',
+      // 'admin'), enforced by tr__dashboards__enforce_publish_publicly. Keep
+      // the two in step: this registry is a UI catalog and grants nothing on
+      // its own.
+      "dashboards__can_publish_publicly",
     ] as const,
   },
   gis: {

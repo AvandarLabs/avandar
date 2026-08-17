@@ -107,13 +107,20 @@ describe("buildChatSystemContent", () => {
   });
 
   it("appends the retry note to every surface", () => {
-    const generic = buildChatSystemContent({
-      ...BASE,
-      isDataExplorer: false,
-      isDashboards: false,
-      retryContextNote: "\n\nRETRY_NOTE",
-    });
+    // All three arms, so moving the note inside one of them fails here.
+    const surfaces = [
+      { isDataExplorer: true, isDashboards: false },
+      { isDataExplorer: false, isDashboards: true },
+      { isDataExplorer: false, isDashboards: false },
+    ] as const;
 
-    expect(generic.endsWith("\n\nRETRY_NOTE")).toBe(true);
+    surfaces.forEach((surface) => {
+      const content = buildChatSystemContent({
+        ...BASE,
+        ...surface,
+        retryContextNote: "\n\nRETRY_NOTE",
+      });
+      expect(content.endsWith("\n\nRETRY_NOTE")).toBe(true);
+    });
   });
 });

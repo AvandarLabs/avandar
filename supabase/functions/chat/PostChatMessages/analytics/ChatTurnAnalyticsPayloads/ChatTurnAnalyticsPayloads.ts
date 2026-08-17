@@ -46,57 +46,53 @@ function _classifyError(error: unknown): ChatTurnErrorClass {
   );
 }
 
-function _fromCompletedTurn(
-  options: Readonly<{
-    modelId: string;
-    latencyMs: number;
-    attemptCount: number;
-    promptChars: number;
-    schemaDatasetCount: number;
-    assistantText: string;
-    parsed: ParsedAttempt;
-  }>,
-): AnalyticsEventPayloads["chat.turn_completed"] {
-  return {
-    modelId: options.modelId,
-    latencyMs: Math.round(options.latencyMs),
-    attemptCount: options.attemptCount,
-    outcome: _classifyOutcome(options.parsed),
-    promptChars: options.promptChars,
-    responseChars: options.assistantText.length,
-    schemaDatasetCount: options.schemaDatasetCount,
-    // Nothing retains chat samples yet, so no turn is ever sampled and no
-    // severity is assessed.
-    wasSampled: false,
-  };
-}
-
-function _fromFailedTurn(
-  options: Readonly<{
-    modelId: string;
-    latencyMs: number;
-    error: unknown;
-  }>,
-): AnalyticsEventPayloads["chat.turn_failed"] {
-  return {
-    modelId: options.modelId,
-    errorClass: _classifyError(options.error),
-    latencyMs: Math.round(options.latencyMs),
-  };
-}
-
 /** Privacy-safe payload builders for server-side chat turn analytics. */
 export const ChatTurnAnalyticsPayloads = {
   /**
    * Builds the `chat.turn_completed` payload for a turn that produced a
    * response.
    */
-  fromCompletedTurn: _fromCompletedTurn,
+  fromCompletedTurn: (
+    options: Readonly<{
+      modelId: string;
+      latencyMs: number;
+      attemptCount: number;
+      promptChars: number;
+      schemaDatasetCount: number;
+      assistantText: string;
+      parsed: ParsedAttempt;
+    }>,
+  ): AnalyticsEventPayloads["chat.turn_completed"] => {
+    return {
+      modelId: options.modelId,
+      latencyMs: Math.round(options.latencyMs),
+      attemptCount: options.attemptCount,
+      outcome: _classifyOutcome(options.parsed),
+      promptChars: options.promptChars,
+      responseChars: options.assistantText.length,
+      schemaDatasetCount: options.schemaDatasetCount,
+      // Nothing retains chat samples yet, so no turn is ever sampled and no
+      // severity is assessed.
+      wasSampled: false,
+    };
+  },
 
   /**
    * Builds the `chat.turn_failed` payload. Records only the classification,
    * never the message: provider error bodies can echo the request, and the
    * message must never carry prompt text into an analytics payload.
    */
-  fromFailedTurn: _fromFailedTurn,
+  fromFailedTurn: (
+    options: Readonly<{
+      modelId: string;
+      latencyMs: number;
+      error: unknown;
+    }>,
+  ): AnalyticsEventPayloads["chat.turn_failed"] => {
+    return {
+      modelId: options.modelId,
+      errorClass: _classifyError(options.error),
+      latencyMs: Math.round(options.latencyMs),
+    };
+  },
 };

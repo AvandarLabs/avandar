@@ -21,6 +21,8 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy={false}
         workspaceShareRole={null}
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
@@ -43,6 +45,8 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy={false}
         workspaceShareRole="viewer"
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
@@ -60,6 +64,8 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy={false}
         workspaceShareRole="viewer"
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
@@ -79,6 +85,8 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy={false}
         workspaceShareRole="viewer"
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
@@ -96,6 +104,8 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy={false}
         workspaceShareRole={null}
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
@@ -115,10 +125,94 @@ describe("ShareGeneralAccess", () => {
         isOwner
         isBusy
         workspaceShareRole={null}
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
         onChange={vi.fn()}
         onWorkspaceRoleChange={vi.fn()}
       />,
     );
     expect(findComboboxByAriaLabel("General access")).toBeDisabled();
+  });
+
+  it("selects Anyone with the link when the value is public", () => {
+    render(
+      <ShareGeneralAccess
+        resourceType="dashboard"
+        value="public"
+        isOwner
+        isBusy={false}
+        workspaceShareRole={null}
+        isPublicOptionAvailable
+        publicOptionDisabledReason={undefined}
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(findComboboxByAriaLabel("General access")).toHaveValue(
+      "Anyone with the link",
+    );
+  });
+
+  it("keeps the workspace-role picker hidden for the public value", () => {
+    // The role picker configures the workspace share row, which "Anyone with
+    // the link" does not write. Rendering it would imply public viewers get a
+    // role, and they get no row at all.
+    render(
+      <ShareGeneralAccess
+        resourceType="dashboard"
+        value="public"
+        isOwner
+        isBusy={false}
+        workspaceShareRole="viewer"
+        isPublicOptionAvailable
+        publicOptionDisabledReason={undefined}
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(
+      findComboboxByAriaLabel("Role for everyone in the workspace"),
+    ).toBeUndefined();
+  });
+
+  it("explains why the public option is unavailable", () => {
+    render(
+      <ShareGeneralAccess
+        resourceType="dashboard"
+        value="restricted"
+        isOwner
+        isBusy={false}
+        workspaceShareRole={null}
+        isPublicOptionAvailable
+        publicOptionDisabledReason="Only workspace admins can publish to the web."
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByText("Only workspace admins can publish to the web."),
+    ).toBeInTheDocument();
+  });
+
+  it("does not render the reason when the public option is unavailable", () => {
+    // Reaching this state (a reason with no available option) should not
+    // happen in practice, but nothing in the types prevents it, so the
+    // reason must stay hidden if it does.
+    render(
+      <ShareGeneralAccess
+        resourceType="dashboard"
+        value="restricted"
+        isOwner
+        isBusy={false}
+        workspaceShareRole={null}
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason="Only workspace admins can publish to the web."
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.queryByText("Only workspace admins can publish to the web."),
+    ).not.toBeInTheDocument();
   });
 });

@@ -8,7 +8,6 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import type {
   AnalyticsApp,
   QueryAnalyticsSurface,
-  QueryAnalyticsTrigger,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -17,8 +16,8 @@ import type { RefObject } from "react";
 /**
  * The parts of the query observer the emitter reads.
  *
- * Narrowed to exactly these three so a caller cannot be misread as supplying
- * the result data: the payload is built from the run's own record instead.
+ * Narrowed to exactly these two so a caller cannot be misread as supplying the
+ * run's own facts: every payload field is built from the run record instead.
  */
 export type QueryAnalyticsObserverState = Pick<
   UseQueryResult<QueryResult.T<UnknownRow>>,
@@ -46,21 +45,26 @@ function _getAppFromSurface(surface: QueryAnalyticsSurface): AnalyticsApp {
  *
  * `query.ran` is deliberately restricted to the Data Explorer. A dashboard
  * with twelve blocks would otherwise report twelve queries per page view.
- * Failures are recorded from every authenticated surface, because a broken
- * published dashboard is always worth knowing about.
+ *
+ * Failures are recorded from workspace-authenticated surfaces only. Both
+ * snapshot modes (`public` and `workspace_published`) identify themselves by
+ * dashboard rather than workspace, so there is no workspace to attribute their
+ * events to and they record nothing, even though `workspace_published` does
+ * carry a session.
  */
 export function useDataQueryAnalytics(
   options: Readonly<{
     surface: QueryAnalyticsSurface;
-    trigger: QueryAnalyticsTrigger;
-    /** Undefined on public pages, which have no session to attribute. */
+    /**
+     * Undefined on both snapshot modes, which identify themselves by dashboard
+     * and so have no workspace to attribute an event to.
+     */
     workspaceId: Workspace.Id | undefined;
     runMetadataRef: RefObject<DataQueryRunMetadata | undefined>;
     queryResult: QueryAnalyticsObserverState;
   }>,
 ): void {
-  const { surface, trigger, workspaceId, runMetadataRef, queryResult } =
-    options;
+  const { surface, workspaceId, runMetadataRef, queryResult } = options;
   const lastEmittedRunIdRef = useRef<number | undefined>(undefined);
   const { status, fetchStatus } = queryResult;
 
@@ -98,8 +102,7 @@ export function useDataQueryAnalytics(
           app: _getAppFromSurface(surface),
           payload: QueryAnalyticsPayloads.fromError({
             surface,
-            trigger,
-            error: runMetadata.error,
+            runMetadata,
           }),
         });
         return;
@@ -117,12 +120,9 @@ export function useDataQueryAnalytics(
         // Built entirely from the run's own record. Reading the row and column
         // counts off the observer would pair them with whichever query is
         // backing `data` now, which is not necessarily the one that just ran.
-        payload: QueryAnalyticsPayloads.fromResult({
-          trigger,
-          runMetadata,
-        }),
+        payload: QueryAnalyticsPayloads.fromResult({ runMetadata }),
       });
     },
-    [status, fetchStatus, workspaceId, surface, trigger, runMetadataRef],
+    [status, fetchStatus, workspaceId, surface, runMetadataRef],
   );
 }

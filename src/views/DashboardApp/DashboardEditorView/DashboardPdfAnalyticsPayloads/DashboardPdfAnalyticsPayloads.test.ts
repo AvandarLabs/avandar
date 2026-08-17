@@ -14,6 +14,9 @@ function _makeDashboard(blockCount: number): Dashboard.T {
     slug: undefined,
     description: undefined,
     isPublic: false,
+    // Unpublished, matching `isPublic: false` and the absent slug. Export is
+    // reachable from the editor regardless of publication state.
+    visibility: "draft",
     isRestricted: false,
     ownerId: "00000000-0000-4000-8000-000000000002" as Dashboard.T["ownerId"],
     ownerProfileId:

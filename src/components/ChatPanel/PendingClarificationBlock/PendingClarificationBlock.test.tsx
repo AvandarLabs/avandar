@@ -9,7 +9,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render } from "@/test-utils";
 import { PendingClarificationBlock } from "./PendingClarificationBlock";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
+import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -28,9 +28,8 @@ const {
     setPendingClarificationMock: vi.fn(),
     useStateMock: vi.fn(),
     clarificationCardHarness: {
-      onAnswer: undefined as
-        | ((answer: ClarificationSubmitAnswer) => void)
-        | undefined,
+      onAnswer: undefined as ClarificationAnswerHandler | undefined,
+      onRequestDifferentDiscovery: undefined as (() => void) | undefined,
     },
   };
 });
@@ -72,10 +71,14 @@ vi.mock("@/components/ChatPanel/ClarificationCard/ClarificationCard", () => {
   return {
     ClarificationCard: ({
       onAnswer,
+      onRequestDifferentDiscovery,
     }: {
-      onAnswer: (answer: ClarificationSubmitAnswer) => void;
+      onAnswer: ClarificationAnswerHandler;
+      onRequestDifferentDiscovery?: () => void;
     }) => {
       clarificationCardHarness.onAnswer = onAnswer;
+      clarificationCardHarness.onRequestDifferentDiscovery =
+        onRequestDifferentDiscovery;
       return <div>Clarification card</div>;
     },
   };
@@ -117,6 +120,7 @@ describe("PendingClarificationBlock", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clarificationCardHarness.onAnswer = undefined;
+    clarificationCardHarness.onRequestDifferentDiscovery = undefined;
     useStateMock.mockReturnValue({
       pendingClarification,
     });
@@ -151,8 +155,7 @@ describe("PendingClarificationBlock", () => {
 
     await act(async () => {
       await clarificationCardHarness.onAnswer?.({
-        kind: "preset",
-        value: "First",
+        answer: { kind: "preset", value: "First" },
       });
     });
 
@@ -160,6 +163,7 @@ describe("PendingClarificationBlock", () => {
       id: pendingClarification.auditId,
       outcome: "answered",
     });
+    expect(appendMock).toHaveBeenCalledWith("[Clarification answer: First]");
   });
 
   it("records cancellation with the pending audit id when boundary consent is rejected", async () => {
@@ -175,17 +179,82 @@ describe("PendingClarificationBlock", () => {
     });
     render(<PendingClarificationBlock />);
 
+    let wasSubmitted: boolean | void = undefined;
     await act(async () => {
-      await clarificationCardHarness.onAnswer?.({
-        kind: "custom",
-        text: "Sensitive answer",
+      wasSubmitted = await clarificationCardHarness.onAnswer?.({
+        answer: { kind: "custom", text: "Sensitive answer" },
       });
     });
 
+    expect(wasSubmitted).toBe(false);
     expect(decideIfDataCanCrossBoundary).toHaveBeenCalled();
     expect(ClarificationAuditEntryClient.recordOutcome).toHaveBeenCalledWith({
       id: pendingClarification.auditId,
       outcome: "cancelled",
+    });
+  });
+
+  it("unblocks the thread and requests a different lookup", async () => {
+    useStateMock.mockReturnValue({
+      pendingClarification: {
+        ...pendingClarification,
+        responseShape: {
+          kind: "discovery",
+          query: 'SELECT DISTINCT "state" FROM "mortality"',
+          column: "state",
+          multi: false,
+          candidateValues: ["California", "CA"],
+        },
+      },
+    });
+    render(<PendingClarificationBlock />);
+
+    await act(async () => {
+      await clarificationCardHarness.onRequestDifferentDiscovery?.();
+    });
+
+    expect(setPendingClarificationMock).toHaveBeenCalledWith(undefined);
+    expect(recordOutcomeMock).toHaveBeenCalledWith({
+      id: pendingClarification.auditId,
+      outcome: "cancelled",
+    });
+    expect(appendMock).toHaveBeenCalledWith(
+      expect.stringContaining("different column or lookup query"),
+    );
+  });
+
+  it("hides an accepted automatic discovery answer from presentation", async () => {
+    useStateMock.mockReturnValue({
+      pendingClarification: {
+        ...pendingClarification,
+        responseShape: {
+          kind: "discovery",
+          query: 'SELECT DISTINCT "state" FROM "mortality"',
+          column: "state",
+          multi: false,
+          candidateValues: ["California", "CA"],
+        },
+      },
+    });
+    decideIfDataCanCrossBoundaryMock.mockResolvedValue({
+      approved: true,
+      payload: { values: ["California"] },
+    });
+    render(<PendingClarificationBlock />);
+
+    await act(async () => {
+      await clarificationCardHarness.onAnswer?.({
+        answer: { kind: "preset", value: "California" },
+        isInternalDiscovery: true,
+      });
+    });
+
+    expect(appendMock).toHaveBeenCalledWith({
+      role: "user",
+      content: [{ type: "text", text: "[Clarification answer: California]" }],
+      metadata: {
+        custom: { isDiscoveryContinuation: true },
+      },
     });
   });
 });

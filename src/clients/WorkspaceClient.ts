@@ -224,6 +224,17 @@ export const WorkspaceClient = createUsableServiceClient(
 
           logger.log("Successfully removed member from workspace");
         },
+
+        deleteWorkspace: async (params: {
+          workspaceId: Workspace.Id;
+        }): Promise<{ deleted: true }> => {
+          const logger = clientLogger.appendName("deleteWorkspace");
+          logger.log("Deleting workspace", params);
+          return await APIClient.post({
+            route: "workspaces/:workspaceId/delete",
+            pathParams: { workspaceId: params.workspaceId },
+          });
+        },
       };
     },
   }),
@@ -233,6 +244,7 @@ export const WorkspaceClient = createUsableServiceClient(
       "validateWorkspaceSlug",
       "createWorkspaceWithOwner",
       "removeMember",
+      "deleteWorkspace",
     ],
   },
 );

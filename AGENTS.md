@@ -113,6 +113,16 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+- Always run `pnpm db:reset` immediately before `pnpm db:new-migration`, so the
+  diff is taken against a database built only from this branch's migrations.
+  All worktrees share one local Supabase instance unless it has been switched,
+  so the running database may carry objects created by a branch you are not on.
+  `supabase db diff` compares the live database against `supabase/schemas/`, so
+  any such object looks like something the declarative schema no longer wants,
+  and the generated migration silently includes a `drop` for it. Committing
+  that migration deletes another branch's work, or production's, when it runs.
+  A generated migration that drops anything you did not touch is this bug until
+  proven otherwise: reset, regenerate, and compare before trusting it.
 - Before any database migration or schema work on a branch other than
   `develop`, create an isolated local Supabase instance with
   `ava supabase switch <temporary-project-id>`, even when no local Supabase

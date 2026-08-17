@@ -23,7 +23,7 @@ import {
 } from "@tabler/icons-react";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";

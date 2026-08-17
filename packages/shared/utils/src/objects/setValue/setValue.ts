@@ -1,8 +1,9 @@
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
+import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
-import type { Paths, UnknownArray } from "type-fest";
+import type { UnknownArray } from "type-fest";
 
 /**
  * Sets the value of a property at a given key path.
@@ -14,13 +15,13 @@ import type { Paths, UnknownArray } from "type-fest";
  */
 export function setValue<
   T extends UnknownObject | UnknownArray,
-  // We need to use this ternary expression on `K` because Paths<> returns
-  // `never` on a record. E.g. Paths<string, string> = never.
-  // So if `Paths<>` can't compute a set of paths, we can fall back
+  // We need to use this ternary expression on `K` because ObjectPaths<> returns
+  // `never` on a record. E.g. ObjectPaths<string, string> = never.
+  // So if `ObjectPaths<>` can't compute a set of paths, we can fall back
   // to using `keyof T` which works fine for records.
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(obj: T, path: K, value: V): T {
   const fullPathAsString = String(path);

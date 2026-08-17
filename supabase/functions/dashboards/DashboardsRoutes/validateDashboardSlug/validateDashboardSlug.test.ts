@@ -15,4 +15,14 @@ describe("validateDashboardSlug", () => {
   it("accepts a lowercase kebab-case slug", () => {
     expect(validateDashboardSlug("public-health-2026")).toBeUndefined();
   });
+
+  it("rejects a UUID-shaped slug so it cannot shadow a dashboard id", () => {
+    expect(
+      validateDashboardSlug("550e8400-e29b-41d4-a716-446655440000"),
+    ).toEqual({ isValid: false, reason: "reserved" });
+  });
+
+  it("still accepts a slug that merely contains hex and hyphens", () => {
+    expect(validateDashboardSlug("q3-2026-revenue")).toBeUndefined();
+  });
 });

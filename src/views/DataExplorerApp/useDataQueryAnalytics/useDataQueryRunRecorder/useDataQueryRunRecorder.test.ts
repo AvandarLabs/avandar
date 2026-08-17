@@ -8,6 +8,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 
 describe("useDataQueryRunRecorder", () => {
   it("records nothing until a run finishes", () => {
@@ -15,6 +16,7 @@ describe("useDataQueryRunRecorder", () => {
       return useDataQueryRunRecorder({
         source: "rawSql",
         dataSourceType: "dataset",
+        trigger: "sql_submit",
       });
     });
 
@@ -26,6 +28,7 @@ describe("useDataQueryRunRecorder", () => {
       return useDataQueryRunRecorder({
         source: "structured",
         dataSourceType: "entity",
+        trigger: "sql_submit",
       });
     });
 
@@ -48,6 +51,7 @@ describe("useDataQueryRunRecorder", () => {
     expect(result.current.runMetadataRef.current).toEqual({
       runId: 1,
       durationMs: 75,
+      trigger: "sql_submit",
       outcome: "success",
       didAutoLimit: true,
       rowCount: 12,
@@ -62,6 +66,7 @@ describe("useDataQueryRunRecorder", () => {
       return useDataQueryRunRecorder({
         source: "rawSql",
         dataSourceType: "none",
+        trigger: "dataset_opened",
       });
     });
 
@@ -69,14 +74,50 @@ describe("useDataQueryRunRecorder", () => {
       result.current.beginRun()({
         outcome: "error",
         error: new Error("failed"),
+        isOffline: false,
       });
       result.current.beginRun()({
         outcome: "error",
         error: new Error("failed"),
+        isOffline: false,
       });
     });
 
     expect(result.current.runMetadataRef.current?.runId).toBe(2);
+  });
+
+  it("records the trigger the run started with, not the one in effect when it settled", () => {
+    // The Data Explorer stamps a new trigger on actions that leave the query
+    // key unchanged (a chat turn regenerating identical SQL, a no-op form
+    // edit). Those do not start a run, so reading the trigger at settle time
+    // would attribute this run to a later, unrelated user action.
+    const { rerender, result } = renderHook(
+      (props: { trigger: DataQueryRunMetadata["trigger"] }) => {
+        return useDataQueryRunRecorder({
+          source: "rawSql",
+          dataSourceType: "dataset",
+          trigger: props.trigger,
+        });
+      },
+      {
+        initialProps: {
+          trigger: "sql_submit" as DataQueryRunMetadata["trigger"],
+        },
+      },
+    );
+
+    const recordRun = result.current.beginRun();
+    rerender({ trigger: "chat_generated" });
+    act(() => {
+      recordRun({
+        outcome: "success",
+        didAutoLimit: false,
+        rowCount: 1,
+        columnCount: 1,
+      });
+    });
+
+    expect(result.current.runMetadataRef.current?.trigger).toBe("sql_submit");
   });
 
   it("does not let a superseded run overwrite the newer one", () => {
@@ -84,6 +125,7 @@ describe("useDataQueryRunRecorder", () => {
       return useDataQueryRunRecorder({
         source: "rawSql",
         dataSourceType: "dataset",
+        trigger: "sql_submit",
       });
     });
 

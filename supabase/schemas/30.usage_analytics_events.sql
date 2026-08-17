@@ -48,20 +48,11 @@ create table public.usage_analytics_events (
   app_version text
 );
 
-create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (
-  workspace_id,
-  created_at desc
-);
+create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (workspace_id, created_at desc);
 
-create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (
-  event_name,
-  created_at desc
-);
+create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (event_name, created_at desc);
 
-create index usage_analytics_events__event_category__created_at_idx on public.usage_analytics_events (
-  event_category,
-  created_at desc
-);
+create index usage_analytics_events__event_category__created_at_idx on public.usage_analytics_events (event_category, created_at desc);
 
 alter table public.usage_analytics_events enable row level security;
 
@@ -94,10 +85,7 @@ with
       select
         auth.uid ()
     ) and
-    client in (
-      'web',
-      'desktop'
-    ) and
+    client in ('web', 'desktop') and
     event_name in (
       'dataset.imported',
       'query.ran',
@@ -156,9 +144,7 @@ select
 --
 -- @param p_event_name: the event's stable name
 -- @returns: the event's funnel stage
-create or replace function public.util__analytics_event_category (
-  p_event_name text
-) returns public.usage_analytics_events__category as $$
+create or replace function public.util__analytics_event_category (p_event_name text) returns public.usage_analytics_events__category as $$
   select (
     case p_event_name
       -- acquisition

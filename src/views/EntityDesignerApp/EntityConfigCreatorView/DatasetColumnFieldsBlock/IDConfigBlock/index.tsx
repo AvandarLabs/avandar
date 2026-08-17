@@ -3,7 +3,7 @@ import { isDefined, makeObject, prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import type { EntityConfigFormType } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 
 type Props = {

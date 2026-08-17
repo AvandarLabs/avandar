@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { DataSourceMetadata } from "../DatasetImportForm";
+import { DataSourceMetadata } from "../DatasetImportForm.types";
 
 function _duckDbColumnsToImportedColumns(
   columns: DuckDbColumnSchema[],

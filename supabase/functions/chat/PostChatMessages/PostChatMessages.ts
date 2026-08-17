@@ -11,8 +11,8 @@ import {
   MAX_CLARIFICATIONS_PER_QUESTION,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import { buildChatToolConfig } from "@sbfn/chat/PostChatMessages/prompt/buildChatToolConfig.ts";
 import { buildRetryContextNote } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
 import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
@@ -146,7 +146,7 @@ export const PostChatMessages = POST({
         priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
       Object.assign(
         requestBody,
-        buildChatToolConfig({
+        makeChatToolConfigFromOptions({
           isDataExplorer,
           isDashboards,
           clarificationCapReached,

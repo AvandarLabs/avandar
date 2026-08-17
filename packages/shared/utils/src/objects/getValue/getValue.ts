@@ -1,21 +1,22 @@
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
+import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
-import type { Paths, UnknownArray } from "type-fest";
+import type { UnknownArray } from "type-fest";
 
 /**
  * Gets the type of a value from an object given a key path in
  * dot notation.
  */
-export type PathValue<T, P extends Paths<T>> =
+export type PathValue<T, P extends ObjectPaths<T>> =
   P extends `${infer K}.${infer Rest}` ?
     K extends keyof T ?
-      Rest extends Paths<T[K]> ?
+      Rest extends ObjectPaths<T[K]> ?
         PathValue<T[K], Rest>
       : never
     : K extends `${number}` ?
       T extends UnknownArray ?
-        Rest extends Paths<T[number]> ?
+        Rest extends ObjectPaths<T[number]> ?
           PathValue<T[number], Rest>
         : never
       : never
@@ -45,23 +46,23 @@ export type PathValue<T, P extends Paths<T>> =
  */
 export function getValue<
   T extends object,
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(obj: T, path: K, options?: { throwError?: true }): V;
 export function getValue<
   T extends object,
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(obj: T, path: K, options: { throwError: false }): V | undefined;
 export function getValue<
   T extends object,
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(obj: T, path: K, options?: { throwError?: boolean }): V | undefined {
   const fullPathAsString = String(path);

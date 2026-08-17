@@ -37,9 +37,10 @@ export function useDataQueryRunRecorder(
   options: Readonly<{
     source: DataQueryRunMetadata["source"];
     dataSourceType: DataQueryRunMetadata["dataSourceType"];
+    trigger: DataQueryRunMetadata["trigger"];
   }>,
 ): DataQueryRunRecorder {
-  const { source, dataSourceType } = options;
+  const { source, dataSourceType, trigger } = options;
   // A ref rather than state on purpose: writing this must not re-render, and
   // the settle that follows re-renders anyway.
   const runMetadataRef = useRef<DataQueryRunMetadata | undefined>(undefined);
@@ -63,6 +64,12 @@ export function useDataQueryRunRecorder(
         durationMs: performance.now() - startedAt,
         source,
         dataSourceType,
+        // This closure was built by the `beginRun()` that started the run, so
+        // it holds that render's trigger. The Data Explorer stamps a new
+        // trigger on actions that leave the query key unchanged, so reading
+        // the current one at settle time would attribute this run to a later,
+        // unrelated user action.
+        trigger,
         ...outcome,
       };
     };

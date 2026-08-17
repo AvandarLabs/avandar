@@ -1303,7 +1303,8 @@ set local role postgres;
 
 -- A dashboard owned by bob, restricted, with zero shares: private to bob.
 insert into public.dashboards (
-  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
 )
 values (
   '90005090-0000-4000-8000-000000000090'::uuid,
@@ -1317,12 +1318,14 @@ values (
   'bob private dashboard',
   '{}'::jsonb,
   true,
-  false
+  'draft',
+  null
 );
 
 -- Same, but public. Public is never private (spec 4.2).
 insert into public.dashboards (
-  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
 )
 values (
   '90005091-0000-4000-8000-000000000091'::uuid,
@@ -1336,7 +1339,8 @@ values (
   'bob public restricted dashboard',
   '{}'::jsonb,
   true,
-  true
+  'public',
+  '90005191-0000-4000-8000-000000000091'::uuid
 );
 
 -- Make alice a Settings Admin so the short-circuit is the grant under test.

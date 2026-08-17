@@ -1,4 +1,5 @@
 import { isDefined } from "@avandar/utils";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
@@ -54,5 +55,13 @@ export async function applyChatTurnResponse(
     : undefined,
   ].filter(isDefined);
 
-  return { content: assistantParts };
+  const isDiscoveryContinuation =
+    response.clarification?.responseShape.kind === "discovery";
+
+  return {
+    content: assistantParts,
+    ...(isDiscoveryContinuation ?
+      { metadata: DiscoveryContinuationMessage.metadata }
+    : {}),
+  };
 }

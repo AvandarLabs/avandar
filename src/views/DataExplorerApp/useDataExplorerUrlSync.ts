@@ -1,7 +1,7 @@
 import { where } from "@avandar/utils";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
@@ -39,7 +39,7 @@ type Options = {
  *   its default empty state, the hook restores data source, column
  *   selections, aggregations, order-by, raw SQL, and viz config from the URL
  *   params. If `sql` is present in the URL, only raw SQL (plus viz / open
- *   dataset) is applied — `ds` and `cols` are ignored so a stale Manual Query
+ *   dataset) is applied: `ds` and `cols` are ignored so a stale Manual Query
  *   cannot block restore or conflict with the SQL text. The SQL is parsed with
  *   `sqlToStructuredQuery` once workspace dataset metadata has loaded so the
  *   Manual Query form is prefilled. Column objects are re-fetched via TanStack
@@ -60,7 +60,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     return parseUrlSearch(urlSearch);
   }, [urlSearch]);
 
-  // Data source lookup — these are already fetched by QueryDataSourceSelect
+  // Data source lookup. These are already fetched by QueryDataSourceSelect
   // so TanStack Query will return cached results with no extra network call.
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -82,7 +82,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     (urlState.colNames?.length ?? 0) > 0 && Boolean(urlState.dsId);
 
   /**
-   * When the URL has `sql`, it wins — do not restore `ds` / cols from URL.
+   * When the URL has `sql`, it wins: do not restore `ds` / cols from URL.
    */
   const restoreStructuredFromUrl = !urlState.rawSql;
 
@@ -125,7 +125,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
 
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Decide once — on the very first render — whether we should hydrate from
+  // Decide once, on the very first render, whether we should hydrate from
   // the URL. Using a ref prevents dispatched state changes from re-triggering
   // the bail-out check mid-hydration (which would cause columns and viz config
   // to never be restored after setDataSource fires).
@@ -259,7 +259,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setOpenDataset(urlState.openDataset);
         }
 
-        // Restore viz config last — may overwrite the result of
+        // Restore viz config last: may overwrite the result of
         // hydrateFromQuery that setColumns triggered above.
         if (urlState.vizConfig) {
           dispatch.setVizConfig(urlState.vizConfig);

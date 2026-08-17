@@ -5,9 +5,29 @@
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { QueryAnalyticsPayloads } from "@/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads";
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 
-function _setOnline(isOnline: boolean): void {
-  vi.spyOn(navigator, "onLine", "get").mockReturnValue(isOnline);
+/**
+ * A failed run as the query function records it. `isOffline` is captured in
+ * the `catch`, not read at emit time, so it is part of the fixture.
+ */
+function _failedRun(
+  error: unknown,
+  options: Readonly<{
+    trigger?: DataQueryRunMetadata["trigger"];
+    isOffline?: boolean;
+  }> = {},
+): Extract<DataQueryRunMetadata, { outcome: "error" }> {
+  return {
+    runId: 1,
+    durationMs: 10,
+    source: "rawSql",
+    dataSourceType: "dataset",
+    trigger: options.trigger ?? "sql_submit",
+    outcome: "error",
+    error,
+    isOffline: options.isOffline ?? false,
+  };
 }
 
 afterEach(() => {
@@ -17,8 +37,8 @@ afterEach(() => {
 describe("QueryAnalyticsPayloads.fromResult", () => {
   it("reports the result size and timing the run itself recorded", () => {
     const payload = QueryAnalyticsPayloads.fromResult({
-      trigger: "sql_submit",
       runMetadata: {
+        trigger: "sql_submit",
         runId: 3,
         durationMs: 128.6,
         outcome: "success",
@@ -43,8 +63,8 @@ describe("QueryAnalyticsPayloads.fromResult", () => {
 
   it("rounds a sub-millisecond duration down to zero", () => {
     const payload = QueryAnalyticsPayloads.fromResult({
-      trigger: "structured_change",
       runMetadata: {
+        trigger: "structured_change",
         runId: 1,
         durationMs: 0.4,
         outcome: "success",
@@ -62,12 +82,12 @@ describe("QueryAnalyticsPayloads.fromResult", () => {
 
 describe("QueryAnalyticsPayloads.fromError", () => {
   it("classifies a missing column before a missing table", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        'Binder Error: Referenced column "revenu" not found in FROM clause!',
+      runMetadata: _failedRun(
+        new Error(
+          'Binder Error: Referenced column "revenu" not found in FROM clause!',
+        ),
       ),
     });
 
@@ -78,23 +98,24 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("classifies a missing table", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "dashboard_block",
-      trigger: "block_render",
-      error: new Error("Catalog Error: Table with name orders does not exist!"),
+      runMetadata: _failedRun(
+        new Error("Catalog Error: Table with name orders does not exist!"),
+        { trigger: "block_render" },
+      ),
     });
 
     expect(payload.errorClass).toBe("missing_table");
   });
 
   it("classifies a missing view, which DuckDB reports as a missing table", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        "Catalog Error: Table with name v_active_users does not exist!",
+      runMetadata: _failedRun(
+        new Error(
+          "Catalog Error: Table with name v_active_users does not exist!",
+        ),
       ),
     });
 
@@ -102,12 +123,10 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("classifies a qualified reference to a column that does not exist", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        'Binder Error: Table "t" does not have a column named "ssn"',
+      runMetadata: _failedRun(
+        new Error('Binder Error: Table "t" does not have a column named "ssn"'),
       ),
     });
 
@@ -115,12 +134,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("does not call an ambiguous column reference a missing one", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        'Binder Error: Ambiguous reference to column name "id" (use: "t.id" or "t2.id")',
+      runMetadata: _failedRun(
+        new Error(
+          'Binder Error: Ambiguous reference to column name "id" (use: "t.id" or "t2.id")',
+        ),
       ),
     });
 
@@ -128,12 +147,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("does not call a missing function a missing table", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        "Catalog Error: Scalar Function with name lower2 does not exist!",
+      runMetadata: _failedRun(
+        new Error(
+          "Catalog Error: Scalar Function with name lower2 does not exist!",
+        ),
       ),
     });
 
@@ -141,66 +160,71 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("classifies a connection timeout", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "structured_change",
-      error: new Error("IO Error: Connection to server timed out"),
+      runMetadata: _failedRun(
+        new Error("IO Error: Connection to server timed out"),
+        { trigger: "structured_change" },
+      ),
     });
 
     expect(payload.errorClass).toBe("timeout");
   });
 
   it("classifies a parser error as syntax", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error('Parser Error: syntax error at or near "SELCT"'),
+      runMetadata: _failedRun(
+        new Error('Parser Error: syntax error at or near "SELCT"'),
+      ),
     });
 
     expect(payload.errorClass).toBe("syntax");
   });
 
   it("classifies a denied read as permission", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "viz_config",
-      trigger: "block_render",
-      error: new Error("permission denied for table datasets"),
+      runMetadata: _failedRun(
+        new Error("permission denied for table datasets"),
+        { trigger: "block_render" },
+      ),
     });
 
     expect(payload.errorClass).toBe("permission");
   });
 
   it("classifies a failed fetch as network", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "structured_change",
-      error: new TypeError("Failed to fetch"),
+      runMetadata: _failedRun(new TypeError("Failed to fetch"), {
+        trigger: "structured_change",
+      }),
     });
 
     expect(payload.errorClass).toBe("network");
   });
 
   it("classifies anything unrecognised as unknown", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "structured_change",
-      error: new Error("something went sideways"),
+      runMetadata: _failedRun(new Error("something went sideways"), {
+        trigger: "structured_change",
+      }),
     });
 
     expect(payload.errorClass).toBe("unknown");
   });
 
   it("reports offline first, whatever the message says", () => {
-    _setOnline(false);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "structured_change",
-      error: new Error('Parser Error: syntax error at or near "SELCT"'),
+      // A message that a rule would otherwise claim, recorded while offline.
+      // Both rules match this fixture, so the assertion pins which one wins.
+      runMetadata: _failedRun(
+        new Error('Parser Error: syntax error at or near "SELCT"'),
+        { trigger: "structured_change", isOffline: true },
+      ),
     });
 
     expect(payload.errorClass).toBe("offline");
@@ -208,12 +232,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("drops the SQL echo DuckDB appends to parser errors", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        'Parser Error: syntax error at or near "SELCT"\nLINE 1: SELCT ssn FROM patients\n        ^',
+      runMetadata: _failedRun(
+        new Error(
+          'Parser Error: syntax error at or near "SELCT"\nLINE 1: SELCT ssn FROM patients\n        ^',
+        ),
       ),
     });
 
@@ -224,12 +248,10 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("drops a single-line SQL echo too", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        "Parser Error: bad token LINE 1: SELECT ssn FROM people",
+      runMetadata: _failedRun(
+        new Error("Parser Error: bad token LINE 1: SELECT ssn FROM people"),
       ),
     });
 
@@ -237,12 +259,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("masks quoted customer values", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        "Conversion Error: Could not convert string 'jane@acme.com' to INT",
+      runMetadata: _failedRun(
+        new Error(
+          "Conversion Error: Could not convert string 'jane@acme.com' to INT",
+        ),
       ),
     });
 
@@ -252,12 +274,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("masks a quoted value containing an apostrophe, which unbalances naive pairing", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        "Conversion Error: Could not convert string 'O'Brien' to INT",
+      runMetadata: _failedRun(
+        new Error(
+          "Conversion Error: Could not convert string 'O'Brien' to INT",
+        ),
       ),
     });
 
@@ -268,12 +290,12 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("masks the value DuckDB puts in a duplicate-key message", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        'Constraint Error: Duplicate key "email: jane@acme.com" violates unique constraint.',
+      runMetadata: _failedRun(
+        new Error(
+          'Constraint Error: Duplicate key "email: jane@acme.com" violates unique constraint.',
+        ),
       ),
     });
 
@@ -283,23 +305,40 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("masks the value PostgREST puts in a unique-violation message", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error("Key (email)=(jane@acme.com) already exists."),
+      runMetadata: _failedRun(
+        new Error("Key (email)=(jane@acme.com) already exists."),
+      ),
     });
 
     expect(payload.errorMessage).toBe("Key (?)=(?) already exists.");
   });
 
-  it("masks a constraint value whose text contains an apostrophe", () => {
-    _setOnline(true);
+  it("masks a parenthesised value that itself contains an apostrophe", () => {
+    // Pins the parenthesis half of the mask ordering. Under the reversed
+    // order the greedy single-quote mask eats the closing paren first, so the
+    // parenthesis rule stops matching and the customer value survives.
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(
-        `Constraint Error: Duplicate key "name: O'Brien" violates unique constraint 'uq_customer_name'`,
+      runMetadata: _failedRun(
+        new Error(
+          "Constraint Error: Key (name)=(O'Brien) violates unique constraint 'uq_name'",
+        ),
+      ),
+    });
+
+    expect(payload.errorMessage).not.toContain("O'Brien");
+    expect(payload.errorMessage).not.toContain("Brien");
+  });
+
+  it("masks a constraint value whose text contains an apostrophe", () => {
+    const payload = QueryAnalyticsPayloads.fromError({
+      surface: "data_explorer",
+      runMetadata: _failedRun(
+        new Error(
+          `Constraint Error: Duplicate key "name: O'Brien" violates unique constraint 'uq_customer_name'`,
+        ),
       ),
     });
 
@@ -310,44 +349,40 @@ describe("QueryAnalyticsPayloads.fromError", () => {
   });
 
   it("masks long digit runs that could be an identifier or an account number", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error("Constraint Error: duplicate key 4111111111111111"),
+      runMetadata: _failedRun(
+        new Error("Constraint Error: duplicate key 4111111111111111"),
+      ),
     });
 
     expect(payload.errorMessage).toBe("Constraint Error: duplicate key ?");
   });
 
   it("keeps double-quoted identifiers, which are schema rather than data", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error('Binder Error: Referenced column "revenu" not found'),
+      runMetadata: _failedRun(
+        new Error('Binder Error: Referenced column "revenu" not found'),
+      ),
     });
 
     expect(payload.errorMessage).toContain('"revenu"');
   });
 
   it("truncates a very long message to 500 characters", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: new Error(`Error: ${"x".repeat(900)}`),
+      runMetadata: _failedRun(new Error(`Error: ${"x".repeat(900)}`)),
     });
 
     expect(payload.errorMessage).toHaveLength(500);
   });
 
   it("handles a thrown non-Error without crashing", () => {
-    _setOnline(true);
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
-      trigger: "sql_submit",
-      error: "just a string",
+      runMetadata: _failedRun("just a string"),
     });
 
     expect(payload.errorMessage).toBe("just a string");

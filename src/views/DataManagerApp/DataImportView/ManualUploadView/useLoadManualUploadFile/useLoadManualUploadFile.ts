@@ -19,7 +19,7 @@ import { notifyError } from "@/utils/notifications/notify";
 import {
   BaseLoadResult,
   ManualUploadDataSourceMetadata,
-} from "../../DatasetImportForm/DatasetImportForm";
+} from "../../DatasetImportForm/DatasetImportForm.types";
 import {
   CsvParseOptions,
   XlsxParseOptions,

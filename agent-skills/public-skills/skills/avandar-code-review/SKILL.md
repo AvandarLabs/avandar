@@ -579,6 +579,11 @@ Check these first because they are the most frequent review findings:
 - Functions should stay short, ideally 45 lines or fewer.
 - If a function is getting too long or contains reusable logic, extract a
   utility function.
+- Avoid unnecessary indirection: when a member or helper is small, used once,
+  or consists of a single statement, inline it into the containing object or
+  use site instead of extracting a separate constant or top-level function.
+  Extract it when reuse, meaningful naming, independent testing, or complex
+  logic makes the separate abstraction clearer.
 - **Treat a source file over 400 lines as monolithic and split it.** A file
   that long stops being one unit a reader can hold at once: unrelated
   concerns share a scroll buffer, every edit touches the same file, and the
@@ -659,11 +664,15 @@ Check these first because they are the most frequent review findings:
 - Avoid abbreviations unless the full word would create a naming collision.
   For example, prefer `value` over `val`.
 - Avoid vague placeholders like `next`, `prev`, or `n` without a business noun.
-- A function that turns one value into another must name both sides, using one
-  of four shapes: `[Receiver].to{Target}`, `[Receiver].from{Source}`,
-  `make{Target}From{Source}`, or `get{Target}From{Source}`. See the naming
-  rule in `docs/code-reviews/typescript-checklist.md` for the full rule,
-  including why `resolve...` is never one of them.
+- A function that turns one value into another must name both sides, counting
+  the receiver as part of the name. A receiver that is itself the source or the
+  target supplies that half, so the method drops it: `[Source].to{Target}`,
+  `[Source].get{Target}`, or `[Target].from{Source}`. Use `to` for a
+  conversion and `get` for a fetch, filter, or lookup. A receiver that names
+  neither side supplies nothing, so the method spells out both halves just as a
+  free function does: `make{Target}From{Source}` or `get{Target}From{Source}`.
+  See the naming rule in `docs/code-reviews/typescript-checklist.md` for the
+  full rule, including why `resolve...` is never one of them.
 - Prefer reusing existing repo-local helpers, first-party packages, or
   installed libraries over introducing bespoke local helpers when an
   equivalent shared abstraction already exists.

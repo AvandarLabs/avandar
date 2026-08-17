@@ -1,11 +1,11 @@
-import type { PathValue, UnknownObject } from "@avandar/utils";
+import type { ObjectPaths, PathValue, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import type {
   GetInputPropsOptions,
   GetInputPropsReturnType,
   GetKeyAndPropsFn,
 } from "@ui/hooks/useForm/useKeysAndPropsCallback";
-import type { Paths, Simplify } from "type-fest";
+import type { Simplify } from "type-fest";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
   P extends keyof FormValues,
@@ -29,7 +29,7 @@ type RemoveListItemFn<FormValues extends UnknownObject> = <
 export type FormType<
   FormValues extends UnknownObject,
   TransformedValues = FormValues,
-  FormPath extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 > = Simplify<
   Omit<
     MantineUseFormReturnType<FormValues, TransformedValues>,

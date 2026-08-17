@@ -1,13 +1,16 @@
 # Private dashboards - design (umbrella)
 
-**Status:** Draft for implementation
+**Status:** Complete. P1, P1.5, P2, P3 and P4 have all landed, which finishes
+the private-dashboards project. Each phase's own design document, named in the
+phase table in section 8, is the authority on what that phase shipped.
 **Author:** pablo@avandarlabs.com (brainstormed with Claude)
 **Date:** 2026-08-13
 **Related:** `docs/permissions-architecture.md`,
 `docs/superpowers/specs/2026-05-17-share-resource-modal-redesign-design.md`,
 `supabase/schemas/16.utils.resource-permissions.sql`,
 `src/components/permissions/ShareResourceModal/`,
-`src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/`
+`src/views/DashboardApp/DashboardShareModal/` (P3 replaced
+`DashboardEditorView/PublishDashboardModal/`, which no longer exists)
 
 > **This is an umbrella design.** The work is too large for one implementation
 > plan, so §8 decomposes it into five phases. Each phase gets its own spec,
@@ -562,15 +565,17 @@ Applies to datasets as well as dashboards: `ShareResourceModal` is shared, and
 
 ## 8. Phasing
 
-| Phase | Contents | Ships independently because |
-| --- | --- | --- |
-| **P1** Permissions hardening | F, I | It is a self-contained correctness change with no new product surface, and it makes "private" true before anything invites users to rely on it. Also makes P4's predicate exact (§4). |
-| **P1.5** The "Only me" control | J | Gives users a way to *ask for* the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2. |
-| **P2** Private publishing core | A, B, D | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal. |
-| **P3** Merged share surface | C, E, G | Flips the flag on. The Drive-style modal is the only way to *set* workspace visibility, so it lands after P2. |
-| **P4** Entitlements | H | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
+| Phase | Contents | Status | Ships independently because |
+| --- | --- | --- | --- |
+| **P1** Permissions hardening | F, I | Landed. `2026-08-13-private-resource-permissions-hardening-design.md` | It is a self-contained correctness change with no new product surface, and it makes "private" true before anything invites users to rely on it. Also makes P4's predicate exact (§4). |
+| **P1.5** The "Only me" control | J | Landed. `2026-08-13-private-dashboards-only-me-control-design.md` | Gives users a way to *ask for* the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2. |
+| **P2** Private publishing core | A, B, D | Landed. `2026-08-14-private-dashboards-publishing-core-design.md` | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal. |
+| **P3** Merged share surface | C, E, G | Landed. `2026-08-15-private-dashboards-merged-share-surface-design.md` | Flips the flag on. The Drive-style modal is the only way to *set* workspace visibility, so it lands after P2. |
+| **P4** Entitlements | H | Landed. `2026-08-16-private-dashboards-entitlement-enforcement-design.md` | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
 
-Each phase gets its own spec, plan, and implementation cycle.
+Each phase gets its own spec, plan, and implementation cycle. Phase specs live
+in `docs/superpowers/specs/`; where a phase spec and this document disagree,
+the phase spec is authoritative for the phase that landed it.
 
 ### 8.0 Why "Only me" is its own phase
 
@@ -673,8 +678,15 @@ None blocking. Deferred details, each to be settled in its phase spec:
   section within the existing Users tab (P1).
 - Exact copy for the "You need access" page, and whether it offers a
   request-access action (P2 ships the page; request-access is out of scope).
-- Whether `DashboardCard` badges need a filter control on the index once
-  shared dashboards appear there (P3).
+- ~~Whether `DashboardCard` badges need a filter control on the index once
+  shared dashboards appear there (P3).~~ **Settled by P3 (§6.3, D-P3-7): no
+  filter control.** `DashboardListView` has no search, sort, or pagination, so a
+  filter would be the view's first list affordance, added for a volume nobody
+  has hit. Badges plus owner-first ordering answer "which of these are mine".
+  Recorded tripwire for revisiting: a workspace where a typical member's index
+  exceeds roughly two screens, or the first user report of not being able to
+  find their own dashboard. Either one makes search the better first move, with
+  filter chips after it.
 
 ---
 

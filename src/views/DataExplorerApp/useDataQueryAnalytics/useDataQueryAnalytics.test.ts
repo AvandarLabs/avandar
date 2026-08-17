@@ -9,10 +9,7 @@ import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnaly
 import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type { QueryAnalyticsObserverState } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
 import type { RenderHookResult } from "@testing-library/react";
-import type {
-  QueryAnalyticsSurface,
-  QueryAnalyticsTrigger,
-} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { QueryAnalyticsSurface } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const { logEventMock } = vi.hoisted(() => {
@@ -29,6 +26,7 @@ const TEST_WORKSPACE_ID =
 const RUN_METADATA: DataQueryRunMetadata = {
   runId: 1,
   durationMs: 50,
+  trigger: "sql_submit",
   outcome: "success",
   didAutoLimit: false,
   rowCount: 7,
@@ -42,8 +40,10 @@ function _failedRun(error: unknown): DataQueryRunMetadata {
   return {
     runId: 1,
     durationMs: 50,
+    trigger: "sql_submit",
     outcome: "error",
     error,
+    isOffline: false,
     source: "rawSql",
     dataSourceType: "dataset",
   };
@@ -55,10 +55,9 @@ function _failedRun(error: unknown): DataQueryRunMetadata {
  */
 type FakeQueryResult = QueryAnalyticsObserverState;
 
-/** What a rerender may vary. A trigger can change with no new run behind it. */
+/** What a rerender may vary. */
 type AnalyticsRenderProps = {
   queryResult: FakeQueryResult;
-  trigger?: QueryAnalyticsTrigger;
 };
 
 function _renderAnalytics(
@@ -77,7 +76,6 @@ function _renderAnalytics(
     (props: AnalyticsRenderProps) => {
       return useDataQueryAnalytics({
         surface: options.surface ?? "data_explorer",
-        trigger: props.trigger ?? "sql_submit",
         workspaceId:
           "workspaceId" in options ? options.workspaceId : TEST_WORKSPACE_ID,
         runMetadataRef,
@@ -217,27 +215,6 @@ describe("useDataQueryAnalytics", () => {
     rerender({ queryResult: { ...settled } });
 
     expect(logEventMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not re-record the same run when only the trigger changes", () => {
-    const settled: FakeQueryResult = {
-      status: "success",
-      fetchStatus: "idle",
-    };
-    const { rerender } = _renderAnalytics({
-      runMetadata: RUN_METADATA,
-      queryResult: settled,
-    });
-
-    // The Data Explorer stamps the next trigger before the dispatch that
-    // changes the query, so this render happens with no run behind it. The
-    // previous run's timing must not be re-reported under the new trigger.
-    rerender({ queryResult: settled, trigger: "structured_change" });
-
-    expect(logEventMock).toHaveBeenCalledTimes(1);
-    expect(logEventMock.mock.calls[0]?.[0]?.payload?.trigger).toBe(
-      "sql_submit",
-    );
   });
 
   it("does not record query.ran for a dashboard block", () => {

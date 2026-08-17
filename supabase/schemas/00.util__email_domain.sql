@@ -12,9 +12,7 @@
 --
 -- @param p_email: an email address, or null
 -- @returns: the lower-cased domain, or null when there is not one
-create or replace function public.util__email_domain (
-  p_email text
-) returns text as $$
+create or replace function public.util__email_domain (p_email text) returns text as $$
   with normalized_email as (
     select lower(trim(p_email)) as value
   )
