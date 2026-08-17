@@ -16,11 +16,12 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
-  dataSource: CsvFileDataset.T | XlsxFileDataset.T;
+  dataSource: CsvFileDataset.T | PdfFileDataset.T | XlsxFileDataset.T;
 };
 
 /**

@@ -155,6 +155,9 @@ export function QueryDataSourceSelect({
         .with("xlsx_file", () => {
           return t`Excel files`;
         })
+        .with("pdf_file", () => {
+          return t`PDF files`;
+        })
         .exhaustive(() => {
           return undefined;
         });
