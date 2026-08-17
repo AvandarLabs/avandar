@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
+import { NuxEvents } from "@/components/Nux/nuxEvents";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError } from "@/utils/notifications/notify";
 import type { QueryKey } from "@tanstack/react-query";
@@ -29,6 +30,22 @@ export function useResourceShareMutations(
   const [upsertShare, isUpserting] = ResourceShareClient.useUpsertResourceShare(
     {
       queriesToInvalidate: invalidateKeys,
+      onSuccess: (_result, variables) => {
+        // Advances the onboarding tutorial's fourth and final milestone.
+        //
+        // Here rather than in `_applyWorkspaceAccess`, which calls this
+        // mutation without awaiting it: emitting there would tick the
+        // milestone off on a share that the shareable-dashboard limit is
+        // about to reject in `onError` below.
+        if (
+          variables.principalType === "workspace" &&
+          variables.resourceType === "dashboard"
+        ) {
+          NuxEvents.emit("dashboard.sharedToWorkspace", {
+            dashboardId: variables.resourceId,
+          });
+        }
+      },
       onError: (error: Error) => {
         // Adding the first non-owner reader to a published, self-only
         // dashboard makes it reachable by somebody else, which is exactly what

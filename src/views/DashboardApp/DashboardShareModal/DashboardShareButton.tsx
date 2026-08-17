@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
 import type { ButtonProps } from "@mantine/core";
@@ -78,6 +79,7 @@ export function DashboardShareButton({
   return (
     <Tooltip label={tooltip}>
       <Button
+        {...nuxAnchorProps(NuxAnchors.dashboardShareButton)}
         size={size}
         variant={isPublished ? "filled" : "default"}
         color={
