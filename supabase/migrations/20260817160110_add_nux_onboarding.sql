@@ -382,6 +382,6 @@ with check (((user_id = ( SELECT auth.uid() AS uid)) AND (client = ANY (ARRAY['w
   WHERE ((m.workspace_id = usage_analytics_events.workspace_id) AND (m.user_id = ( SELECT auth.uid() AS uid))))))));
 
 
-CREATE TRIGGER tr_user_nux_progress__set_updated_at BEFORE UPDATE ON public.user_nux_progress FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
+CREATE TRIGGER tr__user_nux_progress__set_updated_at BEFORE UPDATE ON public.user_nux_progress FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
 

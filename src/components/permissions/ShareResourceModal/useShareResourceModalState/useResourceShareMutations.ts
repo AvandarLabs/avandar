@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
-import { NuxEvents } from "@/components/Nux/nuxEvents";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError } from "@/utils/notifications/notify";
 import type { QueryKey } from "@tanstack/react-query";
@@ -31,7 +31,7 @@ export function useResourceShareMutations(
     {
       queriesToInvalidate: invalidateKeys,
       onSuccess: (_result, variables) => {
-        // Advances the onboarding tutorial's fourth and final milestone.
+        // Advances the onboarding tutorial's `share_dashboard` milestone.
         //
         // Here rather than in `_applyWorkspaceAccess`, which calls this
         // mutation without awaiting it: emitting there would tick the

@@ -2,7 +2,7 @@ import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Collapse } from "@mantine/core";
 import { useState } from "react";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
 import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
 import { DrawerHeight } from "@/views/DataExplorerApp/DataExplorerDrawer/DrawerHeight/DrawerHeight";
@@ -113,7 +113,7 @@ export function DataExplorerDrawer({
           // reaches this step, so the spotlight would cover everything
           // instead of the one control the tooltip is talking about.
           visualizations: (
-            <span {...nuxAnchorProps(NuxAnchors.explorerVizTab)}>
+            <span {...NuxAnchors.props(NuxAnchors.ids.explorerVizTab)}>
               {t`Visualizations`}
             </span>
           ),

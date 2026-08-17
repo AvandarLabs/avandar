@@ -13,26 +13,19 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconCheck, IconChevronRight, IconX } from "@tabler/icons-react";
-import { NUX_MILESTONE_KEYS } from "$/models/Nux/NuxProgress.constants";
-import { areAllMilestonesComplete } from "@/components/Nux/NuxStateManager/nuxSelectors";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import css from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";
+import { areAllMilestonesComplete } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
-import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
+import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import type { ReactNode } from "react";
-
-/**
- * A `msg` descriptor rather than a bare string: `i18n._("...")` on a literal
- * is invisible to the Lingui extractor, so the label would never reach the
- * catalogs and would ship untranslated.
- */
-const DISMISS_LABEL = msg`Dismiss the tutorial`;
 
 type Props = {
   /**
    * Routing lives with the caller, not here: the panel knows which milestone
    * was clicked, `NuxRoot` knows how to get there.
    */
-  onOpenMilestone: (key: NuxMilestoneKey) => void;
+  onOpenMilestone: (key: NuxProgress.MilestoneKey) => void;
 };
 
 /**
@@ -63,7 +56,7 @@ export function NuxChecklistPanel({
   }
 
   const completedCount = state.completedMilestones.length;
-  const total = NUX_MILESTONE_KEYS.length;
+  const totalMilestoneCount = NuxProgress.milestoneKeys.length;
 
   if (!state.isPanelExpanded) {
     return (
@@ -71,7 +64,7 @@ export function NuxChecklistPanel({
         pos="fixed"
         bottom={16}
         right={16}
-        style={{ zIndex: 300 }}
+        className={css.floatingSurface}
         size="compact-sm"
         rightSection={<IconChevronRight size={14} />}
         onClick={() => {
@@ -79,7 +72,7 @@ export function NuxChecklistPanel({
         }}
       >
         <Trans>
-          Get started {completedCount}/{total}
+          Get started {completedCount}/{totalMilestoneCount}
         </Trans>
       </Button>
     );
@@ -94,7 +87,7 @@ export function NuxChecklistPanel({
       bottom={16}
       right={16}
       w={320}
-      style={{ zIndex: 300 }}
+      className={css.floatingSurface}
     >
       <Stack gap="sm">
         <Group justify="space-between" wrap="nowrap">
@@ -102,14 +95,17 @@ export function NuxChecklistPanel({
             <Trans>Get started</Trans>
           </Title>
           <Group gap={4} wrap="nowrap">
-            <Text size="xs" c="dimmed">
-              {completedCount} / {total}
+            <Text size="xs" c="dimmed" data-testid="nux-checklist-progress">
+              {completedCount} / {totalMilestoneCount}
             </Text>
             <ActionIcon
               variant="subtle"
               color="neutral"
               size="sm"
-              aria-label={i18n._(DISMISS_LABEL)}
+              // A `msg` descriptor rather than a bare string: `i18n._("...")`
+              // on a literal is invisible to the Lingui extractor, so the
+              // label would never reach the catalogs.
+              aria-label={i18n._(msg`Dismiss the tutorial`)}
               onClick={() => {
                 dispatch.dismiss();
               }}

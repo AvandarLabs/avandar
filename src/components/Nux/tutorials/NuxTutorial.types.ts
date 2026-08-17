@@ -1,7 +1,7 @@
-import type { NuxAnchor } from "@/components/Nux/nuxAnchors";
-import type { NuxEventName } from "@/components/Nux/nuxEvents";
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
 import type { MessageDescriptor } from "@lingui/core";
-import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { Placement } from "react-joyride";
 
 /**
@@ -10,7 +10,7 @@ import type { Placement } from "react-joyride";
  * `dashboard_editor` routes using the id captured from `dashboard.created`.
  * It is needed because `SaveToDashboardModal` does NOT navigate on create: it
  * shows a toast with an "Open dashboard" link and closes itself, so after
- * milestone 3 the user is still standing in the Data Explorer.
+ * `build_dashboard` the user is still standing in the Data Explorer.
  */
 export type NuxMilestoneRoute =
   | { kind: "data_import" }
@@ -37,7 +37,7 @@ export type NuxStep = {
 };
 
 export type NuxMilestone = {
-  key: NuxMilestoneKey;
+  key: NuxProgress.MilestoneKey;
   title: MessageDescriptor;
   /** One line under the title in the checklist panel. */
   summary: MessageDescriptor;

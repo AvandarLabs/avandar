@@ -1,4 +1,4 @@
-import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions";
+import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions/nuxActions";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 

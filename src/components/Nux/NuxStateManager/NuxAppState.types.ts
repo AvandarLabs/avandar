@@ -1,15 +1,18 @@
-import type { NuxProgress } from "$/models/Nux/NuxProgress";
-import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
+/**
+ * The tutorial's runtime state for one session, seeded from the persisted
+ * `user_nux_progress` row.
+ */
 export type NuxAppState = {
   /** False until the progress row and the auto-check have both landed. */
   isHydrated: boolean;
   /** Row id, needed for every write. `undefined` before hydration. */
   progressId: NuxProgress.Id | undefined;
   status: NuxProgress.Status | undefined;
-  completedMilestones: readonly NuxMilestoneKey[];
+  completedMilestones: readonly NuxProgress.MilestoneKey[];
   /** The milestone whose tooltips are showing, or `undefined` when none are. */
-  activeMilestoneKey: NuxMilestoneKey | undefined;
+  activeMilestoneKey: NuxProgress.MilestoneKey | undefined;
   /**
    * Index into the active milestone's steps. Deliberately NOT persisted: a
    * hard refresh resumes at the milestone's first tooltip, which costs one
@@ -32,6 +35,7 @@ export type NuxAppState = {
   recentDashboardId: string | undefined;
 };
 
+/** The pre-hydration state: nothing is known yet, so no surface renders. */
 export const INITIAL_NUX_STATE: NuxAppState = {
   isHydrated: false,
   progressId: undefined,

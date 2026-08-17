@@ -1,0 +1,8 @@
+/*
+ * Both the collapsed pill and the expanded card sit in the floating-panel
+ * tier: above app chrome so the checklist stays reachable over a toolbar, and
+ * below modals so a dialog always covers it.
+ */
+.floatingSurface {
+  z-index: var(--mantine-z-index-floating-panel);
+}

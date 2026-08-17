@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppLinks } from "@/config/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
@@ -204,7 +204,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               // and a tooltip anchored to the panel would wait out its timeout
               // against an element that does not exist yet.
               "dataset-summary": (
-                <span {...nuxAnchorProps(NuxAnchors.datasetSummaryTab)}>
+                <span {...NuxAnchors.props(NuxAnchors.ids.datasetSummaryTab)}>
                   {t`Data Summary`}
                 </span>
               ),

@@ -6,7 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
-import { NuxEvents } from "@/components/Nux/nuxEvents";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
@@ -137,10 +137,10 @@ export function SaveToDashboardModal({
         createdDashboard.name,
         "created",
       );
-      // Advances the onboarding tutorial's third milestone, and hands it the
-      // id milestone 4 needs to route to the editor. This modal deliberately
-      // does not navigate on create, so without the id the tutorial would have
-      // no way to find the dashboard the user just made.
+      // Advances the onboarding tutorial's `build_dashboard` milestone, and
+      // hands it the id `share_dashboard` needs to route to the editor. This
+      // modal deliberately does not navigate on create, so without the id the
+      // tutorial would have no way to find the dashboard the user just made.
       NuxEvents.emit("dashboard.created", { dashboardId: createdDashboard.id });
       onClose();
     },

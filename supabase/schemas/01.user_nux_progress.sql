@@ -37,7 +37,7 @@ alter table public.user_nux_progress enable row level security;
 /**
  * Trigger the `updated_at` update.
  */
-create trigger tr_user_nux_progress__set_updated_at before
+create trigger tr__user_nux_progress__set_updated_at before
 update on public.user_nux_progress for each row
 execute function public.util__set_updated_at ();
 
@@ -54,6 +54,7 @@ select
 ,
   insert,
 update on table public.user_nux_progress to authenticated;
+
 -- Policies. A user may only ever read or write their own progress. There is
 -- deliberately no DELETE policy: restarting the tutorial updates the row in
 -- place, so there is no code path that needs to remove one.

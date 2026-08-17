@@ -1,4 +1,5 @@
-import { FIRST_DASHBOARD_TUTORIAL_KEY } from "$/models/Nux/NuxProgress.constants";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import { getUserIdByEmail } from "../setup/e2eTestWorkspaceLifecycle";
 import { createSupabaseAdminClient } from "./supabaseAdminClient";
 
 /**
@@ -26,22 +27,16 @@ import { createSupabaseAdminClient } from "./supabaseAdminClient";
 export async function suppressNuxTutorialForUser(email: string): Promise<void> {
   const admin = createSupabaseAdminClient();
 
-  const { data: users, error: listError } = await admin.auth.admin.listUsers();
-  if (listError) {
-    throw new Error(`[e2e] nux tutorial suppression: ${listError.message}`);
-  }
-
-  const user = users.users.find((candidate) => {
-    return candidate.email === email;
-  });
-  if (!user) {
-    throw new Error(`[e2e] nux tutorial suppression: no user for ${email}`);
-  }
+  // The `util__get_user_id_by_email` RPC behind this helper is an exact lookup.
+  // `auth.admin.listUsers()` would return only its first page of 50, so the
+  // seeded user would silently go missing on any database with more auth users
+  // than that, and the failure would surface here as "no user for <email>".
+  const userId = await getUserIdByEmail({ supabaseAdminClient: admin, email });
 
   const { error } = await admin.from("user_nux_progress").upsert(
     {
-      user_id: user.id,
-      tutorial_key: FIRST_DASHBOARD_TUTORIAL_KEY,
+      user_id: userId,
+      tutorial_key: NuxProgress.firstDashboardTutorialKey,
       status: "dismissed",
       completed_milestones: [],
     },

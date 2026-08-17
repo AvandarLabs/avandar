@@ -511,7 +511,7 @@ msgstr "Llama 3.1 8B（离线）"
 msgid "No datasets added yet"
 msgstr "尚未添加数据集"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Only you can see this"
 msgstr ""
 
@@ -523,7 +523,7 @@ msgstr "正在修复查询…"
 msgid "Only workspace admins can publish to the web."
 msgstr "只有工作区管理员可以发布到 Web。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
 msgstr ""
 
@@ -538,7 +538,7 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。要增加可以添�
 msgid "Add columns to the query above to start defining filters."
 msgstr "在上面的查询中添加列以开始定义过滤器。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open it to your workspace"
 msgstr ""
 
@@ -587,7 +587,7 @@ msgstr "折叠于"
 msgid "Bubble Chart"
 msgstr "气泡图"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Restart tutorial"
 msgstr ""
 
@@ -628,7 +628,7 @@ msgstr "该表有一个标题行"
 msgid "Map"
 msgstr "地图"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Change the chart if you like"
 msgstr ""
 
@@ -830,7 +830,7 @@ msgstr "发现查询失败。"
 msgid "Container max width"
 msgstr "容器最大宽度"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Build your first dashboard"
 msgstr ""
 
@@ -922,6 +922,10 @@ msgstr "如果您的设备有 16 GB 内存，并且会同时运行 Avandar 和�
 msgid "Welcome to your first workspace"
 msgstr "欢迎来到您的第一个工作区"
 
+#: src/components/Nux/NuxTour/NuxTour.tsx
+msgid "Skip"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "已复制"
@@ -973,7 +977,7 @@ msgstr "自然"
 msgid "Public"
 msgstr "公开"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
 msgstr ""
@@ -991,7 +995,7 @@ msgstr "隐藏标题"
 msgid "{0} data truncated"
 msgstr "{0} 数据已截断"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Share it with your workspace"
 msgstr ""
 
@@ -1916,7 +1920,7 @@ msgstr "，和 "
 msgid "Password updated successfully"
 msgstr "密码更新成功"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
 msgstr ""
@@ -2046,6 +2050,7 @@ msgid "Create new profile type"
 msgstr "创建新的配置文件类型"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
@@ -2152,6 +2157,10 @@ msgstr "前往数据探索器"
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "雷达图"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Get started {completedCount}/{totalMilestoneCount}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
@@ -2271,7 +2280,7 @@ msgstr "恒等"
 msgid "Data source"
 msgstr "数据源"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
 msgstr ""
 
@@ -2652,7 +2661,7 @@ msgstr "数据探索器和仪表板中已启用聊天"
 msgid "Forgot your password?"
 msgstr "忘记密码？"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
 msgstr ""
 
@@ -2773,7 +2782,7 @@ msgid "This member owns {privateTotal} private resources. They cannot be "
 msgstr "此成员拥有 {privateTotal} "
 "个私有资源。在其他人接管所有权之前，无法移除此成员。工作区管理员无法查看私有内容，因此请从隐私日志中重新分配所有权。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "It profiled your data for you"
 msgstr ""
 
@@ -2918,6 +2927,7 @@ msgid "Dataset is now offline-only"
 msgstr "数据集现在仅限离线使用"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Next"
 msgstr ""
 
@@ -2954,7 +2964,7 @@ msgstr "符号大小列必须为数字。"
 msgid "Avandar (default)"
 msgstr "Avandar（默认）"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Add your first dataset"
 msgstr ""
 
@@ -2962,7 +2972,7 @@ msgstr ""
 msgid "Wide"
 msgstr "宽"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
 msgstr ""
@@ -3006,6 +3016,7 @@ msgid "Update failed"
 msgstr "更新失败"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
@@ -3119,7 +3130,7 @@ msgstr "计算 {datasetName} 中有多少行"
 msgid "Generating SQL…"
 msgstr "正在生成 SQL…"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr ""
 
@@ -3252,7 +3263,7 @@ msgstr "发送"
 msgid "Generated SQL assumptions"
 msgstr "生成的 SQL 假设"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it and save"
 msgstr ""
 
@@ -3281,7 +3292,7 @@ msgstr "面积布局"
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "表单不支持 CTE（WITH 子句）。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
 msgstr ""
 
@@ -3318,7 +3329,7 @@ msgstr "打开仪表板"
 msgid "H1"
 msgstr "H1"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
 msgstr ""
@@ -3894,8 +3905,8 @@ msgid "Could not remove offline chat model"
 msgstr "无法移除离线聊天模型"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
-msgid "Get started {completedCount}/{total}"
-msgstr ""
+#~ msgid "Get started {completedCount}/{total}"
+#~ msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
@@ -3925,7 +3936,7 @@ msgstr "数据集保存成功！"
 msgid "No saved datasets found."
 msgstr "未找到已保存的数据集。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
 msgstr ""
@@ -4503,7 +4514,7 @@ msgstr "日期"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此仪表板未引用任何数据集：没有内容可发布。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
 msgstr ""
 
@@ -4516,11 +4527,11 @@ msgstr " 发布到 Web：任何拥有链接的人都可以查看，以上列表�
 msgid "A confirmation email has been sent to your email address."
 msgstr "确认邮件已发送到您的电子邮件地址。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Just ask"
 msgstr ""
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Pick what they can do"
 msgstr ""
 
@@ -5140,7 +5151,7 @@ msgstr "建议重写："
 msgid "Upload a spreadsheet"
 msgstr "上传电子表格"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
 msgstr ""
@@ -5182,7 +5193,7 @@ msgstr "没有更多内容可加载"
 msgid "Could not make private"
 msgstr "无法设为私密"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
 msgstr ""
 
@@ -5484,7 +5495,7 @@ msgstr "没有成功读取任何行"
 msgid "New user group"
 msgstr "新用户组"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
 msgstr ""
 
@@ -5638,7 +5649,7 @@ msgstr "没有可用列"
 msgid "Resize drawer"
 msgstr "调整抽屉大小"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
 msgstr ""
@@ -5930,7 +5941,7 @@ msgstr "移除本地过滤器"
 msgid "This removes the user group from members and resources that use it."
 msgstr "这将从使用该用户组的成员和资源中移除该用户组。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
 msgstr ""
 
@@ -5971,7 +5982,7 @@ msgstr "尚未添加任何列。"
 msgid "Advanced options"
 msgstr "高级选项"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it to a dashboard"
 msgstr ""
 
@@ -6071,7 +6082,7 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作区已使用全部 {currentSeatUsage} 个 {totalSeats} 座位。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "There's your answer"
 msgstr ""
 
@@ -6169,7 +6180,7 @@ msgstr "输入确认短语"
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "应使用哪个字段作为 {singularConceptName} 的名称？"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
 msgstr ""
 
@@ -6213,7 +6224,7 @@ msgstr "唯一值"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
@@ -6343,6 +6354,7 @@ msgid "Clear all"
 msgstr "清除所有"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Close"
 msgstr ""
 

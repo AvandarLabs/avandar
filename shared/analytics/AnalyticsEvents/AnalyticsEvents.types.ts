@@ -7,7 +7,7 @@ import type {
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
-import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types.ts";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress.ts";
 import type { DashboardFilterMode } from "$/types/dashboard.types.ts";
 import type { Database } from "$/types/database.types.ts";
 
@@ -273,10 +273,13 @@ export type AnalyticsEventPayloads = {
   : K extends "chat.turn_completed" ? ChatTurnCompletedPayload
   : K extends "chat.turn_failed" ?
     { modelId: string; errorClass: ChatTurnErrorClass; latencyMs: number }
-  : K extends "nux.started" ? { startedAtMilestone: NuxMilestoneKey }
-  : K extends "nux.milestone_completed" ? { milestoneKey: NuxMilestoneKey }
-  : K extends "nux.dismissed" ?
-    { milestoneKey: NuxMilestoneKey | null; completedCount: number }
+  : K extends "nux.started" ? { startedAtMilestone: NuxProgress.MilestoneKey }
+  : K extends "nux.milestone_completed" ?
+    { milestoneKey: NuxProgress.MilestoneKey }
+  : // `milestoneKey` is absent when the user dismissed from the checklist with
+  // no milestone open, rather than while walking one.
+  K extends "nux.dismissed" ?
+    { milestoneKey?: NuxProgress.MilestoneKey; completedCount: number }
   : // Written by the `auth.users` insert trigger. `emailDomain` is null when
   // the account has no email address, which is the case for phone-based
   // signups.

@@ -5,7 +5,7 @@ import { render, screen } from "@/test-utils";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { ReactNode } from "react";
 
-function renderPanel(overrides: Partial<NuxAppState>): void {
+function _renderPanel(overrides: Partial<NuxAppState>): void {
   function Wrapper({ children }: { children: ReactNode }): ReactNode {
     return (
       <NuxStateManager.Provider
@@ -34,7 +34,7 @@ function renderPanel(overrides: Partial<NuxAppState>): void {
 
 describe("NuxChecklistPanel", () => {
   it("lists all four milestones when expanded", () => {
-    renderPanel({});
+    _renderPanel({});
     expect(screen.getByText("Add your first dataset")).toBeInTheDocument();
     expect(
       screen.getByText("Share it with your workspace"),
@@ -43,12 +43,12 @@ describe("NuxChecklistPanel", () => {
   });
 
   it("shows progress as milestones complete", () => {
-    renderPanel({ completedMilestones: ["add_dataset", "run_query"] });
+    _renderPanel({ completedMilestones: ["add_dataset", "run_query"] });
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
 
   it("collapses to a pill", () => {
-    renderPanel({ isPanelExpanded: false });
+    _renderPanel({ isPanelExpanded: false });
     expect(
       screen.queryByText("Add your first dataset"),
     ).not.toBeInTheDocument();
@@ -58,7 +58,7 @@ describe("NuxChecklistPanel", () => {
   });
 
   it("renders nothing once every milestone is done", () => {
-    renderPanel({
+    _renderPanel({
       status: "completed",
       completedMilestones: [
         "add_dataset",
@@ -71,7 +71,7 @@ describe("NuxChecklistPanel", () => {
   });
 
   it("renders nothing once dismissed", () => {
-    renderPanel({ status: "dismissed" });
+    _renderPanel({ status: "dismissed" });
     expect(screen.queryByText(/Get started/)).not.toBeInTheDocument();
   });
 });

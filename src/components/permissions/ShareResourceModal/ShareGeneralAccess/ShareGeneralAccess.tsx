@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { appForResource } from "../copy/appForResource";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import { GeneralAccessSelect } from "./GeneralAccessSelect";
@@ -106,7 +106,7 @@ export function ShareGeneralAccess({
         <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        <Box flex={1} {...nuxAnchorProps(NuxAnchors.generalAccessSelect)}>
+        <Box flex={1} {...NuxAnchors.props(NuxAnchors.ids.generalAccessSelect)}>
           <GeneralAccessSelect
             value={value}
             isBusy={isBusy}
@@ -138,7 +138,7 @@ export function ShareGeneralAccess({
           />
         </Box>
         {value === "workspace" ?
-          <Box {...nuxAnchorProps(NuxAnchors.shareRoleSelect)}>
+          <Box {...NuxAnchors.props(NuxAnchors.ids.shareRoleSelect)}>
             <ShareWorkspaceRoleSelect
               role={workspaceShareRole}
               isDisabled={isBusy}

@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Anchor, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
+import type { NuxJoyrideStepData } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
 import type { ReactNode } from "react";
 import type { TooltipRenderProps } from "react-joyride";
 
@@ -22,9 +23,10 @@ export function NuxTooltip({
   step,
   tooltipProps,
 }: Readonly<TooltipRenderProps>): ReactNode {
+  // Joyride types `step.data` as `any`, so `NuxJoyrideStepData` is what keeps
+  // this read tied to what `makeJoyrideStepsFromMilestone` writes.
   const showSampleDownload =
-    (step.data as { showSampleDownload?: boolean } | undefined)
-      ?.showSampleDownload === true;
+    (step.data as NuxJoyrideStepData | undefined)?.showSampleDownload === true;
   const isLastStep = index === size - 1;
 
   return (

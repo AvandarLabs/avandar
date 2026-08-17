@@ -8,7 +8,7 @@ import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatMode
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "./Composer.module.css";
 
 /**
@@ -41,7 +41,7 @@ export function Composer(): React.ReactNode {
     <div
       ref={panelRef}
       className={css.composerContainer}
-      {...nuxAnchorProps(NuxAnchors.chatComposer)}
+      {...NuxAnchors.props(NuxAnchors.ids.chatComposer)}
     >
       <ComposerPrimitive.Root
         className={clsx(css.composer, chatDisabled && css.composerDisabled)}

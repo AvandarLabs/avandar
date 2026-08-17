@@ -1,4 +1,3 @@
-import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -6,31 +5,24 @@ import {
   Group,
   LoadingOverlay,
   MantineTheme,
-  Menu,
   Stack,
-  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { modals } from "@mantine/modals";
 import {
-  IconChevronDown,
   IconDownload,
   IconFolderOpen,
-  IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
-import { NuxEvents } from "@/components/Nux/nuxEvents";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
+import { DataExplorerSaveMenu } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu";
 import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
@@ -38,8 +30,6 @@ import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
-import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
-import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
@@ -67,33 +57,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const chartRef = useRef<HTMLDivElement>(null);
 
   useDataExplorerUrlSync({ urlSearch, navigate });
-
-  const [saveOverDataset, isSavingOver] = VirtualDatasetClient.useUpdate({
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
-    onSuccess: () => {
-      notifySuccess(t`Dataset saved.`);
-    },
-    onError: (error) => {
-      notifyError(t`Failed to save dataset: ${error.message}`);
-    },
-  });
-
-  const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
-    onSuccess: () => {
-      // `rawSql` is part of the query key, so clearing it can start a new
-      // run. Stamp `structured_change` (the union has no member for a
-      // system-initiated clear) so a stale `dataset_opened` from before the
-      // delete does not mislabel that run.
-      dispatch.setQueryTrigger("structured_change");
-      dispatch.setOpenDataset(undefined);
-      dispatch.setRawSql(undefined);
-      notifySuccess(t`Dataset deleted.`);
-    },
-    onError: (error) => {
-      notifyError(t`Failed to delete dataset: ${error.message}`);
-    },
-  });
 
   const workspace = useCurrentWorkspace();
   const applyLargeDatasetAutoLimit = useCallback(
@@ -135,32 +98,51 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
   );
 
+  // The last query completion already announced to the tutorial, so a re-render
+  // or a new `queryResults` identity for the same run cannot announce it twice.
+  const announcedQueryAtRef = useRef<number | undefined>(undefined);
   useEffect(
     function announceSuccessfulQueryToNux() {
-      if (isLoadingResults || dataQuery.isError) {
-        return;
+      // Advances the onboarding tutorial's `run_query` milestone, which is
+      // meant to reward the user for ASKING something. So the trigger matters
+      // as much as the result: `url_hydration` and `dataset_opened` run a
+      // `select *` on their own the moment the tutorial routes here with a
+      // `ds` search param, and counting that would mark the milestone done,
+      // and skip the tooltip that asks the question, before the user typed
+      // anything.
+      // Rows, not just a successful request: an empty result is not an answer.
+      const isUserAskedQuestion =
+        state.queryTrigger !== "url_hydration" &&
+        state.queryTrigger !== "dataset_opened";
+      if (
+        isUserAskedQuestion &&
+        !isLoadingResults &&
+        !dataQuery.isError &&
+        (queryResults?.data?.length ?? 0) > 0 &&
+        announcedQueryAtRef.current !== dataQuery.dataUpdatedAt
+      ) {
+        announcedQueryAtRef.current = dataQuery.dataUpdatedAt;
+        NuxEvents.emit("query.succeeded", {});
       }
-      if ((queryResults?.data?.length ?? 0) === 0) {
-        return;
-      }
-      // Advances the onboarding tutorial's second milestone. Rows, not just a
-      // successful request: an empty result is not an answer.
-      NuxEvents.emit("query.succeeded", {});
     },
-    [isLoadingResults, dataQuery.isError, queryResults],
+    [
+      isLoadingResults,
+      dataQuery.isError,
+      dataQuery.dataUpdatedAt,
+      queryResults,
+      state.queryTrigger,
+    ],
   );
 
   const queryResultColumns = queryResults?.columns ?? [];
 
-  /**
-   * The SQL behind whatever is currently on screen, whether it came from the
-   * chat panel, the SQL editor, or the guided query builder.
-   *
-   * `state.rawSql` alone is not enough: the builder generates its SQL inside
-   * `selectSqlToExecute` at execution time and never stores it, so gating the
-   * save actions on `rawSql` left a chart the user had just built with no way
-   * to keep it.
-   */
+  // The SQL behind whatever is currently on screen, whether it came from the
+  // chat panel, the SQL editor, or the guided query builder.
+  //
+  // Do not gate the save actions on `state.rawSql` instead: the builder
+  // generates its SQL inside `selectSqlToExecute` at execution time and never
+  // stores it, so a chart built that way would have no `rawSql` and could not
+  // be saved.
   const savableSql = selectSqlToExecute({
     rawSql: state.rawSql,
     isStructuredQueryInSync: state.isStructuredQueryInSync,
@@ -260,148 +242,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           >
             <Trans>Open</Trans>
           </Button>
-          <Menu shadow="md" width={240}>
-            <Menu.Target>
-              <Button
-                variant="outline"
-                color="neutral"
-                size="compact-sm"
-                rightSection={<IconChevronDown size={16} />}
-                {...nuxAnchorProps(NuxAnchors.explorerSaveMenu)}
-              >
-                <Trans>Save</Trans>
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {state.openDataset ?
-                <>
-                  {state.openDataset.virtualDatasetId ?
-                    <Menu.Item
-                      disabled={!state.rawSql || isSavingOver}
-                      onClick={() => {
-                        const virtualDatasetId =
-                          state.openDataset?.virtualDatasetId;
-                        if (!state.rawSql || !virtualDatasetId) {
-                          return;
-                        }
-                        saveOverDataset({
-                          id: virtualDatasetId,
-                          data: { rawSql: state.rawSql },
-                        });
-                      }}
-                    >
-                      <Trans>Save: {state.openDataset.name}</Trans>
-                    </Menu.Item>
-                  : null}
-                  <Menu.Item
-                    color="red"
-                    disabled={isDeletingDataset}
-                    onClick={() => {
-                      if (!state.openDataset) {
-                        return;
-                      }
-                      modals.openConfirmModal({
-                        title: t`Delete dataset`,
-                        children: (
-                          <Text size="sm">
-                            <Trans>
-                              Permanently delete{" "}
-                              <strong>{state.openDataset.name}</strong>?
-                            </Trans>
-                          </Text>
-                        ),
-                        labels: {
-                          confirm: t`Delete`,
-                          cancel: t`Cancel`,
-                        },
-                        confirmProps: { color: "red" },
-                        onConfirm: () => {
-                          if (!state.openDataset) {
-                            return;
-                          }
-                          deleteDataset({
-                            id: state.openDataset.datasetId,
-                          });
-                        },
-                      });
-                    }}
-                  >
-                    <Trans>Delete: {state.openDataset.name}</Trans>
-                  </Menu.Item>
-                  <Menu.Divider />
-                </>
-              : null}
-              <Menu.Item
-                disabled={
-                  queryResultData.length === 0 || savableSql === undefined
-                }
-                rightSection={
-                  savableSql === undefined ?
-                    <Tooltip label={t`Run a query first.`}>
-                      <IconInfoCircle size={16} />
-                    </Tooltip>
-                  : null
-                }
-                onClick={() => {
-                  if (!savableSql) {
-                    return;
-                  }
-                  const modalId = modals.open({
-                    title: t`Save as new dataset`,
-                    size: "xl",
-                    children: (
-                      <SaveAsNewDatasetForm
-                        queryResultData={queryResultData}
-                        columns={queryResultColumns}
-                        dateColumns={dateColumns}
-                        rawSql={savableSql}
-                        onSaveSuccess={() => {
-                          modals.close(modalId);
-                        }}
-                      />
-                    ),
-                  });
-                }}
-              >
-                <Trans>Save as new dataset</Trans>
-              </Menu.Item>
-              <Menu.Item
-                disabled={
-                  queryResultData.length === 0 || savableSql === undefined
-                }
-                rightSection={
-                  savableSql === undefined ?
-                    <Tooltip label={t`Run a query first.`}>
-                      <IconInfoCircle size={16} />
-                    </Tooltip>
-                  : null
-                }
-                onClick={() => {
-                  if (!savableSql) {
-                    return;
-                  }
-                  const modalId = modals.open({
-                    withCloseButton: true,
-                    size: "lg",
-                    children: (
-                      <SaveToDashboardModal
-                        rawSql={savableSql}
-                        prompt={state.nlPrompt}
-                        vizType={state.vizConfig.vizType}
-                        vizConfig={state.vizConfig}
-                        workspaceSlug={workspace.slug}
-                        onClose={() => {
-                          modals.close(modalId);
-                        }}
-                      />
-                    ),
-                  });
-                }}
-              >
-                <Trans>Save to dashboard</Trans>
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <DataExplorerSaveMenu
+            savableSql={savableSql}
+            queryResultData={queryResultData}
+            queryResultColumns={queryResultColumns}
+            dateColumns={dateColumns}
+            workspaceSlug={workspace.slug}
+          />
           <Button
             variant="outline"
             color="neutral"
@@ -423,7 +270,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           w="100%"
           mih={0}
           bg="white"
-          {...nuxAnchorProps(NuxAnchors.explorerCanvas)}
+          {...NuxAnchors.props(NuxAnchors.ids.explorerCanvas)}
         >
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

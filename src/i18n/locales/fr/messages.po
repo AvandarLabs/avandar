@@ -536,7 +536,7 @@ msgstr "Llama 3.1 8B (hors ligne)"
 msgid "No datasets added yet"
 msgstr "Aucun ensemble de données ajouté pour l'instant"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Only you can see this"
 msgstr ""
 
@@ -549,7 +549,7 @@ msgid "Only workspace admins can publish to the web."
 msgstr "Seuls les administrateurs de l’espace de travail peuvent publier sur le "
 "Web."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
 msgstr ""
 
@@ -569,7 +569,7 @@ msgid "Add columns to the query above to start defining filters."
 msgstr "Ajoutez des colonnes à la requête ci-dessus pour commencer à définir "
 "des filtres."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open it to your workspace"
 msgstr ""
 
@@ -618,7 +618,7 @@ msgstr "Réduire à"
 msgid "Bubble Chart"
 msgstr "Graphique à bulles"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Restart tutorial"
 msgstr ""
 
@@ -660,7 +660,7 @@ msgstr "La feuille a une ligne d'en-tête"
 msgid "Map"
 msgstr "Carte"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Change the chart if you like"
 msgstr ""
 
@@ -877,7 +877,7 @@ msgstr "Échec de la requête de découverte."
 msgid "Container max width"
 msgstr "Largeur maximale du conteneur"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Build your first dashboard"
 msgstr ""
 
@@ -975,6 +975,10 @@ msgstr "Recommandé si vous disposez de 16 Go de RAM et exécutez Avandar avec "
 msgid "Welcome to your first workspace"
 msgstr "Bienvenue dans votre premier espace de travail"
 
+#: src/components/Nux/NuxTour/NuxTour.tsx
+msgid "Skip"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "Copié"
@@ -1027,7 +1031,7 @@ msgstr "Naturel"
 msgid "Public"
 msgstr "Public"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
 msgstr ""
@@ -1045,7 +1049,7 @@ msgstr "Masquer le titre"
 msgid "{0} data truncated"
 msgstr "Données {0} tronquées"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Share it with your workspace"
 msgstr ""
 
@@ -2022,7 +2026,7 @@ msgstr ", et "
 msgid "Password updated successfully"
 msgstr "Mot de passe mis à jour avec succès"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
 msgstr ""
@@ -2157,6 +2161,7 @@ msgid "Create new profile type"
 msgstr "Créer un nouveau type de profil"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "Terminé"
@@ -2270,6 +2275,10 @@ msgstr "Aller à l'Explorateur de données"
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "Graphique radar"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Get started {completedCount}/{totalMilestoneCount}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
@@ -2395,7 +2404,7 @@ msgstr "Identité"
 msgid "Data source"
 msgstr "Source de données"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
 msgstr ""
 
@@ -2792,7 +2801,7 @@ msgstr "Le chat est activé dans l'Explorateur de données et les tableaux de "
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
 msgstr ""
 
@@ -2922,7 +2931,7 @@ msgstr "Ce membre possède {privateTotal} ressources privées. Il ne peut pas "
 "travail : réattribuez la propriété depuis le journal de "
 "confidentialité."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "It profiled your data for you"
 msgstr ""
 
@@ -3072,6 +3081,7 @@ msgid "Dataset is now offline-only"
 msgstr "Le jeu de données est désormais uniquement hors ligne"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Next"
 msgstr ""
 
@@ -3109,7 +3119,7 @@ msgstr "La colonne de taille du symbole doit être numérique."
 msgid "Avandar (default)"
 msgstr "Avandar (par défaut)"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Add your first dataset"
 msgstr ""
 
@@ -3117,7 +3127,7 @@ msgstr ""
 msgid "Wide"
 msgstr "Large"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
 msgstr ""
@@ -3162,6 +3172,7 @@ msgid "Update failed"
 msgstr "Échec de la mise à jour"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
@@ -3278,7 +3289,7 @@ msgstr "Comptez combien de lignes il y a dans {datasetName}"
 msgid "Generating SQL…"
 msgstr "Génération de SQL…"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr ""
 
@@ -3417,7 +3428,7 @@ msgstr "Envoyer"
 msgid "Generated SQL assumptions"
 msgstr "Hypothèses SQL générées"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it and save"
 msgstr ""
 
@@ -3447,7 +3458,7 @@ msgstr "Disposition en aires"
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "Les CTE (clauses WITH) ne sont pas pris en charge dans le formulaire."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
 msgstr ""
 
@@ -3485,7 +3496,7 @@ msgstr "Ouvrir le tableau de bord"
 msgid "H1"
 msgstr "H1"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
 msgstr ""
@@ -4092,8 +4103,8 @@ msgid "Could not remove offline chat model"
 msgstr "Impossible de supprimer le modèle de chat hors ligne"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
-msgid "Get started {completedCount}/{total}"
-msgstr ""
+#~ msgid "Get started {completedCount}/{total}"
+#~ msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
@@ -4123,7 +4134,7 @@ msgstr "Jeu de données enregistré avec succès !"
 msgid "No saved datasets found."
 msgstr "Aucun jeu de données enregistré trouvé."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
 msgstr ""
@@ -4720,7 +4731,7 @@ msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "Ce tableau de bord ne fait référence à aucun jeu de données : rien à "
 "publier."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
 msgstr ""
 
@@ -4735,11 +4746,11 @@ msgstr " Publié sur le Web : toute personne disposant du lien peut le "
 msgid "A confirmation email has been sent to your email address."
 msgstr "Un e-mail de confirmation a été envoyé à votre adresse e-mail."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Just ask"
 msgstr ""
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Pick what they can do"
 msgstr ""
 
@@ -5394,7 +5405,7 @@ msgstr "Réécriture suggérée :"
 msgid "Upload a spreadsheet"
 msgstr "Télécharger une feuille de calcul"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
 msgstr ""
@@ -5438,7 +5449,7 @@ msgstr "Rien de plus à charger"
 msgid "Could not make private"
 msgstr "Impossible de rendre privé"
 
-#: src/views/ProfileView/TutorialSection.tsx
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
 msgstr ""
 
@@ -5753,7 +5764,7 @@ msgstr "Aucune ligne n'a été lue avec succès"
 msgid "New user group"
 msgstr "Nouveau groupe d'utilisateurs"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
 msgstr ""
 
@@ -5916,7 +5927,7 @@ msgstr "Aucune colonne disponible"
 msgid "Resize drawer"
 msgstr "Redimensionner le panneau"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
 msgstr ""
@@ -6219,7 +6230,7 @@ msgid "This removes the user group from members and resources that use it."
 msgstr "Cela supprime le groupe d'utilisateurs des membres et des ressources "
 "qui l'utilisent."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
 msgstr ""
 
@@ -6260,7 +6271,7 @@ msgstr "Aucune colonne n'a encore été ajoutée."
 msgid "Advanced options"
 msgstr "Options avancées"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it to a dashboard"
 msgstr ""
 
@@ -6367,7 +6378,7 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 msgstr "Votre espace de travail a utilisé tous les {currentSeatUsage} de ses "
 "{totalSeats} sièges."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "There's your answer"
 msgstr ""
 
@@ -6472,7 +6483,7 @@ msgstr "Tapez la phrase de confirmation"
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "Quel champ doit être utilisé comme nom d'un {singularConceptName} ?"
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
 msgstr ""
 
@@ -6517,7 +6528,7 @@ msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING utilise l’opérateur « {operator} », qui n’est pas pris en charge "
 "par le formulaire."
 
-#: src/components/Nux/tutorials/firstDashboard.ts
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
@@ -6654,6 +6665,7 @@ msgid "Clear all"
 msgstr "Tout effacer"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
+#: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Close"
 msgstr ""
 

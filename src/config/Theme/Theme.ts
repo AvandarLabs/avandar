@@ -87,10 +87,11 @@ export const DEFAULT_MODAL_PROPS = {
 } as const;
 
 /**
- * Floating panel z-index. Sits above the app shell (200) but below
- * Mantine's default popover/combobox z-index (300) so that dropdowns
- * opened inside a floating panel render on top of it.
+ * Floating panel z-index. Sits above app chrome so the onboarding checklist
+ * stays reachable over a toolbar, but below `MODAL_ROOT_Z_INDEX` so a modal
+ * always covers it.
  */
+export const FLOATING_PANEL_Z_INDEX = 300;
 
 /**
  * Overlay dropdown z-index for popovers, comboboxes, menus, and tooltips.
@@ -470,6 +471,7 @@ export const Theme = createTheme({
     zIndex: {
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
       appChrome: APP_CHROME_Z_INDEX,
+      floatingPanel: FLOATING_PANEL_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
       popover: POPOVER_Z_INDEX,
       notifications: NOTIFICATIONS_Z_INDEX,
@@ -521,6 +523,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (
 
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
     "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
+    "--mantine-z-index-floating-panel": String(
+      theme.other.zIndex.floatingPanel,
+    ),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
     "--mantine-z-index-popover": String(theme.other.zIndex.popover),
     "--mantine-z-index-notifications": String(theme.other.zIndex.notifications),

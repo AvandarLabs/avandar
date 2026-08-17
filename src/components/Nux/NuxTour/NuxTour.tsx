@@ -1,19 +1,13 @@
-import { useLingui } from "@lingui/react";
+import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import { EVENTS, Joyride } from "react-joyride";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import { buildJoyrideSteps } from "@/components/Nux/NuxTour/buildJoyrideSteps";
+import { makeJoyrideStepsFromMilestone } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
 import { NuxTooltip } from "@/components/Nux/NuxTour/NuxTooltip";
-import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
+import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
+import { MODAL_ROOT_Z_INDEX } from "@/config/Theme/Theme";
 import type { ReactNode } from "react";
 import type { EventHandler } from "react-joyride";
-
-/**
- * Sits above Mantine's modal layer. Milestones 3 and 4 both spotlight controls
- * inside portals, and Joyride's default of 100 would put the overlay behind
- * them.
- */
-const NUX_TOUR_Z_INDEX = 400;
 
 /**
  * Renders the active milestone's tooltips.
@@ -23,9 +17,11 @@ const NUX_TOUR_Z_INDEX = 400;
  * that Joyride knows nothing about.
  */
 export function NuxTour(): ReactNode {
-  const { i18n } = useLingui();
+  const { i18n, t } = useLingui();
   const [state, dispatch] = NuxStateManager.useContext();
 
+  // A plain lambda rather than `propEq`, which cannot take a possibly-undefined
+  // comparison value.
   const milestone = useMemo(() => {
     return FIRST_DASHBOARD_MILESTONES.find((candidate) => {
       return candidate.key === state.activeMilestoneKey;
@@ -33,7 +29,7 @@ export function NuxTour(): ReactNode {
   }, [state.activeMilestoneKey]);
 
   const steps = useMemo(() => {
-    return milestone ? buildJoyrideSteps({ milestone, i18n }) : [];
+    return milestone ? makeJoyrideStepsFromMilestone({ milestone, i18n }) : [];
   }, [milestone, i18n]);
 
   if (!milestone || steps.length === 0) {
@@ -73,8 +69,22 @@ export function NuxTour(): ReactNode {
       stepIndex={Math.min(state.activeStepIndex, steps.length - 1)}
       onEvent={onEvent}
       tooltipComponent={NuxTooltip}
+      // Joyride copies these into the `aria-label` and `title` of the buttons
+      // `NuxTooltip` spreads its props onto. Without them the accessible names
+      // stay Joyride's English defaults in every locale, even though the
+      // visible labels are translated, and "Done" would announce as "Last".
+      locale={{
+        back: t`Back`,
+        close: t`Close`,
+        last: t`Done`,
+        next: t`Next`,
+        skip: t`Skip`,
+      }}
       options={{
-        zIndex: NUX_TOUR_Z_INDEX,
+        // Sits on Mantine's modal layer. The `build_dashboard` and
+        // `share_dashboard` milestones both spotlight controls inside portals,
+        // and Joyride's default of 100 would put the overlay behind them.
+        zIndex: MODAL_ROOT_Z_INDEX,
         // Clicking the backdrop should not end the tutorial: the user is very
         // likely clicking the control the tooltip just told them to click.
         overlayClickAction: false,

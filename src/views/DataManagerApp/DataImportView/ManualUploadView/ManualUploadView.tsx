@@ -6,8 +6,8 @@ import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useEffect, useRef, useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
-import { NuxEvents } from "@/components/Nux/nuxEvents";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { notifyError } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
@@ -153,15 +153,15 @@ export function ManualUploadView({
           }}
           isProcessing={isLoadingFile}
           onAfterSave={(savedDataset) => {
-            // Advances the onboarding tutorial's first milestone. A no-op when
-            // nobody is in the tutorial, which is the normal case.
+            // Advances the onboarding tutorial's `add_dataset` milestone. A
+            // no-op when nobody is in the tutorial, which is the normal case.
             //
-            // Deliberately `onAfterSave` and not `onSaveSuccess`:
+            // Do not emit from `onSaveSuccess` instead:
             // `_navigateAfterDatasetSave` treats a defined `onSaveSuccess` as
-            // "the caller is handling navigation" and returns early, so
-            // emitting from there suppressed the navigation to the new
-            // dataset's page for EVERY manual upload, tutorial or not.
-            // `onAfterSave` runs unconditionally, before that branch.
+            // "the caller is handling navigation" and returns early, which
+            // would suppress the navigation to the new dataset's page for
+            // EVERY manual upload, tutorial or not. `onAfterSave` runs
+            // unconditionally, before that branch.
             NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
             onAfterSave?.();
           }}
@@ -186,7 +186,7 @@ export function ManualUploadView({
   return (
     <Box {...boxProps}>
       <Stack align="flex-start">
-        <Box {...nuxAnchorProps(NuxAnchors.datasetUploadForm)}>
+        <Box {...NuxAnchors.props(NuxAnchors.ids.datasetUploadForm)}>
           <FileUploadForm
             label={t`Upload a spreadsheet`}
             description={t`Select an Excel or CSV file from your computer to import`}
@@ -202,7 +202,7 @@ export function ManualUploadView({
           />
         </Box>
 
-        <Box {...nuxAnchorProps(NuxAnchors.datasetImportForm)}>
+        <Box {...NuxAnchors.props(NuxAnchors.ids.datasetImportForm)}>
           {elements.importForm()}
         </Box>
       </Stack>

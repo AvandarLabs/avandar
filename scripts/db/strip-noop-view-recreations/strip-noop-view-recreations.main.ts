@@ -54,8 +54,11 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { NoopViewRecreations } from "./noopViewRecreations";
-import type { CreateViewStatement, NoopVerdict } from "./noopViewRecreations";
+import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
+import type {
+  CreateViewStatement,
+  NoopVerdict,
+} from "./NoopViewRecreations/NoopViewRecreations";
 
 const PROBE_SCHEMA = "_noop_view_check";
 
@@ -66,7 +69,7 @@ const PROBE_SCHEMA = "_noop_view_check";
  * Falls back to `psql` inside the Supabase container, because not every
  * machine that runs this repo has a local Postgres client installed.
  */
-function makeSqlRunner(projectId: string): (sql: string) => string {
+function _makeSqlRunner(projectId: string): (sql: string) => string {
   const commonArgs = [
     "--username",
     "postgres",
@@ -126,11 +129,11 @@ function makeSqlRunner(projectId: string): (sql: string) => string {
   };
 }
 
-function quoteLiteral(value: string): string {
+function _quoteLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
 
-function quoteIdentifier(value: string): string {
+function _quoteIdentifier(value: string): string {
   return `"${value.replaceAll('"', '""')}"`;
 }
 
@@ -141,16 +144,16 @@ function quoteIdentifier(value: string): string {
  * the two normalise identically. Everything happens inside a transaction that
  * is rolled back, so the database is untouched either way.
  */
-function makeNoopCheck(
+function _makeNoopCheck(
   runSql: (sql: string) => string,
 ): (create: CreateViewStatement) => NoopVerdict {
   return (create) => {
-    const qualified = `${quoteIdentifier(create.view.schema)}.${quoteIdentifier(
+    const qualified = `${_quoteIdentifier(create.view.schema)}.${_quoteIdentifier(
       create.view.name,
     )}`;
 
     const exists = runSql(
-      `select to_regclass(${quoteLiteral(qualified)}) is not null;`,
+      `select to_regclass(${_quoteLiteral(qualified)}) is not null;`,
     ).trim();
     if (exists !== "t") {
       return {
@@ -159,13 +162,13 @@ function makeNoopCheck(
       };
     }
 
-    const probe = `${PROBE_SCHEMA}.${quoteIdentifier(create.view.name)}`;
+    const probe = `${PROBE_SCHEMA}.${_quoteIdentifier(create.view.name)}`;
     const sql = [
       "begin;",
       `create schema ${PROBE_SCHEMA};`,
       `create view ${probe} as ${create.viewBody};`,
-      `select pg_get_viewdef(${quoteLiteral(qualified)}::regclass)`,
-      `     = pg_get_viewdef(${quoteLiteral(probe)}::regclass);`,
+      `select pg_get_viewdef(${_quoteLiteral(qualified)}::regclass)`,
+      `     = pg_get_viewdef(${_quoteLiteral(probe)}::regclass);`,
       "rollback;",
     ].join("\n");
 
@@ -196,7 +199,7 @@ function makeNoopCheck(
   };
 }
 
-function resolveMigrationFile(
+function _getMigrationFilePath(
   repoRoot: string,
   explicitFile: string | undefined,
 ): string {
@@ -216,6 +219,40 @@ function resolveMigrationFile(
   return path.join(migrationsDir, newest);
 }
 
+/** The Supabase project id from `supabase/config.toml`. */
+function _getProjectIdFromConfig(repoRoot: string): string {
+  return (
+    /^project_id\s*=\s*"([^"]+)"/m.exec(
+      readFileSync(path.join(repoRoot, "supabase", "config.toml"), "utf8"),
+    )?.[1] ?? "avandar"
+  );
+}
+
+/**
+ * Whether the local database already has this migration version recorded, or
+ * `undefined` when the database could not be reached.
+ */
+function _isMigrationAlreadyApplied(
+  runSql: (sql: string) => string,
+  version: string,
+): boolean | undefined {
+  try {
+    return (
+      runSql(
+        `select exists (select 1 from supabase_migrations.schema_migrations
+         where version = ${_quoteLiteral(version)});`,
+      ).trim() === "t"
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.log(
+      `SKIPPED: could not reach the local database ` +
+        `(${message.split("\n")[0]}). Leaving the migration untouched.`,
+    );
+    return undefined;
+  }
+}
+
 function main(): void {
   const args = process.argv.slice(2);
   const isDryRun = args.includes("--dry-run");
@@ -224,11 +261,8 @@ function main(): void {
   });
 
   const repoRoot = process.cwd();
-  const migrationFile = resolveMigrationFile(repoRoot, explicitFile);
-  const projectId =
-    /^project_id\s*=\s*"([^"]+)"/m.exec(
-      readFileSync(path.join(repoRoot, "supabase", "config.toml"), "utf8"),
-    )?.[1] ?? "avandar";
+  const migrationFile = _getMigrationFilePath(repoRoot, explicitFile);
+  const projectId = _getProjectIdFromConfig(repoRoot);
 
   const original = readFileSync(migrationFile, "utf8");
   const statements = NoopViewRecreations.splitStatements(original);
@@ -242,44 +276,35 @@ function main(): void {
     return;
   }
 
-  const runSql = makeSqlRunner(projectId);
+  const runSql = _makeSqlRunner(projectId);
 
   // Refuse on an already-applied migration: the comparison below would then be
   // against a database that already contains the change, so a REAL view change
   // would look like a no-op and be silently stripped.
   const version = path.basename(migrationFile).split("_")[0] ?? "";
-  try {
-    const applied = runSql(
-      `select exists (select 1 from supabase_migrations.schema_migrations
-         where version = ${quoteLiteral(version)});`,
-    ).trim();
-    if (applied === "t") {
-      console.log(
-        `SKIPPED: migration ${version} is already applied, so a no-op check ` +
-          "against the live database would not be trustworthy. Run this " +
-          "before applying, or reset first.",
-      );
-      return;
-    }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+  const isAlreadyApplied = _isMigrationAlreadyApplied(runSql, version);
+  if (isAlreadyApplied === undefined) {
+    return;
+  }
+  if (isAlreadyApplied) {
     console.log(
-      `SKIPPED: could not reach the local database ` +
-        `(${message.split("\n")[0]}). Leaving the migration untouched.`,
+      `SKIPPED: migration ${version} is already applied, so a no-op check ` +
+        "against the live database would not be trustworthy. Run this " +
+        "before applying, or reset first.",
     );
     return;
   }
 
   const { removals, decisions } = NoopViewRecreations.planRemovals({
     statements,
-    isNoop: makeNoopCheck(runSql),
+    isNoop: _makeNoopCheck(runSql),
   });
 
-  for (const decision of decisions) {
+  decisions.forEach((decision) => {
     const label = decision.isRemoved ? "REMOVE" : "KEEP  ";
     const key = NoopViewRecreations.viewKey(decision.view);
     console.log(`  ${label}  ${key}  (${decision.reason})`);
-  }
+  });
 
   if (removals.length === 0) {
     console.log("Nothing provably redundant. Migration left untouched.");
