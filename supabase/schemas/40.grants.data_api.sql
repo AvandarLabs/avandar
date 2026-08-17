@@ -95,161 +95,161 @@ select
 ,
   insert,
 update,
-  delete on table public.dashboards to authenticated;
+delete on table public.dashboards to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.dataset_columns to authenticated;
+delete on table public.dataset_columns to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets to authenticated;
+delete on table public.datasets to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets__csv_file to authenticated;
+delete on table public.datasets__csv_file to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets__google_sheets to authenticated;
+delete on table public.datasets__google_sheets to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets__open_data to authenticated;
+delete on table public.datasets__open_data to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets__virtual to authenticated;
+delete on table public.datasets__virtual to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.datasets__xlsx_file to authenticated;
+delete on table public.datasets__xlsx_file to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.dexie_dbs to authenticated;
+delete on table public.dexie_dbs to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.entities to authenticated;
+delete on table public.entities to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.entity_configs to authenticated;
+delete on table public.entity_configs to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.entity_field_configs to authenticated;
+delete on table public.entity_field_configs to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.resource_shares to authenticated;
+delete on table public.resource_shares to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.role_group_app_roles to authenticated;
+delete on table public.role_group_app_roles to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.role_groups to authenticated;
+delete on table public.role_groups to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.tokens__google to authenticated;
+delete on table public.tokens__google to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.user_groups to authenticated;
+delete on table public.user_groups to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.user_profiles to authenticated;
+delete on table public.user_profiles to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.value_extractors__dataset_column_value to authenticated;
+delete on table public.value_extractors__dataset_column_value to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.value_extractors__manual_entry to authenticated;
+delete on table public.value_extractors__manual_entry to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.workspace_invites to authenticated;
+delete on table public.workspace_invites to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.workspace_memberships to authenticated;
+delete on table public.workspace_memberships to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-  delete on table public.workspaces to authenticated;
+delete on table public.workspaces to authenticated;
 
 ------------------------------------------------------------------------------
 -- service_role
@@ -269,4 +269,4 @@ select
 ,
   insert,
 update,
-  delete on all tables in schema public to service_role;
+delete on all tables in schema public to service_role;
