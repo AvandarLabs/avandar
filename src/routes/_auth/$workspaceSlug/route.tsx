@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { RootLayout } from "@/components/layouts/RootLayout/RootLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({
   component: WorkspaceRootLayout,

@@ -7,7 +7,7 @@ import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";

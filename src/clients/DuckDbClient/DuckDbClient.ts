@@ -10,6 +10,7 @@ import {
   exportDuckDbTableAsParquet,
   runDuckDbRawQuery,
 } from "@/clients/DuckDbClient/duckDbRawQuery";
+import { createDuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import { runLeasedDuckDbStructuredQuery } from "@/clients/DuckDbClient/duckDbStructuredQuery";
 import {
   dropDuckDbTableViewAndFile,
@@ -35,6 +36,7 @@ import type {
   RawQueryOptions,
 } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { DuckDbLoadCsvOptions } from "@/clients/DuckDbClient/duckDbCsvLoad";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import type { ILogger } from "@avandar/logger";
 import type * as duckdb from "@duckdb/duckdb-wasm";
@@ -52,9 +54,28 @@ const duckDbLogger: ILogger = Logger.appendName("DuckDbClient");
  * TODO(jpsyx): convert this to a composable function rather than a class.
  */
 class DuckDbClientImpl {
-  #connections = makeDuckDbConnectionManager(duckDbLogger);
+  #spatialAvailability = createDuckDbSpatialAvailabilityStore();
+  #connections = makeDuckDbConnectionManager({
+    logger: duckDbLogger,
+    spatialAvailability: this.#spatialAvailability,
+  });
 
   #logger: ILogger = duckDbLogger;
+
+  /** Starts DuckDB initialization if it has not already begun. */
+  async initialize(): Promise<void> {
+    await this.#connections.getDb();
+  }
+
+  /** Returns the current DuckDB Spatial capability state. */
+  getSpatialAvailability(): DuckDbSpatialAvailability {
+    return this.#spatialAvailability.getSnapshot();
+  }
+
+  /** Subscribes to DuckDB Spatial capability changes. */
+  subscribeSpatialAvailability(listener: () => void): () => void {
+    return this.#spatialAvailability.subscribe(listener);
+  }
 
   /**
    * Builds the operation bundle that extracted units call back into. It is

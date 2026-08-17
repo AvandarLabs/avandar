@@ -5,7 +5,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

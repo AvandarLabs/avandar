@@ -7,7 +7,17 @@
  * - `aggregateOnly`: exact points may never be drawn. Cells holding fewer than
  *   `minCellCount` records are suppressed rather than shown as zero.
  */
+export type ExactSensitivity = { mode: "exact" };
+
+export type JitterSensitivity = { mode: "jitter"; radiusMeters: number };
+
+export type AggregateOnlySensitivity = {
+  mode: "aggregateOnly";
+  minCellCount: number;
+  minGeoLevel: string;
+};
+
 export type SensitivityPolicy =
-  | { mode: "exact" }
-  | { mode: "jitter"; radiusMeters: number }
-  | { mode: "aggregateOnly"; minCellCount: number; minGeoLevel: string };
+  | ExactSensitivity
+  | JitterSensitivity
+  | AggregateOnlySensitivity;

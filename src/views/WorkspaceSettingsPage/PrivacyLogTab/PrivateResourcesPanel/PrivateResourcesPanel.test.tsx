@@ -65,8 +65,18 @@ describe("PrivateResourcesPanel", () => {
   it("renders a row per member with their counts", () => {
     useGetPrivateResourceCounts.mockReturnValue([
       [
-        { userId: "user-1", privateDashboardCount: 2, privateDatasetCount: 5 },
-        { userId: "user-2", privateDashboardCount: 7, privateDatasetCount: 3 },
+        {
+          userId: "user-1",
+          privateDashboardCount: 2,
+          privateDatasetCount: 5,
+          privateMapCount: 4,
+        },
+        {
+          userId: "user-2",
+          privateDashboardCount: 7,
+          privateDatasetCount: 3,
+          privateMapCount: 1,
+        },
       ],
       false,
       { isFetching: false },
@@ -76,6 +86,8 @@ describe("PrivateResourcesPanel", () => {
 
     expect(screen.getByText("Pablo")).toBeInTheDocument();
     expect(screen.getByText("Amara")).toBeInTheDocument();
+    expect(screen.getByText("Private maps")).toBeInTheDocument();
+    expect(screen.getByText("4")).toBeInTheDocument();
     expect(screen.getByText("7")).toBeInTheDocument();
   });
 
@@ -96,8 +108,18 @@ describe("PrivateResourcesPanel", () => {
   it("offers no reassign action for a member with nothing private", () => {
     useGetPrivateResourceCounts.mockReturnValue([
       [
-        { userId: "user-1", privateDashboardCount: 0, privateDatasetCount: 0 },
-        { userId: "user-2", privateDashboardCount: 1, privateDatasetCount: 0 },
+        {
+          userId: "user-1",
+          privateDashboardCount: 0,
+          privateDatasetCount: 0,
+          privateMapCount: 0,
+        },
+        {
+          userId: "user-2",
+          privateDashboardCount: 1,
+          privateDatasetCount: 0,
+          privateMapCount: 0,
+        },
       ],
       false,
       { isFetching: false },
@@ -112,7 +134,14 @@ describe("PrivateResourcesPanel", () => {
 
   it("does not render a private-resource row without a resolved member", () => {
     useGetPrivateResourceCounts.mockReturnValue([
-      [{ userId: "user-3", privateDashboardCount: 1, privateDatasetCount: 0 }],
+      [
+        {
+          userId: "user-3",
+          privateDashboardCount: 1,
+          privateDatasetCount: 0,
+          privateMapCount: 0,
+        },
+      ],
       false,
       { isFetching: false },
     ]);
@@ -125,7 +154,14 @@ describe("PrivateResourcesPanel", () => {
 
   it("keeps cached private-resource data hidden during a mount refetch", () => {
     useGetPrivateResourceCounts.mockReturnValue([
-      [{ userId: "user-1", privateDashboardCount: 2, privateDatasetCount: 5 }],
+      [
+        {
+          userId: "user-1",
+          privateDashboardCount: 2,
+          privateDatasetCount: 5,
+          privateMapCount: 0,
+        },
+      ],
       false,
       { isFetching: true },
     ]);
@@ -153,7 +189,14 @@ describe("PrivateResourcesPanel", () => {
 
   it("keeps the panel mounted while cached member names refetch", () => {
     useGetPrivateResourceCounts.mockReturnValue([
-      [{ userId: "user-1", privateDashboardCount: 1, privateDatasetCount: 0 }],
+      [
+        {
+          userId: "user-1",
+          privateDashboardCount: 1,
+          privateDatasetCount: 0,
+          privateMapCount: 0,
+        },
+      ],
       false,
       { isFetching: false },
     ]);

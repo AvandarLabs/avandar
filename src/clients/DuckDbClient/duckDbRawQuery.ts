@@ -1,6 +1,7 @@
 import { MIMEType } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import * as arrow from "apache-arrow";
+import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
@@ -96,6 +97,12 @@ async function _executeRawQuery<RowObject extends UnknownRow>(
 ): Promise<Blob | QueryResult.T<RowObject>> {
   const { client, options, queryString, queryStringToUse } = input;
   const conn = options.conn ?? (await client.connect());
+  const removeAbortListener =
+    options.signal ?
+      abortDuckDbQuery({ signal: options.signal, connection: conn })
+    : () => {
+        return undefined;
+      };
   try {
     client.logger.log("Executing query", { query: queryStringToUse });
     if ((options.returnType ?? "js") === "js") {
@@ -115,6 +122,7 @@ async function _executeRawQuery<RowObject extends UnknownRow>(
     });
     throw error;
   } finally {
+    removeAbortListener();
     if (conn !== options.conn) {
       await client.closeConnection(conn);
     }

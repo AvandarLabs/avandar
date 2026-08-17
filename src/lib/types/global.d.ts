@@ -1,7 +1,14 @@
 import type { GooglePickerAPI } from "@/lib/types/google-picker";
+import type { Map as MapLibreMap } from "maplibre-gl";
 
 declare global {
   interface Window {
+    /**
+     * Development-only E2E inspection hook for projecting a known map feature
+     * into the currently rendered MapLibre canvas.
+     */
+    __avandarE2EMap?: MapLibreMap;
+
     /**
      * Google API's for different services. This is optional because
      * it is loaded asynchronously on-demand, so it is not always available

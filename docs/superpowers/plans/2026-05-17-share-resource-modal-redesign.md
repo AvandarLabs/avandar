@@ -747,7 +747,11 @@ Expected: FAIL (`buildShareSummary` does not exist).
 - [ ] **Step 3.5: Implement `shareSummary.ts`**
 
 ```ts
-import { appForResource, appLabel, resourceTypeLabel } from "./shareCopy";
+import {
+  appForResource,
+  appLabel,
+  resourceTypeLabel,
+} from "./shareCopy/shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -958,7 +962,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
-import { appForResource, appLabel, SHARE_COPY } from "./shareCopy";
+import { appForResource, appLabel, SHARE_COPY } from "./shareCopy/shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -1126,7 +1130,7 @@ Run: `pnpm test -- SharePrincipalRow` → expect PASS.
 ```tsx
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { SHARE_COPY } from "./shareCopy";
+import { SHARE_COPY } from "./shareCopy/shareCopy";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Option = { value: string; label: string };
@@ -1298,7 +1302,7 @@ import {
   appLabel,
   resourceTypeLabel,
   SHARE_COPY,
-} from "./shareCopy";
+} from "./shareCopy/shareCopy";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -1994,7 +1998,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { propEq } from "@utils";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { SharedWithMeView } from "@/views/SharedWithMeView/SharedWithMeView";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/shared-with-me")({

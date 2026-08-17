@@ -6,12 +6,12 @@ import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootW
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import { AppLinks } from "@/config/AppLinks";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { AppLinks } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 import type { ReactNode } from "react";
 
 type Props = {

@@ -2,7 +2,7 @@ import { capitalize, propEq } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource } from "../copy/appForResource";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -183,7 +183,7 @@ export function buildShareSummary(
   opts: Readonly<BuildShareSummaryOptions>,
 ): SummarySpan[] {
   const resource = resourceTypeLabel(opts.resourceType);
-  const app = appLabel(appForResource(opts.resourceType));
+  const app = appLabel(getAppTypeFromResourceType(opts.resourceType));
 
   const userShares = opts.shares
     .filter(hasPrincipalId)

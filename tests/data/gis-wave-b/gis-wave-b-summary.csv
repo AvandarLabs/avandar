@@ -1,0 +1,8 @@
+boundary_key,value
+A,10
+" A ",20
+Á,30
+Z,40
+DUPLICATE,50
+DUPLICATE,60
+,70

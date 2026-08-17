@@ -9,7 +9,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";

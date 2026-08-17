@@ -1,0 +1,35 @@
+.symbologyOptionsItem {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 4px;
+  height: 26px;
+  justify-content: center;
+  transition:
+    background 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.symbologyOptionsItem[aria-pressed="true"] {
+  background: var(--ava-surface-raised);
+  box-shadow: var(--mantine-shadow-xs);
+  color: var(--mantine-color-text);
+}
+
+/* Keep unavailable controls focusable so their explanation remains reachable. */
+.symbologyOptionsItem[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .symbologyOptionsItem {
+    height: 40px;
+  }
+}

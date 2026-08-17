@@ -16,13 +16,15 @@ export function PrivateResourceRow({
 }: Readonly<Props>): React.ReactNode {
   const hasPrivateResources =
     privateResourceCount.privateDashboardCount > 0 ||
-    privateResourceCount.privateDatasetCount > 0;
+    privateResourceCount.privateDatasetCount > 0 ||
+    privateResourceCount.privateMapCount > 0;
 
   return (
     <Table.Tr>
       <Table.Td>{memberName}</Table.Td>
       <Table.Td>{privateResourceCount.privateDashboardCount}</Table.Td>
       <Table.Td>{privateResourceCount.privateDatasetCount}</Table.Td>
+      <Table.Td>{privateResourceCount.privateMapCount}</Table.Td>
       <Table.Td>
         {hasPrivateResources ?
           <Button

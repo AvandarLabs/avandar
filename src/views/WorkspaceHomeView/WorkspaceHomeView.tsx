@@ -13,7 +13,7 @@ import {
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import type { Workspace } from "$/models/Workspace/Workspace";

@@ -15,6 +15,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: -4.44, lon: 15.27, cases: 12 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -34,6 +35,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 1, lon: 2, cases: 3 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -49,6 +51,7 @@ describe("makeFeatureCollectionFromRows", () => {
         { lat: 1, lon: undefined },
       ],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -62,6 +65,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: "not a number", lon: 2 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -74,6 +78,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: "-4.44", lon: "15.27" }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -87,6 +92,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 0, lon: 0 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -99,6 +105,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 120.5, lon: 45.1 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -111,6 +118,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 120.5, lon: 200.1 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -123,6 +131,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 200, lon: 45 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -138,6 +147,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 91, lon: 89 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -150,6 +160,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 180, lon: 90 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -162,6 +173,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows: [{ lat: 180.0001, lon: 90.0001 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -177,6 +189,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const result = makeFeatureCollectionFromRows({
       rows,
       binding,
+      propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
     });
@@ -188,6 +201,7 @@ describe("makeFeatureCollectionFromRows", () => {
     const jittered = makeFeatureCollectionFromRows({
       rows: [{ lat: -4.44, lon: 15.27 }],
       binding,
+      propertyColumnNames: "all",
       sensitivity: { mode: "jitter", radiusMeters: 500 },
       layerId: "layer-1",
     });
@@ -199,17 +213,100 @@ describe("makeFeatureCollectionFromRows", () => {
   });
 
   it("refuses to build exact points for an aggregate-only layer", () => {
-    expect(() => {
-      return makeFeatureCollectionFromRows({
-        rows: [{ lat: -4.44, lon: 15.27 }],
-        binding,
-        sensitivity: {
-          mode: "aggregateOnly",
-          minCellCount: 5,
-          minGeoLevel: "admin2",
-        },
-        layerId: "layer-1",
-      });
-    }).toThrow(/aggregate/i);
+    const caughtError = (() => {
+      try {
+        makeFeatureCollectionFromRows({
+          rows: [{ lat: -4.44, lon: 15.27 }],
+          binding,
+          propertyColumnNames: "all",
+          sensitivity: {
+            mode: "aggregateOnly",
+            minCellCount: 5,
+            minGeoLevel: "admin2",
+          },
+          layerId: "layer-1",
+        });
+        return undefined;
+      } catch (error) {
+        return error;
+      }
+    })();
+
+    expect(caughtError).toMatchObject({ code: "aggregateOnly" });
+  });
+});
+
+describe("feature properties", () => {
+  it("keeps only the requested columns", () => {
+    const { featureCollection } = makeFeatureCollectionFromRows({
+      rows: [{ lat: 1, lng: 2, caseId: "c1", outcome: "recovered" }],
+      binding: {
+        type: "latLngColumns",
+        latitudeColumnName: "lat",
+        longitudeColumnName: "lng",
+      },
+      propertyColumnNames: ["caseId"],
+      sensitivity: { mode: "exact" },
+      layerId: "layer-1",
+    });
+    expect(featureCollection.features[0]?.properties).toEqual({
+      caseId: "c1",
+    });
+  });
+
+  it("omits requested columns that are not own properties of the row", () => {
+    const row = Object.create({ inherited: "ignore" }) as Record<
+      string,
+      unknown
+    >;
+    Object.assign(row, { lat: 1, lng: 2, caseId: "c1" });
+
+    const { featureCollection } = makeFeatureCollectionFromRows({
+      rows: [row],
+      binding: {
+        type: "latLngColumns",
+        latitudeColumnName: "lat",
+        longitudeColumnName: "lng",
+      },
+      propertyColumnNames: ["caseId", "missing", "inherited"],
+      sensitivity: { mode: "exact" },
+      layerId: "layer-1",
+    });
+
+    expect(featureCollection.features[0]?.properties).toEqual({
+      caseId: "c1",
+    });
+  });
+
+  it("includes a coordinate column when it is explicitly requested", () => {
+    const { featureCollection } = makeFeatureCollectionFromRows({
+      rows: [{ lat: 1, lng: 2 }],
+      binding: {
+        type: "latLngColumns",
+        latitudeColumnName: "lat",
+        longitudeColumnName: "lng",
+      },
+      propertyColumnNames: ["lat"],
+      sensitivity: { mode: "exact" },
+      layerId: "layer-1",
+    });
+    expect(featureCollection.features[0]?.properties).toEqual({ lat: 1 });
+  });
+
+  it("keeps every column except the bound coordinates when asked for all", () => {
+    const { featureCollection } = makeFeatureCollectionFromRows({
+      rows: [{ lat: 1, lng: 2, caseId: "c1" }],
+      binding: {
+        type: "latLngColumns",
+        latitudeColumnName: "lat",
+        longitudeColumnName: "lng",
+      },
+      propertyColumnNames: "all",
+      sensitivity: { mode: "exact" },
+      layerId: "layer-1",
+    });
+    expect(featureCollection.features[0]?.properties).toEqual({
+      caseId: "c1",
+    });
   });
 });

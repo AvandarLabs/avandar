@@ -1,0 +1,19 @@
+.heatmapLegend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+}
+
+.heatmapLegendGradient {
+  border: 1px solid var(--ava-border-strong);
+  border-radius: var(--mantine-radius-xs);
+  height: 12px;
+  width: 100%;
+}
+
+.heatmapLegendLabels {
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  font-size: 11px;
+  justify-content: space-between;
+}
