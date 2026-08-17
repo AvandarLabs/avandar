@@ -11,15 +11,15 @@ import { uuid } from "$/lib/uuid";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { match } from "ts-pattern";
-import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient/PublicQetlClient";
 import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -184,11 +184,11 @@ async function _runSourceQuery({
       });
     },
 
-    // Entity sources resolve through EntityFieldValueClient, which may in
+    // Individual sources resolve through AttributeAssertionClient, which may in
     // turn query many datasets.
-    EntityConfig: async (entityConfig): Promise<QueryResult.T<UnknownRow>> => {
-      return await _runEntityConfigQuery({
-        entityConfig,
+    Concept: async (concept): Promise<QueryResult.T<UnknownRow>> => {
+      return await _runConceptQuery({
+        concept,
         sortedQueryColumns,
         workspaceId,
       });
@@ -197,58 +197,59 @@ async function _runSourceQuery({
 }
 
 /**
- * Runs an entity-source query.
+ * Runs an individual-source query.
  *
- * @returns The requested fields' values, keyed by field name.
+ * @returns The requested attributes' values, keyed by attribute name.
  */
-async function _runEntityConfigQuery({
-  entityConfig,
+async function _runConceptQuery({
+  concept,
   sortedQueryColumns,
   workspaceId,
 }: {
-  entityConfig: EntityConfig.T;
+  concept: Concept.T;
   sortedQueryColumns: SortedQueryColumns;
   workspaceId: Workspace.Id;
 }): Promise<QueryResult.T<UnknownRow>> {
   // TODO(jpsyx): optimize this by using a progressive
   // table-materialization approach
-  const fields = sortedQueryColumns
+  const attributes = sortedQueryColumns
     .map(prop("baseColumn"))
-    .filter(Model.valIsOfModelType("EntityFieldConfig"));
+    .filter(Model.valIsOfModelType("ConceptAttribute"));
 
   // TODO(jpsyx): we still need to apply group bys, aggregations,
   // and sorting. Right now its just returning all values for the
-  // requested fields.
-  const rows = await EntityFieldValueClient.getAllEntityFieldValues({
-    entityConfigId: entityConfig.id,
-    entityFieldConfigs: fields,
+  // requested attributes.
+  const rows = await AttributeAssertionClient.getConceptExtension({
+    conceptId: concept.id,
+    conceptAttributes: attributes,
     workspaceId,
   });
 
-  return _buildEntityConfigResult(fields, rows);
+  return _buildConceptQueryResult(attributes, rows);
 }
 
 /**
- * Builds a {@link QueryResult} out of the raw rows `EntityFieldValueClient`
- * returns, remapping each row from field ids to the field names the rest of
- * the query pipeline expects columns to be keyed by.
+ * Builds a {@link QueryResult} out of the raw rows `AttributeAssertionClient`
+ * returns, remapping each row from attribute ids to the attribute names the
+ * rest of the query pipeline expects columns to be keyed by.
  */
-function _buildEntityConfigResult(
-  fields: readonly EntityFieldConfig.T[],
-  rows: ReadonlyArray<Record<EntityFieldConfig.Id, unknown>>,
+function _buildConceptQueryResult(
+  attributes: readonly ConceptAttribute.T[],
+  rows: ReadonlyArray<Record<ConceptAttribute.Id, unknown>>,
 ): QueryResult.T<UnknownRow> {
-  const queryResultColumns: QueryResult.Column[] = fields.map(
+  const queryResultColumns: QueryResult.Column[] = attributes.map(
     pickProps(["name", "dataType"]),
   );
 
   return {
     id: uuid<QueryResult.Id>(),
-    // Mapping over `fields` rather than over the derived columns keeps each
-    // field's id in hand, so no per-row lookup back into `fields` is needed.
+    // Mapping over `attributes` rather than over the derived columns keeps
+    // each attribute's id in hand, so no per-row lookup back into
+    // `attributes` is needed.
     data: rows.map((row) => {
       return makeObjectFromEntries(
-        fields.map((field) => {
-          return [field.name, row[field.id]];
+        attributes.map((attribute) => {
+          return [attribute.name, row[attribute.id]];
         }),
       );
     }),
@@ -259,7 +260,7 @@ function _buildEntityConfigResult(
 
 /**
  * Runs a structured query (or caller-supplied raw SQL) against the right QETL
- * client, resolving dataset and entity sources.
+ * client, resolving dataset and individual sources.
  *
  * This is the single execution path shared by the Data Explorer and the GIS
  * app. Callers wrap it in their own caching hook rather than duplicating the

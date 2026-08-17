@@ -80,29 +80,29 @@ export const NavbarLinks = {
       },
     };
   },
-  entityDesignerHome: (workspaceSlug: string) => {
+  ontologyDesignerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesignerHome(workspaceSlug),
+      link: AppLinks.ontologyDesignerHome(workspaceSlug),
       icon: <IconBlocks size={DEFAULT_ICON_SIZE} stroke={1.5} />,
       isEnabled: () => {
         return !isFlagEnabled(FeatureFlag.DisableProfileManager);
       },
     };
   },
-  entityManagerHome: ({
+  individualManagerHome: ({
     workspaceSlug,
-    entityConfigId,
-    entityConfigName,
+    conceptId,
+    conceptName,
   }: {
     workspaceSlug: string;
-    entityConfigId: string;
-    entityConfigName: string;
+    conceptId: string;
+    conceptName: string;
   }) => {
     return {
-      link: AppLinks.entityManagerHome({
+      link: AppLinks.individualManagerHome({
         workspaceSlug,
-        entityConfigId,
-        entityConfigName,
+        conceptId,
+        conceptName,
       }),
       icon: <IconBlocks size={DEFAULT_ICON_SIZE} stroke={1.5} />,
       isEnabled: () => {

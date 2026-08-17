@@ -11,7 +11,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * Loads one layer's rows through the shared structured-query executor.
  *
  * Any source the executor understands works here, so dataset, virtual, and
- * entity sources all render without map-specific handling.
+ * individual sources all render without map-specific handling.
  */
 export function useMapLayerData({
   layer,

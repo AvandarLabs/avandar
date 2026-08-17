@@ -21,9 +21,9 @@ export enum FeatureFlag {
   DisableSelfRegistration = "disable-self-registration",
 
   /**
-   * Disable manual entity fields. Users are not allowed to manually change
-   * the values of entity fields. This will be removed once the feature is
-   * ready.
+   * Disable manually entered attributes. Users are not allowed to manually
+   * change the values of concept attributes. This will be removed once the
+   * feature is ready.
    */
   DisableManualData = "disable-manual-data",
 
