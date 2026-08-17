@@ -24,6 +24,14 @@ create table public.datasets__google_sheets (
 -- Enable row level security
 alter table public.datasets__google_sheets enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__google_sheets to authenticated;
+
 -- Policies
 create policy "User can select datasets__google_sheets in their workspace" on public.datasets__google_sheets for
 select

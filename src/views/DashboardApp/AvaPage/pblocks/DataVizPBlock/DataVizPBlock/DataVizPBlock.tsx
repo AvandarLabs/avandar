@@ -10,8 +10,8 @@ import { useLocalFilterState } from "@/views/DashboardApp/AvaPage/pblocks/DataVi
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
-import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import type { UnknownDataFrame } from "@avandar/utils";
@@ -85,6 +85,7 @@ function useDataVizQuery(
   const [queryResults, isLoading] = useDataQuery({
     query: emptyStructuredQuery,
     rawSql: options.filteredSql,
+    analyticsSurface: "dashboard_block",
     ...queryAuth,
   });
   // Memoized separately rather than returned as fresh literals: both are

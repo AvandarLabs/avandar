@@ -20,6 +20,14 @@ create table public.concepts (
 -- Enable row level security
 alter table public.concepts enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.concepts to authenticated;
+
 -- Policies
 create policy "User can SELECT concepts" on public.concepts for
 select

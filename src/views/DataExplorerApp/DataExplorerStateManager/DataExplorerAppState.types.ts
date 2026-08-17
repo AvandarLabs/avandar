@@ -1,4 +1,5 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
@@ -78,6 +79,24 @@ export type DataExplorerAppState = {
    * cache. `undefined` while no query has succeeded.
    */
   lastResultColumns: readonly QueryResultColumn[] | undefined;
+
+  /**
+   * What caused the query that is about to run, recorded on `query.ran` and
+   * `query.failed`. The explorer re-runs on every pill and limit change, so
+   * this is what separates a deliberate run from an incidental one in
+   * reporting.
+   *
+   * Manual-form actions stamp `structured_change` themselves. Every other
+   * origin dispatches `setQueryTrigger` so that it holds its final value by
+   * the end of the synchronous block that changes the query.
+   *
+   * The initial value of `structured_change` is never itself observed as a
+   * stale trigger: no query key exists until a dispatch changes the query,
+   * and by then something has stamped this field. It is also the correct
+   * value for the first thing that happens on an untouched form, which is
+   * always a manual-form action.
+   */
+  queryTrigger: UserQueryAnalyticsTrigger;
 };
 
 export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
@@ -92,4 +111,5 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   isStructuredQueryInSync: true,
   sqlSyncWarnings: [],
   lastResultColumns: undefined,
+  queryTrigger: "structured_change",
 };

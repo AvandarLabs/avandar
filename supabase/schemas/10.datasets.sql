@@ -41,6 +41,14 @@ create table public.datasets (
 -- RLS and policies: `17.rls.datasets.sql`.
 alter table public.datasets enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets to authenticated;
+
 /** Prevents a dataset from being reassigned to another workspace. */
 create or replace function public.datasets__prevent_workspace_id_change () returns trigger language plpgsql
 set
