@@ -19,6 +19,37 @@
 -- in-app reader and no platform-admin concept anywhere in this schema.
 create schema if not exists analytics;
 
+-- KNOWN DIFF ARTIFACT, not a defect to chase.
+--
+-- Every `supabase db diff` emits a `drop view if exists` plus a
+-- `create or replace view` for all seven `analytics.*` views, even when nothing
+-- in this directory changed. Keep them in the generated migration.
+--
+-- They are semantically no-ops, and this was measured rather than assumed.
+-- The stored definitions are the same on both sides; the ONLY difference is
+-- schema qualification, which `pg_get_viewdef` decides at render time from
+-- `search_path` and does not store:
+--
+--   search_path = public, extensions
+--     -> from usage_analytics_events
+--   search_path = pg_catalog
+--     -> from public.usage_analytics_events
+--
+-- Rendered with `public` out of the path, the live definition is
+-- byte-identical to the one `db diff` wants to install. So the diff compares
+-- two renderings of one parse tree under different connection settings, not
+-- two different views, and no edit to the SQL below can change it.
+--
+-- Everything that would make a recreation risky was checked and is absent: the
+-- views hold no data, `relacl` is null on both sides so no privilege change
+-- rides along, and no analytics view depends on another so nothing cascades.
+--
+-- This is the "some view recreation cases" entry in the declarative-schema
+-- caveats. Leave the statements in the generated migration. Hand-editing a
+-- generated migration means deciding by eye which of hundreds of statements are
+-- legitimate, and a wrong call ships a database that no longer matches this
+-- directory, which is the drift that caused the grant problem in the first
+-- place. These particular statements are the harmless ones.
 revoke all on schema analytics
 from
   public,
