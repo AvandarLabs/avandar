@@ -169,7 +169,7 @@ msgstr "Chagua mfano wa mazungumzo"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Skip this step"
-msgstr ""
+msgstr "Ruka hatua hii"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -658,7 +658,7 @@ msgstr "Jina la safu"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Only you can see this"
-msgstr ""
+msgstr "Ni wewe pekee unayeweza kuona hili"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -674,7 +674,7 @@ msgstr "Rangi nyingine"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
-msgstr ""
+msgstr "Waruhusu wenzako wafungue ulichotengeneza hivi punde."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -691,7 +691,7 @@ msgstr "Ongeza safu kwenye swali hapo juu ili kuanza kufafanua filtria."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open it to your workspace"
-msgstr ""
+msgstr "Fungua kwenye workspace yako"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
@@ -752,7 +752,7 @@ msgstr "Chati ya Viputo"
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Restart tutorial"
-msgstr ""
+msgstr "Anzisha upya mafunzo"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -803,7 +803,7 @@ msgstr "Ramani"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Change the chart if you like"
-msgstr ""
+msgstr "Badilisha chati ukitaka"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -1040,7 +1040,7 @@ msgstr "Itifaki"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Build your first dashboard"
-msgstr ""
+msgstr "Tengeneza dashboard yako ya kwanza"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
@@ -1066,7 +1066,7 @@ msgstr "Ondoa ufikiaji kwa {displayName}"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 msgid "Run a query first."
-msgstr ""
+msgstr "Endesha swali kwanza."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
@@ -1153,7 +1153,7 @@ msgstr "Pikseli za maelezo za kuondoa katika ukuzaji wa sasa. Weka sifuri ili "
 
 #: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Skip"
-msgstr ""
+msgstr "Ruka"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
@@ -1226,7 +1226,9 @@ msgstr "Hadharani"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
-msgstr ""
+msgstr "Viewer huwawezesha watu kukitazama. Editor huwawezesha kukibadilisha. "
+"Viewer ndilo chaguo salama kwa chaguo-msingi, na unaweza kubadilisha "
+"jukumu la mtu yeyote baadaye."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -1243,7 +1245,7 @@ msgstr "Data ya {0} imekatwa"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Share it with your workspace"
-msgstr ""
+msgstr "Shiriki kwenye workspace yako"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1882,7 +1884,9 @@ msgstr "Hifadhi URL"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 "unshare another dashboard, and come back to this."
-msgstr ""
+msgstr "Mpango wako hauruhusu kushiriki dashboard nyingine. Unaweza kuboresha "
+"mpango wako, au kuondoa ushiriki wa dashboard nyingine, kisha urudi "
+"hapa."
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -2170,7 +2174,7 @@ msgstr "Ruhusu {pluralConceptName} mpya kuundwa kwa mikono"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
-msgstr ""
+msgstr "Karibu Avandar"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -2413,7 +2417,8 @@ msgstr "Nenosiri limeboreshwa kwa mafanikio"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
-msgstr ""
+msgstr "Fungua Save kisha uchague \"Save to dashboard\". Ipe dashboard jina, "
+"iunde, na Avandar itakupeleka huko."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -2717,7 +2722,7 @@ msgstr "Chati ya Rada"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started {completedCount}/{totalMilestoneCount}"
-msgstr ""
+msgstr "Anza {completedCount}/{totalMilestoneCount}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
@@ -2766,7 +2771,7 @@ msgstr "Safu mlalo {rowIndexes}."
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Dismiss the tutorial"
-msgstr ""
+msgstr "Funga mafunzo"
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2881,7 +2886,7 @@ msgstr "Chanzo cha data"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
-msgstr ""
+msgstr "Leta lahajedwali kwenye Avandar."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
@@ -3322,7 +3327,7 @@ msgstr "Umesahau nenosiri lako?"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
-msgstr ""
+msgstr "Pata jibu kutoka kwenye data uliyoongeza hivi punde."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -3468,7 +3473,7 @@ msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. Hawezi "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "It profiled your data for you"
-msgstr ""
+msgstr "Ilichanganua data yako kwa ajili yako"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -3670,7 +3675,7 @@ msgstr "Nakala ya {0}"
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 #: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Next"
-msgstr ""
+msgstr "Ifuatayo"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
@@ -3710,7 +3715,7 @@ msgstr "Avandar (chaguo la kawaida)"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Add your first dataset"
-msgstr ""
+msgstr "Ongeza dataset yako ya kwanza"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -3719,7 +3724,8 @@ msgstr "Pana"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
-msgstr ""
+msgstr "Fungua Data Summary uone Avandar ilichobaini yenyewe: safu, mgawanyo, "
+"na data inayokosekana. Hukuhitaji kuuliza."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -3902,7 +3908,7 @@ msgstr "Inazalisha SQL…"
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
-msgstr ""
+msgstr "Pitia tena jinsi ya kutengeneza na kushiriki dashboard, kuanzia mwanzo."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -4055,7 +4061,7 @@ msgstr "Kukadiria dhana za SQL"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it and save"
-msgstr ""
+msgstr "Ipe jina na uhifadhi"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -4085,7 +4091,7 @@ msgstr "CTEs (vifungu vya WITH) havitumiki katika fomu."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
-msgstr ""
+msgstr "Anza na lahajedwali"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -4132,7 +4138,8 @@ msgstr "Panga upya safu {layerName}"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
-msgstr ""
+msgstr "Hii ni Data Explorer, na huyu ni Ava. Uliza swali kwa Kiingereza "
+"rahisi, kama vile \"total revenue by region\"."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -4727,7 +4734,8 @@ msgstr "Uhamishaji wa umiliki umeshindikana"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
 "your first dashboard."
-msgstr ""
+msgstr "Unataka ziara ya haraka? Kwa takriban dakika 5, utatoka kwenye "
+"lahajedwali hadi dashboard yako ya kwanza."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -4841,7 +4849,8 @@ msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
-msgstr ""
+msgstr "Avandar tayari ilisoma faili yako na kukisia kila safu ina nini. Ipe "
+"dataset jina, kisha uhifadhi."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5474,7 +5483,7 @@ msgstr "Ingia tena"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
-msgstr ""
+msgstr "Si sasa"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
@@ -5539,7 +5548,7 @@ msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
-msgstr ""
+msgstr "Ava iliandika SQL, ikaiendesha, na ikachagua chati ya kuionyesha."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -5561,7 +5570,7 @@ msgstr "Onyesha maeneo kamili?"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Just ask"
-msgstr ""
+msgstr "Uliza tu"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Expand the layer panel"
@@ -5577,7 +5586,7 @@ msgstr "Safu 1"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Pick what they can do"
-msgstr ""
+msgstr "Chagua wanachoweza kufanya"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -5727,7 +5736,7 @@ msgstr "Ufafanuzi wa ugunduzi"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
-msgstr ""
+msgstr "Anza ziara"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -6351,7 +6360,8 @@ msgstr "Pakia karatasi ya kazi"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
-msgstr ""
+msgstr "Uko kwenye Data Manager, Import. Chagua faili la CSV au Excel kutoka "
+"kwenye kompyuta yako."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -6390,7 +6400,7 @@ msgstr "Imeshindikana kuweka kuwa ya faragha"
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
-msgstr ""
+msgstr "Mafunzo"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -6746,7 +6756,7 @@ msgstr "Kikundi kipya cha mtumiaji"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
-msgstr ""
+msgstr "Hifadhi chati hiyo mahali ambapo unaweza kuirudia."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6936,7 +6946,8 @@ msgstr "Badilisha ukubwa wa paneli ya pembeni"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
-msgstr ""
+msgstr "Kichupo cha Visualizations kina mipangilio ya chati, ikiwa hii si aina "
+"uliyotaka."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -7299,7 +7310,8 @@ msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
-msgstr ""
+msgstr "Dashboard yako ipo, lakini bado hakuna mtu mwingine anayeweza "
+"kuifungua. Hebu turekebishe hilo."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Largest radius"
@@ -7354,7 +7366,7 @@ msgstr "{0} m"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it to a dashboard"
-msgstr ""
+msgstr "Ihifadhi kwenye dashboard"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -7489,7 +7501,7 @@ msgstr "Eneo lako la kazi limetumia {currentSeatUsage} ya viti vyake "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "There's your answer"
-msgstr ""
+msgstr "Hilo ndilo jibu lako"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "This is where you select which columns from which datasets should be "
@@ -7618,7 +7630,7 @@ msgstr "Ni uwanja gani unapaswa kutumika kama jina la {singularConceptName}?"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
-msgstr ""
+msgstr "Uliza swali lako la kwanza"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -7680,7 +7692,9 @@ msgstr "Imehamishwa"
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
-msgstr ""
+msgstr "Workspace inamaanisha kila mtu katika workspace yako, si umma. Hakuna "
+"chochote hapa kinachounda kiungo cha umma. Na unaweza kukirudisha kuwa "
+"Private wakati wowote upendao."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -7834,7 +7848,7 @@ msgstr "Futa yote"
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 #: src/components/Nux/NuxTour/NuxTour.tsx
 msgid "Close"
-msgstr ""
+msgstr "Funga"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -7888,7 +7902,7 @@ msgstr "Haijaripotiwa"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "No spreadsheet handy? <0>Download our sample</0> and use that."
-msgstr ""
+msgstr "Huna lahajedwali karibu? <0>Pakua sampuli yetu</0> na uitumie."
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
@@ -7923,7 +7937,7 @@ msgstr "Tarehe isiyo sahihi"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started"
-msgstr ""
+msgstr "Anza"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"

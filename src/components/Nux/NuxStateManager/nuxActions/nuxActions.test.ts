@@ -1,8 +1,8 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { describe, expect, it } from "vitest";
 import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions/nuxActions";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 const HYDRATED: NuxAppState = {
   ...INITIAL_NUX_STATE,
@@ -104,7 +104,9 @@ describe("nuxActions.completeMilestone", () => {
       activeMilestoneKey: "run_query",
       activeStepIndex: 1,
     };
-    const nextState = nuxActions.completeMilestone(state, { key: "add_dataset" });
+    const nextState = nuxActions.completeMilestone(state, {
+      key: "add_dataset",
+    });
     expect(nextState.activeMilestoneKey).toBe("run_query");
     expect(nextState.activeStepIndex).toBe(1);
   });

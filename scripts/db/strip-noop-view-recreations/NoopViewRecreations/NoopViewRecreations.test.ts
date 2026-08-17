@@ -39,23 +39,20 @@ function _strip(sql: string, isNoop = ALWAYS_NOOP): string {
 describe("splitStatements", () => {
   it("splits on top-level semicolons", () => {
     const statements = splitStatements("select 1;\n\nselect 2;\n");
-    expect(
-      statements.map(prop("body")),
-    ).toEqual(["select 1", "select 2"]);
+    expect(statements.map(prop("body"))).toEqual(["select 1", "select 2"]);
   });
 
   it("ignores semicolons inside single-quoted strings", () => {
     const statements = splitStatements("select 'a;b';\nselect 2;");
-    expect(
-      statements.map(prop("body")),
-    ).toEqual(["select 'a;b'", "select 2"]);
+    expect(statements.map(prop("body"))).toEqual(["select 'a;b'", "select 2"]);
   });
 
   it("handles doubled quotes as escapes, not string terminators", () => {
     const statements = splitStatements("select 'it''s; fine';\nselect 2;");
-    expect(
-      statements.map(prop("body")),
-    ).toEqual(["select 'it''s; fine'", "select 2"]);
+    expect(statements.map(prop("body"))).toEqual([
+      "select 'it''s; fine'",
+      "select 2",
+    ]);
   });
 
   // The analytics category function is a `$$`-quoted body full of semicolons.
@@ -300,8 +297,8 @@ describe("applyRemovals", () => {
       "",
     ].join("\n\n");
     const statements = splitStatements(_strip(sql));
-    expect(
-      statements.map(prop("body")),
-    ).toEqual(['create table "public"."t" (id int)']);
+    expect(statements.map(prop("body"))).toEqual([
+      'create table "public"."t" (id int)',
+    ]);
   });
 });

@@ -10,8 +10,9 @@ import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 export function getFirstUnfinishedMilestoneKey(
   completedMilestones: readonly NuxProgress.MilestoneKey[],
 ): NuxProgress.MilestoneKey | undefined {
+  const completedSet = new Set(completedMilestones);
   return NuxProgress.milestoneKeys.find((key) => {
-    return !completedMilestones.includes(key);
+    return completedSet.has(key);
   });
 }
 

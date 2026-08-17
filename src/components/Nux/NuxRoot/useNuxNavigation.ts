@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 

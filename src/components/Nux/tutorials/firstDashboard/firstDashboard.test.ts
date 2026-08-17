@@ -1,5 +1,5 @@
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { prop } from "@avandar/utils";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { describe, expect, it } from "vitest";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 

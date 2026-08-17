@@ -1,5 +1,5 @@
-import { isDesktop } from "$/platform/isDesktop";
 import { useMediaQuery } from "@mantine/hooks";
+import { isDesktop } from "$/platform/isDesktop";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
