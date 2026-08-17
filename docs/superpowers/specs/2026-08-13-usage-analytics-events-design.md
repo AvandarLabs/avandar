@@ -22,11 +22,37 @@ readable end to end from service-role SQL. Two views carry columns that stay
 empty until Phase 3 instruments `query.ran`, `chat.turn_completed`, and
 `chat.turn.failed`.
 
-**Phase 3, product events: next.** `analyticsSurface` on `useDataQuery`,
-`query.ran`, `query.failed`, `dashboard.pdf_exported`,
-`dashboard.share_settings_updated`, `chat.turn_completed`, and
-`chat.turn_failed`. The reporting views that read those events already exist,
-so Phase 3 ships instrumentation only.
+**Phase 3, product events: complete (2026-08-15).** `analyticsSurface` on
+`useDataQuery`, `query.ran`, `query.failed`, `dashboard.pdf_exported`,
+`chat.turn_completed`, and `chat.turn_failed` are implemented. Implemented by
+`docs/superpowers/plans/2026-08-15-analytics-product-events.md`. No database
+change was needed: every column, category mapping, and reporting view these
+events feed already existed. `analytics.activation.days_to_first_query` and the
+`analytics.chat_health` chat-turn columns now populate.
+
+Four deliberate deviations from the catalog below.
+`dashboard.share_settings_updated` is absent from that list because it was
+already emitted from Phase 1B and was never part of this phase. The `trigger`
+enum gained `dataset_opened`, for opening a saved dataset, and `block_render`,
+because the two non-explorer surfaces have no user-initiated trigger.
+`query.failed` sanitises its `errorMessage` before recording it, since storing
+it verbatim would have put SQL text and customer literals in the payload, which
+the catalog's own privacy rule forbids. And `dashboard.pdf_exported` gained a
+`mode` of `direct` or `annotated`, because the two export paths differ in real
+work and `durationMs` would otherwise be bimodal with nothing to segment on.
+
+`dashboard.pdf_exported` records zero rows until `HIDE_EXPORT_AS_PDF` is
+removed from `ExportPdfButton.tsx`: that button is the only entry point and it
+early-returns `null`, so the flow is unreachable in the product. The
+instrumentation shipped with the phase so the event arrives with the feature
+rather than after it.
+
+**Phase 4, chat samples: next.** Moving `detectPii` to `shared/`, extending it
+to return all matched spans, the surrogates module, the `chat_samples` table,
+the capture pipeline, and retention. Planned in
+`docs/superpowers/plans/2026-08-15-analytics-chat-samples.md`, which resolves
+the three open design questions this document left for it and gates capture
+behind an off-by-default switch.
 
 Three things are wrong today. Ten event names are declared in
 `src/lib/analytics/analyticsEventTypes.ts` but only seven are emitted. Every
@@ -196,6 +222,21 @@ cache hits do not double-count.
 limit change, so this field is what makes deliberate runs separable from
 incidental ones in SQL rather than requiring the volume to be suppressed at
 the source.
+
+The implementation carries two further values. `dataset_opened` covers opening
+a saved dataset from the Data Explorer drawer, a deliberate run that none of
+the four above describes. `block_render` is what dashboard blocks and
+viz-config previews report on `query.failed`, since neither has a
+user-initiated trigger.
+
+Two origins are stamped but read as approximations, and both are documented at
+`_applyQueryChange`. URL hydration restores the structured query through the
+manual-form actions, so it stamps `url_hydration` last in the same synchronous
+block and relies on React coalescing those dispatches into one render. And the
+large-dataset auto-limit in `useSyncLargeDatasetAutoLimit` dispatches
+`setLimit` programmatically after an async row-count fetch, so a limit the
+system applied reads as `structured_change`; the enum has no member for a
+system-initiated change and adding one was out of scope.
 
 One known gap: `useDataQuery` also serves public dashboard views via
 `auth: "public"`, where there is no session, so `logEvent` no-ops and those
@@ -515,10 +556,11 @@ eight event-emitting triggers, the `analytics` schema, and its views make the
 growth funnel readable. Implemented by
 `docs/superpowers/plans/2026-08-14-analytics-growth-events.md`.
 
-**Phase 3, product events.** `analyticsSurface` on `useDataQuery`,
-`query.ran`, `query.failed`, `dashboard.pdf_exported`,
-`dashboard.share_settings_updated`, `chat.turn_completed`, and
-`chat.turn_failed`.
+**Phase 3, product events: complete.** `analyticsSurface` on `useDataQuery`,
+`query.ran`, `query.failed`, `dashboard.pdf_exported`, `chat.turn_completed`,
+and `chat.turn_failed`. Implemented by
+`docs/superpowers/plans/2026-08-15-analytics-product-events.md`.
+`dashboard.share_settings_updated` is absent because it shipped in Phase 1B.
 
 **Phase 4, chat samples.** Moving `detectPii` to `shared/`, extending it to
 return all matched spans, the surrogates module, the `chat_samples` table, the

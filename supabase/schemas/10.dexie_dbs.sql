@@ -26,6 +26,14 @@ create table public.dexie_dbs (
 -- Enable row level security
 alter table public.dexie_dbs enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.dexie_dbs to authenticated;
+
 -- Policies
 create policy "
   User can SELECT dexie_dbs they own

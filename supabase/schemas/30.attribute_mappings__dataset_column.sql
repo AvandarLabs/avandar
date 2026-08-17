@@ -23,6 +23,14 @@ create table public.attribute_mappings__dataset_column (
 -- Enable row level security
 alter table public.attribute_mappings__dataset_column enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.attribute_mappings__dataset_column to authenticated;
+
 -- Policies
 create policy "
   User can SELECT attribute_mappings__dataset_column

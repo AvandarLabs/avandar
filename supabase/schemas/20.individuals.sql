@@ -27,6 +27,14 @@ create table public.individuals (
 -- Enable row level security
 alter table public.individuals enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.individuals to authenticated;
+
 -- Policies
 create policy "User can SELECT individuals in their workspace" on public.individuals for
 select
