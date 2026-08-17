@@ -74,6 +74,17 @@ grant insert (
   app_version
 ) on public.usage_analytics_events to authenticated;
 
+-- SELECT is table-level and stated here rather than in `40.grants.data_api.sql`,
+-- so this table's whole privilege story stays in one place alongside the
+-- column-level INSERT above. The "Workspace managers can SELECT analytics
+-- events" policy below is what narrows it to a caller's own workspaces.
+--
+-- No UPDATE or DELETE for any Data API role: an event is an immutable fact, and
+-- the only writer is the column-scoped INSERT above.
+grant
+select
+  on table public.usage_analytics_events to authenticated;
+
 -- INSERT: authenticated clients may record only browser-owned event names as
 -- themselves. Database and server emitters use privileged writers that bypass
 -- this policy. A nullable workspace remains valid for client events emitted
