@@ -44,8 +44,13 @@ export type IQetlClient = Module<
       <RowObject extends UnknownRow = UnknownRow>(params: {
         rawSql: string;
         returnType?: "js";
+        signal?: AbortSignal;
       }): Promise<QueryResult.T<RowObject>>;
-      (params: { rawSql: string; returnType: "parquet" }): Promise<Blob>;
+      (params: {
+        rawSql: string;
+        returnType: "parquet";
+        signal?: AbortSignal;
+      }): Promise<Blob>;
     };
   }
 >;

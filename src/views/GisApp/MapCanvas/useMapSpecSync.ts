@@ -1,16 +1,14 @@
 import { useEffect } from "react";
 import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance/useMapInstance";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 /**
  * Applies the declarative spec to the map whenever the spec changes or a new
- * style finishes loading.
- *
- * Identity of `spec` is what gates the work, so callers must pass a memoized
- * spec: an equal-valued but freshly built object re-runs `syncMap`, which
- * removes and re-adds layers and re-uploads their GeoJSON. That is why
- * `useLayerMapSpec` memoizes every value it hands to the canvas.
+ * style finishes loading. Identity of `spec` is what gates the work, so
+ * callers must pass a memoized spec: an equal-valued but freshly built object
+ * re-runs `syncMap`, which removes and re-adds layers and re-uploads their
+ * GeoJSON.
  */
 export function useMapSpecSync({
   mapInstance,

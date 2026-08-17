@@ -1,6 +1,6 @@
 import path from "node:path";
 import { config } from "dotenv";
-import { ensureE2EViteFeatureFlags } from "./ensureE2EViteFeatureFlags";
+import { ensureE2EViteFeatureFlags } from "./ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 
 /**
  * Loads `.env.development` from the repository root so Playwright and the

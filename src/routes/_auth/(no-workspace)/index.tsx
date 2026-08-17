@@ -5,7 +5,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 /**
  * This is the `/` root page. We already checked if the user is logged in

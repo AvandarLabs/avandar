@@ -17,7 +17,8 @@ export function usePrivateResourceRemovalState(workspaceId: Workspace.Id): {
       return [
         privateResourceCount.userId,
         privateResourceCount.privateDashboardCount +
-          privateResourceCount.privateDatasetCount,
+          privateResourceCount.privateDatasetCount +
+          privateResourceCount.privateMapCount,
       ];
     }),
   );

@@ -27,6 +27,7 @@ export type IWorkspaceQetlClient = Module<
           rawSql: string;
           workspaceId: Workspace.Id;
           returnType?: "js";
+          signal?: AbortSignal;
         }>,
       ): Promise<QueryResult.T<RowObject>>;
       (
@@ -34,6 +35,7 @@ export type IWorkspaceQetlClient = Module<
           rawSql: string;
           workspaceId: Workspace.Id;
           returnType: "parquet";
+          signal?: AbortSignal;
         }>,
       ): Promise<Blob>;
     };
@@ -157,10 +159,12 @@ export const WorkspaceQetlClient = createModule("WorkspaceQetlClient", {
         rawSql,
         workspaceId,
         returnType = "js",
+        signal,
       }: Readonly<{
         rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js" | "parquet";
+        signal?: AbortSignal;
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
         const session = await AuthClient.getCurrentSession();
         if (!session?.user) {
@@ -175,10 +179,18 @@ export const WorkspaceQetlClient = createModule("WorkspaceQetlClient", {
         });
 
         if (returnType === "parquet") {
-          return await client.runQuery({ rawSql, returnType: "parquet" });
+          return await client.runQuery({
+            rawSql,
+            returnType: "parquet",
+            signal,
+          });
         }
 
-        return await client.runQuery<RowObject>({ rawSql, returnType: "js" });
+        return await client.runQuery<RowObject>({
+          rawSql,
+          returnType: "js",
+          signal,
+        });
       },
     };
   },

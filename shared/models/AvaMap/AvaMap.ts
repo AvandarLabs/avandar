@@ -1,19 +1,14 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
-import type {
-  AvaMapId,
-  AvaMapRead,
-  BasemapConfig,
-  BasemapStyleKey,
-  MapViewState,
-} from "$/models/AvaMap/AvaMap.types.ts";
+/* eslint-disable @typescript-eslint/no-namespace */
+import type { AvaMapId, AvaMapModel } from "$/models/AvaMap/AvaMap.types.ts";
 
-/** Public model namespace for saved map configuration and constructors. */
-export { AvaMapModule as AvaMap } from "$/models/AvaMap/AvaMapModule/AvaMapModule.ts";
+/** Parsers for persisted AvaMap rows. */
+export { AvaMapParsers } from "$/models/AvaMap/AvaMapParsers.ts";
 
+/** Public namespace for the persisted AvaMap row model. */
 export namespace AvaMap {
-  export type T = AvaMapRead;
+  /** Selects a CRUD variant of the AvaMap model. */
+  export type T<K extends keyof AvaMapModel = "Read"> = AvaMapModel[K];
+
+  /** Identifies a persisted AvaMap row. */
   export type Id = AvaMapId;
-  export type Basemap = BasemapConfig;
-  export type BasemapStyle = BasemapStyleKey;
-  export type ViewState = MapViewState;
 }

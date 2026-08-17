@@ -4,8 +4,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Stack, Text } from "@mantine/core";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource } from "../copy/appForResource";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { GeneralAccessSelect } from "./GeneralAccessSelect";
 import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
@@ -94,7 +94,7 @@ export function ShareGeneralAccess({
   onWorkspaceRoleChange,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
-  const app = appLabel(appForResource(resourceType));
+  const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
   const showPublicOptionDisabledReason =
     isPublicOptionAvailable && publicOptionDisabledReason !== undefined;

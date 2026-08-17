@@ -75,7 +75,18 @@ vi.mock(
     return {
       PrivateResourceAdminClient: {
         useGetPrivateResourceCounts: () => {
-          return [[], false, { isFetching: false }];
+          return [
+            [
+              {
+                userId: "user-1",
+                privateDashboardCount: 0,
+                privateDatasetCount: 0,
+                privateMapCount: 0,
+              },
+            ],
+            false,
+            { isFetching: false },
+          ];
         },
         useTransferAllOwnedResources: () => {
           return [vi.fn(), false];
