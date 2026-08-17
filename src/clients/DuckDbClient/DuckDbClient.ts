@@ -10,13 +10,13 @@ import {
   exportDuckDbTableAsParquet,
   runDuckDbRawQuery,
 } from "@/clients/DuckDbClient/duckDbRawQuery";
+import { createDuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import { runLeasedDuckDbStructuredQuery } from "@/clients/DuckDbClient/duckDbStructuredQuery";
 import {
   dropDuckDbTableViewAndFile,
   getDuckDbRelationNames,
 } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import { loadXlsxIntoDuckDb } from "@/clients/DuckDbClient/duckDbXlsxLoad";
-import { createDuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import { makeDuckDbConnectionManager } from "@/clients/DuckDbClient/makeDuckDbConnectionManager";
 import { Logger } from "@/utils/Logger";
 import type { SniffCsvOptions } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
@@ -36,8 +36,8 @@ import type {
   RawQueryOptions,
 } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { DuckDbLoadCsvOptions } from "@/clients/DuckDbClient/duckDbCsvLoad";
-import type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import type { ILogger } from "@avandar/logger";
 import type * as duckdb from "@duckdb/duckdb-wasm";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";

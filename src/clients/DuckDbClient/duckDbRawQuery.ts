@@ -1,8 +1,8 @@
 import { MIMEType } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import * as arrow from "apache-arrow";
-import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
+import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import {
