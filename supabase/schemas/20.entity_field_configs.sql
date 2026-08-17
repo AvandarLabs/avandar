@@ -23,6 +23,14 @@ create table public.entity_field_configs (
 -- Enable row level security
 alter table public.entity_field_configs enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.entity_field_configs to authenticated;
+
 -- Policies
 create policy "
   User can SELECT entity_field_configs

@@ -40,6 +40,14 @@ where
 -- Enable row level security
 alter table public.workspace_invites enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.workspace_invites to authenticated;
+
 -- Policies
 create policy "User can select invites they sent from their workspace" on public.workspace_invites for
 select

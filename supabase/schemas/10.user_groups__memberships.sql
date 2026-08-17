@@ -13,6 +13,15 @@ create index idx_user_group_memberships__user_group_id on public.user_group_memb
 -- Enable row level security
 alter table public.user_group_memberships enable row level security;
 
+-- Data API privileges.
+--
+-- No UPDATE: membership rows are added and removed, never edited in place.
+grant
+select
+,
+  insert,
+  delete on table public.user_group_memberships to authenticated;
+
 create policy "Members can select user_group_memberships" on public.user_group_memberships for
 select
   to authenticated using (

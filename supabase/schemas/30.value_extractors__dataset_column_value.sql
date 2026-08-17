@@ -23,6 +23,14 @@ create table public.value_extractors__dataset_column_value (
 -- Enable row level security
 alter table public.value_extractors__dataset_column_value enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.value_extractors__dataset_column_value to authenticated;
+
 -- Policies
 create policy "
   User can SELECT value_extractors__dataset_column_value

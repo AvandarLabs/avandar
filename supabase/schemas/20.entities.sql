@@ -25,6 +25,14 @@ create table public.entities (
 -- Enable row level security
 alter table public.entities enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.entities to authenticated;
+
 -- Policies
 create policy "User can SELECT entities in their workspace" on public.entities for
 select

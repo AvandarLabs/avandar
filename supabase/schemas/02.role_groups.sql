@@ -27,6 +27,14 @@ create index idx_role_groups__workspace_id on public.role_groups (workspace_id);
 
 alter table public.role_groups enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.role_groups to authenticated;
+
 create trigger tr_role_groups__set_updated_at before
 update on public.role_groups for each row
 execute function public.util__set_updated_at ();

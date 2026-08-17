@@ -10,6 +10,14 @@ create table public.value_extractors__manual_entry (
 -- Enable row level security
 alter table public.value_extractors__manual_entry enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.value_extractors__manual_entry to authenticated;
+
 -- Policies
 create policy "
   User can SELECT value_extractors__manual_entry
