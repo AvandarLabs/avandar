@@ -238,3 +238,9 @@ export type DuckDbStructuredQuery = {
    */
   castTimestampsToISO?: boolean;
 };
+
+/**
+ * An object representing a row with unknown column types.
+ * This is very similar to `UnknownObject` except that keys can only be strings.
+ */
+export type UnknownRow = Record<string, unknown>;

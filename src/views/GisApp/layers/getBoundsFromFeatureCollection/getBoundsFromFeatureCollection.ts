@@ -74,7 +74,9 @@ function _extendBoxWithGeometry(
  * to an infinite box).
  */
 export function getBoundsFromFeatureCollection(
-  featureCollection: GeoJSON.FeatureCollection,
+  featureCollection: Readonly<
+    GeoJSON.FeatureCollection<GeoJSON.Geometry | null>
+  >,
 ): MapBounds | undefined {
   const box: MutableBox = {
     minLongitude: Infinity,

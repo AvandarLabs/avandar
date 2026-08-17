@@ -106,8 +106,9 @@ internal* rather than stretching "private" to cover the second one.
 
 **Public is a different axis from the other two, and callers must compose
 them.** Private and internal are decided by restriction and shares; public is
-decided by `dashboards.is_public`, which the publish flow sets and the `anon`
-RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two axes can
+decided by `dashboards.is_public`, which the publish flow sets indirectly
+through `dashboards.visibility` (`is_public` is generated from it) and which
+the `anon` RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two axes can
 disagree, and at the product level **public wins**: a world-readable dashboard
 is public, never private, whatever its share rows say.
 
@@ -130,16 +131,18 @@ will hide public dashboards from admins.
 Datasets have no public state at all. `datasets` has `is_restricted` but no
 `is_public`, so a dataset is only ever private or internal.
 
-**"Internal" is currently a sharing state, not a publishing state.** Publishing
-today has exactly one outcome, `is_public = true`, so there is no way to
-publish a dashboard to the workspace only. An internal dashboard is reached
-through the app, not through a published URL. Closing that gap is the point of
-the `dashboard_visibility` enum (`draft` | `workspace` | `public`) in
-`docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1, which is
-designed but not implemented. When it lands, "internal" gains a second meaning
-worth disambiguating in review: *internal shared* (reachable in-app, today's
-meaning) versus *internal published* (`visibility = 'workspace'`, a snapshot in
-the `published-private` bucket behind a real URL).
+**"Internal" is now both a sharing state and a publishing state.** The
+`dashboard_visibility` enum (`draft` | `workspace` | `public`) has shipped:
+`dashboards.visibility` is the stored column and `is_public` is a generated
+column that is true only for `visibility = 'public'`. Two meanings are
+therefore worth disambiguating in review: *internal shared* (reachable in-app
+through shares and app roles, the older meaning) versus *internal published*
+(`visibility = 'workspace'`, a snapshot in the `published-private` bucket
+behind a real URL). See
+`docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1 for the
+model and
+`docs/superpowers/specs/2026-08-14-private-dashboards-publishing-core-design.md`
+for what landed.
 
 The guarantee covers **object storage as well as the Postgres row**. The four
 `workspaces` bucket policies on `storage.objects` gate on
@@ -252,6 +255,50 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 membership so a “Health” group share on a dataset reaches only users who can
 already see `data_sources` at all. The flag has no effect on `user` or
 `workspace` principals.
+
+### 4.1 By design: a workspace-wide editor role grants less read than viewer
+
+For a **non-restricted** dashboard, `util__auth_user_may_select_dashboard`
+returns true for any member whose Dashboards app role ranks below `editor`, and
+requires an explicit share for `editor` and `admin`. A workspace member with
+the viewer role can therefore select every non-restricted dashboard in the
+workspace, while an editor sees only the ones they own or hold a share on.
+Promoting someone from viewer to editor shrinks their dashboard list.
+
+Two qualifications, read off
+`supabase/schemas/16.utils.resource-permissions.sql`. The rank comparison is
+reached only after the function's own
+`util__auth_user_can_access_resource(..., 'viewer')` gate, so a member with **no**
+Dashboards app role at all is rejected earlier and does not benefit; the
+"ranks below editor" case is the viewer role in practice. And the owner,
+`util__can_manage_workspace_settings`, and share paths all return true before
+the rank comparison, so an editor who owns the row, is a Settings Admin or
+workspace owner, or holds any share still sees it.
+
+**This is deliberate, not a defect.** It arrived with the permissions UI in
+#209, and the docstring of `util__auth_user_may_select_dataset` states the
+intent directly: it "blocks workspace members whose only grant on an
+unrestricted row is a workspace-wide app role at editor+ (e.g. Global Editor)
+from reading another user's dataset, while keeping viewers, owners,
+settings/workspace managers, restricted-resource paths, and explicit
+`resource_shares` grants." A viewer role is read-only and therefore harmless to
+hand the workspace's unrestricted content; a blanket Global Editor role is not,
+because reading is the first step to editing something nobody gave you. The
+same shape exists in `util__auth_user_may_select_dashboard` for the same
+reason.
+
+It was unobservable while the dashboards index filtered on `owner_id`. P3
+removed that filter, so it is now visible in the product: promoting a member
+from viewer to editor shrinks their dashboard list until someone shares those
+dashboards with them explicitly. That is the intended trade, and it is recorded
+here so the next reader does not mistake it for a bug and "fix" it. Widening it
+would grant every Global Editor read access to every colleague's unrestricted
+dashboard and dataset.
+
+An earlier draft of this section called it an asymmetry to settle. That was
+wrong, and the review that prompted this paragraph reached the same wrong
+conclusion from the code alone; the rationale lives only in the dataset
+function's docstring, which is why it is repeated here.
 
 ```mermaid
 flowchart LR

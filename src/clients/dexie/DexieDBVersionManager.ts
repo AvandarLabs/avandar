@@ -1,7 +1,22 @@
-import { assertIsDefined, identity, objectKeys } from "@avandar/utils";
-import Dexie, { EntityTable, Transaction } from "dexie";
-import { UnionToIntersection } from "type-fest";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
+import { assertIsDefined, identity, objectKeys, propEq } from "@avandar/utils";
+import Dexie from "dexie";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
+import type { EntityTable, IndexableType, Table, Transaction } from "dexie";
+import type { UnionToIntersection } from "type-fest";
+
+/**
+ * The Dexie table type for one model.
+ *
+ * A single-column key resolves to `EntityTable`. Compound keys use `Table`
+ * because `EntityTable` requires its second parameter to be a `keyof T`, and
+ * an array is not one. That branch names the key type directly instead.
+ */
+type DexieModelTable<M extends DexieCrudModelSpec> =
+  M["modelPrimaryKey"] extends readonly string[] ?
+    Table<M["DBRead"], M["modelPrimaryKeyType"] & IndexableType, M["DBRead"]>
+  : M["modelPrimaryKey"] extends keyof M["DBRead"] ?
+    EntityTable<M["DBRead"], M["modelPrimaryKey"]>
+  : EntityTable<M["DBRead"], Extract<M["modelPrimaryKey"], keyof M["DBRead"]>>;
 
 /**
  * A record of Dexie tables representing CRUD models.
@@ -15,7 +30,7 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   M extends any ?
     {
-      [K in M["modelName"]]: EntityTable<M["DBRead"], M["modelPrimaryKey"]>;
+      [K in M["modelName"]]: DexieModelTable<M>;
     }
   : never
 >;
@@ -38,6 +53,24 @@ type DBSchemaType = {
   models: readonly [DexieCrudModelSpec, ...DexieCrudModelSpec[]];
 };
 
+/** A string field name from a schema model's database read shape. */
+type DBSchemaModelKey<M extends DexieCrudModelSpec> = Extract<
+  keyof M["DBRead"],
+  string
+>;
+
+/** A compound Dexie key path containing at least two database read fields. */
+type DBSchemaCompoundPrimaryKey<M extends DexieCrudModelSpec> = readonly [
+  DBSchemaModelKey<M>,
+  DBSchemaModelKey<M>,
+  ...Array<DBSchemaModelKey<M>>,
+];
+
+/** A scalar or compound Dexie key path for one schema model. */
+type DBSchemaPrimaryKey<M extends DexieCrudModelSpec> =
+  | DBSchemaModelKey<M>
+  | DBSchemaCompoundPrimaryKey<M>;
+
 type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
   // we use a conditional here intentionally so that if `DBSchema` is a union,
   // it will get distributed. This will keep the union discriminated rather than
@@ -54,7 +87,12 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
       /** The models to register */
       models: {
         [M in DBSchema["models"][number] as M["modelName"]]: {
-          primaryKey: M["modelPrimaryKey"];
+          /**
+           * The primary key for this historical schema version. A model can
+           * be re-keyed in a later version, while older registrations must
+           * preserve their original key to let Dexie run the upgrade.
+           */
+          primaryKey: DBSchemaPrimaryKey<M>;
           /**
            * Additional columns to index. The primary key column does not have
            * to be specified here. If it is, it'll just get ignored. Primary
@@ -63,6 +101,25 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
           columnsToIndex?: Array<keyof M["DBRead"]>;
         };
       };
+
+      /**
+       * Names of object stores to physically delete in this version.
+       *
+       * `models` can only create or re-index a store, so a store whose
+       * *primary key* changed cannot be expressed there. IndexedDB cannot
+       * re-key a store in place and Dexie aborts the entire upgrade with
+       * "Not yet support for changing primary key" when it sees one. Naming a
+       * store here emits a `null` entry in Dexie's `stores()` spec, which is
+       * how Dexie is told to drop the physical store.
+       *
+       * Dexie cannot drop and recreate the same store within a single
+       * version, so a re-key takes two versions: delete the store here, then
+       * declare it again under `models` in the NEXT version.
+       *
+       * Every row in a deleted store is destroyed, so only delete stores
+       * whose contents can be derived again (for example a download cache).
+       */
+      modelsToDelete?: readonly string[];
 
       /**
        * The upgrader function to run when the Dexie DB is upgraded.
@@ -138,100 +195,126 @@ type DexieDBVersionManager<
   ) => DexieDBType<DBSchemaRegistry[Version]["models"][number]>;
 };
 
-function createDexieDBVersionManager<
-  DBSchemaRegistry extends GenericDexieDBSchemaRegistry,
->(): DexieDBVersionManager<DBSchemaRegistry> {
-  // Registry of all registered Dexie versions.
-  const registeredDexieDBVersions: Record<
+function _getDexieTableDefinition(
+  options: Readonly<{
+    primaryKey: string | readonly string[];
+    columnsToIndex: readonly PropertyKey[];
+  }>,
+): string {
+  const isCompoundKey = Array.isArray(options.primaryKey);
+  const primaryKeySpec =
+    isCompoundKey ?
+      `[${(options.primaryKey as readonly string[]).join("+")}]`
+    : `&${options.primaryKey as string}`;
+  const columnsWithoutPrimaryKey = options.columnsToIndex.filter(
+    (columnName) => {
+      return isCompoundKey || columnName !== options.primaryKey;
+    },
+  );
+  return [primaryKeySpec, ...columnsWithoutPrimaryKey].join(",");
+}
+
+async function _runDexieUpgrade(
+  options: Readonly<{
+    transaction: Transaction;
+    version: number;
+    upgrader: ((transaction: Transaction) => Promise<void> | void) | undefined;
+  }>,
+): Promise<void> {
+  const hasMetaTable = options.transaction.db.tables.some(
+    propEq("name", "meta"),
+  );
+  if (hasMetaTable) {
+    await options.transaction
+      .table("meta")
+      .put({ key: "version", value: String(options.version) });
+  }
+  await options.upgrader?.(options.transaction);
+  window.location.reload();
+}
+
+type DexieVersionRecord<DBSchemaRegistry extends GenericDexieDBSchemaRegistry> =
+  Record<
     `v${number}`,
     DexieDBType<SchemasOfRegistry<DBSchemaRegistry>["models"][number]>
-  > = {};
+  >;
 
-  function _registerDexieDBVersion<
-    CurrentDBSchema extends SchemasOfRegistry<DBSchemaRegistry>,
-  >(
-    config: DBSchemaConfig<CurrentDBSchema>,
-  ): DexieDBType<CurrentDBSchema["models"][number]> {
-    const { db, version, models } = config;
-    const dexieTableDefs = { meta: "&key" };
-
-    objectKeys(models).forEach((modelName) => {
-      const { primaryKey, columnsToIndex = [] } = models[modelName]!;
-      const columnsWithoutPrimaryKey = columnsToIndex.filter((columnName) => {
-        return columnName !== primaryKey;
-      });
-
-      // The & prefix is used by Dexie to know that this primary key should
-      // be unique
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore This is safe
-      dexieTableDefs[modelName] = [
-        `&${primaryKey}`,
-        ...columnsWithoutPrimaryKey,
-      ].join(",");
+function _registerDexieVersion<
+  DBSchemaRegistry extends GenericDexieDBSchemaRegistry,
+  CurrentSchema extends SchemasOfRegistry<DBSchemaRegistry>,
+>(
+  options: Readonly<{
+    versions: DexieVersionRecord<DBSchemaRegistry>;
+    config: DBSchemaConfig<CurrentSchema>;
+  }>,
+): DexieDBType<CurrentSchema["models"][number]> {
+  // `null` is Dexie's instruction to drop a physical object store. Deletions
+  // are applied before the live models so that a name appearing in both is
+  // resolved in favour of the model that this version actually declares.
+  const tableDefinitions: Record<string, string | null> = { meta: "&key" };
+  options.config.modelsToDelete?.forEach((modelName) => {
+    tableDefinitions[modelName] = null;
+  });
+  objectKeys(options.config.models).forEach((modelName) => {
+    const model = options.config.models[modelName]!;
+    tableDefinitions[modelName] = _getDexieTableDefinition({
+      primaryKey: model.primaryKey,
+      columnsToIndex: model.columnsToIndex ?? [],
     });
-
-    db.version(version)
-      .stores(dexieTableDefs)
-      .upgrade(async (tx: Transaction) => {
-        // check if the meta table exists
-        const metaTableExists = tx.db.tables.some((table) => {
-          return table.name === "meta";
-        });
-        if (metaTableExists) {
-          // write the current version to the meta table
-          await tx
-            .table("meta")
-            .put({ key: "version", value: String(version) });
-        }
-
-        // run the user-defined upgrade function
-        if (config.upgrader) {
-          await config.upgrader(tx);
-        }
-
-        // reload the page to clear the cache and start fresh
-        window.location.reload();
+  });
+  options.config.db
+    .version(options.config.version)
+    .stores(tableDefinitions)
+    .upgrade((transaction) => {
+      return _runDexieUpgrade({
+        transaction,
+        version: options.config.version,
+        upgrader: options.config.upgrader,
       });
-    const castedDB = db as DexieDBType<CurrentDBSchema["models"][number]>;
+    });
+  const database = options.config.db as DexieDBType<
+    CurrentSchema["models"][number]
+  >;
+  options.versions[`v${options.config.version}`] = database;
+  return database;
+}
 
-    // store the database in the registry
-    registeredDexieDBVersions[`v${version}`] = castedDB;
-    return castedDB;
-  }
-
+function _createDexieDbVersionManager<
+  DBSchemaRegistry extends GenericDexieDBSchemaRegistry,
+>(): DexieDBVersionManager<DBSchemaRegistry> {
+  const versions: DexieVersionRecord<DBSchemaRegistry> = {};
+  const registerVersions = (
+    schemas: ReadonlyArray<DBSchemaConfig<SchemasOfRegistry<DBSchemaRegistry>>>,
+  ): void => {
+    schemas.forEach((schema) => {
+      _registerDexieVersion({ versions, config: schema });
+    });
+  };
+  const getVersion = <
+    Version extends Extract<keyof DBSchemaRegistry, `v${number}`>,
+  >(
+    version: Version,
+  ): DexieDBType<DBSchemaRegistry[Version]["models"][number]> => {
+    const database = versions[version as `v${number}`];
+    assertIsDefined(
+      database,
+      `Could not find a Dexie DB with version ${version}`,
+    );
+    return database as DexieDBType<DBSchemaRegistry[Version]["models"][number]>;
+  };
   return {
-    registerVersions: (
-      dbSchemas: ReadonlyArray<
-        DBSchemaConfig<SchemasOfRegistry<DBSchemaRegistry>>
-      >,
-    ): void => {
-      dbSchemas.forEach((dbSchema) => {
-        _registerDexieDBVersion(dbSchema);
-      });
-    },
-
-    getVersion: <
-      Version extends Extract<keyof DBSchemaRegistry, `v${number}`> = Extract<
-        keyof DBSchemaRegistry,
-        `v${number}`
-      >,
-    >(
-      version: Version,
-    ): DexieDBType<DBSchemaRegistry[Version]["models"][number]> => {
-      const db = registeredDexieDBVersions[version as `v${number}`];
-      assertIsDefined(db, `Could not find a Dexie DB with version ${version}`);
-      return db as DexieDBType<DBSchemaRegistry[Version]["models"][number]>;
-    },
-
+    registerVersions,
+    getVersion,
     defineVersion: identity,
   };
 }
 
+/** Creates typed Dexie database versions from a schema registry. */
 export const DexieDBVersionManager = {
+  /** Creates an isolated manager for one schema registry. */
   make: <
     DBSchemaRegistry extends GenericDexieDBSchemaRegistry,
   >(): DexieDBVersionManager<DBSchemaRegistry> => {
-    return createDexieDBVersionManager<DBSchemaRegistry>();
+    return _createDexieDbVersionManager<DBSchemaRegistry>();
   },
 };

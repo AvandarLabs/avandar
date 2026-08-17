@@ -47,7 +47,8 @@ async function loadParquetFromDatasetBlobStore(
 ): Promise<void> {
   // Web has no separate blob store yet; the legacy paths register the
   // parquet bytes directly with duckdb-wasm at the call site (see
-  // `LocalPublicDatasetRawDataClient.ts`). Throw with a clear pointer so
+  // `LocalPublicDatasetRawDataClient/LocalPublicDatasetRawDataClient.ts`).
+  // Throw with a clear pointer so
   // a migrated consumer that hits this on web surfaces the gap loudly.
   throw new Error(
     `createWebDuckDbClient.loadParquetFromDatasetBlobStore(${datasetId}): ` +

@@ -15,7 +15,7 @@ import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

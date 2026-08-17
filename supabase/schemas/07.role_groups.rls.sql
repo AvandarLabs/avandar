@@ -31,28 +31,20 @@ select
 create policy "Settings admins can insert role_groups" on public.role_groups for insert to authenticated
 with
   check (
-    public.util__is_settings_admin (
-      public.role_groups.workspace_id
-    )
+    public.util__is_settings_admin (public.role_groups.workspace_id)
   );
 
 create policy "Settings admins can update role_groups" on public.role_groups
 for update
   to authenticated using (
-    public.util__is_settings_admin (
-      public.role_groups.workspace_id
-    )
+    public.util__is_settings_admin (public.role_groups.workspace_id)
   )
 with
   check (
-    public.util__is_settings_admin (
-      public.role_groups.workspace_id
-    )
+    public.util__is_settings_admin (public.role_groups.workspace_id)
   );
 
 create policy "Settings admins can delete custom role_groups" on public.role_groups for delete to authenticated using (
-  public.util__is_settings_admin (
-    public.role_groups.workspace_id
-  ) and
+  public.util__is_settings_admin (public.role_groups.workspace_id) and
   public.role_groups.is_builtin = false
 );

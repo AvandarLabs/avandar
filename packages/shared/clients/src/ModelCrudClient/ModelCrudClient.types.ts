@@ -66,6 +66,12 @@ export type UpsertOptions = {
   };
 };
 
+/** A scalar or compound key accepted by a generic CRUD client. */
+export type ModelPrimaryKeyType =
+  | string
+  | number
+  | ReadonlyArray<string | number>;
+
 export type CrudModelSpec = {
   /** The name of the model */
   modelName: string;
@@ -75,7 +81,7 @@ export type CrudModelSpec = {
    * This refers to the actual _type_ of the primary key
    * (e.g. a UUID), not the key name.
    */
-  modelPrimaryKeyType: string | number;
+  modelPrimaryKeyType: ModelPrimaryKeyType;
 
   /** The type returned when doing a DB `get` (Read) operation */
   DBRead: UnknownObject;

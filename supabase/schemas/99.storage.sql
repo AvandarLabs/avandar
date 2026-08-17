@@ -50,9 +50,7 @@ create policy "Users can SELECT workspace datasets" on storage.objects for
 select
   to authenticated using (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -60,9 +58,7 @@ select
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -77,9 +73,7 @@ create policy "Users can UPLOAD workspace datasets" on storage.objects for inser
 with
   check (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -87,9 +81,7 @@ with
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -104,9 +96,7 @@ create policy "Users can UPDATE workspace datasets" on storage.objects
 for update
   to authenticated using (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -114,9 +104,7 @@ for update
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -129,9 +117,7 @@ for update
 with
   check (
     bucket_id = 'workspaces' and
-    (
-      storage.foldername (name)
-    ) [1] = any (
+    (storage.foldername (name)) [1] = any (
       array(
         select
           unnest(
@@ -139,9 +125,7 @@ with
           )::text
       )
     ) and
-    (
-      storage.foldername (name)
-    ) [2] = 'datasets' and
+    (storage.foldername (name)) [2] = 'datasets' and
     public.util__storage_object_dataset_id (name) is not null and
     public.util__storage_object_workspace_id (name) is not null and
     public.util__auth_user_can_access_resource_in_workspace (
@@ -154,9 +138,7 @@ with
 
 create policy "Users can DELETE workspace datasets" on storage.objects for delete to authenticated using (
   bucket_id = 'workspaces' and
-  (
-    storage.foldername (name)
-  ) [1] = any (
+  (storage.foldername (name)) [1] = any (
     array(
       select
         unnest(
@@ -164,9 +146,7 @@ create policy "Users can DELETE workspace datasets" on storage.objects for delet
         )::text
     )
   ) and
-  (
-    storage.foldername (name)
-  ) [2] = 'datasets' and
+  (storage.foldername (name)) [2] = 'datasets' and
   public.util__storage_object_dataset_id (name) is not null and
   public.util__storage_object_workspace_id (name) is not null and
   public.util__auth_user_can_access_resource_in_workspace (
@@ -178,50 +158,187 @@ create policy "Users can DELETE workspace datasets" on storage.objects for delet
 );
 
 --
--- Bucket `published` (public, world-readable snapshots of published
--- dashboards). Gating is by path shape only; anything written here is public
--- by construction.
+-- Bucket `published` (private, world-readable only through RLS after the
+-- associated dashboard row has committed public visibility and the matching
+-- revision). Editors can read only the exact active staged object generation so
+-- Storage upsert remains retryable without exposing committed snapshots they
+-- cannot select. Keeping the bucket private prevents every other download from
+-- bypassing these SELECT gates.
 --
--- NOTE: there is no DELETE policy, and no code path removes objects from this
--- bucket, so snapshots outlive the dashboards they came from. Tracked as
--- defect 1.2.1 in docs/superpowers/specs/2026-08-13-private-dashboards-design.md
--- and fixed in P2. Declared as-is here to match reality rather than to endorse
--- it.
+-- Write access requires edit rights on the dashboard parsed from the object
+-- path, preventing cross-dashboard snapshot changes.
 --
-create policy "Anyone can SELECT published datasets" on storage.objects for
+create policy "Anonymous users can SELECT public dashboard datasets" on storage.objects for
 select
-  to authenticated,
-  anon using (
+  to anon using (
+    bucket_id = 'published' and
+    exists (
+      select
+        1
+      from
+        public.dashboards
+      where
+        dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+        dashboards.visibility = 'public'::public.dashboard_visibility and
+        dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
+    )
+  );
+
+create policy "Authorized users can SELECT published dashboard datasets" on storage.objects for
+select
+  to authenticated using (
     bucket_id = 'published' and
     (
-      storage.foldername (name)
-    ) [3] = 'datasets'
+      exists (
+        select
+          1
+        from
+          public.dashboards
+        where
+          dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+          dashboards.snapshot_transition_kind in ('publish', 'abort_publish') and
+          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (storage.objects.name) and
+          dashboards.snapshot_transition_target_visibility = 'public' and
+          public.util__auth_user_can_update_resource (
+            'dashboard'::public.resource_type,
+            dashboards.id
+          ) and
+          public.util__auth_user_may_select_dashboard (dashboards.id)
+      ) or
+      (
+        exists (
+          select
+            1
+          from
+            public.dashboards
+          where
+            dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+            dashboards.visibility = 'public'::public.dashboard_visibility and
+            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
+        ) and
+        public.util__auth_user_may_select_dashboard (
+          public.util__storage_object_dashboard_id (storage.objects.name)
+        )
+      )
+    )
   );
 
 create policy "Authenticated users can UPLOAD published datasets" on storage.objects for insert to authenticated
 with
   check (
     bucket_id = 'published' and
-    (
-      storage.foldername (name)
-    ) [3] = 'datasets'
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
   );
 
 create policy "Authenticated users can UPDATE published datasets" on storage.objects
 for update
   to authenticated using (
     bucket_id = 'published' and
-    (
-      storage.foldername (name)
-    ) [3] = 'datasets'
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
   )
 with
   check (
     bucket_id = 'published' and
-    (
-      storage.foldername (name)
-    ) [3] = 'datasets'
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
   );
+
+create policy "Authenticated users can DELETE published datasets" on storage.objects for delete to authenticated using (
+  bucket_id = 'published' and
+  private.util__auth_user_can_delete_dashboard_snapshot_object (
+    storage.objects.bucket_id,
+    storage.objects.name
+  )
+);
+
+--
+-- Bucket `published-private` (workspace-only snapshots). Same object paths as
+-- `published`; only the bucket varies with visibility. Editors may read staged
+-- objects for the exact active publish claim. Viewer-level access starts only
+-- after the dashboard commits workspace visibility.
+--
+create policy "Users can SELECT private published datasets" on storage.objects for
+select
+  to authenticated using (
+    bucket_id = 'published-private' and
+    (
+      exists (
+        select
+          1
+        from
+          public.dashboards
+        where
+          dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+          dashboards.snapshot_transition_kind in ('publish', 'abort_publish') and
+          dashboards.snapshot_transition_revision = public.util__storage_object_snapshot_revision (storage.objects.name) and
+          dashboards.snapshot_transition_target_visibility = 'workspace' and
+          public.util__auth_user_can_update_resource (
+            'dashboard'::public.resource_type,
+            dashboards.id
+          ) and
+          public.util__auth_user_may_select_dashboard (dashboards.id)
+      ) or
+      (
+        exists (
+          select
+            1
+          from
+            public.dashboards
+          where
+            dashboards.id = public.util__storage_object_dashboard_id (storage.objects.name) and
+            dashboards.visibility = 'workspace'::public.dashboard_visibility and
+            dashboards.snapshot_revision = public.util__storage_object_snapshot_revision (storage.objects.name)
+        ) and
+        public.util__auth_user_may_select_dashboard (
+          public.util__storage_object_dashboard_id (storage.objects.name)
+        )
+      )
+    )
+  );
+
+create policy "Users can UPLOAD private published datasets" on storage.objects for insert to authenticated
+with
+  check (
+    bucket_id = 'published-private' and
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
+  );
+
+create policy "Users can UPDATE private published datasets" on storage.objects
+for update
+  to authenticated using (
+    bucket_id = 'published-private' and
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
+  )
+with
+  check (
+    bucket_id = 'published-private' and
+    private.util__auth_user_can_write_dashboard_snapshot_object (
+      storage.objects.bucket_id,
+      storage.objects.name
+    )
+  );
+
+create policy "Users can DELETE private published datasets" on storage.objects for delete to authenticated using (
+  bucket_id = 'published-private' and
+  private.util__auth_user_can_delete_dashboard_snapshot_object (
+    storage.objects.bucket_id,
+    storage.objects.name
+  )
+);
 
 --
 -- Bucket `opendata` (public catalogue data). No path-shape restriction: the
@@ -230,22 +347,14 @@ with
 create policy "Anyone can select open data datasets" on storage.objects for
 select
   to authenticated,
-  anon using (
-    bucket_id = 'opendata'
-  );
+  anon using (bucket_id = 'opendata');
 
 create policy "Auth users can upload open data datasets" on storage.objects for insert to authenticated
 with
-  check (
-    bucket_id = 'opendata'
-  );
+  check (bucket_id = 'opendata');
 
 create policy "Auth users can update open data datasets" on storage.objects
 for update
-  to authenticated using (
-    bucket_id = 'opendata'
-  )
+  to authenticated using (bucket_id = 'opendata')
 with
-  check (
-    bucket_id = 'opendata'
-  );
+  check (bucket_id = 'opendata');

@@ -63,10 +63,7 @@ create unique index resource_shares__uniq_user_group_principal on public.resourc
 where
   principal_type = 'user_group';
 
-create index idx_resource_shares__resource on public.resource_shares (
-  resource_type,
-  resource_id
-);
+create index idx_resource_shares__resource on public.resource_shares (resource_type, resource_id);
 
 /**
  * Rejects a share whose workspace does not own the referenced resource.

@@ -39,6 +39,11 @@ describe("syncable-tables manifest", () => {
     expect(isExcluded("definitely_not_a_real_table_xyz")).toBe(false);
   });
 
+  it("excludes usage analytics events from the desktop mirror", () => {
+    expect(isExcluded("usage_analytics_events")).toBe(true);
+    expect(isSyncable("usage_analytics_events")).toBe(false);
+  });
+
   it("isSyncable returns false for excluded tables", () => {
     EXCLUDED_TABLES.forEach((tableName) => {
       expect(isSyncable(tableName)).toBe(false);

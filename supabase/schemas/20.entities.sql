@@ -19,10 +19,7 @@ create table public.entities (
   -- Status of the entity
   status text not null,
   -- Unique constraint to ensure one external_id per entity_config
-  constraint entities__entity_config_external_id_unique unique (
-    entity_config_id,
-    external_id
-  )
+  constraint entities__entity_config_external_id_unique unique (entity_config_id, external_id)
 );
 
 -- Enable row level security

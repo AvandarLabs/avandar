@@ -19,7 +19,7 @@
 ^shared/types/database\.types\.ts$
 
 # Raw SQL migrations
-^supabase/migrations/.*\.sql$
+^supabase/migrations/
 
 # Any *.gen.* generated file
 \.gen\.[^/]+$

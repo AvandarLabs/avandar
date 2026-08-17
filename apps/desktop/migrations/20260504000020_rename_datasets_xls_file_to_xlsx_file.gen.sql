@@ -5,5 +5,4 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 4
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-alter table datasets__xls_file
-rename to datasets__xlsx_file;
+ALTER TABLE datasets__xls_file RENAME TO datasets__xlsx_file;

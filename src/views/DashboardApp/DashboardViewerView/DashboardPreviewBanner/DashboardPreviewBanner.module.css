@@ -1,0 +1,4 @@
+.dashboardPreviewBannerRoot {
+  background-color: var(--mantine-color-blue-0);
+  border-bottom: 1px solid var(--ava-border-default);
+}

@@ -4,9 +4,4 @@
 -- Electrobun desktop shell. `server` is set by the edge-function analytics
 -- helper. `db` is set by `public.util__log_analytics_event`, which only
 -- Postgres triggers call.
-create type public.usage_analytics_events__client as enum(
-  'web',
-  'desktop',
-  'server',
-  'db'
-);
+create type public.usage_analytics_events__client as enum('web', 'desktop', 'server', 'db');

@@ -4,6 +4,7 @@ import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { Parser } from "node-sql-parser";
 import { match } from "ts-pattern";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 const UUID_REGEX = new RegExp(
   [
@@ -58,7 +59,7 @@ type RowFilterToSqlOptions = {
 };
 
 type WriteDashboardPublishConfigOptions = {
-  dashboardConfig: unknown;
+  dashboardConfig: Dashboard.T["config"];
   publishConfig: PublishSliceConfig.Dashboard;
 };
 
@@ -297,10 +298,10 @@ function _readDashboardPublishConfig(
 
 function _writeDashboardPublishConfig(
   options: Readonly<WriteDashboardPublishConfigOptions>,
-): Record<string, unknown> {
+): Dashboard.T["config"] {
   const dashboardConfig =
     isPlainObject(options.dashboardConfig) ?
-      { ...options.dashboardConfig }
+      (options.dashboardConfig as Record<string, Dashboard.T["config"]>)
     : {};
   return {
     ...dashboardConfig,

@@ -31,7 +31,7 @@ msgstr "إغلاق لوحة الدردشة"
 msgid "ID field is required"
 msgstr "حقل المعرف مطلوب"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو "
@@ -51,12 +51,12 @@ msgid "You are offline. Download an offline chat model using the cloud icon "
 msgstr "أنت غير متصل بالإنترنت. نزّل نموذج دردشة للعمل دون اتصال باستخدام "
 "أيقونة السحابة بجانب مربع الكتابة قبل طرح أسئلة حول البيانات."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى "
 "جميع الأعمدة."
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr "مجموعة واحدة"
 
@@ -86,11 +86,11 @@ msgstr ""
 msgid "More actions for the layer {layerName}"
 msgstr ""
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "قم بتشغيل استعلام لرؤية النتائج."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
@@ -139,6 +139,10 @@ msgstr "دعوة عضو"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "إدخال JOIN في الموضع {index} ليس مرجعًا لجدول عادي."
 
+#: src/config/AppLinks.tsx
+#~ msgid "Geo Explorer"
+#~ msgstr "Geo Explorer"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
 msgstr "امتداد أيمن"
@@ -164,6 +168,12 @@ msgstr ""
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose chat model"
 msgstr "اختر نموذج الدردشة"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
+msgid "The previous URL will become invalid and unreachable. Anyone using the "
+"old link will no longer be able to reach this dashboard."
+msgstr "سيصبح عنوان URL السابق غير صالح وغير قابل للوصول. ولن يتمكن أي شخص "
+"يستخدم الرابط القديم من الوصول إلى لوحة المعلومات هذه بعد الآن."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "XYZ tiles"
@@ -273,7 +283,7 @@ msgstr "H4"
 msgid "Query"
 msgstr "استعلام"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "فلاتر الصفوف"
 
@@ -380,6 +390,12 @@ msgstr "تخطيط الشريط الجانبي"
 msgid "Delete failed"
 msgstr "فشل الحذف"
 
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
+msgid "Your plan does not allow sharing this dashboard with anyone else. "
+"Upgrade your plan, or unshare another dashboard, and try again."
+msgstr "لا تسمح خطتك بمشاركة لوحة المعلومات هذه مع أي شخص آخر. قم بترقية خطتك "
+"أو ألغِ مشاركة لوحة معلومات أخرى، ثم حاول مرة أخرى."
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
 msgstr "فتح"
@@ -410,6 +426,10 @@ msgstr "اختر حقلًا"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls.tsx
 msgid "Matching"
 msgstr ""
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Checking whether that custom URL is available."
+msgstr "جارٍ التحقق من توفّر عنوان URL المخصص هذا."
 
 #. placeholder {0}: error.layerName ?? ""
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
@@ -475,8 +495,8 @@ msgstr "توسيع اللوحة الجانبية"
 msgid "Export annotated PDF"
 msgstr "تصدير PDF معلق"
 
-#. placeholder {0}: failure.limit ?? 64
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#. placeholder {0}: options.failure.limit ?? 64
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
 msgstr "لا يمكن أن يتجاوز عنوان URL المخصص {0} حرفًا"
 
@@ -495,11 +515,6 @@ msgstr ""
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload file"
 msgstr "تحميل ملف"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
-msgid "Manage sharing"
-msgstr "إدارة المشاركة"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Privacy log cleared."
@@ -526,6 +541,12 @@ msgstr "للحصول على مزيد من التحكم في اشتراكك، ي�
 msgid "Extra large"
 msgstr "كبير جدًا"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
+msgid "Nothing has been created or shared with you yet. Create a dashboard to "
+"track key metrics and insights."
+msgstr "لم يتم إنشاء أي شيء أو مشاركته معك بعد. أنشئ لوحة معلومات لتتبّع "
+"المقاييس والرؤى الرئيسية."
+
 #. placeholder {0}: state.openDataset.name
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Save: {0}"
@@ -538,7 +559,7 @@ msgstr "حفظ: {0}"
 msgid "Free"
 msgstr "مجاني"
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "لا تحتوي تصور الجدول على إعدادات إضافية."
 
@@ -563,7 +584,7 @@ msgid "Recommended if you have 4 GB RAM or need the lightest download."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 4 جيجابايت أو كنت تحتاج إلى أخف "
 "تنزيل."
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "شخص واحد"
 
@@ -627,6 +648,10 @@ msgstr ""
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "جارٍ إصلاح الاستعلام…"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Only workspace admins can publish to the web."
+msgstr "يمكن لمسؤولي مساحة العمل فقط النشر على الويب."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/CategoricalControls.tsx
 msgid "Other color"
@@ -700,6 +725,10 @@ msgstr "طي عند"
 msgid "Bubble Chart"
 msgstr "مخطط فقاعي"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
+msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
+msgstr "لوحة المعلومات هذه <0>عامة</0>. يمكن لأي شخص لديه الرابط عرضها."
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid " records"
 msgstr ""
@@ -725,6 +754,10 @@ msgstr ""
 msgid "Use suggestion"
 msgstr "استخدام الاقتراح"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
+msgid "Unpublish"
+msgstr "إلغاء النشر"
+
 #. placeholder {0}: entityConfig.name
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "{0} Manager"
@@ -748,7 +781,7 @@ msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "ابحث في كتالوج البيانات لإضافة مجموعات البيانات المفتوحة إلى مساحة "
 "العمل الخاصة بك."
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
 msgstr "سيفقد {shareClause} إمكانية الوصول."
 
@@ -793,7 +826,7 @@ msgid "Remove User"
 msgstr "إزالة المستخدم"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
@@ -810,9 +843,17 @@ msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
 msgid "Password reset requires an internet connection."
 msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً بالإنترنت."
 
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
+#~ msgid "Symbol size"
+#~ msgstr "حجم الرمز"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis minimum"
 msgstr "الحد الأدنى للمحور Y"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
+msgid "Publish publicly"
+msgstr "النشر للعامة"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -831,7 +872,7 @@ msgstr "ضيق"
 msgid "Column info"
 msgstr "معلومات العمود"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
 "queried\": uploads just the columns your visualizations read. Widen the "
 "scope if you've added viewer-editable filters and want viewers to be "
@@ -885,7 +926,8 @@ msgstr "يرجى التحقق من بريدك الإلكتروني للحصول 
 msgid "Remove offline chat model?"
 msgstr "هل تريد إزالة نموذج الدردشة دون اتصال؟"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
 msgstr "مشاركة “{resourceName}”"
 
@@ -902,6 +944,10 @@ msgstr "احفظ كمجموعة بيانات جديدة"
 msgid "From derived dataset"
 msgstr "من مجموعة البيانات المشتقة"
 
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
+msgid "Published to workspace"
+msgstr "تم النشر في مساحة العمل"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Single select"
 msgstr "اختيار فردي"
@@ -910,8 +956,8 @@ msgstr "اختيار فردي"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في الوقت الحالي."
 
-#. placeholder {0}: previewRows.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#. placeholder {0}: options.numPreviewRows
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "These are the first {0} rows of your dataset. Check to see if the data "
 "is correct. If they are not, it's possible your dataset does not start "
 "on the first row or the CSV uses a different delimiter. Try adjusting "
@@ -950,10 +996,6 @@ msgstr "إذن"
 msgid "Discovery query failed."
 msgstr "فشل استعلام الاكتشاف."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Publish dashboard"
-msgstr "نشر لوحة المعلومات"
-
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig.tsx
 msgid "Container max width"
@@ -972,7 +1014,7 @@ msgid "Unable to delete the offline chat model from cache."
 msgstr "غير قادر على حذف نموذج الدردشة دون اتصال من الذاكرة المؤقتة."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown user"
 msgstr "مستخدم غير معروف"
 
@@ -991,6 +1033,10 @@ msgstr "تم الوصول إلى حد المقاعد"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "خط الأنابيب"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
+msgid "Could not unpublish dashboard"
+msgstr "تعذّر إلغاء نشر لوحة المعلومات"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1077,7 +1123,7 @@ msgstr "أضف إلى مساحة العمل"
 msgid "Workspace Name"
 msgstr "اسم مساحة العمل"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
@@ -1124,6 +1170,10 @@ msgstr ""
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Natural"
 msgstr "طبيعي"
+
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
+msgid "Public"
+msgstr "عام"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -1173,6 +1223,12 @@ msgstr "فشل إعادة تعيين كلمة المرور"
 msgid "New role group"
 msgstr "مجموعة أدوار جديدة"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
+msgid "The published copy still serves the previous audience. Use the button "
+"below to apply your change."
+msgstr "لا تزال النسخة المنشورة متاحة للجمهور السابق. استخدم الزر أدناه لتطبيق "
+"التغيير."
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
@@ -1191,9 +1247,13 @@ msgstr "يساوي..."
 msgid "Profile Designer"
 msgstr "مصمم الملف الشخصي"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} مجموعات"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Ask the dashboard's owner to share it with you."
+msgstr "اطلب من مالك لوحة المعلومات مشاركتها معك."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
@@ -1212,6 +1272,7 @@ msgstr ""
 msgid "Label"
 msgstr "التسمية"
 
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 msgid "Create a dashboard"
 msgstr "إنشاء لوحة معلومات"
@@ -1275,7 +1336,7 @@ msgstr ""
 msgid "Invalid name column selected"
 msgstr "تم اختيار عمود اسم غير صالح"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "مخصص"
@@ -1343,12 +1404,16 @@ msgstr "مرحبًا بعودتك"
 msgid "Phi 3.5 Mini"
 msgstr "Phi 3.5 Mini"
 
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published to "
+msgstr " تم النشر في "
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "{0} suppressed"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "جميع الأعمدة"
 
@@ -1393,7 +1458,7 @@ msgstr "محاذاة"
 msgid "Buffer around a layer"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish every column, all rows. Maximum flexibility for viewers, maximum "
 "exposure."
 msgstr "نشر كل عمود، جميع الصفوف. أقصى مرونة للمشاهدين، أقصى تعرض."
@@ -1423,6 +1488,12 @@ msgstr "تراجع"
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
 "الافتراضي لمعظم المستخدمين)."
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
+#~ msgid "{droppedRowCount} of {totalRowCount} rows were skipped because their "
+#~ "coordinates were missing or out of range."
+#~ msgstr "تم تخطي {droppedRowCount} من أصل {totalRowCount} صفًا لأن إحداثياتها "
+#~ "مفقودة أو خارج النطاق."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -1516,7 +1587,7 @@ msgstr "اختر مجموعة بيانات من القائمة لعرض بيان
 msgid "Medium"
 msgstr "متوسط"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "سيفقد جميع أعضاء {app} إمكانية الوصول."
 
@@ -1559,7 +1630,7 @@ msgstr "تجميع بواسطة"
 msgid "Please select a file to import"
 msgstr "يرجى اختيار ملف للاستيراد"
 
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 msgid "Role for everyone in the workspace"
 msgstr "دور للجميع في مساحة العمل"
 
@@ -1597,7 +1668,7 @@ msgstr "التحويل إلى خطة مجانية"
 msgid "Parsed {0} rows"
 msgstr "تم تحليل {0} صفوف"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "يمكن أن يحتوي عنوان URL المخصص على أحرف صغيرة وأرقام وواصلات فقط"
 
@@ -1663,7 +1734,7 @@ msgstr ""
 msgid "avg"
 msgstr "متوسط"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Generating…"
 msgstr "يتم الإنشاء…"
 
@@ -1746,6 +1817,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "
 "الرئيسية."
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
+msgid "Save URL"
+msgstr "حفظ عنوان URL"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
@@ -1761,6 +1836,10 @@ msgstr "الاسم الذي يراه الأعضاء الآخرون في {workspa
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Suggested:"
 msgstr "مقترح:"
+
+#: src/components/spotlight-modals/DevDuckDbTableSchemaView/DuckDbTablesContent.tsx
+msgid "No tables found"
+msgstr "لم يتم العثور على جداول"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "Overwrite SQL with form changes"
@@ -1791,8 +1870,12 @@ msgstr ""
 msgid "Aggregate only"
 msgstr ""
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
+#~ msgid "No rows could be mapped"
+#~ msgstr "تعذّر تحديد مواقع أي صفوف على الخريطة"
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown group"
 msgstr "مجموعة غير معروفة"
 
@@ -1880,10 +1963,6 @@ msgstr ""
 msgid "Private datasets"
 msgstr "مجموعات البيانات الخاصة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
-msgid "Scans to:"
-msgstr "المسح إلى:"
-
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "اطلب مني إضافة مخطط إلى هذه اللوحة..."
@@ -1906,6 +1985,10 @@ msgstr "اقتراح مستخدم"
 msgid "{0} duplicate boundary keys"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Fix the custom URL before publishing."
+msgstr "أصلح عنوان URL المخصص قبل النشر."
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
 msgstr "\"{sourceFileName}\" انتهى من المعالجة وهو جاهز للاستخدام."
@@ -1924,6 +2007,10 @@ msgstr "جارٍ فهم سؤالك…"
 msgid "The workspace ID cannot be empty"
 msgstr "لا يمكن أن يكون معرّف مساحة العمل فارغًا"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "By default we use a direct UUID-based link."
+msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إلى UUID."
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
 msgstr "إخفاء المحور Y"
@@ -1936,7 +2023,7 @@ msgstr "أو"
 msgid "Items"
 msgstr "العناصر"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "فشل تحديث القيود"
 
@@ -2038,7 +2125,7 @@ msgstr "يتوفر تحديث"
 msgid "Step"
 msgstr "خطوة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
 msgstr "الأقصى"
@@ -2095,6 +2182,18 @@ msgstr "حذف"
 msgid "Failed to save dataset: {0}"
 msgstr "فشل في حفظ مجموعة البيانات: {0}"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
+msgid "Your workspace is on the Free plan, which lets you share or publish one "
+"dashboard. Upgrade to our Starter or Impact plan to share as many "
+"dashboards as you like."
+msgstr "مساحة العمل لديك ضمن الخطة المجانية، التي تتيح لك مشاركة لوحة معلومات "
+"واحدة أو نشرها. قم بالترقية إلى خطة Starter أو Impact لمشاركة العدد "
+"الذي تريده من لوحات المعلومات."
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerFormPopover/LayerFormPopover.tsx
+#~ msgid "Query form"
+#~ msgstr "نموذج الاستعلام"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
@@ -2113,7 +2212,7 @@ msgid "The layer configuration is saved. Retry after connectivity or the "
 "Spatial extension becomes available."
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} أشخاص"
 
@@ -2121,7 +2220,7 @@ msgstr "{numUsers} أشخاص"
 msgid "No classified values are available yet."
 msgstr ""
 
-#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 
@@ -2167,6 +2266,10 @@ msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحو
 msgid "Minimum"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
+msgid "Dashboard unpublished."
+msgstr "تم إلغاء نشر لوحة المعلومات."
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Show SQL"
 msgstr "عرض SQL"
@@ -2203,7 +2306,7 @@ msgstr "اسم مجموعة البيانات مطلوب"
 msgid "Main"
 msgstr "رئيسي"
 
-#: src/clients/dashboards/DashboardClient.ts
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
 msgid "Unable to publish dashboard"
 msgstr "تعذّر نشر لوحة المعلومات"
 
@@ -2233,7 +2336,7 @@ msgstr ", و"
 msgid "Password updated successfully"
 msgstr "تم تحديث كلمة المرور بنجاح"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
 msgstr "الأضيق"
 
@@ -2264,7 +2367,7 @@ msgid "A map plots your datasets, derived datasets, and profiles as layers you "
 "can style, save, and share."
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Custom selection"
 msgstr "اختيار مخصص"
 
@@ -2296,6 +2399,10 @@ msgstr ""
 msgid "Fields to be manually entered"
 msgstr "حقول يجب إدخالها يدويًا"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapLoadingStatus.tsx
+#~ msgid "Loading map data"
+#~ msgstr "جارٍ تحميل بيانات الخريطة"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "your dataset"
 msgstr "مجموعة البيانات الخاصة بك"
@@ -2314,7 +2421,8 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
@@ -2338,10 +2446,6 @@ msgstr ""
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "You do not have access to this dashboard"
-msgstr "ليس لديك حق الوصول إلى هذه اللوحة"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
 msgstr "العمود 8"
@@ -2352,7 +2456,7 @@ msgid "Could not summarize this column. The query may have failed for an "
 msgstr "لم يتمكن من تلخيص هذه العمود. قد يكون الاستعلام قد فشل بسبب قيمة غير "
 "مدعومة أو خلية مشوهة."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "نطاق البيانات"
 
@@ -2382,7 +2486,8 @@ msgid "Please sign in again to continue. If signing in does not work, reset the 
 msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة. إذا لم ينجح تسجيل الدخول، فأعد ضبط "
 "التطبيق لمسح البيانات المخزنة مؤقتًا وحاول مرة أخرى."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput.tsx
 msgid "to"
 msgstr "إلى"
 
@@ -2398,7 +2503,7 @@ msgstr ""
 msgid "Create new profile type"
 msgstr "إنشاء نوع ملف تعريف جديد"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "تم"
 
@@ -2427,15 +2532,17 @@ msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
 msgid "You haven't chosen an X axis"
 msgstr "لم تختار محور X"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Publishing makes this dashboard viewable by anyone with the link, no "
-"Avandar account required."
-msgstr "يؤدي النشر إلى جعل لوحة المعلومات هذه متاحة لأي شخص لديه الرابط، ولا "
-"يتطلب ذلك حسابًا على Avandar."
-
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "ويساوي أيضًا..."
+
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
+msgid "A short, memorable URL for flyers, reports, and QR codes."
+msgstr "عنوان URL قصير وسهل التذكر للمنشورات والتقارير ورموز QR."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "Using your custom URL."
+msgstr "استخدام عنوان URL المخصص."
 
 #: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
 msgid "Profile failed to load"
@@ -2474,6 +2581,12 @@ msgstr ""
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Ocean"
 msgstr "المحيط"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
+msgid "Not published yet. Nobody can open this dashboard from a link until you "
+"publish it."
+msgstr "لم يتم النشر بعد. لا يمكن لأي شخص فتح لوحة المعلومات هذه من رابط حتى "
+"تنشرها."
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some latitudes or longitudes are not numbers."
@@ -2523,15 +2636,11 @@ msgstr "{0} (~{1} ميغابايت) سيتم حذفه من هذا المتصفح
 msgid "Go to Data Explorer"
 msgstr "اذهب إلى مستكشف البيانات"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "This dashboard is <0>public</0>. Anyone with the link below can view it."
-msgstr "هذه اللوحة <0>عامة</0>. يمكن لأي شخص لديه الرابط أدناه مشاهدتها."
-
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "مخطط راداري"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
 msgstr "قم بالتمرير لأعلى إلى الحقول أعلاه، أو استخدم القائمة أدناه."
 
@@ -2564,8 +2673,7 @@ msgstr ""
 msgid "Grid shape"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish"
 msgstr "نشر"
 
@@ -2614,12 +2722,12 @@ msgstr "تظهر النموذج اليدوي تقريبًا"
 msgid "N"
 msgstr ""
 
-#. placeholder {0}: failure.limit ?? 3
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#. placeholder {0}: options.failure.limit ?? 3
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL must be at least {0} characters"
 msgstr "يجب ألا يقل عنوان URL المخصص عن {0} أحرف"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Your dashboard will be published to:"
 msgstr "سيتم نشر لوحتك إلى:"
 
@@ -2695,7 +2803,7 @@ msgstr "لم يتم اختيار مجموعة بيانات"
 msgid "description"
 msgstr "الوصف"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
 msgstr "الأدنى"
@@ -2724,7 +2832,7 @@ msgstr "تم اختيار محور X غير صالح"
 msgid "X axis maximum"
 msgstr "الحد الأقصى للمحور X"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
 
@@ -2739,11 +2847,6 @@ msgstr "تمت إعادة تعيين الملكية."
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
 msgstr "خطأ في مصادقة Google"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "This dashboard is private. This dashboard has not been made publicly "
-"viewable."
-msgstr "هذه اللوحة خاصة. لم يتم جعل هذه اللوحة قابلة للرؤية للجمهور."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -2786,6 +2889,10 @@ msgstr "تأكيد الإجراء"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "Data Preview"
 msgstr "معاينة البيانات"
+
+#: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
+msgid "No dashboards to show"
+msgstr "لا توجد لوحات معلومات لعرضها"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -2832,12 +2939,16 @@ msgstr "تم حفظ اللوحة بنجاح!"
 msgid "Method"
 msgstr ""
 
+#: src/views/GisApp/panels/FeatureInspector.tsx
+#~ msgid "N/A"
+#~ msgstr "غير متوفر"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Longitude"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "نشر فقط الأعمدة التي تقرأها لوحة التحكم الخاصة بك. أضيق، وأكثر خصوصية."
 
@@ -2861,9 +2972,15 @@ msgstr "لا توجد قيم"
 msgid "Clarification {turnNumber} of 3"
 msgstr "توضيح {turnNumber} من 3"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
 msgstr "العودة إلى المحرر"
+
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
+msgid "Among signed-in people, only you will be able to open it. You can share "
+"it again at any time."
+msgstr "من بين الأشخاص الذين سجّلوا الدخول، لن يتمكن سوى أنت من فتحها. يمكنك "
+"مشاركتها مرة أخرى في أي وقت."
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "about a minute"
@@ -2885,7 +3002,7 @@ msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة الع
 msgid "Please check your email"
 msgstr "يرجى التحقق من بريدك الإلكتروني"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "اختر الأعمدة وأضف قيود الصفوف (تعداد، نطاق الأرقام، نطاق التاريخ)."
 
@@ -2920,7 +3037,7 @@ msgstr "الفاصل بين تدريجات المحور X"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "يرجى المحاولة مرة أخرى."
 
@@ -2928,7 +3045,7 @@ msgstr "يرجى المحاولة مرة أخرى."
 msgid "Field Name"
 msgstr "اسم الحقل"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/AddRowFilterMenu.tsx
+#: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ إضافة فلتر صف"
 
@@ -2949,7 +3066,7 @@ msgstr "إضافة أشخاص أو مجموعات مستخدمين"
 msgid "Size column"
 msgstr "عمود الحجم"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Values"
 msgstr "القيم"
 
@@ -3000,6 +3117,12 @@ msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{colu
 msgid "URL template"
 msgstr ""
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
+#~ msgid "None of the {totalRowCount} rows could be mapped because their "
+#~ "coordinates were missing or out of range."
+#~ msgstr "تعذّر تحديد مواقع أي من الصفوف البالغ عددها {totalRowCount} على الخريطة "
+#~ "لأن إحداثياتها مفقودة أو خارج النطاق."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
 msgstr "ميزات الخطة:"
@@ -3016,7 +3139,7 @@ msgstr "ابدأ رحلتك معنا"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B (دون اتصال)"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "QR code"
 msgstr "رمز الاستجابة السريعة"
 
@@ -3045,6 +3168,12 @@ msgstr "النماذج المفتوحة"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
 msgstr "تم إرسال الدعوة"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "{maxAllowed, plural, one {Your plan allows # shared or public "
+"dashboard.} other {Your plan allows # shared or public dashboards.}}"
+msgstr "{maxAllowed, plural, one {تسمح خطتك بمشاركة لوحة معلومات واحدة أو "
+"نشرها.} other {تسمح خطتك بمشاركة # من لوحات المعلومات أو نشرها.}}"
 
 #: src/components/offline/OfflineIndicator/OfflineIndicator.tsx
 msgid "You are offline"
@@ -3155,7 +3284,6 @@ msgstr "أنشئ مجموعات لأعضاء مساحة العمل الخاصة 
 "ولوحات المعلومات لمشاركة فقط مع (أو تقييد) مجموعات مستخدمين معينة."
 
 #: src/components/privacy/ConsentModal/RowValueList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
 msgid "Preview:"
 msgstr "معاينة:"
 
@@ -3168,7 +3296,7 @@ msgid "Select your plan"
 msgstr "اختر خطتك"
 
 #. placeholder {0}: value.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name must be under {maxDatasetNameLength} characters (current: "
 "{0})."
 msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {maxDatasetNameLength} حرفًا "
@@ -3333,6 +3461,7 @@ msgstr "البيانات"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "غير متاح دون اتصال"
 
@@ -3343,6 +3472,10 @@ msgstr "العودة إلى صفحة تسجيل الدخول"
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
 msgstr ""
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapUnconfiguredStatus.tsx
+#~ msgid "Pick a data source and its latitude and longitude columns to plot it."
+#~ msgstr "اختر مصدر بيانات وعمودي خط العرض وخط الطول لرسم بياناته."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
@@ -3401,7 +3534,7 @@ msgstr ""
 msgid "Tab"
 msgstr "علامة تبويب"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "بعض مجموعات البيانات المنشورة لم تتمكن من التحميل. يرجى المحاولة مرة "
 "أخرى لاحقًا."
@@ -3454,10 +3587,6 @@ msgstr "إنشاء"
 msgid "Stroke width"
 msgstr "عرض الحد"
 
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "Create your first dashboard to track key metrics and insights."
-msgstr "أنشئ لوحة التحكم الأولى الخاصة بك لتتبع المقاييس والرؤى الرئيسية."
-
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
 msgstr "الصفحة الرئيسية"
@@ -3476,6 +3605,10 @@ msgstr "هل أنت متأكد أنك تريد حذف مجموعة البيان�
 msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
 msgstr ""
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
+#~ msgid "Symbol size column must be numeric."
+#~ msgstr "يجب أن تكون عمود حجم الرمز رقميًا."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -3502,7 +3635,7 @@ msgstr "URL"
 msgid "GROUP BY uses a non-column expression."
 msgstr "يستخدم GROUP BY تعبيرًا غير معتمد على عمود."
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
 msgstr "جعله خاصًا"
 
@@ -3540,11 +3673,19 @@ msgstr ""
 msgid "Back"
 msgstr "عودة"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Contact us to raise the limit "
+"for your workspace."
+msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plural, one {لوحة معلومات "
+"واحدة} other {# من لوحات المعلومات}} أو نشرها. تواصل معنا لرفع الحد "
+"الأقصى لمساحة العمل لديك."
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "تابع إلى مساحة العمل الخاصة بك"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسافات"
 
@@ -3578,6 +3719,10 @@ msgstr "SQL المُولد"
 msgid " m"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "You need access"
+msgstr "تحتاج إلى الوصول"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
 msgstr "الحد الأقصى لعدد الصفوف للعودة"
@@ -3610,7 +3755,7 @@ msgstr "ما هو المتوسط {averageColumn} في {datasetName}؟"
 msgid "Drop to import"
 msgstr "اسحب للاستيراد"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Date range"
 msgstr "نطاق التاريخ"
 
@@ -3725,18 +3870,28 @@ msgstr "استدلال أقوى من 1.5B مع تنزيل متوسط الحجم.
 msgid "Starting…"
 msgstr "جارٍ البدء…"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "نطاق الأرقام"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
+msgid "Replace URL"
+msgstr "استبدال عنوان URL"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Columns"
 msgstr "الأعمدة"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
 msgstr ""
+
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Anyone with the link can view this {resource}. People and groups below "
+"still control who can edit it."
+msgstr "يمكن لأي شخص لديه الرابط عرض هذا {resource}. يظل الأشخاص والمجموعات "
+"أدناه يتحكمون في من يمكنه تحريره."
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -3758,7 +3913,7 @@ msgstr ""
 msgid "Add to your workspace"
 msgstr "أضف إلى مساحة العمل الخاصة بك"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
 msgstr "غير قادر على تحميل لوحة التحكم"
 
@@ -3831,7 +3986,7 @@ msgstr "مجموعة البيانات"
 msgid "{layerCount} layers"
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "إزالة فاشلة"
@@ -3863,7 +4018,7 @@ msgstr "من مجموعة البيانات"
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "يمكن أن يتكون الملف الشخصي من أعمدة تأتي من مجموعات بيانات مختلفة."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "النهاية (على سبيل المثال 2024-12-31)"
 
@@ -3892,6 +4047,10 @@ msgstr "يوجد ورقة واحدة فقط في هذا الملف الإكسل.
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make dataset offline-only?"
 msgstr "جعل مجموعة البيانات متاحة فقط في وضع عدم الاتصال؟"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
+msgid "Change custom URL?"
+msgstr "هل تريد تغيير عنوان URL المخصص؟"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
@@ -3922,6 +4081,10 @@ msgstr "اختر العمود"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls.tsx
 msgid "1"
 msgstr ""
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Not yet published. Viewers will not see this."
+msgstr "لم يُنشر بعد. لن يتمكن المشاهدون من رؤيته."
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
@@ -3983,6 +4146,10 @@ msgstr "إنشاء مساحة عمل"
 msgid "Try again"
 msgstr "حاول مرة أخرى"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
+msgid "Upgrade plan"
+msgstr "ترقية الخطة"
+
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "لا تقم بتحديث أو إغلاق هذه التبويب وإلا سيتم إلغاء التحميل."
@@ -4020,10 +4187,6 @@ msgstr "Llama 3.2 1B (دون اتصال بالإنترنت)"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Series"
 msgstr "سلسلة"
-
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
-msgid "Not yet published. Public viewers will not see this."
-msgstr "لم يتم نشرها بعد. لن يتمكن المشاهدون العامون من رؤية هذا."
 
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
@@ -4111,6 +4274,18 @@ msgstr "إعادة محاولة البحث"
 msgid "Clarifications"
 msgstr "توضيحات"
 
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
+msgid "\"{resourceName}\" will still be public: anyone with the link keeps "
+"access until you unpublish it."
+msgstr "ستظل \"{resourceName}\" عامة: سيحتفظ أي شخص لديه الرابط بإمكانية الوصول "
+"حتى تلغي نشرها."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
+msgid "This dashboard is still public on the web. Anyone with the link can view "
+"it until you press the button below."
+msgstr "لا تزال لوحة المعلومات هذه عامة على الويب. يمكن لأي شخص لديه الرابط "
+"عرضها حتى تضغط على الزر أدناه."
+
 #: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "تم حذف الكيان"
@@ -4119,13 +4294,25 @@ msgstr "تم حذف الكيان"
 msgid "Select columns"
 msgstr "اختر الأعمدة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "لا يمكنك النشر أثناء وجود تغييرات غير محفوظة. احفظ أولاً."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "حذف مساحة العمل"
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
+#~ msgid "Latitude column"
+#~ msgstr "عمود خط العرض"
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Not published yet."
+msgstr " لم يتم النشر بعد."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
+msgid "Cancel URL change"
+msgstr "إلغاء تغيير عنوان URL"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Draw an area to filter by"
@@ -4233,6 +4420,10 @@ msgstr "تمت إضافة مجموعة البيانات"
 msgid "Optional"
 msgstr "اختياري"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/DroppedRowsAlert.tsx
+#~ msgid "Some rows could not be mapped"
+#~ msgstr "تعذّر تحديد مواقع بعض الصفوف على الخريطة"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
 msgstr ""
@@ -4273,6 +4464,10 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
 
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
+#~ msgid "Select longitude column"
+#~ msgstr "اختر عمود خط الطول"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
 msgstr "تم تحميل مجموعة البيانات بنجاح"
@@ -4304,12 +4499,6 @@ msgstr "مالك"
 msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
 "and 180."
 msgstr ""
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Never changes, so QR codes printed from here keep working even if the "
-"custom URL changes."
-msgstr "لا تتغير أبدًا، لذا تظل رموز QR المطبوعة من هنا تعمل حتى لو تغيرت عنوان "
-"URL المخصص."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -4360,7 +4549,7 @@ msgstr "بالنسبة لمجموعة البيانات <0>{0}</0>، اختر ا�
 "كمعرف {entityConfigName}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Viewer"
@@ -4414,9 +4603,25 @@ msgstr "هذه هي الصفوف الأولى {0} من مجموعة البيان
 msgid "Reassign failed"
 msgstr "فشلت إعادة التعيين"
 
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
+"Impact plan to share as many dashboards as you like."
+msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plural, one {لوحة معلومات "
+"واحدة} other {# من لوحات المعلومات}} أو نشرها. قم بالترقية إلى خطة "
+"Starter أو Impact لمشاركة العدد الذي تريده من لوحات المعلومات."
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
 msgstr ""
+
+#: src/components/permissions/useShareButtonState.ts
+msgid "You need edit access on this resource to share or publish it."
+msgstr "تحتاج إلى صلاحية التعديل على هذا المورد لمشاركته أو نشره."
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
+#~ msgid "Select symbol size column"
+#~ msgstr "اختر عمود حجم الرمز"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
@@ -4426,13 +4631,13 @@ msgstr "تم حذف لوحة التحكم بنجاح!"
 msgid "The name you want other team members to see."
 msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Custom URL"
-msgstr "عنوان URL مخصص"
-
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "اسأل عن بياناتك..."
+
+#: src/views/GisApp/basemap/MapStylePicker.tsx
+#~ msgid "Theme picker"
+#~ msgstr "اختيار السمة"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
@@ -4447,7 +4652,7 @@ msgstr "منحنى"
 msgid "Column 4"
 msgstr "العمود 4"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Preparing data for the visualizations…"
 msgstr "تحضير البيانات للتصورات…"
 
@@ -4518,6 +4723,16 @@ msgstr "لم يتم العثور على مجموعات بيانات محفوظة
 msgid "Built in"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
+msgid "By default we use a direct UUID-based link. Add a custom path below for "
+"a nicer URL."
+msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إلى UUID. أضف مسارًا مخصصًا أدناه "
+"للحصول على عنوان URL أفضل."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
+msgid "Make internal"
+msgstr "جعله داخليًا"
+
 #: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
 #: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
@@ -4578,15 +4793,11 @@ msgstr "SQL"
 msgid "Ordered"
 msgstr "مرتّب"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
 msgstr "لا توجد فلاتر صفوف. ستتضمن الشريحة كل صف في مجموعة البيانات (بالنسبة "
 "للأعمدة المحددة)."
-
-#: src/clients/dashboards/DashboardClient.ts
-msgid "Some datasets are not synced online yet or failed to publish."
-msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو تعذّر نشرها."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Turn"
@@ -4595,6 +4806,10 @@ msgstr "تحويل"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label"
 msgstr "تسمية المحور X"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
+msgid "This custom URL is reserved. Try adding a word to it."
+msgstr "عنوان URL مخصص محجوز. جرّب إضافة كلمة إليه."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Unordered"
@@ -4660,7 +4875,7 @@ msgstr "تحديد متعدد"
 msgid "Unable to load dashboard datasets"
 msgstr "غير قادر على تحميل مجموعات بيانات لوحة التحكم"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
 msgid "No description has been added yet."
 msgstr "لم يتم إضافة أي وصف بعد."
 
@@ -4672,7 +4887,7 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "طي لوحة السحب"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "فشل المشاركة"
 
@@ -4702,7 +4917,7 @@ msgstr ""
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard share settings updated."
 msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
 
@@ -4733,11 +4948,6 @@ msgstr "فشل طلب الدردشة"
 msgid "Copy code"
 msgstr "نسخ الكود"
 
-#. placeholder {0}: savedDataset.name
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
-msgid "Dataset \"{0}\" saved successfully"
-msgstr "تم حفظ مجموعة البيانات \"{0}\" بنجاح"
-
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "{0}s"
@@ -4747,7 +4957,7 @@ msgstr "{0}ثانية"
 msgid "Zoom to layer"
 msgstr ""
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Please fix the highlighted fields."
 msgstr "يرجى إصلاح الحقول المميزة."
 
@@ -4803,6 +5013,7 @@ msgid "Low"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Description"
 msgstr "الوصف"
@@ -4810,6 +5021,12 @@ msgstr "الوصف"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
 msgid "Categories"
 msgstr ""
+
+#: src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts
+msgid "Some datasets are not synced online yet or failed to publish. "
+"{errorMessage}"
+msgstr "لم تتم مزامنة بعض مجموعات البيانات عبر الإنترنت بعد أو فشل نشرها. "
+"{errorMessage}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
@@ -4839,7 +5056,7 @@ msgstr "تصاعدي"
 msgid "Ask about your data"
 msgstr "اسأل عن بياناتك"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Enter values; press Enter after each"
 msgstr "أدخل القيم؛ اضغط على Enter بعد كل واحدة"
 
@@ -4866,7 +5083,7 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 msgstr "لا يمكن تمثيل أجزاء من هذا SQL في النموذج اليدوي. يظهر النموذج تقديرًا "
 "بأفضل جهد؛ SQL أعلاه هو ما يتم تشغيله فعليًا."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "يرجى المحاولة مرة أخرى. لم يتم نشر لوحة التحكم الخاصة بك."
 
@@ -4891,7 +5108,7 @@ msgstr "لون تدريجات المحور Y"
 msgid "{0} · run {1}"
 msgstr "{0} · تشغيل {1}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Process data again"
 msgstr "معالجة البيانات مرة أخرى"
 
@@ -4977,9 +5194,13 @@ msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو �
 msgid "Stacked"
 msgstr "متراص"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState.ts
 msgid "Share this {resourceLabel}"
 msgstr "شارك هذا {resourceLabel}"
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
+#~ msgid "Select latitude column"
+#~ msgstr "حدد عمود خط العرض"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
@@ -4997,6 +5218,10 @@ msgstr "رفع"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr ""
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
+#~ msgid "Something went wrong while loading this layer's data."
+#~ msgstr "حدث خطأ ما أثناء تحميل بيانات هذه الطبقة."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -5090,7 +5315,7 @@ msgstr "الإسناد"
 msgid "Column types updated"
 msgstr "تم تحديث أنواع الأعمدة"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "غير متصل جزئيًا"
 
@@ -5113,6 +5338,11 @@ msgstr ""
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
 msgstr "تسجيل الدخول مرة أخرى"
+
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
+msgid "Shared dashboard limit reached"
+msgstr "تم بلوغ حد لوحات المعلومات المشتركة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
@@ -5156,7 +5386,7 @@ msgstr "اكتب فقرتك هنا..."
 msgid "Send message"
 msgstr "إرسال رسالة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
 msgstr "تم النسخ!"
 
@@ -5164,9 +5394,15 @@ msgstr "تم النسخ!"
 msgid "date"
 msgstr "تاريخ"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceSection.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "هذه اللوحة لا تشير إلى أي مجموعات بيانات: لا يوجد شيء لنشره."
+
+#: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
+msgid " Published on the web: anyone with the link can view it, and the list "
+"above controls editing only."
+msgstr " تم النشر على الويب: يمكن لأي شخص لديه الرابط عرضه، والقائمة أعلاه "
+"تتحكم في التعديل فقط."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Row {rowIndexes}."
@@ -5254,7 +5490,7 @@ msgstr "يرجى المحاولة مرة أخرى لاحقًا."
 msgid "Send <0>{0}</0> value{1} to the AI?"
 msgstr "هل تريد إرسال قيمة <0>{0}</0> {1} إلى الذكاء الاصطناعي؟"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL path"
 msgstr "مسار URL مخصص"
 
@@ -5301,7 +5537,7 @@ msgstr ""
 msgid "The {0} can only render up to {1} {2}, so only displaying the first {3}."
 msgstr "يمكن لـ {0} عرض ما يصل إلى {1} {2} فقط، لذا يتم عرض أول {3} فقط."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot be empty"
 msgstr "لا يمكن أن يكون عنوان URL المخصص فارغًا"
 
@@ -5323,7 +5559,7 @@ msgstr "تحميل {0} للدردشة غير المتصلة"
 msgid "Open chat panel"
 msgstr "فتح لوحة الدردشة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishSliceRowFilter.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "إزالة فلتر الصف"
 
@@ -5335,7 +5571,7 @@ msgstr "تم حذف مجموعة البيانات"
 msgid "Discovery clarification"
 msgstr "توضيح الاكتشاف"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
 msgstr "لا يمكن حفظ مجموعة البيانات"
 
@@ -5454,7 +5690,7 @@ msgstr "إعدادات التصويرية"
 msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (دون اتصال)"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
 msgstr "فشل معالجة البيانات"
 
@@ -5468,7 +5704,11 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في "
 "أي وقت."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+msgid "Anyone with the link"
+msgstr "أي شخص لديه الرابط"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 msgid "This dataset can be stored in the cloud. "
 msgstr "يمكن تخزين مجموعة البيانات هذه في السحابة."
 
@@ -5496,6 +5736,10 @@ msgstr ""
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "حذف مجموعة البيانات"
+
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
+msgid "Your plan does not allow sharing more dashboards."
+msgstr "لا تسمح خطتك بمشاركة المزيد من لوحات المعلومات."
 
 #: src/utils/notifications/notify.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5549,6 +5793,12 @@ msgstr "التخطيط"
 msgid "Role for {displayName}"
 msgstr "الدور لـ {displayName}"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
+msgid "This dashboard is published to your workspace. Only people you have "
+"given access can open the link below."
+msgstr "تم نشر لوحة المعلومات هذه في مساحة العمل لديك. لا يمكن فتح الرابط أدناه "
+"إلا للأشخاص الذين منحتهم صلاحية الوصول."
+
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Review before sending"
 msgstr "راجع قبل الإرسال"
@@ -5580,7 +5830,7 @@ msgstr ""
 msgid "Dataset Name"
 msgstr "اسم مجموعة البيانات"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy share link"
 msgstr "نسخ رابط المشاركة"
 
@@ -5627,7 +5877,7 @@ msgstr "اجعلها متاحة فقط عند عدم الاتصال"
 msgid "{0} is available when you are offline."
 msgstr "{0} متاح عندما تكون غير متصل."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "رابط مخصص متاح"
 
@@ -5648,6 +5898,12 @@ msgstr "مقيد"
 msgid "Contains (free-text)"
 msgstr "يحتوي على (نص حر)"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
+msgid "This dashboard is not published yet. Use the button below to publish it "
+"to the audience you picked."
+msgstr "لم يتم نشر لوحة المعلومات هذه بعد. استخدم الزر أدناه لنشرها للجمهور "
+"الذي اخترته."
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
 msgstr ""
@@ -5656,7 +5912,7 @@ msgstr ""
 msgid "Send feedback"
 msgstr "إرسال ملاحظات"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "جارٍ تحميل مجموعات بيانات اللوحة"
 
@@ -5674,7 +5930,7 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "تحتوي جملة WHERE على عقدة من النوع \"{nodeType}\" لا يدعمها النموذج."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Dashboard published!"
 msgstr "تم نشر اللوحة!"
 
@@ -5684,7 +5940,7 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 msgstr "تعذّر إنشاء SQL دون اتصال. حاول إعادة الصياغة أو أعد الاتصال لاستخدام "
 "الدردشة السحابية."
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr "ستتمكن من فتحه وحدك. يمكنك مشاركته مرة أخرى في أي وقت."
 
@@ -5718,10 +5974,6 @@ msgstr "جارٍ تحميل الموارد الخاصة"
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Data processed successfully"
-msgstr "تمت معالجة البيانات بنجاح"
-
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
 msgid "Smallest radius"
 msgstr ""
@@ -5747,7 +5999,7 @@ msgid "{0} boundaries without data"
 msgstr ""
 
 #. placeholder {0}: value.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
 "(current: {0})."
 msgstr "يجب أن تكون الوصف أقل من {maxDatasetDescriptionLength} حرفًا (الحالي: "
@@ -5876,11 +6128,11 @@ msgstr ""
 msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "فقط ما تم استعلامه"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
 msgstr "تعذر إنشاء رمز الاستجابة السريعة"
 
@@ -5914,7 +6166,7 @@ msgstr ""
 msgid "User group saved"
 msgstr "تم حفظ مجموعة المستخدمين"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "تعذر نشر لوحة التحكم"
 
@@ -5955,6 +6207,10 @@ msgstr "لا توجد أعمدة رقمية"
 msgid "Service"
 msgstr "الخدمة"
 
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
+#~ msgid "Could not load map data"
+#~ msgstr "تعذّر تحميل بيانات الخريطة"
+
 #: src/views/EntityManagerApp/EntityNavbar.tsx
 msgid "Nothing more to load"
 msgstr "لا يوجد المزيد لتحميله"
@@ -5986,7 +6242,7 @@ msgstr "الأشخاص الذين لديهم وصول"
 msgid "Google Sheets"
 msgstr "جداول بيانات Google"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
@@ -6004,7 +6260,7 @@ msgstr "تحميل نموذج دردشة غير متصل مختلف"
 msgid "Edit permissions"
 msgstr "تحرير الأذونات"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "تم الاستعلام"
 
@@ -6026,6 +6282,7 @@ msgstr "خطأ في حفظ مجموعة البيانات"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
@@ -6034,6 +6291,10 @@ msgstr "خطأ في حفظ مجموعة البيانات"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
 msgstr "احفظ"
+
+#: src/components/permissions/useShareButtonState.ts
+msgid "Share or publish this {resourceLabel}"
+msgstr "مشاركة هذا {resourceLabel} أو نشره"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6044,7 +6305,7 @@ msgid "Subscription updated successfully"
 msgstr "تم تحديث الاشتراك بنجاح"
 
 #. placeholder {0}: columns.length
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/QueriedSlicePreview.tsx
+#: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "{0, plural, one {Will publish # column:} other {Will publish # "
 "columns:}}"
 msgstr "{0, plural, one {سيتم نشر # عمود:} other {سيتم نشر # أعمدة:}}"
@@ -6076,7 +6337,7 @@ msgstr "لم تختار عمود الاسم"
 msgid "Grouped"
 msgstr "مجمّع"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
+#: src/components/permissions/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
 msgstr "تحتاج إلى وصول إداري على هذا المورد لإدارة المشاركة."
 
@@ -6098,10 +6359,6 @@ msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغا
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
 msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "File parsed successfully"
-msgstr "تم تحليل الملف بنجاح"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -6144,7 +6401,11 @@ msgstr "يغطي <0>{0}</0>، من <1>{1}</1> إلى <2>{2}</2>."
 msgid "Loading more..."
 msgstr "تحميل المزيد..."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset \"{datasetName}\" saved successfully"
+msgstr "تم حفظ مجموعة البيانات \"{datasetName}\" بنجاح"
+
+#: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL (optional)"
 msgstr "رابط مخصص (اختياري)"
 
@@ -6160,13 +6421,13 @@ msgstr "اسم مجموعة البيانات"
 msgid "Email address updated"
 msgstr "تم تحديث عنوان البريد الإلكتروني"
 
+#: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
+msgid "Sign in with a different account"
+msgstr "تسجيل الدخول باستخدام حساب مختلف"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Freehand"
 msgstr "رسم حر"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Permanent link (use for QR codes)"
-msgstr "رابط دائم (استخدمه لرموز الاستجابة السريعة)"
 
 #: shared/copy/appLabel.ts
 #: src/config/AppLinks/AppLinks.tsx
@@ -6190,7 +6451,7 @@ msgstr "النص البديل"
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "يمكنك عرض لوحة التحكم هذه لأنها تمت مشاركتها معك."
 
@@ -6199,24 +6460,16 @@ msgid "Pick user groups for this member"
 msgstr "اختر مجموعات المستخدمين لهذا العضو"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Admin"
 msgstr "مدير"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardButton.tsx
-msgid "Published"
-msgstr "تم النشر"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Boundary key column"
 msgstr ""
-
-#: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
-#~ msgid "Cluster and Heat are unavailable: they arrive in a later release."
-#~ msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -6240,7 +6493,7 @@ msgstr "تحديد فردي"
 msgid "(clean)"
 msgstr "(نظيف)"
 
-#: src/components/permissions/ShareResourceModal/ShareResourceModal.tsx
+#: src/components/permissions/ShareResourceModal/SharingSettingsLoading.tsx
 msgid "Loading sharing settings…"
 msgstr "جارٍ تحميل إعدادات المشاركة…"
 
@@ -6257,7 +6510,7 @@ msgid "Tone"
 msgstr "النبرة"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
-#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
@@ -6303,20 +6556,11 @@ msgstr "إرسال إلى الذكاء الاصطناعي؟"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "شراء {seatsToAdd} مقاعد"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Share link"
-msgstr "رابط المشاركة"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
 msgstr "الخطة الحالية"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "Using your custom URL. The permanent UUID link below also still works."
-msgstr "باستخدام الرابط المخصص الخاص بك. رابط UUID الدائم أدناه لا يزال يعمل "
-"أيضًا."
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
 msgstr "لم تتم قراءة أي صفوف بنجاح"
@@ -6372,15 +6616,15 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 msgid "Delete the view {0}"
 msgstr ""
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
 msgstr "ستكون مجموعة البيانات هذه متاحة فقط في وضع عدم الاتصال"
 
@@ -6553,7 +6797,7 @@ msgstr "لا توجد إدخالات حتى الآن. يتم ملء السجل �
 msgid "Breaks must be finite and strictly increasing."
 msgstr ""
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name"
 msgstr "اسم مجموعة البيانات"
 
@@ -6583,7 +6827,7 @@ msgstr "تحرير مجموعة الأدوار"
 msgid "Profiles"
 msgstr "الملفات الشخصية"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
 
@@ -6704,6 +6948,10 @@ msgstr "لوحات المعلومات"
 msgid "integer"
 msgstr "عدد صحيح"
 
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolColorField.tsx
+#~ msgid "Symbol color"
+#~ msgstr "لون الرمز"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationCustomTextInput.tsx
 msgid "Custom clarification answer"
 msgstr "إجابة توضيحية مخصصة"
@@ -6732,6 +6980,14 @@ msgstr "أنت على الخطة المجانية"
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls.tsx
 msgid "Count"
 msgstr "العدد"
+
+#: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
+msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
+"one {# dashboard} other {# dashboards}}. Upgrade to our Impact plan to "
+"share as many dashboards as you like."
+msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plural, one {لوحة معلومات "
+"واحدة} other {# من لوحات المعلومات}} أو نشرها. قم بالترقية إلى خطة "
+"Impact لمشاركة العدد الذي تريده من لوحات المعلومات."
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Avandar is still in beta. Some features may not work as expected and "
@@ -6767,11 +7023,11 @@ msgid "Recommended"
 msgstr "موصى به"
 
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/CustomSliceEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Select all"
 msgstr "تحديد الكل"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "فقط ما تم استعلامه (موصى به)"
 
@@ -6783,7 +7039,7 @@ msgstr "ما الحقل الذي يجب استخدامه كاسم لـ {singular
 msgid "Untitled"
 msgstr "بلا عنوان"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
 msgstr "معاينة لوحة المعلومات هذه"
 
@@ -6799,12 +7055,6 @@ msgstr "شكل"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
 msgstr "الأعضاء"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/VanitySlugField/VanitySlugField.tsx
-msgid "A short, memorable URL for flyers, reports, and QR codes. Whatever you "
-"type is kebab-cased automatically."
-msgstr "رابط قصير وسهل التذكر للنشرات والتقارير وأكواد QR. أي شيء تكتبه يتم "
-"تحويله تلقائيًا إلى تنسيق kebab."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls.tsx
 msgid "Point geometry"
@@ -6822,6 +7072,10 @@ msgstr "أنت مشترك حاليًا في هذه الخطة."
 msgid "Upload a dataset"
 msgstr "تحميل مجموعة بيانات"
 
+#: src/views/GisApp/panels/LayerFormPanel/LayerSymbolSizeField.tsx
+#~ msgid "Invalid column type"
+#~ msgstr "نوع العمود غير صالح"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls.tsx
 msgid "Square root"
 msgstr ""
@@ -6833,6 +7087,10 @@ msgstr ""
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.tsx
 msgid "Graduated"
 msgstr ""
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
+msgid "Please try again. Your dashboard is still published."
+msgstr "يرجى المحاولة مرة أخرى. لا تزال لوحة المعلومات منشورة."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Syncing dataset online..."
@@ -6872,10 +7130,6 @@ msgstr "الأعلى"
 msgid "From your prompt:"
 msgstr "من مطالبتك:"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Anyone with this link can view the dashboard."
-msgstr "يمكن لأي شخص لديه هذا الرابط عرض لوحة المعلومات."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Delimiter"
@@ -6900,6 +7154,10 @@ msgstr "الصف {rowNum} / العمود {colNum}"
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "لم يتم إضافة أي أعمدة بعد."
+
+#: src/views/DashboardApp/DashboardShareModal/PublishingSection.tsx
+msgid "Advanced options"
+msgstr "الخيارات المتقدمة"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -6974,7 +7232,7 @@ msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the 
 msgstr "يستخدم HAVING الدالة التجميعية {funcName} مع وسيطة معقدة؛ لذلك أبقت "
 "المطابقة الشرط كتسمية."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/SaveDatasetButton.tsx
 msgid "Save Dataset"
 msgstr "حفظ مجموعة البيانات"
 
@@ -7026,8 +7284,8 @@ msgstr "(لم تُرسل الرسالة.)"
 msgid "No workspace was found"
 msgstr "لم يتم العثور على مساحة عمل"
 
-#. placeholder {0}: importedColumns.length
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#. placeholder {0}: options.numColumns
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct. If they are not, change the import options above and "
 "click Upload again."
@@ -7123,11 +7381,11 @@ msgstr "الوسائط"
 msgid "No maps yet"
 msgstr ""
 
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "أضف موجهًا وأنشئ SQL لتكوين هذه التصوير."
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy link"
 msgstr "نسخ الرابط"
 
@@ -7157,9 +7415,9 @@ msgstr "فشل تحميل ورقة Google"
 msgid "Type the confirmation phrase"
 msgstr "اكتب عبارة التأكيد"
 
-#: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
-msgid "You have not created any dashboards"
-msgstr "لم تقم بإنشاء أي لوحات معلومات"
+#: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
+msgid "Change URL"
+msgstr "تغيير عنوان URL"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls.tsx
 msgid "Ochre"
@@ -7176,6 +7434,10 @@ msgstr "ابحث بالاسم أو مجموعة المستخدمين"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Failed to update email"
 msgstr "فشل في تحديث البريد الإلكتروني"
+
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
+msgid "Published to your workspace."
+msgstr "تم النشر إلى مساحة عملك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "earliest"
@@ -7239,6 +7501,10 @@ msgstr ""
 msgid "Stroke ({strokeWidth}px)"
 msgstr "سمك الخط ({strokeWidth}px)"
 
+#: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
+msgid "Publish to workspace"
+msgstr "النشر إلى مساحة العمل"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "عدد صحيح"
@@ -7256,6 +7522,10 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
+
+#: src/views/GisApp/MapCanvas/MapStatusOverlay/MapEmptyStatus.tsx
+#~ msgid "No mappable rows in this data source."
+#~ msgstr "لا توجد صفوف قابلة للتحديد على الخريطة في مصدر البيانات هذا."
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
@@ -7275,6 +7545,7 @@ msgstr ""
 msgid "Loading"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
 msgstr "لم يتم تحميل لوحة التحكم بعد."
@@ -7288,6 +7559,7 @@ msgstr "خط تحرير"
 msgid "Category {0}"
 msgstr ""
 
+#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
@@ -7299,15 +7571,9 @@ msgstr "لوحة معلومات بدون عنوان"
 msgid "Limit"
 msgstr "حد"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix these issues before saving"
 msgstr "قم بإصلاح هذه المشكلات قبل الحفظ"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
-msgid "Best for word-of-mouth sharing. Visiting the permanent link below also "
-"redirects here."
-msgstr "أفضل للمشاركة الشفهية. زيارة الرابط الدائم أدناه تعيد التوجيه هنا "
-"أيضًا."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
@@ -7327,7 +7593,7 @@ msgstr "عتامة التعبئة"
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
 
-#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts
+#: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} و{groupClause}"
 
@@ -7356,10 +7622,6 @@ msgstr "الدور ومجموعات المستخدمين"
 msgid "Clear all"
 msgstr "مسح الكل"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModalContent.tsx
-msgid "Close"
-msgstr "إغلاق"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} "
@@ -7369,10 +7631,15 @@ msgstr "لقد استخدم مساحة العمل الخاصة بك كل {curren
 msgid "Select the fields a reader should see"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
+#: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Shared with you"
 msgstr "مشارك معك"
+
+#: src/views/GisApp/panels/LayerFormPanel/LayerCoordinateField.tsx
+#~ msgid "Longitude column"
+#~ msgstr "عمود الطول"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Run a query to configure a chart."
@@ -7394,7 +7661,7 @@ msgstr "الحد الأقصى للعرض"
 msgid "Not offline"
 msgstr "ليس في وضع عدم الاتصال"
 
-#: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
+#: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
 
@@ -7415,11 +7682,11 @@ msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishedShareLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share"
 msgstr "مشاركة"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/SliceModeEditor.tsx
+#: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
 
@@ -7545,7 +7812,7 @@ msgstr "من العمود: <0>{columnName}</0>"
 msgid "Bottom"
 msgstr "الأسفل"
 
-#: src/views/DashboardApp/DashboardListView/DashboardCard.tsx
+#: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
 msgstr "جاهز للعمل دون اتصال"
 
@@ -7553,7 +7820,7 @@ msgstr "جاهز للعمل دون اتصال"
 msgid "Swap latitude and longitude"
 msgstr ""
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
 msgstr "تحميل PNG"
 
@@ -7561,15 +7828,9 @@ msgstr "تحميل PNG"
 msgid "Add at least one X / Y series"
 msgstr "أضف على الأقل سلسلة واحدة من X / Y"
 
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow.tsx
+#: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Show QR code"
 msgstr "عرض رمز QR"
-
-#: src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardStatus/PublishDashboardStatus.tsx
-msgid "By default we use a permanent UUID-based link. Add a custom path below "
-"for a nicer URL."
-msgstr "بشكل افتراضي، نستخدم رابط دائم يعتمد على UUID. أضف مسارًا مخصصًا أدناه "
-"للحصول على عنوان URL أجمل."
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Choose the minimum value"

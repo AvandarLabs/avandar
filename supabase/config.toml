@@ -65,6 +65,7 @@ enabled = true
 # is the last word on the storage schema for a local database.
 sql_paths = [
   "./migrations/20260813214231_STORAGE-restore-dropped-object-policies.sql",
+  "./migrations/20260816020300_STORAGE-dashboard-snapshot-buckets.sql",
 ]
 
 [realtime]

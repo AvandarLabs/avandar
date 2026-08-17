@@ -45,7 +45,7 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   return {
     WorkspaceQetlClient: { runQuery: runSpatialQueryMock },
   };

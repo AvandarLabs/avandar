@@ -71,7 +71,4 @@ update on public.value_extractors__manual_entry for each row
 execute function public.util__set_updated_at ();
 
 -- Index for entity field + workspace filtering
-create index idx_manual_entry_value_extractors__efc_id_workspace_id on public.value_extractors__manual_entry (
-  entity_field_config_id,
-  workspace_id
-);
+create index idx_manual_entry_value_extractors__efc_id_workspace_id on public.value_extractors__manual_entry (entity_field_config_id, workspace_id);

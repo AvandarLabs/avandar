@@ -13,7 +13,7 @@
  *   needs. These are what we transpile and emit.
  * - `drop`: Postgres-only construct that has no SQLite equivalent or
  *   would not be useful locally (RLS policies, PL/pgSQL functions,
- *   triggers, GRANT/REVOKE, COMMENT, SET, CREATE EXTENSION, ENUM types,
+ *   triggers, GRANT/REVOKE, COMMENT, SET, CREATE EXTENSION/SCHEMA, ENUM types,
  *   `ENABLE/DISABLE ROW LEVEL SECURITY`, `VALIDATE CONSTRAINT`). The
  *   generator silently discards these.
  * - `unknown`: leading keyword we do not recognise. The generator
@@ -54,7 +54,7 @@ export type Statement = {
  *
  * - `included`: write to the `.gen.sql` output as-is (after sqlglot).
  * - `skipped`: discard silently (Postgres-only or table is excluded).
- * - `droppedFks`: schema-shape statements whose FK target is not part
+ * - `droppedForeignKeys`: schema-shape statements whose FK target is not part
  *   of the SQLite mirror (cross-schema reference like `auth.users`, or
  *   target table is in `EXCLUDED_TABLES`). The generator drops the
  *   whole statement because the target table does not exist locally;
@@ -74,7 +74,7 @@ export type Statement = {
 export type PartitionResult = {
   included: Statement[];
   skipped: Statement[];
-  droppedFks: Statement[];
+  droppedForeignKeys: Statement[];
   needsHandEdit: Statement[];
   unknown: Statement[];
 };
@@ -83,9 +83,9 @@ export type PartitionResult = {
  * Options for `partitionStatements`.
  */
 export type PartitionStatementsOptions = {
-  statements: Statement[];
-  syncable: string[];
-  excluded: string[];
+  statements: readonly Statement[];
+  syncable: readonly string[];
+  excluded: readonly string[];
 };
 
 /**
@@ -107,5 +107,5 @@ export type GeneratorSummary = {
   statementsIncluded: number;
   statementsSkipped: number;
   needsHandEdit: AnnotatedStatement[];
-  droppedFks: AnnotatedStatement[];
+  droppedForeignKeys: AnnotatedStatement[];
 };

@@ -4,10 +4,11 @@ import type { Locator, Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
- * Locator scoped to the open share modal (`role="dialog"`, title "Share").
+ * Locator scoped to the open share modal (`role="dialog"`, title
+ * `Share “{resourceName}”`).
  */
 function shareDialog(page: Page): Locator {
-  return page.getByRole("dialog", { name: "Share" });
+  return page.getByRole("dialog", { name: /^Share / });
 }
 
 /**

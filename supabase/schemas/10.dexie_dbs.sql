@@ -20,10 +20,7 @@ create table public.dexie_dbs (
   created_at timestamptz not null default now(),
   -- Timestamp of the last time this dexie db was sync'd
   last_seen_at timestamptz not null default now(),
-  constraint dexie_dbs_unique_user_db_id unique (
-    db_id,
-    user_id
-  )
+  constraint dexie_dbs_unique_user_db_id unique (db_id, user_id)
 );
 
 -- Enable row level security

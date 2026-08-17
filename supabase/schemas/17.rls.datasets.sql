@@ -20,9 +20,7 @@ select
       select
         auth.uid ()
     ) or
-    public.util__auth_user_may_select_dataset (
-      public.datasets.id
-    )
+    public.util__auth_user_may_select_dataset (public.datasets.id)
   );
 
 create policy "Users with editor app role can insert datasets" on public.datasets for insert to authenticated
@@ -52,9 +50,7 @@ with
     public.datasets.owner_id = any (
       array(
         select
-          public.util__get_workspace_members (
-            public.datasets.workspace_id
-          )
+          public.util__get_workspace_members (public.datasets.workspace_id)
       )
     )
   );

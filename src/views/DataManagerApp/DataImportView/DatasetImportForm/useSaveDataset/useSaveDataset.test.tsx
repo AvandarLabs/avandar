@@ -8,7 +8,7 @@ import type { CsvFileLoadResult } from "../../ManualUploadView/useLoadManualUplo
 import type {
   CsvDataSourceMetadata,
   DatasetImportFormValues,
-} from "../DatasetImportForm";
+} from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -88,7 +88,7 @@ const {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       QueryKeys: {

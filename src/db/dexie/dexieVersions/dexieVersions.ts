@@ -15,6 +15,23 @@
  * 2. In `DBDefinitions`, add a `AvaDexieVersionManager.defineVersion` call.
  *    Include an `upgrader` function if necessary.
  *
+ * **CHANGING A MODEL'S PRIMARY KEY:**
+ *
+ * IndexedDB cannot re-key a store in place, and Dexie aborts the whole upgrade
+ * with "Not yet support for changing primary key" if you try. It also cannot
+ * drop and recreate the same store within one version. A re-key therefore
+ * needs two versions: name the model in `modelsToDelete` in the first, then
+ * declare it again under `models` in the next. Everything the store held is
+ * destroyed, so only re-key stores whose contents can be derived again.
+ *
+ * **WHAT AN `upgrader` MAY DO:**
+ *
+ * Only work that belongs to the version-change transaction, meaning reads and
+ * writes against `tx.table(...)`. Awaiting anything else (a network call, a
+ * different IndexedDB database, OPFS) suspends the upgrader on a task outside
+ * the transaction, and the browser then commits it early and silently drops
+ * every schema change belonging to a later version.
+ *
  * TODO(jpsyx): in the event that we delete an older version prematurely, we
  * should add a function that shows a warning to the user saying that local data
  * was lost and we should clear the IndexedDB database and try to seed it as
@@ -26,6 +43,7 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";
+import { Logger } from "@/utils/Logger";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
@@ -50,6 +68,23 @@ type Schemas = {
   };
   v7: {
     version: 7;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+    ];
+  };
+  v8: {
+    version: 8;
+    models: [
+      LocalDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+    ];
+  };
+  v9: {
+    version: 9;
     models: [
       LocalDatasetModel,
       LocalPublicDatasetModel,
@@ -201,8 +236,84 @@ const DBDefinitions = [
       },
     },
 
-    upgrader: async () => {
-      await deleteObsoleteIndexedDBs();
+    upgrader: () => {
+      // Deliberately not awaited. `deleteObsoleteIndexedDBs` deletes *other*
+      // IndexedDB databases, so awaiting it suspends this upgrader on a task
+      // that is outside the version-change transaction. The browser then
+      // auto-commits the transaction early and silently drops every schema
+      // change belonging to a later version, leaving the database stamped
+      // with the newest version number but carrying an older shape.
+      void deleteObsoleteIndexedDBs().catch((error: unknown) => {
+        // Detached work cannot fail the upgrade, and an unhandled rejection
+        // here would surface as a spurious app-level error.
+        Logger.error("Failed to delete obsolete IndexedDB databases", error);
+      });
+    },
+  }),
+
+  // Deletes the public snapshot cache so that v9 can recreate it keyed on
+  // [dashboardId+datasetId]. IndexedDB cannot re-key a store in place, and
+  // Dexie cannot drop and recreate the same store within one version, so the
+  // re-key has to straddle v8 and v9. Dropping the rows is safe: they are a
+  // cache of parquet blobs that can be downloaded again.
+  AvaDexieVersionManager.defineVersion<8>({
+    db,
+    version: 8,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
+    },
+
+    modelsToDelete: ["LocalPublicDataset"],
+  }),
+
+  // Recreates the public snapshot cache keyed on [dashboardId+datasetId]. A
+  // dataset ID cannot identify a dashboard snapshot because dashboards may
+  // publish different slices of the same dataset, so keying by dataset alone
+  // lets one dashboard's snapshot overwrite another's, including serving a
+  // private snapshot into a public dashboard's render.
+  AvaDexieVersionManager.defineVersion<9>({
+    db,
+    version: 9,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: ["dashboardId", "datasetId"],
+        columnsToIndex: ["dashboardId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
     },
   }),
 ] as const;
@@ -210,4 +321,4 @@ const DBDefinitions = [
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
 /** Registry key for the current AvaDexie schema version. */
-export const CURRENT_AVA_DEXIE_VERSION = "v7" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v9" as const satisfies keyof Schemas;

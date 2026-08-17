@@ -7,7 +7,7 @@ export type PublishSliceRowFilter =
       id?: string;
       kind: "enum";
       columnName: string;
-      values: readonly string[];
+      values: string[];
     }
   | {
       /** Stable identifier used while filters are reordered or removed. */
@@ -32,8 +32,8 @@ export type PublishSliceConfigRead =
   | { mode: "all_columns" }
   | {
       mode: "custom";
-      columns: readonly string[];
-      rowFilters: readonly PublishSliceRowFilter[];
+      columns: string[];
+      rowFilters: PublishSliceRowFilter[];
     };
 
 /** Internal shape backing `PublishSliceConfig.Dashboard`. */

@@ -38,12 +38,15 @@ values
 
 -- a7000001 owns: 2 private dashboards, 1 public+restricted (must NOT count),
 -- 1 unrestricted (must not count), and 1 private dataset.
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
+)
 values
-  ('a7005001-0000-4000-8000-000000000001'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'p1', '{}'::jsonb, true, false),
-  ('a7005002-0000-4000-8000-000000000002'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'p2', '{}'::jsonb, true, false),
-  ('a7005003-0000-4000-8000-000000000003'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'public restricted', '{}'::jsonb, true, true),
-  ('a7005004-0000-4000-8000-000000000004'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'open', '{}'::jsonb, false, false);
+  ('a7005001-0000-4000-8000-000000000001'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'p1', '{}'::jsonb, true, 'draft', null),
+  ('a7005002-0000-4000-8000-000000000002'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'p2', '{}'::jsonb, true, 'draft', null),
+  ('a7005003-0000-4000-8000-000000000003'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'public restricted', '{}'::jsonb, true, 'public', 'a7005103-0000-4000-8000-000000000003'::uuid),
+  ('a7005004-0000-4000-8000-000000000004'::uuid, 'a7001001-0000-4000-8000-000000000001'::uuid, 'a7000001-0000-4000-8000-000000000001'::uuid, 'a7003001-0000-4000-8000-000000000001'::uuid, 'open', '{}'::jsonb, false, 'draft', null);
 
 insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
 values (

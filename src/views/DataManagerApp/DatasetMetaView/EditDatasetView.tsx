@@ -1,6 +1,6 @@
 import { InputTextForm } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 

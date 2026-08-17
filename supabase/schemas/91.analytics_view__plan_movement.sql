@@ -10,10 +10,7 @@
 -- signal that the ranking function needs updating, not a business event.
 create or replace view analytics.plan_movement as
 select
-  date_trunc(
-    'month',
-    e.created_at
-  ) as month,
+  date_trunc('month', e.created_at) as month,
   count(*) filter (
     where
       e.event_name = 'subscription.created'
@@ -21,9 +18,7 @@ select
   count(*) filter (
     where
       e.event_name = 'subscription.created' and
-      (
-        e.payload ->> 'isPolarBacked'
-      )::boolean
+      (e.payload ->> 'isPolarBacked')::boolean
   ) as polar_backed_subscriptions_created,
   count(*) filter (
     where
