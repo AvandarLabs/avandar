@@ -144,7 +144,7 @@ msgstr "Choisir le modèle de discussion"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Skip this step"
-msgstr ""
+msgstr "Ignorer cette étape"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -538,7 +538,7 @@ msgstr "Aucun ensemble de données ajouté pour l'instant"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Only you can see this"
-msgstr ""
+msgstr "Vous seul pouvez voir ceci"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -551,7 +551,7 @@ msgstr "Seuls les administrateurs de l’espace de travail peuvent publier sur l
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
-msgstr ""
+msgstr "Permettez à vos collègues d’ouvrir ce que vous venez de créer."
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -571,7 +571,7 @@ msgstr "Ajoutez des colonnes à la requête ci-dessus pour commencer à définir
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open it to your workspace"
-msgstr ""
+msgstr "Ouvrir dans votre espace de travail"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Only allow one value"
@@ -620,7 +620,7 @@ msgstr "Graphique à bulles"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Restart tutorial"
-msgstr ""
+msgstr "Redémarrer le tutoriel"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -662,7 +662,7 @@ msgstr "Carte"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Change the chart if you like"
-msgstr ""
+msgstr "Modifiez le graphique si vous le souhaitez"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -879,7 +879,7 @@ msgstr "Largeur maximale du conteneur"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Build your first dashboard"
-msgstr ""
+msgstr "Créer votre premier tableau de bord"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
@@ -900,7 +900,7 @@ msgstr "Supprimer l'accès pour {displayName}"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run a query first."
-msgstr ""
+msgstr "Exécutez d’abord une requête."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
@@ -1030,7 +1030,9 @@ msgstr "Public"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
-msgstr ""
+msgstr "Le rôle Lecteur permet de consulter le contenu. Le rôle Éditeur permet "
+"de le modifier. Lecteur est l’option sécurisée par défaut, et vous "
+"pouvez modifier le rôle de chacun ultérieurement."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -1047,7 +1049,7 @@ msgstr "Données {0} tronquées"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Share it with your workspace"
-msgstr ""
+msgstr "Partager avec votre espace de travail"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1588,7 +1590,9 @@ msgstr "Enregistrer l’URL"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 "unshare another dashboard, and come back to this."
-msgstr ""
+msgstr "Votre forfait ne permet pas de partager un autre tableau de bord. Vous "
+"pouvez passer à un forfait supérieur ou annuler le partage d’un autre "
+"tableau de bord, puis revenir ici."
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -1828,7 +1832,7 @@ msgstr "Aucune entité sélectionnée"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
-msgstr ""
+msgstr "Bienvenue sur Avandar"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -2029,7 +2033,8 @@ msgstr "Mot de passe mis à jour avec succès"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
-msgstr ""
+msgstr "Ouvrez Enregistrer et choisissez « Enregistrer dans un tableau de bord "
+"». Nommez le tableau de bord, créez-le, et Avandar vous y conduira."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -2303,7 +2308,7 @@ msgstr "Publier"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Dismiss the tutorial"
-msgstr ""
+msgstr "Fermer le tutoriel"
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2412,7 +2417,7 @@ msgstr "Source de données"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
-msgstr ""
+msgstr "Importez une feuille de calcul dans Avandar."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
@@ -2803,7 +2808,7 @@ msgstr "Mot de passe oublié ?"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
-msgstr ""
+msgstr "Obtenez une réponse à partir des données que vous venez d’ajouter."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -2933,7 +2938,7 @@ msgstr "Ce membre possède {privateTotal} ressources privées. Il ne peut pas "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "It profiled your data for you"
-msgstr ""
+msgstr "Vos données ont été profilées automatiquement"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -3082,7 +3087,7 @@ msgstr "Le jeu de données est désormais uniquement hors ligne"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Next"
-msgstr ""
+msgstr "Suivant"
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Fields that come from datasets"
@@ -3126,7 +3131,7 @@ msgstr "Avandar (par défaut)"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Add your first dataset"
-msgstr ""
+msgstr "Ajouter votre premier jeu de données"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -3135,7 +3140,9 @@ msgstr "Large"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
-msgstr ""
+msgstr "Ouvrez Résumé des données pour voir ce qu’Avandar a déduit "
+"automatiquement : les plages, les distributions et les données "
+"manquantes. Vous n’avez rien eu à demander."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -3272,10 +3279,6 @@ msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Principalement unique : <0>{0}</0> valeurs distinctes sur <1>{1}</1 "
 "lignes."
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Run an AI query first."
-#~ msgstr "Exécutez d'abord une requête AI."
-
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
@@ -3295,7 +3298,8 @@ msgstr "Génération de SQL…"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
-msgstr ""
+msgstr "Découvrez à nouveau, depuis le début, comment créer et partager un "
+"tableau de bord."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -3434,7 +3438,7 @@ msgstr "Hypothèses SQL générées"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Name it and save"
-msgstr ""
+msgstr "Nommez-le et enregistrez-le"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -3464,7 +3468,7 @@ msgstr "Les CTE (clauses WITH) ne sont pas pris en charge dans le formulaire."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Start with a spreadsheet"
-msgstr ""
+msgstr "Commencer par une feuille de calcul"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3503,7 +3507,8 @@ msgstr "H1"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
-msgstr ""
+msgstr "Voici l’Explorateur de données, et voici Ava. Posez une question en "
+"langage courant, comme « chiffre d’affaires total par région »."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -4041,7 +4046,8 @@ msgstr "Échec de la réattribution"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
 "your first dashboard."
-msgstr ""
+msgstr "Vous souhaitez une visite rapide ? En environ 5 minutes, vous passerez "
+"d’une feuille de calcul à votre premier tableau de bord."
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -4111,7 +4117,7 @@ msgstr "Impossible de supprimer le modèle de chat hors ligne"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started {completedCount}/{total}"
-msgstr ""
+msgstr "Commencer {completedCount}/{total}"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
@@ -4144,7 +4150,8 @@ msgstr "Aucun jeu de données enregistré trouvé."
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
-msgstr ""
+msgstr "Avandar a déjà analysé votre fichier et deviné le contenu de chaque "
+"colonne. Donnez un nom au jeu de données, puis enregistrez-le."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -4668,7 +4675,7 @@ msgstr "Se reconnecter"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
-msgstr ""
+msgstr "Pas maintenant"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
@@ -4729,7 +4736,8 @@ msgstr "Ce tableau de bord ne fait référence à aucun jeu de données : rien �
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
-msgstr ""
+msgstr "Ava a écrit le SQL, l’a exécuté et choisi un graphique pour présenter "
+"le résultat."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -4744,11 +4752,11 @@ msgstr "Un e-mail de confirmation a été envoyé à votre adresse e-mail."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Just ask"
-msgstr ""
+msgstr "Il vous suffit de demander"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Pick what they can do"
-msgstr ""
+msgstr "Choisissez ce qu’ils peuvent faire"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -4878,7 +4886,7 @@ msgstr "Clarification de la découverte"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
-msgstr ""
+msgstr "Démarrer la visite"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -5402,7 +5410,8 @@ msgstr "Télécharger une feuille de calcul"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
-msgstr ""
+msgstr "Vous êtes dans Gestionnaire de données, Importation. Sélectionnez un "
+"fichier CSV ou Excel sur votre ordinateur."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -5445,7 +5454,7 @@ msgstr "Impossible de rendre privé"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Tutorial"
-msgstr ""
+msgstr "Tutoriel"
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5765,7 +5774,7 @@ msgstr "Nouveau groupe d'utilisateurs"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
-msgstr ""
+msgstr "Enregistrez ce graphique à un endroit où vous pourrez le retrouver."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5922,7 +5931,8 @@ msgstr "Redimensionner le panneau"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
-msgstr ""
+msgstr "L’onglet Visualisations contient les paramètres du graphique si cette "
+"présentation ne correspond pas à ce que vous souhaitiez."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -6229,7 +6239,8 @@ msgstr "Cela supprime le groupe d'utilisateurs des membres et des ressources "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
-msgstr ""
+msgstr "Votre tableau de bord existe, mais personne d’autre ne peut encore "
+"l’ouvrir. Réglons cela."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
@@ -6270,7 +6281,7 @@ msgstr "Options avancées"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Save it to a dashboard"
-msgstr ""
+msgstr "Enregistrer dans un tableau de bord"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -6384,7 +6395,7 @@ msgstr "Votre espace de travail a utilisé tous les {currentSeatUsage} de ses "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "There's your answer"
-msgstr ""
+msgstr "Voici votre réponse"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -6479,7 +6490,7 @@ msgstr "Tapez la phrase de confirmation"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ask your first question"
-msgstr ""
+msgstr "Posez votre première question"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -6526,7 +6537,9 @@ msgstr "HAVING utilise l’opérateur « {operator} », qui n’est pas pris en 
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
-msgstr ""
+msgstr "Workspace désigne toutes les personnes de votre espace de travail, et "
+"non le public. Rien ici ne crée de lien public. Vous pouvez également "
+"repasser en mode privé à tout moment."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -6660,7 +6673,7 @@ msgstr "Tout effacer"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6707,7 +6720,8 @@ msgstr "Chargement..."
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "No spreadsheet handy? <0>Download our sample</0> and use that."
-msgstr ""
+msgstr "Vous n’avez pas de feuille de calcul sous la main ? <0>Téléchargez "
+"notre exemple</0> et utilisez-le."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -6729,7 +6743,7 @@ msgstr "Date invalide"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started"
-msgstr ""
+msgstr "Commencer"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"

@@ -3201,10 +3201,6 @@ msgstr "Add dataset to workspace"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-#~ msgid "Run an AI query first."
-#~ msgstr "Run an AI query first."
-
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"

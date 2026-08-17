@@ -47,7 +47,6 @@ create index idx_user_nux_progress__user_id on public.user_nux_progress (user_id
 -- Table privileges live in `40.grants.data_api.sql` with every other table's,
 -- so the whole Data API exposure surface can be read in one place. This table
 -- gets `select, insert, update` for `authenticated` and nothing for `anon`.
-
 -- Policies. A user may only ever read or write their own progress. There is
 -- deliberately no DELETE policy: restarting the tutorial updates the row in
 -- place, so there is no code path that needs to remove one.

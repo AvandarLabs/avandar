@@ -17,8 +17,8 @@ import type {
   NuxProgressId,
 } from "$/models/Nux/NuxProgress.types";
 import type { UserId } from "$/models/User/User.types";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /**
  * What already exists in the workspace, used once per user to decide which
