@@ -6,8 +6,8 @@ import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
-import { createDataSectionMapLayerUpdatesMock } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.mapLayerUpdatesMock";
 import { vi } from "vitest";
+import { createDataSectionMapLayerUpdatesMock } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.mapLayerUpdatesMock";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -167,32 +167,35 @@ vi.mock("@/views/DataExplorerApp/QueryDataSourceSelect", () => {
   };
 });
 
-vi.mock("@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect", () => {
-  return {
-    QueryColumnSingleSelect: ({
-      label,
-      onChange,
-    }: {
-      label: string;
-      onChange: (column: QueryColumn.T | null) => void;
-    }) => {
-      return (
-        <button
-          aria-label={label}
-          onClick={() => {
-            onChange(
-              label === "Latitude" ? fixtures.latitudeColumn
-              : label === "Longitude" ? fixtures.longitudeColumn
-              : fixtures.geometryColumn,
-            );
-          }}
-        >
-          {label}
-        </button>
-      );
-    },
-  };
-});
+vi.mock(
+  "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect",
+  () => {
+    return {
+      QueryColumnSingleSelect: ({
+        label,
+        onChange,
+      }: {
+        label: string;
+        onChange: (column: QueryColumn.T | null) => void;
+      }) => {
+        return (
+          <button
+            aria-label={label}
+            onClick={() => {
+              onChange(
+                label === "Latitude" ? fixtures.latitudeColumn
+                : label === "Longitude" ? fixtures.longitudeColumn
+                : fixtures.geometryColumn,
+              );
+            }}
+          >
+            {label}
+          </button>
+        );
+      },
+    };
+  },
+);
 
 export function createLayer(
   overrides: Partial<MapLayer.Standard> = {},
@@ -273,4 +276,3 @@ export function resetDataSectionFixtures(): void {
   fixtures = createFixtures();
   spatialAvailability.value = "available";
 }
-

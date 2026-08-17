@@ -5,8 +5,8 @@ import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatial
 import { classifyLayerValues } from "@/views/GisApp/layers/classifyLayerValues/classifyLayerValues";
 import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/normalizeLayerValue/normalizeLayerValue";
 import { makeSizeLegendStops } from "@/views/GisApp/layers/makeSizeLegendStops/makeSizeLegendStops";
-import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
+import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 

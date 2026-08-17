@@ -1,11 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createLayer,
   fixtures,
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
@@ -17,9 +17,7 @@ describe("DataSection coordinates", () => {
   it("infers coordinates and defaults the popup columns for an unbound layer", async () => {
     const onLayerChange = vi.fn<LayerChangeHandler>();
 
-    render(
-      <DataSection layer={createLayer()} onLayerChange={onLayerChange} />,
-    );
+    render(<DataSection layer={createLayer()} onLayerChange={onLayerChange} />);
 
     await waitFor(() => {
       expect(onLayerChange).toHaveBeenCalledOnce();
@@ -113,5 +111,4 @@ describe("DataSection coordinates", () => {
     }
     expect(updatedLayer.geoBinding.latitude).toBe(fixtures.latitudeColumn.id);
   });
-
 });

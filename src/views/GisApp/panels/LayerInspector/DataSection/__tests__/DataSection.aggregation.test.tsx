@@ -1,3 +1,7 @@
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   createBoundLayer,
   createDataset,
@@ -5,10 +9,6 @@ import {
   fixtures,
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
 import { BoundarySourceControls } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundarySourceControls";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
@@ -145,5 +145,4 @@ describe("DataSection aggregation", () => {
     const updatedLayer = onLayerChange.mock.calls[0]![0](layer);
     expect(updatedLayer.geoBinding).toMatchObject({ sizeMeters: 100 });
   });
-
 });

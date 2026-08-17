@@ -1,10 +1,10 @@
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   applyLatestUpdate,
   queryColumn,
 } from "@/views/GisApp/panels/LayerInspector/StyleSection/__tests__/StyleSection.fixtures";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
 
 describe("StyleSection paint controls", () => {

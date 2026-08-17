@@ -160,28 +160,31 @@ vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
   };
 });
 
-vi.mock("@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect", () => {
-  return {
-    QueryColumnSingleSelect: ({
-      label,
-      onChange,
-    }: {
-      label: ReactNode;
-      onChange: (column: QueryColumn.T | null) => void;
-    }) => {
-      return (
-        <button
-          type="button"
-          onClick={() => {
-            return onChange(queryColumn);
-          }}
-        >
-          {label}
-        </button>
-      );
-    },
-  };
-});
+vi.mock(
+  "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect",
+  () => {
+    return {
+      QueryColumnSingleSelect: ({
+        label,
+        onChange,
+      }: {
+        label: ReactNode;
+        onChange: (column: QueryColumn.T | null) => void;
+      }) => {
+        return (
+          <button
+            type="button"
+            onClick={() => {
+              return onChange(queryColumn);
+            }}
+          >
+            {label}
+          </button>
+        );
+      },
+    };
+  },
+);
 
 export function applyLatestUpdate(
   options: Readonly<{
@@ -194,4 +197,3 @@ export function applyLatestUpdate(
   assertIsDefined(latestCall, "Expected a layer update");
   return latestCall[0](layer);
 }
-

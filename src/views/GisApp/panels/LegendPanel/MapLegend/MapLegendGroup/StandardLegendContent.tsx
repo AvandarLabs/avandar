@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import { FlatLegendEntry } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/FlatLegendEntry";
 import { LegendEntries } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries";
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 

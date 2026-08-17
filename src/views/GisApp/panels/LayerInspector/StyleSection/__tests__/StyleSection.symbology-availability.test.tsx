@@ -1,12 +1,12 @@
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   createTextColumn,
   getCircleSymbology,
   queryColumn,
 } from "@/views/GisApp/panels/LayerInspector/StyleSection/__tests__/StyleSection.fixtures";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
 
 describe("StyleSection symbology availability", () => {
@@ -171,5 +171,4 @@ describe("StyleSection symbology availability", () => {
     ).toBeInTheDocument();
     expect(screen.queryByLabelText("Outline")).not.toBeInTheDocument();
   });
-
 });

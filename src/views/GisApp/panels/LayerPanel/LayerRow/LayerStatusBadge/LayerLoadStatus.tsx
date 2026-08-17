@@ -3,8 +3,8 @@ import { Badge, Group, Loader } from "@mantine/core";
 import { IconCircleX } from "@tabler/icons-react";
 import { match } from "ts-pattern";
 import { ReadyOperationalStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyOperationalStatus";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
 
 type OperationalState = ReturnType<typeof getMapLayerOperationalState>;

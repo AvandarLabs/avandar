@@ -1,5 +1,5 @@
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import { LegendEntries } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries";
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import { SizeLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";

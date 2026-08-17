@@ -54,8 +54,7 @@ export function BoundaryDatasetSelect({
         const option = options.find(({ dataset }) => {
           return dataset.id === datasetId;
         });
-        const boundary =
-          option ? _createBoundaryFromOption(option) : undefined;
+        const boundary = option ? _createBoundaryFromOption(option) : undefined;
         if (!boundary) {
           return;
         }

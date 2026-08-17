@@ -139,7 +139,11 @@ function _withGridBin(layer: MapLayer.T): MapLayer.T {
   const points =
     layer.geoBinding?.type === "latLngColumns" ?
       layer.geoBinding
-    : { type: "latLngColumns" as const, latitude: undefined, longitude: undefined };
+    : {
+        type: "latLngColumns" as const,
+        latitude: undefined,
+        longitude: undefined,
+      };
   return {
     ...layer,
     geoBinding: {

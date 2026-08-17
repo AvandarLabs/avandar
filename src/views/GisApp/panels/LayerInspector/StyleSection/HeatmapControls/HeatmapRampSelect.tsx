@@ -35,7 +35,11 @@ export function HeatmapRampSelect({ ramp, onLayerChange }: Props): ReactNode {
       value={_getRampName(ramp)}
       allowDeselect={false}
       onChange={(rampName) => {
-        if (rampName !== "ochre" && rampName !== "blue" && rampName !== "orange") {
+        if (
+          rampName !== "ochre" &&
+          rampName !== "blue" &&
+          rampName !== "orange"
+        ) {
           return;
         }
         onLayerChange((current) => {

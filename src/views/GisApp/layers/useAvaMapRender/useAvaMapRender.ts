@@ -6,8 +6,8 @@ import { makeLayerRender } from "@/views/GisApp/layers/useAvaMapRender/makeLayer
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
+import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 

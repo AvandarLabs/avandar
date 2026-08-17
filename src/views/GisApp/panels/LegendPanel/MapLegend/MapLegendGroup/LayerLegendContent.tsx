@@ -1,8 +1,8 @@
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
+import { HeatmapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend";
 import { FlatLegendEntry } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/FlatLegendEntry";
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import { SizedLegendContent } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/SizedLegendContent";
 import { StandardLegendContent } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent";
-import { HeatmapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 

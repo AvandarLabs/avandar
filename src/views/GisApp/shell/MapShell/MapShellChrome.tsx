@@ -1,5 +1,5 @@
-import { SkipLinks } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
 import css from "@/views/GisApp/shell/MapShell/MapShell.module.css";
+import { SkipLinks } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
 import type { ReactNode, RefCallback } from "react";
 
 type Props = {

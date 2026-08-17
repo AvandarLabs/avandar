@@ -1,11 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
   resetDataSectionFixtures,
   spatialAvailability,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
 
 beforeEach(() => {

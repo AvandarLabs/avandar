@@ -46,10 +46,7 @@ export function GeometryColumnControls({
           });
         }}
       />
-      <SimplificationControls
-        binding={binding}
-        onLayerChange={onLayerChange}
-      />
+      <SimplificationControls binding={binding} onLayerChange={onLayerChange} />
     </>
   );
 }

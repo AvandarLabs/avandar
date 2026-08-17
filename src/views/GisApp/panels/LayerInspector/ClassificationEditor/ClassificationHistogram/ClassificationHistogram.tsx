@@ -21,7 +21,10 @@ export function ClassificationHistogram({ entries }: Props): ReactNode {
     return <p>{t`No classified values are available yet.`}</p>;
   }
   return (
-    <div className={css.classificationHistogram} aria-label={t`Value distribution`}>
+    <div
+      className={css.classificationHistogram}
+      aria-label={t`Value distribution`}
+    >
       {values.map((entry, index) => {
         return (
           <span

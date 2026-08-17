@@ -47,9 +47,7 @@ const basemap: AvaMapConfig.Basemap = {
   style: "avandar",
 };
 
-function attachMapWithLatestValues(
-  latestValues: LatestMapValues,
-): void {
+function attachMapWithLatestValues(latestValues: LatestMapValues): void {
   const instanceRefs: MapInstanceRefs = {
     mapRef: { current: undefined },
     appliedSpecRef: { current: EMPTY_MAP_SPEC },
