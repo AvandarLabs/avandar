@@ -1,12 +1,14 @@
 import {
-  isDefined,
+  makeSet,
   objectEntries,
   objectKeys,
   prop,
   propEq,
+  propPasses,
 } from "@avandar/utils";
 import type {
   MapLayerSpec,
+  MapSourceSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
@@ -25,16 +27,18 @@ function _syncPaint(
   layerSpec: MapLayerSpec,
   previousLayerSpec: MapLayerSpec | undefined,
 ): void {
-  objectEntries(layerSpec.paint)
-    .filter(isDefined)
-    .forEach(([property, value]) => {
-      const previousValue =
-        previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
-      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-        return;
-      }
-      map.setPaintProperty(layerSpec.id, property, value);
-    });
+  objectEntries(layerSpec.paint).forEach((paintEntry) => {
+    if (!paintEntry) {
+      return;
+    }
+    const [property, value] = paintEntry;
+    const previousValue =
+      previousLayerSpec?.paint[property as keyof MapLayerSpec["paint"]];
+    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+      return;
+    }
+    map.setPaintProperty(layerSpec.id, property, value);
+  });
 }
 
 /** Applies only the layout properties whose values differ. */
@@ -47,16 +51,18 @@ function _syncLayout(
   const previousLayout = previousLayerSpec?.layout ?? {
     visibility: "visible",
   };
-  objectEntries(nextLayout)
-    .filter(isDefined)
-    .forEach(([property, value]) => {
-      const previousValue =
-        previousLayout[property as keyof typeof previousLayout];
-      if (JSON.stringify(previousValue) === JSON.stringify(value)) {
-        return;
-      }
-      map.setLayoutProperty(layerSpec.id, property, value);
-    });
+  objectEntries(nextLayout).forEach((layoutEntry) => {
+    if (!layoutEntry) {
+      return;
+    }
+    const [property, value] = layoutEntry;
+    const previousValue =
+      previousLayout[property as keyof typeof previousLayout];
+    if (JSON.stringify(previousValue) === JSON.stringify(value)) {
+      return;
+    }
+    map.setLayoutProperty(layerSpec.id, property, value);
+  });
 }
 
 /**
@@ -80,6 +86,44 @@ function _removeStaleLayersAndSources(
     if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
       map.removeSource(sourceId);
     }
+  });
+}
+
+function _hasClusterOptionsChanged(
+  previousSourceSpec: MapSourceSpec,
+  nextSourceSpec: MapSourceSpec,
+): boolean {
+  return (
+    previousSourceSpec.cluster !== nextSourceSpec.cluster ||
+    previousSourceSpec.clusterRadius !== nextSourceSpec.clusterRadius ||
+    previousSourceSpec.clusterMaxZoom !== nextSourceSpec.clusterMaxZoom
+  );
+}
+
+/**
+ * Removes sources whose worker-time clustering options changed, along with
+ * the layers that prevent MapLibre from removing those sources.
+ */
+function _removeSourcesWithChangedClusterOptions(
+  map: MapLibreMap,
+  previousSpec: MapSpec,
+  nextSpec: MapSpec,
+): void {
+  objectEntries(nextSpec.sources).forEach(([sourceId, nextSourceSpec]) => {
+    const previousSourceSpec = previousSpec.sources[sourceId];
+    if (
+      !previousSourceSpec ||
+      !_hasClusterOptionsChanged(previousSourceSpec, nextSourceSpec) ||
+      !map.getSource(sourceId)
+    ) {
+      return;
+    }
+    previousSpec.layers.forEach((layerSpec) => {
+      if (layerSpec.source === sourceId && map.getLayer(layerSpec.id)) {
+        map.removeLayer(layerSpec.id);
+      }
+    });
+    map.removeSource(sourceId);
   });
 }
 
@@ -107,7 +151,7 @@ function _syncSources(
       }
       return;
     }
-    map.addSource(sourceId, { type: "geojson", data: sourceSpec.data });
+    map.addSource(sourceId, sourceSpec);
   });
 }
 
@@ -123,21 +167,23 @@ function _syncSources(
  * order does not already match the requested order.
  */
 function _needsReorder(
+  map: MapLibreMap,
   previousSpec: MapSpec,
   nextSpec: MapSpec,
   nextLayerIds: ReadonlySet<string>,
 ): boolean {
-  const previousLayerIds = new Set(previousSpec.layers.map(prop("id")));
-  // Plain predicate rather than `propPasses`: `Set.has` is not a type guard,
-  // and `propPasses` only exposes its type-guard overload, so it rejects a
-  // predicate that merely returns boolean.
   const survivingIds = previousSpec.layers
-    .filter((layerSpec) => {
-      return nextLayerIds.has(layerSpec.id);
-    })
+    .filter(
+      propPasses<MapLayerSpec, "id", string>(
+        "id",
+        (layerId): layerId is string => {
+          return nextLayerIds.has(layerId) && Boolean(map.getLayer(layerId));
+        },
+      ),
+    )
     .map(prop("id"));
   const newIds = nextSpec.layers.map(prop("id")).filter((layerId) => {
-    return !previousLayerIds.has(layerId);
+    return !map.getLayer(layerId);
   });
   const effectiveOrder = [...survivingIds, ...newIds];
   const targetOrder = nextSpec.layers.map(prop("id"));
@@ -157,10 +203,14 @@ function _applyLayers(
   nextSpec: MapSpec,
   nextLayerIds: ReadonlySet<string>,
 ): void {
-  const needsReorder = _needsReorder(previousSpec, nextSpec, nextLayerIds);
+  const needsReorder = _needsReorder(map, previousSpec, nextSpec, nextLayerIds);
 
   nextSpec.layers.forEach((layerSpec) => {
     const previousLayerSpec = _findLayerSpec(previousSpec, layerSpec.id);
+    const existingLayer = map.getLayer(layerSpec.id);
+    if (existingLayer && existingLayer.type !== layerSpec.type) {
+      map.removeLayer(layerSpec.id);
+    }
     if (!map.getLayer(layerSpec.id)) {
       map.addLayer(layerSpec);
     } else {
@@ -200,9 +250,10 @@ export function syncMap({
   previousSpec: MapSpec;
   nextSpec: MapSpec;
 }): void {
-  const nextLayerIds = new Set(nextSpec.layers.map(prop("id")));
+  const nextLayerIds = makeSet(nextSpec.layers, { key: "id" });
 
   _removeStaleLayersAndSources(map, previousSpec, nextSpec, nextLayerIds);
+  _removeSourcesWithChangedClusterOptions(map, previousSpec, nextSpec);
   _syncSources(map, previousSpec, nextSpec);
   _applyLayers(map, previousSpec, nextSpec, nextLayerIds);
 }

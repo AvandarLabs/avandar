@@ -23,6 +23,7 @@ describe("PrivateResourceAdminClient", () => {
           user_id: "user-1",
           private_dashboard_count: 2,
           private_dataset_count: 5,
+          private_map_count: 7,
         },
       ],
       error: null,
@@ -37,7 +38,12 @@ describe("PrivateResourceAdminClient", () => {
       { p_workspace_id: "ws-1" },
     );
     expect(result).toEqual([
-      { userId: "user-1", privateDashboardCount: 2, privateDatasetCount: 5 },
+      {
+        userId: "user-1",
+        privateDashboardCount: 2,
+        privateDatasetCount: 5,
+        privateMapCount: 7,
+      },
     ]);
   });
 

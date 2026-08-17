@@ -2,7 +2,7 @@ import { NavLinkList } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 

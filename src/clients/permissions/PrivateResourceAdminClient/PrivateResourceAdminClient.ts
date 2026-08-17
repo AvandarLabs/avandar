@@ -13,6 +13,7 @@ export type PrivateResourceCount = {
   userId: string;
   privateDashboardCount: number;
   privateDatasetCount: number;
+  privateMapCount: number;
 };
 
 type ClientDependencies = {
@@ -43,6 +44,7 @@ function _createGetPrivateResourceCounts({
         userId: row.user_id,
         privateDashboardCount: row.private_dashboard_count,
         privateDatasetCount: row.private_dataset_count,
+        privateMapCount: row.private_map_count,
       };
     });
   };

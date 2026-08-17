@@ -1,0 +1,11 @@
+.mapTopBarCluster {
+  align-items: center;
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+  display: flex;
+  gap: var(--mantine-spacing-xxs);
+  min-width: 0;
+  padding: var(--mantine-spacing-xxs);
+}
