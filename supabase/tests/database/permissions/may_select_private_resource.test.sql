@@ -48,10 +48,10 @@ values
   ('a4003001-0000-4000-8000-000000000001'::uuid, 'a4000001-0000-4000-8000-000000000001'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4002001-0000-4000-8000-000000000001'::uuid, 'A4 Owner', 'A4 Owner'),
   ('a4003002-0000-4000-8000-000000000002'::uuid, 'a4000002-0000-4000-8000-000000000002'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4002002-0000-4000-8000-000000000002'::uuid, 'A4 Admin', 'A4 Admin');
 
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, visibility)
 values
-  ('a4005001-0000-4000-8000-000000000001'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4000001-0000-4000-8000-000000000001'::uuid, 'a4003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, false),
-  ('a4005002-0000-4000-8000-000000000002'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4000001-0000-4000-8000-000000000001'::uuid, 'a4003001-0000-4000-8000-000000000001'::uuid, 'unrestricted', '{}'::jsonb, false, false);
+  ('a4005001-0000-4000-8000-000000000001'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4000001-0000-4000-8000-000000000001'::uuid, 'a4003001-0000-4000-8000-000000000001'::uuid, 'private', '{}'::jsonb, true, 'draft'),
+  ('a4005002-0000-4000-8000-000000000002'::uuid, 'a4001001-0000-4000-8000-000000000001'::uuid, 'a4000001-0000-4000-8000-000000000001'::uuid, 'a4003001-0000-4000-8000-000000000001'::uuid, 'unrestricted', '{}'::jsonb, false, 'draft');
 
 insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
 values (

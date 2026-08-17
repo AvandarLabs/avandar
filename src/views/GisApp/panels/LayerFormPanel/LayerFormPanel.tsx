@@ -24,7 +24,7 @@ export function LayerFormPanel({
   basemap,
   onLayerChange,
   onBasemapChange,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <Stack gap="xxxs">
       <MapStylePicker

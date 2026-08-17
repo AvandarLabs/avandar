@@ -5,7 +5,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";

@@ -30,7 +30,7 @@ export function buildHeader(
     "-- unless the matching `needs hand-edit` warning calls for it.",
     `-- Schema-shape statements emitted: ${partition.included.length}`,
     `-- Statements dropped (RLS/funcs/triggers/data/etc.): ${partition.skipped.length}`,
-    `-- FK constraints dropped (target not synced to SQLite): ${partition.droppedFks.length}`,
+    `-- FK constraints dropped (target not synced to SQLite): ${partition.droppedForeignKeys.length}`,
     `-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): ${partition.needsHandEdit.length}`,
   ].join("\n");
 }

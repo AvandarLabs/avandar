@@ -63,7 +63,4 @@ create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();
 
-create index idx_datasets__workspace_owner on public.datasets (
-  workspace_id,
-  owner_id
-);
+create index idx_datasets__workspace_owner on public.datasets (workspace_id, owner_id);

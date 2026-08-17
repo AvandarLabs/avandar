@@ -113,13 +113,13 @@ vi.mock("@/clients/datasets/DatasetQueryClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       insertGoogleSheetsDataset: vi.fn(),
-      useGetAll: vi.fn(() => {
+      useGetAll: (): [[], boolean] => {
         return [[], false];
-      }),
+      },
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];

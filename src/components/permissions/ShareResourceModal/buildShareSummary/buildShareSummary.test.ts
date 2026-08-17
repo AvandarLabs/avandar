@@ -226,3 +226,54 @@ describe("buildShareSummary", () => {
     );
   });
 });
+
+describe("publication", () => {
+  const base = {
+    shares: [],
+    isRestricted: true,
+    workspaceShareRole: null,
+    resourceType: "dashboard" as const,
+    workspaceName: "Acme",
+    userById: {},
+    groupById: {},
+  };
+
+  it("says nothing about publication when the resource has none", () => {
+    const spans = buildShareSummary({ ...base, publication: undefined });
+    expect(
+      spans
+        .map((span) => {
+          return span.kind === "text" && span.text;
+        })
+        .join(""),
+    ).not.toContain("Published");
+  });
+
+  it("reports a draft dashboard as not published", () => {
+    const spans = buildShareSummary({ ...base, publication: "draft" });
+    expect(spans.at(-1)).toEqual({
+      kind: "text",
+      text: " Not published yet.",
+    });
+  });
+
+  it("names the workspace for an internally published dashboard", () => {
+    const spans = buildShareSummary({ ...base, publication: "workspace" });
+    expect(spans.at(-2)).toEqual({
+      kind: "pill",
+      label: "Acme",
+      variant: "workspace",
+    });
+  });
+
+  it("warns that the people list stops governing reads once public", () => {
+    const spans = buildShareSummary({ ...base, publication: "public" });
+    expect(
+      spans
+        .map((span) => {
+          return span.kind === "text" ? span.text : "";
+        })
+        .join(""),
+    ).toContain("anyone with the link can view it");
+  });
+});

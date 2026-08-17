@@ -5,4 +5,4 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 5
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-drop index if exists "subscriptions_pkey";
+DROP INDEX IF EXISTS "subscriptions_pkey";

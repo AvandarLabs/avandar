@@ -3,9 +3,7 @@
  *
  * @returns Integer rank 1–3.
  */
-create or replace function public.util__role_level_rank (
-  p_role public.role_level
-) returns int language sql immutable as $$
+create or replace function public.util__role_level_rank (p_role public.role_level) returns int language sql immutable as $$
   select case p_role
     when 'viewer' then 1
     when 'editor' then 2
@@ -18,9 +16,7 @@ $$;
  *
  * @returns Matching role_level or null when rank is zero.
  */
-create or replace function public.util__rank_to_role_level (
-  p_rank int
-) returns public.role_level language sql immutable as $$
+create or replace function public.util__rank_to_role_level (p_rank int) returns public.role_level language sql immutable as $$
   select case p_rank
     when 1 then 'viewer'::public.role_level
     when 2 then 'editor'::public.role_level
@@ -34,9 +30,7 @@ $$;
  *
  * @returns True when settings app role is admin.
  */
-create or replace function public.util__is_settings_admin (
-  p_workspace_id uuid
-) returns boolean language sql security definer stable
+create or replace function public.util__is_settings_admin (p_workspace_id uuid) returns boolean language sql security definer stable
 set
   search_path = public as $$
   select exists (
@@ -121,9 +115,7 @@ $$;
  *
  * @returns True when the auth user may manage workspace-level settings.
  */
-create or replace function public.util__can_manage_workspace_settings (
-  p_workspace_id uuid
-) returns boolean language sql security definer stable
+create or replace function public.util__can_manage_workspace_settings (p_workspace_id uuid) returns boolean language sql security definer stable
 set
   search_path = public as $$
   select exists (

@@ -37,7 +37,7 @@ values
   ('a8003002-0000-4000-8000-000000000002'::uuid, 'a8000002-0000-4000-8000-000000000002'::uuid, 'a8001001-0000-4000-8000-000000000001'::uuid, 'a8002002-0000-4000-8000-000000000002'::uuid, 'A8 Admin', 'A8 Admin'),
   ('a8003003-0000-4000-8000-000000000003'::uuid, 'a8000003-0000-4000-8000-000000000003'::uuid, 'a8001001-0000-4000-8000-000000000001'::uuid, 'a8002003-0000-4000-8000-000000000003'::uuid, 'A8 Target', 'A8 Target');
 
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, visibility)
 values (
   'a8005001-0000-4000-8000-000000000001'::uuid,
   'a8001001-0000-4000-8000-000000000001'::uuid,
@@ -46,7 +46,7 @@ values (
   'private dashboard',
   '{}'::jsonb,
   true,
-  false
+  'draft'
 );
 
 insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)

@@ -63,7 +63,7 @@ describe("partitionStatements", () => {
     expect(result.needsHandEdit.length).toBe(0);
   });
 
-  it("routes schema-shape statements with a cross-schema FK to droppedFks (target table doesn't exist on SQLite)", () => {
+  it("routes cross-schema foreign keys to droppedForeignKeys", () => {
     const stmts = extractStatements(
       "alter table dashboards add constraint fk foreign key (owner_id) references auth.users(id);",
     );
@@ -72,13 +72,13 @@ describe("partitionStatements", () => {
       syncable,
       excluded,
     });
-    expect(result.droppedFks.length).toBe(1);
+    expect(result.droppedForeignKeys.length).toBe(1);
     expect(result.included.length).toBe(0);
     expect(result.skipped.length).toBe(0);
     expect(result.needsHandEdit.length).toBe(0);
   });
 
-  it("routes schema-shape statements whose FK targets an excluded table to droppedFks", () => {
+  it("routes excluded-table foreign keys to droppedForeignKeys", () => {
     const stmts = extractStatements(
       "alter table dashboards add constraint fk foreign key (audit_id) references audit_log(id);",
     );
@@ -87,7 +87,7 @@ describe("partitionStatements", () => {
       syncable,
       excluded,
     });
-    expect(result.droppedFks.length).toBe(1);
+    expect(result.droppedForeignKeys.length).toBe(1);
     expect(result.included.length).toBe(0);
     expect(result.skipped.length).toBe(0);
   });

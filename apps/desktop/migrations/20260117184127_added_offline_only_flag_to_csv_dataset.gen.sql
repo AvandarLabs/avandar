@@ -5,5 +5,4 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 3
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-alter table "datasets__csv_file"
-add column "offline_only" integer default false;
+ALTER TABLE "datasets__csv_file" ADD COLUMN "offline_only" INTEGER DEFAULT FALSE;

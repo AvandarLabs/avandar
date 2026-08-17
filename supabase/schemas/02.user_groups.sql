@@ -8,15 +8,10 @@ create table public.user_groups (
   color text not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint user_groups__workspace_id_name unique (
-    workspace_id,
-    name
-  )
+  constraint user_groups__workspace_id_name unique (workspace_id, name)
 );
 
-create index idx_user_groups__workspace_id on public.user_groups (
-  workspace_id
-);
+create index idx_user_groups__workspace_id on public.user_groups (workspace_id);
 
 alter table public.user_groups enable row level security;
 

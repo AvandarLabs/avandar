@@ -57,9 +57,7 @@ with
   );
 
 create policy "Resource admins can delete resource_shares" on public.resource_shares for delete to authenticated using (
-  public.util__is_settings_admin (
-    public.resource_shares.workspace_id
-  ) or
+  public.util__is_settings_admin (public.resource_shares.workspace_id) or
   public.util__auth_user_can_access_resource (
     public.resource_shares.resource_type,
     public.resource_shares.resource_id,

@@ -1,12 +1,12 @@
 import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { match } from "ts-pattern";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
@@ -16,16 +16,73 @@ type UseDataQueryOptions = {
    * logic may replace it with bounded SQL before execution.
    */
   isStructuredQueryInSync?: boolean;
-} & (
-  | {
-      auth: "workspace";
-      workspaceId: Workspace.Id;
-    }
-  | {
-      auth: "public";
-      publicAvaPageId: Dashboard.Id;
-    }
-);
+} & StructuredQueryAuth;
+
+type RunDataQueryOptions = {
+  auth: StructuredQueryAuth;
+  query: StructuredQuery.Partial;
+  rawSql: string | undefined;
+  isStructuredQueryInSync: boolean;
+};
+
+function _getStructuredQueryAuth(
+  options: Readonly<UseDataQueryOptions>,
+): StructuredQueryAuth {
+  return match(options)
+    .with({ auth: "workspace" }, ({ workspaceId }) => {
+      return {
+        auth: "workspace" as const,
+        workspaceId,
+      };
+    })
+    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) => {
+      return {
+        auth: "public" as const,
+        publicAvaPageId,
+        snapshotRevision,
+      };
+    })
+    .with(
+      { auth: "workspace_published" },
+      ({ publicAvaPageId, snapshotRevision }) => {
+        return {
+          auth: "workspace_published" as const,
+          publicAvaPageId,
+          snapshotRevision,
+        };
+      },
+    )
+    .exhaustive();
+}
+
+async function _runDataQuery(
+  options: Readonly<RunDataQueryOptions>,
+): Promise<QueryResult.T<UnknownRow>> {
+  return match(options.auth)
+    .with({ auth: "workspace" }, ({ workspaceId }) => {
+      return runStructuredQuery({ ...options, auth: "workspace", workspaceId });
+    })
+    .with({ auth: "public" }, ({ publicAvaPageId, snapshotRevision }) => {
+      return runStructuredQuery({
+        ...options,
+        auth: "public",
+        publicAvaPageId,
+        snapshotRevision,
+      });
+    })
+    .with(
+      { auth: "workspace_published" },
+      ({ publicAvaPageId, snapshotRevision }) => {
+        return runStructuredQuery({
+          ...options,
+          auth: "workspace_published",
+          publicAvaPageId,
+          snapshotRevision,
+        });
+      },
+    )
+    .exhaustive();
+}
 
 /**
  * This is the main hook in the DataExplorerApp that will query the data.
@@ -40,21 +97,18 @@ type UseDataQueryOptions = {
  * it properly.
  */
 export function useDataQuery(
-  options: UseDataQueryOptions,
+  options: Readonly<UseDataQueryOptions>,
 ): UseQueryResultTuple<QueryResult.T<UnknownRow>> {
-  const { auth, query, rawSql, isStructuredQueryInSync = true } = options;
+  const { query, rawSql, isStructuredQueryInSync = true } = options;
   const { dataSource, queryColumns } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
-  const workspaceId =
-    auth === "workspace" ? options.workspaceId : options.publicAvaPageId;
-
-  const queryResult = useQuery({
+  const queryAuth = _getStructuredQueryAuth(options);
+  return useQuery({
     enabled: !!dataSource || !!rawSql,
     queryKey: [
-      auth,
-      workspaceId,
+      queryAuth,
       query,
       "rawSql",
       rawSql,
@@ -65,30 +119,13 @@ export function useDataQuery(
       "structuredInSync",
       isStructuredQueryInSync,
     ],
-    queryFn: async (): Promise<QueryResult.T<UnknownRow>> => {
-      // Branching rather than spreading a precomputed params object: the
-      // queryKey lint rule tracks the identifiers this callback reads, and
-      // only the if/else form lets it see the two ids as mutually exclusive.
-      // Both are already carried in the key as `workspaceId` above.
-      if (auth === "workspace") {
-        return await runStructuredQuery({
-          auth: "workspace",
-          workspaceId: options.workspaceId,
-          query,
-          rawSql,
-          isStructuredQueryInSync,
-        });
-      } else {
-        return await runStructuredQuery({
-          auth: "public",
-          publicAvaPageId: options.publicAvaPageId,
-          query,
-          rawSql,
-          isStructuredQueryInSync,
-        });
-      }
+    queryFn: () => {
+      return _runDataQuery({
+        auth: queryAuth,
+        query,
+        rawSql,
+        isStructuredQueryInSync,
+      });
     },
   });
-
-  return queryResult;
 }

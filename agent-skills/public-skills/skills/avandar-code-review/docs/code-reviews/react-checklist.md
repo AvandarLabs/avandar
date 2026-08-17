@@ -35,6 +35,58 @@ try to substitute an unrelated tool.
 - Keep one component per file.
 - Split large or monolithic components into logical sub-components instead of
   keeping too much UI or state logic in one file.
+- Never leave a top-level function whose body is only a `return` of a JSX
+  block. Extract it into its own component file. Such a function is a
+  component that has been denied the ability to use hooks, so everything a
+  hook would have supplied (`i18n`, state, context, memoisation) has to be
+  threaded in through its parameters, and React cannot re-render it
+  independently because it is not a component in the tree. When the function
+  is used **exclusively** by the component in whose file it is declared, the
+  parent becomes a directory and the new component file goes inside it: a
+  component directory is how exclusive coupling to a descendant is expressed.
+
+  The gate is the shape, not the name: a top-level declaration, a return type
+  of `ReactNode`, `JSX.Element`, or `ReactElement`, and a body that is only a
+  return of JSX. Leading destructuring or trivial `const` locals do not
+  change this. Names like `_renderX` or `_getXContent` are the usual tell.
+
+  Exceptions: 1) a function returning anything other than a JSX block; 2) a
+  hook (`useX`), which returns data rather than JSX; 3) a function that is
+  already exported and consumed by more than one component, which belongs in
+  a shared location rather than nested in one parent's directory.
+
+  **Find candidates** (top-level render helpers returning a React node):
+
+  ```bash
+  grep -rEn '^function _[A-Za-z0-9_]+\(' --include="*.tsx" . \
+    | grep -E '(render|Content|Section|Row|Panel|Alert|State)'
+  ```
+
+  Non-exhaustive: the return type is usually on a later line, so confirm
+  each hit returns `ReactNode`/`JSX.Element` and that its body is only a
+  return of JSX before flagging.
+
+  This is bad:
+
+  ```tsx
+  // DashboardCard.tsx
+  function _renderBadgeRow(
+    options: Readonly<{ dashboard: Dashboard.T; i18n: I18n }>,
+  ): ReactNode {
+    return <Group gap="xs">…</Group>;
+  }
+  ```
+
+  This is good:
+
+  ```tsx
+  // DashboardCard/BadgeRow.tsx
+  export function BadgeRow({ dashboard }: Readonly<Props>): ReactNode {
+    const { i18n } = useLingui();
+    return <Group gap="xs">…</Group>;
+  }
+  ```
+
 - Use ternaries for conditional rendering instead of short-circuited `&&`
   evaluations.
 

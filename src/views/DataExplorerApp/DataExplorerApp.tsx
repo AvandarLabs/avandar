@@ -20,7 +20,7 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";

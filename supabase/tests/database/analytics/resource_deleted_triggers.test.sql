@@ -56,7 +56,10 @@ values (
   now() - interval '10 days'
 );
 
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_public, created_at)
+-- `is_public` is generated from `visibility`, so a public fixture is declared
+-- through `visibility` and needs the settled `snapshot_revision` that
+-- `dashboards__settled_snapshot_consistent` requires of a published dashboard.
+insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, visibility, snapshot_revision, created_at)
 values (
   'ad005001-0000-4000-8000-000000000001'::uuid,
   'ad001001-0000-4000-8000-000000000001'::uuid,
@@ -64,7 +67,8 @@ values (
   'ad003001-0000-4000-8000-000000000001'::uuid,
   'ad dashboard',
   '{}'::jsonb,
-  true,
+  'public'::public.dashboard_visibility,
+  'ad006001-0000-4000-8000-000000000001'::uuid,
   now() - interval '3 days'
 );
 

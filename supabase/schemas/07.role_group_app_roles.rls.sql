@@ -30,9 +30,7 @@ with
         public.role_groups rg
       where
         rg.id = public.role_group_app_roles.role_group_id and
-        public.util__is_settings_admin (
-          rg.workspace_id
-        )
+        public.util__is_settings_admin (rg.workspace_id)
     )
   );
 
@@ -46,9 +44,7 @@ for update
         public.role_groups rg
       where
         rg.id = public.role_group_app_roles.role_group_id and
-        public.util__is_settings_admin (
-          rg.workspace_id
-        )
+        public.util__is_settings_admin (rg.workspace_id)
     )
   )
 with
@@ -60,9 +56,7 @@ with
         public.role_groups rg
       where
         rg.id = public.role_group_app_roles.role_group_id and
-        public.util__is_settings_admin (
-          rg.workspace_id
-        )
+        public.util__is_settings_admin (rg.workspace_id)
     )
   );
 
@@ -74,8 +68,6 @@ create policy "Settings admins can delete role_group_app_roles" on public.role_g
       public.role_groups rg
     where
       rg.id = public.role_group_app_roles.role_group_id and
-      public.util__is_settings_admin (
-        rg.workspace_id
-      )
+      public.util__is_settings_admin (rg.workspace_id)
   )
 );

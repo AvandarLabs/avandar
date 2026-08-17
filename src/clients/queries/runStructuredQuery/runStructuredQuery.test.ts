@@ -6,42 +6,46 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
+const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
+
+const { runQueryMock, publicRunQueryMock, getConceptExtensionMock } =
   vi.hoisted(() => {
     return {
       runQueryMock: vi.fn(),
       publicRunQueryMock: vi.fn(),
-      getAllEntityFieldValuesMock: vi.fn(),
+      getConceptExtensionMock: vi.fn(),
     };
   });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   return { WorkspaceQetlClient: { runQuery: runQueryMock } };
 });
-vi.mock("@/clients/qetl/PublicQetlClient", () => {
+vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
   return { PublicQetlClient: { runQuery: publicRunQueryMock } };
 });
 vi.mock(
-  "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient",
+  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
   () => {
     return {
-      EntityFieldValueClient: {
-        getAllEntityFieldValues: getAllEntityFieldValuesMock,
+      AttributeAssertionClient: {
+        getConceptExtension: getConceptExtensionMock,
       },
     };
   },
 );
 
-/** An honest `EntityConfig.T`, built through `Model.make` with no cast. */
-function _createEntityConfig(): EntityConfig.T {
+/** An honest `Concept.T`, built through `Model.make` with no cast. */
+function _createConcept(): Concept.T {
   const now = new Date().toISOString();
-  return Model.make("EntityConfig", {
-    id: uuid<EntityConfig.Id>(),
+  return Model.make("Concept", {
+    id: uuid<Concept.Id>(),
     workspaceId: uuid<Workspace.Id>(),
     ownerId: uuid<User.Id>(),
     name: "Cases",
@@ -52,26 +56,44 @@ function _createEntityConfig(): EntityConfig.T {
   });
 }
 
-/** An honest `EntityFieldConfig.T`, built through `Model.make` with no cast. */
-function _createEntityFieldConfig(
-  entityConfigId: EntityConfig.Id,
+/** An honest `ConceptAttribute.T`, built through `Model.make` with no cast. */
+function _createConceptAttribute(
+  conceptId: Concept.Id,
   name: string,
-): EntityFieldConfig.T {
+): ConceptAttribute.T {
   const now = new Date().toISOString();
-  return Model.make("EntityFieldConfig", {
-    id: uuid<EntityFieldConfig.Id>(),
-    entityConfigId,
+  return Model.make("ConceptAttribute", {
+    id: uuid<ConceptAttribute.Id>(),
+    conceptId,
     workspaceId: uuid<Workspace.Id>(),
     name,
     description: undefined,
     createdAt: now,
     updatedAt: now,
     dataType: "varchar",
-    valueExtractorType: "manual_entry",
-    isTitleField: false,
-    isIdField: false,
+    mappingType: "manual_entry",
+    isLabel: false,
+    isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
+  });
+}
+
+/** An honest `Dataset`, used to ensure structured SQL is generated. */
+function _createDataset(): Dataset.T {
+  const now = new Date().toISOString();
+  return Model.make("Dataset", {
+    id: uuid<Dataset.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    dateOfLastSync: undefined,
+    description: undefined,
+    isRestricted: false,
+    name: "Cases",
+    sourceType: "csv_file",
+    ownerId: uuid<User.Id>(),
+    ownerProfileId: uuid<UserProfile.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
   });
 }
 
@@ -81,7 +103,7 @@ describe("runStructuredQuery", () => {
   beforeEach(() => {
     runQueryMock.mockReset();
     publicRunQueryMock.mockReset();
-    getAllEntityFieldValuesMock.mockReset();
+    getConceptExtensionMock.mockReset();
   });
 
   it("runs caller-supplied raw SQL verbatim", async () => {
@@ -103,6 +125,32 @@ describe("runStructuredQuery", () => {
     });
   });
 
+  it("runs workspace-published raw SQL against the private snapshot client", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+    publicRunQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace_published",
+      publicAvaPageId: dashboardId,
+      snapshotRevision: SNAPSHOT_REVISION,
+      query: StructuredQuery.makeEmpty(),
+      rawSql: "SELECT 1 AS one",
+    });
+
+    expect(publicRunQueryMock).toHaveBeenCalledWith({
+      rawSql: "SELECT 1 AS one",
+      dashboardId,
+      visibility: "workspace",
+      snapshotRevision: SNAPSHOT_REVISION,
+    });
+    expect(runQueryMock).not.toHaveBeenCalled();
+  });
+
   it("returns an empty result when there is nothing to run", async () => {
     const result = await runStructuredQuery({
       auth: "workspace",
@@ -115,27 +163,70 @@ describe("runStructuredQuery", () => {
     expect(result.data).toEqual([]);
   });
 
-  it("rejects a structured query on the public path", async () => {
+  it("rejects structured queries on snapshot routes", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+
     await expect(
       runStructuredQuery({
         auth: "public",
-        publicAvaPageId: uuid<Dashboard.Id>(),
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query: StructuredQuery.makeEmpty(),
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+
+    await expect(
+      runStructuredQuery({
+        auth: "workspace_published",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
         query: StructuredQuery.makeEmpty(),
         rawSql: undefined,
       }),
     ).rejects.toThrow(/raw SQL/i);
   });
 
-  it("remaps entity field values from field ids to field names", async () => {
-    const entityConfig = _createEntityConfig();
-    const nameField = _createEntityFieldConfig(entityConfig.id, "name");
-    const ageField = _createEntityFieldConfig(entityConfig.id, "age");
-    const nameColumn = QueryColumn.makeFromEntityFieldConfig(nameField);
-    const ageColumn = QueryColumn.makeFromEntityFieldConfig(ageField);
+  it("rejects generated structured SQL on every snapshot route", async () => {
+    const dashboardId = uuid<Dashboard.Id>();
+    const query = {
+      ...StructuredQuery.makeEmpty(),
+      dataSource: _createDataset(),
+    };
 
-    getAllEntityFieldValuesMock.mockResolvedValue([
-      { [nameField.id]: "Ada", [ageField.id]: 30 },
-      { [nameField.id]: "Grace", [ageField.id]: 40 },
+    await expect(
+      runStructuredQuery({
+        auth: "public",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query,
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+
+    await expect(
+      runStructuredQuery({
+        auth: "workspace_published",
+        publicAvaPageId: dashboardId,
+        snapshotRevision: SNAPSHOT_REVISION,
+        query,
+        rawSql: undefined,
+      }),
+    ).rejects.toThrow(/raw SQL/i);
+
+    expect(publicRunQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("remaps attribute assertions from attribute ids to attribute names", async () => {
+    const concept = _createConcept();
+    const labelAttribute = _createConceptAttribute(concept.id, "name");
+    const ageField = _createConceptAttribute(concept.id, "age");
+    const nameColumn = QueryColumn.makeFromConceptAttribute(labelAttribute);
+    const ageColumn = QueryColumn.makeFromConceptAttribute(ageField);
+
+    getConceptExtensionMock.mockResolvedValue([
+      { [labelAttribute.id]: "Ada", [ageField.id]: 30 },
+      { [labelAttribute.id]: "Grace", [ageField.id]: 40 },
     ]);
 
     const result = await runStructuredQuery({
@@ -143,7 +234,7 @@ describe("runStructuredQuery", () => {
       workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
-        dataSource: entityConfig,
+        dataSource: concept,
         queryColumns: [nameColumn, ageColumn],
       },
       rawSql: undefined,

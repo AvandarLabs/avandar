@@ -175,7 +175,7 @@ The scaffold is only a starting point. Compare it against the real patterns in:
 - `shared/models/datasets/CsvFileDataset`
 - `shared/models/datasets/OpenDataDataset`
 - `shared/models/Dashboard`
-- `shared/models/EntityConfig/EntityFieldConfig`
+- `shared/models/ontology/ConceptAttribute`
 
 Bring the generated files up to current conventions:
 
@@ -206,7 +206,7 @@ Look at these references:
 - `shared/models/datasets/Dataset/DatasetParsers.ts`
 - `shared/models/Dashboard/DashboardParsers.ts`
 - `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts`
-- `shared/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers.ts`
+- `shared/models/ontology/ConceptAttribute/ConceptAttributeParsers.ts`
 
 ### 6. Add the client
 
@@ -217,7 +217,7 @@ Examples:
 - `src/clients/datasets/CsvFileDatasetClient.ts`
 - `src/clients/datasets/DatasetClient.ts`
 - `src/clients/catalog-entries/OpenDataCatalogEntryClient.ts`
-- `src/clients/entities/EntityFieldConfigClient.ts`
+- `src/clients/ontology/ConceptAttributeClient.ts`
 - `src/clients/WorkspaceClient.ts`
 
 Base convention:
@@ -345,16 +345,14 @@ Common shared model locations:
 
 - `shared/models/datasets/<ModelName>/`
 - `shared/models/catalog-entries/<ModelName>/`
-- `shared/models/entities/<ModelName>/`
+- `shared/models/ontology/<ModelName>/`
 - `shared/models/queries/<ModelName>/`
-- `shared/models/EntityConfig/<ModelName>/`
 
 Common client locations:
 
 - `src/clients/datasets/<ModelName>Client.ts`
 - `src/clients/catalog-entries/<ModelName>Client.ts`
-- `src/clients/entities/<ModelName>Client.ts`
-- `src/clients/entity-configs/<ModelName>Client.ts`
+- `src/clients/ontology/<ModelName>Client.ts`
 - `src/clients/dashboards/<ModelName>Client.ts`
 
 Use a root-level `src/clients/<ModelName>Client.ts` only when that matches the current top-level pattern, such as `WorkspaceClient.ts` or `UserClient.ts`.

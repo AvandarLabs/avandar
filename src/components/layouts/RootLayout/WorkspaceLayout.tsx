@@ -1,7 +1,7 @@
 import { where } from "@avandar/utils";
 import { Outlet } from "@tanstack/react-router";
 import { ReactNode, useMemo } from "react";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { WorkspaceLayoutContents } from "@/components/layouts/RootLayout/WorkspaceLayoutContents";
 import { AppLinks } from "@/config/AppLinks";
@@ -33,21 +33,21 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     "dashboards__can_view_dashboard",
   );
   const canAccessSettings = useIsGlobalAdmin();
-  const [entityConfigs] = EntityConfigClient.useGetAll(
+  const [concepts] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const spotlightActions = useSpotlightActions(workspace.slug);
 
-  const entityManagerLinks: NavbarLink[] = useMemo(() => {
-    return (entityConfigs ?? []).map((entityConfig) => {
-      const navLink = NavbarLinks.entityManagerHome({
+  const individualManagerLinks: NavbarLink[] = useMemo(() => {
+    return (concepts ?? []).map((concept) => {
+      const navLink = NavbarLinks.individualManagerHome({
         workspaceSlug: workspace.slug,
-        entityConfigId: entityConfig.id,
-        entityConfigName: entityConfig.name,
+        conceptId: concept.id,
+        conceptName: concept.name,
       });
       return navLink;
     });
-  }, [workspace.slug, entityConfigs]);
+  }, [workspace.slug, concepts]);
 
   const mainNavBarLinks = useMemo(() => {
     const links: NavbarLink[] = [NavbarLinks.workspaceHome(workspace.slug)];
@@ -65,13 +65,13 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     }
 
     links.push(NavbarLinks.map(workspace.slug));
-    links.push(NavbarLinks.entityDesignerHome(workspace.slug));
-    links.push(...entityManagerLinks);
+    links.push(NavbarLinks.ontologyDesignerHome(workspace.slug));
+    links.push(...individualManagerLinks);
 
     return links;
   }, [
     workspace.slug,
-    entityManagerLinks,
+    individualManagerLinks,
     canAccessDataSources,
     canAccessDataExplorer,
     canAccessDashboards,

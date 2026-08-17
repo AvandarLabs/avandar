@@ -29,10 +29,7 @@ create table public.tokens__google (
   -- space-separated list of scopes.
   scope text not null,
   -- Constraint: all user_id,google_account_id pairs must be unique
-  unique (
-    user_id,
-    google_account_id
-  )
+  unique (user_id, google_account_id)
 );
 
 -- Enable row level security

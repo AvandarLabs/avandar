@@ -16,10 +16,7 @@ create type public.dataset_column_input as (
   column_idx integer
 );
 
-create type public.datasets__csv_file__date_format as (
-  date_format text,
-  timestamp_format text
-);
+create type public.datasets__csv_file__date_format as (date_format text, timestamp_format text);
 
 /**
  * Add a dataset to a given workspace.

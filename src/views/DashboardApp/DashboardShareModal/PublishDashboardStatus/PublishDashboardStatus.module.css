@@ -1,0 +1,7 @@
+.publishDashboardStatusTargetUrl {
+  flex: 1;
+  font-size: var(--mantine-font-size-xs);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}

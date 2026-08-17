@@ -17,8 +17,8 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog entries, dashboards, entities + configs + field values,
- *     value extractors, user profile, plus `workspaces` and
+ *     catalog entries, dashboards, concepts + their attributes + attribute
+ *     mappings, individuals, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
@@ -40,11 +40,11 @@ const ACTIVE_TABLES = [
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
   "dashboards",
-  "entities",
-  "entity_configs",
-  "entity_field_configs",
-  "value_extractors__dataset_column_value",
-  "value_extractors__manual_entry",
+  "concepts",
+  "concept_attributes",
+  "attribute_mappings__dataset_column",
+  "attribute_mappings__manual_entry",
+  "individuals",
   "user_profiles",
   "workspaces",
   "workspace_memberships",
@@ -90,6 +90,22 @@ const DEPRECATED_TABLES = [
   // extractors"); aggregation was re-implemented without a dedicated
   // table.
   "value_extractors__aggregation",
+  // Renamed by 20260817020322 ("Renamed entity domain to Description Logic
+  // nomenclature"). The old names have to stay recognisable so the whole
+  // pre-rename history, and the rename ALTER TABLEs themselves, partition
+  // cleanly:
+  //   entity_configs       -> concepts
+  //   entity_field_configs -> concept_attributes
+  //   entities             -> individuals
+  //   value_extractors__dataset_column_value
+  //                        -> attribute_mappings__dataset_column
+  //   value_extractors__manual_entry
+  //                        -> attribute_mappings__manual_entry
+  "entity_configs",
+  "entity_field_configs",
+  "entities",
+  "value_extractors__dataset_column_value",
+  "value_extractors__manual_entry",
 ] as const;
 
 /**
@@ -111,12 +127,23 @@ export const SYNCABLE_TABLES = [
  * Tables that the desktop intentionally does not mirror. Listed explicitly
  * so the migration generator can distinguish "deliberately excluded" from
  * "unhandled new table" and hard-error on the latter.
+ *
+ * Same rule as {@link DEPRECATED_TABLES}: an entry stays here even after the
+ * table is dropped from the live schema. The generator walks the full Postgres
+ * history one file at a time, so a name that disappears from this list makes
+ * every historical CREATE / ALTER / CREATE INDEX for it partition as
+ * "uncategorised table" and hard-errors the whole run.
  */
 export const EXCLUDED_TABLES = [
   "dexie_dbs",
   "subscriptions",
   "tokens__google",
+  "usage_analytics_events",
   "user_roles",
+  // Dropped by 20260815141744 ("analytics growth events and waitlist
+  // removal"). Retained because 20251120033342, 20251122032910 and
+  // 20251124021247 still contain its DDL.
+  "waitlist_signups",
   "workspace_invites",
   "role_groups",
   "role_group_app_roles",

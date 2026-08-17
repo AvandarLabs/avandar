@@ -3,6 +3,7 @@ import type { UnknownObject } from "@avandar/utils";
 import type {
   QueryResultColumn,
   QueryResultId,
+  QueryResultPage,
   QueryResult as QueryResultT,
 } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
@@ -13,4 +14,6 @@ export namespace QueryResult {
     QueryResultT<TRow>;
   export type Id = QueryResultId;
   export type Column = QueryResultColumn;
+  export type Page<TRow extends UnknownObject = UnknownObject> =
+    QueryResultPage<TRow>;
 }

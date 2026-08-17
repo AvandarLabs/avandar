@@ -14,9 +14,7 @@ create table public.datasets__google_sheets (
   -- if it is still associated to a dataset, otherwise the
   -- dataset will become inaccessible to the workspace.
   -- Ownership should be transferred to another google account first.
-  google_account_id text not null references public.tokens__google (
-    google_account_id
-  ) on update cascade on delete no action,
+  google_account_id text not null references public.tokens__google (google_account_id) on update cascade on delete no action,
   -- The google sheet id
   google_document_id text not null,
   -- Number of rows to skip at the start of the file

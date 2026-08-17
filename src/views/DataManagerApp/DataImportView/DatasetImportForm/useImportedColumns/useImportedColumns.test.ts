@@ -6,7 +6,7 @@ import type {
   CsvFileLoadResult,
   XlsxFileLoadResult,
 } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
-import type { DataSourceMetadata } from "../DatasetImportForm";
+import type { DataSourceMetadata } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 

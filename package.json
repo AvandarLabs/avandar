@@ -31,7 +31,7 @@
     "test:models": "pnpm --filter @avandar/models test",
     "test:modules": "pnpm --filter @avandar/modules test",
     "test:ui": "pnpm --filter @avandar/ui test",
-    "test:db": "supabase test db",
+    "test:db": "supabase test db && ./scripts/test-dashboard-publishing-migrations.sh",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
