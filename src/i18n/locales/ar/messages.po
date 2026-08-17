@@ -140,7 +140,8 @@ msgstr "اختر نموذج الدردشة"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
 "old link will no longer be able to reach this dashboard."
-msgstr ""
+msgstr "سيصبح عنوان URL السابق غير صالح وغير قابل للوصول. ولن يتمكن أي شخص "
+"يستخدم الرابط القديم من الوصول إلى لوحة المعلومات هذه بعد الآن."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
@@ -3201,7 +3202,7 @@ msgstr "نطاق الأرقام"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
-msgstr ""
+msgstr "استبدال عنوان URL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -3359,7 +3360,7 @@ msgstr "جعل مجموعة البيانات متاحة فقط في وضع عد�
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Change custom URL?"
-msgstr ""
+msgstr "هل تريد تغيير عنوان URL المخصص؟"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx

@@ -141,7 +141,8 @@ msgstr "Chagua mfano wa mazungumzo"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
 "old link will no longer be able to reach this dashboard."
-msgstr ""
+msgstr "URL ya awali itakuwa batili na haitapatikana. Mtu yeyote anayetumia "
+"kiungo cha zamani hataweza tena kufikia dashibodi hii."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "most recent"
@@ -3244,7 +3245,7 @@ msgstr "Muda wa nambari"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
-msgstr ""
+msgstr "Badilisha URL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
@@ -3405,7 +3406,7 @@ msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Change custom URL?"
-msgstr ""
+msgstr "Ungependa kubadilisha URL maalum?"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
