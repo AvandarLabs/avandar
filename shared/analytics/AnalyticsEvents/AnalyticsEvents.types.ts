@@ -7,6 +7,7 @@ import type {
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
+import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types.ts";
 import type { DashboardFilterMode } from "$/types/dashboard.types.ts";
 import type { Database } from "$/types/database.types.ts";
 
@@ -133,6 +134,10 @@ export type AnalyticsEventPayloads = {
     { dashboardId: string; wasPublic: boolean; ageDays: number }
   : K extends "chat.message_sent" ? ChatMessageSentPayload
   : K extends "chat.sql_generated" ? { sqlChars: number }
+  : K extends "nux.started" ? { startedAtMilestone: NuxMilestoneKey }
+  : K extends "nux.milestone_completed" ? { milestoneKey: NuxMilestoneKey }
+  : K extends "nux.dismissed" ?
+    { milestoneKey: NuxMilestoneKey | null; completedCount: number }
   : K extends "user.registered" ?
     {
       emailDomain: string | null;
