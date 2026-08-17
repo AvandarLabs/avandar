@@ -43,7 +43,12 @@ function _isBoolean(dataType: AvaDataTypeNs.T): boolean {
  * an operator cannot be added in one place and forgotten in another.
  */
 export const QUERY_FILTER_OPERATOR_SPECS: readonly QueryFilterOperatorSpec[] = [
-  { operator: "=", arity: "scalar", appliesTo: _always, supportsMatchCase: true },
+  {
+    operator: "=",
+    arity: "scalar",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
   {
     operator: "!=",
     arity: "scalar",
@@ -110,7 +115,12 @@ export const QUERY_FILTER_OPERATOR_SPECS: readonly QueryFilterOperatorSpec[] = [
     appliesTo: _isText,
     supportsMatchCase: true,
   },
-  { operator: "in", arity: "list", appliesTo: _always, supportsMatchCase: true },
+  {
+    operator: "in",
+    arity: "list",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
   {
     operator: "not_in",
     arity: "list",

@@ -76,7 +76,7 @@ msgstr "這將允許資料集在線儲存，以便在其他設備上訪問。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "starts with"
-msgstr ""
+msgstr "開頭為"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
@@ -97,7 +97,7 @@ msgstr "值欄"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is not on"
-msgstr ""
+msgstr "不在"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Monthly"
@@ -109,7 +109,7 @@ msgstr "移除 {name} 的訪問權限。"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
 msgid "Match case"
-msgstr ""
+msgstr "區分大小寫"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -137,7 +137,7 @@ msgstr "搜尋資料集..."
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
-msgstr ""
+msgstr "「{value}」不是數字。"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "The dataset failed to load. Please try again later or reach out to "
@@ -271,7 +271,7 @@ msgstr "請檢查您的電子郵件以獲取確認連結。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is not between"
-msgstr ""
+msgstr "不介於"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
@@ -297,7 +297,7 @@ msgstr "在 \"{sourceFileName}\" 中檢測到 {changedCount} 列的類型與匯�
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary.tsx
 msgid "{applied} filter(s) applied, {ignored} not applied"
-msgstr ""
+msgstr "已套用 {applied} 個篩選條件，未套用 {ignored} 個"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
@@ -416,7 +416,7 @@ msgstr "導出註解 PDF"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Group"
-msgstr ""
+msgstr "+ 群組"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
@@ -550,10 +550,6 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "Add columns to the query above to start defining filters."
-#~ msgstr "在上面的查詢中添加欄位以開始定義過濾器。"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "僅允許一個值"
@@ -685,7 +681,7 @@ msgstr "移除用戶"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
-msgstr ""
+msgstr "目前的 SQL 包含表單無法表示的部分。繼續操作會以表單產生的 SQL 覆寫目前內容。"
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
@@ -724,7 +720,7 @@ msgstr "正在更新 {0} 的密碼"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is after"
-msgstr ""
+msgstr "晚於"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -819,7 +815,7 @@ msgstr "此欄位不能為空"
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
-msgstr ""
+msgstr "「{value}」不是日期。請使用 YYYY-MM-DD。"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "Oops!"
@@ -933,11 +929,11 @@ msgstr "歡迎來到您的第一個工作區"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary.tsx
 msgid "{applied} filter(s) applied"
-msgstr ""
+msgstr "已套用 {applied} 個篩選條件"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "Regular expression"
-msgstr ""
+msgstr "正規表示式"
 
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
@@ -1481,12 +1477,6 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
 msgstr "配置此過濾器：在側邊面板中設置其 ID、標籤和列名稱。"
 
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
-#~ msgid "The current SQL contains parts that the form could not represent. "
-#~ "Continuing will overwrite that SQL with one generated from the form. "
-#~ "This cannot be undone (unless you re-run your previous chat prompt)."
-#~ msgstr "當前 SQL 包含表單無法表示的部分。繼續將用從表單生成的 SQL 覆蓋該 SQL。這無法撤銷（除非您重新運行之前的聊天提示）。"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
 msgstr "正式"
@@ -1687,7 +1677,7 @@ msgstr "限制更新失敗"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is before"
-msgstr ""
+msgstr "早於"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -1839,7 +1829,7 @@ msgstr "{numUsers} 人"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls.tsx
 msgid "Combine conditions with"
-msgstr ""
+msgstr "合併條件，使用"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
@@ -1872,6 +1862,10 @@ msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Some filters were removed"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Dashboard unpublished."
@@ -1915,7 +1909,7 @@ msgstr "HAVING 子句使用了表單無法表示的左側運算式。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "has no value"
-msgstr ""
+msgstr "沒有值"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -1937,10 +1931,6 @@ msgstr "最窄"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Graphite"
 msgstr "石墨"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "not in"
-#~ msgstr "不在"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
@@ -2144,11 +2134,11 @@ msgstr "工作表名稱"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is at most"
-msgstr ""
+msgstr "至多為"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is"
-msgstr ""
+msgstr "是"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2190,9 +2180,9 @@ msgstr "發布"
 
 #. placeholder {0}: droppedFilterColumns.join(", ")
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-msgid "Removed filters that referenced columns this data source does not have: "
-"{0}"
-msgstr ""
+#~ msgid "Removed filters that referenced columns this data source does not have: "
+#~ "{0}"
+#~ msgstr "已移除參照此資料來源不存在欄位的篩選條件：{0}"
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2324,7 +2314,7 @@ msgstr "X 軸最大值"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "ends with"
-msgstr ""
+msgstr "結尾為"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -2344,7 +2334,7 @@ msgstr "Google 認證錯誤"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "does not match pattern (legacy)"
-msgstr ""
+msgstr "不符合模式（舊版）"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -2387,10 +2377,6 @@ msgstr "沒有可顯示的儀表板"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "Y 軸最大值"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "is not null"
-#~ msgstr "不為空"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Create dashboard & save"
@@ -2610,10 +2596,6 @@ msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框�
 msgid "Role"
 msgstr "角色"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "is null"
-#~ msgstr "為空"
-
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
 msgstr "Open 模型"
@@ -2647,7 +2629,7 @@ msgstr "自訂角色群組"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "Add a value"
-msgstr ""
+msgstr "新增值"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
@@ -2766,7 +2748,7 @@ msgstr "沒有可用的計劃。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is on or after"
-msgstr ""
+msgstr "在此之後或等於"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
@@ -2790,7 +2772,7 @@ msgstr "每月付款"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "does not start with"
-msgstr ""
+msgstr "開頭不是"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
@@ -2839,7 +2821,7 @@ msgstr "清除日誌"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is any of"
-msgstr ""
+msgstr "為以下任一項"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -2961,7 +2943,7 @@ msgstr "筆畫寬度"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "and"
-msgstr ""
+msgstr "且"
 
 #: src/config/AppLinks.tsx
 msgid "Home"
@@ -2994,7 +2976,7 @@ msgstr "在下面輸入或粘貼電子郵件。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is true"
-msgstr ""
+msgstr "為 true"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
@@ -3024,7 +3006,7 @@ msgstr "標誌"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "matches regex"
-msgstr ""
+msgstr "符合正規表示式"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
@@ -3052,7 +3034,7 @@ msgstr "繼續進入您的工作區"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "has a value"
-msgstr ""
+msgstr "有值"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
@@ -3253,7 +3235,7 @@ msgstr "添加到您的工作區"
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
-msgstr ""
+msgstr "「{value}」不是有效的正規表示式。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
@@ -3299,7 +3281,7 @@ msgstr "高品質 7B 指令模型。最適合處理困難的結構描述，以�
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "This query could not run"
-msgstr ""
+msgstr "此查詢無法執行"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -3307,7 +3289,7 @@ msgstr "查看"
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "This condition does not apply to {typeName} columns."
-msgstr ""
+msgstr "此條件不適用於 {typeName} 欄位。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
@@ -3365,10 +3347,6 @@ msgstr "結束（例如：2024-12-31）"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
 msgid "No datasets match your search."
 msgstr "沒有資料集符合您的搜索。"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "in"
-#~ msgstr "在"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -3480,7 +3458,7 @@ msgstr "允許手動編輯"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is not"
-msgstr ""
+msgstr "不是"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
@@ -3551,7 +3529,7 @@ msgstr "卡片"
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide SQL"
-msgstr ""
+msgstr "隱藏 SQL"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -3705,7 +3683,7 @@ msgstr "時間"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is false"
-msgstr ""
+msgstr "為 false"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
@@ -3713,7 +3691,7 @@ msgstr "長條圖"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is none of"
-msgstr ""
+msgstr "不在以下任一項"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Dataset added"
@@ -4110,7 +4088,7 @@ msgstr "時間範圍"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "Upper bound"
-msgstr ""
+msgstr "上限"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -4156,11 +4134,7 @@ msgstr "請修正標示的欄位。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is on or before"
-msgstr ""
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "between"
-#~ msgstr "之間"
+msgstr "在此之前或等於"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
@@ -4314,7 +4288,7 @@ msgstr "層級"
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "\"{operator}\" is not an operator this form understands."
-msgstr ""
+msgstr "「{operator}」不是此表單支援的運算子。"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
@@ -4487,7 +4461,7 @@ msgstr "再次登入"
 
 #: shared/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
-msgstr ""
+msgstr "第一個值不得大於第二個值。"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
@@ -4546,7 +4520,7 @@ msgstr "此儀表板未引用任何數據集：無法發布。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "does not match regex"
-msgstr ""
+msgstr "不符合正規表示式"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -4567,7 +4541,7 @@ msgstr "全球查看者"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is blank"
-msgstr ""
+msgstr "為空白"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create a new workspace. You can always edit it later."
@@ -4727,7 +4701,7 @@ msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "does not end with"
-msgstr ""
+msgstr "結尾不是"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "This catalog entry has no column metadata. It cannot be imported yet."
@@ -4751,7 +4725,7 @@ msgstr "檔案載入失敗"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls.tsx
 msgid "Remove group"
-msgstr ""
+msgstr "移除群組"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -4848,7 +4822,7 @@ msgstr "分隔線"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "Lower bound"
-msgstr ""
+msgstr "下限"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -5155,7 +5129,7 @@ msgstr "未配置任何字段或數據集。"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls.tsx
 msgid "Remove condition"
-msgstr ""
+msgstr "移除條件"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
@@ -5343,7 +5317,7 @@ msgstr "只有您可以存取此 {resource}。"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is at least"
-msgstr ""
+msgstr "至少為"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -5430,6 +5404,11 @@ msgstr "替代文字"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "切換工作區"
+
+#. placeholder {0}: result.removedColumnNames.join(", ")
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "They referenced columns this data source does not have: {0}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
@@ -5598,7 +5577,7 @@ msgstr "發布日期"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is not blank"
-msgstr ""
+msgstr "不為空白"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
@@ -5826,7 +5805,7 @@ msgstr "移除 {0}"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is between"
-msgstr ""
+msgstr "介於"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -5930,7 +5909,7 @@ msgstr "形狀"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is on"
-msgstr ""
+msgstr "日期為"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -5956,7 +5935,7 @@ msgstr "無效的欄位類型"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls.tsx
 msgid "Condition"
-msgstr ""
+msgstr "條件"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
@@ -6023,7 +6002,7 @@ msgstr "進階選項"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is less than"
-msgstr ""
+msgstr "小於"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -6183,7 +6162,7 @@ msgstr "媒體"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Condition"
-msgstr ""
+msgstr "+ 條件"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Add a prompt and generate SQL to configure this visualization."
@@ -6292,7 +6271,7 @@ msgstr "整數"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."
-msgstr ""
+msgstr "選取資料來源以新增篩選條件。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -6388,7 +6367,7 @@ msgstr "清除所有"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is greater than"
-msgstr ""
+msgstr "大於"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6418,7 +6397,7 @@ msgstr "側邊欄跨度"
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "matches pattern (legacy)"
-msgstr ""
+msgstr "符合模式（舊版）"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Max width"

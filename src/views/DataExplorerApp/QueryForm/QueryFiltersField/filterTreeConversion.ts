@@ -97,18 +97,29 @@ export function toInternalFilterGroup(
   };
 }
 
-/** Seeds the match-case map from a tree that already carries the flag. */
+/**
+ * Seeds the match-case map from a tree that already carries the flag.
+ *
+ * Writes into one accumulator rather than spreading it per rule, which would
+ * copy the whole map at every step and make a deep tree quadratic.
+ */
 export function collectMatchCaseById(
   group: QueryFilterGroup,
 ): Record<string, boolean> {
-  return group.rules.reduce<Record<string, boolean>>((accumulator, child) => {
-    if (child.type === "group") {
-      return { ...accumulator, ...collectMatchCaseById(child) };
-    }
-    return child.id !== undefined && child.matchCase === true ?
-        { ...accumulator, [child.id]: true }
-      : accumulator;
-  }, {});
+  const collected: Record<string, boolean> = {};
+  const visit = (node: QueryFilterGroup): void => {
+    node.rules.forEach((child) => {
+      if (child.type === "group") {
+        visit(child);
+        return;
+      }
+      if (child.id !== undefined && child.matchCase === true) {
+        collected[child.id] = true;
+      }
+    });
+  };
+  visit(group);
+  return collected;
 }
 
 /**

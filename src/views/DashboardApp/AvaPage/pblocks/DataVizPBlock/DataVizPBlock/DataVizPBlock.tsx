@@ -204,11 +204,11 @@ export function DataVizPBlock({
     isLoading,
     queryErrorMessage,
   } = useDataVizDisplayState({
-      filteredSql,
-      puck,
-      vizConfig,
-      rawSql,
-    });
+    filteredSql,
+    puck,
+    vizConfig,
+    rawSql,
+  });
 
   return (
     <DataVizContent

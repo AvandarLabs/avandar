@@ -5,9 +5,9 @@ import {
   toInternalFilterGroup,
   toLibraryFilterGroup,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
 
 /** Milliseconds of quiet before a typed value is committed upward. */
 const COMMIT_DEBOUNCE_MS = 300;
@@ -73,12 +73,18 @@ export function useFilterTreeState({
   /** The last tree we sent upward, so the echo of our own commit is ignored. */
   const committedRef = useRef<QueryFilterGroup>(value);
   /**
-   * The last `value` prop we acted on. Adoption keys off this rather than off
-   * `committedRef` alone: a host that does not echo our commit back (a
-   * controlled parent that ignores the change, or a test spy) would otherwise
-   * look like an external replacement on every render and wipe local state.
+   * The last `value` prop we acted on, serialized. Adoption keys off this
+   * rather than off `committedRef` alone: a host that does not echo our commit
+   * back (a controlled parent that ignores the change, or a test spy) would
+   * otherwise look like an external replacement on every render and wipe local
+   * state.
+   *
+   * Left empty on the first render on purpose: the initial tree is already
+   * built from `value` by `useState` above, so there is nothing to adopt until
+   * the prop actually changes, and serializing eagerly here would rebuild a
+   * string on every render only to throw it away.
    */
-  const lastSeenValueRef = useRef<string>(JSON.stringify(value));
+  const lastSeenValueRef = useRef<string | undefined>(undefined);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Adopt externally replaced trees (Reset, Open, SQL-to-form mapping) while

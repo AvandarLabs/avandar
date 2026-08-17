@@ -1,15 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import { QueryBuilderMantine } from "@react-querybuilder/mantine";
-import { useMemo } from "react";
-import { QueryBuilder } from "react-querybuilder";
 import { makeQueryFilterNodeId } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import {
   defaultOperatorForDataType,
   operatorsForDataType,
 } from "$/models/queries/StructuredQuery/QueryFilterOperator";
+import { useMemo } from "react";
+import { QueryBuilder } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
-import classes from "./QueryFiltersField.module.css";
 import {
   FilterAddAction,
   FilterCombinatorSelector,
@@ -19,13 +18,14 @@ import {
   FilterValueEditorControl,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls";
 import { useFilterTreeState } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState";
+import classes from "./QueryFiltersField.module.css";
+import type { FilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { FilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls";
-import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
-import type { Field, RuleGroupType } from "react-querybuilder";
 import type { ReactNode } from "react";
+import type { Field, RuleGroupType } from "react-querybuilder";
 
 type Props = {
   /**

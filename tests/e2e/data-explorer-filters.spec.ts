@@ -84,13 +84,21 @@ const CASES: readonly FilterCase[] = [
     where: `"daily_new_cases" >= 0`,
     expectedRows: 14510,
   },
-  { name: "numeric less than", where: `"daily_new_cases" < 0`, expectedRows: 190 },
+  {
+    name: "numeric less than",
+    where: `"daily_new_cases" < 0`,
+    expectedRows: 190,
+  },
   {
     name: "numeric at most",
     where: `"daily_new_cases" <= 0`,
     expectedRows: 3256,
   },
-  { name: "numeric equals", where: `"daily_new_cases" = 0`, expectedRows: 3066 },
+  {
+    name: "numeric equals",
+    where: `"daily_new_cases" = 0`,
+    expectedRows: 3066,
+  },
   {
     name: "numeric in list",
     where: `"daily_new_cases" IN (0, 1, 2)`,
@@ -186,9 +194,9 @@ async function _importCaliforniaCsv(options: {
   // Wait on the affordance rather than a success string: the parse callout's
   // wording differs between small and large files, and what matters here is
   // that the dataset is ready to save.
-  await expect(
-    page.getByRole("button", { name: "Save Dataset" }),
-  ).toBeEnabled({ timeout: LONG_WAIT });
+  await expect(page.getByRole("button", { name: "Save Dataset" })).toBeEnabled({
+    timeout: LONG_WAIT,
+  });
   // Save with cloud storage on, then wait for the dataset to report online:
   // a dataset that is still local-only refuses queries from a fresh page with
   // "insufficient dataset lease".

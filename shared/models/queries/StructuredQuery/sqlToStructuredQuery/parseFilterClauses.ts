@@ -10,6 +10,7 @@ import {
   toFilterOperator,
   unwrapLowerCall,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type {
   QueryFilter,
   QueryFilterCombinator,
@@ -17,7 +18,6 @@ import type {
   QueryFilterOperator,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 const _NEGATED_OPERATOR: Partial<

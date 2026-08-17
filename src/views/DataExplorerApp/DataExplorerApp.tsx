@@ -29,8 +29,6 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
-import { AppliedFilterSummary } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary";
-import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
@@ -38,6 +36,8 @@ import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
+import { AppliedFilterSummary } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary";
+import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";

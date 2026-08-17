@@ -1,7 +1,10 @@
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { operatorSpec } from "$/models/queries/StructuredQuery/QueryFilterOperator.ts";
-import { isFilterRuleComplete } from "$/models/queries/StructuredQuery/QueryFilterValidation.ts";
+import {
+  isFilterRuleComplete,
+  validateFilterRule,
+} from "$/models/queries/StructuredQuery/QueryFilterValidation.ts";
 import {
   coerceFilterLiteral,
   filterValueAsList,
@@ -45,8 +48,9 @@ function _castTarget(dataType: AvaDataTypeNs.T): string {
 
 /**
  * Renders one filter rule to SQL. Returns `undefined` when the rule is
- * incomplete or its operator is unknown, which is how incomplete rules get
- * excluded from the query instead of running as `col = ''`.
+ * incomplete, invalid, or its operator is unknown, which is how such rules get
+ * excluded from the query instead of running as `col = ''` or failing the whole
+ * statement with a conversion error.
  *
  * Text matching uses DuckDB's `contains` / `starts_with` / `ends_with`
  * functions rather than `LIKE` patterns. That makes a `%` in the user's value a
@@ -64,6 +68,20 @@ export function renderFilterRule(
 
   const dataType =
     options.columnTypes?.[rule.columnName] ?? rule.columnDataType;
+
+  /*
+   * A rule that cannot be applied is left out of the SQL entirely rather than
+   * handed to DuckDB, which would reject the whole query with a conversion
+   * error and lose the results of every other rule. Validation runs against the
+   * effective type so a live `columnTypes` override is honoured.
+   */
+  const effectiveRule =
+    dataType === rule.columnDataType ?
+      rule
+    : { ...rule, columnDataType: dataType };
+  if (validateFilterRule(effectiveRule) !== undefined) {
+    return undefined;
+  }
   const column = quoteSqlIdentifier(rule.columnName);
   const isTextColumn = dataType === undefined || AvaDataType.isText(dataType);
   const foldCase =

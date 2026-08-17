@@ -1,21 +1,22 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Button, Select, Text, Tooltip } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import clsx from "clsx";
 import { queryFilterOperatorLabel } from "$/copy/queryFilterOperatorLabel";
 import { queryFilterValidationLabel } from "$/copy/queryFilterValidationLabel";
 import {
   isFilterRuleComplete,
   validateFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilterValidation";
-import classes from "./QueryFiltersField.module.css";
+import clsx from "clsx";
 import { FilterValueEditor } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor";
 import { MatchCaseToggle } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle";
+import classes from "./QueryFiltersField.module.css";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {
   QueryFilterOperator,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { ReactNode } from "react";
 import type {
   ActionProps,
   CombinatorSelectorProps,
@@ -23,7 +24,6 @@ import type {
   OperatorSelectorProps,
   ValueEditorProps,
 } from "react-querybuilder";
-import type { ReactNode } from "react";
 
 /**
  * Everything our controls need beyond what react-querybuilder gives them,

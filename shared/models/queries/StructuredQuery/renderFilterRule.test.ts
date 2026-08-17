@@ -228,6 +228,39 @@ describe("renderFilterRule, exclusions", () => {
     expect(_render({ operator: "between", value: [1] })).toBeUndefined();
   });
 
+  it("returns undefined for a rule that fails validation", () => {
+    // D9: an invalid rule is excluded rather than sent to DuckDB, where it
+    // would fail with a conversion error the user did not ask for.
+    expect(
+      _render({
+        columnName: "daily_new_cases",
+        columnDataType: "bigint",
+        operator: "=",
+        value: "abc",
+      }),
+    ).toBeUndefined();
+    expect(_render({ operator: "matches_regex", value: "a(" })).toBeUndefined();
+    expect(
+      _render({
+        columnName: "daily_new_cases",
+        columnDataType: "bigint",
+        operator: "between",
+        value: [200, 100],
+      }),
+    ).toBeUndefined();
+  });
+
+  it("honours a columnTypes override when validating", () => {
+    // The live type says numeric, so a letter is invalid even though the rule
+    // was authored against a text column.
+    expect(
+      _render(
+        { columnName: "cases", columnDataType: "varchar", value: "abc" },
+        { columnTypes: { cases: "bigint" } },
+      ),
+    ).toBeUndefined();
+  });
+
   it("quotes identifiers that contain punctuation", () => {
     expect(_render({ columnName: "Country/Region", value: "Chad" })?.sql).toBe(
       'lower("Country/Region") = lower(?)',

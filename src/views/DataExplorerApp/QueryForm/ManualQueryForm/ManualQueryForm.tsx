@@ -1,7 +1,9 @@
 import { Model } from "@avandar/models";
 import { isDefined, matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Fieldset, Stack, Text } from "@mantine/core";
+import { Fieldset, Stack } from "@mantine/core";
+import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns";
+import { notifyWarning } from "@/utils/notifications/notify";
 import { useEffect, useMemo, useState } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -10,11 +12,10 @@ import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/L
 import { OverwriteSqlAlert } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert";
 import { SortFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields";
 import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields";
-import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns";
 import { AppliedFilterSummary } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
-import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
+import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
 import classes from "./ManualQueryForm.module.css";
 import type {
   SettingsColumnGroup,
@@ -189,10 +190,6 @@ function ManualQueryFormView({
     });
   }, [dataSourceColumns]);
 
-  const [droppedFilterColumns, setDroppedFilterColumns] = useState<
-    readonly string[]
-  >([]);
-
   useEffect(
     function pruneFiltersWhenColumnsChange() {
       if (dataSourceColumnNames.length === 0) {
@@ -200,13 +197,20 @@ function ManualQueryFormView({
       }
       const result = pruneFilterColumns(filters, dataSourceColumnNames);
       if (result.removedColumnNames.length === 0) {
-        setDroppedFilterColumns([]);
         return;
       }
-      setDroppedFilterColumns(result.removedColumnNames);
+      // Reported as a notification rather than held in local state: the removal
+      // is a one-off event, and a toast outlives the render that triggered it
+      // without duplicating the filter tree's state here. Running these rules
+      // would fail the whole query with a binder error, since the new data
+      // source has no such columns.
       handlers.onSetFilters(result.filters);
+      notifyWarning({
+        title: t`Some filters were removed`,
+        message: t`They referenced columns this data source does not have: ${result.removedColumnNames.join(", ")}`,
+      });
     },
-    [dataSourceColumnNames, filters, handlers],
+    [dataSourceColumnNames, filters, handlers, t],
   );
 
   const onFiltersChange = (nextFilters: QueryFilterGroup): void => {
@@ -255,11 +259,6 @@ function ManualQueryFormView({
 
   const filterFields = (
     <Stack gap="xs">
-      {droppedFilterColumns.length > 0 ?
-        <Text size="xs" c="neutral.6">
-          {t`Removed filters that referenced columns this data source does not have: ${droppedFilterColumns.join(", ")}`}
-        </Text>
-      : null}
       <AppliedFilterSummary filters={filters} />
       <QueryFiltersField
         columns={dataSourceColumns}

@@ -360,9 +360,9 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   if (ast.where) {
     const parsedRaw = parseWhereNode(ast.where, unmappedReasons);
     const parsed =
-      parsedRaw === undefined ?
-        undefined
-      : stampFilterColumnTypes(parsedRaw, filterColumnTypes);
+      parsedRaw === undefined ? undefined : (
+        stampFilterColumnTypes(parsedRaw, filterColumnTypes)
+      );
     if (parsed) {
       filters =
         parsed.type === "group" ?

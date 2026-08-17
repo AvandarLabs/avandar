@@ -130,9 +130,9 @@ export function validateFilterRule(
     })
     .with("scalar", () => {
       const value = filterValueAsScalar(rule.value);
-      return value === undefined ?
-          undefined
-        : _validateLiteral(value, rule.columnDataType);
+      return value === undefined ? undefined : (
+          _validateLiteral(value, rule.columnDataType)
+        );
     })
     .with("list", () => {
       return filterValueAsList(rule.value).reduce<

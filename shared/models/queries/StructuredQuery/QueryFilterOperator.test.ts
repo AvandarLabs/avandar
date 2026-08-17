@@ -1,7 +1,7 @@
 import {
-  QUERY_FILTER_OPERATOR_SPECS,
-  operatorSpec,
   operatorsForDataType,
+  operatorSpec,
+  QUERY_FILTER_OPERATOR_SPECS,
 } from "$/models/queries/StructuredQuery/QueryFilterOperator.ts";
 import { describe, expect, it } from "vitest";
 

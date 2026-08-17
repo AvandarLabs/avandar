@@ -36,12 +36,12 @@ describe("renderFilterGroup", () => {
   });
 
   it("joins rules with the group combinator", () => {
-    expect(
-      renderFilterGroup(_group({ rules: [TEXT_RULE, NUM_RULE] })),
-    ).toEqual({
-      sql: '"Admin2" = ? and "cases" > ?',
-      bindings: ["Alameda", 100],
-    });
+    expect(renderFilterGroup(_group({ rules: [TEXT_RULE, NUM_RULE] }))).toEqual(
+      {
+        sql: '"Admin2" = ? and "cases" > ?',
+        bindings: ["Alameda", 100],
+      },
+    );
   });
 
   it("joins with OR when the combinator is OR", () => {
@@ -65,7 +65,9 @@ describe("renderFilterGroup", () => {
         ],
       }),
     );
-    expect(fragment?.sql).toBe('"cases" > ? and ("Admin2" = ? or "Admin2" = ?)');
+    expect(fragment?.sql).toBe(
+      '"cases" > ? and ("Admin2" = ? or "Admin2" = ?)',
+    );
     expect(fragment?.bindings).toEqual([100, "Alameda", "Butte"]);
   });
 

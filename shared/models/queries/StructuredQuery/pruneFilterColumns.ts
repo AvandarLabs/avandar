@@ -9,10 +9,20 @@ export type PruneFilterColumnsResult = {
   removedColumnNames: readonly string[];
 };
 
+/**
+ * Collects removed column names in tree order without duplicates. The `Set`
+ * carries membership so the check stays constant-time as the list grows; the
+ * array preserves the order the names are reported in.
+ */
+type RemovedColumns = {
+  order: string[];
+  seen: Set<string>;
+};
+
 function _prune(
   group: QueryFilterGroup,
   columnNames: ReadonlySet<string>,
-  removed: string[],
+  removed: RemovedColumns,
 ): QueryFilterGroup {
   const rules = group.rules
     .map((child): QueryFilter | undefined => {
@@ -23,8 +33,9 @@ function _prune(
       if (columnNames.has(child.columnName)) {
         return child;
       }
-      if (!removed.includes(child.columnName)) {
-        removed.push(child.columnName);
+      if (!removed.seen.has(child.columnName)) {
+        removed.seen.add(child.columnName);
+        removed.order.push(child.columnName);
       }
       return undefined;
     })
@@ -46,10 +57,10 @@ export function pruneFilterColumns(
   filters: QueryFilterGroup,
   availableColumnNames: readonly string[],
 ): PruneFilterColumnsResult {
-  const removed: string[] = [];
+  const removed: RemovedColumns = { order: [], seen: new Set() };
   const pruned = _prune(filters, new Set(availableColumnNames), removed);
   return {
-    filters: removed.length === 0 ? filters : pruned,
-    removedColumnNames: removed,
+    filters: removed.order.length === 0 ? filters : pruned,
+    removedColumnNames: removed.order,
   };
 }
