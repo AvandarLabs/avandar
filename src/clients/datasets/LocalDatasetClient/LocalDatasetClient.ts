@@ -1,3 +1,5 @@
+import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
+import { match } from "ts-pattern";
 import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
@@ -5,6 +7,7 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
+import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/localDatasetSourceFileType";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
@@ -171,10 +174,16 @@ async function _putParsingDataset(
     sourceFileType: options.sourceFileType,
     sourceFileSize: options.file.size,
     lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
-    // CSV and XLSX are reconstructable from parquet + parse options, so
-    // their cached source bytes are never pinned; see
+    // Derived, never hardcoded: the pin means "these bytes are the retained
+    // original", which is a property of the source type alone. CSV and XLSX
+    // are reconstructable from parquet + parse options so they come out
+    // false here, but a future import path that starts putting rows of a
+    // non-reconstructable kind through this function gets the pin for free
+    // instead of having to remember it. See
     // `requiresOriginalFileRetention`.
-    isSourcePinned: undefined,
+    isSourcePinned: requiresOriginalFileRetention(
+      getDatasetSourceTypeFromSourceFileType(options.sourceFileType),
+    ),
     parseOptions: options.parseOptions,
   });
 }
@@ -284,33 +293,54 @@ function _makeResumeImport(
   context: Readonly<LocalDatasetMutationContext>,
 ): LocalDatasetMutationRecord["resumeImport"] {
   return async (params) => {
+    const logger = context.logger.appendName("resumeImport");
     const row = await AvaDexie.DB.LocalDataset.get(params.datasetId);
     if (!row?.sourceBytes || !row.sourceFileType || !row.parseOptions) {
-      context.logger
-        .appendName("resumeImport")
-        .log("Cannot resume: no cached source bytes", params);
+      logger.log("Cannot resume: no cached source bytes", params);
       return undefined;
     }
+    const sourceFileType = row.sourceFileType;
     await AvaDexie.DB.LocalDataset.update(params.datasetId, {
       lastSourceAccessedAt: Date.now(),
     });
     const file = new File(
       [row.sourceBytes],
-      row.sourceFileName ?? `${row.datasetId}.${row.sourceFileType}`,
+      row.sourceFileName ?? `${row.datasetId}.${sourceFileType}`,
       { type: row.sourceBytes.type },
     );
-    const source =
-      row.sourceFileType === "csv" ?
-        {
+    // Exhaustive on purpose. The previous ternary sent anything that wasn't
+    // `"csv"` down the XLSX branch, so a `"pdf"` row would have been handed
+    // to `read_xlsx`. Adding a source file kind must be a compile error here
+    // rather than a silently wrong parser.
+    const source = match(sourceFileType)
+      .with("csv", () => {
+        return {
           kind: "csv" as const,
           file,
           options: row.parseOptions as LocalDatasetCsvParseOptions,
-        }
-      : {
+        };
+      })
+      .with("xlsx", () => {
+        return {
           kind: "xlsx" as const,
           file,
           options: row.parseOptions as LocalDatasetXlsxParseOptions,
         };
+      })
+      .with("pdf", () => {
+        // A PDF's parquet is produced by table extraction, not by a DuckDB
+        // reader, so there is nothing for the background transcoder to
+        // redrive. The retained original is still safe in `sourceBytes`.
+        return undefined;
+      })
+      .exhaustive();
+    if (!source) {
+      logger.log("Cannot resume: unsupported source file type", {
+        ...params,
+        sourceFileType,
+      });
+      return undefined;
+    }
     return runBackgroundParquetTranscoding({
       datasetId: row.datasetId,
       workspaceId: row.workspaceId,
@@ -320,14 +350,65 @@ function _makeResumeImport(
   };
 }
 
+/**
+ * Discards a dataset's locally-materialized data so the next read
+ * re-materializes it.
+ *
+ * This is the single chokepoint for every cache-invalidation path (editing a
+ * column description, backing out of a resync, re-picking a file), and it
+ * enforces the invariant that no cache invalidation may destroy a retained
+ * original:
+ *
+ * - Unpinned row: deleted outright, as before. `sourceBytes` there is only
+ *   ever a resume cache and the parquet can be re-downloaded or re-uploaded,
+ *   so losing the row is a recoverable cache miss.
+ * - Pinned row with bytes (a retained original, e.g. a PDF): the row is kept
+ *   and only the *derived* data is cleared. For an offline-only PDF these
+ *   bytes are the only copy of the user's document in existence, so deleting
+ *   the row would be unrecoverable data loss, not a cache miss. We leave
+ *   `sourceBytes` plus the metadata needed to rebuild from it
+ *   (`sourceFileName`, `sourceFileType`, `sourceFileSize`, `isSourcePinned`)
+ *   untouched by omitting those keys from the update: Dexie's `update()`
+ *   treats an explicitly-passed `undefined` as "delete this key".
+ *
+ * A pinned row whose bytes are already gone has nothing left to protect, so
+ * it is deleted like any other stale row.
+ *
+ * Returns whether the retained original was preserved.
+ */
+export async function dropLocalDatasetData(
+  datasetId: DatasetId,
+): Promise<{ retainedOriginal: boolean }> {
+  const row = await AvaDexie.DB.LocalDataset.get(datasetId);
+
+  if (row?.isSourcePinned && row.sourceBytes) {
+    await AvaDexie.DB.LocalDataset.update(datasetId, {
+      parquetData: undefined,
+      // Back to "needs materializing". `parseStatus === "ready"` with no
+      // parquet would advertise queryable data that isn't there.
+      parseStatus: "parsing",
+      parseStartedAt: Date.now(),
+      parseFailedReason: undefined,
+    });
+    return { retainedOriginal: true };
+  }
+
+  await AvaDexie.DB.LocalDataset.delete(datasetId);
+  return { retainedOriginal: false };
+}
+
 function _makeDropLocalDataset(
   context: Readonly<LocalDatasetMutationContext>,
 ): LocalDatasetMutationRecord["dropLocalDataset"] {
   return async (params) => {
-    context.logger
-      .appendName("dropLocalDataset")
-      .log("Dropping local dataset", params);
-    await LocalDatasetClient.delete({ id: params.datasetId });
+    const logger = context.logger.appendName("dropLocalDataset");
+    const { retainedOriginal } = await dropLocalDatasetData(params.datasetId);
+    logger.log(
+      retainedOriginal ?
+        "Dropped local dataset's derived data, keeping its retained original"
+      : "Dropping local dataset",
+      params,
+    );
     await DuckDbClient.dropTableViewAndFile({
       tableOrViewName: params.datasetId,
     });
