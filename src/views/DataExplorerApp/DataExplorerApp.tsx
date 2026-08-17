@@ -24,6 +24,8 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { NuxEvents } from "@/components/Nux/nuxEvents";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -38,6 +40,7 @@ import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBa
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
+import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
@@ -124,7 +127,38 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     },
     [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch],
   );
+
+  useEffect(
+    function announceSuccessfulQueryToNux() {
+      if (isLoadingResults || dataQuery.isError) {
+        return;
+      }
+      if ((queryResults?.data?.length ?? 0) === 0) {
+        return;
+      }
+      // Advances the onboarding tutorial's second milestone. Rows, not just a
+      // successful request: an empty result is not an answer.
+      NuxEvents.emit("query.succeeded", {});
+    },
+    [isLoadingResults, dataQuery.isError, queryResults],
+  );
+
   const queryResultColumns = queryResults?.columns ?? [];
+
+  /**
+   * The SQL behind whatever is currently on screen, whether it came from the
+   * chat panel, the SQL editor, or the guided query builder.
+   *
+   * `state.rawSql` alone is not enough: the builder generates its SQL inside
+   * `selectSqlToExecute` at execution time and never stores it, so gating the
+   * save actions on `rawSql` left a chart the user had just built with no way
+   * to keep it.
+   */
+  const savableSql = selectSqlToExecute({
+    rawSql: state.rawSql,
+    isStructuredQueryInSync: state.isStructuredQueryInSync,
+    executionQuery: state.query,
+  });
 
   const columnSignature = useMemo(() => {
     if (!queryResults) {
@@ -226,6 +260,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                 color="neutral"
                 size="compact-sm"
                 rightSection={<IconChevronDown size={16} />}
+                {...nuxAnchorProps(NuxAnchors.explorerSaveMenu)}
               >
                 <Trans>Save</Trans>
               </Button>
@@ -291,17 +326,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
               : null}
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSql === undefined
+                  queryResultData.length === 0 || savableSql === undefined
                 }
                 rightSection={
-                  state.rawSql === undefined ?
-                    <Tooltip label={t`Run an AI query first.`}>
+                  savableSql === undefined ?
+                    <Tooltip label={t`Run a query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSql) {
+                  if (!savableSql) {
                     return;
                   }
                   const modalId = modals.open({
@@ -312,7 +347,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                         queryResultData={queryResultData}
                         columns={queryResultColumns}
                         dateColumns={dateColumns}
-                        rawSql={state.rawSql}
+                        rawSql={savableSql}
                         onSaveSuccess={() => {
                           modals.close(modalId);
                         }}
@@ -325,17 +360,17 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
               </Menu.Item>
               <Menu.Item
                 disabled={
-                  queryResultData.length === 0 || state.rawSql === undefined
+                  queryResultData.length === 0 || savableSql === undefined
                 }
                 rightSection={
-                  state.rawSql === undefined ?
-                    <Tooltip label={t`Run an AI query first.`}>
+                  savableSql === undefined ?
+                    <Tooltip label={t`Run a query first.`}>
                       <IconInfoCircle size={16} />
                     </Tooltip>
                   : null
                 }
                 onClick={() => {
-                  if (!state.rawSql) {
+                  if (!savableSql) {
                     return;
                   }
                   const modalId = modals.open({
@@ -343,7 +378,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
                     size: "lg",
                     children: (
                       <SaveToDashboardModal
-                        rawSql={state.rawSql}
+                        rawSql={savableSql}
                         prompt={state.nlPrompt}
                         vizType={state.vizConfig.vizType}
                         vizConfig={state.vizConfig}
@@ -374,7 +409,15 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
-        <Box ref={chartRef} flex={1} pos="relative" w="100%" mih={0} bg="white">
+        <Box
+          ref={chartRef}
+          flex={1}
+          pos="relative"
+          w="100%"
+          mih={0}
+          bg="white"
+          {...nuxAnchorProps(NuxAnchors.explorerCanvas)}
+        >
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer
             columns={queryResultColumns}

@@ -8,6 +8,7 @@ import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatMode
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
+import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
 import css from "./Composer.module.css";
 
 /**
@@ -37,7 +38,11 @@ export function Composer(): React.ReactNode {
     : t`Chat is enabled in Data Explorer and Dashboards`;
 
   return (
-    <div ref={panelRef} className={css.composerContainer}>
+    <div
+      ref={panelRef}
+      className={css.composerContainer}
+      {...nuxAnchorProps(NuxAnchors.chatComposer)}
+    >
       <ComposerPrimitive.Root
         className={clsx(css.composer, chatDisabled && css.composerDisabled)}
       >
