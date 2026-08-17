@@ -1,6 +1,7 @@
 import { test as base } from "@playwright/test";
 import { cleanupTestUser } from "../helpers/cleanupTestUser";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
+import { suppressNuxInviteForUser } from "../helpers/suppressNuxInvite";
 import {
   E2E_PRIMARY_USER_EMAIL,
   E2E_SECONDARY_USER_EMAIL,
@@ -167,6 +168,11 @@ export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
 
       await ensureAuthUserExists(primaryUser);
       await ensureAuthUserExists(secondaryUser);
+      // The onboarding tutorial invites workspace owners with a modal, which
+      // would swallow clicks in every spec that signs in. Pre-answered here so
+      // it never appears; the tutorial's own spec resets it.
+      await suppressNuxInviteForUser(primaryUser.email);
+      await suppressNuxInviteForUser(secondaryUser.email);
       await provisionFreshE2EWorkspaceForOwner({
         ownerEmail: primaryUser.email,
         workspaceSlug,

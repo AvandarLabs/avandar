@@ -1,6 +1,6 @@
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
-import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions";
+import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 /**
  * Runtime state for the onboarding tutorial.

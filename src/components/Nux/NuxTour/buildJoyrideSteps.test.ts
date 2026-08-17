@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { beforeAll, describe, expect, it } from "vitest";
-import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
 import { buildJoyrideSteps } from "@/components/Nux/NuxTour/buildJoyrideSteps";
+import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
 
 beforeAll(() => {
   i18n.loadAndActivate({ locale: "en", messages: {} });

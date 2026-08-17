@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
+import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { render, screen } from "@/test-utils";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { ReactNode } from "react";
@@ -36,7 +36,9 @@ describe("NuxChecklistPanel", () => {
   it("lists all four milestones when expanded", () => {
     renderPanel({});
     expect(screen.getByText("Add your first dataset")).toBeInTheDocument();
-    expect(screen.getByText("Share it with your workspace")).toBeInTheDocument();
+    expect(
+      screen.getByText("Share it with your workspace"),
+    ).toBeInTheDocument();
     expect(screen.getByText("0 / 4")).toBeInTheDocument();
   });
 
@@ -47,7 +49,9 @@ describe("NuxChecklistPanel", () => {
 
   it("collapses to a pill", () => {
     renderPanel({ isPanelExpanded: false });
-    expect(screen.queryByText("Add your first dataset")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Add your first dataset"),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Get started/ }),
     ).toBeInTheDocument();

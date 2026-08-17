@@ -4,9 +4,7 @@ import { fireEvent, render, screen } from "@/test-utils";
 
 describe("NuxWelcomeModal", () => {
   it("sets expectations without promising anything about the team", () => {
-    render(
-      <NuxWelcomeModal isOpen onStart={vi.fn()} onDecline={vi.fn()} />,
-    );
+    render(<NuxWelcomeModal isOpen onStart={vi.fn()} onDecline={vi.fn()} />);
     expect(screen.getByText("Welcome to Avandar")).toBeInTheDocument();
     expect(
       screen.getByText(/spreadsheet to your first dashboard/),

@@ -3,9 +3,26 @@ import {
   areAllMilestonesComplete,
   getFirstUnfinishedMilestoneKey,
 } from "@/components/Nux/NuxStateManager/nuxSelectors";
+import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxProgress } from "$/models/Nux/NuxProgress";
 import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
+
+/**
+ * How many tooltips a milestone has.
+ *
+ * Reading the tutorial definition here keeps `completeMilestone` a single
+ * self-contained transition rather than one that depends on its caller having
+ * looked the milestone up first. `firstDashboard` is pure data with no React
+ * and no cycle back to this module.
+ */
+function countMilestoneSteps(key: NuxMilestoneKey): number {
+  return (
+    FIRST_DASHBOARD_MILESTONES.find((milestone) => {
+      return milestone.key === key;
+    })?.steps.length ?? 0
+  );
+}
 
 /**
  * Every transition the tutorial can make, as pure functions.
@@ -109,6 +126,17 @@ export const nuxActions = {
     }
     const completedMilestones = [...state.completedMilestones, payload.key];
     const isActive = state.activeMilestoneKey === payload.key;
+
+    // A milestone's LAST tooltip is usually its payoff, and it is written to
+    // be read AFTER the outcome lands: "It profiled your data for you",
+    // "There's your answer", "Pick what they can do". So completing the active
+    // milestone advances to the next tooltip rather than closing the tour.
+    // Closing here would unmount the tour on the very event that earns the
+    // payoff, and three of the ten tooltips could never render at all.
+    const stepCount = countMilestoneSteps(payload.key);
+    const nextStepIndex = state.activeStepIndex + 1;
+    const hasPayoffStep = isActive && nextStepIndex < stepCount;
+
     return {
       ...state,
       completedMilestones,
@@ -116,8 +144,12 @@ export const nuxActions = {
         areAllMilestonesComplete(completedMilestones) ? "completed" : (
           "in_progress"
         ),
-      activeMilestoneKey: isActive ? undefined : state.activeMilestoneKey,
-      activeStepIndex: isActive ? 0 : state.activeStepIndex,
+      activeMilestoneKey:
+        isActive && !hasPayoffStep ? undefined : state.activeMilestoneKey,
+      activeStepIndex:
+        hasPayoffStep ? nextStepIndex
+        : isActive ? 0
+        : state.activeStepIndex,
       isPanelExpanded: !areAllMilestonesComplete(completedMilestones),
       blockedReason: undefined,
       recentDatasetId: payload.datasetId ?? state.recentDatasetId,
@@ -181,8 +213,17 @@ export const nuxActions = {
     if (!state.activeMilestoneKey) {
       return state;
     }
-    return nuxActions.completeMilestone(state, {
+    const completed = nuxActions.completeMilestone(state, {
       key: state.activeMilestoneKey,
     });
+    // Close rather than inheriting `completeMilestone`'s advance-to-the-payoff
+    // behaviour. A skip means the outcome never happened, so there is no payoff
+    // to show: walking the user into "Pick what they can do" after they could
+    // not share at all would be nonsense.
+    return {
+      ...completed,
+      activeMilestoneKey: undefined,
+      activeStepIndex: 0,
+    };
   },
 };

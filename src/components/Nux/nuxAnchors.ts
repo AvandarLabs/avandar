@@ -11,7 +11,14 @@ export const NuxAnchors = {
   datasetUploadForm: "dataset-upload-form",
   /** The name-and-save form that appears once a file has been parsed. */
   datasetImportForm: "dataset-import-form",
-  /** The auto-generated column profile on the dataset page. */
+  /**
+   * The "Data Summary" TAB on the dataset page, not the panel behind it.
+   * That page opens on Metadata, so the profile itself is unmounted when the
+   * tutorial arrives; anchoring the panel would wait out the step's timeout
+   * against an element that does not exist yet.
+   */
+  datasetSummaryTab: "dataset-summary-tab",
+  /** The auto-generated column profile itself, once its tab is open. */
   datasetSummary: "dataset-summary",
   /** The chat panel's message composer. */
   chatComposer: "chat-composer",
@@ -25,7 +32,7 @@ export const NuxAnchors = {
   dashboardShareButton: "dashboard-share-button",
   /** The General access dropdown in the share modal. */
   generalAccessSelect: "general-access-select",
-  /** The workspace role picker, which only mounts once access is `workspace`. */
+  /** The workspace role picker. Only mounts once access is `workspace`. */
   shareRoleSelect: "share-role-select",
 } as const;
 

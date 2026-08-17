@@ -10,7 +10,8 @@ import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types"
 const AWAIT_USER_ACTION_MS = 60_000;
 
 /**
- * The `first_dashboard` tutorial: four milestones, ten tooltips, chunked 3/2/2/3.
+ * The `first_dashboard` tutorial: four milestones, ten tooltips, in chunks of
+ * 3, 2, 2 and 3.
  *
  * Pure data, so it is unit-testable and so a second tutorial is a second file
  * rather than a refactor. Copy uses `msg` descriptors rather than `t` because
@@ -45,10 +46,14 @@ export const FIRST_DASHBOARD_MILESTONES: readonly NuxMilestone[] = [
         targetWaitTimeoutMs: AWAIT_USER_ACTION_MS,
       },
       {
-        anchor: NuxAnchors.datasetSummary,
+        // Points at the Data Summary TAB, not the profile behind it. This
+        // page opens on Metadata, so the profile is not mounted when the
+        // tutorial arrives, and a step anchored to it would sit out its
+        // timeout waiting for an element that does not exist yet.
+        anchor: NuxAnchors.datasetSummaryTab,
         title: msg`It profiled your data for you`,
-        body: msg`Ranges, distributions, what's missing. You didn't have to ask.`,
-        placement: "left",
+        body: msg`Open Data Summary to see what Avandar worked out on its own: ranges, distributions, and what's missing. You didn't have to ask.`,
+        placement: "bottom",
         targetWaitTimeoutMs: AWAIT_USER_ACTION_MS,
       },
     ],

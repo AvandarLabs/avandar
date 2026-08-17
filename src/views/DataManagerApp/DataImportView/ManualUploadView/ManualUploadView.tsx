@@ -147,17 +147,24 @@ export function ManualUploadView({
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}
-          onSaveSuccess={(savedDataset) => {
-            // Advances the onboarding tutorial's first milestone. A no-op
-            // when nobody is in the tutorial, which is the normal case.
-            NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
-            onSaveSuccess?.(savedDataset);
-          }}
+          onSaveSuccess={onSaveSuccess}
           onDataSourceMetadataChange={(metadata) => {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}
           isProcessing={isLoadingFile}
-          onAfterSave={onAfterSave}
+          onAfterSave={(savedDataset) => {
+            // Advances the onboarding tutorial's first milestone. A no-op when
+            // nobody is in the tutorial, which is the normal case.
+            //
+            // Deliberately `onAfterSave` and not `onSaveSuccess`:
+            // `_navigateAfterDatasetSave` treats a defined `onSaveSuccess` as
+            // "the caller is handling navigation" and returns early, so
+            // emitting from there suppressed the navigation to the new
+            // dataset's page for EVERY manual upload, tutorial or not.
+            // `onAfterSave` runs unconditionally, before that branch.
+            NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
+            onAfterSave?.();
+          }}
           onRequestDataReparse={async (parseOptionsFromForm) => {
             if (!DatasetSource.isManuallyUploadable(parseOptionsFromForm)) {
               // this should never happen in this code path

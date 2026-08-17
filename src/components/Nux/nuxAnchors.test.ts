@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  NuxAnchors,
   nuxAnchorProps,
+  NuxAnchors,
   nuxAnchorSelector,
 } from "@/components/Nux/nuxAnchors";
 

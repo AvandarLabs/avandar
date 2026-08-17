@@ -1,7 +1,7 @@
 import type { NuxAnchor } from "@/components/Nux/nuxAnchors";
 import type { NuxEventName } from "@/components/Nux/nuxEvents";
-import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
 import type { MessageDescriptor } from "@lingui/core";
+import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
 import type { Placement } from "react-joyride";
 
 /**

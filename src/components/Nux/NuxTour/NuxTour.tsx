@@ -5,8 +5,8 @@ import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManage
 import { buildJoyrideSteps } from "@/components/Nux/NuxTour/buildJoyrideSteps";
 import { NuxTooltip } from "@/components/Nux/NuxTour/NuxTooltip";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
-import type { EventHandler } from "react-joyride";
 import type { ReactNode } from "react";
+import type { EventHandler } from "react-joyride";
 
 /**
  * Sits above Mantine's modal layer. Milestones 3 and 4 both spotlight controls

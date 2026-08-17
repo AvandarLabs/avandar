@@ -40,7 +40,7 @@ describe("nuxActions.declineInvite", () => {
 });
 
 describe("nuxActions.completeMilestone", () => {
-  it("records the milestone and closes its tooltips", () => {
+  it("records the milestone and closes its tooltips on the last step", () => {
     const next = nuxActions.completeMilestone(
       { ...HYDRATED, activeMilestoneKey: "add_dataset", activeStepIndex: 2 },
       { key: "add_dataset", datasetId: "ds1" },
@@ -48,6 +48,34 @@ describe("nuxActions.completeMilestone", () => {
     expect(next.completedMilestones).toEqual(["add_dataset"]);
     expect(next.activeMilestoneKey).toBeUndefined();
     expect(next.recentDatasetId).toBe("ds1");
+  });
+
+  // The payoff tooltip is written to be read AFTER the outcome lands, so
+  // completing a milestone mid-run must advance rather than close. Closing
+  // here would mean three of the ten tooltips could never render.
+  it("advances to the payoff tooltip when the milestone has one left", () => {
+    const next = nuxActions.completeMilestone(
+      { ...HYDRATED, activeMilestoneKey: "add_dataset", activeStepIndex: 1 },
+      { key: "add_dataset", datasetId: "ds1" },
+    );
+    expect(next.completedMilestones).toEqual(["add_dataset"]);
+    expect(next.activeMilestoneKey).toBe("add_dataset");
+    expect(next.activeStepIndex).toBe(2);
+  });
+
+  it("advances the final milestone to its role-select tooltip", () => {
+    const next = nuxActions.completeMilestone(
+      {
+        ...HYDRATED,
+        completedMilestones: ["add_dataset", "run_query", "build_dashboard"],
+        activeMilestoneKey: "share_dashboard",
+        activeStepIndex: 1,
+      },
+      { key: "share_dashboard" },
+    );
+    expect(next.activeMilestoneKey).toBe("share_dashboard");
+    expect(next.activeStepIndex).toBe(2);
+    expect(next.status).toBe("completed");
   });
 
   it("does not record the same milestone twice", () => {
@@ -124,6 +152,9 @@ describe("nuxActions.skipActiveMilestone", () => {
     expect(next.completedMilestones).toContain("share_dashboard");
     expect(next.status).toBe("completed");
     expect(next.blockedReason).toBeUndefined();
+    // A skip means the outcome never happened, so there is no payoff tooltip
+    // to advance into.
+    expect(next.activeMilestoneKey).toBeUndefined();
   });
 
   it("does nothing when no milestone is open", () => {

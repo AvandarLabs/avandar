@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppLinks } from "@/config/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
@@ -197,7 +198,16 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             tabIds={["dataset-metadata", "dataset-summary"] as const}
             renderTabHeader={{
               "dataset-metadata": t`Metadata`,
-              "dataset-summary": t`Data Summary`,
+              // The onboarding tutorial's first payoff points here. It has to
+              // be the TAB and not the panel: this view opens on Metadata, so
+              // the summary itself is not mounted when the tutorial arrives,
+              // and a tooltip anchored to the panel would wait out its timeout
+              // against an element that does not exist yet.
+              "dataset-summary": (
+                <span {...nuxAnchorProps(NuxAnchors.datasetSummaryTab)}>
+                  {t`Data Summary`}
+                </span>
+              ),
             }}
             renderTabPanel={{
               "dataset-metadata": () => {

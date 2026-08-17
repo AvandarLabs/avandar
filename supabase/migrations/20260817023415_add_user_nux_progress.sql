@@ -33,6 +33,9 @@ alter table "public"."user_nux_progress" validate constraint "user_nux_progress_
 -- at all. PostgREST refuses the request without them.
 grant select, insert, update on table "public"."user_nux_progress" to "authenticated";
 
+-- Matches every peer table. service_role bypasses RLS regardless.
+grant all on table "public"."user_nux_progress" to "service_role";
+
 grant references on table "public"."user_nux_progress" to "anon";
 
 grant trigger on table "public"."user_nux_progress" to "anon";
