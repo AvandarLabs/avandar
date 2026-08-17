@@ -27,7 +27,7 @@ msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
 msgid "Close chat panel"
 msgstr "Funga paneli ya mazungumzo"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "ID field is required"
 msgstr "Sehemu ya ID inahitajika"
 
@@ -64,7 +64,7 @@ msgstr "Kikundi 1"
 msgid "Sort by"
 msgstr "Panga kwa"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Remove field"
 msgstr "Ondoa sehemu"
 
@@ -140,7 +140,7 @@ msgstr "Chagua mfano wa mazungumzo"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Skip this step"
-msgstr "Ruka hatua hii"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -156,7 +156,7 @@ msgstr "ya hivi karibuni zaidi"
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "Sehemu ya kichwa inahitajika"
 
@@ -246,7 +246,7 @@ msgstr "Swali"
 msgid "Row filters"
 msgstr "Filtria za safu"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Description"
 msgstr "Maelezo ya Profaili"
 
@@ -346,8 +346,8 @@ msgstr "Hapana"
 msgid "Could not determine a base table from FROM clause."
 msgstr "Haikuweza kubaini jedwali msingi kutoka kwenye kifungu cha FROM."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Select a field"
 msgstr "Chagua sehemu"
 
@@ -517,7 +517,7 @@ msgstr "Inajibu…"
 msgid "Re-download"
 msgstr "Pakua tena"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
 msgstr "Ruhusu thamani nyingi"
 
@@ -531,7 +531,7 @@ msgstr "Hakuna datasets zilizoongezwa bado"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Only you can see this"
-msgstr "Ni wewe pekee unayeweza kuona hii"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -543,7 +543,7 @@ msgstr "Ni wasimamizi wa workspace pekee wanaoweza kuchapisha kwenye wavuti."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
-msgstr "Waruhusu wenzako wafungue ulichokibuni hivi punde."
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -560,9 +560,9 @@ msgstr "Ongeza safu kwenye swali hapo juu ili kuanza kufafanua filtria."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open it to your workspace"
-msgstr "Fungua kwenye nafasi yako ya kazi"
+msgstr ""
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "Ruhusu thamani moja tu"
 
@@ -591,7 +591,7 @@ msgstr "Fungua data"
 msgid "stddev"
 msgstr "stddev"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "Pata idadi ya thamani zilizopo"
 
@@ -609,7 +609,7 @@ msgstr "Chati ya Viputo"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Restart tutorial"
-msgstr "Anzisha upya mafunzo"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -636,8 +636,8 @@ msgstr "Tumia pendekezo"
 msgid "Unpublish"
 msgstr "Acha kuchapisha"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#. placeholder {0}: concept.name
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "{0} Manager"
 msgstr "{0} Meneja"
 
@@ -651,7 +651,7 @@ msgstr "Ramani"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Change the chart if you like"
-msgstr "Badilisha chati ukitaka"
+msgstr ""
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -865,7 +865,7 @@ msgstr "Upana wa juu wa kontena"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Build your first dashboard"
-msgstr "Buni dashibodi yako ya kwanza"
+msgstr ""
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
@@ -887,7 +887,7 @@ msgstr "Ondoa ufikiaji kwa {displayName}"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run a query first."
-msgstr "Endesha hoja kwanza."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
@@ -1016,9 +1016,7 @@ msgstr "Hadharani"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
-msgstr "Mtazamaji huwawezesha watu kuitazama. Mhariri huwawezesha kuibadilisha. "
-"Mtazamaji ndiye chaguo salama kwa chaguomsingi, na unaweza kubadilisha "
-"jukumu la mtu yeyote baadaye."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -1035,7 +1033,7 @@ msgstr "Data ya {0} imekatwa"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Share it with your workspace"
-msgstr "Shiriki na nafasi yako ya kazi"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1084,7 +1082,7 @@ msgstr "Jina la safu katika SQL"
 msgid "Confirm"
 msgstr "Thibitisha"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "ni sawa na..."
 
@@ -1100,7 +1098,7 @@ msgstr "Vikundi {numGroups}"
 msgid "Ask the dashboard's owner to share it with you."
 msgstr "Mwombe mmiliki wa dashibodi akushirikishe."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Data fulani inapaswa kuja kutoka kwa seti za data zilizopo"
 
@@ -1199,7 +1197,7 @@ msgid "The invitation you are trying to accept is not valid. Please contact the 
 msgstr "Mwaliko unajaribu kukubali si halali. Tafadhali wasiliana na mmiliki wa "
 "eneo la kazi kupata mwaliko mpya."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a description for this profile type"
 msgstr "Ingiza maelezo ya aina hii ya wasifu"
 
@@ -1359,7 +1357,7 @@ msgstr "Mipangilio iliyojengwa ndani"
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" sasa iko katika eneo lako la kazi."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Profile fields"
 msgstr "Sehemu za wasifu"
 
@@ -1455,7 +1453,7 @@ msgstr "Anwani ya barua pepe"
 msgid "Smooth"
 msgstr "Laini"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Ingiza jina la uwanja"
 
@@ -1475,7 +1473,7 @@ msgstr "Profaili yako ya mtumiaji haijapakiwa bado. Tafadhali jaribu tena."
 msgid "Sum"
 msgstr "Jumla"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Sync data!"
 msgstr "Sanidisha data!"
 
@@ -1535,10 +1533,6 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haiwezi kuwakilisha. Kuendelea "
 "kutafuta kutafuta SQL hiyo na moja iliyoundwa kutoka kwa fomu. Hii "
 "haiwezi kufutwa (isipokuwa uirudie amri yako ya mazungumzo ya awali)."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "Select the columns you want in this {entityConfigName}"
-msgstr "Chagua safu unazotaka katika {entityConfigName}"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
 msgstr "Rasmi"
@@ -1568,9 +1562,7 @@ msgstr "Hifadhi URL"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 "unshare another dashboard, and come back to this."
-msgstr "Mpango wako hauruhusu kushiriki dashibodi nyingine. Unaweza kuboresha "
-"mpango wako, au kuacha kushiriki dashibodi nyingine, kisha urudi kwenye "
-"hii."
+msgstr ""
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -1799,15 +1791,19 @@ msgstr "Maelezo"
 msgid "Writing query…"
 msgstr "Inaandika swali…"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "No entity selected"
 msgstr "Hakuna chaguo lililochaguliwa"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Allow new {pluralConceptName} to be created manually"
+msgstr "Ruhusu {pluralConceptName} mpya kuundwa kwa mikono"
+
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
-msgstr "Karibu Avandar"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -1819,7 +1815,7 @@ msgid "Please refresh and try again. If it still does not work, please contact "
 msgstr "Tafadhali onyesha upya na ujaribu tena. Ikiwa bado haifanyi kazi, "
 "tafadhali wasiliana na usaidizi"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
@@ -1872,7 +1868,7 @@ msgstr "{keyboardShortcut} kuhifadhi"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -1929,7 +1925,7 @@ msgstr "Chagua safu"
 msgid "Normal"
 msgstr "Kawaida"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
 msgstr "Ongeza maelezo, kisha export"
 
@@ -1959,7 +1955,7 @@ msgstr "Onyesha SQL"
 msgid "Grid"
 msgstr "Gridi"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Haiwezi kusawazisha hii kitu"
 
@@ -1986,10 +1982,6 @@ msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "Kifungu cha HAVING kinatumia upande wa kushoto ambao fomu haiwezi "
 "kuwakilisha."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Allow new {pluralEntityConfigName} to be created manually"
-msgstr "Ruhusu {pluralEntityConfigName} mpya kuundwa kwa mikono"
-
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -2007,8 +1999,7 @@ msgstr "Nenosiri limeboreshwa kwa mafanikio"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
-msgstr "Fungua Save na uchague \"Save to dashboard\". Ipe dashibodi jina, "
-"iunde, na Avandar itakupeleka huko."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -2049,7 +2040,7 @@ msgstr "Safu wima ya 5"
 msgid "Enter a description for this dataset"
 msgstr "Ingiza maelezo ya dataset hii"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "Sehemu za kuingizwa kwa mikono"
 
@@ -2069,8 +2060,8 @@ msgstr "seti yako ya data"
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -2080,7 +2071,7 @@ msgstr "seti yako ya data"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2135,7 +2126,7 @@ msgstr "kwa"
 msgid "Download offline chat model (WebLLM)"
 msgstr "Pakua mfano wa mazungumzo ya mtandaoni (WebLLM)"
 
-#: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
+#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
 msgid "Create new profile type"
 msgstr "Unda aina mpya ya wasifu"
 
@@ -2144,7 +2135,7 @@ msgstr "Unda aina mpya ya wasifu"
 msgid "Done"
 msgstr "Imekamilika"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add Field"
 msgstr "Ongeza Sehemu"
 
@@ -2160,7 +2151,7 @@ msgstr "Toleo jipya linapatikana. Onyesha upya ili kusasisha."
 msgid "You haven't chosen an X axis"
 msgstr "Hujachagua mhimili wa X"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "na pia ni sawa na..."
 
@@ -2172,7 +2163,7 @@ msgstr "URL fupi na rahisi kukumbuka kwa vipeperushi, ripoti na misimbo ya QR."
 msgid "Using your custom URL."
 msgstr "Unatumia URL yako maalum."
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Profile failed to load"
 msgstr "Wasifu haujafanikiwa kupakia"
 
@@ -2194,7 +2185,7 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "Kuinua mpango wa \"Lipa Kile Unachotaka\" kunaweza kufanywa tu kupitia "
 "lango la malipo.<0/>Kitufe kilichopo chini kita kupeleka huko."
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete entity"
 msgstr "Futa kitu"
 
@@ -2230,12 +2221,6 @@ msgstr "Dataset imefutwa."
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
 msgstr "Jina la karatasi"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single "
-"{entityConfigName}."
-msgstr "Tutatumia safu hizo kuunganisha seti za data kuwa {entityConfigName} "
-"moja."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2278,7 +2263,7 @@ msgstr "Chapisha"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Dismiss the tutorial"
-msgstr "Funga mafunzo"
+msgstr ""
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2295,17 +2280,11 @@ msgstr "Hakuna SQL bado. Muulize Avandar swali au jenga query katika tab ya "
 msgid "Received a non-string value for a text field"
 msgstr "Kupokea thamani isiyo ya maandiko kwa uwanja wa maandiko"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come "
-"from..."
-msgstr "Tuambie kuhusu mahali ambapo data ya {singularEntityConfigName} "
-"inapaswa kutokea..."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "Imeshindikana kufuta workspace"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete Entity"
 msgstr "Futa Kitu"
 
@@ -2387,7 +2366,7 @@ msgstr "Chanzo cha data"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
-msgstr "Leta lahajedwali kwenye Avandar."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
@@ -2457,7 +2436,7 @@ msgstr "maandishi"
 msgid "Split (+/-)"
 msgstr "Gawanya (+/-)"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Active"
 msgstr "Hai"
 
@@ -2610,7 +2589,7 @@ msgstr "Muda wa alama za mhimili wa X"
 msgid "Please try again."
 msgstr "Tafadhali jaribu tena."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field Name"
 msgstr "Jina la Uwanja"
 
@@ -2704,6 +2683,12 @@ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for 
 msgstr "Inapendekezwa ikiwa una RAM ya GB 32 na mashine yenye nguvu inayotumika "
 "hasa kwa kazi za uchanganuzi."
 
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If each {0} can only have one {attributeName} value, check this box."
+msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
+"kisanduku hiki."
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
 msgstr "Jukumu"
@@ -2748,10 +2733,10 @@ msgstr "Makundi ya jukumu la kawaida"
 msgid "Rose"
 msgstr "Rose"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "Je, uko tayari kufuta {0}?"
 
@@ -2775,7 +2760,7 @@ msgstr "Umesahau nenosiri lako?"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
-msgstr "Pata jibu kutoka kwenye data uliyoongeza hivi punde."
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -2903,7 +2888,7 @@ msgstr "Mwanachama huyu anamiliki rasilimali {privateTotal} za faragha. Hawezi "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "It profiled your data for you"
-msgstr "Imekuchanganulia data yako"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -2963,7 +2948,7 @@ msgid "Search by name, organization, pipeline…"
 msgstr "Tafuta kwa jina, shirika, bomba…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "Data"
 
@@ -3002,7 +2987,7 @@ msgstr "Hakuna faili iliyochaguliwa"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Wasilisha"
 
@@ -3051,19 +3036,13 @@ msgstr "Seti ya data sasa ni ya mtandaoni pekee"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Next"
-msgstr "Ifuatayo"
+msgstr ""
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "Sehemu zinazotoka kwenye seti za data"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {entityConfigName}."
-msgstr "Hapa ndipo unachagua ni safu zipi kutoka kwenye seti zipi za data "
-"zinapaswa kuongezwa kwenye {entityConfigName} hii."
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create"
 msgstr "Unda"
 
@@ -3095,7 +3074,7 @@ msgstr "Avandar (chaguo la kawaida)"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Add your first dataset"
-msgstr "Ongeza seti yako ya kwanza ya data"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -3104,8 +3083,7 @@ msgstr "Pana"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
-msgstr "Fungua Data Summary ili kuona Avandar ilichobaini yenyewe: safu, "
-"mgawanyo na kinachokosekana. Hukuhitaji kuuliza."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -3168,7 +3146,7 @@ msgstr "Endelea kwenye ofisi yako"
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "Chagua thamani ya juu"
 
@@ -3240,6 +3218,10 @@ msgstr "Ongeza seti ya data kwenye eneo la kazi"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Kawaida sana: <0>{0}</0> thamani tofauti katika <1>{1}</1> mistari."
 
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#~ msgid "Run an AI query first."
+#~ msgstr "Kimbia swali la AI kwanza."
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
@@ -3259,7 +3241,7 @@ msgstr "Inazalisha SQL…"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
-msgstr "Pitia tena jinsi ya kuunda na kushiriki dashibodi, kuanzia mwanzo."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -3399,7 +3381,7 @@ msgstr "Kukadiria dhana za SQL"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Name it and save"
-msgstr "Ipe jina na uhifadhi"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -3429,7 +3411,7 @@ msgstr "CTEs (vifungu vya WITH) havitumiki katika fomu."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Start with a spreadsheet"
-msgstr "Anza na lahajedwali"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3450,10 +3432,10 @@ msgstr "seti ya data"
 msgid "Remove failed"
 msgstr "Ondoa iliyo fail"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} imefutwa kwa mafanikio"
 
@@ -3468,14 +3450,13 @@ msgstr "H1"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
-msgstr "Hii ni Data Explorer, na huyu ni Ava. Uliza swali kwa Kiingereza cha "
-"kawaida, kama vile \"jumla ya mapato kwa eneo\"."
+msgstr ""
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
 msgstr "Kutoka kwenye dataset"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "Profaili inaweza kuwa na safu zinazotoka kwenye datasets tofauti."
 
@@ -3526,12 +3507,12 @@ msgstr "Rangi"
 msgid "Y axis label"
 msgstr "Lebo ya mhimili wa Y"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Finished syncing {0} data"
 msgstr "Imekamilisha kusawazisha data {0}"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "Chagua safu"
 
@@ -3596,8 +3577,8 @@ msgstr "Usi-refresh au kufunga tab hii vinginevyo upakuaji utafutwa."
 msgid "Forest"
 msgstr "Msitu"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "Ruhusu kuhariri kwa mkono"
 
@@ -3617,8 +3598,8 @@ msgstr "Llama 3.2 1B (nje ya mtandao)"
 msgid "Series"
 msgstr "Mfululizo"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "Kitu hakikupata kupakia. Tafadhali jaribu tena baadaye au wasiliana na "
@@ -3643,7 +3624,7 @@ msgstr "Hesabu safu katika {datasetName} kwa {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL haikutumika. Ingia ili kuidhinisha thamani za kichujio."
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "Ukurasa wa meneja wa profaili umeshindwa kupakia. Tafadhali jaribu tena "
@@ -3686,8 +3667,8 @@ msgstr "Futa maamuzi yote ya idhini kwenye kifaa hiki kwa kudumu? Kitendo hiki "
 msgid "Let AI decide (legacy)"
 msgstr "Acha AI iamue (urithi)"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "New field"
 msgstr "Uwanja mpya"
 
@@ -3716,7 +3697,7 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 msgstr "Dashibodi hii bado iko hadharani kwenye wavuti. Mtu yeyote aliye na "
 "kiungo anaweza kuiona hadi ubonyeze kitufe kilicho hapa chini."
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "Kitu kimefutwa"
 
@@ -3749,7 +3730,7 @@ msgstr "Ghairi mabadiliko ya URL"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Chagua dashibodi, au unda mpya."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "Pata jumla ya thamani"
 
@@ -3773,6 +3754,11 @@ msgstr "Futa kumbukumbu za faragha"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "Idhini"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Tell us about where the {singularConceptName} data should come from..."
+msgstr "Tuambie kuhusu mahali ambapo data ya {singularConceptName} inapaswa "
+"kutokea..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -3806,7 +3792,7 @@ msgstr "Umepata kuunganishwa kwa {0} kwa mafanikio"
 msgid "X column"
 msgstr "Safu ya X"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "Chagua thamani inayojirudia zaidi"
 
@@ -3945,13 +3931,6 @@ msgstr "Chombo"
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "Muulize msimamizi wa mipangilio ya ofisi yako kuboresha majukumu yako."
 
-#. placeholder {0}: sourcedDataset?.name
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the "
-"{entityConfigName} ID"
-msgstr "Kwa seti ya data <0>{0}</0>, chagua safu ya kutumia kama "
-"{entityConfigName} ID"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -3963,7 +3942,7 @@ msgstr "Mtazamaji"
 msgid "Pick one"
 msgstr "Chagua moja"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "Hakuna maeneo yaliyoongezwa"
 
@@ -3998,8 +3977,7 @@ msgstr "Uhamishaji wa umiliki umeshindikana"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
 "your first dashboard."
-msgstr "Ungependa ziara fupi? Kwa takribani dakika 5, utatoka kwenye "
-"lahajedwali hadi kwenye dashibodi yako ya kwanza."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -4068,7 +4046,7 @@ msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started {completedCount}/{total}"
-msgstr "Anza {completedCount}/{total}"
+msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
@@ -4101,8 +4079,7 @@ msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
-msgstr "Avandar tayari imesoma faili yako na kukisia yaliyomo katika kila safu. "
-"Ipe seti ya data jina, kisha ihifadhi."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -4114,9 +4091,9 @@ msgstr "Kwa chaguo-msingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 msgid "Make internal"
 msgstr "Fanya iwe ya ndani"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "Tafadhali chagua chombo kutoka kwenye sidebar ya kushoto, au unda mpya."
 
@@ -4303,7 +4280,7 @@ msgstr "Tafadhali rekebisha maeneo yaliyoangaziwa."
 msgid "between"
 msgstr "katika"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
 msgstr "Haifanyi kazi"
 
@@ -4316,7 +4293,7 @@ msgstr "Kulia"
 msgid "all members of "
 msgstr "wanachama wote wa "
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 
@@ -4334,6 +4311,12 @@ msgstr "Chagua mfano wa kupakua. Unaweza kubadilisha mifano au kupakua tena "
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Omba kipengele"
+
+#. placeholder {0}: sourcedDataset?.name
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
+msgstr "Kwa seti ya data <0>{0}</0>, chagua safu ya kutumia kama {conceptName} "
+"ID"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -4406,6 +4389,10 @@ msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako haijachapishwa."
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "We will use those columns to merge datasets into a single {conceptName}."
+msgstr "Tutatumia safu hizo kuunganisha seti za data kuwa {conceptName} moja."
+
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4427,7 +4414,7 @@ msgstr "{0} · endesha {1}"
 msgid "Process data again"
 msgstr "Process data again"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Export as PDF"
 msgstr "Export as PDF"
 
@@ -4461,7 +4448,7 @@ msgstr "Pakia dataset"
 msgid "Reset"
 msgstr "Rekebisha"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a name for this profile type"
 msgstr "Ingiza jina la aina hii ya wasifu"
 
@@ -4469,7 +4456,7 @@ msgstr "Ingiza jina la aina hii ya wasifu"
 msgid "Area"
 msgstr "Eneo"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "Hakuna maeneo yaliyowekwa bado"
 
@@ -4481,7 +4468,7 @@ msgstr "haijumuishi"
 msgid "Workspace name updated"
 msgstr "Jina la eneo la kazi limeboreshwa"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "Ongeza safu kama uwanja"
 
@@ -4556,7 +4543,7 @@ msgstr "safu zaidi ya 1000 zilikataliwa"
 msgid "Update subscription"
 msgstr "Sasisha usajili"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "Pata wastani wa thamani"
 
@@ -4622,7 +4609,7 @@ msgstr "Ingia tena"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
-msgstr "Si sasa"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
@@ -4683,7 +4670,7 @@ msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
-msgstr "Ava iliandika SQL, ikaendesha, na ikachagua chati ya kuionyesha."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -4697,11 +4684,11 @@ msgstr "Barua ya kuthibitisha imetumwa kwa anwani yako ya barua pepe."
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Just ask"
-msgstr "Uliza tu"
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Pick what they can do"
-msgstr "Chagua wanachoweza kufanya"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -4828,7 +4815,7 @@ msgstr "Ufafanuzi wa ugunduzi"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
-msgstr "Anza ziara"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -4917,6 +4904,10 @@ msgstr "Kumbukumbu ya faragha"
 msgid "Private resources"
 msgstr "Rasilimali za faragha"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "Select the columns you want in this {conceptName}"
+msgstr "Chagua safu unazotaka katika {conceptName}"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "Mipangilio ya Uonyeshaji"
@@ -4952,7 +4943,7 @@ msgstr "Seti hii ya data inaweza kuhifadhiwa kwenye wingu."
 msgid "Billing"
 msgstr "Malipo"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Name"
 msgstr "Jina la Wasifu"
 
@@ -5035,7 +5026,7 @@ msgstr "Dashibodi hii imechapishwa kwenye workspace yako. Ni watu uliowapa "
 msgid "Review before sending"
 msgstr "Kagua kabla ya kutuma"
 
-#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
+#: src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts
 msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "Maswali ya umma hayakubaliwi kwa maswali yaliyo na muundo. Tumia SQL ya "
@@ -5173,7 +5164,7 @@ msgstr "Inapakia seti za data…"
 msgid "Loading private resources"
 msgstr "Inapakia rasilimali za faragha"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
 
@@ -5186,12 +5177,6 @@ msgstr "Upatikanaji umekataliwa"
 msgid "Created \"{dashboardName}\""
 msgstr "Imetengenezwa \"{dashboardName}\""
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If each {0} can only have one {fieldName} value, check this box."
-msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {fieldName}, angalia "
-"kisanduku hiki."
-
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -5202,6 +5187,10 @@ msgstr "Maelezo yanapaswa kuwa chini ya {maxDatasetDescriptionLength} herufi "
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
 msgstr "Idadi ya viti vya kuongeza"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "We should join data into the same {conceptName} when…"
+msgstr "Tunapaswa kuunganisha data katika {conceptName} sawa wakati..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -5306,7 +5295,7 @@ msgstr "Tu kile kilichoulizwa"
 msgid "Could not generate QR code"
 msgstr "Haiwezekani kuunda QR code"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "No fields or dataset are configured."
 msgstr "Hakuna maeneo au dataset zilizowekwa."
 
@@ -5346,8 +5335,7 @@ msgstr "Pakia karatasi ya kazi"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
-msgstr "Uko kwenye Data Manager, Import. Chagua faili ya CSV au Excel kutoka "
-"kwenye kompyuta yako."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -5380,7 +5368,7 @@ msgstr "Huduma"
 msgid "Could not load map data"
 msgstr "Imeshindikana kupakia data ya ramani"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "Hakuna kitu kingine cha kupakia"
 
@@ -5390,7 +5378,7 @@ msgstr "Imeshindikana kuweka kuwa ya faragha"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Tutorial"
-msgstr "Mafunzo"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5500,11 +5488,6 @@ msgid "You need admin access on this resource to manage sharing."
 msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 "kushiriki."
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If there are multiple {fieldName} values for one {0}, then..."
-msgstr "Ikiwa kuna thamani nyingi za {fieldName} kwa {0} moja, basi..."
-
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
@@ -5519,7 +5502,7 @@ msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 msgid "Stack group"
 msgstr "Kundi la tabaka"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
 
@@ -5548,7 +5531,7 @@ msgstr "Inarejelea usindikaji wa seti za data…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "Inashughulikia <0>{0}</0>, kutoka <1>{1}</1> hadi <2>{2}</2>."
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Loading more..."
 msgstr "Inapakua zaidi..."
 
@@ -5706,7 +5689,7 @@ msgstr "Kikundi kipya cha mtumiaji"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
-msgstr "Hifadhi chati hiyo mahali ambapo unaweza kuirudia."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5726,7 +5709,7 @@ msgstr "Hii {resource} inapatikana kwa mtu yeyote mwenye ruhusa ya {app} {0}."
 msgid "Amber"
 msgstr "Amber"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "Sanidi jinsi ya kuungana na seti za data"
 
@@ -5734,13 +5717,19 @@ msgstr "Sanidi jinsi ya kuungana na seti za data"
 msgid "Excel"
 msgstr "Excel"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Dataset columns"
 msgstr "Safu za seti za data"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {conceptName}."
+msgstr "Kwa kila dataset uliyoongeza, tafadhali eleza ni safu zipi zinapaswa "
+"kutumika kutambulisha {conceptName} kipekee."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -5779,13 +5768,14 @@ msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 msgid "Try again."
 msgstr "Jaribu tena."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "We should join data into the same {entityConfigName} when…"
-msgstr "Tunapaswa kuunganisha data katika {entityConfigName} sawa wakati..."
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "ina"
+
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If there are multiple {attributeName} values for one {0}, then..."
+msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -5859,8 +5849,7 @@ msgstr "Badilisha ukubwa wa paneli ya pembeni"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
-msgstr "Kichupo cha Visualizations kina mipangilio ya chati, ikiwa hii si "
-"mwonekano uliotaka."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -5890,7 +5879,7 @@ msgstr "Haiwezekani kufanya dataset iwe ya mtandaoni pekee"
 msgid "Hide details"
 msgstr "Ficha maelezo"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Enter comment"
 msgstr "Ingiza maoni"
 
@@ -6093,11 +6082,6 @@ msgstr "Chagua yote"
 msgid "Only what's queried (recommended)"
 msgstr "Tu kile kinachoulizwa (inapendekezwa)"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "What field should be used as a {singularEntityConfigName}'s name?"
-msgstr "Ni uwanja gani unapaswa kutumika kama jina la "
-"{singularEntityConfigName}?"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
 msgstr "Bila kichwa"
@@ -6163,8 +6147,7 @@ msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
-msgstr "Dashibodi yako ipo, lakini bado hakuna mtu mwingine anayeweza "
-"kuifungua. Hebu turekebishe hilo."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
@@ -6195,7 +6178,7 @@ msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Safu {rowNum} / Safu wima {colNum}"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "Hakuna safu zilizoongezwa bado."
 
@@ -6205,7 +6188,7 @@ msgstr "Chaguo za kina"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Save it to a dashboard"
-msgstr "Ihifadhi kwenye dashibodi"
+msgstr ""
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -6221,12 +6204,6 @@ msgstr "Chagua preset ya eneo la kazi au ubinafsishe kwa kila programu. Vikundi 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "Dataset imehifadhiwa"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {entityConfigName}."
-msgstr "Kwa kila dataset uliyoongeza, tafadhali eleza ni safu zipi zinapaswa "
-"kutumika kutambulisha {entityConfigName} kipekee."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6284,7 +6261,7 @@ msgstr "Hati iliyochaguliwa: {0}"
 msgid "Subtle"
 msgstr "Isiyoonekana sana"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Activity"
 msgstr "Shughuli"
 
@@ -6317,7 +6294,13 @@ msgstr "Eneo lako la kazi limetumia {currentSeatUsage} ya viti vyake "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "There's your answer"
-msgstr "Hilo ndilo jibu lako"
+msgstr ""
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "This is where you select which columns from which datasets should be "
+"added into this {conceptName}."
+msgstr "Hapa ndipo unachagua ni safu zipi kutoka kwenye seti zipi za data "
+"zinapaswa kuongezwa kwenye {conceptName} hii."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -6408,9 +6391,13 @@ msgstr "Google Sheet ilishindwa kupakia"
 msgid "Type the confirmation phrase"
 msgstr "Andika kifungu cha uthibitisho"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What field should be used as a {singularConceptName}'s name?"
+msgstr "Ni uwanja gani unapaswa kutumika kama jina la {singularConceptName}?"
+
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ask your first question"
-msgstr "Uliza swali lako la kwanza"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -6456,9 +6443,7 @@ msgstr "HAVING inatumia opereta \"{operator}\" ambaye fomu haitumii."
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
-msgstr "Workspace inamaanisha kila mtu katika workspace yako, si umma. Hakuna "
-"chochote hapa kinachounda kiungo cha umma. Na unaweza kukirejesha kuwa "
-"Faragha wakati wowote unapotaka."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -6568,8 +6553,8 @@ msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} na {groupClause}"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "Entity failed to load"
 msgstr "Kitu hakikupata kupakia"
 
@@ -6591,7 +6576,7 @@ msgstr "Futa yote"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Close"
-msgstr "Funga"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6632,13 +6617,13 @@ msgstr "Sio mtandaoni"
 msgid "This dashboard is published publicly."
 msgstr "Dashibodi hii imechapishwa hadharani."
 
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "Inapakia..."
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "No spreadsheet handy? <0>Download our sample</0> and use that."
-msgstr "Huna lahajedwali karibu? <0>Pakua mfano wetu</0> na uutumie."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -6660,7 +6645,7 @@ msgstr "Tarehe isiyo sahihi"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started"
-msgstr "Anza"
+msgstr ""
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
@@ -6754,7 +6739,7 @@ msgstr "Ongeza angalau mfululizo mmoja wa X / Y"
 msgid "Show QR code"
 msgstr "Onyesha QR code"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "Chagua thamani ya chini"
 

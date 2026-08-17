@@ -27,7 +27,7 @@ msgstr "Changes to your payment method can be made in your"
 msgid "Close chat panel"
 msgstr "Close chat panel"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "ID field is required"
 msgstr "ID field is required"
 
@@ -63,7 +63,7 @@ msgstr "1 group"
 msgid "Sort by"
 msgstr "Sort by"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Remove field"
 msgstr "Remove field"
 
@@ -154,7 +154,7 @@ msgstr "most recent"
 msgid "PII detected:"
 msgstr "PII detected:"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "Title field is required"
 
@@ -244,7 +244,7 @@ msgstr "Query"
 msgid "Row filters"
 msgstr "Row filters"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Description"
 msgstr "Profile Description"
 
@@ -344,8 +344,8 @@ msgstr "No"
 msgid "Could not determine a base table from FROM clause."
 msgstr "Could not determine a base table from FROM clause."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Select a field"
 msgstr "Select a field"
 
@@ -513,7 +513,7 @@ msgstr "Replying…"
 msgid "Re-download"
 msgstr "Re-download"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
 msgstr "Allow multiple values"
 
@@ -558,7 +558,7 @@ msgstr "Add columns to the query above to start defining filters."
 msgid "Open it to your workspace"
 msgstr "Open it to your workspace"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "Only allow one value"
 
@@ -587,7 +587,7 @@ msgstr "Open data"
 msgid "stddev"
 msgstr "stddev"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "Get a count of how many values there are"
 
@@ -631,8 +631,8 @@ msgstr "Use suggestion"
 msgid "Unpublish"
 msgstr "Unpublish"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#. placeholder {0}: concept.name
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "{0} Manager"
 msgstr "{0} Manager"
 
@@ -1070,7 +1070,7 @@ msgstr "Column name in SQL"
 msgid "Confirm"
 msgstr "Confirm"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "is equal to..."
 
@@ -1086,7 +1086,7 @@ msgstr "{numGroups} groups"
 msgid "Ask the dashboard's owner to share it with you."
 msgstr "Ask the dashboard's owner to share it with you."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Some data should come from existing datasets"
 
@@ -1184,7 +1184,7 @@ msgid "The invitation you are trying to accept is not valid. Please contact the 
 msgstr "The invitation you are trying to accept is not valid. Please contact "
 "the workspace owner to get a new invitation."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a description for this profile type"
 msgstr "Enter a description for this profile type"
 
@@ -1341,7 +1341,7 @@ msgstr "Built-in presets"
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" is now in your workspace."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Profile fields"
 msgstr "Profile fields"
 
@@ -1436,7 +1436,7 @@ msgstr "Email address"
 msgid "Smooth"
 msgstr "Smooth"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Enter a name for the field"
 
@@ -1456,7 +1456,7 @@ msgstr "Your user profile is not loaded yet. Please retry."
 msgid "Sum"
 msgstr "Sum"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Sync data!"
 msgstr "Sync data!"
 
@@ -1516,10 +1516,6 @@ msgid "The current SQL contains parts that the form could not represent. "
 msgstr "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "Select the columns you want in this {entityConfigName}"
-msgstr "Select the columns you want in this {entityConfigName}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
@@ -1774,11 +1770,15 @@ msgstr "Info"
 msgid "Writing query…"
 msgstr "Writing query…"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "No entity selected"
 msgstr "No entity selected"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Allow new {pluralConceptName} to be created manually"
+msgstr "Allow new {pluralConceptName} to be created manually"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
@@ -1794,7 +1794,7 @@ msgid "Please refresh and try again. If it still does not work, please contact "
 msgstr "Please refresh and try again. If it still does not work, please contact "
 "support"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
@@ -1846,7 +1846,7 @@ msgstr "{keyboardShortcut} to save"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -1903,7 +1903,7 @@ msgstr "Select a column"
 msgid "Normal"
 msgstr "Normal"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
 msgstr "Annotate, then export"
 
@@ -1933,7 +1933,7 @@ msgstr "Show SQL"
 msgid "Grid"
 msgstr "Grid"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "Cannot sync this entity"
 
@@ -1958,10 +1958,6 @@ msgstr "Unable to publish dashboard"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING clause uses a left-hand side the form cannot represent."
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Allow new {pluralEntityConfigName} to be created manually"
-msgstr "Allow new {pluralEntityConfigName} to be created manually"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -2021,7 +2017,7 @@ msgstr "Column 5"
 msgid "Enter a description for this dataset"
 msgstr "Enter a description for this dataset"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "Fields to be manually entered"
 
@@ -2041,8 +2037,8 @@ msgstr "your dataset"
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -2052,7 +2048,7 @@ msgstr "your dataset"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2106,7 +2102,7 @@ msgstr "to"
 msgid "Download offline chat model (WebLLM)"
 msgstr "Download offline chat model (WebLLM)"
 
-#: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
+#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
 msgid "Create new profile type"
 msgstr "Create new profile type"
 
@@ -2115,7 +2111,7 @@ msgstr "Create new profile type"
 msgid "Done"
 msgstr "Done"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add Field"
 msgstr "Add Field"
 
@@ -2131,7 +2127,7 @@ msgstr "A new version is available. Refresh to update."
 msgid "You haven't chosen an X axis"
 msgstr "You haven't chosen an X axis"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "and is also equal to..."
 
@@ -2143,7 +2139,7 @@ msgstr "A short, memorable URL for flyers, reports, and QR codes."
 msgid "Using your custom URL."
 msgstr "Using your custom URL."
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Profile failed to load"
 msgstr "Profile failed to load"
 
@@ -2165,7 +2161,7 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete entity"
 msgstr "Delete entity"
 
@@ -2201,12 +2197,6 @@ msgstr "Dataset deleted."
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
 msgstr "Sheet name"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single "
-"{entityConfigName}."
-msgstr "We will use those columns to merge datasets into a single "
-"{entityConfigName}."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2266,17 +2256,11 @@ msgstr "No SQL yet. Ask Avandar a question or build a query in the Manual tab "
 msgid "Received a non-string value for a text field"
 msgstr "Received a non-string value for a text field"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come "
-"from..."
-msgstr "Tell us about where the {singularEntityConfigName} data should come "
-"from..."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "Failed to delete workspace"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete Entity"
 msgstr "Delete Entity"
 
@@ -2428,7 +2412,7 @@ msgstr "text"
 msgid "Split (+/-)"
 msgstr "Split (+/-)"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Active"
 msgstr "Active"
 
@@ -2578,7 +2562,7 @@ msgstr "X axis tick interval"
 msgid "Please try again."
 msgstr "Please try again."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field Name"
 msgstr "Field Name"
 
@@ -2671,6 +2655,11 @@ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for 
 msgstr "Recommended if you have 32 GB RAM and a powerful machine used mainly "
 "for analytics work."
 
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If each {0} can only have one {attributeName} value, check this box."
+msgstr "If each {0} can only have one {attributeName} value, check this box."
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
 msgstr "Role"
@@ -2714,10 +2703,10 @@ msgstr "Custom role groups"
 msgid "Rose"
 msgstr "Rose"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "Are you sure you want to delete {0}?"
 
@@ -2927,7 +2916,7 @@ msgid "Search by name, organization, pipeline…"
 msgstr "Search by name, organization, pipeline…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "Data"
 
@@ -2965,7 +2954,7 @@ msgstr "No file selected"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "Submit"
 
@@ -3015,17 +3004,11 @@ msgstr "Dataset is now offline-only"
 msgid "Next"
 msgstr "Next"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "Fields that come from datasets"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {entityConfigName}."
-msgstr "This is where you select which columns from which datasets should be "
-"added into this {entityConfigName}."
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create"
 msgstr "Create"
 
@@ -3129,7 +3112,7 @@ msgstr "Continue to your workspace"
 msgid "The custom URL cannot contain spaces"
 msgstr "The custom URL cannot contain spaces"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "Choose the maximum value"
 
@@ -3200,6 +3183,10 @@ msgstr "Add dataset to workspace"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#~ msgid "Run an AI query first."
+#~ msgstr "Run an AI query first."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -3408,10 +3395,10 @@ msgstr "dataset"
 msgid "Remove failed"
 msgstr "Remove failed"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} deleted successfully"
 
@@ -3433,7 +3420,7 @@ msgstr "This is the Data Explorer, and this is Ava. Ask a question in plain "
 msgid "From dataset"
 msgstr "From dataset"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "A profile can consist of columns that come from different datasets."
 
@@ -3483,12 +3470,12 @@ msgstr "Color"
 msgid "Y axis label"
 msgstr "Y axis label"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Finished syncing {0} data"
 msgstr "Finished syncing {0} data"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "Select column"
 
@@ -3553,8 +3540,8 @@ msgstr "Do not refresh or close this tab or else the download will be canceled."
 msgid "Forest"
 msgstr "Forest"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "Allow manual edit"
 
@@ -3574,8 +3561,8 @@ msgstr "Llama 3.2 1B (offline)"
 msgid "Series"
 msgstr "Series"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "The entity failed to load. Please try again later or reach out to "
@@ -3599,7 +3586,7 @@ msgstr "Count rows in {datasetName} by {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL was not applied. Sign in to approve filter values."
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "The profile manager page failed to load. Please try again later or "
@@ -3640,8 +3627,8 @@ msgstr "Permanently delete all consent decisions on this device? This action "
 msgid "Let AI decide (legacy)"
 msgstr "Let AI decide (legacy)"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "New field"
 msgstr "New field"
 
@@ -3670,7 +3657,7 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 msgstr "This dashboard is still public on the web. Anyone with the link can "
 "view it until you press the button below."
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "Entity deleted"
 
@@ -3702,7 +3689,7 @@ msgstr "Cancel URL change"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Pick a dashboard, or create a new one."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "Get a sum of the values"
 
@@ -3726,6 +3713,10 @@ msgstr "Clear privacy log"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "Consent"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Tell us about where the {singularConceptName} data should come from..."
+msgstr "Tell us about where the {singularConceptName} data should come from..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -3759,7 +3750,7 @@ msgstr "You have successfully connected to {0}"
 msgid "X column"
 msgstr "X column"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "Choose the most frequent value"
 
@@ -3897,13 +3888,6 @@ msgstr "Tool"
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "Ask a workspace settings administrator to update your roles."
 
-#. placeholder {0}: sourcedDataset?.name
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the "
-"{entityConfigName} ID"
-msgstr "For dataset <0>{0}</0>, choose the column to use as the "
-"{entityConfigName} ID"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -3915,7 +3899,7 @@ msgstr "Viewer"
 msgid "Pick one"
 msgstr "Pick one"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "No fields have been added"
 
@@ -4065,9 +4049,9 @@ msgstr "By default we use a direct UUID-based link. Add a custom path below for 
 msgid "Make internal"
 msgstr "Make internal"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "Please select an entity from the left sidebar, or create a new one."
 
@@ -4254,7 +4238,7 @@ msgstr "Please fix the highlighted fields."
 msgid "between"
 msgstr "between"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
 msgstr "Inactive"
 
@@ -4267,7 +4251,7 @@ msgstr "Right"
 msgid "all members of "
 msgstr "all members of "
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Some data should be manually entered"
 
@@ -4284,6 +4268,12 @@ msgstr "Pick a model to download. You can switch models or re-download later."
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Request a feature"
+
+#. placeholder {0}: sourcedDataset?.name
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
+msgstr "For dataset <0>{0}</0>, choose the column to use as the {conceptName} "
+"ID"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -4356,6 +4346,11 @@ msgstr "Parts of this SQL could not be represented in the Manual form. The form 
 msgid "Please try again. Your dashboard has not been published."
 msgstr "Please try again. Your dashboard has not been published."
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "We will use those columns to merge datasets into a single {conceptName}."
+msgstr "We will use those columns to merge datasets into a single "
+"{conceptName}."
+
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4377,7 +4372,7 @@ msgstr "{0} · run {1}"
 msgid "Process data again"
 msgstr "Process data again"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Export as PDF"
 msgstr "Export as PDF"
 
@@ -4411,7 +4406,7 @@ msgstr "Upload dataset"
 msgid "Reset"
 msgstr "Reset"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a name for this profile type"
 msgstr "Enter a name for this profile type"
 
@@ -4419,7 +4414,7 @@ msgstr "Enter a name for this profile type"
 msgid "Area"
 msgstr "Area"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "No fields have been configured yet"
 
@@ -4431,7 +4426,7 @@ msgstr "does not contain"
 msgid "Workspace name updated"
 msgstr "Workspace name updated"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "Add column as a field"
 
@@ -4506,7 +4501,7 @@ msgstr " over 1000 rows were rejected"
 msgid "Update subscription"
 msgstr "Update subscription"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "Get an average of the values"
 
@@ -4864,6 +4859,10 @@ msgstr "Privacy log"
 msgid "Private resources"
 msgstr "Private resources"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "Select the columns you want in this {conceptName}"
+msgstr "Select the columns you want in this {conceptName}"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "Visualization Settings"
@@ -4899,7 +4898,7 @@ msgstr "This dataset can be stored in the cloud. "
 msgid "Billing"
 msgstr "Billing"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Name"
 msgstr "Profile Name"
 
@@ -4980,7 +4979,7 @@ msgstr "This dashboard is published to your workspace. Only people you have "
 msgid "Review before sending"
 msgstr "Review before sending"
 
-#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
+#: src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts
 msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "Public queries are not supported for structured queries. Use raw SQL "
@@ -5117,7 +5116,7 @@ msgstr "Loading datasets…"
 msgid "Loading private resources"
 msgstr "Loading private resources"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Choose the first value we see"
 
@@ -5130,11 +5129,6 @@ msgstr "Access denied"
 msgid "Created \"{dashboardName}\""
 msgstr "Created \"{dashboardName}\""
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If each {0} can only have one {fieldName} value, check this box."
-msgstr "If each {0} can only have one {fieldName} value, check this box."
-
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -5145,6 +5139,10 @@ msgstr "Description must be under {maxDatasetDescriptionLength} characters "
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
 msgstr "Number of seats to add"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "We should join data into the same {conceptName} when…"
+msgstr "We should join data into the same {conceptName} when…"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -5247,7 +5245,7 @@ msgstr "Just what's queried"
 msgid "Could not generate QR code"
 msgstr "Could not generate QR code"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "No fields or dataset are configured."
 msgstr "No fields or dataset are configured."
 
@@ -5321,7 +5319,7 @@ msgstr "Service"
 msgid "Could not load map data"
 msgstr "Could not load map data"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "Nothing more to load"
 
@@ -5442,11 +5440,6 @@ msgstr "Grouped"
 msgid "You need admin access on this resource to manage sharing."
 msgstr "You need admin access on this resource to manage sharing."
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If there are multiple {fieldName} values for one {0}, then..."
-msgstr "If there are multiple {fieldName} values for one {0}, then..."
-
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
@@ -5461,7 +5454,7 @@ msgstr "Only you have access to this {resource}."
 msgid "Stack group"
 msgstr "Stack group"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Select rule (e.g. most frequent)"
 
@@ -5490,7 +5483,7 @@ msgstr "Resuming dataset processing…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Loading more..."
 msgstr "Loading more..."
 
@@ -5667,7 +5660,7 @@ msgstr "This {resource} is accessible to anyone with {app} {0} permission."
 msgid "Amber"
 msgstr "Amber"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "Configure how to join datasets"
 
@@ -5675,13 +5668,19 @@ msgstr "Configure how to join datasets"
 msgid "Excel"
 msgstr "Excel"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Dataset columns"
 msgstr "Dataset columns"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "Could not prepare the offline chat model."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {conceptName}."
+msgstr "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {conceptName}."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -5719,13 +5718,14 @@ msgstr "The workspace ID cannot contain spaces"
 msgid "Try again."
 msgstr "Try again."
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "We should join data into the same {entityConfigName} when…"
-msgstr "We should join data into the same {entityConfigName} when…"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "contains"
+
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If there are multiple {attributeName} values for one {0}, then..."
+msgstr "If there are multiple {attributeName} values for one {0}, then..."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -5830,7 +5830,7 @@ msgstr "Unable to make dataset offline-only"
 msgid "Hide details"
 msgstr "Hide details"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Enter comment"
 msgstr "Enter comment"
 
@@ -6032,10 +6032,6 @@ msgstr "Select all"
 msgid "Only what's queried (recommended)"
 msgstr "Only what's queried (recommended)"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "What field should be used as a {singularEntityConfigName}'s name?"
-msgstr "What field should be used as a {singularEntityConfigName}'s name?"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
 msgstr "Untitled"
@@ -6131,7 +6127,7 @@ msgstr "Invalid value column selected"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Row {rowNum} / Col {colNum}"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "No columns have been added yet."
 
@@ -6156,12 +6152,6 @@ msgstr "Choose a workspace preset or customize per app. User groups control "
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "Dataset saved"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {entityConfigName}."
-msgstr "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {entityConfigName}."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6219,7 +6209,7 @@ msgstr "Selected document: {0}"
 msgid "Subtle"
 msgstr "Subtle"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Activity"
 msgstr "Activity"
 
@@ -6253,6 +6243,12 @@ msgstr "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "There's your answer"
 msgstr "There's your answer"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "This is where you select which columns from which datasets should be "
+"added into this {conceptName}."
+msgstr "This is where you select which columns from which datasets should be "
+"added into this {conceptName}."
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -6341,6 +6337,10 @@ msgstr "Google Sheet failed to load"
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Type the confirmation phrase"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What field should be used as a {singularConceptName}'s name?"
+msgstr "What field should be used as a {singularConceptName}'s name?"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ask your first question"
@@ -6500,8 +6500,8 @@ msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} and {groupClause}"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "Entity failed to load"
 msgstr "Entity failed to load"
 
@@ -6564,7 +6564,7 @@ msgstr "Not offline"
 msgid "This dashboard is published publicly."
 msgstr "This dashboard is published publicly."
 
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "Loading..."
 
@@ -6686,7 +6686,7 @@ msgstr "Add at least one X / Y series"
 msgid "Show QR code"
 msgstr "Show QR code"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "Choose the minimum value"
 

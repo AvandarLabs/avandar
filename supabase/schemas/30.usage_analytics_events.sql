@@ -74,10 +74,10 @@ grant insert (
   app_version
 ) on public.usage_analytics_events to authenticated;
 
--- SELECT is table-level and stated here rather than in `40.grants.data_api.sql`,
--- so this table's whole privilege story stays in one place alongside the
--- column-level INSERT above. The "Workspace managers can SELECT analytics
--- events" policy below is what narrows it to a caller's own workspaces.
+-- SELECT is table-level, stated here alongside the column-level INSERT above
+-- so this table's whole privilege story stays in one place. The "Workspace
+-- managers can SELECT analytics events" policy below narrows it to a caller's
+-- own workspaces.
 --
 -- No UPDATE or DELETE for any Data API role: an event is an immutable fact, and
 -- the only writer is the column-scoped INSERT above.

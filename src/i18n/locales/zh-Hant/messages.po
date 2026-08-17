@@ -27,7 +27,7 @@ msgstr "您可以在您的付款方式中進行更改"
 msgid "Close chat panel"
 msgstr "關閉聊天面板"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "ID field is required"
 msgstr "ID 欄位為必填"
 
@@ -61,7 +61,7 @@ msgstr "1 個群組"
 msgid "Sort by"
 msgstr "排序依據"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Remove field"
 msgstr "移除欄位"
 
@@ -134,7 +134,7 @@ msgstr "選擇聊天模型"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Skip this step"
-msgstr "略過此步驟"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -149,7 +149,7 @@ msgstr "最近的"
 msgid "PII detected:"
 msgstr "檢測到 PII："
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "標題欄位為必填"
 
@@ -237,7 +237,7 @@ msgstr "查詢"
 msgid "Row filters"
 msgstr "行過濾器"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Description"
 msgstr "個人資料描述"
 
@@ -334,8 +334,8 @@ msgstr "否"
 msgid "Could not determine a base table from FROM clause."
 msgstr "無法從 FROM 子句判定基礎資料表。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Select a field"
 msgstr "選擇一個欄位"
 
@@ -499,7 +499,7 @@ msgstr "回覆中…"
 msgid "Re-download"
 msgstr "重新下載"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
 msgstr "允許多個值"
 
@@ -513,7 +513,7 @@ msgstr "尚未添加任何資料集"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Only you can see this"
-msgstr "只有你看得到這個"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -525,7 +525,7 @@ msgstr "只有工作區管理員可以發布到網路。"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Let your colleagues open what you just built."
-msgstr "讓同事開啟你剛建立的內容。"
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -540,9 +540,9 @@ msgstr "在上面的查詢中添加欄位以開始定義過濾器。"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open it to your workspace"
-msgstr "開放給你的工作區"
+msgstr ""
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "僅允許一個值"
 
@@ -571,7 +571,7 @@ msgstr "開放數據"
 msgid "stddev"
 msgstr "標準差"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "獲取值的數量"
 
@@ -589,7 +589,7 @@ msgstr "泡泡圖"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Restart tutorial"
-msgstr "重新開始教學"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -615,8 +615,8 @@ msgstr "使用建議"
 msgid "Unpublish"
 msgstr "取消發布"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#. placeholder {0}: concept.name
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "{0} Manager"
 msgstr "{0} 管理員"
 
@@ -630,7 +630,7 @@ msgstr "地圖"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Change the chart if you like"
-msgstr "你可以視需要變更圖表"
+msgstr ""
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -832,7 +832,7 @@ msgstr "容器最大寬度"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Build your first dashboard"
-msgstr "建立你的第一個儀表板"
+msgstr ""
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
@@ -853,7 +853,7 @@ msgstr "移除 {displayName} 的訪問權限"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Run a query first."
-msgstr "請先執行查詢。"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
@@ -976,7 +976,7 @@ msgstr "公開"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
 "safe default, and you can change anyone's role later."
-msgstr "檢視者可以查看內容，編輯者可以變更內容。檢視者是安全的預設角色，你之後可以變更任何人的角色。"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
@@ -993,7 +993,7 @@ msgstr "{0} 筆資料已截斷"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Share it with your workspace"
-msgstr "與你的工作區分享"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1041,7 +1041,7 @@ msgstr "SQL 中的列名"
 msgid "Confirm"
 msgstr "確認"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "等於..."
 
@@ -1057,7 +1057,7 @@ msgstr "{numGroups} 個群組"
 msgid "Ask the dashboard's owner to share it with you."
 msgstr "請要求儀表板擁有者與您分享。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "某些數據應來自現有數據集"
 
@@ -1154,7 +1154,7 @@ msgid "The invitation you are trying to accept is not valid. Please contact the 
 "workspace owner to get a new invitation."
 msgstr "您嘗試接受的邀請無效。請聯繫工作區擁有者以獲取新的邀請。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a description for this profile type"
 msgstr "為此配置文件類型輸入描述"
 
@@ -1308,7 +1308,7 @@ msgstr "內建預設"
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 現在在您的工作區中。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Profile fields"
 msgstr "配置文件欄位"
 
@@ -1402,7 +1402,7 @@ msgstr "電子郵件地址"
 msgid "Smooth"
 msgstr "平滑"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "為該欄位輸入名稱"
 
@@ -1422,7 +1422,7 @@ msgstr "您的用戶檔案尚未加載。請重試。"
 msgid "Sum"
 msgstr "總和"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Sync data!"
 msgstr "同步數據！"
 
@@ -1479,10 +1479,6 @@ msgid "The current SQL contains parts that the form could not represent. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
 msgstr "當前 SQL 包含表單無法表示的部分。繼續將用從表單生成的 SQL 覆蓋該 SQL。這無法撤銷（除非您重新運行之前的聊天提示）。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "Select the columns you want in this {entityConfigName}"
-msgstr "選擇您想在此 {entityConfigName} 中的欄位"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
 msgstr "正式"
@@ -1511,7 +1507,7 @@ msgstr "儲存網址"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 "unshare another dashboard, and come back to this."
-msgstr "你的方案不允許分享其他儀表板。你可以升級方案，或取消分享其他儀表板，再返回此處。"
+msgstr ""
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -1727,15 +1723,19 @@ msgstr "資訊"
 msgid "Writing query…"
 msgstr "正在撰寫查詢…"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "No entity selected"
 msgstr "未選擇任何實體"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Allow new {pluralConceptName} to be created manually"
+msgstr "允許手動創建新的 {pluralConceptName}"
+
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Welcome to Avandar"
-msgstr "歡迎使用 Avandar"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -1746,7 +1746,7 @@ msgid "Please refresh and try again. If it still does not work, please contact "
 "support"
 msgstr "請重新整理後再試一次。如果仍無法運作，請聯絡支援服務"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 msgid "Export this dashboard as a PDF, or sketch on it first. Annotations "
 "support text, arrows, and freehand drawing with adjustable roughness "
 "(RoughJS)."
@@ -1796,7 +1796,7 @@ msgstr "{keyboardShortcut} 以保存"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -1850,7 +1850,7 @@ msgstr "選擇一個欄位"
 msgid "Normal"
 msgstr "一般"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Annotate, then export"
 msgstr "標註後再匯出"
 
@@ -1879,7 +1879,7 @@ msgstr "顯示 SQL"
 msgid "Grid"
 msgstr "網格"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "無法同步此實體"
 
@@ -1905,10 +1905,6 @@ msgstr "無法發佈儀表板"
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING 子句使用了表單無法表示的左側運算式。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Allow new {pluralEntityConfigName} to be created manually"
-msgstr "允許手動創建新的 {pluralEntityConfigName}"
-
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -1925,7 +1921,7 @@ msgstr "密碼更新成功"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
 "it, and Avandar will take you there."
-msgstr "開啟「儲存」，然後選擇「儲存至儀表板」。命名儀表板並建立後，Avandar 會帶你前往該儀表板。"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
@@ -1964,7 +1960,7 @@ msgstr "第 5 欄"
 msgid "Enter a description for this dataset"
 msgstr "請輸入此數據集的描述"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "需要手動輸入的欄位"
 
@@ -1984,8 +1980,8 @@ msgstr "您的數據集"
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -1995,7 +1991,7 @@ msgstr "您的數據集"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2047,7 +2043,7 @@ msgstr "至"
 msgid "Download offline chat model (WebLLM)"
 msgstr "下載離線聊天模型 (WebLLM)"
 
-#: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
+#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
 msgid "Create new profile type"
 msgstr "創建新的配置文件類型"
 
@@ -2056,7 +2052,7 @@ msgstr "創建新的配置文件類型"
 msgid "Done"
 msgstr "完成"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add Field"
 msgstr "添加欄位"
 
@@ -2072,7 +2068,7 @@ msgstr "有新版本可用。請重新整理以更新。"
 msgid "You haven't chosen an X axis"
 msgstr "您尚未選擇 X 軸"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "並且也等於..."
 
@@ -2084,7 +2080,7 @@ msgstr "適合傳單、報告和 QR Code 的簡短易記網址。"
 msgid "Using your custom URL."
 msgstr "使用您的自訂網址。"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Profile failed to load"
 msgstr "配置文件加載失敗"
 
@@ -2105,7 +2101,7 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "升級到「隨您所願付費」計劃只能通過計費入口網站進行。<0/>下面的按鈕將帶您前往那裡。"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete entity"
 msgstr "刪除實體"
 
@@ -2139,11 +2135,6 @@ msgstr "數據集已刪除。"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
 msgstr "工作表名稱"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single "
-"{entityConfigName}."
-msgstr "我們將使用這些欄位將數據集合併為單一 {entityConfigName}。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2185,7 +2176,7 @@ msgstr "發布"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Dismiss the tutorial"
-msgstr "關閉教學"
+msgstr ""
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
@@ -2201,16 +2192,11 @@ msgstr "尚未生成 SQL。請向 Avandar 提問或在手動標籤中構建查�
 msgid "Received a non-string value for a text field"
 msgstr "收到非字串值的文本欄位"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come "
-"from..."
-msgstr "告訴我們 {singularEntityConfigName} 數據應該來自哪裡..."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "刪除工作區失敗"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete Entity"
 msgstr "刪除實體"
 
@@ -2289,7 +2275,7 @@ msgstr "數據來源"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
-msgstr "將試算表匯入 Avandar。"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
@@ -2358,7 +2344,7 @@ msgstr "文本"
 msgid "Split (+/-)"
 msgstr "分割（+/-）"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Active"
 msgstr "活躍"
 
@@ -2506,7 +2492,7 @@ msgstr "X 軸刻度間隔"
 msgid "Please try again."
 msgstr "請再試一次。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field Name"
 msgstr "字段名稱"
 
@@ -2595,6 +2581,11 @@ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for 
 "analytics work."
 msgstr "如果您有 32 GB RAM，且主要使用效能強大的機器進行分析工作，建議使用此選項。"
 
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If each {0} can only have one {attributeName} value, check this box."
+msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框。"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
 msgstr "角色"
@@ -2638,10 +2629,10 @@ msgstr "自訂角色群組"
 msgid "Rose"
 msgstr "玫瑰"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "您確定要刪除 {0} 嗎？"
 
@@ -2665,7 +2656,7 @@ msgstr "忘記密碼了嗎？"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
-msgstr "從你剛新增的資料中取得答案。"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
@@ -2786,7 +2777,7 @@ msgstr "此成員擁有 {privateTotal} "
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "It profiled your data for you"
-msgstr "Avandar 已為你分析資料"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -2844,7 +2835,7 @@ msgid "Search by name, organization, pipeline…"
 msgstr "按名稱、組織、管道等搜索…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "數據"
 
@@ -2882,7 +2873,7 @@ msgstr "未選擇任何檔案"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
 
@@ -2930,18 +2921,13 @@ msgstr "資料集現在僅限離線使用"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Next"
-msgstr "下一步"
+msgstr ""
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "來自數據集的欄位"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {entityConfigName}."
-msgstr "這是您選擇應該添加到此 {entityConfigName} 的數據集中的哪些列的地方。"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create"
 msgstr "創建"
 
@@ -2972,7 +2958,7 @@ msgstr "Avandar（預設）"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Add your first dataset"
-msgstr "新增你的第一個資料集"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
@@ -2981,7 +2967,7 @@ msgstr "寬"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
 "distributions, and what's missing. You didn't have to ask."
-msgstr "開啟「資料摘要」，查看 Avandar 自動分析出的結果：範圍、分布，以及缺少的資料。你不必特別提出要求。"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -3042,7 +3028,7 @@ msgstr "繼續進入您的工作區"
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
@@ -3114,6 +3100,10 @@ msgstr "將資料集添加到工作區"
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#~ msgid "Run an AI query first."
+#~ msgstr "請先運行 AI 查詢。"
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
@@ -3133,7 +3123,7 @@ msgstr "正在產生 SQL…"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
-msgstr "再次從頭開始，逐步了解如何建立及分享儀表板。"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -3266,7 +3256,7 @@ msgstr "生成的 SQL 假設"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Name it and save"
-msgstr "命名並儲存"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
@@ -3295,7 +3285,7 @@ msgstr "表單不支援 CTE（WITH 子句）。"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Start with a spreadsheet"
-msgstr "從試算表開始"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3315,10 +3305,10 @@ msgstr "資料集"
 msgid "Remove failed"
 msgstr "移除失敗"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} 刪除成功"
 
@@ -3333,13 +3323,13 @@ msgstr "H1"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
 "English, like \"total revenue by region\"."
-msgstr "這是 Data Explorer，這是 Ava。用自然語言提出問題，例如「各地區的總營收」。"
+msgstr ""
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
 msgstr "來自數據集"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "一個配置文件可以由來自不同數據集的列組成。"
 
@@ -3388,12 +3378,12 @@ msgstr "顏色"
 msgid "Y axis label"
 msgstr "Y 軸標籤"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Finished syncing {0} data"
 msgstr "完成同步 {0} 數據"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "選擇列"
 
@@ -3458,8 +3448,8 @@ msgstr "請勿刷新或關閉此標籤，否則下載將被取消。"
 msgid "Forest"
 msgstr "森林"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "允許手動編輯"
 
@@ -3479,8 +3469,8 @@ msgstr "Llama 3.2 1B（離線）"
 msgid "Series"
 msgstr "系列"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "實體加載失敗。請稍後再試或聯繫支持。"
@@ -3502,7 +3492,7 @@ msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未套用 SQL。請登入以核准篩選值。"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "配置文件管理頁面加載失敗。請稍後再試或聯繫支持。"
@@ -3539,8 +3529,8 @@ msgstr "是否永久刪除此設備上的所有同意決策？此操作無法撤
 msgid "Let AI decide (legacy)"
 msgstr "讓 AI 決定 (舊版)"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "New field"
 msgstr "新增欄位"
 
@@ -3567,7 +3557,7 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 "it until you press the button below."
 msgstr "此儀表板仍公開於網路上。任何取得連結的人都能檢視，直到您按下下方按鈕為止。"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "實體已刪除"
 
@@ -3599,7 +3589,7 @@ msgstr "取消網址變更"
 msgid "Pick a dashboard, or create a new one."
 msgstr "選擇一個儀表板，或創建一個新儀表板。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "獲取數值總和"
 
@@ -3623,6 +3613,10 @@ msgstr "清除隱私日誌"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "同意"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Tell us about where the {singularConceptName} data should come from..."
+msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -3655,7 +3649,7 @@ msgstr "您已成功連接到 {0}"
 msgid "X column"
 msgstr "X 欄"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "選擇最常見的值"
 
@@ -3790,12 +3784,6 @@ msgstr "工具"
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "請向工作區設置管理員請求更新您的角色。"
 
-#. placeholder {0}: sourcedDataset?.name
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the "
-"{entityConfigName} ID"
-msgstr "對於數據集 <0>{0}</0>，選擇用作 {entityConfigName} ID 的欄位"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -3807,7 +3795,7 @@ msgstr "檢視者"
 msgid "Pick one"
 msgstr "選擇一個"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "尚未添加任何欄位"
 
@@ -3842,7 +3830,7 @@ msgstr "重新指派失敗"
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
 "your first dashboard."
-msgstr "想快速瀏覽嗎？大約 5 分鐘內，你就能從試算表建立第一個儀表板。"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -3909,7 +3897,7 @@ msgstr "無法移除離線聊天模型"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started {completedCount}/{total}"
-msgstr "開始使用 {completedCount}/{total}"
+msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
@@ -3942,7 +3930,7 @@ msgstr "未找到已保存的資料集。"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Avandar already read your file and guessed what each column contains. "
 "Give the dataset a name, then save."
-msgstr "Avandar 已讀取你的檔案，並推測每個欄位包含的內容。為資料集命名後儲存。"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -3953,9 +3941,9 @@ msgstr "根據預設，我們會使用直接的 UUID 連結。請在下方新增
 msgid "Make internal"
 msgstr "設為內部"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "請從左側邊欄選擇一個實體，或創建一個新實體。"
 
@@ -4139,7 +4127,7 @@ msgstr "請修正標示的欄位。"
 msgid "between"
 msgstr "之間"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
 msgstr "不活躍"
 
@@ -4152,7 +4140,7 @@ msgstr "右"
 msgid "all members of "
 msgstr "所有成員的 "
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
 
@@ -4168,6 +4156,11 @@ msgstr "選擇要下載的模型。您可以稍後切換模型或重新下載。
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "請求功能"
+
+#. placeholder {0}: sourcedDataset?.name
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
+msgstr "對於數據集 <0>{0}</0>，選擇用作 {conceptName} ID 的欄位"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -4238,6 +4231,10 @@ msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努�
 msgid "Please try again. Your dashboard has not been published."
 msgstr "請再試一次。您的儀表板尚未發布。"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "We will use those columns to merge datasets into a single {conceptName}."
+msgstr "我們將使用這些欄位將數據集合併為單一 {conceptName}。"
+
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4259,7 +4256,7 @@ msgstr "{0} · 執行 {1}"
 msgid "Process data again"
 msgstr "重新處理數據"
 
-#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
+#: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Export as PDF"
 msgstr "匯出為 PDF"
 
@@ -4293,7 +4290,7 @@ msgstr "上傳數據集"
 msgid "Reset"
 msgstr "重置"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a name for this profile type"
 msgstr "為此配置文件類型輸入名稱"
 
@@ -4301,7 +4298,7 @@ msgstr "為此配置文件類型輸入名稱"
 msgid "Area"
 msgstr "區域"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
@@ -4313,7 +4310,7 @@ msgstr "不包含"
 msgid "Workspace name updated"
 msgstr "工作區名稱已更新"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "將列添加為字段"
 
@@ -4385,7 +4382,7 @@ msgstr "超過 1000 行被拒絕"
 msgid "Update subscription"
 msgstr "更新訂閱"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "獲取值的平均值"
 
@@ -4451,7 +4448,7 @@ msgstr "再次登入"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
-msgstr "現在不要"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
@@ -4510,7 +4507,7 @@ msgstr "此儀表板未引用任何數據集：無法發布。"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
-msgstr "Ava 撰寫並執行 SQL，還選擇了圖表來呈現結果。"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -4523,11 +4520,11 @@ msgstr "確認電子郵件已發送至您的電子郵件地址。"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Just ask"
-msgstr "直接提問"
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Pick what they can do"
-msgstr "選擇他們可以執行的操作"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -4650,7 +4647,7 @@ msgstr "發現澄清"
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
-msgstr "開始導覽"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -4736,6 +4733,10 @@ msgstr "隱私日誌"
 msgid "Private resources"
 msgstr "私人資源"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "Select the columns you want in this {conceptName}"
+msgstr "選擇您想在此 {conceptName} 中的欄位"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "視覺化設定"
@@ -4770,7 +4771,7 @@ msgstr "此資料集可以儲存在雲端。"
 msgid "Billing"
 msgstr "計費"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Name"
 msgstr "配置文件名稱"
 
@@ -4847,7 +4848,7 @@ msgstr "此儀表板已發布至您的工作區。只有您授予存取權限的
 msgid "Review before sending"
 msgstr "發送前檢查"
 
-#: src/clients/queries/runStructuredQuery/runStructuredQuery.ts
+#: src/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata.ts
 msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "結構化查詢不支援公共查詢。請改用原始 SQL。"
@@ -4979,7 +4980,7 @@ msgstr "載入數據集中…"
 msgid "Loading private resources"
 msgstr "正在載入私人資源"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
@@ -4992,11 +4993,6 @@ msgstr "訪問被拒"
 msgid "Created \"{dashboardName}\""
 msgstr "已創建「{dashboardName}」"
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If each {0} can only have one {fieldName} value, check this box."
-msgstr "如果每個 {0} 只能有一個 {fieldName} 值，請勾選此框。"
-
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -5006,6 +5002,10 @@ msgstr "描述必須少於 {maxDatasetDescriptionLength} 個字符（當前：{0
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
 msgstr "要新增的座位數"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "We should join data into the same {conceptName} when…"
+msgstr "當…時，我們應將數據合併到同一 {conceptName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -5106,7 +5106,7 @@ msgstr "僅查詢的內容"
 msgid "Could not generate QR code"
 msgstr "無法生成 QR 碼"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "No fields or dataset are configured."
 msgstr "未配置任何字段或數據集。"
 
@@ -5146,7 +5146,7 @@ msgstr "上傳電子表格"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
 "computer."
-msgstr "你目前位於 Data Manager 的 Import。從電腦中選擇 CSV 或 Excel 檔案。"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -5177,7 +5177,7 @@ msgstr "服務"
 msgid "Could not load map data"
 msgstr "無法載入地圖資料"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "沒有更多內容可加載"
 
@@ -5187,7 +5187,7 @@ msgstr "無法設為私人"
 
 #: src/views/ProfileView/TutorialSection.tsx
 msgid "Tutorial"
-msgstr "教學"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5294,11 +5294,6 @@ msgstr "分組"
 msgid "You need admin access on this resource to manage sharing."
 msgstr "您需要對此資源擁有管理員訪問權限才能管理共享。"
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If there are multiple {fieldName} values for one {0}, then..."
-msgstr "如果一個 {0} 有多個 {fieldName} 值，那麼..."
-
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
@@ -5312,7 +5307,7 @@ msgstr "只有您可以存取此 {resource}。"
 msgid "Stack group"
 msgstr "堆疊群組"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "選擇規則（例如：最常見）"
 
@@ -5340,7 +5335,7 @@ msgstr "恢復數據集處理中…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "涵蓋 <0>{0}</0>，從 <1>{1}</1> 到 <2>{2}</2>。"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Loading more..."
 msgstr "加載更多中..."
 
@@ -5494,7 +5489,7 @@ msgstr "新使用者群組"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
-msgstr "將圖表儲存到方便日後返回的位置。"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5514,7 +5509,7 @@ msgstr "此 {resource} 對擁有 {app} {0} 權限的任何人可訪問。"
 msgid "Amber"
 msgstr "琥珀色"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "配置如何合併數據集"
 
@@ -5522,13 +5517,18 @@ msgstr "配置如何合併數據集"
 msgid "Excel"
 msgstr "Excel"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Dataset columns"
 msgstr "數據集欄位"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {conceptName}."
+msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {conceptName}。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -5566,13 +5566,14 @@ msgstr "工作區 ID 不得包含空格"
 msgid "Try again."
 msgstr "再試一次。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "We should join data into the same {entityConfigName} when…"
-msgstr "當…時，我們應將數據合併到同一 {entityConfigName}"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "包含"
+
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If there are multiple {attributeName} values for one {0}, then..."
+msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -5643,7 +5644,7 @@ msgstr "調整抽屜大小"
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "The Visualizations tab has the chart settings, if this isn't the shape "
 "you wanted."
-msgstr "如果這不是你想要的圖表樣式，可以在「視覺化」分頁中調整圖表設定。"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -5673,7 +5674,7 @@ msgstr "無法將資料集設為僅限離線使用"
 msgid "Hide details"
 msgstr "隱藏詳細資料"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Enter comment"
 msgstr "輸入評論"
 
@@ -5870,10 +5871,6 @@ msgstr "全選"
 msgid "Only what's queried (recommended)"
 msgstr "僅查詢的內容（推薦）"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "What field should be used as a {singularEntityConfigName}'s name?"
-msgstr "應使用哪個欄位作為 {singularEntityConfigName} 的名稱？"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
 msgstr "未命名"
@@ -5938,7 +5935,7 @@ msgstr "這將從使用該用戶群組的成員和資源中移除該用戶群組
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
-msgstr "你的儀表板已建立，但其他人還無法開啟。讓我們修正這個問題。"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
@@ -5969,7 +5966,7 @@ msgstr "選擇的值欄位無效"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 列 / 第 {colNum} 欄"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "尚未添加任何欄位。"
 
@@ -5979,7 +5976,7 @@ msgstr "進階選項"
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Save it to a dashboard"
-msgstr "儲存至儀表板"
+msgstr ""
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -5993,11 +5990,6 @@ msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "資料集已儲存"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {entityConfigName}."
-msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {entityConfigName}。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -6054,7 +6046,7 @@ msgstr "選定的文件：{0}"
 msgid "Subtle"
 msgstr "細微"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Activity"
 msgstr "活動"
 
@@ -6084,7 +6076,12 @@ msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座�
 
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "There's your answer"
-msgstr "這就是你的答案"
+msgstr ""
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "This is where you select which columns from which datasets should be "
+"added into this {conceptName}."
+msgstr "這是您選擇應該添加到此 {conceptName} 的數據集中的哪些列的地方。"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -6171,9 +6168,13 @@ msgstr "Google 表單載入失敗"
 msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What field should be used as a {singularConceptName}'s name?"
+msgstr "應使用哪個欄位作為 {singularConceptName} 的名稱？"
+
 #: src/components/Nux/tutorials/firstDashboard.ts
 msgid "Ask your first question"
-msgstr "提出你的第一個問題"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -6219,7 +6220,7 @@ msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
 msgid "Workspace means everyone in your workspace, not the public. Nothing here "
 "creates a public link. And you can set it back to Private whenever you "
 "like."
-msgstr "Workspace 是指您工作區中的所有人，而不是公開使用者。這裡的任何操作都不會建立公開連結。您也可以隨時將其設回私人。"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -6323,8 +6324,8 @@ msgstr "為了確認，請在下方輸入 <0>{confirmationTarget}</0>："
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "Entity failed to load"
 msgstr "實體加載失敗"
 
@@ -6346,7 +6347,7 @@ msgstr "清除所有"
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "Close"
-msgstr "關閉"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -6386,13 +6387,13 @@ msgstr "不離線"
 msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
 
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "載入中..."
 
 #: src/components/Nux/NuxTour/NuxTooltip.tsx
 msgid "No spreadsheet handy? <0>Download our sample</0> and use that."
-msgstr "手邊沒有試算表嗎？<0>下載我們的範例</0>並使用它。"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -6414,7 +6415,7 @@ msgstr "無效的日期"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
 msgid "Get started"
-msgstr "開始使用"
+msgstr ""
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
@@ -6507,7 +6508,7 @@ msgstr "至少添加一個 X / Y 系列"
 msgid "Show QR code"
 msgstr "顯示 QR 碼"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "選擇最小值"
 

@@ -17,8 +17,8 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog entries, dashboards, entities + configs + field values,
- *     value extractors, user profile, plus `workspaces` and
+ *     catalog entries, dashboards, concepts + their attributes + attribute
+ *     mappings, individuals, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
@@ -40,11 +40,11 @@ const ACTIVE_TABLES = [
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
   "dashboards",
-  "entities",
-  "entity_configs",
-  "entity_field_configs",
-  "value_extractors__dataset_column_value",
-  "value_extractors__manual_entry",
+  "concepts",
+  "concept_attributes",
+  "attribute_mappings__dataset_column",
+  "attribute_mappings__manual_entry",
+  "individuals",
   "user_profiles",
   "workspaces",
   "workspace_memberships",
@@ -90,6 +90,22 @@ const DEPRECATED_TABLES = [
   // extractors"); aggregation was re-implemented without a dedicated
   // table.
   "value_extractors__aggregation",
+  // Renamed by 20260817020322 ("Renamed entity domain to Description Logic
+  // nomenclature"). The old names have to stay recognisable so the whole
+  // pre-rename history, and the rename ALTER TABLEs themselves, partition
+  // cleanly:
+  //   entity_configs       -> concepts
+  //   entity_field_configs -> concept_attributes
+  //   entities             -> individuals
+  //   value_extractors__dataset_column_value
+  //                        -> attribute_mappings__dataset_column
+  //   value_extractors__manual_entry
+  //                        -> attribute_mappings__manual_entry
+  "entity_configs",
+  "entity_field_configs",
+  "entities",
+  "value_extractors__dataset_column_value",
+  "value_extractors__manual_entry",
 ] as const;
 
 /**

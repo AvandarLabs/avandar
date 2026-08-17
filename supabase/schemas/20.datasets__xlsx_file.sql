@@ -32,6 +32,14 @@ create table public.datasets__xlsx_file (
 -- Enable row level security
 alter table public.datasets__xlsx_file enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__xlsx_file to authenticated;
+
 -- Policies
 create policy "User can select datasets__xlsx_file in their workspace" on public.datasets__xlsx_file for
 select

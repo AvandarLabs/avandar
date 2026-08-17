@@ -1,11 +1,10 @@
-import { isNonNullish, propEq, where } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { where } from "@avandar/utils";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import {
@@ -19,6 +18,7 @@ import {
   parseUrlSearch,
   serializeStateToUrl,
 } from "@/views/DataExplorerApp/DataExplorerUrlState";
+import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
@@ -39,7 +39,7 @@ type Options = {
  *   its default empty state, the hook restores data source, column
  *   selections, aggregations, order-by, raw SQL, and viz config from the URL
  *   params. If `sql` is present in the URL, only raw SQL (plus viz / open
- *   dataset) is applied — `ds` and `cols` are ignored so a stale Manual Query
+ *   dataset) is applied: `ds` and `cols` are ignored so a stale Manual Query
  *   cannot block restore or conflict with the SQL text. The SQL is parsed with
  *   `sqlToStructuredQuery` once workspace dataset metadata has loaded so the
  *   Manual Query form is prefilled. Column objects are re-fetched via TanStack
@@ -60,12 +60,12 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     return parseUrlSearch(urlSearch);
   }, [urlSearch]);
 
-  // Data source lookup — these are already fetched by QueryDataSourceSelect
+  // Data source lookup. These are already fetched by QueryDataSourceSelect
   // so TanStack Query will return cached results with no extra network call.
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const [entityConfigs] = EntityConfigClient.useGetAll(
+  const [concepts] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
 
@@ -73,16 +73,16 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     if (!urlState.dsId) {
       return undefined;
     }
-    return [...(datasets ?? []), ...(entityConfigs ?? [])].find((ds) => {
+    return [...(datasets ?? []), ...(concepts ?? [])].find((ds) => {
       return ds.id === urlState.dsId;
     });
-  }, [urlState.dsId, datasets, entityConfigs]);
+  }, [urlState.dsId, datasets, concepts]);
 
   const needsColumns =
     (urlState.colNames?.length ?? 0) > 0 && Boolean(urlState.dsId);
 
   /**
-   * When the URL has `sql`, it wins — do not restore `ds` / cols from URL.
+   * When the URL has `sql`, it wins: do not restore `ds` / cols from URL.
    */
   const restoreStructuredFromUrl = !urlState.rawSql;
 
@@ -96,24 +96,24 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     );
   }, [restoredDataSource, datasets]);
 
-  const isEntityConfigSource = useMemo(() => {
+  const isConceptSource = useMemo(() => {
     return (
       Boolean(restoredDataSource) &&
-      (entityConfigs?.some((e) => {
+      (concepts?.some((e) => {
         return e.id === restoredDataSource?.id;
       }) ??
         false)
     );
-  }, [restoredDataSource, entityConfigs]);
+  }, [restoredDataSource, concepts]);
 
   const [datasetColumns] = DatasetColumnClient.useGetAll({
     ...where("dataset_id", "eq", restoredDataSource?.id),
     useQueryOptions: { enabled: needsColumns && isDatasetSource },
   });
 
-  const [entityFieldConfigs] = EntityFieldConfigClient.useGetAll({
-    ...where("entity_config_id", "eq", restoredDataSource?.id),
-    useQueryOptions: { enabled: needsColumns && isEntityConfigSource },
+  const [conceptAttributes] = ConceptAttributeClient.useGetAll({
+    ...where("concept_id", "eq", restoredDataSource?.id),
+    useQueryOptions: { enabled: needsColumns && isConceptSource },
   });
 
   const [allDatasetColumns] = DatasetColumnClient.useGetAll(
@@ -125,7 +125,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
 
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Decide once — on the very first render — whether we should hydrate from
+  // Decide once, on the very first render, whether we should hydrate from
   // the URL. Using a ref prevents dispatched state changes from re-triggering
   // the bail-out check mid-hydration (which would cause columns and viz config
   // to never be restored after setDataSource fires).
@@ -153,15 +153,35 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           restoredDataSource,
           needsColumns,
           datasetColumns,
-          entityFieldConfigs,
+          conceptAttributes,
           sqlMappingMetadataLoaded,
         })
       ) {
         return;
       }
 
+      // Cleared on unmount so the row-count lookup below cannot dispatch into
+      // an unmounted tree. It is checked once, immediately after the only
+      // suspension point, rather than before each dispatch: everything from
+      // there on is synchronous, so no later dispatch can outlive this check.
+      let isEffectActive = true;
+
       void (async () => {
         if (restoreStructuredFromUrl && restoredDataSource) {
+          // Every dispatch below has to stay in one synchronous run. The
+          // trigger stamp at the end of this block explains why, and an
+          // `await` between here and there silently relabels every hydrated
+          // query.
+          //
+          // `async-defer-await` wants cheap guards hoisted above the await so
+          // discarded work is never started. The only guard here reads
+          // `isEffectActive`, which is unconditionally true until this await
+          // yields, so hoisting it would check nothing. False positive.
+          //
+          // `react-doctor-disable-next-line` takes no rule name, so this
+          // suppresses every rule on the next line. Keep the line it guards to
+          // the single `const commitOptions` declaration.
+          // react-doctor-disable-next-line
           const commitOptions =
             isDatasetSource ?
               await buildDataSourceCommitOptions({
@@ -170,6 +190,9 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
                 workspaceId: workspace.id,
               })
             : undefined;
+          if (!isEffectActive) {
+            return;
+          }
           dispatch.setDataSource({
             dataSource: restoredDataSource,
             options: commitOptions,
@@ -179,22 +202,13 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
         if (
           restoreStructuredFromUrl &&
           needsColumns &&
-          (datasetColumns ?? entityFieldConfigs)
+          (datasetColumns ?? conceptAttributes)
         ) {
-          const allQueryColumns = [
-            ...(datasetColumns ?? []).map((col) => {
-              return QueryColumn.makeFromDatasetColumn(col);
-            }),
-            ...(entityFieldConfigs ?? []).map((col) => {
-              return QueryColumn.makeFromEntityFieldConfig(col);
-            }),
-          ];
-
-          const restoredCols = (urlState.colNames ?? [])
-            .map((name) => {
-              return allQueryColumns.find(propEq("baseColumn.name", name));
-            })
-            .filter(isNonNullish);
+          const restoredCols = getRestoredColumnsFromUrl({
+            colNames: urlState.colNames,
+            datasetColumns,
+            conceptAttributes,
+          });
 
           if (restoredCols.length > 0) {
             dispatch.setColumns(restoredCols);
@@ -245,14 +259,32 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setOpenDataset(urlState.openDataset);
         }
 
-        // Restore viz config last — may overwrite the result of
+        // Restore viz config last: may overwrite the result of
         // hydrateFromQuery that setColumns triggered above.
         if (urlState.vizConfig) {
           dispatch.setVizConfig(urlState.vizConfig);
         }
 
+        // Stamped last on purpose. Stamping earlier would not survive: the
+        // structured restores above route through the manual-form reducer,
+        // which stamps `structured_change` itself.
+        //
+        // This works only because every dispatch above runs synchronously in
+        // this block, so React coalesces them into one render and no query
+        // observes an intermediate trigger. Do not introduce an `await`
+        // between the first dispatch and this line. A render could then commit
+        // mid-hydration, and every hydrated query would silently report
+        // `structured_change` instead. If suspending here ever becomes
+        // necessary, the trigger has to move into the query-changing action
+        // payloads rather than being stamped separately.
+        dispatch.setQueryTrigger("url_hydration");
+
         setIsHydrated(true);
       })();
+
+      return () => {
+        isEffectActive = false;
+      };
     },
     // Intentionally omitting `state` from deps: the "should hydrate?"
     // decision is captured once via shouldHydrateRef so that mid-hydration
@@ -264,7 +296,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
       urlState,
       restoredDataSource,
       datasetColumns,
-      entityFieldConfigs,
+      conceptAttributes,
       needsColumns,
       datasets,
       allDatasetColumns,

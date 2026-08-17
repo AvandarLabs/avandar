@@ -27,6 +27,13 @@ create table if not exists catalog_entries__dataset_column (
 -- RLS Policies
 alter table catalog_entries__dataset_column enable row level security;
 
+-- Data API privileges.
+--
+-- Read-only: the column catalog is populated by the backend.
+grant
+select
+  on table public.catalog_entries__dataset_column to authenticated;
+
 -- Any signed-in user may read the catalog's column associations.
 --
 -- Scoped `to authenticated` rather than left unscoped. An unscoped policy

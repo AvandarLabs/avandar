@@ -15,15 +15,15 @@ describe("isAppLinkAvailableOffline", () => {
 
   it("blocks network-backed apps", () => {
     expect(isAppLinkAvailableOffline(AppLinks.map("ws"))).toBe(false);
-    expect(isAppLinkAvailableOffline(AppLinks.entityDesignerHome("ws"))).toBe(
+    expect(isAppLinkAvailableOffline(AppLinks.ontologyDesignerHome("ws"))).toBe(
       false,
     );
     expect(
       isAppLinkAvailableOffline(
-        AppLinks.entityManagerHome({
+        AppLinks.individualManagerHome({
           workspaceSlug: "ws",
-          entityConfigId: "ec-1",
-          entityConfigName: "Profiles",
+          conceptId: "ec-1",
+          conceptName: "Profiles",
         }),
       ),
     ).toBe(false);

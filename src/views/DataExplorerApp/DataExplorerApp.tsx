@@ -42,7 +42,7 @@ import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetFo
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
-import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { ReactNode } from "react";
@@ -81,6 +81,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
+      // `rawSql` is part of the query key, so clearing it can start a new
+      // run. Stamp `structured_change` (the union has no member for a
+      // system-initiated clear) so a stale `dataset_opened` from before the
+      // delete does not mislabel that run.
+      dispatch.setQueryTrigger("structured_change");
       dispatch.setOpenDataset(undefined);
       dispatch.setRawSql(undefined);
       notifySuccess(t`Dataset deleted.`);
@@ -113,6 +118,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     isStructuredQueryInSync: state.isStructuredQueryInSync,
     auth: "workspace",
     workspaceId: workspace.id,
+    analyticsSurface: "data_explorer",
+    analyticsTrigger: state.queryTrigger,
   });
 
   useEffect(
@@ -436,6 +443,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
         opened={isOpenDatasetModalOpen}
         onClose={closeOpenDatasetModal}
         onOpen={(info, rawSql) => {
+          dispatch.setQueryTrigger("dataset_opened");
           dispatch.setRawSql(rawSql);
           dispatch.setOpenDataset(info);
           closeOpenDatasetModal();

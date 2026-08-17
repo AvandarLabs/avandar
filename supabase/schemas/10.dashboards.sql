@@ -323,6 +323,19 @@ execute function private.dashboards__validate_snapshot_transition_update ();
 -- (after `16.utils__permissions.sql` defines resource helper functions).
 alter table public.dashboards enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.dashboards to authenticated;
+
+-- The only table `anon` can reach, via the public dashboard link.
+grant
+select
+  on table public.dashboards to anon;
+
 /** Prevents a dashboard from being reassigned to another workspace. */
 create or replace function public.dashboards__prevent_workspace_id_change () returns trigger language plpgsql
 set

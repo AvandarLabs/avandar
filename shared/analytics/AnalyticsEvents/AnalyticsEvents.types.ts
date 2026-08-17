@@ -25,6 +25,70 @@ export type DbAnalyticsEventName = (typeof DB_ANALYTICS_EVENT_NAMES)[number];
 /** Every analytics event name accepted by the platform. */
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
 
+/** Which surface executed a query. Recorded on failures from every surface. */
+export type QueryAnalyticsSurface =
+  | "data_explorer"
+  | "dashboard_block"
+  | "viz_config";
+
+/**
+ * What caused a query to run.
+ *
+ * `dataset_opened` covers opening a saved dataset from the Data Explorer
+ * drawer. `block_render` is what dashboard blocks and viz-config previews
+ * report, since neither has a user-initiated trigger: they run whenever their
+ * SQL changes.
+ */
+export type QueryAnalyticsTrigger =
+  | "sql_submit"
+  | "structured_change"
+  | "chat_generated"
+  | "url_hydration"
+  | "dataset_opened"
+  | "block_render";
+
+/**
+ * The triggers a user can actually cause.
+ *
+ * `block_render` is what dashboard blocks and viz-config previews report for
+ * having no user behind them, so a Data Explorer position that holds a trigger
+ * can never legitimately be that value.
+ */
+export type UserQueryAnalyticsTrigger = Exclude<
+  QueryAnalyticsTrigger,
+  "block_render"
+>;
+
+/**
+ * Coarse classification of a failed query, derived from the runtime error.
+ * Classifying at the emitter is what makes failures groupable in SQL without
+ * storing the error text that would be needed to group them after the fact.
+ */
+export type QueryErrorClass =
+  | "offline"
+  | "syntax"
+  | "missing_column"
+  | "missing_table"
+  | "permission"
+  | "timeout"
+  | "network"
+  | "unknown";
+
+/** What a completed chat turn produced. */
+export type ChatTurnOutcome =
+  | "sql"
+  | "clarification"
+  | "dashboard_block"
+  | "text"
+  | "empty";
+
+/** Coarse classification of a chat turn that never produced a response. */
+export type ChatTurnErrorClass =
+  | "upstream_error"
+  | "network"
+  | "parse"
+  | "unknown";
+
 type DatasetImportedPayload = {
   datasetId: string;
   sourceType: DatasetSource.ImportableSourceType;
@@ -60,10 +124,6 @@ type ChatMessageSentPayload = {
 };
 
 /**
- * Written by the `auth.users` insert trigger. `emailDomain` is null when the
- * account has no email address, which is the case for phone-based signups.
- */
-/**
  * Written by the `workspace_invites` insert trigger. The invite id, never a
  * hashed address, is the join key to `workspace.invite_accepted`.
  */
@@ -92,6 +152,78 @@ type SubscriptionPlanChangedPayload = {
 };
 
 /**
+ * Recorded for Data Explorer executions only. A dashboard with twelve blocks
+ * would otherwise report twelve queries per page view and drown the
+ * activation signal, so the other two surfaces record failures only.
+ */
+type QueryRanPayload = {
+  trigger: QueryAnalyticsTrigger;
+  source: "rawSql" | "structured";
+  dataSourceType: "dataset" | "entity" | "none";
+  rowCount: number;
+  columnCount: number;
+  durationMs: number;
+  didAutoLimit: boolean;
+};
+
+/**
+ * Recorded from every workspace-authenticated surface. `errorMessage` is
+ * sanitised before it gets here: first line only, SQL echo removed, quoted
+ * literals and long digit runs masked, truncated to 500 characters. Raw SQL
+ * and customer literals must never reach this column.
+ *
+ * `isOffline` and `errorClass: "offline"` are equivalent by construction: a
+ * device that is offline classifies as `offline` whatever the underlying
+ * driver reported on the way down. Both are kept because the event catalog
+ * names `isOffline` and `errorClass` is what reporting groups by.
+ */
+type QueryFailedPayload = {
+  surface: QueryAnalyticsSurface;
+  trigger: QueryAnalyticsTrigger;
+  errorClass: QueryErrorClass;
+  errorMessage: string;
+  isOffline: boolean;
+};
+
+/**
+ * Recorded by the chat edge function, the only layer that knows the model,
+ * the latency, and how many attempts the empty-response escalation took.
+ *
+ * `wasSampled` and `piiSeverity` describe chat-sample retention. Nothing
+ * retains samples yet, so `wasSampled` is always false and `piiSeverity` is
+ * always absent until the capture pipeline exists.
+ *
+ * `attemptCount`, `latencyMs`, and `outcome` are read out of `payload` with
+ * `->>` by `supabase/schemas/91.analytics_view__chat_health.sql`. Renaming one
+ * silently degrades that report rather than failing anything: the attempt and
+ * latency columns go null, and the outcome mix collapses to `unknown` because
+ * the view coalesces a missing key to that value. A rename has to update the
+ * view in the same change.
+ */
+type ChatTurnCompletedPayload = {
+  modelId: string;
+  latencyMs: number;
+  attemptCount: number;
+  outcome: ChatTurnOutcome;
+  promptChars: number;
+  responseChars: number;
+  schemaDatasetCount: number;
+  wasSampled: boolean;
+  piiSeverity?: "clean" | "warning" | "critical";
+};
+
+/**
+ * `mode` distinguishes the two export paths: `direct` renders the dashboard
+ * straight to a file, `annotated` goes through the annotation step first.
+ */
+type DashboardPdfExportedPayload = {
+  dashboardId: string;
+  blockCount: number;
+  durationMs: number;
+  mode: "direct" | "annotated";
+};
+
+/**
  * Payload shape per event. Written as a mapped type over
  * `AnalyticsEventName`, so adding a name to a list above without giving it a
  * payload is a compile error.
@@ -105,6 +237,8 @@ type SubscriptionPlanChangedPayload = {
 export type AnalyticsEventPayloads = {
   [K in AnalyticsEventName]: K extends "dataset.imported" ?
     DatasetImportedPayload
+  : K extends "query.ran" ? QueryRanPayload
+  : K extends "query.failed" ? QueryFailedPayload
   : K extends "dashboard.published" ?
     {
       dashboardId: string;
@@ -123,7 +257,9 @@ export type AnalyticsEventPayloads = {
   : K extends "dashboard.block_added_via_chat" ?
     DashboardBlockAddedViaChatPayload
   : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload
-  : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
+  : K extends "dashboard.pdf_export_opened" ?
+    { dashboardId: string; blockCount: number }
+  : K extends "dashboard.pdf_exported" ? DashboardPdfExportedPayload
   : K extends "dataset.deleted" ?
     {
       datasetId: string;
@@ -134,11 +270,17 @@ export type AnalyticsEventPayloads = {
     { dashboardId: string; wasPublic: boolean; ageDays: number }
   : K extends "chat.message_sent" ? ChatMessageSentPayload
   : K extends "chat.sql_generated" ? { sqlChars: number }
+  : K extends "chat.turn_completed" ? ChatTurnCompletedPayload
+  : K extends "chat.turn_failed" ?
+    { modelId: string; errorClass: ChatTurnErrorClass; latencyMs: number }
   : K extends "nux.started" ? { startedAtMilestone: NuxMilestoneKey }
   : K extends "nux.milestone_completed" ? { milestoneKey: NuxMilestoneKey }
   : K extends "nux.dismissed" ?
     { milestoneKey: NuxMilestoneKey | null; completedCount: number }
-  : K extends "user.registered" ?
+  : // Written by the `auth.users` insert trigger. `emailDomain` is null when
+  // the account has no email address, which is the case for phone-based
+  // signups.
+  K extends "user.registered" ?
     {
       emailDomain: string | null;
       provider: string | null;

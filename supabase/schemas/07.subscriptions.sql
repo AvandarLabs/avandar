@@ -87,6 +87,14 @@ create index idx_subscriptions__subscription_owner_id_workspace_id on public.sub
 -- Enable row level security
 alter table public.subscriptions enable row level security;
 
+-- Data API privileges.
+--
+-- Read-only: subscription rows are written by the billing backend under
+-- `service_role`, never by a browser.
+grant
+select
+  on table public.subscriptions to authenticated;
+
 --------------------------------------------------------------------------------
 -- Policies: subscriptions
 -- Only SELECT policies have been added.

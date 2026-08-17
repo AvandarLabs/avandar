@@ -45,9 +45,9 @@ export function structuredQueryToSql(
 
   if (
     query.dataSource !== undefined &&
-    Model.isOfModelType(query.dataSource, "EntityConfig")
+    Model.isOfModelType(query.dataSource, "Concept")
   ) {
-    throw new Error("Querying EntityConfigs through DuckDB is not supported.");
+    throw new Error("Querying Concepts through DuckDB is not supported.");
   }
 
   const {

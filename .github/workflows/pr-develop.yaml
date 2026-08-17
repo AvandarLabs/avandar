@@ -42,6 +42,9 @@ jobs:
           package-manager-cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - run: pnpm type-check
       - uses: supabase/setup-cli@v1
         with:
