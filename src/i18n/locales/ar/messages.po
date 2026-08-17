@@ -337,7 +337,7 @@ msgstr "لا"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Some values do not fit the type you chose"
-msgstr ""
+msgstr "بعض القيم لا تتوافق مع النوع الذي اخترته"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
@@ -1607,7 +1607,7 @@ msgstr "عرض التفاصيل"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Boolean"
-msgstr ""
+msgstr "منطقي"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1693,7 +1693,7 @@ msgstr "فشل تحديث القيود"
 
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Data Type"
-msgstr ""
+msgstr "نوع البيانات"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2885,7 +2885,7 @@ msgstr "نوع التسمية"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Number"
-msgstr ""
+msgstr "رقم"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4145,7 +4145,7 @@ msgstr "يمين"
 #. placeholder {0}: error.columnName
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "More than one column is named \"{0}\". Column names must be unique."
-msgstr ""
+msgstr "يوجد أكثر من عمود باسم \"{0}\". يجب أن تكون أسماء الأعمدة فريدة."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -4158,7 +4158,7 @@ msgstr "يجب إدخال بعض البيانات يدويًا"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Integer"
-msgstr ""
+msgstr "عدد صحيح"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4377,7 +4377,8 @@ msgstr "رفع"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
 "and would be left empty."
-msgstr ""
+msgstr "‏\"{0}\" باعتباره {typeLabel}: لا يمكن تحويل {1} من أصل {2} من القيم "
+"التي تم أخذ عينات منها، وستُترك فارغة."
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4694,7 +4695,7 @@ msgstr "استيراد مجموعة البيانات"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "{0} columns were detected. Correct any name or type that is wrong before "
 "saving."
-msgstr ""
+msgstr "تم اكتشاف {0} من الأعمدة. صحّح أي اسم أو نوع غير صحيح قبل الحفظ."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
@@ -4721,10 +4722,6 @@ msgstr "لا تحتوي هذه الإدخالات في الكتالوج على �
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "نموذج الدردشة غير المتصل جاهز"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "تم تحديث وصف العمود بنجاح!"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -5130,7 +5127,7 @@ msgstr "إرسال الإجابة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Column {columnNumber} needs a name."
-msgstr ""
+msgstr "يحتاج العمود {columnNumber} إلى اسم."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -5516,7 +5513,7 @@ msgstr "الخطة الحالية"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column updated successfully!"
-msgstr ""
+msgstr "تم تحديث العمود بنجاح!"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6204,7 +6201,7 @@ msgstr "فشل تحميل ورقة Google"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Fix these column names before saving"
-msgstr ""
+msgstr "أصلح أسماء هذه الأعمدة قبل الحفظ"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

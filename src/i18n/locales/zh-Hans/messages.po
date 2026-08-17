@@ -328,7 +328,7 @@ msgstr "否"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Some values do not fit the type you chose"
-msgstr ""
+msgstr "部分值与您选择的类型不匹配"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
@@ -1565,7 +1565,7 @@ msgstr "显示详细信息"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Boolean"
-msgstr ""
+msgstr "布尔值"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1647,7 +1647,7 @@ msgstr "限制更新失败"
 
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Data Type"
-msgstr ""
+msgstr "数据类型"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2807,7 +2807,7 @@ msgstr "标签类型"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Number"
-msgstr ""
+msgstr "数字"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4044,7 +4044,7 @@ msgstr "右"
 #. placeholder {0}: error.columnName
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "More than one column is named \"{0}\". Column names must be unique."
-msgstr ""
+msgstr "有多个列名为“{0}”。列名必须唯一。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -4057,7 +4057,7 @@ msgstr "某些数据应手动输入"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Integer"
-msgstr ""
+msgstr "整数"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4271,7 +4271,7 @@ msgstr "上传"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
 "and would be left empty."
-msgstr ""
+msgstr "“{0}”作为 {typeLabel}：采样值中有 {1} 个（共 {2} 个）无法转换，转换后将留空。"
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4585,7 +4585,7 @@ msgstr "导入数据集"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "{0} columns were detected. Correct any name or type that is wrong before "
 "saving."
-msgstr ""
+msgstr "检测到 {0} 个列。请在保存前更正错误的名称或类型。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
@@ -4611,10 +4611,6 @@ msgstr "此目录条目没有列元数据。尚无法导入。"
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "离线聊天模型已准备好"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "列描述更新成功！"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -5005,7 +5001,7 @@ msgstr "发送答案"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Column {columnNumber} needs a name."
-msgstr ""
+msgstr "第 {columnNumber} 列需要名称。"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -5384,7 +5380,7 @@ msgstr "当前计划"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column updated successfully!"
-msgstr ""
+msgstr "列已成功更新！"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6055,7 +6051,7 @@ msgstr "Google 表格加载失败"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Fix these column names before saving"
-msgstr ""
+msgstr "请在保存前修正这些列名"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

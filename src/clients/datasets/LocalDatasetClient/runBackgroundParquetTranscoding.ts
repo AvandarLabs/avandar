@@ -1,4 +1,4 @@
-import { makeMap } from "@avandar/utils";
+import { isDefined, makeMap } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
@@ -101,31 +101,34 @@ async function _reconcileColumns(params: {
 
   const byName = makeMap(existingColumns, { key: "originalName" });
 
-  let changedCount = 0;
-  for (const detected of params.transcodeColumns) {
-    const existing = byName.get(detected.column_name);
-    if (!existing) {
-      continue;
-    }
-    if (existing.detectedDataType !== detected.column_type) {
+  const staleColumns = params.transcodeColumns
+    .map((detected) => {
+      const existingColumn = byName.get(detected.column_name);
+      return (
+          isDefined(existingColumn) &&
+            existingColumn.detectedDataType !== detected.column_type
+        ) ?
+          { existingColumn, detectedDataType: detected.column_type }
+        : undefined;
+    })
+    .filter(isDefined);
+
+  // One row per column, so the writes are independent and go out together.
+  await Promise.all(
+    staleColumns.map(async (staleColumn) => {
       try {
         await DatasetColumnClient.update({
-          id: existing.id,
-          data: _getReconciledColumnUpdate({
-            existingColumn: existing,
-            detectedDataType: detected.column_type,
-          }),
+          id: staleColumn.existingColumn.id,
+          data: _getReconciledColumnUpdate(staleColumn),
         });
-        changedCount += 1;
       } catch {
-        // Best-effort: surface the discrepancy via the toast even if the
-        // write fails.
-        changedCount += 1;
+        // Best-effort: the toast reports the discrepancy either way, which is
+        // why a failed write still counts as changed.
       }
-    }
-  }
+    }),
+  );
 
-  return { changedCount };
+  return { changedCount: staleColumns.length };
 }
 
 /**

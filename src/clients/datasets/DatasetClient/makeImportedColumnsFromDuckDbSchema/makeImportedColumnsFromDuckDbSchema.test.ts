@@ -52,9 +52,7 @@ describe("makeImportedColumnsFromDuckDbSchema", () => {
       _columnSchema("population", "BIGINT"),
     ]);
 
-    expect(
-      columns.every(propEq("isDataTypeUserSet", false)),
-    ).toBe(true);
+    expect(columns.every(propEq("isDataTypeUserSet", false))).toBe(true);
   });
 
   it("numbers the columns by their position in the source schema", () => {
@@ -64,8 +62,6 @@ describe("makeImportedColumnsFromDuckDbSchema", () => {
       _columnSchema("c", "VARCHAR"),
     ]);
 
-    expect(
-      columns.map(prop("columnIdx")),
-    ).toEqual([0, 1, 2]);
+    expect(columns.map(prop("columnIdx"))).toEqual([0, 1, 2]);
   });
 });

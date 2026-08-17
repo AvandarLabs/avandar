@@ -11,9 +11,11 @@ type MakeCastProbeSqlOptions = {
 
 /** Renders one sampled value as the text DuckDB will be asked to cast. */
 function _toProbeText(value: unknown): string | undefined {
-  return isNullish(value) ? undefined
+  return (
+    isNullish(value) ? undefined
     : value instanceof Date ? value.toISOString()
-    : String(value);
+    : String(value)
+  );
 }
 
 /**

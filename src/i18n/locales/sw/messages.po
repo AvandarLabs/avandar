@@ -340,7 +340,7 @@ msgstr "Hapana"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Some values do not fit the type you chose"
-msgstr ""
+msgstr "Baadhi ya thamani haziendani na aina uliyochagua"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
@@ -1625,7 +1625,7 @@ msgstr "Onyesha maelezo"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1714,7 +1714,7 @@ msgstr "Sasisho la vizuizi limefeli"
 
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Data Type"
-msgstr ""
+msgstr "Aina ya data"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2923,7 +2923,7 @@ msgstr "Aina ya lebo"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Number"
-msgstr ""
+msgstr "Nambari"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4199,7 +4199,8 @@ msgstr "Kulia"
 #. placeholder {0}: error.columnName
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "More than one column is named \"{0}\". Column names must be unique."
-msgstr ""
+msgstr "Zaidi ya safu wima moja imepewa jina \"{0}\". Majina ya safu wima "
+"lazima yawe ya kipekee."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -4212,7 +4213,7 @@ msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Integer"
-msgstr ""
+msgstr "Nambari kamili"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4434,7 +4435,8 @@ msgstr "Pakia"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
 "and would be left empty."
-msgstr ""
+msgstr "\"{0}\" kama {typeLabel}: thamani {1} kati ya {2} zilizochaguliwa "
+"haziwezi kubadilishwa na zitaachwa tupu."
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4755,7 +4757,8 @@ msgstr "Ingiza seti ya data"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "{0} columns were detected. Correct any name or type that is wrong before "
 "saving."
-msgstr ""
+msgstr "Safu wima {0} ziligunduliwa. Sahihisha jina au aina yoyote isiyo sahihi "
+"kabla ya kuhifadhi."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
@@ -4783,10 +4786,6 @@ msgstr "Kichupo hiki hakina metadata ya safu. Hakiwezi kuingizwa bado."
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "Mfano wa mazungumzo ya mtandaoni uko tayari"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "Maelezo ya safu yameboreshwa kwa mafanikio!"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -5197,7 +5196,7 @@ msgstr "Tuma jibu"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Column {columnNumber} needs a name."
-msgstr ""
+msgstr "Safu wima {columnNumber} inahitaji jina."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -5587,7 +5586,7 @@ msgstr "Mpango wa Sasa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column updated successfully!"
-msgstr ""
+msgstr "Safu wima imesasishwa kwa mafanikio!"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6281,7 +6280,7 @@ msgstr "Google Sheet ilishindwa kupakia"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Fix these column names before saving"
-msgstr ""
+msgstr "Sahihisha majina haya ya safu wima kabla ya kuhifadhi"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

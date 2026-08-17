@@ -4735,10 +4735,6 @@ msgstr "This catalog entry has no column metadata. It cannot be imported yet."
 msgid "Offline chat model ready"
 msgstr "Offline chat model ready"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "Column description updated successfully!"
-
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Save your changes first: the PDF reflects the saved dashboard."

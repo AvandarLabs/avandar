@@ -1,5 +1,6 @@
 //! How an object, and each of its keys, is rendered.
 
+import type { DescribableValueArrayRenderOptions } from "./arrayRenderOptions";
 import type {
   DescribableObject,
   DescribableObjectOf,
@@ -7,7 +8,6 @@ import type {
   ObjectKeyTransformationType,
   PrimitiveValue,
 } from "./describableValues";
-import type { DescribableValueArrayRenderOptions } from "./arrayRenderOptions";
 import type { PrimitiveValueRenderOptions } from "./primitiveValueRenderOptions";
 import type { StringKeyOf } from "@avandar/utils";
 import type { ReactNode } from "react";

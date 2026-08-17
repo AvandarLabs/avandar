@@ -346,7 +346,7 @@ msgstr "Non"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Some values do not fit the type you chose"
-msgstr ""
+msgstr "Certaines valeurs ne correspondent pas au type que vous avez choisi"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
@@ -1647,7 +1647,7 @@ msgstr "Afficher les détails"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Boolean"
-msgstr ""
+msgstr "Booléen"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -1738,7 +1738,7 @@ msgstr "Échec de la mise à jour de la restriction"
 
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 msgid "Data Type"
-msgstr ""
+msgstr "Type de données"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2959,7 +2959,7 @@ msgstr "Type d'étiquette"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Number"
-msgstr ""
+msgstr "Nombre"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4249,7 +4249,8 @@ msgstr "Droite"
 #. placeholder {0}: error.columnName
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "More than one column is named \"{0}\". Column names must be unique."
-msgstr ""
+msgstr "Plusieurs colonnes portent le nom « {0} ». Les noms de colonnes doivent "
+"être uniques."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "all members of "
@@ -4262,7 +4263,7 @@ msgstr "Certaines données doivent être saisies manuellement"
 #: src/hooks/datasets/useDatasetColumnRenderOptions/useDatasetColumnRenderOptions.ts
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Integer"
-msgstr ""
+msgstr "Entier"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4486,7 +4487,8 @@ msgstr "Télécharger"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "\"{0}\" as {typeLabel}: {1} of {2} sampled values cannot be converted "
 "and would be left empty."
-msgstr ""
+msgstr "« {0} » en tant que {typeLabel} : {1} des {2} valeurs échantillonnées "
+"ne peuvent pas être converties et resteraient vides."
 
 #: src/views/GisApp/MapCanvas/MapStatusOverlay/MapErrorStatus.tsx
 msgid "Something went wrong while loading this layer's data."
@@ -4811,7 +4813,8 @@ msgstr "Importer le jeu de données"
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "{0} columns were detected. Correct any name or type that is wrong before "
 "saving."
-msgstr ""
+msgstr "{0} colonnes ont été détectées. Corrigez tout nom ou type incorrect "
+"avant d’enregistrer."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick google sheet"
@@ -4840,10 +4843,6 @@ msgstr "Cette entrée de catalogue n'a pas de métadonnées de colonne. Elle ne 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
 msgstr "Modèle de chat hors ligne prêt"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
-#~ msgid "Column description updated successfully!"
-#~ msgstr "Description de la colonne mise à jour avec succès !"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
@@ -5259,7 +5258,7 @@ msgstr "Envoyer la réponse"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Column {columnNumber} needs a name."
-msgstr ""
+msgstr "La colonne {columnNumber} doit avoir un nom."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -5653,7 +5652,7 @@ msgstr "Plan actuel"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column updated successfully!"
-msgstr ""
+msgstr "Colonne mise à jour avec succès !"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
@@ -6358,7 +6357,7 @@ msgstr "Échec du chargement de la feuille Google"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ColumnIssuesCallout.tsx
 msgid "Fix these column names before saving"
-msgstr ""
+msgstr "Corrigez ces noms de colonnes avant d’enregistrer"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"

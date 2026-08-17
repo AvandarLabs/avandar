@@ -41,9 +41,9 @@ describe("makeDatasetColumnInputsFromImportedColumns", () => {
   it("leaves an absent description absent rather than sending an empty string", () => {
     const [withoutDescription, withDescription] =
       makeDatasetColumnInputsFromImportedColumns([
-      _importedColumn(),
-      _importedColumn({ description: "Where the reading was taken" }),
-    ]);
+        _importedColumn(),
+        _importedColumn({ description: "Where the reading was taken" }),
+      ]);
 
     expect(withoutDescription?.description).toBeUndefined();
     expect(withDescription?.description).toBe("Where the reading was taken");

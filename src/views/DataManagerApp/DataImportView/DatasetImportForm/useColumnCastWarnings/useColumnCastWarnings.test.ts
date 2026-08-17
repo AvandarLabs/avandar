@@ -7,9 +7,12 @@ const probeColumnCastLossMock = vi.hoisted(() => {
   return vi.fn();
 });
 
-vi.mock("@/clients/DuckDbClient/probeColumnCastLoss/probeColumnCastLoss", () => {
-  return { probeColumnCastLoss: probeColumnCastLossMock };
-});
+vi.mock(
+  "@/clients/DuckDbClient/probeColumnCastLoss/probeColumnCastLoss",
+  () => {
+    return { probeColumnCastLoss: probeColumnCastLossMock };
+  },
+);
 
 vi.mock("@/utils/Logger", () => {
   return { Logger: { error: vi.fn() } };
