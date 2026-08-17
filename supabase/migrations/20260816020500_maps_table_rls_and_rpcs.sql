@@ -778,27 +778,6 @@ set
   end;
 $function$;
 
--- Default privileges still grant DML to anon on a newly created table.
--- Match `normalize_data_api_grants`: maps is authenticated-only, like datasets.
-revoke delete on table "public"."maps"
-from
-  "anon";
-
-revoke insert on table "public"."maps"
-from
-  "anon";
-
-revoke
-select
-  on table "public"."maps"
-from
-  "anon";
-
-revoke
-update on table "public"."maps"
-from
-  "anon";
-
 grant delete on table "public"."maps" to "authenticated";
 
 grant insert on table "public"."maps" to "authenticated";
