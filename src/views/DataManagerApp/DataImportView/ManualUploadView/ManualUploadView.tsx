@@ -6,6 +6,8 @@ import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useEffect, useRef, useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { NuxEvents } from "@/components/Nux/nuxEvents";
 import { notifyError } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
@@ -145,7 +147,12 @@ export function ManualUploadView({
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}
-          onSaveSuccess={onSaveSuccess}
+          onSaveSuccess={(savedDataset) => {
+            // Advances the onboarding tutorial's first milestone. A no-op
+            // when nobody is in the tutorial, which is the normal case.
+            NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
+            onSaveSuccess?.(savedDataset);
+          }}
           onDataSourceMetadataChange={(metadata) => {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}
@@ -172,21 +179,25 @@ export function ManualUploadView({
   return (
     <Box {...boxProps}>
       <Stack align="flex-start">
-        <FileUploadForm
-          label={t`Upload a spreadsheet`}
-          description={t`Select an Excel or CSV file from your computer to import`}
-          placeholder={t`Select file`}
-          accept={[
-            MIMEType.TEXT_CSV,
-            MIMEType.APPLICATION_MS_EXCEL,
-            MIMEType.APPLICATION_OPENXML_EXCEL,
-          ]}
-          fullWidth
-          isSubmitting={isLoadingFile}
-          onSubmit={onFileSubmit}
-        />
+        <Box {...nuxAnchorProps(NuxAnchors.datasetUploadForm)}>
+          <FileUploadForm
+            label={t`Upload a spreadsheet`}
+            description={t`Select an Excel or CSV file from your computer to import`}
+            placeholder={t`Select file`}
+            accept={[
+              MIMEType.TEXT_CSV,
+              MIMEType.APPLICATION_MS_EXCEL,
+              MIMEType.APPLICATION_OPENXML_EXCEL,
+            ]}
+            fullWidth
+            isSubmitting={isLoadingFile}
+            onSubmit={onFileSubmit}
+          />
+        </Box>
 
-        {elements.importForm()}
+        <Box {...nuxAnchorProps(NuxAnchors.datasetImportForm)}>
+          {elements.importForm()}
+        </Box>
       </Stack>
     </Box>
   );
