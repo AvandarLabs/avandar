@@ -1,0 +1,12 @@
+.classificationHistogram {
+  align-items: end;
+  display: flex;
+  gap: 2px;
+  height: 72px;
+}
+
+.classificationHistogramBar {
+  background: var(--mantine-primary-color-filled);
+  flex: 1;
+  min-height: 2px;
+}

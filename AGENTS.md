@@ -225,4 +225,5 @@ Implement functionality using red/green TDD.
   browser sessions. Those accounts are dedicated to automated E2E tests.
 - Take screenshots along the way, since they are the only record of what the
   page looked like. Store them in `.temp/` directory at the repo root, which
-  is gitignored.
+  is gitignored, inside a subdirectory named after the current branch
+  (kebab-cased, in case of invalid characters) (e.g. `.temp/feat-hello-world`)

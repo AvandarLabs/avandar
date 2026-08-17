@@ -84,6 +84,7 @@ export type RunQetlQueryOptions = {
   rawSql: string;
   returnType?: "parquet" | "js";
   datasetDuckDbLease?: DatasetDuckDbLease;
+  signal?: AbortSignal;
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
@@ -102,4 +103,5 @@ export type RunLeasedQueryOptions = {
   queryDependencies: readonly Dataset.Id[];
   rawSql: string;
   returnType: "parquet" | "js";
+  signal?: AbortSignal;
 };

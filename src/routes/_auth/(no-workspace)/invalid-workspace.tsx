@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { Logger } from "@/utils/Logger";
 import type { ReactElement } from "react";
 
