@@ -1170,6 +1170,36 @@ export type Database = {
           },
         ]
       }
+      user_nux_progress: {
+        Row: {
+          completed_milestones: string[]
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["nux_status"]
+          tutorial_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string
@@ -1915,6 +1945,7 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
+      nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
       resource_type: "dashboard" | "dataset"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2158,6 +2189,7 @@ export const Constants = {
         "dataset_column_value",
         "manual_entry",
       ],
+      nux_status: ["not_started", "in_progress", "completed", "dismissed"],
       resource_type: ["dashboard", "dataset"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],
