@@ -10,6 +10,8 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import { CanvasAgGridStyles } from "@/views/DashboardApp/DashboardEditorView/CanvasAgGridStyles";
+import css from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.module.css";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
@@ -18,13 +20,17 @@ import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
+import { useFullWidthCanvasViewport } from "@/views/DashboardApp/DashboardEditorView/useFullWidthCanvasViewport/useFullWidthCanvasViewport";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
 import { useCallback, useEffect, useMemo } from "react";
-import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "./DashboardEditorView.constants";
+import {
+  DASHBOARD_EDITOR_INITIAL_PUCK_UI,
+  DASHBOARD_TOOLBAR_BUTTON_SIZE,
+} from "./DashboardEditorView.constants";
 import type { ReactElement } from "react";
 
 type Props = {
@@ -78,6 +84,9 @@ export function DashboardEditorView({
 
   const dashboardTitle: string = dashboard.name ?? "Untitled dashboard";
 
+  const { onAction: onPuckAction, PuckOverride: FullWidthCanvasOverride } =
+    useFullWidthCanvasViewport();
+
   const puckConfig = useDashboardPuckConfig({
     dashboardTitle,
     workspaceId: dashboard.workspaceId,
@@ -129,7 +138,12 @@ export function DashboardEditorView({
   return (
     <DashboardFilterStateManager.Provider>
       <AppLayout floatingToolbar>
-        <Flex direction="column" h="100%" pt={40}>
+        <Flex
+          className={css.compactDashboardEditor}
+          direction="column"
+          h="100%"
+          pt={40}
+        >
           {isShareOnlyAccess ?
             <Alert
               color="blue"
@@ -149,11 +163,15 @@ export function DashboardEditorView({
             metadata={avaPageMetadata}
             config={puckConfig}
             height="100%"
+            ui={DASHBOARD_EDITOR_INITIAL_PUCK_UI}
             data={editorData ?? initialEditorData}
             onChange={(d: Data) => {
               dashboardEditorDispatch.updateEditorData(d as AvaPageData);
             }}
+            onAction={onPuckAction}
             overrides={{
+              iframe: CanvasAgGridStyles,
+              puck: FullWidthCanvasOverride,
               headerActions: () => {
                 return (
                   <>
