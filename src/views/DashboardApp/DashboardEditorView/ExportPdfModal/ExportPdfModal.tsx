@@ -7,15 +7,19 @@ import {
   IconPencil,
 } from "@tabler/icons-react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import { DashboardPdfAnalyticsPayloads } from "@/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads";
 import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
 import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
+import { runTimedExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/runTimedExport/runTimedExport";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
 
@@ -83,17 +87,55 @@ export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
 
   const filename = buildPdfFilenameFromDashboardName(dashboard.name);
 
+  const logPdfExported = useCallback(
+    (
+      options: Readonly<{
+        durationMs: number;
+        mode: AnalyticsEventPayloads["dashboard.pdf_exported"]["mode"];
+      }>,
+    ): void => {
+      void AnalyticsClient.logEvent({
+        event: "dashboard.pdf_exported",
+        workspaceId: dashboard.workspaceId,
+        app: "dashboards",
+        payload: DashboardPdfAnalyticsPayloads.fromExported({
+          dashboard,
+          durationMs: options.durationMs,
+          mode: options.mode,
+        }),
+      });
+    },
+    [dashboard],
+  );
+
+  // Hoisted out of the JSX so the annotated export's `useCallback` is not
+  // invalidated by a fresh arrow on every render of this modal.
+  const onAnnotatedExported = useCallback(
+    (durationMs: number): void => {
+      logPdfExported({ durationMs, mode: "annotated" });
+    },
+    [logPdfExported],
+  );
+
   const onDirectExport = useCallback(async (): Promise<void> => {
-    if (!renderContainerRef.current) {
+    const container = renderContainerRef.current;
+    if (!container) {
       notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
       return;
     }
     setIsExporting(true);
     try {
-      await PdfExport.captureAndDownloadPdf({
-        element: renderContainerRef.current,
-        filename,
-        title: dashboard.name || t`Untitled dashboard`,
+      await runTimedExport({
+        runExport: async () => {
+          await PdfExport.captureAndDownloadPdf({
+            element: container,
+            filename,
+            title: dashboard.name || t`Untitled dashboard`,
+          });
+        },
+        onExported: (durationMs) => {
+          logPdfExported({ durationMs, mode: "direct" });
+        },
       });
       notifySuccess(t`PDF downloaded.`);
       onClose();
@@ -106,7 +148,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
     } finally {
       setIsExporting(false);
     }
-  }, [filename, dashboard.name, onClose, t]);
+  }, [filename, dashboard.name, onClose, t, logPdfExported]);
 
   // Always-mounted hidden render container so html2canvas can capture from
   // it. Positioned off-screen but at a fixed width so the layout matches a
@@ -194,6 +236,7 @@ export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
         onBack={() => {
           return setStep("choose");
         }}
+        onExported={onAnnotatedExported}
       />
     </Stack>
   );

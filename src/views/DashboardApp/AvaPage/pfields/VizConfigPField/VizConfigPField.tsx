@@ -7,7 +7,7 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { useMemo } from "react";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
-import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
 
@@ -60,6 +60,7 @@ export function VizConfigPField({
   const [queryResults] = useDataQuery({
     query: emptyStructuredQuery,
     rawSql: rawSql,
+    analyticsSurface: "viz_config",
     ...(workspaceId !== undefined ?
       {
         auth: "workspace" as const,

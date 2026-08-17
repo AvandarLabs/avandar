@@ -13,7 +13,7 @@ import { useLocalFilterState } from "@/views/DashboardApp/AvaPage/pblocks/DataVi
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
-import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactElement } from "react";
@@ -81,6 +81,7 @@ export function DataVizPBlock({
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
     rawSql: filteredSql,
+    analyticsSurface: "dashboard_block",
     ...(metadata.auth === "workspace" ?
       {
         auth: "workspace" as const,

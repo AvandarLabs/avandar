@@ -5,20 +5,26 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-const { runQueryMock, publicRunQueryMock, getAllEntityFieldValuesMock } =
-  vi.hoisted(() => {
-    return {
-      runQueryMock: vi.fn(),
-      publicRunQueryMock: vi.fn(),
-      getAllEntityFieldValuesMock: vi.fn(),
-    };
-  });
+const {
+  runQueryMock,
+  publicRunQueryMock,
+  getAllEntityFieldValuesMock,
+  resolveManualQueryForExecutionMock,
+} = vi.hoisted(() => {
+  return {
+    runQueryMock: vi.fn(),
+    publicRunQueryMock: vi.fn(),
+    getAllEntityFieldValuesMock: vi.fn(),
+    resolveManualQueryForExecutionMock: vi.fn(),
+  };
+});
 
 vi.mock("@/clients/qetl/WorkspaceQetlClient", () => {
   return { WorkspaceQetlClient: { runQuery: runQueryMock } };
@@ -33,6 +39,14 @@ vi.mock(
       EntityFieldValueClient: {
         getAllEntityFieldValues: getAllEntityFieldValuesMock,
       },
+    };
+  },
+);
+vi.mock(
+  "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution",
+  () => {
+    return {
+      resolveManualQueryForExecution: resolveManualQueryForExecutionMock,
     };
   },
 );
@@ -75,14 +89,21 @@ function _createEntityFieldConfig(
   });
 }
 
+beforeEach(() => {
+  runQueryMock.mockReset();
+  publicRunQueryMock.mockReset();
+  getAllEntityFieldValuesMock.mockReset();
+  // Mirrors the real resolver's behavior for queries that never trip the
+  // large-dataset auto-limit guard, which is every query these tests use
+  // unless a test overrides this default.
+  resolveManualQueryForExecutionMock.mockReset();
+  resolveManualQueryForExecutionMock.mockImplementation((params) => {
+    return Promise.resolve({ query: params.query, didAutoLimit: false });
+  });
+});
+
 describe("runStructuredQuery", () => {
   const workspaceId = uuid<Workspace.Id>();
-
-  beforeEach(() => {
-    runQueryMock.mockReset();
-    publicRunQueryMock.mockReset();
-    getAllEntityFieldValuesMock.mockReset();
-  });
 
   it("runs caller-supplied raw SQL verbatim", async () => {
     runQueryMock.mockResolvedValue({
@@ -161,5 +182,59 @@ describe("runStructuredQuery", () => {
       { name: "Ada", age: 30 },
       { name: "Grace", age: 40 },
     ]);
+  });
+});
+
+/**
+ * `didAutoLimit` is decided deep inside SQL selection, several calls below the
+ * public entry point. These tests pin which path reaches the resolver at all,
+ * and that when it does, the value the resolver returned is the value the
+ * caller sees rather than a constant.
+ */
+describe("runStructuredQueryWithMetadata", () => {
+  it("reports false for raw SQL, which never consults the resolver", async () => {
+    const emptyResult = { id: "r1", columns: [], data: [], numRows: 0 };
+    runQueryMock.mockResolvedValue(emptyResult);
+    // Set up to fail the assertion if the raw-SQL path ever starts consulting
+    // the resolver. Passing `rawSql` means it must not, so the reported value
+    // has to stay false even though the resolver would say otherwise.
+    resolveManualQueryForExecutionMock.mockResolvedValue({
+      query: StructuredQuery.makeEmpty(),
+      didAutoLimit: true,
+      rowCount: 900000,
+    });
+
+    const { result, didAutoLimit } = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: StructuredQuery.makeEmpty(),
+      rawSql: "SELECT 1",
+    });
+
+    expect(result).toBe(emptyResult);
+    expect(didAutoLimit).toBe(false);
+    expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
+  });
+
+  it("reports true when the resolver bounded a large dataset", async () => {
+    resolveManualQueryForExecutionMock.mockResolvedValue({
+      query: { ...StructuredQuery.makeEmpty(), limit: 5000 },
+      didAutoLimit: true,
+      rowCount: 900000,
+    });
+
+    // rawSql is undefined and the query has no dataSource, so execution falls
+    // through to the empty-result path in `_runSourceQuery` rather than
+    // reaching `WorkspaceQetlClient.runQuery`. `didAutoLimit` still comes
+    // from the resolver, which is what this test pins.
+    const { didAutoLimit } = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: StructuredQuery.makeEmpty(),
+      rawSql: undefined,
+      isStructuredQueryInSync: true,
+    });
+
+    expect(didAutoLimit).toBe(true);
   });
 });

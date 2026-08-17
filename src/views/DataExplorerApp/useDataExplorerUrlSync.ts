@@ -1,5 +1,4 @@
-import { isNonNullish, propEq, where } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { where } from "@avandar/utils";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -19,6 +18,7 @@ import {
   parseUrlSearch,
   serializeStateToUrl,
 } from "@/views/DataExplorerApp/DataExplorerUrlState";
+import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
@@ -160,8 +160,28 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
         return;
       }
 
+      // Cleared on unmount so the row-count lookup below cannot dispatch into
+      // an unmounted tree. It is checked once, immediately after the only
+      // suspension point, rather than before each dispatch: everything from
+      // there on is synchronous, so no later dispatch can outlive this check.
+      let isEffectActive = true;
+
       void (async () => {
         if (restoreStructuredFromUrl && restoredDataSource) {
+          // Every dispatch below has to stay in one synchronous run. The
+          // trigger stamp at the end of this block explains why, and an
+          // `await` between here and there silently relabels every hydrated
+          // query.
+          //
+          // `async-defer-await` wants cheap guards hoisted above the await so
+          // discarded work is never started. The only guard here reads
+          // `isEffectActive`, which is unconditionally true until this await
+          // yields, so hoisting it would check nothing. False positive.
+          //
+          // `react-doctor-disable-next-line` takes no rule name, so this
+          // suppresses every rule on the next line. Keep the line it guards to
+          // the single `const commitOptions` declaration.
+          // react-doctor-disable-next-line
           const commitOptions =
             isDatasetSource ?
               await buildDataSourceCommitOptions({
@@ -170,6 +190,9 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
                 workspaceId: workspace.id,
               })
             : undefined;
+          if (!isEffectActive) {
+            return;
+          }
           dispatch.setDataSource({
             dataSource: restoredDataSource,
             options: commitOptions,
@@ -181,20 +204,11 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           needsColumns &&
           (datasetColumns ?? entityFieldConfigs)
         ) {
-          const allQueryColumns = [
-            ...(datasetColumns ?? []).map((col) => {
-              return QueryColumn.makeFromDatasetColumn(col);
-            }),
-            ...(entityFieldConfigs ?? []).map((col) => {
-              return QueryColumn.makeFromEntityFieldConfig(col);
-            }),
-          ];
-
-          const restoredCols = (urlState.colNames ?? [])
-            .map((name) => {
-              return allQueryColumns.find(propEq("baseColumn.name", name));
-            })
-            .filter(isNonNullish);
+          const restoredCols = getRestoredColumnsFromUrl({
+            colNames: urlState.colNames,
+            datasetColumns,
+            entityFieldConfigs,
+          });
 
           if (restoredCols.length > 0) {
             dispatch.setColumns(restoredCols);
@@ -251,8 +265,26 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setVizConfig(urlState.vizConfig);
         }
 
+        // Stamped last on purpose. Stamping earlier would not survive: the
+        // structured restores above route through the manual-form reducer,
+        // which stamps `structured_change` itself.
+        //
+        // This works only because every dispatch above runs synchronously in
+        // this block, so React coalesces them into one render and no query
+        // observes an intermediate trigger. Do not introduce an `await`
+        // between the first dispatch and this line. A render could then commit
+        // mid-hydration, and every hydrated query would silently report
+        // `structured_change` instead. If suspending here ever becomes
+        // necessary, the trigger has to move into the query-changing action
+        // payloads rather than being stamped separately.
+        dispatch.setQueryTrigger("url_hydration");
+
         setIsHydrated(true);
       })();
+
+      return () => {
+        isEffectActive = false;
+      };
     },
     // Intentionally omitting `state` from deps: the "should hydrate?"
     // decision is captured once via shouldHydrateRef so that mid-hydration

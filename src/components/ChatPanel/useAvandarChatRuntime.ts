@@ -350,6 +350,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           const prompt =
             [...apiMessages].reverse().find(propEq("role", "user"))?.content ??
             "";
+          dataExplorerDispatch.setQueryTrigger("chat_generated");
           dataExplorerDispatch.setRawSql(sql);
           dataExplorerDispatch.setNlPrompt(prompt);
           try {
