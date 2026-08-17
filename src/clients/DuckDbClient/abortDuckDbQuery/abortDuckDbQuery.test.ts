@@ -7,7 +7,10 @@ describe("abortDuckDbQuery", () => {
     const cancelSent = vi.fn(async () => {
       return undefined;
     });
-    const cleanup = abortDuckDbQuery(controller.signal, { cancelSent });
+    const cleanup = abortDuckDbQuery({
+      signal: controller.signal,
+      connection: { cancelSent },
+    });
 
     controller.abort();
     controller.abort();
@@ -22,7 +25,10 @@ describe("abortDuckDbQuery", () => {
     controller.abort();
 
     expect(() => {
-      abortDuckDbQuery(controller.signal, { cancelSent: vi.fn() });
+      abortDuckDbQuery({
+        signal: controller.signal,
+        connection: { cancelSent: vi.fn() },
+      });
     }).toThrow();
   });
 });

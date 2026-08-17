@@ -55,20 +55,26 @@ describe("parseMapLayerSpatialResult", () => {
     };
 
     expect(
-      parseMapLayerSpatialResult(
-        _createResult(JSON.stringify(featureCollection), diagnostics),
-        "polygon",
-      ),
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(
+          JSON.stringify(featureCollection),
+          diagnostics,
+        ),
+        family: "polygon",
+      }),
     ).toEqual({ featureCollection, diagnostics });
   });
 
   it("accepts an empty FeatureCollection", () => {
     const featureCollection = { type: "FeatureCollection", features: [] };
     expect(
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, JSON.stringify(diagnostics)),
-        "polygon",
-      ).featureCollection,
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(
+          featureCollection,
+          JSON.stringify(diagnostics),
+        ),
+        family: "polygon",
+      }).featureCollection,
     ).toEqual(featureCollection);
   });
 
@@ -82,10 +88,13 @@ describe("parseMapLayerSpatialResult", () => {
     };
 
     expect(
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, JSON.stringify(binDiagnostics)),
-        "polygon",
-      ).diagnostics,
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(
+          featureCollection,
+          JSON.stringify(binDiagnostics),
+        ),
+        family: "polygon",
+      }).diagnostics,
     ).toEqual(binDiagnostics);
   });
 
@@ -99,10 +108,10 @@ describe("parseMapLayerSpatialResult", () => {
     ],
   ])("rejects %s", (_label, featureCollection, resultDiagnostics) => {
     expect(() => {
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, resultDiagnostics),
-        "polygon",
-      );
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(featureCollection, resultDiagnostics),
+        family: "polygon",
+      });
     }).toThrow();
   });
 
@@ -118,10 +127,10 @@ describe("parseMapLayerSpatialResult", () => {
       ],
     };
     expect(() => {
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, diagnostics),
-        "polygon",
-      );
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(featureCollection, diagnostics),
+        family: "polygon",
+      });
     }).toThrow(/family/i);
   });
 
@@ -142,27 +151,27 @@ describe("parseMapLayerSpatialResult", () => {
       ],
     };
     expect(
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, {
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(featureCollection, {
           ...diagnostics,
           observedFamilies: ["point"],
         }),
-        "point",
-      ).featureCollection.features,
+        family: "point",
+      }).featureCollection.features,
     ).toHaveLength(2);
   });
 
   it("rejects mixed geometry families", () => {
     const featureCollection = { type: "FeatureCollection", features: [] };
     expect(() => {
-      parseMapLayerSpatialResult(
-        _createResult(featureCollection, {
+      parseMapLayerSpatialResult({
+        queryResult: _createResult(featureCollection, {
           ...diagnostics,
           observedFamilies: ["point", "polygon"],
           hasMixedFamilies: true,
         }),
-        "polygon",
-      );
+        family: "polygon",
+      });
     }).toThrow(/mixed/i);
   });
 });

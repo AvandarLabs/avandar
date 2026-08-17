@@ -111,18 +111,11 @@ execute function public.util__set_updated_at ();
 -- Indexes to improve performance
 create index idx_maps__slug on public.maps (slug);
 
-create index idx_maps__workspace_owner on public.maps (
-  workspace_id,
-  owner_id
-);
+create index idx_maps__workspace_owner on public.maps (workspace_id, owner_id);
 
-create index idx_maps__owner_id on public.maps (
-  owner_id
-);
+create index idx_maps__owner_id on public.maps (owner_id);
 
-create index idx_maps__owner_profile_id on public.maps (
-  owner_profile_id
-);
+create index idx_maps__owner_profile_id on public.maps (owner_profile_id);
 
 -- Globally unique vanity slug for public maps, mirroring dashboards so a
 -- future `/m/<slug>` route resolves to at most one map even if a frontend

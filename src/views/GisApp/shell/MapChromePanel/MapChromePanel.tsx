@@ -1,8 +1,8 @@
 import { matchLiteral } from "@avandar/utils";
-import { ActionIcon, Collapse, Paper } from "@mantine/core";
-import { IconChevronDown } from "@tabler/icons-react";
+import { Collapse, Paper } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/views/GisApp/shell/MapChromePanel/MapChromePanel.module.css";
+import { MapChromePanelHeader } from "@/views/GisApp/shell/MapChromePanel/MapChromePanelHeader";
 import type { ChromePanelId } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
 import type { ReactNode } from "react";
 
@@ -16,7 +16,7 @@ type Props = {
   title: string;
 
   /** Shown after the title, for example a layer count. */
-  count?: number;
+  itemCount?: number;
 
   /** Rendered in the header, to the left of the collapse control. */
   headerActions?: ReactNode;
@@ -36,61 +36,12 @@ type Props = {
   children: ReactNode;
 };
 
-function _renderHeader(
-  options: Readonly<{
-    title: string;
-    count?: number;
-    headerActions?: ReactNode;
-    isCollapsed: boolean;
-    onToggleCollapsed: () => void;
-    collapseLabel: string;
-    expandLabel: string;
-    titleId: string;
-    bodyId: string;
-  }>,
-): ReactNode {
-  const {
-    title,
-    count,
-    headerActions,
-    isCollapsed,
-    onToggleCollapsed,
-    collapseLabel,
-    expandLabel,
-    titleId,
-    bodyId,
-  } = options;
-  return (
-    <div className={css.mapChromePanelHeader}>
-      <h2 className={css.mapChromePanelTitle} id={titleId}>
-        {title}
-      </h2>
-      {count === undefined ? null : (
-        <span className={css.mapChromePanelCount}>{count}</span>
-      )}
-      <span className={css.mapChromePanelSpacer} />
-      {headerActions}
-      <ActionIcon
-        className={css.mapChromePanelHeaderAction}
-        variant="subtle"
-        color="neutral"
-        aria-expanded={!isCollapsed}
-        aria-controls={bodyId}
-        aria-label={isCollapsed ? expandLabel : collapseLabel}
-        onClick={onToggleCollapsed}
-      >
-        <IconChevronDown size={16} stroke={1.8} />
-      </ActionIcon>
-    </div>
-  );
-}
-
 /** Renders a collapsible, accessible landmark over the map. */
 export function MapChromePanel({
   variant,
   id,
   title,
-  count,
+  itemCount,
   headerActions,
   isCollapsed,
   onToggleCollapsed,
@@ -118,17 +69,17 @@ export function MapChromePanel({
       withBorder={false}
       shadow="none"
     >
-      {_renderHeader({
-        title,
-        count,
-        headerActions,
-        isCollapsed,
-        onToggleCollapsed,
-        collapseLabel,
-        expandLabel,
-        titleId,
-        bodyId,
-      })}
+      <MapChromePanelHeader
+        title={title}
+        itemCount={itemCount}
+        headerActions={headerActions}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={onToggleCollapsed}
+        collapseLabel={collapseLabel}
+        expandLabel={expandLabel}
+        titleId={titleId}
+        bodyId={bodyId}
+      />
       <Collapse
         className={css.mapChromePanelBody}
         id={bodyId}

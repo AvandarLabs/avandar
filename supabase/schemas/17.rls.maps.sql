@@ -14,10 +14,7 @@
  * is not readable without authenticating.
  */
 /** Checks that an ordinary update keeps the persisted map owner unchanged. */
-create or replace function public.maps__owner_id_matches_stored (
-  p_map_id uuid,
-  p_owner_id uuid
-) returns boolean language sql security definer stable
+create or replace function public.maps__owner_id_matches_stored (p_map_id uuid, p_owner_id uuid) returns boolean language sql security definer stable
 set
   search_path = '' as $$
   select
@@ -29,20 +26,14 @@ set
 $$;
 
 revoke
-execute on function public.maps__owner_id_matches_stored (
-  uuid,
-  uuid
-)
+execute on function public.maps__owner_id_matches_stored (uuid, uuid)
 from
   public,
   anon,
   service_role;
 
 grant
-execute on function public.maps__owner_id_matches_stored (
-  uuid,
-  uuid
-) to authenticated;
+execute on function public.maps__owner_id_matches_stored (uuid, uuid) to authenticated;
 
 -- The inline owner short-circuit lets the row owner pass SELECT RLS without the
 -- helper re-fetching the row. Required so `INSERT ... RETURNING *` works for
@@ -55,9 +46,7 @@ select
       select
         auth.uid ()
     ) or
-    public.maps__auth_user_may_select (
-      public.maps.id
-    )
+    public.maps__auth_user_may_select (public.maps.id)
   );
 
 create policy "Users with editor app role can insert maps" on public.maps for insert to authenticated
@@ -84,16 +73,11 @@ with
       'map'::public.resource_type,
       public.maps.id
     ) and
-    public.maps__owner_id_matches_stored (
-      public.maps.id,
-      public.maps.owner_id
-    ) and
+    public.maps__owner_id_matches_stored (public.maps.id, public.maps.owner_id) and
     public.maps.owner_id = any (
       array(
         select
-          public.util__get_workspace_members (
-            public.maps.workspace_id
-          )
+          public.util__get_workspace_members (public.maps.workspace_id)
       )
     )
   );

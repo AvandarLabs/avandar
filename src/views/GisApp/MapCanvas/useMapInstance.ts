@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useAttachMapInstance";
 import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";

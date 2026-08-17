@@ -1,4 +1,3 @@
-import { Tooltip } from "@avandar/ui";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import {
@@ -10,6 +9,8 @@ import {
   IconVector,
 } from "@tabler/icons-react";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
+import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
+import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
@@ -52,34 +53,11 @@ function _getMapToolDefinitions(i18n: I18n): MapToolDefinition[] {
   ];
 }
 
-/** Renders an unavailable map tool with its reason in the accessible name. */
-function _renderUnavailableMapTool(tool: MapToolDefinition): ReactNode {
-  const accessibleLabel = `${tool.label}. ${tool.reason}`;
-  return (
-    <Tooltip key={tool.key} label={accessibleLabel}>
-      <button
-        type="button"
-        className={css.mapToolClusterTool}
-        aria-disabled
-        aria-label={accessibleLabel}
-        onClick={(event) => {
-          event.preventDefault();
-        }}
-      >
-        {tool.icon}
-      </button>
-    </Tooltip>
-  );
-}
-
 /** Renders the stable toolbar layout and its available tool states. */
 export function MapToolCluster(): ReactNode {
   const { i18n } = useLingui();
   const tools = _getMapToolDefinitions(i18n);
-  const panLabel = i18n._(msg`Pan and select`);
-  const coordinateSearchLabel = i18n._(msg`Go to a coordinate or P-code`);
   const unavailableReason = i18n._(msg`This tool is not available.`);
-
   return (
     <div
       className={css.mapToolCluster}
@@ -88,32 +66,27 @@ export function MapToolCluster(): ReactNode {
       aria-label={i18n._(msg`Map tools`)}
       tabIndex={-1}
     >
-      <Tooltip label={panLabel}>
-        <button
-          type="button"
-          className={css.mapToolClusterTool}
-          aria-pressed
-          aria-label={panLabel}
-        >
-          <IconPointer size={17} stroke={1.6} />
-        </button>
-      </Tooltip>
+      <PanMapTool
+        label={i18n._(msg`Pan and select`)}
+        icon={<IconPointer size={17} stroke={1.6} />}
+      />
       <span className={css.mapToolClusterSeparator} aria-hidden />
-      {tools.map(_renderUnavailableMapTool)}
+      {tools.map((tool) => {
+        return (
+          <UnavailableMapTool
+            key={tool.key}
+            icon={tool.icon}
+            label={tool.label}
+            reason={tool.reason}
+          />
+        );
+      })}
       <span className={css.mapToolClusterSeparator} aria-hidden />
-      <Tooltip label={`${coordinateSearchLabel}. ${unavailableReason}`}>
-        <button
-          type="button"
-          className={css.mapToolClusterTool}
-          aria-disabled
-          aria-label={`${coordinateSearchLabel}. ${unavailableReason}`}
-          onClick={(event) => {
-            event.preventDefault();
-          }}
-        >
-          <IconSearch size={17} stroke={1.6} />
-        </button>
-      </Tooltip>
+      <UnavailableMapTool
+        icon={<IconSearch size={17} stroke={1.6} />}
+        label={i18n._(msg`Go to a coordinate or P-code`)}
+        reason={unavailableReason}
+      />
     </div>
   );
 }

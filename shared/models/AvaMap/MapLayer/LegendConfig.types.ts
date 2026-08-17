@@ -12,8 +12,11 @@ export type LegendBreak = {
 };
 
 /** One ordered row displayed by a map legend. */
+export const LEGEND_ENTRY_TYPES = ["value", "noData", "suppressed"] as const;
+export type LegendEntryType = (typeof LEGEND_ENTRY_TYPES)[number];
+
 export type LegendEntry = {
-  type: "value" | "noData" | "suppressed";
+  type: LegendEntryType;
   color: string;
   label: string;
   count: number;

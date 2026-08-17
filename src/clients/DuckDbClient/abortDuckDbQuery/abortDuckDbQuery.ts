@@ -3,16 +3,16 @@ type CancellableDuckDbConnection = {
 };
 
 /** Registers one AbortSignal to cancel the active DuckDB query. */
-export function abortDuckDbQuery(
-  signal: AbortSignal,
-  connection: CancellableDuckDbConnection,
-): () => void {
-  signal.throwIfAborted();
+export function abortDuckDbQuery(options: {
+  signal: AbortSignal;
+  connection: CancellableDuckDbConnection;
+}): () => void {
+  options.signal.throwIfAborted();
   const onAbort = (): void => {
-    void connection.cancelSent();
+    void options.connection.cancelSent();
   };
-  signal.addEventListener("abort", onAbort, { once: true });
+  options.signal.addEventListener("abort", onAbort, { once: true });
   return () => {
-    signal.removeEventListener("abort", onAbort);
+    options.signal.removeEventListener("abort", onAbort);
   };
 }

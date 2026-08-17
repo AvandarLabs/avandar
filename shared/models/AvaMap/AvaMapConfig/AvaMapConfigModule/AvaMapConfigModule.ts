@@ -86,9 +86,11 @@ export const AvaMapConfigModule = {
     const nextLayers = [...orderedLayerIds].reverse().map((layerId) => {
       return config.layers.find(propEq("id", layerId))!;
     });
-    const isUnchanged = nextLayers.every((layer, layerIndex) => {
-      return layer === config.layers[layerIndex];
-    });
+    const isUnchanged =
+      nextLayers.length === config.layers.length &&
+      nextLayers.every((layer, layerIndex) => {
+        return layer === config.layers[layerIndex];
+      });
     return isUnchanged ? config : { ...config, layers: nextLayers };
   },
 

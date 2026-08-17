@@ -75,11 +75,7 @@ end;
 $$;
 
 revoke
-execute on function public.rpc_workspaces__transfer_all_owned_resources (
-  uuid,
-  uuid,
-  uuid
-)
+execute on function public.rpc_workspaces__transfer_all_owned_resources (uuid, uuid, uuid)
 from
   public,
   anon,
@@ -87,8 +83,4 @@ from
   service_role;
 
 grant
-execute on function public.rpc_workspaces__transfer_all_owned_resources (
-  uuid,
-  uuid,
-  uuid
-) to authenticated;
+execute on function public.rpc_workspaces__transfer_all_owned_resources (uuid, uuid, uuid) to authenticated;

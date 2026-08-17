@@ -12,36 +12,51 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
-/** Edits manual cuts as a validated, comma-separated numeric list. */
-export function ClassificationBreakList(props: Props): ReactNode {
-  const { t } = useLingui();
-  const [text, setText] = useState(props.breaks.join(", "));
-  const numbers = text.split(",").map((part) => {
+function _parseBreaks(text: string): number[] {
+  return text.split(",").map((part) => {
     return Number(part.trim());
   });
-  const isValid =
+}
+
+function _areBreaksValid(numbers: readonly number[]): boolean {
+  return (
     numbers.length > 0 &&
     numbers.every((value, index) => {
       return (
         Number.isFinite(value) && (index === 0 || value > numbers[index - 1]!)
       );
-    });
+    })
+  );
+}
+
+/** Edits manual cuts as a validated, comma-separated numeric list. */
+export function ClassificationBreakList({
+  breaks,
+  onLayerChange,
+}: Props): ReactNode {
+  const { t } = useLingui();
+  const [text, setText] = useState(() => {
+    return breaks.join(", ");
+  });
+  const numbers = _parseBreaks(text);
   return (
     <TextInput
       label={t`Manual breaks`}
       description={t`Enter strictly increasing values separated by commas.`}
       error={
-        isValid ? undefined : t`Breaks must be finite and strictly increasing.`
+        _areBreaksValid(numbers) ? undefined : (
+          t`Breaks must be finite and strictly increasing.`
+        )
       }
       value={text}
       onChange={(event) => {
         const value = event.currentTarget.value;
         setText(value);
-        const nextNumbers = value.split(",").map((part) => {
-          return Number(part.trim());
-        });
-        props.onLayerChange((current) => {
-          return MapLayerUpdates.withManualBreaks(current, nextNumbers);
+        onLayerChange((current) => {
+          return MapLayerUpdates.withManualBreaks({
+            layer: current,
+            breaks: _parseBreaks(value),
+          });
         });
       }}
     />

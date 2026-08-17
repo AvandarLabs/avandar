@@ -146,11 +146,7 @@ end;
 $$;
 
 revoke
-execute on function public.rpc_resources__transfer_ownership (
-  public.resource_type,
-  uuid,
-  uuid
-)
+execute on function public.rpc_resources__transfer_ownership (public.resource_type, uuid, uuid)
 from
   public,
   anon,
@@ -158,8 +154,4 @@ from
   service_role;
 
 grant
-execute on function public.rpc_resources__transfer_ownership (
-  public.resource_type,
-  uuid,
-  uuid
-) to authenticated;
+execute on function public.rpc_resources__transfer_ownership (public.resource_type, uuid, uuid) to authenticated;

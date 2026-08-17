@@ -28,7 +28,7 @@ export function LayerPanel({
       variant="layers"
       id="gis-layers-panel"
       title={t`Layers`}
-      count={listProps.rows.length}
+      itemCount={listProps.rows.length}
       isCollapsed={isCollapsed}
       onToggleCollapsed={onToggleCollapsed}
       collapseLabel={t`Collapse the layers panel`}

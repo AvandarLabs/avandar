@@ -55,10 +55,10 @@ const duckDbLogger: ILogger = Logger.appendName("DuckDbClient");
  */
 class DuckDbClientImpl {
   #spatialAvailability = createDuckDbSpatialAvailabilityStore();
-  #connections = makeDuckDbConnectionManager(
-    duckDbLogger,
-    this.#spatialAvailability,
-  );
+  #connections = makeDuckDbConnectionManager({
+    logger: duckDbLogger,
+    spatialAvailability: this.#spatialAvailability,
+  });
 
   #logger: ILogger = duckDbLogger;
 

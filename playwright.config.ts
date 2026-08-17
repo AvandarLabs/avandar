@@ -5,7 +5,7 @@ import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 import {
   ensureE2EViteFeatureFlags,
   shouldReuseE2EViteServer,
-} from "./tests/e2e/setup/ensureE2EViteFeatureFlags";
+} from "./tests/e2e/setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 ensureE2EViteFeatureFlags();

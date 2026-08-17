@@ -1,18 +1,20 @@
 import { matchLiteral } from "@avandar/utils";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
+import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
+import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
+import { makeFillLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeFillLayerSpecsFromMapLayer";
+import { makeHeatmapLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeHeatmapLayerSpecFromMapLayer";
+import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
 import type {
   CircleRadiusValue,
   MapLayerSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
-
-/** Highlight applied to the feature the user has selected. */
-const SELECTED_STROKE_COLOR = "#ffd700";
 
 type ProportionalSymbol = Extract<
   MapLayer.Symbology,
@@ -25,43 +27,6 @@ type MakeLayerSpecFromMapLayerInput = {
   stats: LayerStats;
   valueColumnName?: string;
 };
-
-type CreateMapLayerSpecInput = {
-  layer: MapLayer.T;
-  stats: LayerStats;
-  valueColumnName: string | undefined;
-  sourceId: string;
-};
-
-/** Builds color paint from flat or preclassified feature properties. */
-function _buildColor(color: MapLayer.Color): string | ExpressionSpecification {
-  if (color.type === "single") {
-    return color.color;
-  }
-  const classColors =
-    color.type === "graduated" ?
-      color.ramp
-    : color.categories.map(({ color: categoryColor }) => {
-        return categoryColor;
-      });
-  const noDataColor = color.noData.color;
-  const classMatch = [
-    "match",
-    ["get", MapLayerSpatialFeatureProperties.classIndex],
-    ...classColors.flatMap((classColor, index) => {
-      return [index, classColor];
-    }),
-    color.type === "categorical" ? color.other.color : noDataColor,
-  ] as unknown as ExpressionSpecification;
-  return [
-    "case",
-    ["==", ["get", MapLayerSpatialFeatureProperties.state], "suppressed"],
-    "#868e96",
-    ["==", ["get", MapLayerSpatialFeatureProperties.state], "noData"],
-    noDataColor,
-    classMatch,
-  ];
-}
 
 /** Applies the selected scale to a numeric span. */
 function _getScaledSpan({
@@ -149,7 +114,7 @@ function _buildCircleRadius({
 }
 
 /** Creates the MapLibre circle layer for one persisted map layer. */
-function _createCircleLayerSpec({
+function _buildCircleLayerSpec({
   layer,
   stats,
   valueColumnName,
@@ -169,7 +134,7 @@ function _createCircleLayerSpec({
         stats,
         valueColumnName,
       }),
-      "circle-color": _buildColor(symbology.color),
+      "circle-color": makeColorExpressionFromColor(symbology.color),
       "circle-opacity": 0.8,
       "circle-stroke-width": symbology.stroke.width,
       "circle-stroke-color": [
@@ -184,10 +149,11 @@ function _createCircleLayerSpec({
 }
 
 /** Creates the MapLibre line layer for one persisted map layer. */
-function _createLineLayerSpec(
-  layer: MapLayer.T,
-  sourceId: string,
-): MapLayerSpec {
+function _buildLineLayerSpec(options: {
+  layer: MapLayer.T;
+  sourceId: string;
+}): MapLayerSpec {
+  const { layer, sourceId } = options;
   const symbology = layer.symbology;
   if (symbology.type !== "line") {
     throw new Error("Line symbology is required");
@@ -197,209 +163,48 @@ function _createLineLayerSpec(
     type: "line",
     source: sourceId,
     paint: {
-      "line-color": _buildColor(symbology.color),
+      "line-color": makeColorExpressionFromColor(symbology.color),
       "line-width": symbology.stroke.width,
     },
     ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
   };
 }
 
-/** Creates the polygon fill followed by its independently sized outline. */
-function _createFillLayerSpecs(
-  layer: MapLayer.T,
-  sourceId: string,
-): readonly MapLayerSpec[] {
-  const symbology = layer.symbology;
-  if (symbology.type !== "fill") {
-    throw new Error("Fill symbology is required");
-  }
-  const visibility =
-    layer.isVisible ? {} : { layout: { visibility: "none" as const } };
-  const layerId = MapLayerIds.toLayerId(layer.id);
-  return [
-    {
-      id: layerId,
-      type: "fill",
-      source: sourceId,
-      paint: {
-        "fill-color": _buildColor(symbology.color),
-        "fill-opacity": symbology.opacity,
-      },
-      ...visibility,
-    },
-    {
-      id: `${layerId}-outline`,
-      type: "line",
-      source: sourceId,
-      paint: {
-        "line-color": symbology.stroke.color,
-        "line-width": symbology.stroke.width,
-      },
-      ...visibility,
-    },
-  ];
-}
-
-/** Creates the count-sized circle representing one point cluster. */
-function _createClusterCircleLayerSpec(
-  layer: MapLayer.T,
-  sourceId: string,
-): MapLayerSpec {
-  const { symbology } = layer;
-  if (symbology.type !== "cluster") {
-    throw new Error("Cluster symbology is required");
-  }
-  return {
-    id: MapLayerIds.toLayerId(layer.id),
-    type: "circle",
-    source: sourceId,
-    filter: ["has", "point_count"],
-    paint: {
-      "circle-color": symbology.color.color,
-      "circle-opacity": 0.8,
-      "circle-radius": [
-        "interpolate",
-        ["linear"],
-        ["get", "point_count"],
-        1,
-        20,
-        100,
-        30,
-        750,
-        40,
-      ],
-      "circle-stroke-width": symbology.stroke.width,
-      "circle-stroke-color": symbology.stroke.color,
-    },
-    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
-  };
-}
-
-/** Creates the abbreviated point-count label for one cluster. */
-function _createClusterCountLayerSpec(
-  layer: MapLayer.T,
-  sourceId: string,
-): MapLayerSpec {
-  return {
-    id: MapLayerIds.toClusterCountLayerId(layer.id),
-    type: "symbol",
-    source: sourceId,
-    filter: ["has", "point_count"],
-    paint: {},
-    layout: {
-      "text-field": ["get", "point_count_abbreviated"],
-      "text-font": ["Noto Sans Regular"],
-      "text-size": 12,
-      ...(layer.isVisible ? {} : { visibility: "none" }),
-    },
-  };
-}
-
-/** Creates the ordinary circle shown for points outside clusters. */
-function _createUnclusteredCircleLayerSpec(
-  layer: MapLayer.T,
-  sourceId: string,
-): MapLayerSpec {
-  const { symbology } = layer;
-  if (symbology.type !== "cluster") {
-    throw new Error("Cluster symbology is required");
-  }
-  return {
-    id: MapLayerIds.toUnclusteredLayerId(layer.id),
-    type: "circle",
-    source: sourceId,
-    filter: ["!", ["has", "point_count"]],
-    paint: {
-      "circle-color": symbology.color.color,
-      "circle-opacity": 0.8,
-      "circle-radius": MapLayer.defaultSymbolRadius,
-      "circle-stroke-width": symbology.stroke.width,
-      "circle-stroke-color": [
-        "case",
-        ["boolean", ["feature-state", "isSelected"], false],
-        SELECTED_STROKE_COLOR,
-        symbology.stroke.color,
-      ],
-    },
-    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
-  };
-}
-
-/** Creates the three paint layers backed by one clustered source. */
-function _createClusterLayerSpecs(
-  layer: MapLayer.T,
-  sourceId: string,
-): readonly MapLayerSpec[] {
-  return [
-    _createClusterCircleLayerSpec(layer, sourceId),
-    _createClusterCountLayerSpec(layer, sourceId),
-    _createUnclusteredCircleLayerSpec(layer, sourceId),
-  ];
-}
-
-/** Builds an evenly spaced density expression from a heatmap ramp. */
-function _buildHeatmapColor(ramp: readonly string[]): ExpressionSpecification {
-  return [
-    "interpolate",
-    ["linear"],
-    ["heatmap-density"],
-    0,
-    "rgba(0, 0, 0, 0)",
-    ...ramp.flatMap((color, index) => {
-      return [(index + 1) / ramp.length, color];
-    }),
-  ] as ExpressionSpecification;
-}
-
-/** Creates a density layer from the configured radius, weight, and ramp. */
-function _createHeatmapLayerSpec({
-  layer,
-  valueColumnName,
-  sourceId,
-}: Readonly<CreateMapLayerSpecInput>): MapLayerSpec {
-  const { symbology } = layer;
-  if (symbology.type !== "heatmap") {
-    throw new Error("Heatmap symbology is required");
-  }
-  let heatmapWeight: ExpressionSpecification | 1;
-  if (symbology.weight) {
-    if (!valueColumnName) {
-      throw new Error("Heatmap weight requires a resolved value column name");
-    }
-    heatmapWeight = ["to-number", ["get", valueColumnName], 0];
-  } else {
-    heatmapWeight = 1;
-  }
-  return {
-    id: MapLayerIds.toLayerId(layer.id),
-    type: "heatmap",
-    source: sourceId,
-    paint: {
-      "heatmap-weight": heatmapWeight,
-      "heatmap-radius": symbology.radiusPx,
-      "heatmap-color": _buildHeatmapColor(symbology.ramp),
-    },
-    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
-  };
-}
-
-/** Creates the paint layers matching the configured geometry symbology. */
-function _createMapLayerSpecs(
+/** Makes the paint layers matching the configured geometry symbology. */
+function _makeMapLayerSpecs(
   options: Readonly<CreateMapLayerSpecInput>,
-): readonly MapLayerSpec[] {
-  if (options.layer.symbology.type === "fill") {
-    return _createFillLayerSpecs(options.layer, options.sourceId);
-  }
-  if (options.layer.symbology.type === "line") {
-    return [_createLineLayerSpec(options.layer, options.sourceId)];
-  }
-  if (options.layer.symbology.type === "cluster") {
-    return _createClusterLayerSpecs(options.layer, options.sourceId);
-  }
-  if (options.layer.symbology.type === "heatmap") {
-    return [_createHeatmapLayerSpec(options)];
-  }
-  return [_createCircleLayerSpec(options)];
+): MapLayerSpec[] {
+  return matchLiteral(options.layer.symbology.type, {
+    fill: () => {
+      return makeFillLayerSpecsFromMapLayer({
+        layer: options.layer,
+        sourceId: options.sourceId,
+      });
+    },
+    line: () => {
+      return [
+        _buildLineLayerSpec({
+          layer: options.layer,
+          sourceId: options.sourceId,
+        }),
+      ];
+    },
+    cluster: () => {
+      return makeClusterLayerSpecsFromMapLayer({
+        layer: options.layer,
+        sourceId: options.sourceId,
+      });
+    },
+    heatmap: () => {
+      return [makeHeatmapLayerSpecFromMapLayer(options)];
+    },
+    circle: () => {
+      return [_buildCircleLayerSpec(options)];
+    },
+    proportionalSymbol: () => {
+      return [_buildCircleLayerSpec(options)];
+    },
+  });
 }
 
 /**
@@ -433,7 +238,7 @@ export function makeLayerSpecFromMapLayer({
   }
 
   const sourceId = MapLayerIds.toSourceId(layer.id);
-  const layerSpecs = _createMapLayerSpecs({
+  const layerSpecs = _makeMapLayerSpecs({
     layer,
     stats,
     valueColumnName,

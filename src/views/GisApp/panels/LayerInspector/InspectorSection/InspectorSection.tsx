@@ -16,16 +16,6 @@ type Props = {
   children: ReactNode;
 };
 
-function _renderChevron(): ReactNode {
-  return (
-    <IconChevronDown
-      className={css.inspectorSectionChevron}
-      size={14}
-      stroke={2}
-    />
-  );
-}
-
 /**
  * One collapsible inspector section.
  *
@@ -67,7 +57,11 @@ export function InspectorSection({
           });
         }}
       >
-        {_renderChevron()}
+        <IconChevronDown
+          className={css.inspectorSectionChevron}
+          size={14}
+          stroke={2}
+        />
         {title}
         {note ?
           <span className={css.inspectorSectionNote}>{note}</span>

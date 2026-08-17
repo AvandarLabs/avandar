@@ -7,25 +7,36 @@ import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
+function _getCategoryKey(category: { value: string }, index: number): string {
+  return category.value === "" ? `empty-${index}` : category.value;
+}
+
 /** Edits up to three named categories plus the Other fallback. */
-export function CategoricalControls(props: Props): ReactNode {
+export function CategoricalControls({
+  layer,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  const { symbology } = props.layer;
+  const { symbology } = layer;
   if (symbology.type === "heatmap" || symbology.color.type !== "categorical") {
     return null;
   }
   const color = symbology.color;
   const update = (nextColor: typeof color): void => {
-    props.onLayerChange((current) => {
-      return MapLayerUpdates.withLayerColor(current, nextColor);
+    onLayerChange((current) => {
+      return MapLayerUpdates.withLayerColor({
+        layer: current,
+        color: nextColor,
+      });
     });
   };
+  const visibleCategories = color.categories.slice(0, 3);
   return (
     <>
-      {color.categories.slice(0, 3).map((category, index) => {
+      {visibleCategories.map((category, index) => {
         return (
           <TextInput
-            key={index}
+            key={_getCategoryKey(category, index)}
             label={t`Category ${index + 1}`}
             value={category.value}
             onChange={(event) => {

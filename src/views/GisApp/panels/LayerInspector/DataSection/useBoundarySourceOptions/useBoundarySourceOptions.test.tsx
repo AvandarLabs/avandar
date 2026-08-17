@@ -18,7 +18,7 @@ const clientState = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       useGetAll: () => {

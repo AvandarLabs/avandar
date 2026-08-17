@@ -1,16 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { ClassificationEditor } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor";
-import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
-import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSection/FilterSection";
 import css from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.module.css";
-import { LayerLeadStatus } from "@/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus";
-import { LegendSection } from "@/views/GisApp/panels/LayerInspector/LegendSection/LegendSection";
-import { MatchReport } from "@/views/GisApp/panels/LayerInspector/MatchReport/MatchReport";
-import { PopupSection } from "@/views/GisApp/panels/LayerInspector/PopupSection/PopupSection";
-import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
-import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
-import { CoordinateValidationReport } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport";
+import { LayerInspectorFocusedView } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorFocusedView";
+import { LayerInspectorSections } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorSections";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type {
   LayerChangeHandler,
@@ -29,6 +20,19 @@ type Props = {
   onOpenClassification: () => void;
   onCloseMatchReport: () => void;
 };
+
+function _shouldShowFocusedView(options: {
+  inspectorView: LayerInspectorView;
+  viewState: MapLayerViewState | undefined;
+}): boolean {
+  const { inspectorView, viewState } = options;
+  return (
+    (inspectorView.type === "matchReport" &&
+      viewState?.spatialDiagnostics !== undefined) ||
+    inspectorView.type === "classification" ||
+    inspectorView.type === "validationReport"
+  );
+}
 
 /** Renders the selected layer's inspector sections. */
 export function LayerInspectorBody({
@@ -49,57 +53,25 @@ export function LayerInspectorBody({
       </div>
     );
   }
-  if (inspectorView.type === "matchReport" && viewState?.spatialDiagnostics) {
+  if (_shouldShowFocusedView({ inspectorView, viewState })) {
     return (
-      <MatchReport
-        diagnostics={viewState.spatialDiagnostics}
-        onBack={onCloseMatchReport}
-      />
-    );
-  }
-  if (inspectorView.type === "classification") {
-    return (
-      <ClassificationEditor
+      <LayerInspectorFocusedView
         layer={layer}
+        viewState={viewState}
         onLayerChange={onLayerChange}
-        onBack={onCloseMatchReport}
-      />
-    );
-  }
-  if (inspectorView.type === "validationReport") {
-    return (
-      <CoordinateValidationReport
-        drops={viewState?.drops ?? []}
-        onBack={onCloseMatchReport}
-        onSwapLatLng={() => {
-          onLayerChange(MapLayerUpdates.swapLatLngColumns);
-        }}
+        inspectorView={inspectorView}
+        onCloseMatchReport={onCloseMatchReport}
       />
     );
   }
   return (
-    <>
-      <div className={css.layerInspectorBodyLead}>
-        <h3 className={css.layerInspectorBodyLeadName}>{layer.name}</h3>
-        <LayerLeadStatus
-          viewState={viewState}
-          onOpenMatchReport={onOpenMatchReport}
-        />
-      </div>
-      <DataSection layer={layer} onLayerChange={onLayerChange} />
-      <StyleSection
-        layer={layer}
-        onLayerChange={onLayerChange}
-        onOpenClassification={onOpenClassification}
-      />
-      <SensitivitySection layer={layer} onLayerChange={onLayerChange} />
-      <FilterSection
-        layer={layer}
-        onLayerChange={onLayerChange}
-        focusRequest={filterFocusRequest}
-      />
-      <PopupSection layer={layer} onLayerChange={onLayerChange} />
-      <LegendSection layer={layer} onLayerChange={onLayerChange} />
-    </>
+    <LayerInspectorSections
+      layer={layer}
+      viewState={viewState}
+      onLayerChange={onLayerChange}
+      filterFocusRequest={filterFocusRequest}
+      onOpenMatchReport={onOpenMatchReport}
+      onOpenClassification={onOpenClassification}
+    />
   );
 }

@@ -60,9 +60,7 @@ describe("CoordinateValidationReport", () => {
 
     rerender(
       <CoordinateValidationReport
-        drops={[
-          { reason: "outOfRange", count: 1, sampleRowIndexes: [3] },
-        ]}
+        drops={[{ reason: "outOfRange", count: 1, sampleRowIndexes: [3] }]}
         onBack={vi.fn()}
         onSwapLatLng={onSwapLatLng}
       />,

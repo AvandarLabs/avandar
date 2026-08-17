@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { useSyncExternalStore } from "react";
@@ -5,6 +6,7 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { I18n } from "@lingui/core";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
@@ -16,149 +18,210 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
+type SpatialAvailability = ReturnType<
+  typeof DuckDbClient.getSpatialAvailability
+>;
+type BindingTypeValue =
+  | "latLngColumns"
+  | "geometryColumn"
+  | "joinToBoundaries"
+  | "aggregatePointsToBoundaries"
+  | "binPointsToGrid";
+
+function _getSelectedBindingType(layer: MapLayer.T): BindingTypeValue {
+  const type = layer.geoBinding?.type;
+  if (
+    type === "geometryColumn" ||
+    type === "joinToBoundaries" ||
+    type === "aggregatePointsToBoundaries" ||
+    type === "binPointsToGrid"
+  ) {
+    return type;
+  }
+  return "latLngColumns";
+}
+
+function _hasUsableBoundary(options: readonly BoundarySourceOption[]): boolean {
+  return options.some(({ columns }) => {
+    return columns.length >= 2;
+  });
+}
+
+function _getSpatialDescription(
+  i18n: I18n,
+  availability: SpatialAvailability,
+): string | undefined {
+  if (availability === "loading") {
+    return i18n._(
+      msg`Geometry columns are available when Spatial finishes loading.`,
+    );
+  }
+  if (availability === "unavailable") {
+    return i18n._(
+      msg`Geometry columns need DuckDB Spatial, which is unavailable.`,
+    );
+  }
+  return undefined;
+}
+
+function _getBindingTypeData(options: {
+  i18n: I18n;
+  isAggregateOnly: boolean;
+  availability: SpatialAvailability;
+  hasBoundary: boolean;
+}): Array<{ value: string; label: string; disabled?: boolean }> {
+  const { i18n, isAggregateOnly, availability, hasBoundary } = options;
+  const spatialDisabled = availability !== "available";
+  const boundaryDisabled = spatialDisabled || !hasBoundary;
+  return [
+    {
+      value: "latLngColumns",
+      label: i18n._(msg`Latitude and longitude columns`),
+      disabled: isAggregateOnly,
+    },
+    {
+      value: "geometryColumn",
+      label: i18n._(msg`Geometry column`),
+      disabled: spatialDisabled,
+    },
+    {
+      value: "binPointsToGrid",
+      label: i18n._(msg`Bin into a grid`),
+      disabled: spatialDisabled,
+    },
+    {
+      value: "joinToBoundaries",
+      label: i18n._(msg`Join to boundaries`),
+      disabled: boundaryDisabled,
+    },
+    {
+      value: "aggregatePointsToBoundaries",
+      label: i18n._(msg`Aggregate points to boundaries`),
+      disabled: boundaryDisabled,
+    },
+  ];
+}
+
+function _createDefaultBoundary(
+  option: BoundarySourceOption,
+): MapLayer.BoundarySource {
+  return {
+    datasetId: option.dataset.id,
+    geometryColumnId: option.columns[0]!.id,
+    geometryEncoding: "wkt",
+    keyColumnId: option.columns[1]!.id,
+    displayNameColumnId: undefined,
+    simplification: { tolerancePixels: 0.75 },
+  };
+}
+
+function _getPointsFromLayer(layer: MapLayer.T): MapLayer.PointBinding {
+  const binding = layer.geoBinding;
+  if (binding?.type === "latLngColumns") {
+    return binding;
+  }
+  if (binding?.type === "geometryColumn" && binding.family === "point") {
+    return {
+      type: "geometryColumn",
+      column: binding.column,
+      encoding: binding.encoding,
+      family: "point",
+      simplification: undefined,
+      sourceCrs: binding.sourceCrs,
+    };
+  }
+  return { type: "latLngColumns", latitude: undefined, longitude: undefined };
+}
+
+function _applyBindingTypeChange(options: {
+  layer: MapLayer.T;
+  value: string;
+  sourceColumns: readonly QueryColumn.T[];
+  boundaryOptions: readonly BoundarySourceOption[];
+}): MapLayer.T {
+  const { layer, value, sourceColumns, boundaryOptions } = options;
+  if (value === "binPointsToGrid") {
+    return MapLayerUpdates.withGridBin(layer);
+  }
+  const boundaryOption = boundaryOptions.find(({ columns }) => {
+    return columns.length >= 2;
+  });
+  if (value === "joinToBoundaries") {
+    const dataKeyColumn = sourceColumns[0];
+    if (!boundaryOption || !dataKeyColumn) {
+      return layer;
+    }
+    return MapLayerUpdates.withBoundaryJoin({
+      layer,
+      dataKeyColumn,
+      matching: "exact",
+      boundary: _createDefaultBoundary(boundaryOption),
+    });
+  }
+  if (value === "aggregatePointsToBoundaries") {
+    if (!boundaryOption) {
+      return layer;
+    }
+    return MapLayerUpdates.withPointAggregation({
+      layer,
+      points: _getPointsFromLayer(layer),
+      boundary: _createDefaultBoundary(boundaryOption),
+    });
+  }
+  if (value !== "latLngColumns" && value !== "geometryColumn") {
+    return layer;
+  }
+  return MapLayerUpdates.withGeometryBindingType({
+    layer,
+    type: value,
+    geometryColumn: sourceColumns[0],
+  });
+}
+
+function _subscribeSpatialAvailability(listener: () => void): () => void {
+  return DuckDbClient.subscribeSpatialAvailability(listener);
+}
+
+function _getSpatialAvailability(): SpatialAvailability {
+  return DuckDbClient.getSpatialAvailability();
+}
+
 /** Selects the geometry source while reflecting Spatial capability state. */
-export function GeometryBindingTypeSelect(props: Props): ReactNode {
-  const { t } = useLingui();
+export function GeometryBindingTypeSelect({
+  layer,
+  sourceColumns,
+  boundaryOptions,
+  onLayerChange,
+}: Props): ReactNode {
+  const { t, i18n } = useLingui();
   const availability = useSyncExternalStore(
-    (listener) => {
-      return DuckDbClient.subscribeSpatialAvailability(listener);
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
+    _subscribeSpatialAvailability,
+    _getSpatialAvailability,
+    _getSpatialAvailability,
   );
-  const description =
-    availability === "loading" ?
-      t`Geometry columns are available when Spatial finishes loading.`
-    : availability === "unavailable" ?
-      t`Geometry columns need DuckDB Spatial, which is unavailable.`
-    : undefined;
   return (
     <Select
       label={t`Geometry`}
-      data={[
-        {
-          value: "latLngColumns",
-          label: t`Latitude and longitude columns`,
-          disabled: props.layer.sensitivity.mode === "aggregateOnly",
-        },
-        {
-          value: "geometryColumn",
-          label: t`Geometry column`,
-          disabled: availability !== "available",
-        },
-        {
-          value: "binPointsToGrid",
-          label: t`Bin into a grid`,
-          disabled: availability !== "available",
-        },
-        {
-          value: "joinToBoundaries",
-          label: t`Join to boundaries`,
-          disabled:
-            availability !== "available" ||
-            props.boundaryOptions.every(({ columns }) => {
-              return columns.length < 2;
-            }),
-        },
-        {
-          value: "aggregatePointsToBoundaries",
-          label: t`Aggregate points to boundaries`,
-          disabled:
-            availability !== "available" ||
-            props.boundaryOptions.every(({ columns }) => {
-              return columns.length < 2;
-            }),
-        },
-      ]}
-      value={
-        props.layer.geoBinding?.type === "geometryColumn" ? "geometryColumn"
-        : props.layer.geoBinding?.type === "joinToBoundaries" ?
-          "joinToBoundaries"
-        : props.layer.geoBinding?.type === "aggregatePointsToBoundaries" ?
-          "aggregatePointsToBoundaries"
-        : props.layer.geoBinding?.type === "binPointsToGrid" ?
-          "binPointsToGrid"
-        : "latLngColumns"
-      }
+      data={_getBindingTypeData({
+        i18n,
+        isAggregateOnly: layer.sensitivity.mode === "aggregateOnly",
+        availability,
+        hasBoundary: _hasUsableBoundary(boundaryOptions),
+      })}
+      value={_getSelectedBindingType(layer)}
       allowDeselect={false}
-      description={description}
+      description={_getSpatialDescription(i18n, availability)}
       onChange={(value) => {
         if (!value) {
           return;
         }
-        props.onLayerChange((current) => {
-          if (value === "binPointsToGrid") {
-            return MapLayerUpdates.withGridBin(current);
-          }
-          if (value === "joinToBoundaries") {
-            const boundaryOption = props.boundaryOptions.find(({ columns }) => {
-              return columns.length >= 2;
-            });
-            const dataKeyColumn = props.sourceColumns[0];
-            if (!boundaryOption || !dataKeyColumn) {
-              return current;
-            }
-            return MapLayerUpdates.withBoundaryJoin(current, {
-              dataKeyColumn,
-              matching: "exact",
-              boundary: {
-                datasetId: boundaryOption.dataset.id,
-                geometryColumnId: boundaryOption.columns[0]!.id,
-                geometryEncoding: "wkt",
-                keyColumnId: boundaryOption.columns[1]!.id,
-                displayNameColumnId: undefined,
-                simplification: { tolerancePixels: 0.75 },
-              },
-            });
-          }
-          if (value === "aggregatePointsToBoundaries") {
-            const boundaryOption = props.boundaryOptions.find(({ columns }) => {
-              return columns.length >= 2;
-            });
-            if (!boundaryOption) {
-              return current;
-            }
-            const currentBinding = current.geoBinding;
-            const points: MapLayer.PointBinding =
-              currentBinding?.type === "latLngColumns" ? currentBinding
-              : (
-                currentBinding?.type === "geometryColumn" &&
-                currentBinding.family === "point"
-              ) ?
-                {
-                  type: "geometryColumn",
-                  column: currentBinding.column,
-                  encoding: currentBinding.encoding,
-                  family: "point",
-                  simplification: undefined,
-                  sourceCrs: currentBinding.sourceCrs,
-                }
-              : {
-                  type: "latLngColumns",
-                  latitude: undefined,
-                  longitude: undefined,
-                };
-            return MapLayerUpdates.withPointAggregation(current, {
-              points,
-              boundary: {
-                datasetId: boundaryOption.dataset.id,
-                geometryColumnId: boundaryOption.columns[0]!.id,
-                geometryEncoding: "wkt",
-                keyColumnId: boundaryOption.columns[1]!.id,
-                displayNameColumnId: undefined,
-                simplification: { tolerancePixels: 0.75 },
-              },
-            });
-          }
-          return MapLayerUpdates.withGeometryBindingType(
-            current,
-            value as "latLngColumns" | "geometryColumn",
-            props.sourceColumns[0],
-          );
+        onLayerChange((current) => {
+          return _applyBindingTypeChange({
+            layer: current,
+            value,
+            sourceColumns,
+            boundaryOptions,
+          });
         });
       }}
     />

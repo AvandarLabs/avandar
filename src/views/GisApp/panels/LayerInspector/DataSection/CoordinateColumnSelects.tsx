@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { Model } from "@avandar/models";

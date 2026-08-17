@@ -29,10 +29,29 @@ export type NormalizationConfig = {
   multiplier: 1 | 1_000 | 100_000;
 };
 
+/** Automatic classification methods for a graduated color ramp. */
+export const AUTOMATIC_CLASSIFICATION_METHODS = [
+  "quantile",
+  "equalInterval",
+  "jenks",
+  "standardDeviation",
+] as const;
+export type AutomaticClassificationMethod =
+  (typeof AUTOMATIC_CLASSIFICATION_METHODS)[number];
+
+/** True when `value` is an automatic classification method. */
+export function isAutomaticClassificationMethod(
+  value: string,
+): value is AutomaticClassificationMethod {
+  return (AUTOMATIC_CLASSIFICATION_METHODS as readonly string[]).includes(
+    value,
+  );
+}
+
 /** Editable classification settings for a graduated color ramp. */
 export type ClassificationConfig =
   | {
-      method: "quantile" | "equalInterval" | "jenks" | "standardDeviation";
+      method: AutomaticClassificationMethod;
       classCount: number;
     }
   | { method: "manual"; breaks: readonly number[] };

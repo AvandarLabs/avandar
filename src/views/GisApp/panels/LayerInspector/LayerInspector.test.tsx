@@ -1,8 +1,8 @@
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@/test-utils";
 import { LayerInspector } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 
 vi.mock("@/views/GisApp/shell/MapChromePanel/MapChromePanel", () => {
@@ -37,7 +37,7 @@ const FULLY_UNMATCHED_STATE = {
 } as MapLayerViewState;
 
 function _layer(geoBinding: MapLayer.GeoBinding | undefined): MapLayer.T {
-  return { id: LAYER_ID, geoBinding } as MapLayer.T;
+  return { ...MapLayer.makeEmpty("Layer"), id: LAYER_ID, geoBinding };
 }
 
 function _renderInspector(options: {

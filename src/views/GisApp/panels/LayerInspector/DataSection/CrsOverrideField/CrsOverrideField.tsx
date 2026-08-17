@@ -15,13 +15,16 @@ const UTM_NORTH_CODES = [
 const UTM_SOUTH_CODES = [32733, 32734, 32735, 32736, 32737];
 const PRESET_CODES = [4326, 3857, 4258, ...UTM_NORTH_CODES, ...UTM_SOUTH_CODES];
 
-function _setCustomCrs(props: Props, value: string | number): void {
+function _setCustomCrs(
+  onChange: (sourceCrs: number | undefined) => void,
+  value: string | number,
+): void {
   if (value === "") {
-    props.onChange(undefined);
+    onChange(undefined);
     return;
   }
   if (typeof value === "number" && Number.isInteger(value) && value > 0) {
-    props.onChange(value);
+    onChange(value);
   }
 }
 
@@ -46,37 +49,34 @@ function _getPresetData(i18n: I18n): Array<{ value: string; label: string }> {
 }
 
 /** Selects a common source CRS or accepts any positive EPSG integer. */
-export function CrsOverrideField(props: Props): ReactNode {
+export function CrsOverrideField({ sourceCrs, onChange }: Props): ReactNode {
   const { i18n, t } = useLingui();
+  const presetValue =
+    sourceCrs !== undefined && PRESET_CODES.includes(sourceCrs) ?
+      String(sourceCrs)
+    : null;
   return (
     <>
       <Select
         label={t`Source CRS`}
         description={t`Leave empty when the geometry is already WGS 84.`}
         data={_getPresetData(i18n)}
-        value={
-          (
-            props.sourceCrs !== undefined &&
-            PRESET_CODES.includes(props.sourceCrs)
-          ) ?
-            String(props.sourceCrs)
-          : null
-        }
+        value={presetValue}
         clearable
         onChange={(value) => {
-          props.onChange(value === null ? undefined : Number(value));
+          onChange(value === null ? undefined : Number(value));
         }}
       />
       <NumberInput
         label={t`EPSG code`}
         description={t`Enter a positive integer for any CRS not listed above.`}
-        value={props.sourceCrs ?? ""}
+        value={sourceCrs ?? ""}
         min={1}
         step={1}
         allowDecimal={false}
         clampBehavior="blur"
         onChange={(value) => {
-          _setCustomCrs(props, value);
+          _setCustomCrs(onChange, value);
         }}
       />
     </>

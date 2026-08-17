@@ -1,11 +1,14 @@
-import { makeJenksBreaks } from "./makeJenksBreaks/makeJenksBreaks";
+import { isDefined } from "@avandar/utils";
+import { makeJenksBreaksFromValues } from "./makeJenksBreaksFromValues/makeJenksBreaksFromValues";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
+/** One feature id paired with the value used for classification. */
 export type LayerValue = { featureId: string; value: unknown };
 
+/** Class indexes, legend rows, and coverage counts for one layer's values. */
 export type LayerClassification = {
-  breaks: readonly MapLayer.LegendBreak[];
-  entries: readonly MapLayer.LegendEntry[];
+  breaks: MapLayer.LegendBreak[];
+  entries: MapLayer.LegendEntry[];
   classIndexByFeatureId: ReadonlyMap<string, number>;
   sourceValueCount: number;
   classifiedValueCount: number;
@@ -23,9 +26,9 @@ type Options = {
 function _makeQuantileCuts(
   sortedValues: readonly number[],
   classCount: number,
-): readonly number[] {
-  const cuts: number[] = [];
-  for (let classIndex = 1; classIndex < classCount; classIndex += 1) {
+): number[] {
+  const cuts = Array.from({ length: classCount - 1 }, (_, offset) => {
+    const classIndex = offset + 1;
     let cutIndex = Math.ceil((classIndex * sortedValues.length) / classCount);
     while (
       cutIndex < sortedValues.length &&
@@ -33,17 +36,15 @@ function _makeQuantileCuts(
     ) {
       cutIndex += 1;
     }
-    if (cutIndex < sortedValues.length) {
-      cuts.push(sortedValues[cutIndex]!);
-    }
-  }
+    return cutIndex < sortedValues.length ? sortedValues[cutIndex] : undefined;
+  }).filter(isDefined);
   return [...new Set(cuts)];
 }
 
 function _makeEqualIntervalCuts(
   sortedValues: readonly number[],
   classCount: number,
-): readonly number[] {
+): number[] {
   const minimum = sortedValues[0]!;
   const maximum = sortedValues.at(-1)!;
   const width = (maximum - minimum) / classCount;
@@ -98,13 +99,11 @@ function _makeCuts(
       didSample: false,
     };
   }
-  const jenks = makeJenksBreaks(values, classCount);
+  const jenks = makeJenksBreaksFromValues({ values, classCount });
   return { cuts: jenks.breaks, didSample: jenks.didSample };
 }
 
-function _buildBreaks(
-  cuts: readonly number[],
-): readonly MapLayer.LegendBreak[] {
+function _buildBreaks(cuts: readonly number[]): MapLayer.LegendBreak[] {
   return Array.from({ length: cuts.length + 1 }, (_, index) => {
     return { lower: cuts[index - 1], upper: cuts[index] };
   });

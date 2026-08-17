@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { SkipLinks } from "../SkipLinks/SkipLinks";
 import css from "./MapShell.module.css";
+import { MapShellChrome } from "./MapShellChrome";
 import type { ReactNode, RefCallback } from "react";
 
 type Props = {
@@ -28,71 +28,6 @@ type Props = {
   rightColumnRef: RefCallback<HTMLDivElement>;
 };
 
-function _renderChrome(
-  options: Readonly<{
-    topBar: ReactNode;
-    layerPanel: ReactNode;
-    inspector: ReactNode;
-    legend: ReactNode;
-    toolCluster: ReactNode;
-    statusCard: ReactNode;
-    firstRunCard: ReactNode;
-    isChromeHidden: boolean;
-    topBarRef: RefCallback<HTMLDivElement>;
-    leftColumnRef: RefCallback<HTMLDivElement>;
-    rightColumnRef: RefCallback<HTMLDivElement>;
-    readOnlyHeading: string;
-    readOnlyBody: string;
-  }>,
-): ReactNode {
-  const {
-    topBar,
-    layerPanel,
-    inspector,
-    legend,
-    toolCluster,
-    statusCard,
-    firstRunCard,
-    isChromeHidden,
-    topBarRef,
-    leftColumnRef,
-    rightColumnRef,
-    readOnlyHeading,
-    readOnlyBody,
-  } = options;
-  return (
-    <div className={css.mapShellChrome}>
-      <SkipLinks isChromeHidden={isChromeHidden} />
-      <div className={css.mapShellReadOnlyNotice} role="status">
-        <span>
-          <strong>{readOnlyHeading}</strong> {readOnlyBody}
-        </span>
-      </div>
-      {isChromeHidden ? null : (
-        <>
-          <div className={css.mapShellTopBar} ref={topBarRef}>
-            {topBar}
-          </div>
-          {firstRunCard ?
-            <div className={css.mapShellFirstRun}>{firstRunCard}</div>
-          : null}
-          <div className={css.mapShellLeftColumn} ref={leftColumnRef}>
-            {layerPanel}
-          </div>
-          <div className={css.mapShellRightColumn} ref={rightColumnRef}>
-            {inspector}
-          </div>
-          <div className={css.mapShellBottomLeft}>{legend}</div>
-          <div className={css.mapShellBottomCenter}>
-            {statusCard}
-            {toolCluster}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 /** Renders the full-bleed map with floating chrome and a furniture strip. */
 export function MapShell({
   canvas,
@@ -119,21 +54,21 @@ export function MapShell({
         aria-label={t`${mapLabel}. Use the layer panel to change what is shown.`}
       >
         {canvas}
-        {_renderChrome({
-          topBar,
-          layerPanel,
-          inspector,
-          legend,
-          toolCluster,
-          statusCard,
-          firstRunCard,
-          isChromeHidden,
-          topBarRef,
-          leftColumnRef,
-          rightColumnRef,
-          readOnlyHeading: t`Viewing only on this screen size.`,
-          readOnlyBody: t`Pan, zoom and tap a feature to read it. To edit layers, open this map on a tablet or a laptop.`,
-        })}
+        <MapShellChrome
+          topBar={topBar}
+          layerPanel={layerPanel}
+          inspector={inspector}
+          legend={legend}
+          toolCluster={toolCluster}
+          statusCard={statusCard}
+          firstRunCard={firstRunCard}
+          isChromeHidden={isChromeHidden}
+          topBarRef={topBarRef}
+          leftColumnRef={leftColumnRef}
+          rightColumnRef={rightColumnRef}
+          readOnlyHeading={t`Viewing only on this screen size.`}
+          readOnlyBody={t`Pan, zoom and tap a feature to read it. To edit layers, open this map on a tablet or a laptop.`}
+        />
       </div>
       {furnitureBar}
     </div>

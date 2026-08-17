@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
@@ -9,9 +10,7 @@ function _isPointBindingComplete(
   const hasColumn = (columnId: QueryColumn.Id | undefined): boolean => {
     return (
       columnId !== undefined &&
-      layer.source.queryColumns.some((column) => {
-        return column.id === columnId;
-      })
+      layer.source.queryColumns.some(propEq("id", columnId))
     );
   };
   return points.type === "geometryColumn" ?
@@ -28,9 +27,7 @@ export const MapLayerData = {
     }
     const binding = layer.geoBinding;
     if (binding?.type === "geometryColumn") {
-      return layer.source.queryColumns.some((column) => {
-        return column.id === binding.column;
-      });
+      return layer.source.queryColumns.some(propEq("id", binding.column));
     }
     if (binding?.type === "binPointsToGrid") {
       return _isPointBindingComplete(layer, binding.points);
@@ -45,7 +42,7 @@ export const MapLayerData = {
   },
 
   /** Cache key for a layer's rows, excluding display-only layer settings. */
-  toQueryKey: (
+  getQueryKeyFromMapLayer: (
     layer: MapLayer.T,
     spatialContext?: {
       availability: string;

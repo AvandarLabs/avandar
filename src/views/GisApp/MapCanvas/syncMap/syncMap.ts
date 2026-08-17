@@ -203,12 +203,7 @@ function _applyLayers(
   nextSpec: MapSpec,
   nextLayerIds: ReadonlySet<string>,
 ): void {
-  const needsReorder = _needsReorder(
-    map,
-    previousSpec,
-    nextSpec,
-    nextLayerIds,
-  );
+  const needsReorder = _needsReorder(map, previousSpec, nextSpec, nextLayerIds);
 
   nextSpec.layers.forEach((layerSpec) => {
     const previousLayerSpec = _findLayerSpec(previousSpec, layerSpec.id);

@@ -2,13 +2,13 @@ import { propEq, where } from "@avandar/utils";
 import { useHotkeys } from "@mantine/hooks";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCallback, useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { FitBoundsRequest } from "@/views/GisApp/layers/FitBoundsRequest/FitBoundsRequest";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender";
+import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
+import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
 import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-import { usePersistedLayerLegends } from "@/views/GisApp/layers/usePersistedLayerLegends/usePersistedLayerLegends";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import { ChromePanelState } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
 import { useMapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
@@ -142,7 +142,7 @@ function useGisAppRendering(
     layerQueryStates,
     mapConfig: options.editor.mapConfig,
   });
-  usePersistedLayerLegends({
+  PersistedLayerLegends.usePersistedLayerLegends({
     mapConfig: options.editor.mapConfig,
     legendUpdates: rendering.legendUpdates,
     updateConfig: options.editor.updateConfig,

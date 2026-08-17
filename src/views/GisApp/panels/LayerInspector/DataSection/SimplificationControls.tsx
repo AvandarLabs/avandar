@@ -13,9 +13,12 @@ type Props = {
 };
 
 /** Edits screen-space geometry simplification for lines and polygons. */
-export function SimplificationControls(props: Props): ReactNode {
+export function SimplificationControls({
+  binding,
+  onLayerChange,
+}: Props): ReactNode {
   const { t } = useLingui();
-  if (props.binding.family === "point") {
+  if (binding.family === "point") {
     return null;
   }
   return (
@@ -26,14 +29,15 @@ export function SimplificationControls(props: Props): ReactNode {
         description={t`Pixels of detail to remove at the current zoom. Set to zero to disable simplification.`}
         min={0}
         step={0.05}
-        value={props.binding.simplification?.tolerancePixels ?? 0}
+        value={binding.simplification?.tolerancePixels ?? 0}
         onChange={(value) => {
           const tolerancePixels = typeof value === "number" ? value : 0;
-          props.onLayerChange((current) => {
-            return MapLayerUpdates.withGeometrySimplification(
-              current,
-              tolerancePixels === 0 ? undefined : { tolerancePixels },
-            );
+          onLayerChange((current) => {
+            return MapLayerUpdates.withGeometrySimplification({
+              layer: current,
+              simplification:
+                tolerancePixels === 0 ? undefined : { tolerancePixels },
+            });
           });
         }}
       />

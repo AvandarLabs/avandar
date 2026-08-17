@@ -1,19 +1,18 @@
-import { Model } from "@avandar/models";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
+import {
+  createDataset,
+  createGridBinLayer,
+  createQueryableLayer,
+  createSpatialLayer,
+  wrapperForHook,
+} from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { User } from "$/models/User/User";
-import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement, ReactNode } from "react";
 
 const {
   initializeDuckDbMock,
@@ -60,124 +59,6 @@ const { useMapLayersData } =
 const { MapLayerData } =
   await import("@/views/GisApp/layers/useMapLayersData/MapLayerData");
 
-/**
- * An honest `DatasetColumn`, built through `Model.make` with no cast. Mirrors
- * the fixture in `MapLayerModule.test.ts`: `dataType` is a real `AvaDataType`
- * ("double"), not a loose "number", and the id field is `columnIdx`.
- */
-function _createNumericColumn(name: string): DatasetColumn.T {
-  const now = new Date().toISOString();
-  return Model.make("DatasetColumn", {
-    id: uuid<DatasetColumn.Id>(),
-    datasetId: uuid<Dataset.Id>(),
-    workspaceId: uuid<Workspace.Id>(),
-    createdAt: now,
-    updatedAt: now,
-    name,
-    originalName: name,
-    originalDataType: "DOUBLE",
-    dataType: "double",
-    detectedDataType: "DOUBLE",
-    description: undefined,
-    columnIdx: 0,
-  });
-}
-
-/** An honest `Dataset`, built through `Model.make` with no cast. */
-function _createDataset(): Dataset.T {
-  const now = new Date().toISOString();
-  return Model.make("Dataset", {
-    id: uuid<Dataset.Id>(),
-    createdAt: now,
-    updatedAt: now,
-    dateOfLastSync: undefined,
-    description: undefined,
-    isRestricted: false,
-    name: "Cases",
-    sourceType: "csv_file",
-    ownerId: uuid<User.Id>(),
-    ownerProfileId: uuid<UserProfile.Id>(),
-    workspaceId: uuid<Workspace.Id>(),
-  });
-}
-
-/** A layer with a data source and a geo binding that resolves. */
-function _createQueryableLayer(): MapLayer.Standard {
-  const layer = MapLayer.makeEmpty("Cases");
-  const latitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lat"),
-  );
-  const longitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lon"),
-  );
-  return {
-    ...layer,
-    source: {
-      ...layer.source,
-      dataSource: _createDataset(),
-      queryColumns: [latitude, longitude],
-    },
-    geoBinding: {
-      type: "latLngColumns",
-      latitude: latitude.id,
-      longitude: longitude.id,
-    },
-  };
-}
-
-/** A direct WKT point layer that requires DuckDB Spatial. */
-function _createSpatialLayer(): MapLayer.Standard {
-  const layer = MapLayer.makeEmpty("Shapes");
-  const dataset = _createDataset();
-  const geometry = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("shape"),
-  );
-  return {
-    ...layer,
-    source: {
-      ...layer.source,
-      dataSource: dataset,
-      queryColumns: [geometry],
-    },
-    geoBinding: {
-      type: "geometryColumn",
-      column: geometry.id,
-      encoding: "wkt",
-      family: "point",
-      simplification: undefined,
-      sourceCrs: undefined,
-    },
-  };
-}
-
-/** A grid-bin layer whose points come from the given binding. */
-function _createGridBinLayer(
-  layer: MapLayer.T,
-  points: MapLayer.PointBinding,
-): MapLayer.T {
-  return {
-    ...layer,
-    geoBinding: {
-      type: "binPointsToGrid",
-      grid: "hex",
-      sizeMeters: 10_000,
-      points,
-      aggregation: {
-        operation: "count",
-        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
-      },
-    },
-  };
-}
-
-/** Wraps a hook under test with the QueryClient it needs. */
-function _wrapperForHook(options: { children: ReactNode }): ReactElement {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return createElement(QueryClientProvider, { client }, options.children);
-}
-
 describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
@@ -190,7 +71,7 @@ describe("useMapLayersData", () => {
   });
 
   it("queries with a layer's source when the layer is queryable", async () => {
-    const layer = _createQueryableLayer();
+    const layer = createQueryableLayer();
     const queryResult: QueryResult.T<UnknownRow> = {
       id: uuid<QueryResult.Id>(),
       data: [{ cases: 1 }],
@@ -203,7 +84,7 @@ describe("useMapLayersData", () => {
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     await waitFor(() => {
@@ -226,7 +107,7 @@ describe("useMapLayersData", () => {
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     expect(runStructuredQueryMock).not.toHaveBeenCalled();
@@ -235,7 +116,7 @@ describe("useMapLayersData", () => {
   });
 
   it("does not query a layer whose geo binding does not resolve", () => {
-    const queryable = _createQueryableLayer();
+    const queryable = createQueryableLayer();
     const layer: MapLayer.T = {
       ...queryable,
       geoBinding: {
@@ -249,7 +130,7 @@ describe("useMapLayersData", () => {
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     expect(runStructuredQueryMock).not.toHaveBeenCalled();
@@ -258,8 +139,8 @@ describe("useMapLayersData", () => {
   });
 
   it("runs separate queries and retains rows for two queryable layers", async () => {
-    const firstLayer = _createQueryableLayer();
-    const secondLayer = _createQueryableLayer();
+    const firstLayer = createQueryableLayer();
+    const secondLayer = createQueryableLayer();
     const firstQueryResult: QueryResult.T<UnknownRow> = {
       id: uuid<QueryResult.Id>(),
       data: [{ cases: 1 }],
@@ -283,7 +164,7 @@ describe("useMapLayersData", () => {
           workspaceId,
         });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     await waitFor(() => {
@@ -302,13 +183,13 @@ describe("useMapLayersData", () => {
 
   it("waits for Spatial capability before running a geometry layer", () => {
     spatialAvailability.value = "loading";
-    const layer = _createSpatialLayer();
+    const layer = createSpatialLayer();
 
     const { result } = renderHook(
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
@@ -318,13 +199,13 @@ describe("useMapLayersData", () => {
 
   it("reports unavailable Spatial without executing QETL", () => {
     spatialAvailability.value = "unavailable";
-    const layer = _createSpatialLayer();
+    const layer = createSpatialLayer();
 
     const { result } = renderHook(
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
@@ -332,7 +213,7 @@ describe("useMapLayersData", () => {
   });
 
   it("runs available geometry layers as raw SQL and parses the envelope", async () => {
-    const layer = _createSpatialLayer();
+    const layer = createSpatialLayer();
     const featureCollection = { type: "FeatureCollection", features: [] };
     const diagnostics = {
       sourceCount: 0,
@@ -357,7 +238,7 @@ describe("useMapLayersData", () => {
       () => {
         return useMapLayersData({ layers: [layer], workspaceId });
       },
-      { wrapper: _wrapperForHook },
+      { wrapper: wrapperForHook },
     );
 
     await waitFor(() => {
@@ -378,7 +259,7 @@ describe("useMapLayersData", () => {
 
 describe("MapLayerData.isQueryable", () => {
   it("is true for a layer with a source and a resolvable binding", () => {
-    expect(MapLayerData.isQueryable(_createQueryableLayer())).toBe(true);
+    expect(MapLayerData.isQueryable(createQueryableLayer())).toBe(true);
   });
 
   it("is false until the layer has a data source", () => {
@@ -389,15 +270,15 @@ describe("MapLayerData.isQueryable", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withSource: MapLayer.T = {
       ...layer,
-      source: { ...layer.source, dataSource: _createDataset() },
+      source: { ...layer.source, dataSource: createDataset() },
     };
     expect(MapLayerData.isQueryable(withSource)).toBe(false);
   });
 
   it("is true for a grid bin bound to both coordinate columns", () => {
-    const base = _createQueryableLayer();
+    const base = createQueryableLayer();
     const [latitude, longitude] = base.source.queryColumns;
-    const layer = _createGridBinLayer(base, {
+    const layer = createGridBinLayer(base, {
       type: "latLngColumns",
       latitude: latitude?.id,
       longitude: longitude?.id,
@@ -407,8 +288,8 @@ describe("MapLayerData.isQueryable", () => {
   });
 
   it("is false for a grid bin missing one coordinate column", () => {
-    const base = _createQueryableLayer();
-    const layer = _createGridBinLayer(base, {
+    const base = createQueryableLayer();
+    const layer = createGridBinLayer(base, {
       type: "latLngColumns",
       latitude: base.source.queryColumns[0]?.id,
       longitude: undefined,
@@ -418,8 +299,8 @@ describe("MapLayerData.isQueryable", () => {
   });
 
   it("is true for a grid bin bound to a point geometry column", () => {
-    const base = _createSpatialLayer();
-    const layer = _createGridBinLayer(base, {
+    const base = createSpatialLayer();
+    const layer = createGridBinLayer(base, {
       type: "geometryColumn",
       column: base.source.queryColumns[0]!.id,
       encoding: "wkt",
@@ -432,7 +313,7 @@ describe("MapLayerData.isQueryable", () => {
   });
 
   it("is false for a grid bin whose point geometry column is gone", () => {
-    const layer = _createGridBinLayer(_createSpatialLayer(), {
+    const layer = createGridBinLayer(createSpatialLayer(), {
       type: "geometryColumn",
       column: uuid<QueryColumn.Id>(),
       encoding: "wkt",
@@ -445,12 +326,12 @@ describe("MapLayerData.isQueryable", () => {
   });
 });
 
-describe("MapLayerData.toQueryKey", () => {
+describe("MapLayerData.getQueryKeyFromMapLayer", () => {
   it("changes when the source changes", () => {
     const layer = MapLayer.makeEmpty("Cases");
     const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(MapLayerData.toQueryKey(layer)).not.toEqual(
-      MapLayerData.toQueryKey(withLimit),
+    expect(MapLayerData.getQueryKeyFromMapLayer(layer)).not.toEqual(
+      MapLayerData.getQueryKeyFromMapLayer(withLimit),
     );
   });
 
@@ -463,8 +344,8 @@ describe("MapLayerData.toQueryKey", () => {
         color: { type: "single" as const, color: "#ef4444" },
       },
     };
-    expect(MapLayerData.toQueryKey(layer)).toEqual(
-      MapLayerData.toQueryKey(recolored),
+    expect(MapLayerData.getQueryKeyFromMapLayer(layer)).toEqual(
+      MapLayerData.getQueryKeyFromMapLayer(recolored),
     );
   });
 });

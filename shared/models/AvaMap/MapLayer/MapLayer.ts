@@ -41,6 +41,18 @@ import type {
   SensitivityPolicy, // prettier-ignore
 } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 
+export {
+  GEOMETRY_ENCODINGS,
+  GEOMETRY_FAMILIES,
+  isGeometryEncoding,
+  isGeometryFamily,
+} from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
+export {
+  AUTOMATIC_CLASSIFICATION_METHODS,
+  isAutomaticClassificationMethod,
+} from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
+export { LEGEND_ENTRY_TYPES } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
+
 /** Public model namespace for map layers, related types, and constructors. */
 export {
   MapLayerModule as MapLayer, // prettier-ignore

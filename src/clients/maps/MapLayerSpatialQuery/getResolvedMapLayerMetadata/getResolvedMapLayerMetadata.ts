@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import { propEq } from "@avandar/utils";
+import { isDefined, propEq } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { match } from "ts-pattern";
 import type {
@@ -64,17 +64,13 @@ function _getAggregatingBinding(
 /** Returns every source column persisted by a geometry binding. */
 function _getRequiredSourceColumnIds(
   binding: MapLayer.GeoBinding | undefined,
-): readonly QueryColumn.Id[] {
+): QueryColumn.Id[] {
   if (!binding) {
     return [];
   }
   return match(binding)
     .with({ type: "latLngColumns" }, ({ latitude, longitude }) => {
-      return [latitude, longitude].filter(
-        (columnId): columnId is QueryColumn.Id => {
-          return columnId !== undefined;
-        },
-      );
+      return [latitude, longitude].filter(isDefined);
     })
     .with({ type: "geometryColumn" }, ({ column }) => {
       return [column];
@@ -97,9 +93,9 @@ function _findBoundaryColumn(
   datasetId: Dataset.Id,
   columnId: DatasetColumn.Id,
 ): DatasetColumn.T | undefined {
-  return columns.find((column) => {
-    return column.id === columnId && column.datasetId === datasetId;
-  });
+  return columns
+    .filter(propEq("id", columnId))
+    .find(propEq("datasetId", datasetId));
 }
 
 /** Resolves all columns of one persisted boundary reference. */

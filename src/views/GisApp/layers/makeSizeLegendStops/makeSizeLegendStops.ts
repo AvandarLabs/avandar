@@ -11,7 +11,7 @@ export function makeSizeLegendStops(
     scale: "sqrt" | "linear";
     formatLabel: (value: number) => string;
   }>,
-): readonly MapLayer.SizeLegendStop[] {
+): MapLayer.SizeLegendStop[] {
   const sortedValues = options.values
     .filter(Number.isFinite)
     .toSorted((left, right) => {

@@ -99,7 +99,7 @@ async function _executeRawQuery<RowObject extends UnknownRow>(
   const conn = options.conn ?? (await client.connect());
   const removeAbortListener =
     options.signal ?
-      abortDuckDbQuery(options.signal, conn)
+      abortDuckDbQuery({ signal: options.signal, connection: conn })
     : () => {
         return undefined;
       };

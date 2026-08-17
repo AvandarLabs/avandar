@@ -56,13 +56,16 @@ export function useMapLayersData({
       layer.geoBinding.type !== "latLngColumns"
     );
   });
-  useEffect(() => {
-    if (hasSpatialLayer && spatialAvailability === "loading") {
-      void DuckDbClient.initialize().catch(() => {
-        return undefined;
-      });
-    }
-  }, [hasSpatialLayer, spatialAvailability]);
+  useEffect(
+    function initializeDuckDbForSpatialLayers() {
+      if (hasSpatialLayer && spatialAvailability === "loading") {
+        void DuckDbClient.initialize().catch(() => {
+          return undefined;
+        });
+      }
+    },
+    [hasSpatialLayer, spatialAvailability],
+  );
   const results = useQueries({
     queries: layers.map((layer) => {
       const isSpatial =
@@ -74,7 +77,7 @@ export function useMapLayersData({
         enabled: MapLayerData.isQueryable(layer) && isCapabilityReady,
         queryKey: [
           workspaceId,
-          ...MapLayerData.toQueryKey(
+          ...MapLayerData.getQueryKeyFromMapLayer(
             layer,
             isSpatial ?
               {
@@ -193,6 +196,9 @@ async function _runSpatialLayer(options: {
   });
   return {
     type: "spatial",
-    ...parseMapLayerSpatialResult(queryResult, plan.family),
+    ...parseMapLayerSpatialResult({
+      queryResult,
+      family: plan.family,
+    }),
   };
 }

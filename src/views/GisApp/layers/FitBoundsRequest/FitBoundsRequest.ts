@@ -25,6 +25,18 @@ function _getUnionBounds(boundsList: readonly MapBounds[]): MapBounds {
   }, firstBounds);
 }
 
+function _getOrCreateLayerIdSet(ref: {
+  current: Set<MapLayer.Id> | undefined;
+}): Set<MapLayer.Id> {
+  const existing = ref.current;
+  if (existing !== undefined) {
+    return existing;
+  }
+  const created = new Set<MapLayer.Id>();
+  ref.current = created;
+  return created;
+}
+
 /** Explicit and first-render camera-fit request hooks. */
 export const FitBoundsRequest = {
   /** Creates explicit camera requests using the current panel-aware padding. */
@@ -60,16 +72,20 @@ export const FitBoundsRequest = {
     layerBounds: ReadonlyMap<MapLayer.Id, MapBounds | undefined>;
     requestFitBounds: (bounds: MapBounds) => void;
   }>): void => {
-    const fittedLayerIdsRef = useRef(new Set<MapLayer.Id>());
+    const fittedLayerIdsRef = useRef<Set<MapLayer.Id> | undefined>(undefined);
+    if (fittedLayerIdsRef.current === undefined) {
+      fittedLayerIdsRef.current = new Set();
+    }
     useEffect(
       function fitFirstRenderOfEachLayer() {
+        const fittedLayerIds = _getOrCreateLayerIdSet(fittedLayerIdsRef);
         const newlyReadyEntries = [...layerBounds].filter(
           ([layerId, bounds]) => {
-            return Boolean(bounds) && !fittedLayerIdsRef.current.has(layerId);
+            return Boolean(bounds) && !fittedLayerIds.has(layerId);
           },
         );
         fittedLayerIdsRef.current = new Set([
-          ...fittedLayerIdsRef.current,
+          ...fittedLayerIds,
           ...newlyReadyEntries.map(([layerId]) => {
             return layerId;
           }),

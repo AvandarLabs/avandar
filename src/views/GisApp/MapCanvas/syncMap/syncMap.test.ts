@@ -1,126 +1,22 @@
-import { makeObject } from "@avandar/utils";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
+import {
+  asMapLibreMap,
+  createCollection,
+  createFakeMap,
+  createSpec,
+  emptyCollection,
+  emptySpec,
+} from "@/views/GisApp/MapCanvas/syncMap/syncMap.fixtures";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { Map as MapLibreMap } from "maplibre-gl";
-
-type FakeSource = { setData: ReturnType<typeof vi.fn> };
-
-type FakeMap = {
-  /** Imperative calls in the order `syncMap` made them. */
-  calls: string[];
-
-  /** The persistent source stubs, so `setData` calls stay observable. */
-  sourcesById: Map<string, FakeSource>;
-
-  on: ReturnType<typeof vi.fn>;
-  getSource: (id: string) => FakeSource | undefined;
-  addSource: ReturnType<typeof vi.fn>;
-  removeSource: ReturnType<typeof vi.fn>;
-  getLayer: (id: string) => { id: string; type: string } | undefined;
-  addLayer: ReturnType<typeof vi.fn>;
-  removeLayer: ReturnType<typeof vi.fn>;
-  moveLayer: ReturnType<typeof vi.fn>;
-  setPaintProperty: ReturnType<typeof vi.fn>;
-  setLayoutProperty: ReturnType<typeof vi.fn>;
-};
-
-/**
- * Minimal stand-in for the MapLibre surface `syncMap` touches. Records calls
- * so tests can assert on the imperative sequence.
- */
-function _createFakeMap(): FakeMap {
-  const sourcesById = new Map<string, FakeSource>();
-  const layersById = new Map<string, { id: string; type: string }>();
-  const calls: string[] = [];
-  return {
-    calls,
-    sourcesById,
-    // `on` exists so the "registers no listeners" test observes a real spy
-    // rather than an absent property.
-    on: vi.fn(),
-    getSource: (id: string) => {
-      return sourcesById.get(id);
-    },
-    addSource: vi.fn((id: string) => {
-      sourcesById.set(id, {
-        setData: vi.fn(() => {
-          calls.push(`setData:${id}`);
-        }),
-      });
-      calls.push(`addSource:${id}`);
-    }),
-    removeSource: vi.fn((id: string) => {
-      sourcesById.delete(id);
-      calls.push(`removeSource:${id}`);
-    }),
-    getLayer: (id: string) => {
-      return layersById.get(id);
-    },
-    addLayer: vi.fn((layer: { id: string; type: string }) => {
-      layersById.set(layer.id, layer);
-      calls.push(`addLayer:${layer.id}`);
-    }),
-    removeLayer: vi.fn((id: string) => {
-      layersById.delete(id);
-      calls.push(`removeLayer:${id}`);
-    }),
-    moveLayer: vi.fn((id: string) => {
-      calls.push(`moveLayer:${id}`);
-    }),
-    setPaintProperty: vi.fn((layerId: string, property: string) => {
-      calls.push(`setPaint:${layerId}:${property}`);
-    }),
-    setLayoutProperty: vi.fn((layerId: string, property: string) => {
-      calls.push(`setLayout:${layerId}:${property}`);
-    }),
-  };
-}
-
-/** The one place the fake is widened to the real MapLibre surface. */
-function _asMapLibreMap(map: FakeMap): MapLibreMap {
-  return map as unknown as MapLibreMap;
-}
-
-function _createCollection(): GeoJSON.FeatureCollection {
-  return { type: "FeatureCollection", features: [] };
-}
-
-const emptyCollection = _createCollection();
-
-function _createSpec(
-  layerIds: readonly string[],
-  data: GeoJSON.FeatureCollection = emptyCollection,
-): MapSpec {
-  return {
-    sources: makeObject(layerIds, {
-      keyFn: (layerId) => {
-        return `source-${layerId}`;
-      },
-      valueFn: () => {
-        return { type: "geojson" as const, data };
-      },
-    }),
-    layers: layerIds.map((layerId) => {
-      return {
-        id: `layer-${layerId}`,
-        type: "circle" as const,
-        source: `source-${layerId}`,
-        paint: { "circle-radius": 6 },
-      };
-    }),
-  };
-}
-
-const emptySpec: MapSpec = { sources: {}, layers: [] };
 
 describe("syncMap", () => {
   it("adds sources before the layers that use them", () => {
-    const map = _createFakeMap();
+    const map = createFakeMap();
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
-      nextSpec: _createSpec(["a"]),
+      nextSpec: createSpec(["a"]),
     });
     expect(map.calls.indexOf("addSource:source-a")).toBeLessThan(
       map.calls.indexOf("addLayer:layer-a"),
@@ -128,16 +24,16 @@ describe("syncMap", () => {
   });
 
   it("removes layers before their sources", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.calls.length = 0;
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: emptySpec,
     });
@@ -145,30 +41,30 @@ describe("syncMap", () => {
   });
 
   it("does not re-add an unchanged layer", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.addLayer.mockClear();
-    syncMap({ map: _asMapLibreMap(map), previousSpec: spec, nextSpec: spec });
+    syncMap({ map: asMapLibreMap(map), previousSpec: spec, nextSpec: spec });
     expect(map.addLayer).not.toHaveBeenCalled();
   });
 
   it("pushes new source data when the feature collection changed", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.calls.length = 0;
-    const withNewData = _createSpec(["a"], _createCollection());
+    const withNewData = createSpec(["a"], createCollection());
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: withNewData,
     });
@@ -176,23 +72,23 @@ describe("syncMap", () => {
   });
 
   it("does not push source data when the collection reference is unchanged", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.calls.length = 0;
-    syncMap({ map: _asMapLibreMap(map), previousSpec: spec, nextSpec: spec });
+    syncMap({ map: asMapLibreMap(map), previousSpec: spec, nextSpec: spec });
     expect(map.sourcesById.get("source-a")?.setData).not.toHaveBeenCalled();
   });
 
   it("re-adds a source and its layers when clustering changes", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a", "b"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
@@ -212,7 +108,7 @@ describe("syncMap", () => {
     map.addSource.mockClear();
 
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: clustered,
     });
@@ -233,7 +129,7 @@ describe("syncMap", () => {
   });
 
   it("adds heatmap layer specs as heatmap layers", () => {
-    const map = _createFakeMap();
+    const map = createFakeMap();
     const spec: MapSpec = {
       sources: {
         density: { type: "geojson", data: emptyCollection },
@@ -249,7 +145,7 @@ describe("syncMap", () => {
     };
 
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
@@ -258,10 +154,10 @@ describe("syncMap", () => {
   });
 
   it("replaces an existing layer when its type changes", () => {
-    const map = _createFakeMap();
-    const circleSpec = _createSpec(["density"]);
+    const map = createFakeMap();
+    const circleSpec = createSpec(["density"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: circleSpec,
     });
@@ -279,7 +175,7 @@ describe("syncMap", () => {
     map.calls.length = 0;
 
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: circleSpec,
       nextSpec: heatmapSpec,
     });
@@ -296,10 +192,10 @@ describe("syncMap", () => {
   });
 
   it("updates paint in place when only paint changed", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
@@ -309,7 +205,7 @@ describe("syncMap", () => {
     };
     map.calls.length = 0;
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: repainted,
     });
@@ -317,10 +213,10 @@ describe("syncMap", () => {
   });
 
   it("enforces draw order when layers are reordered", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a", "b"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
@@ -330,7 +226,7 @@ describe("syncMap", () => {
     };
     map.calls.length = 0;
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: reordered,
     });
@@ -338,17 +234,17 @@ describe("syncMap", () => {
   });
 
   it("reorders when a new layer is inserted at the bottom", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a", "b"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.calls.length = 0;
-    const withNewBottomLayer = _createSpec(["c", "a", "b"]);
+    const withNewBottomLayer = createSpec(["c", "a", "b"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: withNewBottomLayer,
     });
@@ -362,10 +258,10 @@ describe("syncMap", () => {
   });
 
   it("reorders survivors when a layer is removed in the same sync", () => {
-    const map = _createFakeMap();
-    const full = _createSpec(["a", "b", "c"]);
+    const map = createFakeMap();
+    const full = createSpec(["a", "b", "c"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: full,
     });
@@ -378,7 +274,7 @@ describe("syncMap", () => {
       layers: [full.layers[2]!, full.layers[0]!],
     };
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: full,
       nextSpec: survivorsReordered,
     });
@@ -391,17 +287,17 @@ describe("syncMap", () => {
   });
 
   it("does not reorder when a new layer is only appended at the top", () => {
-    const map = _createFakeMap();
-    const spec = _createSpec(["a", "b"]);
+    const map = createFakeMap();
+    const spec = createSpec(["a", "b"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
       nextSpec: spec,
     });
     map.calls.length = 0;
-    const withNewTopLayer = _createSpec(["a", "b", "c"]);
+    const withNewTopLayer = createSpec(["a", "b", "c"]);
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: spec,
       nextSpec: withNewTopLayer,
     });
@@ -409,11 +305,11 @@ describe("syncMap", () => {
   });
 
   it("registers no event listeners", () => {
-    const map = _createFakeMap();
+    const map = createFakeMap();
     syncMap({
-      map: _asMapLibreMap(map),
+      map: asMapLibreMap(map),
       previousSpec: emptySpec,
-      nextSpec: _createSpec(["a"]),
+      nextSpec: createSpec(["a"]),
     });
     expect(map.on).not.toHaveBeenCalled();
   });

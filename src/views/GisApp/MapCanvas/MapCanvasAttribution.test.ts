@@ -1,6 +1,6 @@
 import { objectKeys } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers";
+import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
@@ -38,7 +38,7 @@ vi.mock("maplibre-gl", () => {
 });
 
 const { EMPTY_MAP_SPEC, MapInstanceHelpers } =
-  await import("@/views/GisApp/MapCanvas/MapInstanceHelpers");
+  await import("@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers");
 
 describe("MapCanvas attribution", () => {
   beforeEach(() => {

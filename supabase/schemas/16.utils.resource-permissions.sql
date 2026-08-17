@@ -871,11 +871,7 @@ set
 $$;
 
 revoke
-execute on function public.util__auth_user_may_select_resource_base (
-  public.resource_type,
-  uuid,
-  uuid
-)
+execute on function public.util__auth_user_may_select_resource_base (public.resource_type, uuid, uuid)
 from
   public,
   anon,
@@ -917,12 +913,7 @@ end;
 $$;
 
 revoke
-execute on function public.maps__auth_user_may_select_grant (
-  uuid,
-  uuid,
-  uuid,
-  boolean
-)
+execute on function public.maps__auth_user_may_select_grant (uuid, uuid, uuid, boolean)
 from
   public,
   anon,
@@ -936,9 +927,7 @@ from
  * access, owner access, settings-manager access, shares, and GIS app roles are
  * all evaluated by the composed helpers below.
  */
-create or replace function public.maps__auth_user_may_select (
-  p_map_id uuid
-) returns boolean language plpgsql security definer stable
+create or replace function public.maps__auth_user_may_select (p_map_id uuid) returns boolean language plpgsql security definer stable
 set
   search_path = '' as $$
 declare

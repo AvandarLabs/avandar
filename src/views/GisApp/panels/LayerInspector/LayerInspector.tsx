@@ -30,6 +30,16 @@ export type LayerInspectorView =
   | { type: "classification" }
   | { type: "validationReport" };
 
+function _getOrCreateSet<T>(ref: { current: Set<T> | undefined }): Set<T> {
+  const existing = ref.current;
+  if (existing !== undefined) {
+    return existing;
+  }
+  const created = new Set<T>();
+  ref.current = created;
+  return created;
+}
+
 /** The selected layer's editor, sectioned by the model's axes. */
 export function LayerInspector({
   layer,
@@ -42,36 +52,47 @@ export function LayerInspector({
   filterFocusRequest,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const openedFingerprints = useRef(new Set<string>());
-  const autoOpenEligibleLayerIds = useRef(
-    new Set<MapLayer.Id>(
-      layer?.geoBinding?.type === "joinToBoundaries" ? [layer.id] : [],
-    ),
+  const openedFingerprints = useRef<Set<string> | undefined>(undefined);
+  const fingerprints = _getOrCreateSet(openedFingerprints);
+  const autoOpenEligibleLayerIds = useRef<Set<MapLayer.Id> | undefined>(
+    undefined,
   );
+  const shouldSeedEligibleLayerIds =
+    autoOpenEligibleLayerIds.current === undefined;
+  const eligibleLayerIds = _getOrCreateSet(autoOpenEligibleLayerIds);
+  if (
+    shouldSeedEligibleLayerIds &&
+    layer?.geoBinding?.type === "joinToBoundaries"
+  ) {
+    eligibleLayerIds.add(layer.id);
+  }
   const previousLayerIdRef = useRef(layer?.id);
   if (layer?.id !== previousLayerIdRef.current) {
     previousLayerIdRef.current = layer?.id;
     if (layer?.geoBinding?.type === "joinToBoundaries") {
-      autoOpenEligibleLayerIds.current.add(layer.id);
+      eligibleLayerIds.add(layer.id);
     }
   }
   const diagnostics = viewState?.spatialDiagnostics;
-  useEffect(() => {
-    if (
-      !layer ||
-      !autoOpenEligibleLayerIds.current.has(layer.id) ||
-      !diagnostics ||
-      diagnostics.sourceCount === 0 ||
-      diagnostics.matchedSourceKeyCount !== 0
-    ) {
-      return;
-    }
-    const fingerprint = `${layer.id}:${JSON.stringify(diagnostics)}`;
-    if (!openedFingerprints.current.has(fingerprint)) {
-      openedFingerprints.current.add(fingerprint);
-      onInspectorViewChange({ type: "matchReport" });
-    }
-  }, [diagnostics, layer, onInspectorViewChange]);
+  useEffect(
+    function openMatchReportForUnmatchedJoin() {
+      if (
+        !layer ||
+        !eligibleLayerIds.has(layer.id) ||
+        !diagnostics ||
+        diagnostics.sourceCount === 0 ||
+        diagnostics.matchedSourceKeyCount !== 0
+      ) {
+        return;
+      }
+      const fingerprint = `${layer.id}:${JSON.stringify(diagnostics)}`;
+      if (!fingerprints.has(fingerprint)) {
+        fingerprints.add(fingerprint);
+        onInspectorViewChange({ type: "matchReport" });
+      }
+    },
+    [diagnostics, eligibleLayerIds, fingerprints, layer, onInspectorViewChange],
+  );
   return (
     <MapChromePanel
       variant="inspector"

@@ -6,10 +6,22 @@ import type {
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /** Encodings accepted for a persisted geometry-column reference. */
-export type GeometryEncoding = "wkt" | "wkb" | "geojson";
+export const GEOMETRY_ENCODINGS = ["wkt", "wkb", "geojson"] as const;
+export type GeometryEncoding = (typeof GEOMETRY_ENCODINGS)[number];
+
+/** True when `value` is a persisted geometry encoding. */
+export function isGeometryEncoding(value: string): value is GeometryEncoding {
+  return (GEOMETRY_ENCODINGS as readonly string[]).includes(value);
+}
 
 /** Geometry families rendered by one map layer. */
-export type GeometryFamily = "point" | "line" | "polygon";
+export const GEOMETRY_FAMILIES = ["point", "line", "polygon"] as const;
+export type GeometryFamily = (typeof GEOMETRY_FAMILIES)[number];
+
+/** True when `value` is a rendered geometry family. */
+export function isGeometryFamily(value: string): value is GeometryFamily {
+  return (GEOMETRY_FAMILIES as readonly string[]).includes(value);
+}
 
 /** Screen-space tolerance persisted for topology-preserving simplification. */
 export type GeometrySimplification = { tolerancePixels: number };

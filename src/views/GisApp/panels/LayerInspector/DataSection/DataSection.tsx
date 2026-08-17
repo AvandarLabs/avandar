@@ -2,12 +2,8 @@ import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { BoundaryJoinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls";
-import { CoordinateBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingControls";
+import { DataSectionBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSectionBindingControls";
 import { GeometryBindingTypeSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect";
-import { GeometryColumnControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls";
-import { GridBinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GridBinControls";
-import { PointAggregationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
@@ -48,32 +44,12 @@ export function DataSection({ layer, onLayerChange }: Props): ReactNode {
         boundaryOptions={boundarySources.options}
         onLayerChange={onLayerChange}
       />
-      {layer.geoBinding?.type === "geometryColumn" ?
-        <GeometryColumnControls layer={layer} onLayerChange={onLayerChange} />
-      : layer.geoBinding?.type === "joinToBoundaries" ?
-        <BoundaryJoinControls
-          layer={layer}
-          options={boundarySources.options}
-          onLayerChange={onLayerChange}
-        />
-      : layer.geoBinding?.type === "aggregatePointsToBoundaries" ?
-        <PointAggregationControls
-          layer={layer}
-          options={boundarySources.options}
-          sourceColumns={sourceColumns}
-          onLayerChange={onLayerChange}
-        />
-      : layer.geoBinding?.type === "binPointsToGrid" ?
-        <GridBinControls
-          layer={layer}
-          sourceColumns={sourceColumns}
-          onLayerChange={onLayerChange}
-        />
-      : <CoordinateBindingControls
-          layer={layer}
-          onLayerChange={onLayerChange}
-        />
-      }
+      <DataSectionBindingControls
+        layer={layer}
+        sourceColumns={sourceColumns}
+        boundaryOptions={boundarySources.options}
+        onLayerChange={onLayerChange}
+      />
     </InspectorSection>
   );
 }

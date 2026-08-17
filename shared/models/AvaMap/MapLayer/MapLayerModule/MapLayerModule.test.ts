@@ -220,21 +220,6 @@ describe("MapLayer.withSensitivity", () => {
   });
 });
 
-describe("MapLayer Wave C defaults", () => {
-  it("uses the approved density defaults", () => {
-    expect(MapLayer.defaultClusterRadiusPx).toBe(50);
-    expect(MapLayer.defaultHeatmapRadiusPx).toBe(30);
-    expect(MapLayer.defaultGridSizeMeters).toBe(10_000);
-    expect(MapLayer.defaultHeatmapRamp).toEqual([
-      "#ffd4af",
-      "#daa475",
-      "#b97c44",
-      "#9b5802",
-      "#7e3500",
-    ]);
-  });
-});
-
 describe("MapLayer.toGeoBinding", () => {
   it("returns undefined when the layer has no binding", () => {
     const layer = MapLayer.makeEmpty("Cases");

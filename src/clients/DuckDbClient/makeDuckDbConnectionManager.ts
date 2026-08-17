@@ -129,10 +129,11 @@ async function _loadDuckDbExtensions(
   }
 }
 
-async function _initializeDuckDb(
-  logger: ILogger,
-  spatialAvailability: DuckDbSpatialAvailabilityStore,
-): Promise<duckdb.AsyncDuckDB> {
+async function _initializeDuckDb(options: {
+  logger: ILogger;
+  spatialAvailability: DuckDbSpatialAvailabilityStore;
+}): Promise<duckdb.AsyncDuckDB> {
+  const { logger, spatialAvailability } = options;
   const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
 
   const worker = new Worker(bundle.mainWorker!);
@@ -161,16 +162,17 @@ async function _initializeDuckDb(
 }
 
 /** Creates the lazily started DuckDB instance and its connection tracker. */
-export function makeDuckDbConnectionManager(
-  logger: ILogger,
-  spatialAvailability: DuckDbSpatialAvailabilityStore,
-): DuckDbConnectionManager {
+export function makeDuckDbConnectionManager(options: {
+  logger: ILogger;
+  spatialAvailability: DuckDbSpatialAvailabilityStore;
+}): DuckDbConnectionManager {
+  const { logger, spatialAvailability } = options;
   const openConnections = new Set<duckdb.AsyncDuckDBConnection>();
   let dbPromise: Promise<duckdb.AsyncDuckDB> | undefined;
 
   const getDb = async (): Promise<duckdb.AsyncDuckDB> => {
     if (!dbPromise) {
-      dbPromise = _initializeDuckDb(logger, spatialAvailability).catch(
+      dbPromise = _initializeDuckDb({ logger, spatialAvailability }).catch(
         (error: unknown) => {
           dbPromise = undefined;
           spatialAvailability.set("unavailable");

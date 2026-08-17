@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
-import css from "@/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.module.css";
 import { CoordinateValidationReason } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason";
+import css from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.module.css";
 import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { ReactNode } from "react";
 
@@ -19,12 +19,15 @@ export function CoordinateValidationReport({
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
-    <section className={css.report} aria-label={t`Coordinate validation report`}>
+    <section
+      className={css.coordinateValidationReport}
+      aria-label={t`Coordinate validation report`}
+    >
       <Button variant="subtle" onClick={onBack}>
         {t`Back`}
       </Button>
       <h3>{t`Coordinate validation report`}</h3>
-      <ul className={css.list}>
+      <ul className={css.coordinateValidationReportList}>
         {drops.map((drop) => {
           return (
             <CoordinateValidationReason
