@@ -35,6 +35,7 @@ const ACTIVE_TABLES = [
   "datasets__csv_file",
   "datasets__google_sheets",
   "datasets__open_data",
+  "datasets__pdf_file",
   "datasets__virtual",
   "datasets__xlsx_file",
   "catalog_entries__open_data",
