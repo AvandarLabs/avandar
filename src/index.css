@@ -35,6 +35,13 @@
 .ag-paging-row-summary-panel {
   align-items: center;
   display: flex;
+  /*
+   * ag-grid renders the summary as inline number spans with literal
+   * "to"/"of" text between them. Making the panel a flex container turns
+   * each into a flex item and collapses the whitespace at their edges,
+   * so "1 to 6 of 6" became "1to6of6". A small gap restores the spacing.
+   */
+  gap: 0.25em;
 }
 
 button {
