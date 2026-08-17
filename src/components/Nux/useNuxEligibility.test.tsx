@@ -20,7 +20,12 @@ vi.mock("$/platform/isDesktop", () => {
 });
 vi.mock("@mantine/hooks", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/hooks")>();
-  return { ...actual, useMediaQuery: vi.fn(() => true) };
+  return {
+    ...actual,
+    useMediaQuery: vi.fn(() => {
+      return true;
+    }),
+  };
 });
 
 const OWNER_ID = "11111111-1111-4111-8111-111111111111";
@@ -37,8 +42,12 @@ beforeEach(() => {
 describe("useNuxEligibility", () => {
   it("is eligible for the workspace owner on desktop web", () => {
     expect(
-      renderHook(() => useNuxEligibility(), { wrapper: TestProviders }).result
-        .current,
+      renderHook(
+        () => {
+          return useNuxEligibility();
+        },
+        { wrapper: TestProviders },
+      ).result.current,
     ).toBe(true);
   });
 
@@ -48,8 +57,12 @@ describe("useNuxEligibility", () => {
     } as never);
     vi.mocked(useIsGlobalAdmin).mockReturnValue(true);
     expect(
-      renderHook(() => useNuxEligibility(), { wrapper: TestProviders }).result
-        .current,
+      renderHook(
+        () => {
+          return useNuxEligibility();
+        },
+        { wrapper: TestProviders },
+      ).result.current,
     ).toBe(true);
   });
 
@@ -58,16 +71,24 @@ describe("useNuxEligibility", () => {
       ownerId: "other",
     } as never);
     expect(
-      renderHook(() => useNuxEligibility(), { wrapper: TestProviders }).result
-        .current,
+      renderHook(
+        () => {
+          return useNuxEligibility();
+        },
+        { wrapper: TestProviders },
+      ).result.current,
     ).toBe(false);
   });
 
   it("is not eligible in the desktop app", () => {
     vi.mocked(isDesktop).mockReturnValue(true);
     expect(
-      renderHook(() => useNuxEligibility(), { wrapper: TestProviders }).result
-        .current,
+      renderHook(
+        () => {
+          return useNuxEligibility();
+        },
+        { wrapper: TestProviders },
+      ).result.current,
     ).toBe(false);
   });
 });
