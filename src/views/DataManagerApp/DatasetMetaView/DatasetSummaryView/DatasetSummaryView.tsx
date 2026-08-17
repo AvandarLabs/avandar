@@ -11,7 +11,7 @@ import {
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection";

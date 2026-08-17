@@ -6,7 +6,7 @@ import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useEffect, useRef, useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import { NuxEvents } from "@/components/Nux/nuxEvents";
 import { notifyError } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";

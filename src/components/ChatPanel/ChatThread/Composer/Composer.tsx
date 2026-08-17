@@ -8,7 +8,7 @@ import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatMode
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
-import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import css from "./Composer.module.css";
 
 /**

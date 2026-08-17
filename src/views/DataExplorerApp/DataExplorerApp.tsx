@@ -24,7 +24,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { NuxAnchors, nuxAnchorProps } from "@/components/Nux/nuxAnchors";
+import { nuxAnchorProps, NuxAnchors } from "@/components/Nux/nuxAnchors";
 import { NuxEvents } from "@/components/Nux/nuxEvents";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
