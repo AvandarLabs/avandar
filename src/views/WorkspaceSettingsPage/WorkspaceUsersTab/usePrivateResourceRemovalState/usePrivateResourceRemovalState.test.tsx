@@ -27,6 +27,7 @@ describe("usePrivateResourceRemovalState", () => {
           userId: "user-1",
           privateDashboardCount: 2,
           privateDatasetCount: 3,
+          privateMapCount: 0,
         },
       ],
       false,
@@ -44,6 +45,29 @@ describe("usePrivateResourceRemovalState", () => {
     expect(result.current).toEqual({
       isFetchingPrivateCounts: true,
       privateResourceTotalByUserId: { "user-1": 5 },
+    });
+  });
+
+  it("blocks removal when the member only owns private maps", () => {
+    useGetPrivateResourceCounts.mockReturnValue([
+      [
+        {
+          userId: "user-1",
+          privateDashboardCount: 0,
+          privateDatasetCount: 0,
+          privateMapCount: 1,
+        },
+      ],
+      false,
+      { isFetching: false },
+    ]);
+
+    const { result } = renderHook(() => {
+      return usePrivateResourceRemovalState("workspace-1" as Workspace.Id);
+    });
+
+    expect(result.current.privateResourceTotalByUserId).toEqual({
+      "user-1": 1,
     });
   });
 });

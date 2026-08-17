@@ -20,8 +20,8 @@ import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIn
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
-import type { AppLink } from "@/config/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CSSProperties, ReactNode } from "react";
 

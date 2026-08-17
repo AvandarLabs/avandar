@@ -5,8 +5,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { makeDatasetColumnInputsFromImportedColumns } from "@/clients/datasets/DatasetClient/makeDatasetColumnInputsFromImportedColumns/makeDatasetColumnInputsFromImportedColumns";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -305,7 +306,10 @@ function _createSaveDatasetMutationOptions(
   options: Readonly<CreateSaveDatasetMutationOptions>,
 ): SaveDatasetMutationOptions {
   return {
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    queriesToInvalidate: [
+      DatasetClient.QueryKeys.getAll(),
+      DatasetColumnClient.QueryKeys.getAll(),
+    ],
     onMutate: () => {
       return {
         isFirstInWorkspace:

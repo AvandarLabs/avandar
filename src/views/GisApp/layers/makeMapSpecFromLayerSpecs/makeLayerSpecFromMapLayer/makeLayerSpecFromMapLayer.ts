@@ -1,7 +1,13 @@
 import { matchLiteral } from "@avandar/utils";
+import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
+import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
+import { makeFillLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeFillLayerSpecsFromMapLayer";
+import { makeHeatmapLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeHeatmapLayerSpecFromMapLayer";
+import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
 import type {
   CircleRadiusValue,
   MapLayerSpec,
@@ -10,22 +16,26 @@ import type {
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
 
-/** Highlight applied to the feature the user has selected. */
-const SELECTED_STROKE_COLOR = "#ffd700";
-
 type ProportionalSymbol = Extract<
   MapLayer.Symbology,
   { type: "proportionalSymbol" }
 >;
 
+type MakeLayerSpecFromMapLayerInput = {
+  layer: MapLayer.T;
+  featureCollection: GeoJSON.FeatureCollection;
+  stats: LayerStats;
+  valueColumnName?: string;
+};
+
 /** Applies the selected scale to a numeric span. */
 function _getScaledSpan({
   scale,
   span,
-}: {
+}: Readonly<{
   scale: ProportionalSymbol["scale"];
   span: number;
-}): number {
+}>): number {
   return matchLiteral(scale, {
     sqrt: () => {
       return Math.sqrt(span);
@@ -35,13 +45,6 @@ function _getScaledSpan({
     },
   });
 }
-
-type CreateMapLayerSpecOptions = {
-  layer: MapLayer.T;
-  stats: LayerStats;
-  valueColumnName: string | undefined;
-  sourceId: string;
-};
 
 /** Builds the MapLibre expression that scales a source value from zero. */
 function _buildScaledValueExpression({
@@ -86,6 +89,9 @@ function _buildCircleRadius({
   if (symbology.type === "circle") {
     return symbology.radius;
   }
+  if (symbology.type !== "proportionalSymbol") {
+    throw new Error("Point symbology is required");
+  }
   const { valueDomain } = stats;
   if (!valueColumnName || !valueDomain || valueDomain[0] === valueDomain[1]) {
     return symbology.minRadius;
@@ -108,13 +114,16 @@ function _buildCircleRadius({
 }
 
 /** Creates the MapLibre circle layer for one persisted map layer. */
-function _createMapLayerSpec({
+function _buildCircleLayerSpec({
   layer,
   stats,
   valueColumnName,
   sourceId,
-}: CreateMapLayerSpecOptions): MapLayerSpec {
+}: Readonly<CreateMapLayerSpecInput>): MapLayerSpec {
   const { symbology } = layer;
+  if (symbology.type !== "circle" && symbology.type !== "proportionalSymbol") {
+    throw new Error("Point symbology is required");
+  }
   return {
     id: MapLayerIds.toLayerId(layer.id),
     type: "circle",
@@ -125,7 +134,7 @@ function _createMapLayerSpec({
         stats,
         valueColumnName,
       }),
-      "circle-color": symbology.color.color,
+      "circle-color": makeColorExpressionFromColor(symbology.color),
       "circle-opacity": 0.8,
       "circle-stroke-width": symbology.stroke.width,
       "circle-stroke-color": [
@@ -139,6 +148,65 @@ function _createMapLayerSpec({
   };
 }
 
+/** Creates the MapLibre line layer for one persisted map layer. */
+function _buildLineLayerSpec(options: {
+  layer: MapLayer.T;
+  sourceId: string;
+}): MapLayerSpec {
+  const { layer, sourceId } = options;
+  const symbology = layer.symbology;
+  if (symbology.type !== "line") {
+    throw new Error("Line symbology is required");
+  }
+  return {
+    id: MapLayerIds.toLayerId(layer.id),
+    type: "line",
+    source: sourceId,
+    paint: {
+      "line-color": makeColorExpressionFromColor(symbology.color),
+      "line-width": symbology.stroke.width,
+    },
+    ...(layer.isVisible ? {} : { layout: { visibility: "none" } }),
+  };
+}
+
+/** Makes the paint layers matching the configured geometry symbology. */
+function _makeMapLayerSpecs(
+  options: Readonly<CreateMapLayerSpecInput>,
+): MapLayerSpec[] {
+  return matchLiteral(options.layer.symbology.type, {
+    fill: () => {
+      return makeFillLayerSpecsFromMapLayer({
+        layer: options.layer,
+        sourceId: options.sourceId,
+      });
+    },
+    line: () => {
+      return [
+        _buildLineLayerSpec({
+          layer: options.layer,
+          sourceId: options.sourceId,
+        }),
+      ];
+    },
+    cluster: () => {
+      return makeClusterLayerSpecsFromMapLayer({
+        layer: options.layer,
+        sourceId: options.sourceId,
+      });
+    },
+    heatmap: () => {
+      return [makeHeatmapLayerSpecFromMapLayer(options)];
+    },
+    circle: () => {
+      return [_buildCircleLayerSpec(options)];
+    },
+    proportionalSymbol: () => {
+      return [_buildCircleLayerSpec(options)];
+    },
+  });
+}
+
 /**
  * Turns one layer plus its data into MapLibre sources and layers.
  *
@@ -150,7 +218,7 @@ function _createMapLayerSpec({
  * @param params.featureCollection The layer's features, already converted from
  * query rows.
  * @param params.stats Value domain used by data-driven paint expressions.
- * @param params.valueColumnName Result column backing a proportional symbol,
+ * @param params.valueColumnName Result column backing data-driven point paint,
  * looked up by the caller from the symbology's column id.
  * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
@@ -161,20 +229,16 @@ export function makeLayerSpecFromMapLayer({
   featureCollection,
   stats,
   valueColumnName,
-}: {
-  layer: MapLayer.T;
-  featureCollection: GeoJSON.FeatureCollection;
-  stats: LayerStats;
-  valueColumnName?: string;
-}): MapSpec {
-  if (layer.sensitivity.mode === "aggregateOnly") {
-    throw new SensitivityViolationError(
-      `Layer "${layer.name}" is aggregate-only and cannot be drawn as individual symbols.`,
-    );
+}: Readonly<MakeLayerSpecFromMapLayerInput>): MapSpec {
+  if (
+    layer.sensitivity.mode === "aggregateOnly" &&
+    layer.symbology.type !== "fill"
+  ) {
+    throw new SensitivityViolationError("aggregateOnlyLayerSpec", layer.name);
   }
 
   const sourceId = MapLayerIds.toSourceId(layer.id);
-  const layerSpec = _createMapLayerSpec({
+  const layerSpecs = _makeMapLayerSpecs({
     layer,
     stats,
     valueColumnName,
@@ -182,7 +246,18 @@ export function makeLayerSpecFromMapLayer({
   });
 
   return {
-    sources: { [sourceId]: { type: "geojson", data: featureCollection } },
-    layers: [layerSpec],
+    sources: {
+      [sourceId]:
+        layer.symbology.type === "cluster" ?
+          {
+            type: "geojson",
+            data: featureCollection,
+            cluster: true,
+            clusterRadius: layer.symbology.radiusPx,
+            clusterMaxZoom: 14,
+          }
+        : { type: "geojson", data: featureCollection },
+    },
+    layers: layerSpecs,
   };
 }

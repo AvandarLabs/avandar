@@ -46,6 +46,7 @@ async function _runLeasedQuery<RowObject extends UnknownObject>(
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     datasetTableReadMode: runnerOptions.duckDbReadMode,
     publicSnapshotDuckDbOwner: runnerOptions.publicSnapshotDuckDbOwner,
+    signal: queryOptions.signal,
   };
   return queryOptions.returnType === "parquet" ?
       DuckDbClient.runRawQuery(queryOptions.rawSql, {
@@ -65,6 +66,7 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
     runQuery: QetlRunQuery;
   }>,
 ): Promise<Blob | QueryResult.T<RowObject>> {
+  options.queryOptions.signal?.throwIfAborted();
   const queryDependencies = await options.runnerOptions.getDiceFromSql(
     options.queryOptions.rawSql,
   );
@@ -86,6 +88,7 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
           queryDependencies,
           rawSql: options.queryOptions.rawSql,
           returnType: options.queryOptions.returnType ?? "js",
+          signal: options.queryOptions.signal,
         },
       });
     },

@@ -20,8 +20,20 @@
  * throws instead, and the map surfaces the error in its status overlay.
  */
 export class SensitivityViolationError extends Error {
-  constructor(message: string) {
-    super(message);
+  /** Machine-readable reason the requested geometry is forbidden. */
+  readonly code: "aggregateOnly" | "aggregateOnlyLayerSpec";
+
+  /** Layer name associated with a layer-spec failure. */
+  readonly layerName: string | undefined;
+
+  /** Creates a sensitivity-policy error without formatting display copy. */
+  constructor(
+    code: "aggregateOnly" | "aggregateOnlyLayerSpec",
+    layerName?: string,
+  ) {
+    super(code);
     this.name = "SensitivityViolationError";
+    this.code = code;
+    this.layerName = layerName;
   }
 }

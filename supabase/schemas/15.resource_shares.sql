@@ -69,8 +69,8 @@ create index idx_resource_shares__resource on public.resource_shares (resource_t
  * Rejects a share whose workspace does not own the referenced resource.
  *
  * A polymorphic resource id cannot use a conventional foreign key, so this
- * trigger maintains the equivalent workspace invariant for both resource
- * tables.
+ * trigger maintains the equivalent workspace invariant for every resource
+ * table.
  */
 create or replace function public.resource_shares__validate_resource_workspace () returns trigger language plpgsql security definer
 set
@@ -86,6 +86,10 @@ begin
     select ds.workspace_id into v_resource_workspace_id
     from public.datasets ds
     where ds.id = new.resource_id;
+  elsif new.resource_type = 'map'::public.resource_type then
+    select m.workspace_id into v_resource_workspace_id
+    from public.maps m
+    where m.id = new.resource_id;
   end if;
 
   if v_resource_workspace_id is distinct from new.workspace_id then
