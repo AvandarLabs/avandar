@@ -25,26 +25,31 @@ create schema if not exists analytics;
 -- `create or replace view` for all seven `analytics.*` views, even when nothing
 -- in this directory changed. Keep them in the generated migration.
 --
--- They are semantically no-ops. The only differences between the live
--- definition and the one `db diff` wants to install are in how Postgres RENDERS
--- the stored parse tree, not in what it means:
+-- They are semantically no-ops, and this was measured rather than assumed.
+-- The stored definitions are the same on both sides; the ONLY difference is
+-- schema qualification, which `pg_get_viewdef` decides at render time from
+-- `search_path` and does not store:
 --
---   - schema qualification: `from usage_analytics_events` against
---     `from public.usage_analytics_events`. Qualification is chosen at render
---     time from `search_path`; it is not stored, so it cannot be fixed by
---     editing the SQL below.
---   - parenthesis nesting inside `filter (where ...)`, which differs between
---     `pg_get_viewdef`'s pretty and non-pretty forms.
+--   search_path = public, extensions
+--     -> from usage_analytics_events
+--   search_path = pg_catalog
+--     -> from public.usage_analytics_events
 --
--- Everything that would make a recreation risky was checked and is absent:
--- the views hold no data, `relacl` is null on both sides so no privilege
--- changes ride along, and no analytics view depends on another so nothing
--- cascades.
+-- Rendered with `public` out of the path, the live definition is
+-- byte-identical to the one `db diff` wants to install. So the diff compares
+-- two renderings of one parse tree under different connection settings, not
+-- two different views, and no edit to the SQL below can change it.
+--
+-- Everything that would make a recreation risky was checked and is absent: the
+-- views hold no data, `relacl` is null on both sides so no privilege change
+-- rides along, and no analytics view depends on another so nothing cascades.
 --
 -- This is the "some view recreation cases" entry in the declarative-schema
--- caveats. Do not hand-trim it from a migration. Trimming a generated
--- migration by hand is what previously hid a real privilege bug, and the
--- statements here are the harmless ones.
+-- caveats. Leave the statements in the generated migration. Hand-editing a
+-- generated migration means deciding by eye which of hundreds of statements are
+-- legitimate, and a wrong call ships a database that no longer matches this
+-- directory, which is the drift that caused the grant problem in the first
+-- place. These particular statements are the harmless ones.
 revoke all on schema analytics
 from
   public,
