@@ -37,7 +37,8 @@ async function _reconcileColumns(params: {
 }): Promise<{ changedCount: number }> {
   // Lazy import to avoid a circular module load; these clients pull in
   // LocalDatasetClient transitively for cloud-fetch fallbacks.
-  const { DatasetClient } = await import("@/clients/datasets/DatasetClient");
+  const { DatasetClient } =
+    await import("@/clients/datasets/DatasetClient/DatasetClient");
   const { DatasetColumnClient } =
     await import("@/clients/datasets/DatasetColumnClient");
 

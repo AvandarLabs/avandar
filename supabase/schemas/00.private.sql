@@ -1,0 +1,46 @@
+-- The internal schema.
+--
+-- Nothing here is API surface. It holds the helpers that RLS policies and
+-- triggers call: `security definer` functions that read past RLS (billing
+-- rows, other people's dashboards, whole-workspace inventories) and would be
+-- probes if an ordinary user could invoke them directly.
+--
+-- `private` is deliberately absent from `config.toml`'s `[api] schemas` list,
+-- so PostgREST does not serve it at all. That is the structural guarantee, and
+-- it is the same one `90.analytics_schema.sql` relies on.
+--
+-- The revoke-then-grant below is not self-contradictory, it is the two halves
+-- of a deny-by-default rule:
+--
+-- 1. `revoke all on schema private` removes CREATE and USAGE from everybody.
+--    On Postgres 15 a new schema is granted to nobody anyway, so these are
+--    no-ops today; they are written out so the intent survives a future
+--    default privilege being added.
+-- 2. `grant usage` gives `authenticated` the right to RESOLVE a name in this
+--    schema. It grants no right to call anything: EXECUTE is a separate,
+--    per-function privilege, and every function defined here revokes it
+--    explicitly. Schema USAGE without EXECUTE means a caller can neither list
+--    nor invoke; it only means name resolution does not fail before the
+--    EXECUTE check runs.
+--
+--    `authenticated` needs it because two of these helpers are called from
+--    storage RLS policies (`99.storage.sql`) that are evaluated as the calling
+--    role rather than as the policy's owner. Those two, and only those two,
+--    are then granted EXECUTE individually in
+--    `16.utils.resource-permissions.sql`. Everything else stays revoked from
+--    every role and is reached only through the trigger machinery, which does
+--    not consult EXECUTE at all.
+--
+-- `service_role` is intentionally NOT granted usage. It bypasses RLS, so it
+-- never needs to resolve these helpers, and leaving it out keeps the schema
+-- unreachable from the one key that would otherwise be able to call anything.
+create schema if not exists private;
+
+revoke all on schema private
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant usage on schema private to authenticated;

@@ -522,31 +522,53 @@ SELECT * FROM (<original sql>) AS _ava_filtered WHERE <clauses AND …>
 
 ## 8. Publishing and sharing
 
-### 8.1 Publish modal
+### 8.1 Share modal (publishing lives inside it)
 
-`PublishDashboardModal` (opened only when there are no unsaved changes, and
-offline-gated via `OfflineGated` / `useOfflineGate`):
+`PublishDashboardModal` and `PublishDashboardButton` no longer exist. P3 merged
+publishing into the Drive-style share surface: `DashboardShareButton` opens
+`DashboardShareModal`, which owns publishing state
+(`useDashboardPublishingControl`) and renders the resource-generic
+`ShareResourceModal` with an optional `publishing` prop. The publish target is
+picked in the modal's General access dropdown ("Only me", "Restricted",
+"Anyone in `<workspace>`", "Anyone with the link"), which maps to
+`dashboards.visibility` (`draft` | `workspace` | `public`). See
+`docs/superpowers/specs/2026-08-15-private-dashboards-merged-share-surface-design.md`.
 
-- **Status** — whether the dashboard is already public and which URL is
-  canonical.
+The publishing section still carries what the old modal carried (opened only
+when there are no unsaved changes, and offline-gated via `OfflineGated` /
+`useOfflineGate`):
+
+- **Status** — what is published today, which URL is canonical, and a warning
+  when the selected target has not been applied yet (red, naming the live
+  exposure, when the dashboard is still public on the web).
 - **Vanity slug** — `VanitySlugField` + `toVanitySlug` normalization, with
   live availability checking against the `dashboards/validate-slug` edge
   function. States: pending, accepted, rejected; the submit button is
   disabled while pending or rejected. Slug rules (server-side):
-  non-empty, no spaces, `^[a-z0-9-]+$`, 3–64 characters, and not already
-  taken by another public dashboard (the dashboard being edited is excluded
-  from the collision check so re-publishing with its own slug passes).
+  non-empty, no spaces, `^[a-z0-9-]+$`, 3–64 characters, and unique **within
+  the target's namespace** (globally for `public`, per workspace for
+  `workspace`), with the dashboard being edited excluded from the collision
+  check so re-publishing with its own slug passes. Changing the target
+  re-validates, because a slug free in one namespace can be taken in the
+  other.
 - **Per-dataset publish slices** — see below.
 - **Share links** (once published) — `PublishedShareLinks` / `ShareUrlRow`
   with one-click copy and a "Show QR code" modal (generated client-side with
-  `qrcode`, no network call, downloadable as an image). Two URLs are surfaced
-  with explicit guidance: the vanity `/d/<slug>` URL for word-of-mouth, and
-  the permanent `/public/dashboards/<workspaceSlug>/<dashboardId>` URL for QR
-  codes (it never changes, and it redirects to the vanity URL when one
-  exists). The QR affordance is deliberately hidden on the vanity row so
-  every printed QR encodes the stable URL.
-- Submit button reads "Publish" or "Update & republish".
-- Publishing emits `dashboard.published`.
+  `qrcode`, no network call, downloadable as an image). `buildShareUrls`
+  returns both URLs for the current target: `canonical`
+  (`/d/<dashboardId>` for `public`, `/<workspaceSlug>/d/<dashboardId>` for
+  `workspace`) and, when a slug is set, `vanity` (the same prefix with the
+  slug). The QR affordance encodes `canonical` and is hidden on the vanity
+  row, so a printed QR follows the id rather than a renameable slug. It is
+  **not** audience-stable: the canonical URL differs between the two
+  namespaces, so republishing to a different audience yields a different
+  canonical URL. The legacy
+  `/public/dashboards/<workspaceSlug>/<dashboardId>` path survives only as a
+  redirect for QR codes already in circulation.
+- Submit button reads "Publish" or "Update & republish"; an Unpublish action
+  sits alongside it once something is published.
+- Publishing emits `dashboard.published` (payload carries `visibility`);
+  unpublishing emits `dashboard.unpublished`.
 
 ### 8.2 Publish slice configuration (data minimization)
 
@@ -597,7 +619,11 @@ ids known to belong to the workspace.
      publish" error toast and abort
 4. Persists the slice config back into the dashboard `config` JSON so
    re-publishes default to the same selection.
-5. Sets `isPublic: true` and writes / clears the slug.
+5. Sets `visibility` to the publish target (`workspace` or `public`) and
+   writes / clears the slug. `is_public` is a generated column derived from
+   `visibility = 'public'`, so it is never written directly. Snapshots route
+   to the `published` bucket for `public` and `published-private` for
+   `workspace`.
 
 `validateDashboardSlug` is a separate mutation backed by the edge function so
 the uniqueness lookup runs with admin privileges, unblocked by RLS.
@@ -606,16 +632,20 @@ the uniqueness lookup runs with admin privileges, unblocked by RLS.
 
 `DashboardViewerView` renders with `<PuckPageRender>` (no editor chrome):
 
-- `mode="public"` enforces `dashboard.isPublic` and shows an access-denied
-  panel otherwise.
-- `mode="preview"` skips the gate (the route is auth-gated), and shows a
-  banner stating whether the dashboard is published, plus a "Back to editor"
-  button.
+- `mode="published"` denies a `draft` dashboard and shows
+  `DashboardAccessDeniedView` otherwise; who may read a non-draft snapshot is
+  enforced by RLS and the bucket policies, not by a client flag.
+- `mode="preview"` is auth-gated by the route, and additionally denies a
+  `draft` dashboard to anyone whose effective role is below `editor` (P3). It
+  shows a banner stating whether the dashboard is published, plus a "Back to
+  editor" button.
 - `useEnsurePublishedDashboardDatasets` loads all published parquet
   dependencies into DuckDB before rendering, with dedicated loading and
   error states plus an error toast.
-- The vanity route resolves `slug` + `is_public` directly with no workspace
-  lookup, relying on the anon SELECT policy.
+- The public vanity route (`/d/<slugOrId>`) resolves `slug` + `is_public`
+  directly with no workspace lookup, relying on the anon SELECT policy. The
+  workspace route (`/<workspaceSlug>/d/<slugOrId>`) resolves inside the
+  workspace's slug namespace and is gated by authenticated RLS instead.
 
 ---
 
@@ -657,7 +687,11 @@ open):
   (v4 root props, empty content, "Untitled dashboard"), then navigates
   straight into the editor.
 - Responsive sizing via `useIsTabletSize`.
-- Scoped to the current workspace and the current user as owner.
+- Scoped to the current workspace only. P3 removed the `owner_id` filter, so
+  the index now shows every dashboard RLS returns, including ones shared with
+  the viewer. `sortDashboardsForList` orders the current user's own dashboards
+  first, and cards carry ownership and visibility badges. There is
+  deliberately no filter control (P3 §6.3).
 
 ---
 
@@ -670,12 +704,17 @@ open):
 `id`, `workspace_id` (FK, cascade), `owner_id` (FK `auth.users`, no-action
 delete), `owner_profile_id` (FK `user_profiles`, no-action delete),
 `created_at`, `updated_at` (trigger-maintained), `name`, `description`,
-`is_public`, `slug`, `config` (jsonb, not null), `is_restricted`.
+`visibility` (`dashboard_visibility`, default `draft`), `is_public` (stored
+generated column, `visibility = 'public'`), `slug`, `config` (jsonb, not
+null), `is_restricted`, `snapshot_revision`, and the
+`snapshot_transition_*` claim columns.
 
-Indexes: `idx_dashboards__slug`; partial unique index
-`dashboards__slug_unique_when_public` on `slug` where `is_public and slug is
-not null` — so a slug collision fails at the DB level even if the frontend
-check is bypassed.
+Indexes: `idx_dashboards__slug`, `idx_dashboards__workspace_owner`; two
+partial unique indexes, one per slug namespace, so a collision fails at the DB
+level even if the frontend check is bypassed:
+`dashboards__slug_unique_when_public` on `(slug)` where `visibility =
+'public'`, and `dashboards__slug_unique_per_workspace_when_internal` on
+`(workspace_id, slug)` where `visibility = 'workspace'`.
 
 ### 11.2 RLS (`supabase/schemas/17.rls.dashboards.sql`)
 

@@ -1,5 +1,5 @@
 import { uuid } from "$/lib/uuid";
-import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";

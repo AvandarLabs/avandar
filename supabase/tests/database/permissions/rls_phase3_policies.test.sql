@@ -104,6 +104,11 @@ where
     else 'Global Editor'
   end;
 
+-- Both fixtures are published to the workspace so that the only thing these
+-- assertions vary is `is_restricted`. A `draft` would confound them: since
+-- `util__auth_user_may_select_dashboard` gained its draft gate, a viewer is
+-- denied a draft no matter how `is_restricted` is set, and the unrestricted
+-- case would fail for a reason that has nothing to do with restriction.
 insert into public.dashboards (
   id,
   workspace_id,
@@ -112,7 +117,8 @@ insert into public.dashboards (
   name,
   config,
   is_restricted,
-  is_public
+  visibility,
+  snapshot_revision
 )
 values
   (
@@ -123,7 +129,8 @@ values
     'open dash',
     '{}'::jsonb,
     false,
-    false
+    'workspace',
+    'a7005001-0000-4000-8000-000000000001'::uuid
   ),
   (
     'a7004002-0000-4000-8000-000000000002'::uuid,
@@ -133,7 +140,8 @@ values
     'restricted dash',
     '{}'::jsonb,
     true,
-    false
+    'workspace',
+    'a7005002-0000-4000-8000-000000000002'::uuid
   )
 on conflict (id) do nothing;
 

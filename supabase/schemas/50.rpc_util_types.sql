@@ -13,6 +13,4 @@
  * values in a composite type are marked as nullable. So if we wrap function
  * parameters in a composite type, they become nullable.
  */
-create type public.util__nullable_text as (
-  value text
-);
+create type public.util__nullable_text as (value text);

@@ -55,6 +55,11 @@ export default [
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
       "src/i18n/locales/**/messages.ts",
+      // `supabase start` writes a minified edge-runtime bundle here. It is
+      // gitignored but was still linted, so `pnpm lint` failed with hundreds of
+      // errors on any machine where the local stack had been started, and
+      // passed in CI where it had not.
+      "supabase/.temp/**",
     ],
   },
   eslintPluginImportX.flatConfigs.recommended,

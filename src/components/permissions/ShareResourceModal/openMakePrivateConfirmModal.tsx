@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { makePrivateConfirmCopy } from "./copy/makePrivateConfirmCopy";
+import { makePrivateConfirmCopy } from "./copy/makePrivateConfirmCopy/makePrivateConfirmCopy";
 
 type OpenMakePrivateConfirmModalOptions = {
   resourceName: string;
@@ -9,6 +9,7 @@ type OpenMakePrivateConfirmModalOptions = {
   numUsers: number;
   numGroups: number;
   losesWorkspaceAccess: boolean;
+  isPubliclyPublished: boolean;
   onConfirm: () => void;
 };
 
@@ -24,6 +25,7 @@ export function openMakePrivateConfirmModal(
     numGroups: options.numGroups,
     losesWorkspaceAccess: options.losesWorkspaceAccess,
     app: options.app,
+    isPubliclyPublished: options.isPubliclyPublished,
   });
 
   modals.openConfirmModal({

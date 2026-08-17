@@ -10,9 +10,7 @@ with
   registrations as (
     select
       e.user_id,
-      min(
-        e.created_at
-      ) as registered_at
+      min(e.created_at) as registered_at
     from
       public.usage_analytics_events e
     where
@@ -45,17 +43,10 @@ with
   ),
   user_weeks as (
     select
-      date_trunc(
-        'week',
-        r.registered_at
-      ) as cohort_week,
+      date_trunc('week', r.registered_at) as cohort_week,
       count(*) as users_registered,
-      count(
-        c.user_id
-      ) as users_email_confirmed,
-      count(
-        w.user_id
-      ) as users_created_workspace
+      count(c.user_id) as users_email_confirmed,
+      count(w.user_id) as users_created_workspace
     from
       registrations r
       left join confirmations c on c.user_id = r.user_id

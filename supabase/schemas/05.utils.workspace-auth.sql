@@ -38,9 +38,7 @@ $$ language plpgsql security definer stable;
  * @param workspace_id: Workspace id to check
  * @returns: Array of user ids
  */
-create or replace function public.util__get_workspace_members (
-  workspace_id uuid
-) returns uuid[] as $$
+create or replace function public.util__get_workspace_members (workspace_id uuid) returns uuid[] as $$
 begin
   return array(
     select public.workspace_memberships.user_id

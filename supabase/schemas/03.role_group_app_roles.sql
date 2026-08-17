@@ -8,15 +8,10 @@ create table public.role_group_app_roles (
   role public.role_level not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint role_group_app_roles__role_group_id_app unique (
-    role_group_id,
-    app
-  )
+  constraint role_group_app_roles__role_group_id_app unique (role_group_id, app)
 );
 
-create index idx_role_group_app_roles__role_group_id on public.role_group_app_roles (
-  role_group_id
-);
+create index idx_role_group_app_roles__role_group_id on public.role_group_app_roles (role_group_id);
 
 alter table public.role_group_app_roles enable row level security;
 

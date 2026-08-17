@@ -6,11 +6,11 @@ import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";
 import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
@@ -75,7 +75,7 @@ export function useChangePlanModal(): (
         t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
       );
     },
-    queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+    queriesToInvalidate: getPlanChangeQueriesToInvalidate(),
   });
   const [convertToNativeFree, isConvertingToNativeFree] =
     SubscriptionClient.useCreateFreeSubscription({
@@ -91,7 +91,7 @@ export function useChangePlanModal(): (
           t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
         );
       },
-      queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+      queriesToInvalidate: getPlanChangeQueriesToInvalidate(),
     });
 
   const openChangePlanModal = ({

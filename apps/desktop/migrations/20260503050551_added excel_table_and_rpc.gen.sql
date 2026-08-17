@@ -5,23 +5,8 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 33
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 2
-create table "datasets__xls_file" (
-  "id" uuid not null,
-  "dataset_id" uuid not null,
-  "workspace_id" uuid not null,
-  "created_at" timestamptz not null default current_timestamp,
-  "updated_at" timestamptz not null default current_timestamp,
-  "is_in_cloud_storage" integer not null default false,
-  "size_in_bytes" integer not null,
-  "rows_to_skip" integer not null default 0,
-  "sheet_name" text,
-  "has_header" integer not null default true,
-  "date_format" text,
-  "timestamp_format" text
-);
+CREATE TABLE "datasets__xls_file" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "is_in_cloud_storage" INTEGER NOT NULL DEFAULT FALSE, "size_in_bytes" INTEGER NOT NULL, "rows_to_skip" INTEGER NOT NULL DEFAULT 0, "sheet_name" TEXT, "has_header" INTEGER NOT NULL DEFAULT TRUE, "date_format" TEXT, "timestamp_format" TEXT);
 
-create unique index datasets__xls_file_dataset_id_key on datasets__xls_file (
-  dataset_id
-);
+CREATE UNIQUE INDEX datasets__xls_file_dataset_id_key ON datasets__xls_file(dataset_id);
 
-create unique index datasets__xls_file_pkey on datasets__xls_file (id);
+CREATE UNIQUE INDEX datasets__xls_file_pkey ON datasets__xls_file(id);

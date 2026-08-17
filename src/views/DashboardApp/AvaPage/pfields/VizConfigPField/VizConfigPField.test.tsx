@@ -71,6 +71,7 @@ function renderField(props: { value: VizConfig.T }): {
           onChange={onChange}
           workspaceId={TEST_WORKSPACE_ID}
           dashboardId={TEST_DASHBOARD_ID}
+          snapshotRevision="2026-08-14T01:00:00.000Z"
         />
       </AvandarAppProvider>
     </QueryClientProvider>,

@@ -215,6 +215,23 @@ when the gate matches.
   For each hit, confirm the call opts into `ALWAYS_REFETCH_ON_MOUNT`
   and that any dependent control and label follow the two rules above.
 
+### Phase: `-`-prefixed files under `src/routes/`
+
+- **Gate:** the diff adds or renames a file whose basename starts with `-`
+  under `src/routes/`. Skip otherwise.
+- **Rule:** the general module checklist flags a `-` prefix, but TanStack
+  Router treats `src/routes/` as its `routesDirectory` and skips any file
+  whose basename starts with the ignore prefix `-`. A colocated route test is
+  therefore **required** to carry that prefix, or the router would try to turn
+  it into a route. So:
+  - A colocated test for a route module **may** use the `-` prefix, and should
+    sit next to the route it covers, named after it:
+    `src/routes/.../d/$slugOrId.tsx` → `src/routes/.../d/-$slugOrId.test.tsx`.
+  - Nothing else under `src/routes/` may use the prefix. A component, hook,
+    helper, or type that merely wants to hide from the router is a unit in the
+    wrong place: move it into the owning view directory under `src/views/`
+    (or `src/components/`) and import it from the route.
+
 ### Phase: AvaPage schema migrations
 
 - **Gate:** the diff touches any file under

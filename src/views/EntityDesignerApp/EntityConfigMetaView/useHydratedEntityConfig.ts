@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";

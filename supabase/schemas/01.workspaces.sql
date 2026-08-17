@@ -28,6 +28,4 @@ update on public.workspaces for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-create index idx_workspaces__owner_id on public.workspaces (
-  owner_id
-);
+create index idx_workspaces__owner_id on public.workspaces (owner_id);

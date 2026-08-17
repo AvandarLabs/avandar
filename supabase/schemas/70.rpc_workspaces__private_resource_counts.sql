@@ -7,9 +7,7 @@
  * @param p_workspace_id Workspace to report on.
  * @returns One row per workspace member, including zero-count members.
  */
-create or replace function public.rpc_workspaces__private_resource_counts (
-  p_workspace_id uuid
-) returns table (
+create or replace function public.rpc_workspaces__private_resource_counts (p_workspace_id uuid) returns table (
   user_id uuid,
   private_dashboard_count bigint,
   private_dataset_count bigint
