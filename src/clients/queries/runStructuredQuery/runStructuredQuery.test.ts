@@ -8,8 +8,8 @@ import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStru
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -19,13 +19,13 @@ const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
 const {
   runQueryMock,
   publicRunQueryMock,
-  getAllEntityFieldValuesMock,
+  getConceptExtensionMock,
   resolveManualQueryForExecutionMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     publicRunQueryMock: vi.fn(),
-    getAllEntityFieldValuesMock: vi.fn(),
+    getConceptExtensionMock: vi.fn(),
     resolveManualQueryForExecutionMock: vi.fn(),
   };
 });
@@ -37,11 +37,11 @@ vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
   return { PublicQetlClient: { runQuery: publicRunQueryMock } };
 });
 vi.mock(
-  "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient",
+  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
   () => {
     return {
-      EntityFieldValueClient: {
-        getAllEntityFieldValues: getAllEntityFieldValuesMock,
+      AttributeAssertionClient: {
+        getConceptExtension: getConceptExtensionMock,
       },
     };
   },
@@ -55,11 +55,11 @@ vi.mock(
   },
 );
 
-/** An honest `EntityConfig.T`, built through `Model.make` with no cast. */
-function _createEntityConfig(): EntityConfig.T {
+/** An honest `Concept.T`, built through `Model.make` with no cast. */
+function _createConcept(): Concept.T {
   const now = new Date().toISOString();
-  return Model.make("EntityConfig", {
-    id: uuid<EntityConfig.Id>(),
+  return Model.make("Concept", {
+    id: uuid<Concept.Id>(),
     workspaceId: uuid<Workspace.Id>(),
     ownerId: uuid<User.Id>(),
     name: "Cases",
@@ -70,24 +70,24 @@ function _createEntityConfig(): EntityConfig.T {
   });
 }
 
-/** An honest `EntityFieldConfig.T`, built through `Model.make` with no cast. */
-function _createEntityFieldConfig(
-  entityConfigId: EntityConfig.Id,
+/** An honest `ConceptAttribute.T`, built through `Model.make` with no cast. */
+function _createConceptAttribute(
+  conceptId: Concept.Id,
   name: string,
-): EntityFieldConfig.T {
+): ConceptAttribute.T {
   const now = new Date().toISOString();
-  return Model.make("EntityFieldConfig", {
-    id: uuid<EntityFieldConfig.Id>(),
-    entityConfigId,
+  return Model.make("ConceptAttribute", {
+    id: uuid<ConceptAttribute.Id>(),
+    conceptId,
     workspaceId: uuid<Workspace.Id>(),
     name,
     description: undefined,
     createdAt: now,
     updatedAt: now,
     dataType: "varchar",
-    valueExtractorType: "manual_entry",
-    isTitleField: false,
-    isIdField: false,
+    mappingType: "manual_entry",
+    isLabel: false,
+    isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
   });
@@ -114,7 +114,7 @@ function _createDataset(): Dataset.T {
 beforeEach(() => {
   runQueryMock.mockReset();
   publicRunQueryMock.mockReset();
-  getAllEntityFieldValuesMock.mockReset();
+  getConceptExtensionMock.mockReset();
   // Mirrors the real resolver's behavior for queries that never trip the
   // large-dataset auto-limit guard, which is every query these tests use
   // unless a test overrides this default.
@@ -238,16 +238,16 @@ describe("runStructuredQuery", () => {
     expect(publicRunQueryMock).not.toHaveBeenCalled();
   });
 
-  it("remaps entity field values from field ids to field names", async () => {
-    const entityConfig = _createEntityConfig();
-    const nameField = _createEntityFieldConfig(entityConfig.id, "name");
-    const ageField = _createEntityFieldConfig(entityConfig.id, "age");
-    const nameColumn = QueryColumn.makeFromEntityFieldConfig(nameField);
-    const ageColumn = QueryColumn.makeFromEntityFieldConfig(ageField);
+  it("remaps attribute assertions from attribute ids to attribute names", async () => {
+    const concept = _createConcept();
+    const labelAttribute = _createConceptAttribute(concept.id, "name");
+    const ageField = _createConceptAttribute(concept.id, "age");
+    const nameColumn = QueryColumn.makeFromConceptAttribute(labelAttribute);
+    const ageColumn = QueryColumn.makeFromConceptAttribute(ageField);
 
-    getAllEntityFieldValuesMock.mockResolvedValue([
-      { [nameField.id]: "Ada", [ageField.id]: 30 },
-      { [nameField.id]: "Grace", [ageField.id]: 40 },
+    getConceptExtensionMock.mockResolvedValue([
+      { [labelAttribute.id]: "Ada", [ageField.id]: 30 },
+      { [labelAttribute.id]: "Grace", [ageField.id]: 40 },
     ]);
 
     const result = await runStructuredQuery({
@@ -255,7 +255,7 @@ describe("runStructuredQuery", () => {
       workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
-        dataSource: entityConfig,
+        dataSource: concept,
         queryColumns: [nameColumn, ageColumn],
       },
       rawSql: undefined,

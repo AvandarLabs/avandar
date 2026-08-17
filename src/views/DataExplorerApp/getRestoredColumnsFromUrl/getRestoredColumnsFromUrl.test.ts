@@ -10,8 +10,8 @@ import { describe, expect, it } from "vitest";
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 function _makeDatasetColumn(name: string): DatasetColumn.T {
@@ -32,34 +32,34 @@ function _makeDatasetColumn(name: string): DatasetColumn.T {
   });
 }
 
-function _makeEntityFieldConfig(name: string): EntityFieldConfig.T {
+function _makeConceptAttribute(name: string): ConceptAttribute.T {
   const now = "2026-01-01T00:00:00.000Z";
-  return Model.make("EntityFieldConfig", {
-    id: uuid<EntityFieldConfig.Id>(),
-    entityConfigId: uuid<EntityConfig.Id>(),
+  return Model.make("ConceptAttribute", {
+    id: uuid<ConceptAttribute.Id>(),
+    conceptId: uuid<Concept.Id>(),
     workspaceId: uuid<Workspace.Id>(),
     name,
     description: undefined,
     createdAt: now,
     updatedAt: now,
     dataType: "varchar",
-    valueExtractorType: "manual_entry",
-    isTitleField: false,
-    isIdField: false,
+    mappingType: "manual_entry",
+    isLabel: false,
+    isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
   });
 }
 
 describe("getRestoredColumnsFromUrl", () => {
-  it("resolves entity field names, which use a different source model", () => {
-    // An entity source supplies its columns through EntityFieldConfig rather
+  it("resolves concept attribute names, which use a different source model", () => {
+    // A concept source supplies its columns through ConceptAttribute rather
     // than DatasetColumn. Without this, deleting that whole conversion from
     // the source leaves every other test in this file green.
     const restored = getRestoredColumnsFromUrl({
       colNames: ["status"],
       datasetColumns: undefined,
-      entityFieldConfigs: [_makeEntityFieldConfig("status")],
+      conceptAttributes: [_makeConceptAttribute("status")],
     });
 
     expect(restored.map(prop("baseColumn.name"))).toEqual(["status"]);
@@ -72,7 +72,7 @@ describe("getRestoredColumnsFromUrl", () => {
         _makeDatasetColumn("region"),
         _makeDatasetColumn("total"),
       ],
-      entityFieldConfigs: undefined,
+      conceptAttributes: undefined,
     });
 
     expect(restored.map(prop("baseColumn.name"))).toEqual(["region", "total"]);
@@ -87,7 +87,7 @@ describe("getRestoredColumnsFromUrl", () => {
         _makeDatasetColumn("region"),
         _makeDatasetColumn("total"),
       ],
-      entityFieldConfigs: undefined,
+      conceptAttributes: undefined,
     });
 
     expect(restored.map(prop("baseColumn.name"))).toEqual(["total", "region"]);
@@ -100,7 +100,7 @@ describe("getRestoredColumnsFromUrl", () => {
         _makeDatasetColumn("region"),
         _makeDatasetColumn("total"),
       ],
-      entityFieldConfigs: undefined,
+      conceptAttributes: undefined,
     });
 
     expect(restored.map(prop("baseColumn.name"))).toEqual(["region", "total"]);
@@ -111,7 +111,7 @@ describe("getRestoredColumnsFromUrl", () => {
       getRestoredColumnsFromUrl({
         colNames: undefined,
         datasetColumns: [_makeDatasetColumn("region")],
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
       }),
     ).toEqual([]);
   });
@@ -121,7 +121,7 @@ describe("getRestoredColumnsFromUrl", () => {
       getRestoredColumnsFromUrl({
         colNames: ["region"],
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
       }),
     ).toEqual([]);
   });

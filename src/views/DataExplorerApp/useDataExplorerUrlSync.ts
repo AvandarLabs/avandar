@@ -3,8 +3,8 @@ import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStru
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import {
@@ -65,7 +65,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const [entityConfigs] = EntityConfigClient.useGetAll(
+  const [concepts] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
 
@@ -73,10 +73,10 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     if (!urlState.dsId) {
       return undefined;
     }
-    return [...(datasets ?? []), ...(entityConfigs ?? [])].find((ds) => {
+    return [...(datasets ?? []), ...(concepts ?? [])].find((ds) => {
       return ds.id === urlState.dsId;
     });
-  }, [urlState.dsId, datasets, entityConfigs]);
+  }, [urlState.dsId, datasets, concepts]);
 
   const needsColumns =
     (urlState.colNames?.length ?? 0) > 0 && Boolean(urlState.dsId);
@@ -96,24 +96,24 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
     );
   }, [restoredDataSource, datasets]);
 
-  const isEntityConfigSource = useMemo(() => {
+  const isConceptSource = useMemo(() => {
     return (
       Boolean(restoredDataSource) &&
-      (entityConfigs?.some((e) => {
+      (concepts?.some((e) => {
         return e.id === restoredDataSource?.id;
       }) ??
         false)
     );
-  }, [restoredDataSource, entityConfigs]);
+  }, [restoredDataSource, concepts]);
 
   const [datasetColumns] = DatasetColumnClient.useGetAll({
     ...where("dataset_id", "eq", restoredDataSource?.id),
     useQueryOptions: { enabled: needsColumns && isDatasetSource },
   });
 
-  const [entityFieldConfigs] = EntityFieldConfigClient.useGetAll({
-    ...where("entity_config_id", "eq", restoredDataSource?.id),
-    useQueryOptions: { enabled: needsColumns && isEntityConfigSource },
+  const [conceptAttributes] = ConceptAttributeClient.useGetAll({
+    ...where("concept_id", "eq", restoredDataSource?.id),
+    useQueryOptions: { enabled: needsColumns && isConceptSource },
   });
 
   const [allDatasetColumns] = DatasetColumnClient.useGetAll(
@@ -153,7 +153,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           restoredDataSource,
           needsColumns,
           datasetColumns,
-          entityFieldConfigs,
+          conceptAttributes,
           sqlMappingMetadataLoaded,
         })
       ) {
@@ -202,12 +202,12 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
         if (
           restoreStructuredFromUrl &&
           needsColumns &&
-          (datasetColumns ?? entityFieldConfigs)
+          (datasetColumns ?? conceptAttributes)
         ) {
           const restoredCols = getRestoredColumnsFromUrl({
             colNames: urlState.colNames,
             datasetColumns,
-            entityFieldConfigs,
+            conceptAttributes,
           });
 
           if (restoredCols.length > 0) {
@@ -296,7 +296,7 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
       urlState,
       restoredDataSource,
       datasetColumns,
-      entityFieldConfigs,
+      conceptAttributes,
       needsColumns,
       datasets,
       allDatasetColumns,

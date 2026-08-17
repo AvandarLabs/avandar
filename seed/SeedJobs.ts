@@ -97,58 +97,58 @@ export const SeedJobs = [
   },
 
   {
-    name: "createEntityConfigs",
+    name: "createConcepts",
     jobFn: async ({ data, dbClient, helpers }): Promise<void> => {
-      // create the entity configs
-      await promiseMap(data.entityConfigs, async (entityConfig) => {
+      // create the concepts
+      await promiseMap(data.concepts, async (concept) => {
         const { data: workspace } = await dbClient
           .from("workspaces")
           .select()
-          .eq("slug", entityConfig.workspaceSlug)
+          .eq("slug", concept.workspaceSlug)
           .single();
 
         if (!workspace) {
           throw new Error(
-            `Workspace with slug ${entityConfig.workspaceSlug} not found`,
+            `Workspace with slug ${concept.workspaceSlug} not found`,
           );
         }
 
-        const { data: insertedEntityConfig } = await dbClient
-          .from("entity_configs")
+        const { data: insertedConcept } = await dbClient
+          .from("concepts")
           .insert({
-            owner_id: helpers.getUserByEmail(entityConfig.owner).id,
+            owner_id: helpers.getUserByEmail(concept.owner).id,
             workspace_id: workspace.id,
-            name: entityConfig.name,
-            description: entityConfig.description,
-            allow_manual_creation: entityConfig.allowManualCreation,
+            name: concept.name,
+            description: concept.description,
+            allow_manual_creation: concept.allowManualCreation,
           })
           .select()
           .single()
           .throwOnError();
 
-        // now create the field configs for this entity config
-        await promiseMap(entityConfig.fields, async (entityFieldConfig) => {
+        // now create the attributes for this concept
+        await promiseMap(concept.attributes, async (conceptAttribute) => {
           const {
             name,
             description,
             dataType,
-            valueExtractorType,
+            mappingType,
             allowManualEdit,
-            isIdField,
-            isTitleField,
+            isIdentifier,
+            isLabel,
             isArray,
-          } = entityFieldConfig;
-          return await dbClient.from("entity_field_configs").insert({
-            entity_config_id: insertedEntityConfig.id,
+          } = conceptAttribute;
+          return await dbClient.from("concept_attributes").insert({
+            concept_id: insertedConcept.id,
             workspace_id: workspace.id,
             name,
             description,
             allow_manual_edit: allowManualEdit,
             data_type: dataType,
             is_array: isArray,
-            is_id_field: isIdField,
-            is_title_field: isTitleField,
-            value_extractor_type: valueExtractorType,
+            is_identifier: isIdentifier,
+            is_label: isLabel,
+            mapping_type: mappingType,
           });
         });
       });

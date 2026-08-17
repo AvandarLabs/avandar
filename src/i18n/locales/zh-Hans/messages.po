@@ -27,7 +27,7 @@ msgstr "您可以在您的支付方式中进行更改"
 msgid "Close chat panel"
 msgstr "关闭聊天面板"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "ID field is required"
 msgstr "ID 字段是必填项"
 
@@ -61,7 +61,7 @@ msgstr "1 个群组"
 msgid "Sort by"
 msgstr "排序方式"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Remove field"
 msgstr "移除字段"
 
@@ -145,7 +145,7 @@ msgstr "最近的"
 msgid "PII detected:"
 msgstr "检测到个人身份信息："
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
 msgstr "标题字段是必填项"
 
@@ -233,7 +233,7 @@ msgstr "查询"
 msgid "Row filters"
 msgstr "行过滤器"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Description"
 msgstr "个人资料描述"
 
@@ -330,8 +330,8 @@ msgstr "否"
 msgid "Could not determine a base table from FROM clause."
 msgstr "无法从 FROM 子句中确定基础表。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Select a field"
 msgstr "选择一个字段"
 
@@ -495,7 +495,7 @@ msgstr "正在回复…"
 msgid "Re-download"
 msgstr "重新下载"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
 msgstr "允许多个值"
 
@@ -526,7 +526,7 @@ msgstr "您当前的计划仅支持最多 {0} 个数据集。要增加可以添�
 msgid "Add columns to the query above to start defining filters."
 msgstr "在上面的查询中添加列以开始定义过滤器。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "仅允许一个值"
 
@@ -555,7 +555,7 @@ msgstr "打开数据"
 msgid "stddev"
 msgstr "标准差"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "获取值的数量"
 
@@ -595,8 +595,8 @@ msgstr "使用建议"
 msgid "Unpublish"
 msgstr "取消发布"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#. placeholder {0}: concept.name
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "{0} Manager"
 msgstr "{0} 管理员"
 
@@ -1000,7 +1000,7 @@ msgstr "SQL 中的列名"
 msgid "Confirm"
 msgstr "确认"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "等于..."
 
@@ -1016,7 +1016,7 @@ msgstr "{numGroups} 个群组"
 msgid "Ask the dashboard's owner to share it with you."
 msgstr "请让仪表板所有者与您共享该仪表板。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "某些数据应来自现有数据集"
 
@@ -1113,7 +1113,7 @@ msgid "The invitation you are trying to accept is not valid. Please contact the 
 "workspace owner to get a new invitation."
 msgstr "您尝试接受的邀请无效。请联系工作区所有者以获取新的邀请。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a description for this profile type"
 msgstr "为此配置文件类型输入描述"
 
@@ -1267,7 +1267,7 @@ msgstr "内置预设"
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 现在在您的工作区中。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Profile fields"
 msgstr "配置文件字段"
 
@@ -1360,7 +1360,7 @@ msgstr "电子邮件地址"
 msgid "Smooth"
 msgstr "平滑"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "为字段输入名称"
 
@@ -1380,7 +1380,7 @@ msgstr "您的用户配置文件尚未加载。请重试。"
 msgid "Sum"
 msgstr "总和"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Sync data!"
 msgstr "同步数据！"
 
@@ -1436,10 +1436,6 @@ msgid "The current SQL contains parts that the form could not represent. "
 "Continuing will overwrite that SQL with one generated from the form. "
 "This cannot be undone (unless you re-run your previous chat prompt)."
 msgstr "当前 SQL 包含表单无法表示的部分。继续将用从表单生成的 SQL 覆盖该 SQL。这无法撤销（除非您重新运行之前的聊天提示）。"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "Select the columns you want in this {entityConfigName}"
-msgstr "选择您想要在此 {entityConfigName} 中的列"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
@@ -1679,11 +1675,15 @@ msgstr "信息"
 msgid "Writing query…"
 msgstr "正在编写查询…"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "No entity selected"
 msgstr "未选择实体"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Allow new {pluralConceptName} to be created manually"
+msgstr "允许手动创建新的 {pluralConceptName}"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -1744,7 +1744,7 @@ msgstr "按 {keyboardShortcut} 保存"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -1827,7 +1827,7 @@ msgstr "显示 SQL"
 msgid "Grid"
 msgstr "网格"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Cannot sync this entity"
 msgstr "无法同步此实体"
 
@@ -1852,10 +1852,6 @@ msgstr "无法发布仪表板"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Allow new {pluralEntityConfigName} to be created manually"
-msgstr "允许手动创建新的 {pluralEntityConfigName}"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -1907,7 +1903,7 @@ msgstr "第 5 列"
 msgid "Enter a description for this dataset"
 msgstr "输入此数据集的描述"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Fields to be manually entered"
 msgstr "需要手动输入的字段"
 
@@ -1938,7 +1934,7 @@ msgstr "您的数据集"
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -1990,7 +1986,7 @@ msgstr "到"
 msgid "Download offline chat model (WebLLM)"
 msgstr "下载离线聊天模型（WebLLM）"
 
-#: src/views/EntityDesignerApp/EntityConfigNavbar.tsx
+#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
 msgid "Create new profile type"
 msgstr "创建新的配置文件类型"
 
@@ -1998,7 +1994,7 @@ msgstr "创建新的配置文件类型"
 msgid "Done"
 msgstr "完成"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add Field"
 msgstr "添加字段"
 
@@ -2014,7 +2010,7 @@ msgstr "有新版本可用。刷新以更新。"
 msgid "You haven't chosen an X axis"
 msgstr "您尚未选择 X 轴"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "并且也等于..."
 
@@ -2026,7 +2022,7 @@ msgstr "适用于传单、报告和二维码的简短易记 URL。"
 msgid "Using your custom URL."
 msgstr "使用您的自定义 URL。"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Profile failed to load"
 msgstr "配置文件加载失败"
 
@@ -2047,7 +2043,7 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "升级到“您想支付多少”计划只能通过账单门户进行。<0/>下面的按钮将带您前往那里。"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete entity"
 msgstr "删除实体"
 
@@ -2081,11 +2077,6 @@ msgstr "数据集已删除。"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Sheet name"
 msgstr "工作表名称"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single "
-"{entityConfigName}."
-msgstr "我们将使用这些列将数据集合并为一个单一的 {entityConfigName}。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2139,16 +2130,11 @@ msgstr "尚无 SQL。请向 Avandar 提问或在手动选项卡中构建查询�
 msgid "Received a non-string value for a text field"
 msgstr "收到非字符串值的文本字段"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "Tell us about where the {singularEntityConfigName} data should come "
-"from..."
-msgstr "告诉我们 {singularEntityConfigName} 数据应该来自哪里..."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Failed to delete workspace"
 msgstr "删除工作区失败"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete Entity"
 msgstr "删除实体"
 
@@ -2292,7 +2278,7 @@ msgstr "文本"
 msgid "Split (+/-)"
 msgstr "拆分（+/-）"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Active"
 msgstr "活动"
 
@@ -2440,7 +2426,7 @@ msgstr "X 轴刻度间隔"
 msgid "Please try again."
 msgstr "请再试一次。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field Name"
 msgstr "字段名称"
 
@@ -2529,6 +2515,11 @@ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for 
 "analytics work."
 msgstr "如果你拥有 32 GB RAM，并且主要使用高性能设备进行分析工作，推荐使用此模型。"
 
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If each {0} can only have one {attributeName} value, check this box."
+msgstr "如果每个 {0} 只能有一个 {attributeName} 值，请勾选此框。"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
 msgstr "角色"
@@ -2572,10 +2563,10 @@ msgstr "自定义角色组"
 msgid "Rose"
 msgstr "玫瑰"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "您确定要删除 {0} 吗？"
 
@@ -2770,7 +2761,7 @@ msgid "Search by name, organization, pipeline…"
 msgstr "按名称、组织、管道搜索…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "数据"
 
@@ -2808,7 +2799,7 @@ msgstr "未选择文件"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
 
@@ -2854,16 +2845,11 @@ msgstr "打开 {0}"
 msgid "Dataset is now offline-only"
 msgstr "数据集现在仅限离线使用"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "来自数据集的字段"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {entityConfigName}."
-msgstr "在这里选择应添加到此 {entityConfigName} 的数据集中的哪些列。"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create"
 msgstr "创建"
 
@@ -2954,7 +2940,7 @@ msgstr "继续进入您的工作区"
 msgid "The custom URL cannot contain spaces"
 msgstr "自定义 URL 不能包含空格"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "选择最大值"
 
@@ -3219,10 +3205,10 @@ msgstr "数据集"
 msgid "Remove failed"
 msgstr "删除失败"
 
+#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
-#. placeholder {0}: entityConfig.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} 删除成功"
 
@@ -3238,7 +3224,7 @@ msgstr "H1"
 msgid "From dataset"
 msgstr "来自数据集"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "A profile can consist of columns that come from different datasets."
 msgstr "一个配置文件可以由来自不同数据集的列组成。"
 
@@ -3287,12 +3273,12 @@ msgstr "颜色"
 msgid "Y axis label"
 msgstr "Y 轴标签"
 
-#. placeholder {0}: entityConfig.name
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Finished syncing {0} data"
 msgstr "完成同步 {0} 数据"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "选择列"
 
@@ -3357,8 +3343,8 @@ msgstr "请勿刷新或关闭此标签页，否则下载将被取消。"
 msgid "Forest"
 msgstr "森林"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "允许手动编辑"
 
@@ -3378,8 +3364,8 @@ msgstr "Llama 3.2 1B（离线）"
 msgid "Series"
 msgstr "系列"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "实体加载失败。请稍后再试或联系支持。"
@@ -3401,7 +3387,7 @@ msgstr "按 {groupByColumn} 统计 {datasetName} 中的行数"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未应用 SQL。请登录以批准筛选值。"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "The profile manager page failed to load. Please try again later or reach "
 "out to support."
 msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。"
@@ -3438,8 +3424,8 @@ msgstr "是否永久删除此设备上的所有同意决定？此操作无法撤
 msgid "Let AI decide (legacy)"
 msgstr "让 AI 决定（遗留）"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "New field"
 msgstr "新字段"
 
@@ -3466,7 +3452,7 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 "it until you press the button below."
 msgstr "此仪表板仍在 Web 上公开。任何拥有链接的人都可以查看，直到您按下下面的按钮。"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Entity deleted"
 msgstr "实体已删除"
 
@@ -3498,7 +3484,7 @@ msgstr "取消 URL 更改"
 msgid "Pick a dashboard, or create a new one."
 msgstr "选择一个仪表板，或创建一个新仪表板。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "获取值的总和"
 
@@ -3522,6 +3508,10 @@ msgstr "清除隐私日志"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Consent"
 msgstr "同意"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Tell us about where the {singularConceptName} data should come from..."
+msgstr "告诉我们 {singularConceptName} 数据应该来自哪里..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -3554,7 +3544,7 @@ msgstr "您已成功连接到 {0}"
 msgid "X column"
 msgstr "X 列"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "选择最常见的值"
 
@@ -3689,12 +3679,6 @@ msgstr "工具"
 msgid "Ask a workspace settings administrator to update your roles."
 msgstr "请向工作区设置管理员请求更新您的角色。"
 
-#. placeholder {0}: sourcedDataset?.name
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "For dataset <0>{0}</0>, choose the column to use as the "
-"{entityConfigName} ID"
-msgstr "对于数据集 <0>{0}</0>，选择用作 {entityConfigName} ID 的列"
-
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -3706,7 +3690,7 @@ msgstr "查看者"
 msgid "Pick one"
 msgstr "选择一个"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "尚未添加任何字段"
 
@@ -3838,9 +3822,9 @@ msgstr "默认情况下，我们使用基于 UUID 的直接链接。您可以在
 msgid "Make internal"
 msgstr "设为内部"
 
-#: src/routes/_auth/$workspaceSlug/entity-designer/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 msgid "Please select an entity from the left sidebar, or create a new one."
 msgstr "请从左侧边栏选择一个实体，或创建一个新实体。"
 
@@ -4024,7 +4008,7 @@ msgstr "请修正高亮的字段。"
 msgid "between"
 msgstr "之间"
 
-#: src/views/EntityManagerApp/SingleEntityView/StatusPill.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
 msgstr "非活动"
 
@@ -4037,7 +4021,7 @@ msgstr "右"
 msgid "all members of "
 msgstr "所有成员的 "
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些数据应手动输入"
 
@@ -4053,6 +4037,11 @@ msgstr "选择要下载的模型。您可以稍后切换模型或重新下载。
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "请求功能"
+
+#. placeholder {0}: sourcedDataset?.name
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
+msgstr "对于数据集 <0>{0}</0>，选择用作 {conceptName} ID 的列"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -4123,6 +4112,10 @@ msgstr "此 SQL 的部分内容无法以手动形式表示。该表单显示了�
 msgid "Please try again. Your dashboard has not been published."
 msgstr "请再试一次。您的仪表板尚未发布。"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "We will use those columns to merge datasets into a single {conceptName}."
+msgstr "我们将使用这些列将数据集合并为一个单一的 {conceptName}。"
+
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -4178,7 +4171,7 @@ msgstr "上传数据集"
 msgid "Reset"
 msgstr "重置"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Enter a name for this profile type"
 msgstr "输入此配置文件类型的名称"
 
@@ -4186,7 +4179,7 @@ msgstr "输入此配置文件类型的名称"
 msgid "Area"
 msgstr "区域"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
@@ -4198,7 +4191,7 @@ msgstr "不包含"
 msgid "Workspace name updated"
 msgstr "工作区名称已更新"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "将列添加为字段"
 
@@ -4270,7 +4263,7 @@ msgstr "超过 1000 行被拒绝"
 msgid "Update subscription"
 msgstr "更新订阅"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "获取值的平均值"
 
@@ -4601,6 +4594,10 @@ msgstr "隐私日志"
 msgid "Private resources"
 msgstr "私有资源"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "Select the columns you want in this {conceptName}"
+msgstr "选择您想要在此 {conceptName} 中的列"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "可视化设置"
@@ -4635,7 +4632,7 @@ msgstr "此数据集可以存储在云中。"
 msgid "Billing"
 msgstr "账单"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Profile Name"
 msgstr "配置文件名称"
 
@@ -4843,7 +4840,7 @@ msgstr "正在加载数据集…"
 msgid "Loading private resources"
 msgstr "正在加载私有资源"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "选择我们看到的第一个值"
 
@@ -4856,11 +4853,6 @@ msgstr "访问被拒绝"
 msgid "Created \"{dashboardName}\""
 msgstr "创建了 \"{dashboardName}\""
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If each {0} can only have one {fieldName} value, check this box."
-msgstr "如果每个 {0} 只能有一个 {fieldName} 值，请勾选此框。"
-
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -4870,6 +4862,10 @@ msgstr "描述必须少于 {maxDatasetDescriptionLength} 个字符（当前：{0
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Number of seats to add"
 msgstr "要添加的座位数量"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
+msgid "We should join data into the same {conceptName} when…"
+msgstr "当…时，我们应该将数据连接到同一个 {conceptName}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -4970,7 +4966,7 @@ msgstr "仅查询的内容"
 msgid "Could not generate QR code"
 msgstr "无法生成二维码"
 
-#: src/views/EntityDesignerApp/EntityConfigMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "No fields or dataset are configured."
 msgstr "未配置任何字段或数据集。"
 
@@ -5036,7 +5032,7 @@ msgstr "服务"
 msgid "Could not load map data"
 msgstr "无法加载地图数据"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "没有更多内容可加载"
 
@@ -5149,11 +5145,6 @@ msgstr "分组"
 msgid "You need admin access on this resource to manage sharing."
 msgstr "您需要对该资源具有管理员访问权限才能管理共享。"
 
-#. placeholder {0}: state.singularEntityConfigName
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
-msgid "If there are multiple {fieldName} values for one {0}, then..."
-msgstr "如果一个 {0} 有多个 {fieldName} 值，那么..."
-
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
@@ -5167,7 +5158,7 @@ msgstr "只有你可以访问此 {resource}。"
 msgid "Stack group"
 msgstr "堆叠组"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
 
@@ -5195,7 +5186,7 @@ msgstr "正在恢复数据集处理…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "覆盖 <0>{0}</0>，从 <1>{1}</1> 到 <2>{2}</2>。"
 
-#: src/views/EntityManagerApp/EntityNavbar.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Loading more..."
 msgstr "加载更多..."
 
@@ -5365,7 +5356,7 @@ msgstr "此 {resource} 对拥有 {app} {0} 权限的任何人可访问。"
 msgid "Amber"
 msgstr "琥珀色"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Configure how to join datasets"
 msgstr "配置如何连接数据集"
 
@@ -5373,13 +5364,18 @@ msgstr "配置如何连接数据集"
 msgid "Excel"
 msgstr "Excel"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Dataset columns"
 msgstr "数据集列"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "无法准备离线聊天模型。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset you've added, please specify which columns should be "
+"used to uniquely identify a {conceptName}."
+msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {conceptName}。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -5417,13 +5413,14 @@ msgstr "工作区 ID 不能包含空格"
 msgid "Try again."
 msgstr "请再试一次。"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index.tsx
-msgid "We should join data into the same {entityConfigName} when…"
-msgstr "当…时，我们应该将数据连接到同一个 {entityConfigName}"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "contains"
 msgstr "包含"
+
+#. placeholder {0}: state.singularConceptName
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "If there are multiple {attributeName} values for one {0}, then..."
+msgstr "如果一个 {0} 有多个 {attributeName} 值，那么..."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -5519,7 +5516,7 @@ msgstr "无法将数据集设置为仅离线使用"
 msgid "Hide details"
 msgstr "隐藏详情"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Enter comment"
 msgstr "输入评论"
 
@@ -5716,10 +5713,6 @@ msgstr "全选"
 msgid "Only what's queried (recommended)"
 msgstr "仅查询的内容（推荐）"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/index.tsx
-msgid "What field should be used as a {singularEntityConfigName}'s name?"
-msgstr "应使用哪个字段作为 {singularEntityConfigName} 的名称？"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
 msgstr "无标题"
@@ -5811,7 +5804,7 @@ msgstr "选择的值列无效"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 行 / 第 {colNum} 列"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "尚未添加任何列。"
 
@@ -5831,11 +5824,6 @@ msgstr "选择一个工作区预设或按应用自定义。用户组控制数据
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved"
 msgstr "数据集已保存"
-
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {entityConfigName}."
-msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {entityConfigName}。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5892,7 +5880,7 @@ msgstr "选定文档：{0}"
 msgid "Subtle"
 msgstr "细微"
 
-#: src/views/EntityManagerApp/SingleEntityView/ActivityBlock.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Activity"
 msgstr "活动"
 
@@ -5919,6 +5907,11 @@ msgstr "X 轴标签颜色"
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作区已使用全部 {currentSeatUsage} 个 {totalSeats} 座位。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "This is where you select which columns from which datasets should be "
+"added into this {conceptName}."
+msgstr "在这里选择应添加到此 {conceptName} 的数据集中的哪些列。"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -6004,6 +5997,10 @@ msgstr "Google 表格加载失败"
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "输入确认短语"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What field should be used as a {singularConceptName}'s name?"
+msgstr "应使用哪个字段作为 {singularConceptName} 的名称？"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -6147,8 +6144,8 @@ msgstr "要确认，请在下面输入 <0>{confirmationTarget}</0>："
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
 
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx
-#: src/routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 msgid "Entity failed to load"
 msgstr "实体加载失败"
 
@@ -6206,7 +6203,7 @@ msgstr "不离线"
 msgid "This dashboard is published publicly."
 msgstr "此仪表板已公开发布。"
 
-#: src/views/EntityManagerApp/SingleEntityView/index.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading..."
 msgstr "加载中..."
 
@@ -6319,7 +6316,7 @@ msgstr "添加至少一个 X / Y 系列"
 msgid "Show QR code"
 msgstr "显示二维码"
 
-#: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "选择最小值"
 

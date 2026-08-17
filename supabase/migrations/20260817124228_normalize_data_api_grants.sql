@@ -98,29 +98,29 @@ revoke select on table "public"."dexie_dbs" from "anon";
 
 revoke update on table "public"."dexie_dbs" from "anon";
 
-revoke delete on table "public"."entities" from "anon";
+revoke delete on table "public"."individuals" from "anon";
 
-revoke insert on table "public"."entities" from "anon";
+revoke insert on table "public"."individuals" from "anon";
 
-revoke select on table "public"."entities" from "anon";
+revoke select on table "public"."individuals" from "anon";
 
-revoke update on table "public"."entities" from "anon";
+revoke update on table "public"."individuals" from "anon";
 
-revoke delete on table "public"."entity_configs" from "anon";
+revoke delete on table "public"."concepts" from "anon";
 
-revoke insert on table "public"."entity_configs" from "anon";
+revoke insert on table "public"."concepts" from "anon";
 
-revoke select on table "public"."entity_configs" from "anon";
+revoke select on table "public"."concepts" from "anon";
 
-revoke update on table "public"."entity_configs" from "anon";
+revoke update on table "public"."concepts" from "anon";
 
-revoke delete on table "public"."entity_field_configs" from "anon";
+revoke delete on table "public"."concept_attributes" from "anon";
 
-revoke insert on table "public"."entity_field_configs" from "anon";
+revoke insert on table "public"."concept_attributes" from "anon";
 
-revoke select on table "public"."entity_field_configs" from "anon";
+revoke select on table "public"."concept_attributes" from "anon";
 
-revoke update on table "public"."entity_field_configs" from "anon";
+revoke update on table "public"."concept_attributes" from "anon";
 
 revoke delete on table "public"."resource_shares" from "anon";
 
@@ -206,21 +206,21 @@ revoke select on table "public"."user_profiles" from "anon";
 
 revoke update on table "public"."user_profiles" from "anon";
 
-revoke delete on table "public"."value_extractors__dataset_column_value" from "anon";
+revoke delete on table "public"."attribute_mappings__dataset_column" from "anon";
 
-revoke insert on table "public"."value_extractors__dataset_column_value" from "anon";
+revoke insert on table "public"."attribute_mappings__dataset_column" from "anon";
 
-revoke select on table "public"."value_extractors__dataset_column_value" from "anon";
+revoke select on table "public"."attribute_mappings__dataset_column" from "anon";
 
-revoke update on table "public"."value_extractors__dataset_column_value" from "anon";
+revoke update on table "public"."attribute_mappings__dataset_column" from "anon";
 
-revoke delete on table "public"."value_extractors__manual_entry" from "anon";
+revoke delete on table "public"."attribute_mappings__manual_entry" from "anon";
 
-revoke insert on table "public"."value_extractors__manual_entry" from "anon";
+revoke insert on table "public"."attribute_mappings__manual_entry" from "anon";
 
-revoke select on table "public"."value_extractors__manual_entry" from "anon";
+revoke select on table "public"."attribute_mappings__manual_entry" from "anon";
 
-revoke update on table "public"."value_extractors__manual_entry" from "anon";
+revoke update on table "public"."attribute_mappings__manual_entry" from "anon";
 
 revoke delete on table "public"."workspace_invites" from "anon";
 

@@ -174,7 +174,7 @@ when touching cross-cutting areas (for example, dataset source types).
      `Read` variant fully required, and then we specify the optional fields.
    - If your `Read` variant has a discriminated union, you will need sub-types for
      each part of the union, and then reference them in the `Insert` and `Update`
-     variants. See [EntityFieldConfig.types.ts](src/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts)
+     variants. See [ConceptAttribute.types.ts](shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts)
      for an example. This is because if you apply `Partial<>` or `SetRequired<>`
      to the full object, TypeScript loses the discriminated union and treats it
      as a regular union. Splitting up the union into types and applying

@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { GenericSeedData } from "scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
@@ -64,27 +64,27 @@ export const SeedData = {
     },
   ],
 
-  entityConfigs: [
+  concepts: [
     {
       owner: SEED_USERS.primaryTestUser,
       workspaceSlug: WORKSPACE_SLUGS.primaryTestWorkspace,
       name: "State",
-      description: "This entity represents a US State",
+      description: "This individual represents a US State",
       datasetId: null,
       allowManualCreation: false,
-      fields: [
-        Model.make("EntityFieldConfig", {
+      attributes: [
+        Model.make("ConceptAttribute", {
           name: "Name",
-          description: "This entity represents a US State",
+          description: "This individual represents a US State",
           dataType: "varchar",
-          valueExtractorType: "manual_entry",
+          mappingType: "manual_entry",
           allowManualEdit: true,
-          isIdField: true,
-          isTitleField: true,
+          isIdentifier: true,
+          isLabel: true,
           isArray: false,
         } as const),
       ] satisfies Array<
-        Omit<EntityFieldConfigModel["Insert"], "entityConfigId" | "workspaceId">
+        Omit<ConceptAttributeModel["Insert"], "conceptId" | "workspaceId">
       >,
     },
   ],

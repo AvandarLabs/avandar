@@ -179,11 +179,11 @@ export const AppLinks = {
     };
   },
 
-  // Entity Designer links
-  entityDesignerHome: (workspaceSlug: string) => {
+  // Ontology Designer links
+  ontologyDesignerHome: (workspaceSlug: string) => {
     return {
-      key: "entity-designer",
-      to: "/$workspaceSlug/entity-designer",
+      key: "ontology-designer",
+      to: "/$workspaceSlug/ontology-designer",
       params: { workspaceSlug },
       label: (): string => {
         return t`Profile Designer`;
@@ -191,32 +191,32 @@ export const AppLinks = {
       isAvailableOffline: false,
     };
   },
-  entityDesignerConfigView: ({
+  ontologyDesignerConceptView: ({
     workspaceSlug,
-    entityConfigId,
-    entityConfigName,
+    conceptId,
+    conceptName,
   }: {
     workspaceSlug: string;
-    entityConfigId: string;
-    entityConfigName: string;
+    conceptId: string;
+    conceptName: string;
   }) => {
     return {
-      key: `entity-config-${entityConfigId}`,
-      to: "/$workspaceSlug/entity-designer/$entityConfigId",
+      key: `concept-${conceptId}`,
+      to: "/$workspaceSlug/ontology-designer/$conceptId",
       params: {
         workspaceSlug,
-        entityConfigId,
+        conceptId,
       },
       label: () => {
-        return entityConfigName;
+        return conceptName;
       },
       isAvailableOffline: false,
     };
   },
-  entityDesignerCreatorView: (workspaceSlug: string) => {
+  ontologyDesignerCreatorView: (workspaceSlug: string) => {
     return {
-      key: "entity-creator",
-      to: "/$workspaceSlug/entity-designer/entity-creator",
+      key: "concept-creator",
+      to: "/$workspaceSlug/ontology-designer/concept-creator",
       params: { workspaceSlug },
       label: (): string => {
         return t`Create new entity`;
@@ -225,50 +225,50 @@ export const AppLinks = {
     };
   },
 
-  // Entity Manager links
-  entityManagerHome: ({
+  // Individual Manager links
+  individualManagerHome: ({
     workspaceSlug,
-    entityConfigId,
-    entityConfigName,
+    conceptId,
+    conceptName,
   }: {
     workspaceSlug: string;
-    entityConfigId: string;
-    entityConfigName: string;
+    conceptId: string;
+    conceptName: string;
   }) => {
     return {
-      key: `entity-manager-${entityConfigId}`,
-      to: "/$workspaceSlug/entity-manager/$entityConfigId",
+      key: `individual-manager-${conceptId}`,
+      to: "/$workspaceSlug/individual-manager/$conceptId",
       params: {
         workspaceSlug,
-        entityConfigId,
+        conceptId,
       },
       label: () => {
-        return entityConfigName;
+        return conceptName;
       },
       isAvailableOffline: false,
     };
   },
-  entityManagerEntityView: ({
+  individualManagerIndividualView: ({
     workspaceSlug,
-    entityConfigId,
-    entityId,
-    entityName,
+    conceptId,
+    individualId,
+    individualName,
   }: {
     workspaceSlug: string;
-    entityConfigId: string;
-    entityId: string;
-    entityName: string;
+    conceptId: string;
+    individualId: string;
+    individualName: string;
   }) => {
     return {
-      key: `entity-manager-${entityConfigId}-${entityId}`,
-      to: "/$workspaceSlug/entity-manager/$entityConfigId/$entityId",
+      key: `individual-manager-${conceptId}-${individualId}`,
+      to: "/$workspaceSlug/individual-manager/$conceptId/$individualId",
       params: {
         workspaceSlug,
-        entityConfigId,
-        entityId,
+        conceptId,
+        individualId,
       },
       label: () => {
-        return entityName;
+        return individualName;
       },
       isAvailableOffline: false,
     };
