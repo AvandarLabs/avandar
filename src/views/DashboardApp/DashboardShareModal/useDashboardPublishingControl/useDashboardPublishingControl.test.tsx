@@ -102,7 +102,10 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-function makeDashboard(visibility: Dashboard.Visibility): Dashboard.T {
+function makeDashboard(
+  visibility: Dashboard.Visibility,
+  options: Readonly<{ isRestricted?: boolean }> = {},
+): Dashboard.T {
   return {
     id: "11111111-2222-4333-8444-555555555555",
     workspaceId: "ws-1",
@@ -110,6 +113,7 @@ function makeDashboard(visibility: Dashboard.Visibility): Dashboard.T {
     slug: undefined,
     visibility,
     isPublic: visibility === "public",
+    isRestricted: options.isRestricted ?? false,
     config: { content: [], root: {}, zones: {} },
   } as unknown as Dashboard.T;
 }
@@ -119,11 +123,14 @@ function TestWrapper({ children }: Readonly<{ children: ReactNode }>) {
 }
 
 /** The hook needs a Lingui context for its notification copy. */
-function renderControl(visibility: Dashboard.Visibility) {
+function renderControl(
+  visibility: Dashboard.Visibility,
+  options: Readonly<{ isRestricted?: boolean }> = {},
+) {
   return renderHook(
     () => {
       return useDashboardPublishingControl({
-        dashboard: makeDashboard(visibility),
+        dashboard: makeDashboard(visibility, options),
         onShareableLimitReached,
       });
     },
@@ -147,6 +154,22 @@ describe("useDashboardPublishingControl", () => {
     const { result } = renderControl("public");
     expect(result.current.targetVisibility).toBe("public");
     expect(result.current.actionKind).toBe("republish");
+  });
+
+  // New dashboards are `visibility: draft` with `is_restricted` defaulting
+  // false, so General access already shows "Anyone in Dashboards". The publish
+  // target has to match that on open: otherwise Publish stays disabled until
+  // the user re-selects the option that is already selected.
+  it("opens a workspace-shared draft ready to publish to the workspace", () => {
+    const { result } = renderControl("draft", { isRestricted: false });
+    expect(result.current.targetVisibility).toBe("workspace");
+    expect(result.current.actionKind).toBe("publish_workspace");
+    act(() => {
+      result.current.onPrimaryAction();
+    });
+    expect(publish).toHaveBeenCalledWith(
+      expect.objectContaining({ visibility: "workspace" }),
+    );
   });
 
   it("publishes to the workspace when the target is workspace", () => {
@@ -180,7 +203,7 @@ describe("useDashboardPublishingControl", () => {
   });
 
   it("does nothing when there is no audience to publish to", () => {
-    const { result } = renderControl("draft");
+    const { result } = renderControl("draft", { isRestricted: true });
     act(() => {
       result.current.onPrimaryAction();
     });

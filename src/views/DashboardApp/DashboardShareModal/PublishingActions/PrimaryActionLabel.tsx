@@ -14,7 +14,7 @@ export function PrimaryActionLabel({ actionKind }: Readonly<Props>): ReactNode {
       return <Trans>Publish to workspace</Trans>;
     },
     publish_public: () => {
-      return <Trans>Publish</Trans>;
+      return <Trans>Publish publicly</Trans>;
     },
     republish: () => {
       return <Trans>Update &amp; republish</Trans>;

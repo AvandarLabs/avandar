@@ -1,8 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { Code, Stack, Text } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { DivergenceAlert } from "./DivergenceAlert";
-import css from "./PublishDashboardStatus.module.css";
+import { PublishedTargetUrl } from "./PublishedTargetUrl";
 import { VisibilityAlert } from "./VisibilityAlert";
+import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
 
@@ -11,6 +12,8 @@ type Props = {
   targetVisibility: Dashboard.Visibility;
   isUsingVanity: boolean;
   targetUrl: string;
+  pathPrefix: string;
+  vanitySlug?: VanitySlugFieldProps;
 };
 
 /**
@@ -26,6 +29,8 @@ export function PublishDashboardStatus({
   targetVisibility,
   isUsingVanity,
   targetUrl,
+  pathPrefix,
+  vanitySlug,
 }: Readonly<Props>): ReactNode {
   const isAlreadyPublished = visibility !== "draft";
   return (
@@ -40,15 +45,16 @@ export function PublishDashboardStatus({
             <Trans>Your dashboard is published at:</Trans>
           : <Trans>Your dashboard will be published to:</Trans>}
         </Text>
-        <Code block className={css.publishDashboardStatusTargetUrl}>
-          {targetUrl}
-        </Code>
+        <PublishedTargetUrl
+          targetUrl={targetUrl}
+          pathPrefix={pathPrefix}
+          vanitySlug={vanitySlug}
+        />
         <Text size="xs" c="dimmed">
           {isUsingVanity ?
-            <Trans>
-              Using your custom URL. The direct UUID link below also still
-              works.
-            </Trans>
+            <Trans>Using your custom URL.</Trans>
+          : isAlreadyPublished ?
+            <Trans>By default we use a direct UUID-based link.</Trans>
           : <Trans>
               By default we use a direct UUID-based link. Add a custom path
               below for a nicer URL.

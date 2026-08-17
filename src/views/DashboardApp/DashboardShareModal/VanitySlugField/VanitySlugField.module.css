@@ -1,4 +1,22 @@
-.vanitySlugFieldPreview {
-  font-size: var(--mantine-font-size-xs);
-  padding: 1px 6px;
+.vanitySlugFieldEditor {
+  flex: 1;
+  min-width: 0;
+}
+
+.vanitySlugFieldPrefixedRow {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--mantine-spacing-xs);
+}
+
+.vanitySlugFieldUrlPrefix {
+  flex-shrink: 0;
+  padding-block-start: var(--mantine-spacing-xs);
+  white-space: nowrap;
+}
+
+.vanitySlugFieldInput {
+  flex: 1;
+  min-width: 0;
 }

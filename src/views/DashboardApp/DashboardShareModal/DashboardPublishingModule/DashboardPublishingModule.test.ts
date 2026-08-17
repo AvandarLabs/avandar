@@ -35,6 +35,35 @@ describe("getTargetVisibilityFromGeneralAccessValue", () => {
   });
 });
 
+describe("getInitialTargetVisibility", () => {
+  it("opens a published dashboard on its persisted visibility", () => {
+    expect(
+      DashboardPublishingModule.getInitialTargetVisibility({
+        visibility: "public",
+        isRestricted: true,
+      }),
+    ).toBe("public");
+  });
+
+  it("opens an unrestricted draft ready to publish to the workspace", () => {
+    expect(
+      DashboardPublishingModule.getInitialTargetVisibility({
+        visibility: "draft",
+        isRestricted: false,
+      }),
+    ).toBe("workspace");
+  });
+
+  it("leaves a restricted draft unpublished until an audience is chosen", () => {
+    expect(
+      DashboardPublishingModule.getInitialTargetVisibility({
+        visibility: "draft",
+        isRestricted: true,
+      }),
+    ).toBe("draft");
+  });
+});
+
 describe("getPublishActionKindFromVisibilities", () => {
   const cases = [
     { visibility: "draft", target: "draft", expected: "disabled_no_audience" },

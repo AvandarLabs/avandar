@@ -10,6 +10,8 @@ import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquet
 export type ShareUrls = {
   canonical: string;
   vanity: string | undefined;
+  /** Origin and path up to the slug or id, including the trailing slash. */
+  pathPrefix: string;
 };
 
 function _origin(): string {
@@ -49,8 +51,10 @@ export function makeShareUrlsFromPublishTarget(
     args.visibility === "public" ?
       `${base}/d`
     : `${base}/${args.workspaceSlug}/d`;
+  const pathPrefix = `${prefix}/`;
   return {
-    canonical: `${prefix}/${args.dashboardId}`,
-    vanity: args.slug ? `${prefix}/${args.slug}` : undefined,
+    canonical: `${pathPrefix}${args.dashboardId}`,
+    vanity: args.slug ? `${pathPrefix}${args.slug}` : undefined,
+    pathPrefix,
   };
 }

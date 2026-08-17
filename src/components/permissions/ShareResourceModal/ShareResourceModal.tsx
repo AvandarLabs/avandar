@@ -53,10 +53,6 @@ export function ShareResourceModal({
 
   return (
     <Stack gap="md">
-      <Text size="sm" c="dimmed">
-        <Trans>Share &ldquo;{resourceName}&rdquo;</Trans>
-      </Text>
-
       <ShareGeneralAccess
         resourceType={resourceType}
         value={state.generalAccess.displayedValue}

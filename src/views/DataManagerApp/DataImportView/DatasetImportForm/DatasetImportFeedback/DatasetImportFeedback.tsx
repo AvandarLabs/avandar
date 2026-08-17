@@ -44,8 +44,6 @@ export function DatasetImportFeedback({
         numRows={dataSourceMetadata.datasetLoadResult.numRows}
         failureMessage={copy.failureMessage}
         failureTitle={copy.failureTitle}
-        successMessage={copy.successMessage}
-        successTitle={copy.successTitle}
       />
       <DatasetPreview
         columns={columns}

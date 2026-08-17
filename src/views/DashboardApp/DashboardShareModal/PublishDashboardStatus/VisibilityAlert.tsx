@@ -47,7 +47,7 @@ export function VisibilityAlert({ visibility }: Readonly<Props>): ReactNode {
           <Text size="sm">
             <Trans>
               This dashboard is <strong>public</strong>. Anyone with the link
-              can view it, with no Avandar account.
+              can view it.
             </Trans>
           </Text>
         </Alert>

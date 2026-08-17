@@ -34,6 +34,31 @@ function _getTargetVisibilityFromGeneralAccessValue(
 }
 
 /**
+ * The publish target the modal should open on, given what is already true of
+ * the dashboard.
+ *
+ * A published dashboard opens on its persisted visibility, so a public
+ * dashboard shows "Anyone with the link". A draft opens on the General access
+ * shape already persisted: unrestricted drafts are workspace-shared (the
+ * insert default), so Publish is enabled without making the user re-select
+ * the option the dropdown is already showing. Restricted drafts stay draft
+ * until someone picks an audience, because "Only me" has none.
+ */
+function _getInitialTargetVisibility(
+  dashboard: Readonly<{
+    visibility: Dashboard.Visibility;
+    isRestricted: boolean;
+  }>,
+): Dashboard.Visibility {
+  if (dashboard.visibility !== "draft") {
+    return dashboard.visibility;
+  }
+  return _getTargetVisibilityFromGeneralAccessValue(
+    dashboard.isRestricted ? "private" : "workspace",
+  );
+}
+
+/**
  * Resolves the primary action from what is persisted and what the dropdown
  * currently asks for.
  *
@@ -77,6 +102,19 @@ export const DashboardPublishingModule = {
    */
   getTargetVisibilityFromGeneralAccessValue:
     _getTargetVisibilityFromGeneralAccessValue,
+
+  /**
+   * The publish target the modal should open on, given what is already true of
+   * the dashboard.
+   *
+   * A published dashboard opens on its persisted visibility, so a public
+   * dashboard shows "Anyone with the link". A draft opens on the General access
+   * shape already persisted: unrestricted drafts are workspace-shared (the
+   * insert default), so Publish is enabled without making the user re-select
+   * the option the dropdown is already showing. Restricted drafts stay draft
+   * until someone picks an audience, because "Only me" has none.
+   */
+  getInitialTargetVisibility: _getInitialTargetVisibility,
 
   /**
    * Resolves the primary action from what is persisted and what the dropdown

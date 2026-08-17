@@ -71,7 +71,7 @@ function _getGeneralAccessTooltip(
     },
     public: () => {
       return i18n._(
-        msg`Anyone with the link can view this ${resource}, with no Avandar account. People and groups below still control who can edit it.`,
+        msg`Anyone with the link can view this ${resource}. People and groups below still control who can edit it.`,
       );
     },
   });

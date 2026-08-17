@@ -38,7 +38,7 @@ type SwitchUserAndOpenDatasetOptions = DatasetPageOptions & {
 };
 
 function _shareDialog(page: Page): Locator {
-  return page.getByRole("dialog", { name: "Share" });
+  return page.getByRole("dialog", { name: /^Share / });
 }
 
 function _isSharingWrite(request: Request): boolean {

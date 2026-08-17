@@ -84,6 +84,7 @@ describe("ShareResourceModal share rows", () => {
     expect(
       screen.queryByRole("button", { name: /Remove access for John Snow/ }),
     ).toBeNull();
+    expect(screen.queryByText("Share “California COVID”")).toBeNull();
   });
 
   it("refreshes sharing state and blocks access changes while fetching", async () => {

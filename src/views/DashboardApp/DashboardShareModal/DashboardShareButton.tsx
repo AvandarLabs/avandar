@@ -95,10 +95,11 @@ export function DashboardShareButton({
             event.preventDefault();
             return;
           }
+          const resourceName = dashboard.name;
           _openDashboardShareModal({
             dashboard,
             hasUnsavedChanges,
-            title: t`Share`,
+            title: t`Share “${resourceName}”`,
           });
         }}
       >

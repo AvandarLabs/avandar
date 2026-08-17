@@ -1,14 +1,28 @@
-import { Divider, Stack } from "@mantine/core";
+import { Trans } from "@lingui/react/macro";
+import { Accordion, Divider, Stack } from "@mantine/core";
 import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
-import { PublishedShareLinks } from "@/views/DashboardApp/DashboardShareModal/PublishedShareLinks";
 import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection";
 import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
+import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { ReactNode } from "react";
 
 type Props = {
   publishing: ReturnType<typeof useDashboardPublishingControl>;
 };
+
+function _vanitySlugProps(
+  publishing: Props["publishing"],
+): VanitySlugFieldProps {
+  return /*  */ {
+    slugInput: publishing.slugInput,
+    normalisedSlug: publishing.normalisedSlug,
+    errorMessage: publishing.slugErrorMessage,
+    hasPendingCheck: publishing.hasPendingSlugCheck,
+    isAccepted: publishing.isSlugAccepted,
+    onChange: publishing.onSlugInputChange,
+  };
+}
 
 /** The "Published data" half of the merged share modal. */
 export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
@@ -23,24 +37,26 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
         targetUrl={
           publishing.shareUrls.vanity ?? publishing.shareUrls.canonical
         }
+        pathPrefix={publishing.shareUrls.pathPrefix}
+        vanitySlug={isPublished ? _vanitySlugProps(publishing) : undefined}
       />
-      <VanitySlugField
-        slugInput={publishing.slugInput}
-        normalisedSlug={publishing.normalisedSlug}
-        urlPrefix={publishing.urlPrefix}
-        errorMessage={publishing.slugErrorMessage}
-        hasPendingCheck={publishing.hasPendingSlugCheck}
-        isAccepted={publishing.isSlugAccepted}
-        onChange={publishing.onSlugInputChange}
-      />
-      <PublishSliceSection
-        dashboard={publishing.currentDashboard}
-        publishConfig={publishing.publishConfig}
-        onChange={publishing.onPublishConfigChange}
-      />
-      {isPublished ?
-        <PublishedShareLinks shareUrls={publishing.shareUrls} />
-      : null}
+      {isPublished ? null : (
+        <VanitySlugField {..._vanitySlugProps(publishing)} />
+      )}
+      <Accordion defaultValue={null} variant="separated" keepMounted={false}>
+        <Accordion.Item value="advanced">
+          <Accordion.Control>
+            <Trans>Advanced options</Trans>
+          </Accordion.Control>
+          <Accordion.Panel>
+            <PublishSliceSection
+              dashboard={publishing.currentDashboard}
+              publishConfig={publishing.publishConfig}
+              onChange={publishing.onPublishConfigChange}
+            />
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
     </Stack>
   );
 }

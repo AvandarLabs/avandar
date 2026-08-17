@@ -51,7 +51,6 @@ function useDatasetImportFormState(
   const copy = useDatasetImportCopy({
     numColumns: columns.length,
     numPreviewRows: previewRows.length,
-    numRows: options.dataSourceMetadata.datasetLoadResult.numRows,
   });
 
   return {

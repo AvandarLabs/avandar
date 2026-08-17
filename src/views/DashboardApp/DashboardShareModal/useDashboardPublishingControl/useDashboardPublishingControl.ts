@@ -19,7 +19,6 @@ type DashboardPublishingControl = SlugValidationState & {
   actionKind: PublishActionKind;
   isBusy: boolean;
   shareUrls: ReturnType<typeof makeShareUrlsFromPublishTarget>;
-  urlPrefix: string;
   slugInput: string;
   normalisedSlug: string;
   publishConfig: PublishSliceConfig.Dashboard;
@@ -32,9 +31,11 @@ type DashboardPublishingControl = SlugValidationState & {
 /**
  * Owns everything about a dashboard's publication that the share modal needs.
  *
- * The target visibility is initialised from the persisted one, which is what
- * makes a public dashboard open showing "Anyone with the link" and makes any
- * later divergence a visible pending change rather than a silent one.
+ * The target visibility is initialised from `getInitialTargetVisibility`: a
+ * published dashboard opens on what is persisted, and a draft opens on the
+ * General access shape already on the row, so an unrestricted draft is ready
+ * to publish instead of showing a disabled Publish button next to "Anyone in
+ * Dashboards".
  *
  * The dropdown never writes visibility: it moves the target, and
  * `onPrimaryAction` is the only thing that calls the mutations.
@@ -54,7 +55,11 @@ export function useDashboardPublishingControl(
   const workspace = useCurrentWorkspace();
   const [currentDashboard, setCurrentDashboard] = useState(options.dashboard);
   const [targetVisibility, setTargetVisibility] =
-    useState<Dashboard.Visibility>(options.dashboard.visibility);
+    useState<Dashboard.Visibility>(() => {
+      return DashboardPublishingModule.getInitialTargetVisibility(
+        options.dashboard,
+      );
+    });
   const [slugInput, setSlugInput] = useState(currentDashboard.slug ?? "");
   const normalisedSlug = makeVanitySlugFromText(slugInput);
   const [publishConfig, setPublishConfig] = useState(() => {
@@ -152,7 +157,6 @@ export function useDashboardPublishingControl(
     actionKind,
     isBusy: isPublishing || isUnpublishing,
     shareUrls,
-    urlPrefix: urlVisibility === "public" ? "/d/" : `/${workspace.slug}/d/`,
     slugInput,
     normalisedSlug,
     publishConfig,

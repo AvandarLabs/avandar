@@ -88,12 +88,6 @@ export function ShareUrlQrModal({ url, isOpened, onClose }: Props): ReactNode {
             <Trans>Generating…</Trans>
           </Text>
         }
-        <Text size="xs" c="dimmed" ta="center">
-          <Trans>Scans to:</Trans>{" "}
-          <Text component="span" ff="monospace" size="xs">
-            {url}
-          </Text>
-        </Text>
         <Button
           leftSection={<IconDownload size={14} />}
           variant="outline"

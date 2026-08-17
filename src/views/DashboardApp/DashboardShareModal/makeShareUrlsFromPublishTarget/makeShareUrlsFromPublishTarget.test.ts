@@ -16,6 +16,7 @@ describe("makeShareUrlsFromPublishTarget", () => {
     ).toEqual({
       canonical: `${window.location.origin}/d/${dashboardId}`,
       vanity: `${window.location.origin}/d/q3-revenue`,
+      pathPrefix: `${window.location.origin}/d/`,
     });
   });
 
@@ -30,6 +31,7 @@ describe("makeShareUrlsFromPublishTarget", () => {
     ).toEqual({
       canonical: `${window.location.origin}/acme/d/${dashboardId}`,
       vanity: `${window.location.origin}/acme/d/q3-revenue`,
+      pathPrefix: `${window.location.origin}/acme/d/`,
     });
   });
 

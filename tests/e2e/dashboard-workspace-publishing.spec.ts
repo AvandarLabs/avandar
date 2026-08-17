@@ -91,7 +91,7 @@ async function _publishToWorkspaceViaShareModal(page: Page): Promise<void> {
   await openShareModal(page);
   await setGeneralAccess(page, "Workspace", "viewer");
 
-  const dialog = page.getByRole("dialog", { name: "Share" });
+  const dialog = page.getByRole("dialog", { name: /^Share / });
   await expect(dialog).toContainText("This dashboard is not published yet", {
     timeout: MEDIUM_WAIT,
   });
@@ -251,7 +251,7 @@ test.describe("dashboard workspace publishing", () => {
       });
 
       await openShareModal(page);
-      const dialog = page.getByRole("dialog", { name: "Share" });
+      const dialog = page.getByRole("dialog", { name: /^Share / });
       await expect(
         dialog.getByText("Only workspace admins can publish to the web."),
       ).toBeVisible({ timeout: MEDIUM_WAIT });

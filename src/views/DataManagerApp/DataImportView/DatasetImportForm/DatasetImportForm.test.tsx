@@ -213,6 +213,15 @@ describe("DatasetImportForm", () => {
       </I18nProvider>,
     );
 
+    expect(
+      screen.queryByText("Data processed successfully"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("These are the first 1 rows of your dataset.", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+
     fireEvent.change(screen.getByLabelText("Delimiter"), {
       target: { value: ";" },
     });

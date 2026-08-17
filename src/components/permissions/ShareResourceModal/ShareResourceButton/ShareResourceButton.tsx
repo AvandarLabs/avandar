@@ -45,7 +45,7 @@ export function ShareResourceButton({
           }
 
           modals.open({
-            title: t`Share`,
+            title: t`Share “${resourceName}”`,
             size: "lg",
             children: (
               <ShareResourceModal
