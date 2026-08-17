@@ -44,6 +44,22 @@ execute function public.util__set_updated_at ();
 -- Index to improve lookups by user
 create index idx_user_nux_progress__user_id on public.user_nux_progress (user_id);
 
+-- Table privileges, stated explicitly rather than inherited from Supabase's
+-- default privileges, which did not apply to this table when it was created.
+-- RLS below decides which ROWS a caller may touch; these decide whether the
+-- caller may touch the table at all, and PostgREST refuses the request without
+-- them. Peer tables (`user_profiles`, `dashboards`, `dexie_dbs`) all carry the
+-- equivalent.
+--
+-- No `delete`, matching the absence of a delete policy: restarting the
+-- tutorial updates the row in place. Nothing for `anon`, because an
+-- unauthenticated visitor has no onboarding progress.
+grant
+select
+,
+  insert,
+update on table public.user_nux_progress to authenticated;
+
 -- Policies. A user may only ever read or write their own progress. There is
 -- deliberately no DELETE policy: restarting the tutorial updates the row in
 -- place, so there is no code path that needs to remove one.
