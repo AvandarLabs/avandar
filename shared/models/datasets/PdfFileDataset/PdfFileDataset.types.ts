@@ -72,8 +72,11 @@ export type PdfFileDatasetRead = Model.Base<
     /** Snapped row boundaries; undefined for `tagged`. */
     gridY: readonly number[] | undefined;
 
-    /** Page range detection was limited to, as `[start, end]` inclusive. */
-    pageRange: readonly [number, number] | undefined;
+    /** First page detection was limited to, inclusive and zero-based. */
+    pageRangeStart: number | undefined;
+
+    /** Last page detection was limited to, inclusive and zero-based. */
+    pageRangeEnd: number | undefined;
 
     /** Number of leading rows treated as header. */
     headerRows: number;

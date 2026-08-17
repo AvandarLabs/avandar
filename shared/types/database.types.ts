@@ -743,7 +743,8 @@ export type Database = {
           header_rows: number
           id: string
           is_in_cloud_storage: boolean
-          page_range: unknown
+          page_range_end: number | null
+          page_range_start: number | null
           regions: Json
           size_in_bytes: number
           updated_at: string
@@ -761,7 +762,8 @@ export type Database = {
           header_rows?: number
           id?: string
           is_in_cloud_storage?: boolean
-          page_range?: unknown
+          page_range_end?: number | null
+          page_range_start?: number | null
           regions: Json
           size_in_bytes: number
           updated_at?: string
@@ -779,7 +781,8 @@ export type Database = {
           header_rows?: number
           id?: string
           is_in_cloud_storage?: boolean
-          page_range?: unknown
+          page_range_end?: number | null
+          page_range_start?: number | null
           regions?: Json
           size_in_bytes?: number
           updated_at?: string

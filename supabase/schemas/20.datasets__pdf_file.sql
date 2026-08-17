@@ -34,8 +34,15 @@ create table public.datasets__pdf_file (
   -- the grid directly.
   grid_x jsonb,
   grid_y jsonb,
-  -- The page range the user limited detection to, if any.
-  page_range int4range,
+  -- The page range the user limited detection to, if any. Inclusive, and
+  -- zero-based to match `regions[].page`.
+  --
+  -- Two plain integers rather than an `int4range`, deliberately. We never
+  -- range-query this column, and PostgREST hands a range back as its text
+  -- form ("[4,9)"), which would mean writing and maintaining a codec for
+  -- no benefit.
+  page_range_start integer,
+  page_range_end integer,
   -- Number of leading rows treated as header.
   header_rows integer not null default 1,
   -- Whether a value spanning several rows is repeated into each of them.
