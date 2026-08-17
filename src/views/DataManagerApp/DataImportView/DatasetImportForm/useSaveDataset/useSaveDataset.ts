@@ -1,6 +1,7 @@
 import { useMutation } from "@avandar/query-hooks";
 import { snakeCaseKeysShallow, where } from "@avandar/utils";
-import { t } from "@lingui/core/macro";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
@@ -289,7 +290,10 @@ function _startOriginalFileUploadIfAllowed(
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     notifyError({
-      title: t`Dataset saved, but its original file failed to upload`,
+      // `i18n._(msg\`...\`)` rather than the `t` macro, because this runs
+      // outside the hook body where `useLingui`'s `t` is in scope. This is
+      // the same pattern `runBackgroundParquetTranscoding` uses.
+      title: i18n._(msg`Dataset saved, but its original file failed to upload`),
       message: errorMessage,
     });
   });

@@ -117,7 +117,8 @@ async function _oneShotOriginalFileUpload(options: {
  * user-visible operation: it does not report its own progress and does not
  * touch the source row's `isInCloudStorage` flag, which already describes
  * the Parquet upload's cloud-sync state. Callers that need to upload both
- * should sequence this alongside `DatasetParquetStorageClient.startDatasetUpload`.
+ * should sequence this alongside
+ * `DatasetParquetStorageClient.startDatasetUpload`.
  *
  * @param options The options for uploading the dataset's original file.
  * @param options.workspaceId The ID of the workspace the dataset belongs to.

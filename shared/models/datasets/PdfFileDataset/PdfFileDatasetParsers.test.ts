@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PdfFileDatasetParsers } from "./PdfFileDatasetParsers.ts";
-import type { PdfFileDatasetModel } from "./PdfFileDataset.types.ts";
+import { PdfFileDatasetParsers } from "$/models/datasets/PdfFileDataset/PdfFileDatasetParsers.ts";
+import type { PdfFileDatasetModel } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types.ts";
 
 const validRow: PdfFileDatasetModel["DBRead"] = {
   id: "00000000-0000-4000-8000-000000000001",
