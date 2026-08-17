@@ -67,10 +67,7 @@ export const nuxActions = {
   },
 
   /** Clicking a milestone row in the checklist. */
-  openMilestone: (
-    state: NuxAppState,
-    key: NuxMilestoneKey,
-  ): NuxAppState => {
+  openMilestone: (state: NuxAppState, key: NuxMilestoneKey): NuxAppState => {
     return {
       ...state,
       status: state.status === "not_started" ? "in_progress" : state.status,
@@ -116,9 +113,9 @@ export const nuxActions = {
       ...state,
       completedMilestones,
       status:
-        areAllMilestonesComplete(completedMilestones) ?
-          "completed"
-        : "in_progress",
+        areAllMilestonesComplete(completedMilestones) ? "completed" : (
+          "in_progress"
+        ),
       activeMilestoneKey: isActive ? undefined : state.activeMilestoneKey,
       activeStepIndex: isActive ? 0 : state.activeStepIndex,
       isPanelExpanded: !areAllMilestonesComplete(completedMilestones),
@@ -169,5 +166,23 @@ export const nuxActions = {
     reason: string | undefined,
   ): NuxAppState => {
     return { ...state, blockedReason: reason };
+  },
+
+  /**
+   * Marks the open milestone done without its real outcome having happened.
+   *
+   * The escape hatch for a milestone the user genuinely cannot finish, which
+   * today means exactly one case: the free plan allows one shared dashboard
+   * and this user already spent it. Without this the checklist would sit at
+   * 3/4 forever, which is a worse experience than an honest "you've seen how
+   * this works".
+   */
+  skipActiveMilestone: (state: NuxAppState): NuxAppState => {
+    if (!state.activeMilestoneKey) {
+      return state;
+    }
+    return nuxActions.completeMilestone(state, {
+      key: state.activeMilestoneKey,
+    });
   },
 };

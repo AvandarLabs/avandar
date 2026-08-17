@@ -14,8 +14,8 @@ import {
 } from "@mantine/core";
 import { IconCheck, IconChevronRight, IconX } from "@tabler/icons-react";
 import { NUX_MILESTONE_KEYS } from "$/models/Nux/NuxProgress.constants";
-import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { areAllMilestonesComplete } from "@/components/Nux/NuxStateManager/nuxSelectors";
+import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard";
 import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
 import type { ReactNode } from "react";
@@ -46,7 +46,9 @@ type Props = {
  * milestone, which is why no tooltip has to be spent telling the user where
  * to click next.
  */
-export function NuxChecklistPanel({ onOpenMilestone }: Readonly<Props>): ReactNode {
+export function NuxChecklistPanel({
+  onOpenMilestone,
+}: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
   const [state, dispatch] = NuxStateManager.useContext();
 
@@ -139,15 +141,18 @@ export function NuxChecklistPanel({ onOpenMilestone }: Readonly<Props>): ReactNo
                   : null}
                 </ThemeIcon>
                 <Stack gap={0}>
-                  <Text size="sm" fw={isDone ? 400 : 600} td={isDone ? "line-through" : undefined}>
+                  <Text
+                    size="sm"
+                    fw={isDone ? 400 : 600}
+                    td={isDone ? "line-through" : undefined}
+                  >
                     {i18n._(milestone.title)}
                   </Text>
-                  {isDone ?
-                    null
-                  : <Text size="xs" c="dimmed">
+                  {isDone ? null : (
+                    <Text size="xs" c="dimmed">
                       {i18n._(milestone.summary)}
                     </Text>
-                  }
+                  )}
                 </Stack>
               </Group>
             </UnstyledButton>
@@ -155,9 +160,20 @@ export function NuxChecklistPanel({ onOpenMilestone }: Readonly<Props>): ReactNo
         })}
 
         {state.blockedReason ?
-          <Text size="xs" c="dimmed">
-            {state.blockedReason}
-          </Text>
+          <Stack gap={4}>
+            <Text size="xs" c="dimmed">
+              {state.blockedReason}
+            </Text>
+            <Button
+              variant="subtle"
+              size="compact-xs"
+              onClick={() => {
+                dispatch.skipActiveMilestone();
+              }}
+            >
+              <Trans>Skip this step</Trans>
+            </Button>
+          </Stack>
         : null}
       </Stack>
     </Card>

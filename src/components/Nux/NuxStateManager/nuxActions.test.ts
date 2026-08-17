@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions";
+import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 
 // `progressId` is a branded UUID, so a plain string needs the double cast.
 const HYDRATED: NuxAppState = {
   ...INITIAL_NUX_STATE,
-  progressId: "11111111-1111-4111-8111-111111111111" as unknown as NuxAppState["progressId"],
+  progressId:
+    "11111111-1111-4111-8111-111111111111" as unknown as NuxAppState["progressId"],
   status: "not_started",
   isHydrated: true,
 };
@@ -109,5 +110,24 @@ describe("nuxActions.dismiss", () => {
     expect(next.status).toBe("dismissed");
     expect(next.activeMilestoneKey).toBeUndefined();
     expect(next.isPanelExpanded).toBe(false);
+  });
+});
+
+describe("nuxActions.skipActiveMilestone", () => {
+  it("records the milestone so a blocked user is not stuck", () => {
+    const next = nuxActions.skipActiveMilestone({
+      ...HYDRATED,
+      completedMilestones: ["add_dataset", "run_query", "build_dashboard"],
+      activeMilestoneKey: "share_dashboard",
+      blockedReason: "Your plan allows 1 shared dashboard.",
+    });
+    expect(next.completedMilestones).toContain("share_dashboard");
+    expect(next.status).toBe("completed");
+    expect(next.blockedReason).toBeUndefined();
+  });
+
+  it("does nothing when no milestone is open", () => {
+    const state = { ...HYDRATED, activeMilestoneKey: undefined };
+    expect(nuxActions.skipActiveMilestone(state)).toBe(state);
   });
 });

@@ -62,6 +62,12 @@ export function useResourceShareMutations(
             title: t`Shared dashboard limit reached`,
             message: t`Your plan does not allow sharing this dashboard with anyone else. Upgrade your plan, or unshare another dashboard, and try again.`,
           });
+          // Tells the tutorial its final milestone cannot be finished on this
+          // plan, so the checklist can offer a way out instead of parking on
+          // a step the user is not allowed to complete.
+          NuxEvents.emit("dashboard.shareBlocked", {
+            reason: t`Your plan does not allow sharing another dashboard. You can upgrade, or unshare another dashboard, and come back to this.`,
+          });
           return;
         }
         notifyError({ title: t`Share failed`, message: error.message });

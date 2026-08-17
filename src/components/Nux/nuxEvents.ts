@@ -10,13 +10,16 @@ export type NuxEventName =
   | "dataset.saved"
   | "query.succeeded"
   | "dashboard.created"
-  | "dashboard.sharedToWorkspace";
+  | "dashboard.sharedToWorkspace"
+  | "dashboard.shareBlocked";
 
 export type NuxEventPayloads = {
   "dataset.saved": { datasetId: string };
   "query.succeeded": Record<string, never>;
   "dashboard.created": { dashboardId: string };
   "dashboard.sharedToWorkspace": { dashboardId: string };
+  /** Not a completion. Sets `blockedReason` so the panel can offer a skip. */
+  "dashboard.shareBlocked": { reason: string };
 };
 
 /** A discriminated union, so a subscriber narrows the payload by name. */

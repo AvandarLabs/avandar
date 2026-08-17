@@ -20,6 +20,14 @@ export function useNuxCompletionEvents(): void {
   useEffect(
     function subscribeToNuxEvents() {
       return NuxEvents.subscribe((event: NuxEvent) => {
+        // Not a completion. `FIRST_DASHBOARD_MILESTONES.find` would return
+        // `undefined` for it anyway, since no milestone declares it as a
+        // completion event, but relying on that would be relying on an
+        // accident.
+        if (event.name === "dashboard.shareBlocked") {
+          dispatch.setBlockedReason(event.payload.reason);
+          return;
+        }
         const milestone = FIRST_DASHBOARD_MILESTONES.find((candidate) => {
           return candidate.completionEvent === event.name;
         });
