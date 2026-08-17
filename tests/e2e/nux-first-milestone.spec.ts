@@ -20,11 +20,11 @@ import type { E2EWorkerCredentials } from "./fixtures/e2e.fixture";
  * Puts the worker's primary user back where a brand-new user starts.
  *
  * The invite renders only while the progress row is `not_started`, and the
- * worker fixture deliberately seeds every e2e user to `in_progress` so the
- * modal never blocks the other specs. This spec is the one that wants it, so
- * it puts its own user back. Both of the invite's buttons also write
- * `in_progress`, so the reset is what makes a second run of this spec behave
- * like the first.
+ * worker fixture deliberately seeds every e2e user to `dismissed` so neither
+ * the modal nor the checklist panel gets in the way of the other specs. This
+ * spec is the one that wants them, so it puts its own user back. Both of the
+ * invite's buttons also write `in_progress`, so the reset is what makes a
+ * second run of this spec behave like the first.
  *
  * Runs as the user rather than through the service role because RLS then
  * scopes the update to their own row for free, which is exactly the intent.
@@ -41,6 +41,26 @@ async function _resetNuxProgress(user: E2EWorkerCredentials): Promise<void> {
 
     if (error) {
       throw new Error(`[e2e] nux progress reset failed: ${error.message}`);
+    }
+
+    // Verify rather than trust. PostgREST reports no error when an UPDATE
+    // matches zero rows, so an RLS mismatch or a missing row would leave the
+    // status the fixture seeded and the invite would simply never appear,
+    // failing this spec far away from the real cause.
+    const { data: rows, error: readError } = await client
+      .from("user_nux_progress")
+      .select("status")
+      .eq("tutorial_key", FIRST_DASHBOARD_TUTORIAL_KEY);
+
+    if (readError) {
+      throw new Error(
+        `[e2e] nux progress read-back failed: ${readError.message}`,
+      );
+    }
+    if (rows?.length !== 1 || rows[0]?.status !== "not_started") {
+      throw new Error(
+        `[e2e] nux progress reset did not apply. Rows: ${JSON.stringify(rows)}`,
+      );
     }
   } finally {
     await client.auth.signOut();
