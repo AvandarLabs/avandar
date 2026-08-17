@@ -37,6 +37,7 @@ async function _writeParsingRowWithCachedSourceBytes(): Promise<void> {
     sourceFileType: "csv",
     sourceFileSize: sourceBytes.size,
     lastSourceAccessedAt: 1_700_000_000_000,
+    isSourcePinned: undefined,
     parseOptions: { type: "csv" },
   });
 }
@@ -97,6 +98,7 @@ describe("LocalDatasetParsers", () => {
       sourceFileType: undefined,
       sourceFileSize: undefined,
       lastSourceAccessedAt: undefined,
+      isSourcePinned: undefined,
       parseOptions: undefined,
     });
 

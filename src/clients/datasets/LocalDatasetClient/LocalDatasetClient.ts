@@ -45,8 +45,15 @@ const PREVIEW_ROW_COUNT = 200;
  * the running total + `reservedBytes` is under
  * `SOURCE_CACHE_TOTAL_MAX_BYTES`. Idempotent and safe to call before any
  * cache write.
+ *
+ * Pinned rows (`isSourcePinned`) still count toward the running total, since
+ * they genuinely occupy the budget, but are never eviction candidates: for a
+ * retained original (e.g. a PDF) these bytes are the only copy in existence.
+ * This means a large enough pinned set can leave the total permanently over
+ * budget with nothing left to reclaim, so the loop only ever considers the
+ * unpinned candidates and ends once they're exhausted.
  */
-async function _evictSourceCache(reservedBytes: number): Promise<void> {
+export async function evictSourceCache(reservedBytes: number): Promise<void> {
   const rows = (await AvaDexie.DB.LocalDataset.toArray()).filter((r) => {
     return r.sourceBytes !== undefined;
   });
@@ -54,12 +61,19 @@ async function _evictSourceCache(reservedBytes: number): Promise<void> {
     return sum + (r.sourceBytes?.size ?? 0);
   }, 0);
 
-  rows.sort((a, b) => {
-    return (a.lastSourceAccessedAt ?? 0) - (b.lastSourceAccessedAt ?? 0);
-  });
+  const evictionCandidates = rows
+    .filter((r) => {
+      return !r.isSourcePinned;
+    })
+    .sort((a, b) => {
+      return (a.lastSourceAccessedAt ?? 0) - (b.lastSourceAccessedAt ?? 0);
+    });
 
-  while (total + reservedBytes > SOURCE_CACHE_TOTAL_MAX_BYTES && rows.length) {
-    const victim = rows.shift();
+  while (
+    total + reservedBytes > SOURCE_CACHE_TOTAL_MAX_BYTES &&
+    evictionCandidates.length
+  ) {
+    const victim = evictionCandidates.shift();
     if (!victim || !victim.sourceBytes) {
       break;
     }
@@ -82,7 +96,7 @@ async function _maybeCacheSourceBytes(file: File): Promise<Blob | undefined> {
   if (file.size > SOURCE_CACHE_PER_FILE_MAX_BYTES) {
     return undefined;
   }
-  await _evictSourceCache(file.size);
+  await evictSourceCache(file.size);
   return file;
 }
 
@@ -157,6 +171,10 @@ async function _putParsingDataset(
     sourceFileType: options.sourceFileType,
     sourceFileSize: options.file.size,
     lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
+    // CSV and XLSX are reconstructable from parquet + parse options, so
+    // their cached source bytes are never pinned; see
+    // `requiresOriginalFileRetention`.
+    isSourcePinned: undefined,
     parseOptions: options.parseOptions,
   });
 }
@@ -186,6 +204,7 @@ async function _downloadCloudDataset(
           sourceFileType: undefined,
           sourceFileSize: undefined,
           lastSourceAccessedAt: undefined,
+          isSourcePinned: undefined,
           parseOptions: undefined,
         },
       })

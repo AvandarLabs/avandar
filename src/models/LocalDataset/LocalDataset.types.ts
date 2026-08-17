@@ -21,7 +21,7 @@ export type LocalDatasetParseStatus = "ready" | "parsing" | "failed";
  * transcoding is in progress, so we can resume it after a tab refresh
  * without asking the user to re-pick the file.
  */
-export type LocalDatasetSourceFileType = "csv" | "xlsx";
+export type LocalDatasetSourceFileType = "csv" | "xlsx" | "pdf";
 
 /**
  * Parse options needed to resume the background parquet transcoding for a
@@ -88,11 +88,12 @@ type LocalDatasetDBRead = {
   parseFailedReason: string | undefined;
 
   /**
-   * Cached bytes of the original source file (CSV or XLSX). Only retained
-   * for files below the per-file cache threshold so we can resume the
-   * background parquet transcoding after a tab refresh without asking the
-   * user to re-pick the file. Always cleared once `parseStatus` transitions
-   * to `"ready"`.
+   * Cached bytes of the original source file (CSV, XLSX, or PDF). Only
+   * retained for files below the per-file cache threshold so we can resume
+   * the background parquet transcoding after a tab refresh without asking
+   * the user to re-pick the file. Cleared once `parseStatus` transitions to
+   * `"ready"`, unless `isSourcePinned` is set, in which case these bytes are
+   * the retained original and are kept indefinitely.
    */
   sourceBytes: Blob | undefined;
 
@@ -111,6 +112,18 @@ type LocalDatasetDBRead = {
    * entries when the cumulative cache exceeds its size budget.
    */
   lastSourceAccessedAt: number | undefined;
+
+  /**
+   * When true, `sourceBytes` is the retained original file rather than a
+   * resume cache, and must survive both LRU eviction and the post-transcode
+   * cleanup.
+   *
+   * Set for source types where the original cannot be reconstructed from the
+   * parquet plus metadata; see `requiresOriginalFileRetention`. For an
+   * offline-only PDF these bytes are the only copy in existence, so dropping
+   * them is unrecoverable data loss rather than a cache miss.
+   */
+  isSourcePinned: boolean | undefined;
 
   /**
    * Parse options needed to redrive the background parquet transcoding

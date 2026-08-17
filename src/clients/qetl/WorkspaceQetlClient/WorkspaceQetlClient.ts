@@ -79,6 +79,7 @@ async function _insertWorkspaceFacts(
         sourceFileType: undefined,
         sourceFileSize: undefined,
         lastSourceAccessedAt: undefined,
+        isSourcePinned: undefined,
         parseOptions: undefined,
       };
     }),
