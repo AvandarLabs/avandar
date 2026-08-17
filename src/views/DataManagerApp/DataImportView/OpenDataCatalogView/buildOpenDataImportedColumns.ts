@@ -1,13 +1,7 @@
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import type { ExcludeNullsIn } from "@avandar/utils";
 import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types";
-import type { CompositeTypes, Json } from "$/types/database.types";
-import type { SetOptional } from "type-fest";
-
-type DatasetColumnInput = SetOptional<
-  ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
-  "description"
->;
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Json } from "$/types/database.types";
 
 /**
  * Reads `metadata.table.column_names` from catalog pipeline metadata.
@@ -47,25 +41,24 @@ export function getColumnNamesFromOpenDataMetadata(
 }
 
 /**
- * Builds RPC column inputs for open-data datasets using catalog column names.
+ * Builds open-data import columns from catalog column names alone.
  * Uses `VARCHAR` / `varchar` so Parquet loads without forced casts when types
  * match user expectations in Qetl.
  *
  * @param columnNames - Original column names from the catalog metadata.
- * @returns Rows for `rpc_datasets__add_open_data_dataset.p_columns`.
  */
-export function buildOpenDataDatasetColumnInputs(
+export function buildOpenDataImportedColumns(
   columnNames: readonly string[],
-): DatasetColumnInput[] {
+): DatasetColumn.Imported[] {
   return columnNames.map((originalName, columnIdx) => {
     return {
-      original_name: originalName,
+      originalName,
       name: originalName,
-      description: undefined,
-      original_data_type: "VARCHAR",
-      detected_data_type: "VARCHAR",
-      data_type: "varchar",
-      column_idx: columnIdx,
+      originalDataType: "VARCHAR",
+      detectedDataType: "VARCHAR",
+      dataType: "varchar",
+      isDataTypeUserSet: false,
+      columnIdx,
     };
   });
 }
@@ -87,44 +80,50 @@ function _sortCatalogDatasetColumns(
 }
 
 /**
- * Builds RPC column inputs from `catalog_entries__dataset_column` rows.
+ * Builds open-data import columns from `catalog_entries__dataset_column` rows.
  *
  * @param rows - Column rows for one open-data catalog entry.
  */
-export function buildOpenDataDatasetColumnInputsFromCatalogRows(
+export function buildOpenDataImportedColumnsFromCatalogRows(
   rows: readonly CatalogDatasetColumnRead[],
-): DatasetColumnInput[] {
+): DatasetColumn.Imported[] {
   const sorted = _sortCatalogDatasetColumns(rows);
   return sorted.map((col, columnIdx) => {
     return {
-      original_name: col.columnName,
+      originalName: col.columnName,
       name: col.columnName,
-      description: undefined,
-      original_data_type: col.originalDataType,
-      detected_data_type: col.castDataType,
-      data_type: DuckDbDataTypeUtils.toAvaDataType(col.castDataType),
-      column_idx: columnIdx,
+      originalDataType: col.originalDataType,
+      detectedDataType: col.castDataType,
+      dataType: DuckDbDataTypeUtils.toAvaDataType(col.castDataType),
+      isDataTypeUserSet: false,
+      columnIdx,
     };
   });
 }
 
 /**
- * Prefers normalized catalog column rows; falls back to legacy JSON metadata.
+ * Resolves the columns an open-data import will persist, preferring normalized
+ * catalog column rows and falling back to legacy JSON metadata.
+ *
+ * These reach the insert RPC through `toDatasetColumnInputs` like every other
+ * source's columns do, but open data never offers the user a column editor:
+ * the catalog, not this workspace, owns what the columns are called and how
+ * they are typed.
  *
  * @param options.catalogColumns - Rows from `catalog_entries__dataset_column`.
  * @param options.metadata - Legacy `catalog_entries__open_data.metadata` JSON.
  */
-export function resolveOpenDataDatasetColumnInputs(options: {
+export function resolveOpenDataImportedColumns(options: {
   catalogColumns: readonly CatalogDatasetColumnRead[] | undefined;
   metadata: Json | undefined;
-}): DatasetColumnInput[] | undefined {
+}): DatasetColumn.Imported[] | undefined {
   const { catalogColumns, metadata } = options;
   if (catalogColumns !== undefined && catalogColumns.length > 0) {
-    return buildOpenDataDatasetColumnInputsFromCatalogRows(catalogColumns);
+    return buildOpenDataImportedColumnsFromCatalogRows(catalogColumns);
   }
   const columnNames = getColumnNamesFromOpenDataMetadata(metadata);
   if (!columnNames) {
     return undefined;
   }
-  return buildOpenDataDatasetColumnInputs(columnNames);
+  return buildOpenDataImportedColumns(columnNames);
 }

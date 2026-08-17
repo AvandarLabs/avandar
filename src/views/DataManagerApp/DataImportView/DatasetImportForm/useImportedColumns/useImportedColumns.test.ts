@@ -1,6 +1,6 @@
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
-import { renderHook } from "@/test-utils";
+import { act, renderHook } from "@/test-utils";
 import { useImportedColumns } from "./useImportedColumns";
 import type {
   CsvFileLoadResult,
@@ -132,23 +132,23 @@ function _googleSheetsMetadata(
 
 describe("useImportedColumns", () => {
   it("maps csv_file DuckDB columns to imported columns", () => {
-    const columns = [
+    const metadata = _csvFileMetadata([
       _duckDbColumn("user_id", "BIGINT"),
       _duckDbColumn("label", "VARCHAR"),
-    ];
-    const metadata = _csvFileMetadata(columns);
+    ]);
 
     const { result } = renderHook(() => {
       return useImportedColumns(metadata);
     });
 
-    expect(result.current).toEqual([
+    expect(result.current.columns).toEqual([
       {
         name: "user_id",
         originalName: "user_id",
         originalDataType: "BIGINT",
         detectedDataType: "BIGINT",
         dataType: "bigint",
+        isDataTypeUserSet: false,
         columnIdx: 0,
       },
       {
@@ -157,62 +157,63 @@ describe("useImportedColumns", () => {
         originalDataType: "VARCHAR",
         detectedDataType: "VARCHAR",
         dataType: "varchar",
+        isDataTypeUserSet: false,
         columnIdx: 1,
       },
     ]);
   });
 
   it("maps xlsx_file DuckDB columns the same way as csv_file", () => {
-    const columns = [_duckDbColumn("amount", "DOUBLE")];
-    const metadata = _xlsxFileMetadata(columns);
+    const metadata = _xlsxFileMetadata([_duckDbColumn("amount", "DOUBLE")]);
 
     const { result } = renderHook(() => {
       return useImportedColumns(metadata);
     });
 
-    expect(result.current).toEqual([
+    expect(result.current.columns).toEqual([
       {
         name: "amount",
         originalName: "amount",
         originalDataType: "DOUBLE",
         detectedDataType: "DOUBLE",
         dataType: "double",
+        isDataTypeUserSet: false,
         columnIdx: 0,
       },
     ]);
   });
 
   it("maps google_sheets DuckDB columns using the CSV load shape", () => {
-    const columns = [_duckDbColumn("flag", "BOOLEAN")];
-    const metadata = _googleSheetsMetadata(columns);
+    const metadata = _googleSheetsMetadata([_duckDbColumn("flag", "BOOLEAN")]);
 
     const { result } = renderHook(() => {
       return useImportedColumns(metadata);
     });
 
-    expect(result.current).toEqual([
+    expect(result.current.columns).toEqual([
       {
         name: "flag",
         originalName: "flag",
         originalDataType: "BOOLEAN",
         detectedDataType: "BOOLEAN",
         dataType: "boolean",
+        isDataTypeUserSet: false,
         columnIdx: 0,
       },
     ]);
   });
 
-  it("returns an empty array when there are no columns", () => {
+  it("returns no columns when the source has none", () => {
     const metadata = _csvFileMetadata([]);
 
     const { result } = renderHook(() => {
       return useImportedColumns(metadata);
     });
 
-    expect(result.current).toEqual([]);
+    expect(result.current.columns).toEqual([]);
   });
 
-  it("returns a stable array reference when metadata is unchanged", () => {
+  it("returns a stable columns reference when metadata is unchanged", () => {
     const metadata = _csvFileMetadata([_duckDbColumn("a", "VARCHAR")]);
 
     const { result, rerender } = renderHook(
@@ -222,8 +223,122 @@ describe("useImportedColumns", () => {
       { initialProps: { metadata } },
     );
 
-    const first = result.current;
+    const first = result.current.columns;
     rerender({ metadata });
-    expect(result.current).toBe(first);
+    expect(result.current.columns).toBe(first);
+  });
+
+  it("marks file and sheet imports as editable", () => {
+    const metadata = _csvFileMetadata([_duckDbColumn("a", "VARCHAR")]);
+
+    const { result } = renderHook(() => {
+      return useImportedColumns(metadata);
+    });
+
+    expect(result.current.isEditable).toBe(true);
+  });
+
+  it("applies a rename and keeps the source name for the parquet", () => {
+    const metadata = _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]);
+
+    const { result } = renderHook(() => {
+      return useImportedColumns(metadata);
+    });
+
+    act(() => {
+      result.current.updateColumn(0, { name: "City" });
+    });
+
+    expect(result.current.columns[0]?.name).toBe("City");
+    expect(result.current.columns[0]?.originalName).toBe("cty");
+  });
+
+  it("records a type the user chose as an override", () => {
+    const metadata = _csvFileMetadata([_duckDbColumn("when", "VARCHAR")]);
+
+    const { result } = renderHook(() => {
+      return useImportedColumns(metadata);
+    });
+
+    act(() => {
+      result.current.updateColumn(0, { dataType: "date" });
+    });
+
+    expect(result.current.columns[0]?.dataType).toBe("date");
+    expect(result.current.columns[0]?.isDataTypeUserSet).toBe(true);
+    expect(result.current.columns[0]?.detectedDataType).toBe("VARCHAR");
+  });
+
+  it("merges successive edits to the same column", () => {
+    const metadata = _csvFileMetadata([_duckDbColumn("when", "VARCHAR")]);
+
+    const { result } = renderHook(() => {
+      return useImportedColumns(metadata);
+    });
+
+    act(() => {
+      result.current.updateColumn(0, { name: "Recorded On" });
+    });
+    act(() => {
+      result.current.updateColumn(0, { dataType: "timestamp" });
+    });
+
+    expect(result.current.columns[0]?.name).toBe("Recorded On");
+    expect(result.current.columns[0]?.dataType).toBe("timestamp");
+  });
+
+  it("reports a duplicate name so the form can block the save", () => {
+    const metadata = _csvFileMetadata([
+      _duckDbColumn("a", "VARCHAR"),
+      _duckDbColumn("b", "VARCHAR"),
+    ]);
+
+    const { result } = renderHook(() => {
+      return useImportedColumns(metadata);
+    });
+
+    expect(result.current.errors).toEqual([]);
+
+    act(() => {
+      result.current.updateColumn(1, { name: "a" });
+    });
+
+    expect(
+      result.current.errors.map((error) => {
+        return error.kind;
+      }),
+    ).toEqual(["duplicate_name", "duplicate_name"]);
+  });
+
+  it("discards edits when a re-parse produces a new set of columns", () => {
+    const firstParse = _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]);
+
+    const { result, rerender } = renderHook(
+      (props: { metadata: DataSourceMetadata }) => {
+        return useImportedColumns(props.metadata);
+      },
+      { initialProps: { metadata: firstParse } },
+    );
+
+    act(() => {
+      result.current.updateColumn(0, { name: "City", dataType: "date" });
+    });
+    expect(result.current.columns[0]?.name).toBe("City");
+
+    // A re-parse mints a new load result id for the same column names.
+    const reparsed = _csvFileMetadata([_duckDbColumn("cty", "VARCHAR")]);
+    rerender({
+      metadata: {
+        ...reparsed,
+        datasetLoadResult: {
+          ...(reparsed as typeof firstParse).datasetLoadResult,
+          id: "00000000-0000-4000-8000-000000000099" as CsvFileLoadResult["id"],
+        },
+      } as DataSourceMetadata,
+    });
+
+    expect(result.current.columns[0]?.name).toBe("cty");
+    expect(result.current.columns[0]?.dataType).toBe("varchar");
+    expect(result.current.columns[0]?.isDataTypeUserSet).toBe(false);
   });
 });

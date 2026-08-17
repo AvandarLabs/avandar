@@ -1,10 +1,10 @@
 import { useMutation } from "@avandar/query-hooks";
-import { snakeCaseKeysShallow, where } from "@avandar/utils";
+import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { toDatasetColumnInputs } from "@/clients/datasets/DatasetClient/toDatasetColumnInputs/toDatasetColumnInputs";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -15,7 +15,6 @@ import type {
   DatasetImportFormValues,
   DataSourceMetadata,
 } from "../DatasetImportForm.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -45,21 +44,6 @@ export type FileParseOptions =
   | XlsxParseOptions
   | GoogleSheetsParseOptions;
 
-function _duckDbColumnsToImportedColumns(
-  columns: readonly DuckDbColumnSchema[],
-): DatasetColumn.Imported[] {
-  return columns.map((duckDbColumn, columnIndex) => {
-    return {
-      name: duckDbColumn.column_name,
-      originalName: duckDbColumn.column_name,
-      originalDataType: duckDbColumn.column_type,
-      detectedDataType: duckDbColumn.column_type,
-      dataType: DuckDbDataTypeUtils.toAvaDataType(duckDbColumn.column_type),
-      columnIdx: columnIndex,
-    };
-  });
-}
-
 type UseSaveDatasetOptions = {
   /**
    * Called once the dataset has been saved and the success notification
@@ -77,13 +61,20 @@ type UseSaveDatasetOptions = {
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
-type SaveDatasetValues = DatasetImportFormValues & DataSourceMetadata;
+/**
+ * The columns arrive from the import form rather than being re-derived from
+ * `dataSourceMetadata`, because by this point the user may have renamed,
+ * re-typed, or described them.
+ */
+type SaveDatasetValues = DatasetImportFormValues &
+  DataSourceMetadata & { columns: readonly DatasetColumn.Imported[] };
 
 type SaveDatasetMutationContext = {
   isFirstInWorkspace?: boolean;
 };
 
 type DatasetInsertContext = {
+  columns: readonly DatasetColumn.Imported[];
   datasetDescription: string;
   datasetName: string;
   workspaceId: Dataset.T["workspaceId"];
@@ -138,13 +129,13 @@ async function _saveCsvDataset(
 ): Promise<Dataset.T> {
   const { datasetLoadResult, onlineStorageAllowed, parseOptions, sizeInBytes } =
     options.payload;
-  const { csvSniff, columns } = datasetLoadResult;
+  const { csvSniff } = datasetLoadResult;
   return DatasetClient.insertCsvFileDataset({
     datasetId: datasetLoadResult.datasetId,
     workspaceId: options.context.workspaceId,
     datasetName: options.context.datasetName,
     datasetDescription: options.context.datasetDescription,
-    columns: _duckDbColumnsToImportedColumns(columns).map(snakeCaseKeysShallow),
+    columns: toDatasetColumnInputs(options.context.columns),
     isInCloudStorage: onlineStorageAllowed,
     sizeInBytes,
     parseOptions: {
@@ -168,11 +159,11 @@ async function _saveGoogleSheetsDataset(
   }>,
 ): Promise<Dataset.T> {
   const { datasetLoadResult, parseOptions } = options.payload;
-  const { csvSniff, columns } = datasetLoadResult.sheetLoadMetadata;
+  const { csvSniff } = datasetLoadResult.sheetLoadMetadata;
   return DatasetClient.insertGoogleSheetsDataset({
     googleAccountId: options.payload.googleAccountId,
     googleDocumentId: options.payload.googleDocumentId,
-    columns: _duckDbColumnsToImportedColumns(columns).map(snakeCaseKeysShallow),
+    columns: toDatasetColumnInputs(options.context.columns),
     datasetDescription: options.context.datasetDescription,
     datasetId: datasetLoadResult.datasetId,
     datasetName: options.context.datasetName,
@@ -194,9 +185,7 @@ async function _saveXlsxDataset(
     workspaceId: options.context.workspaceId,
     datasetName: options.context.datasetName,
     datasetDescription: options.context.datasetDescription,
-    columns: _duckDbColumnsToImportedColumns(datasetLoadResult.columns).map(
-      snakeCaseKeysShallow,
-    ),
+    columns: toDatasetColumnInputs(options.context.columns),
     isInCloudStorage: onlineStorageAllowed,
     sizeInBytes,
     rowsToSkip: parseOptions.numRowsToSkip ?? 0,
@@ -213,8 +202,9 @@ function _saveDatasetFromValues(
     workspaceId: Dataset.T["workspaceId"];
   }>,
 ): Promise<Dataset.T> {
-  const { name, description, ...dataSourceMetadata } = options.values;
+  const { name, description, columns, ...dataSourceMetadata } = options.values;
   const context = {
+    columns,
     datasetDescription: description,
     datasetName: name,
     workspaceId: options.workspaceId,

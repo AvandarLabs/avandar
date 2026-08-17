@@ -46,6 +46,7 @@ function _createNumericColumn(name: string): DatasetColumn.T {
     originalDataType: "DOUBLE",
     dataType: "double",
     detectedDataType: "DOUBLE",
+    isDataTypeUserSet: false,
     description: undefined,
     columnIdx: 0,
   });

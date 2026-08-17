@@ -389,6 +389,16 @@ export type ObjectArrayRenderOptions<
        */
       itemRenderOptions?: ObjectRenderOptions<T, RootData>;
       renderTableHeader?: undefined;
+
+      /**
+       * Only a table renders the edit column, so this branch declares the key
+       * as `undefined` rather than omitting it. `ObjectDescriptionList` reaches
+       * these options through an `Omit`, and `Omit` over a union keeps only the
+       * keys both members share, so a key missing from one branch is not
+       * accepted on either. `defaultExpanded` and `titleKey` above are declared
+       * the same way for the same reason.
+       */
+      editable?: undefined;
     });
 
 /**

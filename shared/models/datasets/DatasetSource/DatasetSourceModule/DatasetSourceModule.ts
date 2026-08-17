@@ -5,6 +5,7 @@ import type {
   CanBeOfflineOnlyDatasetSourceModel,
   DatasetSourceModel,
   DatasetSourceType,
+  ImportTimeColumnEditableDatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 function _canBeOfflineOnly(
@@ -41,6 +42,33 @@ function _canBeOfflineOnly(
     .exhaustive();
 }
 
+function _supportsImportTimeColumnEditing(
+  sourceType: DatasetSourceType,
+): sourceType is ImportTimeColumnEditableDatasetSourceType;
+function _supportsImportTimeColumnEditing(sourceType: {
+  sourceType: DatasetSourceType;
+}): sourceType is
+  | { sourceType: "csv_file" }
+  | { sourceType: "google_sheets" }
+  | { sourceType: "xlsx_file" };
+function _supportsImportTimeColumnEditing(
+  sourceType: DatasetSourceType | { sourceType: DatasetSourceType },
+): boolean {
+  const type =
+    typeof sourceType === "string" ? sourceType : sourceType.sourceType;
+
+  // Matched exhaustively on purpose: a source type added without an answer
+  // here throws rather than silently defaulting to one behavior or the other.
+  return match(type)
+    .with("csv_file", "google_sheets", "xlsx_file", () => {
+      return true;
+    })
+    .with("open_data", "virtual", () => {
+      return false;
+    })
+    .exhaustive();
+}
+
 export const DatasetSourceModule = {
   SourceTypes: registry<DatasetSourceType>().keys(
     "csv_file",
@@ -52,6 +80,15 @@ export const DatasetSourceModule = {
 
   canBeOfflineOnly: _canBeOfflineOnly,
   isManuallyUploadable: _canBeOfflineOnly,
+
+  /**
+   * Whether the user may rename, re-type, and describe a source's columns on
+   * the import form, before the dataset is saved.
+   *
+   * Accepts a bare source type or anything carrying one, so an import view can
+   * ask the question of its `dataSourceMetadata` directly.
+   */
+  supportsImportTimeColumnEditing: _supportsImportTimeColumnEditing,
 
   /**
    * Get the source type of a dataset source model.

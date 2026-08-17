@@ -38,7 +38,16 @@ create table public.dataset_columns (
   -- Description of the column. This is nullable.
   description text,
   -- Column index (to order them)
-  column_idx integer not null
+  column_idx integer not null,
+  -- Whether `data_type` was chosen by the user rather than derived from
+  -- `detected_data_type`.
+  --
+  -- Query time needs to know whether to project `try_cast(col as data_type)`
+  -- over the stored parquet, and it cannot infer that by comparing `data_type`
+  -- against `detected_data_type`: the two differ both when the user picked a
+  -- type and when a re-parse revised `detected_data_type` underneath an
+  -- untouched column. Only an explicit flag separates those cases.
+  is_data_type_user_set boolean not null default false
 );
 
 -- Enable row level security

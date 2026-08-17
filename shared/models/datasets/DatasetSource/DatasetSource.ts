@@ -4,10 +4,11 @@ import type {
   DatasetSourceRegistry,
   DatasetSourceType,
   ImportableDatasetSourceType,
+  ImportTimeColumnEditableDatasetSourceType,
   ManuallyUploadableDatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
-export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
+export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule/DatasetSourceModule.ts";
 
 export namespace DatasetSource {
   export type T<
@@ -17,6 +18,8 @@ export namespace DatasetSource {
   export type Registry = DatasetSourceRegistry;
   export type SourceType = DatasetSourceType;
   export type ImportableSourceType = ImportableDatasetSourceType;
+  export type ImportTimeColumnEditableSourceType =
+    ImportTimeColumnEditableDatasetSourceType;
   export type ManuallyUploadableSourceType =
     ManuallyUploadableDatasetSourceType;
 }

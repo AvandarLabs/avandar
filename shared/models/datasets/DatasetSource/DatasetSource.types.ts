@@ -21,6 +21,21 @@ export type ManuallyUploadableDatasetSourceType = Extract<
   "csv_file" | "xlsx_file"
 >;
 
+/**
+ * Source types whose columns the user may rename, re-type, and describe on the
+ * import form, before the dataset is saved.
+ *
+ * A source qualifies when this workspace is the authority on what its columns
+ * are called and how they are typed, which is true exactly when the column
+ * metadata came from inferring it over the source bytes. `open_data` is
+ * excluded because the shared catalog owns its column metadata, and `virtual`
+ * because its columns are whatever its SQL projects.
+ */
+export type ImportTimeColumnEditableDatasetSourceType = Extract<
+  DatasetSourceType,
+  "csv_file" | "google_sheets" | "xlsx_file"
+>;
+
 export type DatasetSourceRegistry<
   K extends "Read" | "Insert" | "Update" = "Read",
 > = {

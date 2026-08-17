@@ -3,6 +3,7 @@ import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import {
   notifyError,
@@ -28,8 +29,13 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * column whose detected type changed, we update the Supabase row + tally
  * for the warning toast.
  *
- * We intentionally only touch `detectedDataType` (not `dataType`) so user
- * overrides of the queryable type are preserved.
+ * A column the user typed themselves keeps its `dataType`; only its
+ * `detectedDataType` is corrected, so their choice survives. For every other
+ * column `dataType` follows the corrected `detectedDataType`, because the
+ * queryable type was only ever derived from it. Leaving `dataType` behind here
+ * is what used to flatten XLSX imports to text: their sniff reports every
+ * column as `VARCHAR`, so every column would keep a `varchar` queryable type
+ * that no longer matched the parquet.
  */
 async function _reconcileColumns(params: {
   datasetId: DatasetId;
@@ -82,7 +88,13 @@ async function _reconcileColumns(params: {
       try {
         await DatasetColumnClient.update({
           id: existing.id,
-          data: { detectedDataType: detected.column_type },
+          data: {
+            detectedDataType: detected.column_type,
+            dataType:
+              existing.isDataTypeUserSet ?
+                existing.dataType
+              : DuckDbDataTypeUtils.toAvaDataType(detected.column_type),
+          },
         });
         changedCount += 1;
       } catch {

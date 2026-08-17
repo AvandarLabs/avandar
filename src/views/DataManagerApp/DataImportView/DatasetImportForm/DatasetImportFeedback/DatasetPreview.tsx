@@ -12,6 +12,7 @@ type Props = {
   columnsMessage: string;
   dataSourceMetadata: DataSourceMetadata;
   isProcessing: boolean;
+  onColumnChange: DatasetImportFeedbackProps["onColumnChange"] | undefined;
   onDataSourceMetadataChange: DatasetImportFeedbackProps["onDataSourceMetadataChange"];
   onRequestDataReparse: DatasetImportFeedbackProps["onRequestDataReparse"];
   previewMessage: string;
@@ -24,6 +25,7 @@ export function DatasetPreview({
   columnsMessage,
   dataSourceMetadata,
   isProcessing,
+  onColumnChange,
   onDataSourceMetadataChange,
   onRequestDataReparse,
   previewMessage,
@@ -33,6 +35,10 @@ export function DatasetPreview({
     <DatasetPreviewBlock
       previewRows={previewRows}
       columns={columns}
+      // The rows come straight from the parse, so they are still keyed by the
+      // source's own column names even after the user renames a column.
+      previewRowKey="originalName"
+      onColumnChange={onColumnChange}
       dataPreviewCalloutMessage={previewMessage}
       dataColumnsCalloutMessage={columnsMessage}
       dataPreviewCalloutContents={

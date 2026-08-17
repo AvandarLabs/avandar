@@ -28,7 +28,8 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
+import { toDatasetColumnInputs } from "@/clients/datasets/DatasetClient/toDatasetColumnInputs/toDatasetColumnInputs";
+import { resolveOpenDataImportedColumns } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataImportedColumns";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
@@ -122,12 +123,12 @@ export function OpenDataCatalogView({
       return;
     }
 
-    const columnInputs = resolveOpenDataDatasetColumnInputs({
+    const importedColumns = resolveOpenDataImportedColumns({
       catalogColumns: catalogDatasetColumns,
       metadata: selectedEntry.metadata,
     });
 
-    if (!columnInputs) {
+    if (!importedColumns) {
       notifyError({
         title: t`Cannot add dataset`,
         message: t`This catalog entry has no column metadata. It cannot be imported yet.`,
@@ -137,7 +138,7 @@ export function OpenDataCatalogView({
 
     insertOpenDataDataset({
       catalogEntryId: selectedEntry.id,
-      columns: columnInputs,
+      columns: toDatasetColumnInputs(importedColumns),
       datasetDescription: selectedEntry.description ?? "",
       datasetId: uuid(),
       datasetName: selectedEntry.displayName,

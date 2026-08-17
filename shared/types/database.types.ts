@@ -446,6 +446,7 @@ export type Database = {
           description: string | null
           detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id: string
+          is_data_type_user_set: boolean
           name: string
           original_data_type: string
           original_name: string
@@ -460,6 +461,7 @@ export type Database = {
           description?: string | null
           detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id?: string
+          is_data_type_user_set?: boolean
           name: string
           original_data_type: string
           original_name: string
@@ -474,6 +476,7 @@ export type Database = {
           description?: string | null
           detected_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id?: string
+          is_data_type_user_set?: boolean
           name?: string
           original_data_type?: string
           original_name?: string
@@ -1955,6 +1958,7 @@ export type Database = {
           | null
         data_type: Database["public"]["Enums"]["datasets__ava_data_type"] | null
         column_idx: number | null
+        is_data_type_user_set: boolean | null
       }
       datasets__csv_file__date_format: {
         date_format: string | null

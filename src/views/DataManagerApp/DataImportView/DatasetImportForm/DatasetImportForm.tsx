@@ -6,6 +6,7 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { DatasetImportFeedback } from "./DatasetImportFeedback/DatasetImportFeedback";
 import { DatasetImportFields } from "./DatasetImportFields";
 import { SaveDatasetButton } from "./SaveDatasetButton";
+import { useColumnCastWarnings } from "./useColumnCastWarnings/useColumnCastWarnings";
 import { useDatasetImportCopy } from "./useDatasetImportCopy";
 import { useDatasetImportValidation } from "./useDatasetImportValidation";
 import { useImportedColumns } from "./useImportedColumns/useImportedColumns";
@@ -39,7 +40,7 @@ function useDatasetImportFormState(
 ): DatasetImportFormState {
   const { t } = useLingui();
   const validation = useDatasetImportValidation(options.initialDatasetName);
-  const columns = useImportedColumns(options.dataSourceMetadata);
+  const importedColumns = useImportedColumns(options.dataSourceMetadata);
   const [saveDataset, isSavePending] = useSaveDataset({
     onAfterSave: options.onAfterSave,
     onSaveSuccess: options.onSaveSuccess,
@@ -48,10 +49,15 @@ function useDatasetImportFormState(
   const previewRows = useMemo(() => {
     return options.rows.slice(0, GlobalAppConfig.dataManagerApp.maxPreviewRows);
   }, [options.rows]);
+  const castWarnings = useColumnCastWarnings({
+    columns: importedColumns.columns,
+    previewRows,
+  });
   const copy = useDatasetImportCopy({
-    numColumns: columns.length,
+    numColumns: importedColumns.columns.length,
     numPreviewRows: previewRows.length,
   });
+  const hasColumnErrors = importedColumns.errors.length > 0;
 
   return {
     fieldProps: {
@@ -62,10 +68,14 @@ function useDatasetImportFormState(
       descriptionPlaceholder: t`Enter a description for this dataset`,
     },
     feedbackProps: {
-      columns,
+      castWarnings,
+      columnErrors: importedColumns.errors,
+      columns: importedColumns.columns,
       copy,
       dataSourceMetadata: options.dataSourceMetadata,
       isProcessing: options.isProcessing ?? false,
+      onColumnChange:
+        importedColumns.isEditable ? importedColumns.updateColumn : undefined,
       onDataSourceMetadataChange: options.onDataSourceMetadataChange,
       onRequestDataReparse: options.onRequestDataReparse,
       previewRows,
@@ -73,14 +83,20 @@ function useDatasetImportFormState(
     },
     onSubmit: validation.form.onSubmit(
       offline.guard((values) => {
-        saveDataset({ ...values, ...options.dataSourceMetadata });
+        saveDataset({
+          ...values,
+          ...options.dataSourceMetadata,
+          columns: importedColumns.columns,
+        });
       }),
       (errors) => {
         return validation.onValidationFailure(errors);
       },
     ),
     saveButtonProps: {
-      disableSubmit: options.disableSubmit,
+      // A duplicate or empty column name would not fail loudly: DuckDB would
+      // build the dataset's view anyway and quietly make a column unreadable.
+      disableSubmit: options.disableSubmit || hasColumnErrors,
       isOfflineBlocked: offline.isBlocked,
       isSavePending,
     },

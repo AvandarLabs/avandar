@@ -18,6 +18,15 @@ type Props = {
   className?: string;
 
   /**
+   * Header text to show instead of the key itself, keyed by entry in
+   * `columnNames`. Lets a grid label a column differently from the key its
+   * values are stored under, which is what the import form needs while a
+   * pending rename has not been applied to the data yet. Keys with no entry
+   * keep showing their own name.
+   */
+  columnLabels?: Readonly<Record<string, string>>;
+
+  /**
    * The `data` is a conventional data frame represented as an array of rows,
    * where each row is an object. Each key in the object is the name of the
    * column.
@@ -44,6 +53,7 @@ const avandarGridTheme = themeMaterial.withParams({
 export function DataGrid({
   columnNames,
   className,
+  columnLabels,
   data,
   dateColumns,
   height = 500,
@@ -60,7 +70,7 @@ export function DataGrid({
       const isDate = dateColumns?.has(field) ?? false;
       return {
         field: field,
-        headerName: field,
+        headerName: columnLabels?.[field] ?? field,
         filter: true,
         valueFormatter:
           isDate ?
@@ -79,7 +89,7 @@ export function DataGrid({
             },
       };
     });
-  }, [columnNames, dateColumns, dateFormat, timezone]);
+  }, [columnNames, columnLabels, dateColumns, dateFormat, timezone]);
 
   // AgGrid will fill the size of the parent container
   return (

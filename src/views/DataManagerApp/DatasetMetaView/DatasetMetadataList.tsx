@@ -6,8 +6,9 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { getDatasetColumnUpdate } from "@/views/DataManagerApp/DatasetMetaView/getDatasetColumnUpdate/getDatasetColumnUpdate";
 import type { ObjectKeyRenderOptionsMap } from "@avandar/ui";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
@@ -103,9 +104,6 @@ function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWit
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
   const datasetMetadataRenderOptions = useDatasetMetadataRenderOptions();
-  const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
-    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
-  });
 
   const [updateDatasetColumn, isUpdatingDatasetColumn] =
     DatasetColumnClient.useUpdate({
@@ -116,11 +114,17 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         [DatasetQueryClient.getClientName()],
       ],
       onSuccess: () => {
-        notifySuccess(t`Column description updated successfully!`);
+        notifySuccess(t`Column updated successfully!`);
 
-        // drop the local column data so it can be re-materialized when the
-        // dataset is next loaded. No need to await this promise though.
-        dropLocalDataset({ datasetId: dataset.id });
+        // Drop only the DuckDB view, which is where a renamed or re-typed
+        // column is projected, so it gets rebuilt from the parquet on the next
+        // query. The parquet itself is untouched and must stay that way: for a
+        // dataset the user chose to keep offline-only it is the sole copy, and
+        // nothing on the read path checks `isInCloudStorage` before trying to
+        // re-download. No need to await this.
+        void DuckDbClient.dropTableViewAndFile({
+          tableOrViewName: dataset.id,
+        });
       },
     });
 
@@ -134,43 +138,18 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         keyRenderOptions={datasetMetadataRenderOptions}
         onSubmitChange={async (value) => {
           if (Model.isOfModelType(value, "DatasetColumn")) {
-            const datasetColumn = value as DatasetColumn.T;
-            const prevDatasetColumn = dataset.columns?.find((column) => {
+            const editedColumn = value as DatasetColumn.T;
+            const previousColumn = dataset.columns?.find((column) => {
               return column.id === value.id;
             });
-            assertIsDefined(prevDatasetColumn);
+            assertIsDefined(previousColumn);
 
-            const newColumnName =
-              datasetColumn.name !== prevDatasetColumn.name ?
-                datasetColumn.name
-              : undefined;
-            const newDataType =
-              (
-                (datasetColumn.dataType as string) !==
-                datasetColumn.detectedDataType
-              ) ?
-                datasetColumn.dataType
-              : undefined;
-            const newDescription =
-              datasetColumn.description !== prevDatasetColumn.description ?
-                datasetColumn.description
-              : undefined;
-
-            // update the column metadata in the backend if any changes were
-            // made to the description, data type, or name
-            if (
-              newDescription !== undefined ||
-              newDataType !== undefined ||
-              newColumnName !== undefined
-            ) {
-              updateDatasetColumn({
-                id: datasetColumn.id,
-                data: {
-                  description: newDescription,
-                  dataType: newDataType,
-                  name: newColumnName,
-                },
-              });
+            const update = getDatasetColumnUpdate({
+              previousColumn,
+              editedColumn,
+            });
+            if (update) {
+              updateDatasetColumn({ id: editedColumn.id, data: update });
             }
           }
         }}

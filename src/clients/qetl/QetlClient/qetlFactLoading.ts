@@ -1,5 +1,4 @@
 import {
-  isDefined,
   makeBucketRecord,
   makeIdLookupRecord,
   promiseMap,
@@ -12,47 +11,22 @@ import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCa
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { getColumnReplacements } from "@/clients/qetl/QetlClient/getColumnReplacements/getColumnReplacements";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
-  ColumnReplacement,
   DiceExtractor,
   ExtractedFact,
   QetlRunnerOptions,
   QetlRunQuery,
 } from "@/clients/qetl/QetlClient/QetlClient.types";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 type FetchExtractorOptions = {
   extractor: DiceExtractor;
   datasetDuckDbLease: DatasetDuckDbLease;
   runQuery: QetlRunQuery;
 };
-
-function _getColumnReplacements(
-  columns: readonly DatasetColumn.T[],
-): ColumnReplacement[] {
-  return columns
-    .map((column) => {
-      const hasChangedName = column.name !== column.originalName;
-      const hasChangedDataType =
-        column.dataType !==
-        DuckDbDataTypeUtils.toAvaDataType(column.detectedDataType);
-      return hasChangedName || hasChangedDataType ?
-          {
-            originalName: column.originalName,
-            alias: hasChangedName ? column.name : undefined,
-            dataType:
-              hasChangedDataType ?
-                DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
-              : undefined,
-          }
-        : undefined;
-    })
-    .filter(isDefined);
-}
 
 async function _getCachedFact(
   extractor: Readonly<DiceExtractor>,
@@ -188,7 +162,7 @@ export async function loadDiceFacts(
       blob: fact.parquetBlob,
       datasetDuckDbLease: options.datasetDuckDbLease,
       columnReplacements: makeIdLookupRecord(
-        _getColumnReplacements(columnsByDatasetId[fact.datasetId] ?? []),
+        getColumnReplacements(columnsByDatasetId[fact.datasetId] ?? []),
         { key: "originalName" },
       ),
     });

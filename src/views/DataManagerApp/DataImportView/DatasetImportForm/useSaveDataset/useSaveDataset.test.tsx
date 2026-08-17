@@ -11,6 +11,7 @@ import type {
 } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
 
@@ -34,9 +35,39 @@ const SAVED_DATASET = Model.make("Dataset", {
   isRestricted: false,
 });
 
-const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
+/**
+ * The columns as the user left them on the import form: `value` was renamed and
+ * re-typed, `name` was not touched.
+ */
+const EDITED_COLUMNS: DatasetColumn.Imported[] = [
+  {
+    originalName: "name",
+    name: "name",
+    originalDataType: "VARCHAR",
+    detectedDataType: "VARCHAR",
+    dataType: "varchar",
+    isDataTypeUserSet: false,
+    columnIdx: 0,
+  },
+  {
+    originalName: "value",
+    name: "Recorded On",
+    originalDataType: "VARCHAR",
+    detectedDataType: "VARCHAR",
+    dataType: "date",
+    isDataTypeUserSet: true,
+    description: "When the reading was taken",
+    columnIdx: 1,
+  },
+];
+
+const CSV_PARAMS: DatasetImportFormValues &
+  CsvDataSourceMetadata & {
+    columns: readonly DatasetColumn.Imported[];
+  } = {
   name: "Imported CSV",
   description: "",
+  columns: EDITED_COLUMNS,
   sourceType: "csv_file",
   onlineStorageAllowed: false,
   sizeInBytes: 20,
@@ -228,6 +259,47 @@ describe("useSaveDataset", () => {
       });
     });
     expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
+  });
+
+  it("persists the columns the user edited, not the ones inference produced", async () => {
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+    await act(async () => {
+      await result.current[0].async(CSV_PARAMS);
+    });
+
+    await waitFor(() => {
+      expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
+    });
+    expect(
+      insertCsvFileDatasetMock.mock.calls[0]?.[0]?.columns,
+    ).toEqual([
+      {
+        original_name: "name",
+        name: "name",
+        description: undefined,
+        original_data_type: "VARCHAR",
+        detected_data_type: "VARCHAR",
+        data_type: "varchar",
+        is_data_type_user_set: false,
+        column_idx: 0,
+      },
+      {
+        original_name: "value",
+        name: "Recorded On",
+        description: "When the reading was taken",
+        original_data_type: "VARCHAR",
+        detected_data_type: "VARCHAR",
+        data_type: "date",
+        is_data_type_user_set: true,
+        column_idx: 1,
+      },
+    ]);
   });
 
   it("marks a later import as non-first", async () => {

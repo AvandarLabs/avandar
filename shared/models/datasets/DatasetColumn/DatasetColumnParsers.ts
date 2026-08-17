@@ -33,6 +33,7 @@ const DBReadSchema = z.object({
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
   column_idx: z.number(),
+  is_data_type_user_set: z.boolean(),
 });
 
 export const DatasetColumnParsers =

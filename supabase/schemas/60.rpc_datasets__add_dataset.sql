@@ -13,7 +13,10 @@ create type public.dataset_column_input as (
   -- The queryable data type of the column
   data_type public.datasets__ava_data_type,
   -- The index of the column, so we can display columns in order in the UI
-  column_idx integer
+  column_idx integer,
+  -- Whether `data_type` was chosen by the user rather than derived from
+  -- `detected_data_type`. Null is treated as false.
+  is_data_type_user_set boolean
 );
 
 create type public.datasets__csv_file__date_format as (date_format text, timestamp_format text);
@@ -114,7 +117,8 @@ begin
       detected_data_type,
       data_type,
       description,
-      column_idx
+      column_idx,
+      is_data_type_user_set
     ) values (
       v_dataset.id,
       p_workspace_id,
@@ -124,7 +128,8 @@ begin
       v_column.detected_data_type,
       v_column.data_type,
       v_column.description,
-      v_column.column_idx
+      v_column.column_idx,
+      coalesce(v_column.is_data_type_user_set, false)
     );
   end loop;
   return v_dataset;

@@ -43,6 +43,19 @@ export type DatasetColumnRead = Model.Base<
      */
     dataType: AvaDataType.T;
 
+    /**
+     * Whether `dataType` was chosen by the user rather than derived from
+     * `detectedDataType`.
+     *
+     * Query time reads this to decide whether to project a `TRY_CAST` over the
+     * stored parquet, which keeps the column's original type. It cannot infer
+     * that by comparing `dataType` against `detectedDataType`: those two also
+     * diverge when a re-parse revises `detectedDataType` underneath a column
+     * the user never touched, and casting back to the stale type would then
+     * undo the correction.
+     */
+    isDataTypeUserSet: boolean;
+
     /** Unique identifier of the dataset the column belongs to. */
     datasetId: DatasetId;
 
@@ -77,8 +90,16 @@ export type DatasetColumnRead = Model.Base<
 >;
 
 /**
- * This is a subset of a DatasetColumn type with only the name, data type,
- * and column index. We use this time when a dataset is imported.
+ * A dataset column as it exists during import, before the dataset is saved and
+ * the column earns an `id`, a `datasetId`, and its timestamps.
+ *
+ * Every import path builds these, the user may edit the `name`, `dataType`, and
+ * `description` of each one while still on the import form, and
+ * `toDatasetColumnInputs` turns the final list into the rows the insert RPCs
+ * take. The fields describing what the source actually contained
+ * (`originalName`, `originalDataType`, `detectedDataType`) are never editable,
+ * so a rename or a re-type stays reversible and the stored parquet, which keeps
+ * the original names and types, stays addressable.
  */
 export type ImportedDatasetColumn = Pick<
   DatasetColumnRead,
@@ -87,8 +108,10 @@ export type ImportedDatasetColumn = Pick<
   | "originalDataType"
   | "detectedDataType"
   | "dataType"
+  | "isDataTypeUserSet"
   | "columnIdx"
->;
+> &
+  Partial<Pick<DatasetColumnRead, "description">>;
 
 /**
  * CRUD type definitions for the DatasetColumn model.
@@ -102,7 +125,11 @@ export type DatasetColumnModel = SupabaseCrudModelSpec<
       Read: DatasetColumnRead;
       Insert: SetOptional<
         DatasetColumnRead,
-        "createdAt" | "description" | "id" | "updatedAt"
+        | "createdAt"
+        | "description"
+        | "id"
+        | "isDataTypeUserSet"
+        | "updatedAt"
       >;
       Update: Partial<DatasetColumnRead>;
     };
