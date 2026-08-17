@@ -4,9 +4,9 @@ import type {
   DescribableObject,
   GenericRootData,
   PrimitiveValue,
-} from "./describableValues";
-import type { ObjectRenderOptions } from "./objectRenderOptions";
-import type { PrimitiveValueRenderOptions } from "./primitiveValueRenderOptions";
+} from "./describableValues.types";
+import type { ObjectRenderOptions } from "./objectRenderOptions.types";
+import type { PrimitiveValueRenderOptions } from "./primitiveValueRenderOptions.types";
 import type { StringKeyOf } from "@avandar/utils";
 import type { ReactNode } from "react";
 

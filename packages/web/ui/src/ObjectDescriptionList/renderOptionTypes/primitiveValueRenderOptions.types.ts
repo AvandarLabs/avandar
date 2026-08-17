@@ -1,7 +1,10 @@
 //! How one primitive value is rendered, and which keys say so.
 
 import { registry } from "@avandar/utils";
-import type { GenericRootData, RenderAsTypeOptions } from "./describableValues";
+import type {
+  GenericRootData,
+  RenderAsTypeOptions,
+} from "./describableValues.types";
 import type { FormattableTimezone } from "@avandar/utils";
 import type { ReactNode } from "react";
 

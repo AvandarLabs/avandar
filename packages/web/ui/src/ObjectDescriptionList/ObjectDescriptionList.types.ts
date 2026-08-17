@@ -5,11 +5,8 @@ export type {
   NestedArrayRenderOptions,
   ObjectArrayRenderOptions,
   ObjectRowRenderOptions,
-} from "./renderOptionTypes/arrayRenderOptions";
-export type {
-  GetChildObjects,
-  _GetChildObjectsHelper,
-} from "./renderOptionTypes/childObjects";
+} from "./renderOptionTypes/arrayRenderOptions.types";
+export type { GetChildObjects } from "./renderOptionTypes/childObjects.types";
 export type {
   DescribableObject,
   DescribableObjectOf,
@@ -17,12 +14,12 @@ export type {
   ObjectKeyTransformationType,
   PrimitiveValue,
   RenderAsTypeOptions,
-} from "./renderOptionTypes/describableValues";
+} from "./renderOptionTypes/describableValues.types";
 export type {
   ObjectKeyRenderOptionsMap,
   ObjectRenderOptions,
-} from "./renderOptionTypes/objectRenderOptions";
+} from "./renderOptionTypes/objectRenderOptions.types";
 export {
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   type PrimitiveValueRenderOptions,
-} from "./renderOptionTypes/primitiveValueRenderOptions";
+} from "./renderOptionTypes/primitiveValueRenderOptions.types";

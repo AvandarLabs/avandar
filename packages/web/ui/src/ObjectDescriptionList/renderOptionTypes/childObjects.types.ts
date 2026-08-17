@@ -1,8 +1,11 @@
 //! The set of child objects an `onSubmitChange` callback can receive.
 
-import type { DescribableObject, GenericRootData } from "./describableValues";
+import type {
+  DescribableObject,
+  GenericRootData,
+} from "./describableValues.types";
 
-export type _GetChildObjectsHelper<T extends GenericRootData> =
+type _GetChildObjectsHelper<T extends GenericRootData> =
   T extends DescribableObject ?
     | T
     | {

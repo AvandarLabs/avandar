@@ -1,14 +1,14 @@
 //! How an object, and each of its keys, is rendered.
 
-import type { DescribableValueArrayRenderOptions } from "./arrayRenderOptions";
+import type { DescribableValueArrayRenderOptions } from "./arrayRenderOptions.types";
 import type {
   DescribableObject,
   DescribableObjectOf,
   GenericRootData,
   ObjectKeyTransformationType,
   PrimitiveValue,
-} from "./describableValues";
-import type { PrimitiveValueRenderOptions } from "./primitiveValueRenderOptions";
+} from "./describableValues.types";
+import type { PrimitiveValueRenderOptions } from "./primitiveValueRenderOptions.types";
 import type { StringKeyOf } from "@avandar/utils";
 import type { ReactNode } from "react";
 
