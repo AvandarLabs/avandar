@@ -44,28 +44,9 @@ execute function public.util__set_updated_at ();
 -- Index to improve lookups by user
 create index idx_user_nux_progress__user_id on public.user_nux_progress (user_id);
 
--- Table privileges, stated explicitly rather than inherited from Supabase's
--- default privileges, which did not apply to this table when it was created.
--- RLS below decides which ROWS a caller may touch; these decide whether the
--- caller may touch the table at all, and PostgREST refuses the request without
--- them. Peer tables (`user_profiles`, `dashboards`, `dexie_dbs`) all carry the
--- equivalent.
---
--- No `delete`, matching the absence of a delete policy: restarting the
--- tutorial updates the row in place. Nothing for `anon`, because an
--- unauthenticated visitor has no onboarding progress.
-grant
-select
-,
-  insert,
-update on table public.user_nux_progress to authenticated;
-
--- `service_role` gets the full set, matching every peer table (`user_profiles`,
--- `dashboards`, `dexie_dbs`). It is the trusted backend key and bypasses RLS
--- anyway, so withholding DML here would only make this one table an
--- inconsistent special case that back-office and test tooling has to work
--- around.
-grant all on table public.user_nux_progress to service_role;
+-- Table privileges live in `40.grants.data_api.sql` with every other table's,
+-- so the whole Data API exposure surface can be read in one place. This table
+-- gets `select, insert, update` for `authenticated` and nothing for `anon`.
 
 -- Policies. A user may only ever read or write their own progress. There is
 -- deliberately no DELETE policy: restarting the tutorial updates the row in
