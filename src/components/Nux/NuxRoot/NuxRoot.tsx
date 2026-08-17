@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
 import { useNuxCompletionEvents } from "@/components/Nux/NuxRoot/useNuxCompletionEvents";
 import { useNuxHydration } from "@/components/Nux/NuxRoot/useNuxHydration";
@@ -21,6 +22,44 @@ function NuxRootContents(): ReactNode {
   useNuxHydration();
   useNuxPersistence();
   useNuxCompletionEvents();
+
+  const loggedTerminalStatusRef = useRef<string | undefined>(undefined);
+  useEffect(
+    function logTerminalNuxStatus() {
+      if (!state.isHydrated || !state.status) {
+        return;
+      }
+      if (state.status !== "completed" && state.status !== "dismissed") {
+        return;
+      }
+      if (loggedTerminalStatusRef.current === state.status) {
+        return;
+      }
+      loggedTerminalStatusRef.current = state.status;
+      if (state.status === "completed") {
+        void AnalyticsClient.logEvent({
+          event: "nux.completed",
+          workspaceId: workspace.id,
+        });
+        return;
+      }
+      void AnalyticsClient.logEvent({
+        event: "nux.dismissed",
+        workspaceId: workspace.id,
+        payload: {
+          milestoneKey: state.activeMilestoneKey ?? null,
+          completedCount: state.completedMilestones.length,
+        },
+      });
+    },
+    [
+      state.isHydrated,
+      state.status,
+      state.activeMilestoneKey,
+      state.completedMilestones.length,
+      workspace.id,
+    ],
+  );
 
   const isInviteOpen = state.isHydrated && state.status === "not_started";
 
