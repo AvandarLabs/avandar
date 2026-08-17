@@ -35,6 +35,14 @@ create table public.tokens__google (
 -- Enable row level security
 alter table public.tokens__google enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.tokens__google to authenticated;
+
 -- Policies
 create policy "
   User can SELECT their own google tokens

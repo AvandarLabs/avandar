@@ -1,7 +1,6 @@
 import { makeObject, prop, setValue } from "@avandar/utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
@@ -9,11 +8,16 @@ import {
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import {
+  applyQueryChange,
+  isSameColumnSchema,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
@@ -34,44 +38,6 @@ import type {
 // pulling in the full state manager.
 const initialDataExplorerState: DataExplorerAppState =
   INITIAL_DATA_EXPLORER_STATE;
-
-/**
- * Try to compute a fresh SQL string from the structured query. Used by
- * manual-form actions to keep `rawSql` in sync. Returns undefined when the
- * query has no data source.
- */
-function _regenerateRawSqlFromQuery(
-  query: PartialStructuredQuery,
-): string | undefined {
-  if (query.dataSource === undefined) {
-    return undefined;
-  }
-  try {
-    const sql = structuredQueryToSql(query);
-    return sql || undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * Apply a structured-query change and also refresh `rawSql` to match,
- * marking SQL ↔ form sync as `true`. Used by manual-form actions that
- * the user makes after opening the panel.
- */
-function _applyQueryChange(
-  state: DataExplorerAppState,
-  newQuery: PartialStructuredQuery,
-): DataExplorerAppState {
-  const newSql = _regenerateRawSqlFromQuery(newQuery);
-  return {
-    ...state,
-    query: newQuery,
-    rawSql: newSql,
-    isStructuredQueryInSync: true,
-    sqlSyncWarnings: [],
-  };
-}
 
 /**
  * This store is used to manage the state of the Data Explorer app.
@@ -97,7 +63,7 @@ export const DataExplorerStateManager = createAppStateManager({
         dataSource,
         ...(options?.limit !== undefined ? { limit: options.limit } : {}),
       } as PartialStructuredQuery);
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the columns for the query. */
@@ -124,7 +90,7 @@ export const DataExplorerStateManager = createAppStateManager({
         state.vizConfig,
         newQuery,
       );
-      const next = _applyQueryChange(state, newQuery);
+      const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
 
@@ -155,7 +121,7 @@ export const DataExplorerStateManager = createAppStateManager({
         aggregations: newAggregations,
       } as PartialStructuredQuery;
       const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
-      const next = _applyQueryChange(state, newQuery);
+      const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
     },
 
@@ -168,7 +134,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         orderByColumn: columnId,
       } as PartialStructuredQuery;
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the direction that we are ordering by. */
@@ -180,7 +146,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         orderByDirection: direction,
       } as PartialStructuredQuery;
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /** Set the LIMIT clause for the query. */
@@ -189,7 +155,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         limit,
       } as PartialStructuredQuery;
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -201,7 +167,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         filters,
       } as PartialStructuredQuery;
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -231,7 +197,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         filters: EMPTY_QUERY_FILTER,
       } as PartialStructuredQuery;
-      return _applyQueryChange(state, newQuery);
+      return applyQueryChange({ state, newQuery });
     },
 
     /**
@@ -269,10 +235,10 @@ export const DataExplorerStateManager = createAppStateManager({
         columns,
       });
 
-      const columnsChanged = !_sameColumnSchema(
-        state.lastResultColumns,
-        columns,
-      );
+      const columnsChanged = !isSameColumnSchema({
+        previousColumns: state.lastResultColumns,
+        currentColumns: columns,
+      });
       const vizConfigChanged = !isVizConfigEqualForQueryResultSync(
         next,
         state.vizConfig,
@@ -370,30 +336,27 @@ export const DataExplorerStateManager = createAppStateManager({
       return { ...state, lastQueryError };
     },
 
+    /**
+     * Record what caused the next query run.
+     *
+     * The trigger is not part of the query key, so what matters is only that
+     * it holds its final value by the end of the synchronous block that
+     * changes the query: React coalesces those dispatches into one render, so
+     * no intermediate value is ever observed. Origins that only touch
+     * `rawSql` stamp immediately before their change. URL hydration stamps
+     * last instead, after the manual-form actions it dispatches, because
+     * those would otherwise overwrite it.
+     */
+    setQueryTrigger: (
+      state: DataExplorerAppState,
+      queryTrigger: UserQueryAnalyticsTrigger,
+    ): DataExplorerAppState => {
+      return { ...state, queryTrigger };
+    },
+
     /** Reset the Data Explorer to its initial (blank) state. */
     resetState: (): DataExplorerAppState => {
       return initialDataExplorerState;
     },
   },
 });
-
-/**
- * Returns true when two column lists describe the same result schema —
- * same length, names, and data types, in order. Used by
- * `syncVizFromQueryResult` to avoid re-emitting state on identical refetches.
- */
-function _sameColumnSchema(
-  prev: readonly QueryResultColumn[] | undefined,
-  next: readonly QueryResultColumn[],
-): boolean {
-  if (prev === undefined) {
-    return next.length === 0;
-  }
-  if (prev.length !== next.length) {
-    return false;
-  }
-  return next.every((b, idx) => {
-    const a = prev[idx]!;
-    return a.name === b.name && a.dataType === b.dataType;
-  });
-}

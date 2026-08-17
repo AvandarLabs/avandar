@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { notifyError } from "@/utils/notifications/notify";
 import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
+import { runTimedExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/runTimedExport/runTimedExport";
 import type { RefObject } from "react";
 
 type UseAnnotatedPdfExportOptions = {
@@ -10,6 +11,8 @@ type UseAnnotatedPdfExportOptions = {
   filename: string;
   title: string;
   onClose: () => void;
+  /** Called with the wall-clock duration after a successful export only. */
+  onExported: (durationMs: number) => void;
 };
 
 type AnnotatedPdfExport = {
@@ -22,19 +25,26 @@ export function useAnnotatedPdfExport(
   options: Readonly<UseAnnotatedPdfExportOptions>,
 ): AnnotatedPdfExport {
   const { t } = useLingui();
-  const { filename, onClose, overlayRef, sourceElement, title } = options;
+  const { filename, onClose, onExported, overlayRef, sourceElement, title } =
+    options;
   const [isExporting, setIsExporting] = useState(false);
   const exportPdf = useCallback(async (): Promise<void> => {
-    if (!sourceElement || !overlayRef.current) {
+    const overlayCanvas = overlayRef.current;
+    if (!sourceElement || !overlayCanvas) {
       return;
     }
     setIsExporting(true);
     try {
-      await PdfExport.captureAndDownloadPdf({
-        element: sourceElement,
-        annotationCanvas: overlayRef.current,
-        filename,
-        title,
+      await runTimedExport({
+        runExport: async () => {
+          await PdfExport.captureAndDownloadPdf({
+            element: sourceElement,
+            annotationCanvas: overlayCanvas,
+            filename,
+            title,
+          });
+        },
+        onExported,
       });
       onClose();
     } catch (error: unknown) {
@@ -46,6 +56,6 @@ export function useAnnotatedPdfExport(
     } finally {
       setIsExporting(false);
     }
-  }, [filename, onClose, overlayRef, sourceElement, t, title]);
+  }, [filename, onClose, onExported, overlayRef, sourceElement, t, title]);
   return { isExporting, exportPdf };
 }

@@ -23,6 +23,14 @@ create table public.concept_attributes (
 -- Enable row level security
 alter table public.concept_attributes enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.concept_attributes to authenticated;
+
 -- Policies
 create policy "
   User can SELECT concept_attributes
