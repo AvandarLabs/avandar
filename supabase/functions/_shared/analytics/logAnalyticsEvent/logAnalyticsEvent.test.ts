@@ -110,6 +110,11 @@ describe("logAnalyticsEvent", () => {
       logAnalyticsEvent({
         supabaseAdminClient: fakeClient.client,
         event: "chat.turn_failed",
+        payload: {
+          modelId: "openai/gpt-4o-mini",
+          errorClass: "upstream_error",
+          latencyMs: 12,
+        },
       }),
     ).resolves.toBeUndefined();
 
@@ -129,6 +134,11 @@ describe("logAnalyticsEvent", () => {
       logAnalyticsEvent({
         supabaseAdminClient: fakeClient.client,
         event: "chat.turn_failed",
+        payload: {
+          modelId: "openai/gpt-4o-mini",
+          errorClass: "upstream_error",
+          latencyMs: 12,
+        },
       }),
     ).resolves.toBeUndefined();
 

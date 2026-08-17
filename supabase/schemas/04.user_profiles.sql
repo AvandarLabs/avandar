@@ -24,6 +24,14 @@ create table public.user_profiles (
 -- Enable row level security
 alter table public.user_profiles enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.user_profiles to authenticated;
+
 /**
  * Prevent changes to user_id, workspace_id, and membership_id
  * This function must be used in a trigger.

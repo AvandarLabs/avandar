@@ -34,9 +34,9 @@ vi.mock("@puckeditor/core", () => {
   };
 });
 
-vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
+const { useDataQueryMock } = vi.hoisted(() => {
   return {
-    useDataQuery: () => {
+    useDataQueryMock: vi.fn(() => {
       return [
         {
           id: "result-1",
@@ -52,8 +52,12 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
         },
         false,
       ];
-    },
+    }),
   };
+});
+
+vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
+  return { useDataQuery: useDataQueryMock };
 });
 
 function renderField(props: { value: VizConfig.T }): {
@@ -80,6 +84,13 @@ function renderField(props: { value: VizConfig.T }): {
 }
 
 describe("VizConfigPField", () => {
+  it("runs its preview query under the viz_config analytics surface", () => {
+    renderField({ value: { vizType: "table" } });
+    expect(useDataQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ analyticsSurface: "viz_config" }),
+    );
+  });
+
   it("shows a hint and no axis controls for the table viz type", () => {
     renderField({ value: { vizType: "table" } });
     expect(screen.getByText(/no extra settings/i)).toBeInTheDocument();

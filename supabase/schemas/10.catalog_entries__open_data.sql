@@ -53,6 +53,13 @@ create table public.catalog_entries__open_data (
 -- Enable row level security
 alter table public.catalog_entries__open_data enable row level security;
 
+-- Data API privileges.
+--
+-- Read-only: the open data catalog is populated by the backend.
+grant
+select
+  on table public.catalog_entries__open_data to authenticated;
+
 -- Policies
 create policy "User can select open data catalog entries" on public.catalog_entries__open_data for
 select

@@ -27,10 +27,23 @@ create table if not exists catalog_entries__dataset_column (
 -- RLS Policies
 alter table catalog_entries__dataset_column enable row level security;
 
--- Allow everyone to select (read) associations
+-- Data API privileges.
+--
+-- Read-only: the column catalog is populated by the backend.
+grant
+select
+  on table public.catalog_entries__dataset_column to authenticated;
+
+-- Any signed-in user may read the catalog's column associations.
+--
+-- Scoped `to authenticated` rather than left unscoped. An unscoped policy
+-- defaults to role `public`, which includes `anon`, so this table was readable
+-- by an unauthenticated visitor. Nothing anonymous browses the open data
+-- catalog, and the sibling table `catalog_entries__open_data` is already
+-- authenticated-only, so the two now agree.
 create policy "User can select catalog dataset columns" on catalog_entries__dataset_column for
 select
-  using (true);
+  to authenticated using (true);
 
 /**
  * Trigger the `updated_at` update.

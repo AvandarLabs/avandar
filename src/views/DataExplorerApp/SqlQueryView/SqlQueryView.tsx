@@ -50,6 +50,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
 
   const onSubmitSql = (rawValue: string): void => {
     const trimmedValue = rawValue.trim();
+    dispatch.setQueryTrigger("sql_submit");
     dispatch.setRawSql(trimmedValue);
     const mapping = parseSql(trimmedValue);
     dispatch.applySqlMapping({

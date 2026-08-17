@@ -21,6 +21,14 @@ create table public.workspace_memberships (
 -- Enable row level security
 alter table public.workspace_memberships enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.workspace_memberships to authenticated;
+
 /**
  * Trigger the `updated_at` update.
  */
