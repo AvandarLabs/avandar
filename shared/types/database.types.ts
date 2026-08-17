@@ -730,6 +730,78 @@ export type Database = {
           },
         ]
       }
+      datasets__pdf_file: {
+        Row: {
+          created_at: string
+          dataset_id: string
+          detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
+          fill_merged_cells: boolean
+          fingerprint: Json
+          grid_x: Json | null
+          grid_y: Json | null
+          has_original_file: boolean
+          header_rows: number
+          id: string
+          is_in_cloud_storage: boolean
+          page_range: unknown
+          regions: Json
+          size_in_bytes: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id: string
+          detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
+          fill_merged_cells?: boolean
+          fingerprint: Json
+          grid_x?: Json | null
+          grid_y?: Json | null
+          has_original_file?: boolean
+          header_rows?: number
+          id?: string
+          is_in_cloud_storage?: boolean
+          page_range?: unknown
+          regions: Json
+          size_in_bytes: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string
+          detection_mode?: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
+          fill_merged_cells?: boolean
+          fingerprint?: Json
+          grid_x?: Json | null
+          grid_y?: Json | null
+          has_original_file?: boolean
+          header_rows?: number
+          id?: string
+          is_in_cloud_storage?: boolean
+          page_range?: unknown
+          regions?: Json
+          size_in_bytes?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__pdf_file_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__pdf_file_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets__virtual: {
         Row: {
           created_at: string
