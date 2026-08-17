@@ -132,6 +132,10 @@ msgstr "數據集加載失敗。請稍後再試或聯繫支持。"
 msgid "Choose chat model"
 msgstr "選擇聊天模型"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Skip this step"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
 "old link will no longer be able to reach this dashboard."
@@ -507,6 +511,10 @@ msgstr "Llama 3.1 8B（離線）"
 msgid "No datasets added yet"
 msgstr "尚未添加任何資料集"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Only you can see this"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "修正查詢中…"
@@ -514,6 +522,10 @@ msgstr "修正查詢中…"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Only workspace admins can publish to the web."
 msgstr "只有工作區管理員可以發布到網路。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Let your colleagues open what you just built."
+msgstr ""
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -525,6 +537,10 @@ msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添�
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Add columns to the query above to start defining filters."
 msgstr "在上面的查詢中添加欄位以開始定義過濾器。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Open it to your workspace"
+msgstr ""
 
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator.tsx
 msgid "Only allow one value"
@@ -571,6 +587,10 @@ msgstr "收合於"
 msgid "Bubble Chart"
 msgstr "泡泡圖"
 
+#: src/views/ProfileView/TutorialSection.tsx
+msgid "Restart tutorial"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
 msgstr "此儀表板為<0>公開</0>。任何取得連結的人都能查看。"
@@ -607,6 +627,10 @@ msgstr "該工作表有一個標題列"
 #: src/views/GisApp/MapCanvas/MapCanvas.tsx
 msgid "Map"
 msgstr "地圖"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Change the chart if you like"
+msgstr ""
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -806,6 +830,10 @@ msgstr "發現查詢失敗。"
 msgid "Container max width"
 msgstr "容器最大寬度"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Build your first dashboard"
+msgstr ""
+
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "關閉側邊欄"
@@ -822,6 +850,10 @@ msgstr "未知用戶"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {displayName}"
 msgstr "移除 {displayName} 的訪問權限"
+
+#: src/views/DataExplorerApp/DataExplorerApp.tsx
+msgid "Run a query first."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
@@ -941,6 +973,11 @@ msgstr "自然"
 msgid "Public"
 msgstr "公開"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
+"safe default, and you can change anyone's role later."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
 msgstr "刪除角色群組"
@@ -953,6 +990,10 @@ msgstr "隱藏標題"
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "{0} 筆資料已截斷"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Share it with your workspace"
+msgstr ""
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1467,6 +1508,11 @@ msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"
 msgid "Save URL"
 msgstr "儲存網址"
 
+#: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
+msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
+"unshare another dashboard, and come back to this."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "檢測到偏見："
@@ -1687,6 +1733,10 @@ msgstr "正在撰寫查詢…"
 msgid "No entity selected"
 msgstr "未選擇任何實體"
 
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Welcome to Avandar"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
 msgstr "通過反饋告訴我們您想要的開放資料集"
@@ -1872,6 +1922,11 @@ msgstr "，和"
 msgid "Password updated successfully"
 msgstr "密碼更新成功"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
+"it, and Avandar will take you there."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
 msgstr "最窄"
@@ -1996,6 +2051,7 @@ msgstr "下載離線聊天模型 (WebLLM)"
 msgid "Create new profile type"
 msgstr "創建新的配置文件類型"
 
+#: src/components/Nux/NuxTour/NuxTooltip.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
@@ -2127,6 +2183,10 @@ msgstr "系統將要求您確認當前密碼。"
 msgid "Publish"
 msgstr "發布"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Dismiss the tutorial"
+msgstr ""
+
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Using {0}"
@@ -2226,6 +2286,10 @@ msgstr "識別"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Data source"
 msgstr "數據來源"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Bring a spreadsheet into Avandar."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
@@ -2599,6 +2663,10 @@ msgstr "在資料探索器和儀表板中啟用聊天"
 msgid "Forgot your password?"
 msgstr "忘記密碼了嗎？"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Get an answer out of the data you just added."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "條"
@@ -2715,6 +2783,10 @@ msgid "This member owns {privateTotal} private resources. They cannot be "
 "workspace admins, so reassign ownership from the Privacy log."
 msgstr "此成員擁有 {privateTotal} "
 "個私人資源。在其他人取得這些資源的擁有權之前，無法移除該成員。工作區管理員永遠無法查看私人內容，因此請從隱私記錄重新指派擁有權。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "It profiled your data for you"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only you can access this {resource}. Everyone else loses access, "
@@ -2856,6 +2928,10 @@ msgstr "打開 {0}"
 msgid "Dataset is now offline-only"
 msgstr "資料集現在僅限離線使用"
 
+#: src/components/Nux/NuxTour/NuxTooltip.tsx
+msgid "Next"
+msgstr ""
+
 #: src/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "來自數據集的欄位"
@@ -2894,9 +2970,18 @@ msgstr "符號大小欄位必須為數字。"
 msgid "Avandar (default)"
 msgstr "Avandar（預設）"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Add your first dataset"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
 msgstr "寬"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Open Data Summary to see what Avandar worked out on its own: ranges, "
+"distributions, and what's missing. You didn't have to ask."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
@@ -2936,6 +3021,7 @@ msgstr "決策"
 msgid "Update failed"
 msgstr "更新失敗"
 
+#: src/components/Nux/NuxTour/NuxTooltip.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Back"
@@ -3029,8 +3115,8 @@ msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Run an AI query first."
-msgstr "請先運行 AI 查詢。"
+#~ msgid "Run an AI query first."
+#~ msgstr "請先運行 AI 查詢。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -3048,6 +3134,10 @@ msgstr "計算 {datasetName} 中有多少行"
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
+
+#: src/views/ProfileView/TutorialSection.tsx
+msgid "Walk through building and sharing a dashboard again, from the top."
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -3178,6 +3268,10 @@ msgstr "發送"
 msgid "Generated SQL assumptions"
 msgstr "生成的 SQL 假設"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Name it and save"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
 msgstr "導入失敗：{reason}"
@@ -3202,6 +3296,10 @@ msgstr "區域圖配置"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "表單不支援 CTE（WITH 子句）。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Start with a spreadsheet"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3235,6 +3333,11 @@ msgstr "打開儀表板"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H1"
 msgstr "H1"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "This is the Data Explorer, and this is Ava. Ask a question in plain "
+"English, like \"total revenue by region\"."
+msgstr ""
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
@@ -3740,6 +3843,11 @@ msgstr "這是您的數據集的前 {0} 行。"
 msgid "Reassign failed"
 msgstr "重新指派失敗"
 
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
+"your first dashboard."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
@@ -3803,6 +3911,10 @@ msgstr "回答時間"
 msgid "Could not remove offline chat model"
 msgstr "無法移除離線聊天模型"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Get started {completedCount}/{total}"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Legend"
 msgstr "圖例"
@@ -3830,6 +3942,11 @@ msgstr "資料集已成功保存！"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "未找到已保存的資料集。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Avandar already read your file and guessed what each column contains. "
+"Give the dataset a name, then save."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -4336,6 +4453,10 @@ msgstr "數據探索器"
 msgid "Sign in again"
 msgstr "再次登入"
 
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Not now"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
@@ -4391,6 +4512,10 @@ msgstr "日期"
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此儀表板未引用任何數據集：無法發布。"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
 "above controls editing only."
@@ -4399,6 +4524,14 @@ msgstr " 已發布至網路：任何取得連結的人都能檢視，上方清�
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "A confirmation email has been sent to your email address."
 msgstr "確認電子郵件已發送至您的電子郵件地址。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Just ask"
+msgstr ""
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Pick what they can do"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -4518,6 +4651,10 @@ msgstr "資料集已刪除"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
 msgstr "發現澄清"
+
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Start tour"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -5010,6 +5147,11 @@ msgstr "建議重寫："
 msgid "Upload a spreadsheet"
 msgstr "上傳電子表格"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "You're in Data Manager, Import. Pick a CSV or Excel file from your "
+"computer."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -5046,6 +5188,10 @@ msgstr "沒有更多內容可加載"
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 msgid "Could not make private"
 msgstr "無法設為私人"
+
+#: src/views/ProfileView/TutorialSection.tsx
+msgid "Tutorial"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
@@ -5350,6 +5496,10 @@ msgstr "未成功讀取任何行"
 msgid "New user group"
 msgstr "新使用者群組"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Keep that chart somewhere you can come back to."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
@@ -5493,6 +5643,11 @@ msgstr "沒有可用的欄位"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Resize drawer"
 msgstr "調整抽屜大小"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "The Visualizations tab has the chart settings, if this isn't the shape "
+"you wanted."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -5785,6 +5940,10 @@ msgstr "移除本地篩選器"
 msgid "This removes the user group from members and resources that use it."
 msgstr "這將從使用該用戶群組的成員和資源中移除該用戶群組。"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr "頂端"
@@ -5821,6 +5980,10 @@ msgstr "尚未添加任何欄位。"
 #: src/views/DashboardApp/DashboardShareModal/PublishingSection.tsx
 msgid "Advanced options"
 msgstr "進階選項"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Save it to a dashboard"
+msgstr ""
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -5923,6 +6086,10 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座位。"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "There's your answer"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
 "{resource}, in addition to whatever's listed below."
@@ -6008,6 +6175,10 @@ msgstr "Google 表單載入失敗"
 msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
 
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Ask your first question"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
 msgstr "變更網址"
@@ -6047,6 +6218,12 @@ msgstr "不同的值"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
+
+#: src/components/Nux/tutorials/firstDashboard.ts
+msgid "Workspace means everyone in your workspace, not the public. Nothing here "
+"creates a public link. And you can set it back to Private whenever you "
+"like."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -6171,6 +6348,10 @@ msgstr "角色與用戶群組"
 msgid "Clear all"
 msgstr "清除所有"
 
+#: src/components/Nux/NuxTour/NuxTooltip.tsx
+msgid "Close"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
@@ -6213,6 +6394,10 @@ msgstr "此儀表板已公開發佈。"
 msgid "Loading..."
 msgstr "載入中..."
 
+#: src/components/Nux/NuxTour/NuxTooltip.tsx
+msgid "No spreadsheet handy? <0>Download our sample</0> and use that."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -6230,6 +6415,10 @@ msgstr "面積圖"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "無效的日期"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx
+msgid "Get started"
+msgstr ""
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
