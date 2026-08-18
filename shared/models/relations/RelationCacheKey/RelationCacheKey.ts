@@ -103,8 +103,10 @@ export async function makeIdentityTokensFromIdentity(
   identity: RelationCacheIdentity,
 ): Promise<RelationCacheIdentityTokens> {
   const tableName = RelationRef.toTableName(identity.relation);
-  const versionToken = await _getVersionToken(identity.sourceVersion);
-  const definitionToken = await _getDefinitionToken(identity.definition);
+  const [versionToken, definitionToken] = await Promise.all([
+    _getVersionToken(identity.sourceVersion),
+    _getDefinitionToken(identity.definition),
+  ]);
   const identityKey = [
     identity.principal,
     tableName,

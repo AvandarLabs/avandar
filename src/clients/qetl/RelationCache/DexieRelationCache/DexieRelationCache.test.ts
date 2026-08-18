@@ -272,6 +272,35 @@ describe("DexieRelationCache.write", () => {
   });
 });
 
+describe("DexieRelationCache.evict", () => {
+  it("forgets every entry for the given relations and principal, leaving other principals untouched", async () => {
+    await DexieRelationCache.write(
+      _makeWrite({ identity: { relation: { kind: "dataset", id: DATASET_A } } }),
+    );
+    await DexieRelationCache.write(
+      _makeWrite({
+        identity: {
+          relation: { kind: "dataset", id: DATASET_A },
+          principal: OTHER_WORKSPACE_PRINCIPAL,
+        },
+      }),
+    );
+
+    await DexieRelationCache.evict(
+      [{ kind: "dataset", id: DATASET_A }],
+      WORKSPACE_PRINCIPAL,
+    );
+
+    const survivors = await db.RelationCacheEntry.toArray();
+    expect(survivors).toHaveLength(1);
+    expect(survivors[0]!.principalKey).toBe(OTHER_WORKSPACE_PRINCIPAL);
+
+    const payloads = await db.RelationCachePayload.toArray();
+    expect(payloads).toHaveLength(1);
+    expect(payloads[0]!.identityKey).toBe(survivors[0]!.identityKey);
+  });
+});
+
 describe("DexieRelationCache.touch", () => {
   it("updates lastQueriedAt without rewriting the payload table", async () => {
     await DexieRelationCache.write(_makeWrite());
