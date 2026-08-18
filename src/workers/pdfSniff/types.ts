@@ -74,6 +74,14 @@ export type CandidateTable = {
   cells: ReadonlyArray<readonly string[]>;
 };
 
+/** Page geometry narrowed to one region. What every extractor consumes. */
+export type RegionGeometry = {
+  pageIndex: number;
+  bbox: BBox;
+  textItems: readonly TextItem[];
+  rules: readonly RuleSegment[];
+};
+
 /** A run of text items sharing a baseline, in left-to-right order. */
 export type TextLine = {
   /** Baseline y, in PDF points from the page's bottom. */
