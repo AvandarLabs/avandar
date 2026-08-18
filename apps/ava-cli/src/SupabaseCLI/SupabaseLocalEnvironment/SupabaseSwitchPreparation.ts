@@ -1,4 +1,5 @@
 import path from "node:path";
+import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
@@ -119,12 +120,14 @@ async function _selectSwitchPorts(
     io: SupabaseLocalEnvironmentIO;
     source: SwitchSource;
     requestedBasePort?: number;
+    occupiedHostPorts: readonly number[];
   }>,
 ): Promise<{ basePort: number; derivedPorts: Record<string, number> }> {
   const basePort = await SupabasePorts.getAvailableBasePortFromPorts({
     currentApiPort: options.source.config.apiPort,
     currentPorts: options.source.config.ports,
     requestedBasePort: options.requestedBasePort,
+    occupiedHostPorts: options.occupiedHostPorts,
     isPortAvailable: options.io.isPortAvailable,
   });
   const derivedPorts = SupabasePorts.makeDerivedPortsFromBasePort({
@@ -133,6 +136,36 @@ async function _selectSwitchPorts(
     basePort,
   });
   return { basePort, derivedPorts };
+}
+
+/** Moves the dev server off the port every other worktree serves on. */
+async function _selectDevServerPort(
+  options: Readonly<{
+    io: SupabaseLocalEnvironmentIO;
+    envFiles: readonly string[];
+    currentApiPort: number;
+    basePort: number;
+    derivedPorts: Record<string, number>;
+    occupiedHostPorts: readonly number[];
+  }>,
+): Promise<number> {
+  const {
+    io,
+    envFiles,
+    currentApiPort,
+    basePort,
+    derivedPorts,
+    occupiedHostPorts,
+  } = options;
+  const envContentsList = await promiseMap(envFiles, (envFile) => {
+    return io.readTextFile(envFile);
+  });
+  return await DevServerPort.getAvailable({
+    currentDevServerPort: DevServerPort.fromEnvFiles(envContentsList),
+    portDelta: basePort - currentApiPort,
+    reservedPorts: [...Object.values(derivedPorts), ...occupiedHostPorts],
+    isPortAvailable: io.isPortAvailable,
+  });
 }
 
 function _requireSafeProjectId(temporaryProjectId: string): void {
@@ -153,23 +186,33 @@ async function _prepareSwitch(
   const { io, temporaryProjectId, requestedBasePort } = options;
   _requireSafeProjectId(temporaryProjectId);
   const identity = await _readSwitchIdentity(io);
-  const source = await _readSwitchSource({
-    io,
-    temporaryProjectId,
-    worktreePath: identity.worktreePath,
-  });
-  const [{ basePort, derivedPorts }, envFiles] = await Promise.all([
-    _selectSwitchPorts({
+  const [source, occupiedHostPorts, envFiles] = await Promise.all([
+    _readSwitchSource({
       io,
-      source,
-      requestedBasePort,
+      temporaryProjectId,
+      worktreePath: identity.worktreePath,
     }),
+    io.listPublishedHostPorts(),
     io.findDevelopmentEnvFiles(),
   ]);
+  const { basePort, derivedPorts } = await _selectSwitchPorts({
+    io,
+    source,
+    requestedBasePort,
+    occupiedHostPorts,
+  });
   await _requireSwitchSourceFiles({
     io,
     sourcePaths: envFiles,
     worktreePath: identity.worktreePath,
+  });
+  const devServerPort = await _selectDevServerPort({
+    io,
+    envFiles,
+    currentApiPort: source.config.apiPort,
+    basePort,
+    derivedPorts,
+    occupiedHostPorts,
   });
   await SupabaseBackupHierarchy.prepareBackupHierarchy({ io, ...identity });
   const manifest = await SupabaseBackupStore.createBackup({
@@ -184,6 +227,7 @@ async function _prepareSwitch(
     backupDirectory: identity.backupDirectory,
     configContents: source.configContents,
     configPath: source.configPath,
+    devServerPort,
     envFiles,
     manifest,
   };

@@ -1,3 +1,4 @@
+import { EnvFileLine } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
 import type {
   SupabaseConfigState,
   SupabaseLocalStatus,
@@ -8,15 +9,33 @@ const SECTION_PATTERN = /^\s*\[([^\]]+)\]\s*(?:#.*)?$/;
 const PORT_PATTERN =
   /^(\s*)(port|[A-Za-z0-9_-]+_port)(\s*=\s*)(\d+)(\s*(?:#.*)?)$/;
 
+/**
+ * Where each development variable gets its value.
+ *
+ * `VITE_SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` keep their historic
+ * names but hold the publishable and secret keys, which is what
+ * `scripts/ci/prepare-envs` writes and what the local stack now issues. Writing
+ * the legacy JWTs into them would leave a switched worktree on a different key
+ * format from every other environment.
+ */
 const ENV_VALUE_FROM_KEY = {
   VITE_SUPABASE_API_URL: "apiUrl",
-  VITE_SUPABASE_ANON_KEY: "anonKey",
+  VITE_SUPABASE_ANON_KEY: "publishableKey",
   SUPABASE_POSTGRES_URL: "databaseUrl",
-  SUPABASE_SERVICE_ROLE_KEY: "serviceRoleKey",
+  SUPABASE_SERVICE_ROLE_KEY: "secretKey",
   SUPABASE_URL: "apiUrl",
   SB_SECRET_KEY: "secretKey",
   SB_PUBLISHABLE_KEY: "publishableKey",
 } as const satisfies Record<string, keyof SupabaseLocalStatus>;
+
+/**
+ * Variables holding a full URL served by the local Supabase API.
+ *
+ * Only the origin moves with a switch: the path identifies the endpoint, so it
+ * survives untouched. A value pointing at a remote host is left alone, since a
+ * hosted callback URL has nothing to do with the local stack.
+ */
+const ENV_KEYS_REBASED_ON_API_URL = new Set(["GOOGLE_REDIRECT_URI"]);
 
 function _readRequiredString(
   options: Readonly<{ value: unknown; sourceKey: string }>,
@@ -151,6 +170,26 @@ function _makeLocalStatusFromJson(statusJson: string): SupabaseLocalStatus {
   };
 }
 
+/** Moves a loopback URL onto the local Supabase API origin, path intact. */
+function _makeValueRebasedOnApiUrl(
+  options: Readonly<{ value: string; apiUrl: string }>,
+): string | undefined {
+  const { value, apiUrl } = options;
+  const url = EnvFileLine.getLoopbackUrl(value);
+  const apiOrigin = EnvFileLine.getLoopbackUrl(apiUrl);
+  if (
+    url === undefined ||
+    apiOrigin === undefined ||
+    url.port === apiOrigin.port
+  ) {
+    return undefined;
+  }
+  const quote = EnvFileLine.getQuote(value);
+  url.protocol = apiOrigin.protocol;
+  url.host = apiOrigin.host;
+  return `${quote}${url.toString()}${quote}`;
+}
+
 /** Rewrites known development variables from local Supabase status. */
 function _makeDevelopmentEnvFromStatus(
   options: Readonly<{
@@ -169,6 +208,13 @@ function _makeDevelopmentEnvFromStatus(
       const key = line.slice(0, separatorIndex);
       if (key === "SB_JWT_ISSUER") {
         return `${key}=${status.apiUrl}/auth/v1`;
+      }
+      if (ENV_KEYS_REBASED_ON_API_URL.has(key)) {
+        const rebasedValue = _makeValueRebasedOnApiUrl({
+          value: line.slice(separatorIndex + 1).trim(),
+          apiUrl: status.apiUrl,
+        });
+        return rebasedValue === undefined ? line : `${key}=${rebasedValue}`;
       }
       const statusKey = _getStatusKeyFromEnvKey(key);
       return statusKey ? `${key}=${status[statusKey]}` : line;

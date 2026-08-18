@@ -115,10 +115,12 @@ Implement functionality using red/green TDD.
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
 - Always run `pnpm db:reset` immediately before `pnpm db:new-migration`, so the
   diff is taken against a database built only from this branch's migrations.
-  All worktrees share one local Supabase instance unless it has been switched,
-  so the running database may carry objects created by a branch you are not on.
-  `supabase db diff` compares the live database against `supabase/schemas/`, so
-  any such object looks like something the declarative schema no longer wants,
+  All worktrees share the standard `avandar` stack until they switch. Each
+  switched worktree gets its own Docker project and ports, so several
+  worktrees can run `pnpm dev` at once. `supabase db diff` compares the live
+  database this worktree is using against `supabase/schemas/`, so objects
+  from another project look like something the declarative schema no longer
+  wants,
   and the generated migration silently includes a `drop` for it. Committing
   that migration deletes another branch's work, or production's, when it runs.
   A generated migration that drops anything you did not touch is this bug until
@@ -130,6 +132,16 @@ Implement functionality using red/green TDD.
   by lowercasing it, replacing each run of characters outside `a-z`, `0-9`, and
   `_` with `-`, collapsing repeated hyphens, and trimming leading and trailing
   hyphens. For example, `feat/analytics-p2` becomes `feat-analytics-p2`.
+- A switch also moves this worktree's Vite dev-server port, pinning
+  `AVA_VITE_DEV_PORT` in `.env.development` and repointing `VITE_APP_URL` at it
+  so `pnpm dev` can run here and in another worktree at the same time. A
+  restore puts both back.
+- Run `ava supabase status` to see whether the current worktree is on the
+  shared `avandar` stack or on a switched project, along with its ports, keys,
+  endpoints, and whether the development environment files still match the
+  running stack. Its first line reads green when the switch state is the right
+  one for the branch (`develop` on the shared stack, every other branch
+  switched) and yellow when it is not.
 - Keep the switched local instance active unless the user explicitly asks to
   merge into `develop`. When an authorized merge to `develop` is requested, run
   `ava supabase restore` before staging, committing, or merging, then verify

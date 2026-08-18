@@ -1,6 +1,7 @@
 import { SupabaseMigrationsCLI } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/SupabaseMigrationsCLI";
 import { SupabaseRestoreCli } from "@ava-cli/SupabaseCLI/SupabaseRestoreCli";
 import { SupabaseRunCLI } from "@ava-cli/SupabaseCLI/SupabaseRunCLI/SupabaseRunCLI";
+import { SupabaseStatusCli } from "@ava-cli/SupabaseCLI/SupabaseStatusCli";
 import { SupabaseSwitchCli } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli";
 import { Acclimate } from "@avandar/acclimate";
 
@@ -12,4 +13,5 @@ export const SupabaseCLI = Acclimate.createCLI("supabase")
   .addCommand("migrations", SupabaseMigrationsCLI)
   .addCommand("restore", SupabaseRestoreCli)
   .addCommand("run", SupabaseRunCLI)
+  .addCommand("status", SupabaseStatusCli)
   .addCommand("switch", SupabaseSwitchCli);

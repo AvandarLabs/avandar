@@ -1,3 +1,4 @@
+import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
 import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseDockerCleanup";
@@ -32,6 +33,7 @@ async function _rewriteDevelopmentEnvironments(
     io: SupabaseLocalEnvironmentIO;
     envFiles: readonly string[];
     statusJson: string;
+    devServerPort: number;
   }>,
 ): Promise<void> {
   const status = SupabaseConfig.makeLocalStatusFromJson(options.statusJson);
@@ -42,9 +44,12 @@ async function _rewriteDevelopmentEnvironments(
   const envContents = await options.io.readTextFile(envPath);
   await options.io.writeTextFile({
     filePath: envPath,
-    contents: SupabaseConfig.makeDevelopmentEnvFromStatus({
-      envContents,
-      status,
+    contents: DevServerPort.toDevelopmentEnv({
+      envContents: SupabaseConfig.makeDevelopmentEnvFromStatus({
+        envContents,
+        status,
+      }),
+      devServerPort: options.devServerPort,
     }),
   });
   await _rewriteDevelopmentEnvironments({
@@ -126,7 +131,7 @@ async function _activateSwitch(
     preparation: SwitchPreparation;
     temporaryProjectId: string;
   }>,
-): Promise<{ basePort: number; projectId: string }> {
+): Promise<{ basePort: number; devServerPort: number; projectId: string }> {
   const { io, preparation, temporaryProjectId } = options;
   await io.writeTextFile({
     filePath: preparation.configPath,
@@ -146,6 +151,7 @@ async function _activateSwitch(
     io,
     envFiles: preparation.envFiles,
     statusJson: statusResult.stdout,
+    devServerPort: preparation.devServerPort,
   });
   await SupabaseBackupStore.writeManifest({
     io,
@@ -154,6 +160,7 @@ async function _activateSwitch(
   });
   return {
     basePort: preparation.manifest.basePort,
+    devServerPort: preparation.devServerPort,
     projectId: temporaryProjectId,
   };
 }
@@ -164,7 +171,7 @@ async function _switch(
     temporaryProjectId: string;
     requestedBasePort?: number;
   }>,
-): Promise<{ basePort: number; projectId: string }> {
+): Promise<{ basePort: number; devServerPort: number; projectId: string }> {
   const preparation = await SupabaseSwitchPreparation.prepareSwitch(options);
   try {
     return await _activateSwitch({
