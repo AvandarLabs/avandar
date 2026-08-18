@@ -34,6 +34,33 @@ Read `docs/superpowers/specs/2026-08-18-pdf-region-extraction-design.md` in
 full first. This plan implements it directly, and several tasks below only make
 sense against the evidence recorded there.
 
+## Two defects inherited from Phase B1, to fix in this phase
+
+Both were found while implementing B1 Task 13 and confirmed against the code.
+Neither blocks B1, and both bite here.
+
+**1. Retention silently fails for PDFs over 200MB.** `_maybeCacheSourceBytes`
+in `src/clients/datasets/LocalDatasetClient/LocalDatasetClient.ts:102` returns
+`undefined` when `file.size > SOURCE_CACHE_PER_FILE_MAX_BYTES` (200MB), while
+`_putParsingDataset` sets `isSourcePinned` from the source type regardless. A
+large PDF therefore lands as a pinned row with **no bytes**, and
+`startOriginalFileUploadIfNeeded` then throws "no original file is cached
+locally" at save time.
+
+That ceiling is correct for CSV and XLSX, where the cached bytes are a
+convenience for resuming a parse. It is wrong for PDF, where the original is
+the only copy of data extraction is lossy against, and large PDFs are common in
+this corpus. Fix in Task 19 by exempting sources that require retention from
+the ceiling, or by refusing the upload up front with an explicit message.
+Silently pinning a row with no bytes is the one option that must not survive.
+
+**2. A mid-selection refresh drops the user back to the upload step.**
+`resumeImport` correctly returns `undefined` for a `pdf` row, since there is no
+transcode to redrive, so the bytes survive a refresh but the form state does
+not. Restoring the picker from `sourceBytes` plus the stored `pageRange` is
+this phase's job, because this phase is the first where a user has selection
+work worth losing.
+
 ## Background an engineer new to this problem needs
 
 **The four shapes, and why a table detector does not cover them.**
@@ -4067,7 +4094,7 @@ export function PdfRegionOverlay({
   scale,
   pageHeight,
   onRegionDrawn,
-}: Props): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const [preview, setPreview] = useState<null | {
@@ -4341,7 +4368,7 @@ export function PdfRegionPicker({
   activeRegionId,
   onRegionsChange,
   onActiveRegionChange,
-}: Props): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const [pageIndex, setPageIndex] = useState(0);
   const [scale, setScale] = useState(1);
   const [pageHeight, setPageHeight] = useState(842);
@@ -4684,7 +4711,7 @@ export function PdfReviewGrid({
   table,
   onTableChange,
   onRowFocus,
-}: Props): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const header = table.cells[0] ?? [];
   const dataRows = table.cells.slice(table.headerRows);
 

@@ -2358,7 +2358,7 @@ export function PdfPagePreview({
   pageIndex,
   highlight,
   width = 320,
-}: Props): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",

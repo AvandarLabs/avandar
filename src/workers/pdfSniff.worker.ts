@@ -103,6 +103,12 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
 
     const pages: PageGeometry[] = [];
 
+    // Pages are read sequentially on purpose, so the await-in-loop here is
+    // deliberate rather than an oversight. Two reasons: progress has to be
+    // reported page by page, which a Promise.all cannot do; and a large
+    // document read in parallel holds every page's geometry and pdf.js's
+    // internal page objects in memory at once, which is exactly the case the
+    // page-range cap exists to avoid.
     for (let pageNumber = firstPage; pageNumber <= lastPage; pageNumber += 1) {
       const page = await doc.getPage(pageNumber);
       pages.push(await extractPageGeometry(page, pageNumber - 1));

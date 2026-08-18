@@ -1,6 +1,7 @@
 import { Box, Loader, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import type { BBox } from "@/workers/pdfSniff/types";
+import type { ReactNode } from "react";
 
 type Props = {
   file: File;
@@ -32,7 +33,7 @@ export function PdfPagePreview({
   pageIndex,
   highlight,
   width = 320,
-}: Props): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
