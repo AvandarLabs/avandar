@@ -12,6 +12,21 @@
 
 ---
 
+## Read this before trusting any code block
+
+**The TypeScript in this plan is illustrative, not verified.** It was written
+from type names checked against the repo, but the blocks themselves were never
+compiled. A parallel session found them wrong in at least four tasks: incorrect
+`vi.mock` specifiers (the real `DatasetClient` is one directory deeper than
+sketched), a Task 7 fixture that violates this plan's own registration
+invariant, `ConceptAttribute.dataType` being `AvaDataType` rather than
+`DuckDbDataType`, and `structuredQueryToSql` fixtures that need real `Dataset`
+and `DatasetColumn` models instead of object literals.
+
+**The repository is the authority.** Read the real types before writing, and
+treat a divergence between this plan and the code as the plan being wrong.
+Report the divergence rather than bending the code to match.
+
 ## Conventions this plan follows
 
 Read these before Task 1. They are enforced by `docs/rules/typescript.md` and
@@ -64,7 +79,7 @@ Read these before Task 1. They are enforced by `docs/rules/typescript.md` and
 | `src/clients/qetl/wrappers/VirtualDatasetWrapper/` | `virtual` |
 | `src/clients/qetl/wrappers/GoogleSheetsWrapper/` | `google_sheets`: declares capabilities, still throws |
 | `src/clients/qetl/wrappers/ConceptWrapper/` | `concept`: delegates to `AttributeAssertionClient` |
-| `src/clients/qetl/QetlClient/relationResolution.ts` | Renamed from `qetlDiceExtractors.ts`, registry-driven |
+| `src/clients/qetl/QetlClient/getRelationSources.ts` | Renamed from `qetlDiceExtractors.ts`, registry-driven |
 
 **Landing order rationale:** the harness (Task 1) and the types (Tasks 2 to 4)
 are additive and land first. Characterization tests (Task 5) come **before** any
@@ -1753,7 +1768,7 @@ cd src/clients/qetl
 git mv QetlClient QueryMediator
 git mv QueryMediator/QetlClient.ts QueryMediator/QueryMediator.ts
 git mv QueryMediator/QetlClient.types.ts QueryMediator/QueryMediator.types.ts
-git mv QueryMediator/qetlDiceExtractors.ts QueryMediator/relationResolution.ts
+git mv QueryMediator/qetlDiceExtractors.ts QueryMediator/getRelationSources.ts
 git mv QueryMediator/qetlFactLoading.ts QueryMediator/relationLoading.ts
 git mv QueryMediator/qetlQueryRunner.ts QueryMediator/queryRunner.ts
 git mv WorkspaceQetlClient WorkspaceQuerySession
@@ -1769,7 +1784,7 @@ git mv PublicQetlClient PublicQuerySession
 | `QetlClientFactory` | `QueryMediatorFactory` |
 | `WorkspaceQetlClient` | `WorkspaceQuerySession` |
 | `PublicQetlClient` | `PublicQuerySession` |
-| `getDiceExtractors` | `resolveRelationSources` |
+| `getDiceExtractors` | `getRelationSources` |
 | `getMissingDice` | `probeRelationCache` |
 | `getDiceFromSql` | `extractReferencedRelations` |
 | `DiceExtractor` | `RelationSource` |

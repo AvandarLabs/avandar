@@ -176,7 +176,7 @@ consequence.
             |
       RelationRef[]
             |
-      RelationRegistry.resolve
+   RelationRegistry.getWrapperForRelation
             |
       SourceWrapper  +  RelationCapabilities
             |
@@ -360,19 +360,29 @@ invalidated when its SQL is edited. Spec 2 fixes it by putting the logical
 definition in the cache key. Declaring `none` here means the mediator cannot
 accidentally believe it has a freshness answer for virtual datasets.
 
-### 4.4 `RelationRegistry`: resolve a ref to a wrapper
+### 4.4 `RelationRegistry`: map a ref to its wrapper
+
+**Naming note (corrected 2026-08-18).** An earlier draft called these methods
+`resolve` / `resolveAll` and the module `relationResolution.ts`.
+`docs/rules/typescript.md:272` **bans naming a conversion `resolve...`**, because
+the word names neither side and the reader learns nothing about what went in or
+came out; `:310` extends the ban to `_resolve...`. The verbs below name both
+sides. Task 13 carries the rename through any code already written against the
+old names.
 
 ```ts
 export type RelationRegistry = {
-  resolve(ref: RelationRef): SourceWrapper | undefined;
-  resolveAll(refs: readonly RelationRef[]): ResolvedRelations;
+  getWrapperForRelation(ref: RelationRef.T): SourceWrapper | undefined;
+  getWrappersForRelations(
+    refs: readonly RelationRef.T[],
+  ): RelationWrapperAssignments;
   register(wrapper: SourceWrapper): void;
 };
 ```
 
 Construction is explicit and injected, not a module-level singleton with
 side-effectful imports, so a test can build a registry containing one fake
-wrapper. `resolveAll` returns resolved and unresolved refs separately, because an
+wrapper. `getWrappersForRelations` returns matched and unmatched refs separately, because an
 unresolvable ref must become `needs_clarification` rather than an exception
 (proposal section 10).
 
@@ -415,7 +425,7 @@ before:  match(dataset.source_type)
            .with("virtual",       ...)
            ...
 
-after:   const wrapper = registry.resolve(ref)
+after:   const wrapper = registry.getWrapperForRelation(ref)
          match(wrapper.capabilities.predicatePushdown)
            .with("none", () => acquireThroughWrapper(wrapper, ref))
            .otherwise(() => pushDownThroughWrapper(wrapper, ref))
