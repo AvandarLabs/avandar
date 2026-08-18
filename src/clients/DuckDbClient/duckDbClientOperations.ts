@@ -29,6 +29,7 @@ export type RawQueryOptions = {
   datasetDuckDbLease?: DatasetDuckDbLease;
   datasetTableReadMode?: "public" | "workspace";
   publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+  signal?: AbortSignal;
   [TRUSTED_INTERNAL_SQL]?: true;
 };
 

@@ -16,7 +16,8 @@ select
 ,
   insert,
 update,
-delete on table public.attribute_mappings__manual_entry to authenticated;
+delete on table public.attribute_mappings__manual_entry to authenticated,
+service_role;
 
 -- Policies
 create policy "

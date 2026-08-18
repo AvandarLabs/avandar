@@ -1,0 +1,60 @@
+.inspectorSection {
+  border-bottom: 1px solid var(--ava-border-default);
+}
+
+.inspectorSection:last-child {
+  border-bottom: 0;
+}
+
+.inspectorSectionToggle {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: var(--mantine-color-text);
+  display: flex;
+  font-size: 12px;
+  font-weight: 600;
+  gap: var(--mantine-spacing-xs);
+  letter-spacing: 0.02em;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  text-align: left;
+  transition: background 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.inspectorSectionToggle:hover {
+  background: var(--ava-surface-sunken);
+}
+
+/* Full-bleed control inside a clipping panel: the ring draws inside. */
+.inspectorSectionToggle:focus-visible {
+  outline-offset: -2px;
+}
+
+.inspectorSectionChevron {
+  color: var(--mantine-color-dimmed);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.inspectorSectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-sm);
+}
+
+.inspectorSection[data-open="false"] .inspectorSectionChevron {
+  transform: rotate(-90deg);
+}
+
+.inspectorSection[data-open="false"] .inspectorSectionContent {
+  display: none;
+}
+
+.inspectorSectionNote {
+  color: var(--mantine-color-dimmed);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  margin-left: auto;
+}

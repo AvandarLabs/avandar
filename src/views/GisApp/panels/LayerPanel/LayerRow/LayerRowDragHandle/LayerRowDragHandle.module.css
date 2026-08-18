@@ -1,0 +1,14 @@
+.layerRowDragHandle {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: var(--mantine-color-neutral-3);
+  cursor: grab;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+
+.layerRowDragHandle:focus-visible {
+  outline-offset: -2px;
+}

@@ -2,8 +2,8 @@
 # Launches the Avandar desktop shell.
 #
 # Behavior:
-#   - If Vite (port 5173) is already serving (e.g. `pnpm dev` running in another
-#     terminal), reuse it and start only the desktop shell.
+#   - If Vite is already serving on this worktree's port (e.g. `pnpm dev`
+#     running in another terminal), reuse it and start only the desktop shell.
 #   - Otherwise, start `pnpm dev` (the full Avandar dev environment) in the
 #     background, wait for Vite to be reachable, and only then start the
 #     desktop shell. This is important: Electrobun opens the webview window
@@ -19,7 +19,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-VITE_PORT="${AVA_VITE_DEV_PORT:-5173}"
+VITE_PORT="$("${ROOT_DIR}/scripts/utils/get-dev-server-port.sh")"
 VITE_URL="http://127.0.0.1:${VITE_PORT}"
 # Generous default: first run after `pnpm install` cold-starts esbuild,
 # downloads native binaries, builds Lingui catalogs, etc.

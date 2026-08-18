@@ -246,4 +246,84 @@ SB_PUBLISHABLE_KEY=publishable
 SB_JWT_ISSUER=http://127.0.0.1:55321/auth/v1
 `);
   });
+
+  it("writes the publishable and secret keys, not the legacy JWTs", () => {
+    expect(
+      SupabaseConfig.makeDevelopmentEnvFromStatus({
+        envContents:
+          "VITE_SUPABASE_ANON_KEY=old\nSUPABASE_SERVICE_ROLE_KEY=old\n",
+        status: {
+          apiUrl: "http://127.0.0.1:55321",
+          databaseUrl:
+            "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
+          anonKey: "legacy-anon",
+          serviceRoleKey: "legacy-service",
+          publishableKey: "publishable",
+          secretKey: "secret",
+        },
+      }),
+    ).toBe(`VITE_SUPABASE_ANON_KEY=publishable
+SUPABASE_SERVICE_ROLE_KEY=secret
+`);
+  });
+
+  it("leaves a callback URL already on the API port alone", () => {
+    expect(
+      SupabaseConfig.makeDevelopmentEnvFromStatus({
+        envContents:
+          'GOOGLE_REDIRECT_URI="http://localhost:55321/functions/v1/google-auth-callback"\n',
+        status: {
+          apiUrl: "http://127.0.0.1:55321",
+          databaseUrl:
+            "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
+          anonKey: "anon",
+          serviceRoleKey: "service",
+          publishableKey: "publishable",
+          secretKey: "secret",
+        },
+      }),
+    ).toBe(
+      'GOOGLE_REDIRECT_URI="http://localhost:55321/functions/v1/google-auth-callback"\n',
+    );
+  });
+
+  it("moves a loopback callback URL onto the new API port", () => {
+    expect(
+      SupabaseConfig.makeDevelopmentEnvFromStatus({
+        envContents:
+          'GOOGLE_REDIRECT_URI="http://localhost:54321/functions/v1/google-auth-callback"\n',
+        status: {
+          apiUrl: "http://127.0.0.1:55321",
+          databaseUrl:
+            "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
+          anonKey: "anon",
+          serviceRoleKey: "service",
+          publishableKey: "publishable",
+          secretKey: "secret",
+        },
+      }),
+    ).toBe(
+      'GOOGLE_REDIRECT_URI="http://127.0.0.1:55321/functions/v1/google-auth-callback"\n',
+    );
+  });
+
+  it("leaves a callback URL served by a remote host alone", () => {
+    expect(
+      SupabaseConfig.makeDevelopmentEnvFromStatus({
+        envContents:
+          "GOOGLE_REDIRECT_URI=https://avandarlabs.com/functions/v1/google-auth-callback\n",
+        status: {
+          apiUrl: "http://127.0.0.1:55321",
+          databaseUrl:
+            "postgresql://postgres:postgres@127.0.0.1:55322/postgres",
+          anonKey: "anon",
+          serviceRoleKey: "service",
+          publishableKey: "publishable",
+          secretKey: "secret",
+        },
+      }),
+    ).toBe(
+      "GOOGLE_REDIRECT_URI=https://avandarlabs.com/functions/v1/google-auth-callback\n",
+    );
+  });
 });

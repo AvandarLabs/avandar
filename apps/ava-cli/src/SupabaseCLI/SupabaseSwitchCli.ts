@@ -1,6 +1,10 @@
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
-import { printError, printSuccess } from "@ava-cli/utils/cliOutput/cliOutput";
+import {
+  printError,
+  printInfo,
+  printSuccess,
+} from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
 /** CLI for starting a branch-isolated local Supabase project. */
@@ -46,9 +50,12 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
         temporaryProjectId: commandArguments.temporaryProjectId,
         requestedBasePort: commandArguments.requestedBasePort,
       })
-        .then(({ basePort, projectId }) => {
+        .then(({ basePort, devServerPort, projectId }) => {
           printSuccess(
             `Supabase project ${projectId} is active on API port ${basePort}.`,
+          );
+          printInfo(
+            `\`pnpm dev\` will serve this worktree on port ${devServerPort}.`,
           );
         })
         .catch((error: unknown) => {

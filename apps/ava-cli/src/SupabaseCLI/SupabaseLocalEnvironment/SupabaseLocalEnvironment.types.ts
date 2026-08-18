@@ -96,6 +96,8 @@ export type SupabaseLocalEnvironmentIO = {
   readWorktreePath: () => Promise<string>;
   /** Reports whether a TCP port can be bound locally. */
   isPortAvailable: (port: number) => Promise<boolean>;
+  /** Lists host TCP ports Docker has already published. */
+  listPublishedHostPorts: () => Promise<number[]>;
   /** Reports whether Docker contains resources for a project. */
   hasSupabaseResources: (projectId: string) => Promise<boolean>;
   /** Lists Docker resources owned by a project. */
@@ -119,8 +121,41 @@ export type SwitchPreparation = {
   backupDirectory: string;
   configContents: string;
   configPath: string;
+  devServerPort: number;
   envFiles: string[];
   manifest: SupabaseBackupManifest;
+};
+
+/** One development environment file as it exists on disk. */
+export type DevelopmentEnvFile = {
+  filePath: string;
+  contents: string;
+};
+
+/** One labelled value rendered by `ava supabase status`. */
+export type SupabaseStatusEntry = {
+  label: string;
+  value: string;
+};
+
+/** How far one development environment file has drifted from the stack. */
+export type SupabaseEnvironmentDrift = {
+  filePath: string;
+  staleKeys: string[];
+};
+
+/** Identity, ports, and endpoints of the local Supabase this worktree uses. */
+export type SupabaseStatusReport = {
+  isSwitched: boolean;
+  /** Whether the switch state is the healthy one for this branch. */
+  isExpectedForBranch: boolean;
+  isRunning: boolean;
+  branch: string;
+  projectId: string;
+  ports: SupabaseStatusEntry[];
+  environmentValues: SupabaseStatusEntry[];
+  endpoints: SupabaseStatusEntry[];
+  environmentDrift: SupabaseEnvironmentDrift[];
 };
 
 /** A validated backup plus the directories a restore will read. */

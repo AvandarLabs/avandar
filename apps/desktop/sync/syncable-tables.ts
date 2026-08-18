@@ -22,7 +22,7 @@
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
- *     tables, and the web-only `dexie_dbs` tracker.
+ *     tables, the web-only `dexie_dbs` tracker, and web GIS `maps`.
  */
 
 /**
@@ -153,6 +153,8 @@ export const EXCLUDED_TABLES = [
   "user_group_memberships",
   "resource_user_group_tags",
   "resource_shares",
+  // Web GIS maps are not mirrored to desktop SQLite yet.
+  "maps",
 ] as const;
 
 /**

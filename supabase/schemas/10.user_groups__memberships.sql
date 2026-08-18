@@ -15,12 +15,20 @@ alter table public.user_group_memberships enable row level security;
 
 -- Data API privileges.
 --
--- No UPDATE: membership rows are added and removed, never edited in place.
+-- No UPDATE for the Data API: membership rows are added and removed, never
+-- edited in place. `service_role` still gets full DML for backend writes.
 grant
 select
 ,
   insert,
   delete on table public.user_group_memberships to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.user_group_memberships to service_role;
 
 create policy "Members can select user_group_memberships" on public.user_group_memberships for
 select

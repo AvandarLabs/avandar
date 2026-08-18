@@ -2,6 +2,10 @@
 
 Use this checklist only when the diff includes TypeScript or TSX files.
 
+This file is the core of the `files` focused review. That pack also
+applies the file-layout bullets listed under **Focused Reviews** in
+`SKILL.md`; it does not apply identifier naming or comment rules.
+
 - Keep one module per file.
 - The only exception is a file that intentionally groups a collection of
   related utility functions.

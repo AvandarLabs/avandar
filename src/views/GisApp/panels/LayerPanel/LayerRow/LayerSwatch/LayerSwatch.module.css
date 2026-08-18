@@ -1,0 +1,24 @@
+.layerSwatch {
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-xs);
+  flex: none;
+  height: 18px;
+  width: 18px;
+}
+
+.layerSwatch--point {
+  border-color: var(--ava-surface-overlay);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--ava-border-strong);
+  height: 14px;
+  margin: 2px;
+  width: 14px;
+}
+
+.layerSwatch--sized {
+  border-color: var(--ava-surface-overlay);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 3px var(--ava-surface-overlay),
+    0 0 0 1px var(--ava-border-strong);
+}

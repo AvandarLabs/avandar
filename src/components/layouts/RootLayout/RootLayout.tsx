@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
 import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
-import { WorkspaceLayout } from "@/components/layouts/RootLayout/WorkspaceLayout";
-import { NavbarLinks } from "@/config/NavbarLinks";
+import { WorkspaceLayout } from "@/components/layouts/RootLayout/WorkspaceLayout/WorkspaceLayout";
+import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 
 type Props = {
   mode: "no-workspace" | "workspace";

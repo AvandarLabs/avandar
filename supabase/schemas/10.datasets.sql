@@ -47,7 +47,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets to authenticated;
+delete on table public.datasets to authenticated,
+service_role;
 
 /** Prevents a dataset from being reassigned to another workspace. */
 create or replace function public.datasets__prevent_workspace_id_change () returns trigger language plpgsql

@@ -1,4 +1,4 @@
-import type { AppLink } from "@/config/AppLinks";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
 
 /**
  * Whether a navbar (or similar) app link can be used while offline.

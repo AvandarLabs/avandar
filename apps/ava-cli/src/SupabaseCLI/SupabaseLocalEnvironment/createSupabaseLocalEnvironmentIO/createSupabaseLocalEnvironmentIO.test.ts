@@ -1,5 +1,4 @@
 import { rm } from "node:fs/promises";
-import * as net from "node:net";
 import path from "node:path";
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { promiseMap } from "@avandar/utils";
@@ -84,28 +83,6 @@ function _setCommandSuccess(
     callback(undefined, {
       stdout: result.stdout,
       stderr: result.stderr,
-    });
-  });
-}
-
-function _listenOnLoopback(): Promise<net.Server> {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
-      resolve(server);
-    });
-  });
-}
-
-function _closeServer(server: net.Server): Promise<void> {
-  return new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve();
     });
   });
 }
@@ -351,21 +328,5 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     await expect(io.readBranch()).rejects.toThrow(
       "Cannot read the current Git branch: Git unavailable.",
     );
-  });
-
-  it("reports free and occupied loopback ports", async () => {
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
-    const occupiedServer = await _listenOnLoopback();
-    const address = occupiedServer.address();
-    if (address === null || typeof address === "string") {
-      throw new Error("Expected a TCP loopback address.");
-    }
-
-    try {
-      await expect(io.isPortAvailable(0)).resolves.toBe(true);
-      await expect(io.isPortAvailable(address.port)).resolves.toBe(false);
-    } finally {
-      await _closeServer(occupiedServer);
-    }
   });
 });

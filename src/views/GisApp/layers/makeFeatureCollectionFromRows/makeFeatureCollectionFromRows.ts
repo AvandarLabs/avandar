@@ -3,6 +3,7 @@ import {
   isDefined,
   isNullish,
   makeBucketMap,
+  makeObject,
   omit,
   prop,
 } from "@avandar/utils";
@@ -30,21 +31,48 @@ export type GeometryDropReport = {
 /** How many row indexes a single drop report keeps as a sample. */
 const MAX_SAMPLE_ROW_INDEXES = 10;
 
-/** Error text for point rendering under an aggregate-only policy. */
-const AGGREGATE_ONLY_ERROR_MESSAGE =
-  "Aggregate-only layers cannot be drawn from individual coordinates.";
-
 /** One row's outcome: either a feature, or the reason it produced none. */
 type RowPlacement = { rowIndex: number } & (
   | { feature: GeoJSON.Feature }
   | { dropReason: DropReason }
 );
 
-type CreatePointFeatureOptions = {
+type PlaceCoordinateInput = {
+  latitude: number;
+  longitude: number;
+  sensitivity: MapLayer.Sensitivity;
+  layerId: string;
+  rowIndex: number;
+};
+
+type CreatePointFeatureInput = {
   binding: MapLayer.GeoBindingColumnNames;
   coordinate: { longitude: number; latitude: number };
+  propertyColumnNames: readonly string[] | "all";
   row: UnknownRow;
   rowIndex: number;
+};
+
+type PlaceRowInput = {
+  row: UnknownRow;
+  rowIndex: number;
+  binding: MapLayer.GeoBindingColumnNames;
+  sensitivity: MapLayer.Sensitivity;
+  layerId: string;
+  propertyColumnNames: readonly string[] | "all";
+};
+
+type MakeFeatureCollectionInput = {
+  rows: readonly UnknownRow[];
+  binding: MapLayer.GeoBindingColumnNames;
+  propertyColumnNames: readonly string[] | "all";
+  sensitivity: MapLayer.Sensitivity;
+  layerId: string;
+};
+
+type FeatureCollectionConversion = {
+  featureCollection: GeoJSON.FeatureCollection;
+  drops: GeometryDropReport[];
 };
 
 function _classifyCoordinate(
@@ -87,13 +115,7 @@ function _placeCoordinate({
   sensitivity,
   layerId,
   rowIndex,
-}: {
-  latitude: number;
-  longitude: number;
-  sensitivity: MapLayer.Sensitivity;
-  layerId: string;
-  rowIndex: number;
-}): { longitude: number; latitude: number } {
+}: PlaceCoordinateInput): { longitude: number; latitude: number } {
   return match(sensitivity)
     .with({ mode: "exact" }, () => {
       return { longitude, latitude };
@@ -107,22 +129,43 @@ function _placeCoordinate({
       });
     })
     .with({ mode: "aggregateOnly" }, () => {
-      throw new SensitivityViolationError(AGGREGATE_ONLY_ERROR_MESSAGE);
+      throw new SensitivityViolationError("aggregateOnly");
     })
     .exhaustive();
 }
 
-/** Builds a point feature without repeating its coordinate source columns. */
+/** Copies requested keys that are own properties of the source row. */
+function _pickOwnProperties(
+  options: Readonly<{
+    row: UnknownRow;
+    propertyColumnNames: readonly string[];
+  }>,
+): GeoJSON.GeoJsonProperties {
+  const { row, propertyColumnNames } = options;
+  const ownPropertyColumnNames = propertyColumnNames.filter(
+    (propertyColumnName) => {
+      return Object.prototype.hasOwnProperty.call(row, propertyColumnName);
+    },
+  );
+  return makeObject(ownPropertyColumnNames, {
+    valueFn: (propertyColumnName) => {
+      return row[propertyColumnName];
+    },
+  });
+}
+
+/** Builds a point feature carrying exactly the requested properties. */
 function _createPointFeature({
   binding,
   coordinate,
+  propertyColumnNames,
   row,
   rowIndex,
-}: CreatePointFeatureOptions): GeoJSON.Feature {
-  const properties: GeoJSON.GeoJsonProperties = omit(row, [
-    binding.latitudeColumnName,
-    binding.longitudeColumnName,
-  ]);
+}: CreatePointFeatureInput): GeoJSON.Feature {
+  const properties: GeoJSON.GeoJsonProperties =
+    propertyColumnNames === "all" ?
+      omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
+    : _pickOwnProperties({ row, propertyColumnNames });
   return {
     type: "Feature",
     id: rowIndex,
@@ -135,15 +178,15 @@ function _createPointFeature({
 }
 
 /** Reads and validates the coordinate columns of one source row. */
-function _readCoordinate({
-  binding,
-  row,
-}: {
-  binding: MapLayer.GeoBindingColumnNames;
-  row: UnknownRow;
-}):
+function _readCoordinate(
+  options: Readonly<{
+    row: UnknownRow;
+    binding: MapLayer.GeoBindingColumnNames;
+  }>,
+):
   | { coordinate: { longitude: number; latitude: number } }
   | { dropReason: DropReason } {
+  const { row, binding } = options;
   const rawLatitude = row[binding.latitudeColumnName];
   const rawLongitude = row[binding.longitudeColumnName];
   if (isNullish(rawLatitude) || isNullish(rawLongitude)) {
@@ -155,9 +198,9 @@ function _readCoordinate({
     return { dropReason: "nonNumericCoordinate" };
   }
   const invalidReason = _classifyCoordinate(latitude, longitude);
-  return invalidReason ?
-      { dropReason: invalidReason }
-    : { coordinate: { longitude, latitude } };
+  return invalidReason === undefined ?
+      { coordinate: { longitude, latitude } }
+    : { dropReason: invalidReason };
 }
 
 /**
@@ -170,13 +213,8 @@ function _placeRow({
   binding,
   sensitivity,
   layerId,
-}: {
-  row: UnknownRow;
-  rowIndex: number;
-  binding: MapLayer.GeoBindingColumnNames;
-  sensitivity: MapLayer.Sensitivity;
-  layerId: string;
-}): RowPlacement {
+  propertyColumnNames,
+}: PlaceRowInput): RowPlacement {
   const coordinateRead = _readCoordinate({ row, binding });
   if ("dropReason" in coordinateRead) {
     return { rowIndex, dropReason: coordinateRead.dropReason };
@@ -193,6 +231,7 @@ function _placeRow({
     feature: _createPointFeature({
       binding,
       coordinate: placedCoordinate,
+      propertyColumnNames,
       row,
       rowIndex,
     }),
@@ -216,10 +255,9 @@ function _buildDropReports(
 }
 
 /** Separates successful placements from drops and builds their report. */
-function _buildConversionResult(placements: readonly RowPlacement[]): {
-  featureCollection: GeoJSON.FeatureCollection;
-  drops: GeometryDropReport[];
-} {
+function _buildConversionResult(
+  placements: readonly RowPlacement[],
+): FeatureCollectionConversion {
   const features = placements
     .map((placement) => {
       return "feature" in placement ? placement.feature : undefined;
@@ -251,6 +289,9 @@ function _buildConversionResult(placements: readonly RowPlacement[]): {
  * @param params The rows to convert and how to read geometry out of them.
  * @param params.rows Query result rows, one candidate feature each.
  * @param params.binding Which columns carry geometry, named not id'd.
+ * @param params.propertyColumnNames Which columns become feature properties,
+ * from the layer's popup config. `"all"` keeps everything except the bound
+ * coordinate columns.
  * @param params.sensitivity Spatial privacy policy applied to each geometry.
  * @param params.layerId Used with the row index to seed jitter.
  * @returns The converted features and a report for every row that was dropped.
@@ -260,23 +301,23 @@ function _buildConversionResult(placements: readonly RowPlacement[]): {
 export function makeFeatureCollectionFromRows({
   rows,
   binding,
+  propertyColumnNames,
   sensitivity,
   layerId,
-}: {
-  rows: readonly UnknownRow[];
-  binding: MapLayer.GeoBindingColumnNames;
-  sensitivity: MapLayer.Sensitivity;
-  layerId: string;
-}): {
-  featureCollection: GeoJSON.FeatureCollection;
-  drops: GeometryDropReport[];
-} {
+}: MakeFeatureCollectionInput): FeatureCollectionConversion {
   if (sensitivity.mode === "aggregateOnly") {
-    throw new SensitivityViolationError(AGGREGATE_ONLY_ERROR_MESSAGE);
+    throw new SensitivityViolationError("aggregateOnly");
   }
 
   const placements = rows.map((row, rowIndex) => {
-    return _placeRow({ row, rowIndex, binding, sensitivity, layerId });
+    return _placeRow({
+      row,
+      rowIndex,
+      binding,
+      propertyColumnNames,
+      sensitivity,
+      layerId,
+    });
   });
   return _buildConversionResult(placements);
 }

@@ -1,0 +1,19 @@
+.layerInspectorBodyLead {
+  border-bottom: 1px solid var(--ava-border-default);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-sm)
+    var(--mantine-spacing-xs);
+}
+
+.layerInspectorBodyLeadName {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+
+.layerInspectorBodyEmptyState {
+  color: var(--mantine-color-dimmed);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-sm);
+  text-align: center;
+}
