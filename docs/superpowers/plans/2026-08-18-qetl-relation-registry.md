@@ -16,12 +16,19 @@
 
 **The TypeScript in this plan is illustrative, not verified.** It was written
 from type names checked against the repo, but the blocks themselves were never
-compiled. A parallel session found them wrong in at least four tasks: incorrect
+compiled. A parallel session found them wrong in at least five places: incorrect
 `vi.mock` specifiers (the real `DatasetClient` is one directory deeper than
 sketched), a Task 7 fixture that violates this plan's own registration
-invariant, `ConceptAttribute.dataType` being `AvaDataType` rather than
-`DuckDbDataType`, and `structuredQueryToSql` fixtures that need real `Dataset`
-and `DatasetColumn` models instead of object literals.
+invariant, **Task 11's `ConceptWrapper` capabilities declaring
+`wholeRelationAcquirable: "yes"` with no `acquire`, which trips that same
+invariant and made the registry throw at construction**,
+`ConceptAttribute.dataType` being `AvaDataType` rather than `DuckDbDataType`,
+and `structuredQueryToSql` fixtures that need real `Dataset` and
+`DatasetColumn` models instead of object literals.
+
+Note the pattern: **two of the five are the plan contradicting its own stated
+invariant.** Treat an apparent conflict between a sample and a rule stated in
+prose as the sample being wrong.
 
 **The repository is the authority.** Read the real types before writing, and
 treat a divergence between this plan and the code as the plan being wrong.
@@ -1612,7 +1619,14 @@ const CAPABILITIES = {
    */
   predicatePushdown: "full",
   aggregatePushdown: true,
-  wholeRelationAcquirable: "yes",
+  /**
+   * Corrected after the cutover: this sample declared `"yes"` while the wrapper
+   * implements no `acquire`, which trips the registry's own construction-time
+   * invariant (Task 7, step 2a) and made the registry throw. `"no"` is also the
+   * mode the proposal selects for concepts, since a concept pushes down rather
+   * than being acquired whole.
+   */
+  wholeRelationAcquirable: "no",
   maxRowsPerCall: "unbounded",
   maxBytesPerCall: "unbounded",
   freshnessSignal: "modified-time",
