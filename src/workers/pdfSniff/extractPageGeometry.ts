@@ -1,4 +1,5 @@
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+import { assembleWords } from "./assembleWords";
 import type { PageGeometry, RuleSegment, TextItem } from "./types";
 import type { PDFPageProxy } from "pdfjs-dist";
 
@@ -225,7 +226,7 @@ export async function extractPageGeometry(
     pageIndex,
     width: viewport.width,
     height: viewport.height,
-    textItems,
+    textItems: assembleWords(textItems),
     rules,
     looksScanned: textItems.length <= SCANNED_PAGE_MAX_TEXT_ITEMS,
   };
