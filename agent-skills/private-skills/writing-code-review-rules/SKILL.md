@@ -141,7 +141,7 @@ Priorities when deciding, highest first:
 Do not split finer than one checklist file per coherent topic. Per-rule
 agents explode the merge/dedupe burden for no recall gain.
 
-### Pass 5: Orchestration sync (only if Pass 3/4 forces a split)
+### Pass 5: Orchestration sync
 
 A new checklist file is not a review lane until `avandar-code-review`
 knows about it. When you split a file, update the public skill's
@@ -155,8 +155,15 @@ knows about it. When you split a file, update the public skill's
    "Library-Gated Phases") with the gate and reference link.
 4. If the split changes how many phases can fire, re-check that the
    "When To Fan Out" threshold guidance still reads correctly.
+5. If the rule (or the file it lives in) belongs to a focused-review
+   pack (`docstrings`, `files`, or `naming` in **Focused Reviews**),
+   update that pack's "Apply only" list in the same change. A comment
+   rule added to `comments-checklist.md` but omitted from the
+   `docstrings` pack will never run under `avandar-code-review
+   docstrings`.
 
-If no split was warranted (the common case), skip this pass entirely.
+If no split was warranted and the rule is not in a focused-review pack,
+skip this pass.
 
 ## Rule Pattern
 

@@ -4,6 +4,10 @@ Use this checklist when the diff includes any source file that supports
 both block (`/** ... */`) and line (`//`) comments. This applies to
 TypeScript, TSX, JavaScript, JSX, and most C-family languages.
 
+This file is the core of the `docstrings` focused review. That pack also
+applies the comment bullets listed under **Focused Reviews** in
+`SKILL.md`; it does not apply any other phase.
+
 - Use block comments (`/** ... */`) only as documentation attached to an
   identifier (functions, types, exports, etc.). Do not use file-level header
   comments (see the file-level-comment rule below). Any comment inside a
