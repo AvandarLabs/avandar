@@ -1,5 +1,22 @@
 # PDF Import Phase B: Table Detection and Import UI Implementation Plan
 
+> ## SUPERSEDED. Do not execute this plan.
+>
+> It has been split into three, because reading the two situation reports named
+> as the v0 merge gate showed neither contains a single table. Roughly half the
+> tasks here are shared foundation that region extraction needs too, and the
+> detection half cannot unblock a merge it extracts nothing for.
+>
+> | Execute instead | Contains |
+> |---|---|
+> | [`2026-08-18-pdf-import-phase-b1-extraction-foundation.md`](./2026-08-18-pdf-import-phase-b1-extraction-foundation.md) | Tasks 1 to 5, 12, 14 to 16 and 18 from here, plus word and line assembly |
+> | [`2026-08-18-pdf-import-phase-b2-selection-extraction.md`](./2026-08-18-pdf-import-phase-b2-selection-extraction.md) | New. Task 17 rewritten as the region picker. **The merge gate.** |
+> | [`2026-08-18-pdf-import-phase-b3-auto-table-detection.md`](./2026-08-18-pdf-import-phase-b3-auto-table-detection.md) | Tasks 6 to 11, 13 and 19 from here |
+>
+> Task bodies were moved verbatim, so nothing written here was lost. Kept for
+> history and for the self-review notes at the end. See
+> `docs/superpowers/specs/2026-08-18-pdf-region-extraction-design.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Detect tables in a born-digital PDF entirely in the browser, show them outlined over rendered page previews, and import the selected one as a dataset.
