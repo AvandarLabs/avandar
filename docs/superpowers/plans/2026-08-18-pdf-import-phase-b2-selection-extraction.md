@@ -3015,7 +3015,7 @@ import type { ExtractedTable } from "./types";
 
 function table(
   regionId: string,
-  cells: readonly (readonly string[])[],
+  cells: ReadonlyArray<readonly string[]>,
 ): ExtractedTable {
   return {
     regionId,
@@ -3194,7 +3194,7 @@ export type DocumentMetadata = {
 
 export type CombinedTable = {
   outputMode: "natural" | "observations";
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   headerRows: number;
 };
 
@@ -5031,7 +5031,7 @@ export function parseRegionResponse(params: {
 }): ExtractedTable {
   const empty = {
     regionId: params.regionId,
-    cells: [] as readonly (readonly string[])[],
+    cells: [] as ReadonlyArray<readonly string[]>,
     headerRows: 0,
     extractedBy: "model" as const,
     rowProvenance: [],
@@ -5165,7 +5165,7 @@ export type PdfFileLoadResult = BaseLoadResult & {
    * `tables` because the fingerprint and the CSV are computed from the
    * combination, not from any single region.
    */
-  combinedCells: readonly (readonly string[])[];
+  combinedCells: ReadonlyArray<readonly string[]>;
   combinedHeaderRows: number;
 };
 ```

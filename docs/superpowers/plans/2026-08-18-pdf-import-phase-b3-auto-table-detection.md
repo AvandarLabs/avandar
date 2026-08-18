@@ -965,7 +965,7 @@ function _groupIntoRows(
  * This is the crux of stream detection and the reason it earns only medium
  * or low confidence: alignment is evidence of a column, not proof of one.
  */
-function _findColumnPositions(rows: readonly (readonly TextItem[])[]): number[] {
+function _findColumnPositions(rows: ReadonlyArray<readonly TextItem[]>): number[] {
   const clusters: { position: number; rowsSeen: Set<number> }[] = [];
 
   rows.forEach((row, rowIndex) => {
@@ -1544,7 +1544,7 @@ import type { CandidateTable } from "./types";
 function fragment(options: {
   pageIndex: number;
   gridX: readonly number[];
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
 }): CandidateTable {
   return {
     pageIndex: options.pageIndex,
@@ -1694,11 +1694,11 @@ const COLUMN_MATCH_TOLERANCE = 6;
 
 /** A merged table before scoring. */
 export type MergedTable = {
-  fragments: readonly { pageIndex: number; bbox: BBox }[];
+  fragments: ReadonlyArray<{ pageIndex: number; bbox: BBox }>;
   detectionMode: CandidateTable["detectionMode"];
   gridX: readonly number[];
   gridY: readonly number[];
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
 };
 
 function _columnsMatch(a: CandidateTable, b: CandidateTable): boolean {
@@ -1825,7 +1825,7 @@ import type { MergedTable } from "./mergePageSpans";
 
 function table(options: {
   detectionMode: MergedTable["detectionMode"];
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
 }): MergedTable {
   return {
     fragments: [{ pageIndex: 0, bbox: [100, 100, 400, 700] }],
@@ -1973,7 +1973,7 @@ function _isNumericish(value: string): boolean {
   return value !== "" && /^-?\d+(\.\d+)?$/u.test(value);
 }
 
-function _fillRatio(cells: readonly (readonly string[])[]): number {
+function _fillRatio(cells: ReadonlyArray<readonly string[]>): number {
   const total = cells.reduce((sum, row) => {
     return sum + row.length;
   }, 0);
@@ -1995,7 +1995,7 @@ function _fillRatio(cells: readonly (readonly string[])[]): number {
  * Counts leading rows that carry no numbers. A header row is text; a data
  * row in any table worth importing has at least one number somewhere.
  */
-function _detectHeaderRows(cells: readonly (readonly string[])[]): number {
+function _detectHeaderRows(cells: ReadonlyArray<readonly string[]>): number {
   let headerRows = 0;
   for (let i = 0; i < Math.min(cells.length - 1, MAX_HEADER_ROWS); i += 1) {
     const row = cells[i]!;
@@ -2016,7 +2016,7 @@ function _detectHeaderRows(cells: readonly (readonly string[])[]): number {
  * a legitimately sparse column such as free-text notes.
  */
 function _fillMergedCellsDown(
-  cells: readonly (readonly string[])[],
+  cells: ReadonlyArray<readonly string[]>,
   headerRows: number,
 ): { cells: string[][]; mergedCellCount: number } {
   const filled = cells.map((row) => {

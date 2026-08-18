@@ -57,17 +57,17 @@ export type CandidateTable = {
   /** Row boundaries in page y coordinates, descending (top to bottom). */
   gridY: readonly number[];
   /** Extracted cell text, `cells[rowIndex][columnIndex]`. */
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
 };
 
 /** A candidate after page-span merging and scoring. */
 export type ScoredTable = {
   /** Page fragments in reading order. A single-page table has one. */
-  fragments: readonly { pageIndex: number; bbox: BBox }[];
+  fragments: ReadonlyArray<{ pageIndex: number; bbox: BBox }>;
   detectionMode: PdfDetectionMode;
   gridX: readonly number[];
   gridY: readonly number[];
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   confidence: "high" | "medium" | "low";
   /** Human-readable reasons behind the confidence, shown in the UI. */
   confidenceNotes: readonly string[];
@@ -125,7 +125,7 @@ export type PdfCellFlag = {
 export type ExtractedTable = {
   regionId: string;
   /** `cells[rowIndex][columnIndex]`, header rows included. */
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   headerRows: number;
   flags: readonly PdfCellFlag[];
   extractedBy: "rules" | "model";
@@ -133,5 +133,5 @@ export type ExtractedTable = {
    * Where each row came from, parallel to `cells` minus the header rows.
    * Powers "click a row, highlight it on the page".
    */
-  rowProvenance: readonly { page: number; bbox: BBox }[];
+  rowProvenance: ReadonlyArray<{ page: number; bbox: BBox }>;
 };

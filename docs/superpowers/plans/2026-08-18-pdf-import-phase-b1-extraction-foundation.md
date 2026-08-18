@@ -282,17 +282,17 @@ export type CandidateTable = {
   /** Row boundaries in page y coordinates, descending (top to bottom). */
   gridY: readonly number[];
   /** Extracted cell text, `cells[rowIndex][columnIndex]`. */
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
 };
 
 /** A candidate after page-span merging and scoring. */
 export type ScoredTable = {
   /** Page fragments in reading order. A single-page table has one. */
-  fragments: readonly { pageIndex: number; bbox: BBox }[];
+  fragments: ReadonlyArray<{ pageIndex: number; bbox: BBox }>;
   detectionMode: PdfDetectionMode;
   gridX: readonly number[];
   gridY: readonly number[];
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   confidence: "high" | "medium" | "low";
   /** Human-readable reasons behind the confidence, shown in the UI. */
   confidenceNotes: readonly string[];
@@ -381,7 +381,7 @@ export type PdfCellFlag = {
 export type ExtractedTable = {
   regionId: string;
   /** `cells[rowIndex][columnIndex]`, header rows included. */
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   headerRows: number;
   flags: readonly PdfCellFlag[];
   extractedBy: "rules" | "model";
@@ -389,7 +389,7 @@ export type ExtractedTable = {
    * Where each row came from, parallel to `cells` minus the header rows.
    * Powers "click a row, highlight it on the page".
    */
-  rowProvenance: readonly { page: number; bbox: BBox }[];
+  rowProvenance: ReadonlyArray<{ page: number; bbox: BBox }>;
 };
 ```
 
@@ -2090,7 +2090,7 @@ function _escapeCsvValue(value: string): string {
  * year lost entirely. Joining the stack preserves it.
  */
 function _buildColumnNames(
-  headerRows: readonly (readonly string[])[],
+  headerRows: ReadonlyArray<readonly string[]>,
   columnCount: number,
 ): string[] {
   const names = Array.from({ length: columnCount }, (_, columnIndex) => {
@@ -2124,7 +2124,7 @@ function _buildColumnNames(
 
 /** Serialises the table, header included, as CSV text. */
 export function pdfTableToCsv(table: {
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   headerRows: number;
 }): string {
   const columnCount = table.cells[0]?.length ?? 0;
@@ -2275,7 +2275,7 @@ async function _sha256Hex(input: string): Promise<string> {
  * drift rather than silently importing different data under the same name.
  */
 export async function computePdfTableFingerprint(table: {
-  cells: readonly (readonly string[])[];
+  cells: ReadonlyArray<readonly string[]>;
   headerRows: number;
 }): Promise<PdfTableFingerprint> {
   const headerRow = table.cells[table.headerRows - 1] ?? [];
