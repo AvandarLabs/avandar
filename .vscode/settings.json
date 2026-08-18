@@ -1,10 +1,11 @@
 {
-  "deno.suggest.autoImports": true,
-  "deno.suggest.imports.autoDiscover": true,
-  "deno.organizeImports.enabled": true,
-  "deno.lint": false,
+  "deno.enable": false,
   "deno.enablePaths": ["./supabase/functions", "./shared", "./packages/shared"],
   "deno.config": "./deno.json",
+  "deno.lint": false,
+  "deno.cacheOnSave": false,
+  "deno.organizeImports.enabled": true,
+  "deno.suggest.imports.autoDiscover": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -16,8 +17,8 @@
   "stylelint.validate": ["css", "tailwindcss"],
   "css.validate": false,
   "postcss.validate": false,
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "js/ts.tsdk.path": "./node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "cssVariables.lookupFiles": [
     "**/*.css",
     "**/*.scss",
