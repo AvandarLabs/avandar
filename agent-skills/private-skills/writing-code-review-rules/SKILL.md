@@ -156,11 +156,13 @@ knows about it. When you split a file, update the public skill's
 4. If the split changes how many phases can fire, re-check that the
    "When To Fan Out" threshold guidance still reads correctly.
 5. If the rule (or the file it lives in) belongs to a focused-review
-   pack (`docstrings`, `files`, or `naming` in **Focused Reviews**),
-   update that pack's "Apply only" list in the same change. A comment
-   rule added to `comments-checklist.md` but omitted from the
-   `docstrings` pack will never run under `avandar-code-review
-   docstrings`.
+   pack (`docstrings`, `files`, `naming`, or `tests` in **Focused
+   Reviews**), update that pack's "Apply only" list in the same
+   change. A comment rule added to `comments-checklist.md` but omitted
+   from the `docstrings` pack will never run under
+   `avandar-code-review docstrings`. A test rule added to
+   `tests-checklist.md` but omitted from the `tests` pack will never
+   run under `avandar-code-review tests`.
 
 If no split was warranted and the rule is not in a focused-review pack,
 skip this pass.

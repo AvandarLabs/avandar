@@ -1,10 +1,10 @@
 ---
 name: avandar-code-review
-description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by docstrings, files, and/or naming (any subset, concatenatable).
+description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by docstrings, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.1.0"
-  tags: avandar, code-review, typescript, react, sql, conventions, style, docstrings, files, naming
+  version: "2.2.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style, docstrings, files, naming, tests
 ---
 
 # Avandar Code Review
@@ -14,8 +14,8 @@ and style conventions. The core skill must make sense outside the
 Avandar product repo. On a **full review**, run the common-mistakes and
 general-checks sections, then only apply the language-specific and
 library-gated phases when the diff matches their gate. On a **focused
-review** (`docstrings`, `files`, and/or `naming`), skip every phase and
-bullet outside the selected packs; see **Focused Reviews**.
+review** (`docstrings`, `files`, `naming`, and/or `tests`), skip every
+phase and bullet outside the selected packs; see **Focused Reviews**.
 
 ## Public Core And Repo-Local Rules
 
@@ -90,8 +90,8 @@ Never error out because a menu tool is missing; just ask in chat.
 
 A focused review is a concatenatable subset of this skill. It still
 reviews the **entire** eligible diff, but applies **only** the named
-packs. Use it when the user wants comments, file layout, or naming in
-isolation instead of a full review.
+packs. Use it when the user wants comments, file layout, naming, or
+test quality in isolation instead of a full review.
 
 ### Invocation
 
@@ -104,14 +104,17 @@ Duplicate tokens collapse. The recognized pack tokens are:
 | `docstrings` | comments, comment blocks, and docstrings |
 | `files` | file hierarchy, directories, coupling, file names, single main export |
 | `naming` | variable, function, and module-object naming |
+| `tests` | test quality: tautologies, placeholders, observable behavior, e2e UI vs DB |
 
 Examples:
 
 - `avandar-code-review docstrings`
 - `avandar-code-review files`
 - `avandar-code-review naming`
+- `avandar-code-review tests`
 - `avandar-code-review files naming`
 - `avandar-code-review files naming docstrings`
+- `avandar-code-review files naming docstrings tests`
 
 If at least one pack token is present, this is a focused review:
 
@@ -224,6 +227,30 @@ the `files` pack.
 Do not apply comment rules, directory-module rules, function-shape
 rules, import/export form, or any other phase.
 
+### Pack: `tests`
+
+Gate: the diff adds or modifies a test file (`*.test.ts`, `*.test.tsx`,
+`*.spec.ts`, `*.spec.tsx`, or the repo's equivalent unit/integration
+test naming). Same gate as Phase: tests.
+
+Apply **only**:
+
+- The entire **Phase: tests** checklist
+  (`docs/code-reviews/tests-checklist.md`): tautological and
+  assertion-free tests, observable-behavior assertions, placeholder
+  tests, runtime assertions that restate the type system, e2e specs
+  that write the behavior under test through the database instead of
+  the UI, `__tests__/` layout once a module has two or more test
+  files, and integration-test placement.
+
+This pack does not pull extra bullets from Most Common Mistakes,
+General Checks, or the TypeScript checklist. Running the tests
+themselves stays in Auto Mode's **Finish protocol**
+("Testing At The End Of Review"); this pack reviews test *code*.
+
+Do not apply comment rules, directory-module rules, identifier naming,
+or any other TypeScript / React / SQL / library rule.
+
 ### Focused-review find lanes
 
 Each selected pack is one phase and one find lane. Do not load
@@ -235,10 +262,11 @@ full-review lane.
 | `focused-docstrings` | `docstrings` | comments gate |
 | `focused-files` | `files` | `.ts` / `.tsx` in the diff |
 | `focused-naming` | `naming` | `.ts` / `.tsx` in the diff |
+| `focused-tests` | `tests` | test-file gate (`*.test.*` / `*.spec.*`) |
 
 Fan-out uses the same threshold: fewer than 3 selected packs run
-inline; all 3 selected packs fan out. Repo-local extra-checklist phases
-do **not** count (they do not run).
+inline; 3 or more selected packs fan out. Repo-local extra-checklist
+phases do **not** count (they do not run).
 
 ## Review Modes
 
@@ -430,8 +458,8 @@ modified by the author under review). Do not flag issues on context lines
 
    **Focused review:** the only phases that fire are the selected packs,
    in this order (omit any pack the user did not name): `docstrings`,
-   `files`, `naming`. Do not gate on extra-checklist or library presence.
-   Skip the rest of this step.
+   `files`, `naming`, `tests`. Do not gate on extra-checklist or library
+   presence. Skip the rest of this step.
 
    **Full review:** gate each phase by file type, package presence, and
    whether `extra-checklist.md` exists. The phase order is:
@@ -488,10 +516,10 @@ Priorities, in order:
 
 Count the phases that actually fire for this diff (after gating).
 
-**Focused review:** count only the selected packs (1, 2, or 3). Do not
-open `extra-checklist.md`. Do not count library-gated or other
-language-specific phases. Fewer than 3 selected packs run inline; all 3
-fan out.
+**Focused review:** count only the selected packs. Do not open
+`extra-checklist.md`. Do not count library-gated or other
+language-specific phases. Fewer than 3 selected packs run inline; 3 or
+more fan out.
 
 **Full review:** this count MUST include the repo-local phases: every
 phase declared in `extra-checklist.md` plus every further ruleset it
@@ -978,6 +1006,9 @@ SKILL file.
   separate from **running** the tests (see "Testing At The End Of Review").
 - **Reference:**
   [`docs/code-reviews/tests-checklist.md`](docs/code-reviews/tests-checklist.md)
+- **Focused review:** this phase is the core of the `tests` pack. See
+  **Focused Reviews**. That pack applies this checklist only; it does
+  not pull extra bullets from other phases.
 - **Covers:** tautological and assertion-free tests (for example
   `expect(typeof x).toBe("function")`, which only fails if a symbol is deleted
   or renamed and stays green through any behavioral break), tests that assert
