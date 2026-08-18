@@ -6,8 +6,8 @@ import {
   pipe,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
-import { z } from "zod";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
+import { z } from "zod";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
@@ -20,15 +20,12 @@ import type { Workspace } from "$/models/Workspace/Workspace.ts";
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   dataset_id: z.uuid(),
-  detection_mode: z.enum(["tagged", "lattice", "stream", "manual"]),
-  fill_merged_cells: z.boolean(),
   fingerprint: supabaseJSONSchema,
-  grid_x: supabaseJSONSchema.nullable(),
-  grid_y: supabaseJSONSchema.nullable(),
   has_original_file: z.boolean(),
-  header_rows: z.number(),
   id: z.uuid(),
   is_in_cloud_storage: z.boolean(),
+  llm_model: z.string().nullable(),
+  output_mode: z.enum(["natural", "observations"]),
   page_range_end: z.number().nullable(),
   page_range_start: z.number().nullable(),
   regions: supabaseJSONSchema,
@@ -38,8 +35,8 @@ const DBReadSchema = z.object({
 });
 
 /**
- * Validation schemas for the shapes stashed inside the `regions`,
- * `fingerprint`, `grid_x`, and `grid_y` jsonb columns.
+ * Validation schemas for the shapes stashed inside the `regions` and
+ * `fingerprint` jsonb columns.
  *
  * `DBReadSchema` above must stay structurally equal to the generated
  * database row type (enforced by `ZodConsistencyTests` below), so it can
@@ -48,19 +45,40 @@ const DBReadSchema = z.object({
  * fails loudly with a `ZodError` naming the bad field instead of being
  * silently accepted and breaking somewhere confusing downstream.
  */
-const pdfTableRegionSchema = z.object({
+const pdfRegionFragmentSchema = z.object({
   page: z.number().int().nonnegative(),
   bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
 });
-const pdfTableRegionsSchema = z.array(pdfTableRegionSchema).readonly();
+
+const pdfRegionSchema = z.object({
+  id: z.string().min(1),
+  label: z.string(),
+  // `shape` and `detectionMode` mirror the `datasets__pdf_region_shape` and
+  // `datasets__pdf_detection_mode` enums. Those are no longer columns, so
+  // Postgres cannot reject a bad value inside the jsonb for us; this is the
+  // only thing standing between a typo and a `match` that throws much later,
+  // at extraction time, with no clue where the value came from.
+  shape: z.enum([
+    "grid_table",
+    "labelled_graphic",
+    "repeating_blocks",
+    "prose_measures",
+  ]),
+  detectionMode: z.enum(["tagged", "lattice", "stream", "manual"]),
+  fragments: z.array(pdfRegionFragmentSchema).readonly(),
+  // Deliberately unvalidated beyond "is an object": each shape's extractor
+  // owns the meaning of its own options, and validating them here would put
+  // every shape's settings in one place again, which is what this
+  // restructure removed.
+  options: z.record(z.string(), z.unknown()).default({}),
+});
+const pdfRegionsSchema = z.array(pdfRegionSchema).readonly();
 
 const pdfTableFingerprintSchema = z.object({
   headers: z.array(z.string()).readonly(),
   shape: z.tuple([z.number().int(), z.number().int()]),
   hash: z.string(),
 });
-
-const gridCoordinatesSchema = z.array(z.number()).readonly();
 
 export const PdfFileDatasetParsers =
   makeParserRegistry<PdfFileDatasetModel>().build({
@@ -75,22 +93,14 @@ export const PdfFileDatasetParsers =
           datasetId: obj.datasetId as DatasetId,
           id: obj.id as PdfFileDatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,
-          regions: pdfTableRegionsSchema.parse(obj.regions),
+          regions: pdfRegionsSchema.parse(obj.regions),
           fingerprint: pdfTableFingerprintSchema.parse(obj.fingerprint),
-          gridX:
-            obj.gridX === undefined
-              ? undefined
-              : gridCoordinatesSchema.parse(obj.gridX),
-          gridY:
-            obj.gridY === undefined
-              ? undefined
-              : gridCoordinatesSchema.parse(obj.gridY),
           pageRangeStart: obj.pageRangeStart,
           pageRangeEnd: obj.pageRangeEnd,
         });
       },
     ),
-    // The domain types (`PdfTableRegion[]`, `PdfTableFingerprint`, etc.) are
+    // The domain types (`PdfRegion[]`, `PdfTableFingerprint`, etc.) are
     // deliberately stronger than the DB's `Json` columns, so they don't
     // structurally satisfy `Json` and need a cast here. This was considered,
     // not overlooked: the write direction is guarded by the SQL `not null`

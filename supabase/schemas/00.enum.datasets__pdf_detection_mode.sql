@@ -14,11 +14,12 @@
 -- region-selection feature ships, so that adding that feature needs no enum
 -- migration.
 --
+-- NOT DEAD, despite no column having this type. Each entry in
+-- `datasets__pdf_file.regions` carries its own `detectionMode`, so the values
+-- are now referenced from inside that jsonb rather than by a column. This
+-- declaration is what stops `db diff` dropping the type, and it is the
+-- canonical list the Zod enum in `PdfFileDatasetParsers.ts` mirrors.
+--
 -- Keep new values at the end: moving one is not a rename, it forces a full
 -- rebuild of the type and a rewrite of every column using it.
-create type public.datasets__pdf_detection_mode as enum(
-  'tagged',
-  'lattice',
-  'stream',
-  'manual'
-);
+create type public.datasets__pdf_detection_mode as enum('tagged', 'lattice', 'stream', 'manual');

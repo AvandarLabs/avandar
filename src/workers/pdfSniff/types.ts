@@ -1,7 +1,21 @@
-import type { PdfDetectionMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
+import type {
+  BBox,
+  PdfDetectionMode,
+} from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 
-/** `[x0, y0, x1, y1]`, bottom-left and top-right, in PDF points. */
-export type BBox = readonly [number, number, number, number];
+/*
+ * `BBox`, `PdfRegionShape`, `PdfRegionFragment` and `PdfRegion` are defined in
+ * the model rather than here, because they are the shape persisted in the
+ * `datasets__pdf_file.regions` jsonb column, and `shared/` cannot import from
+ * `src/` (see the note in `PdfFileDataset.types.ts`). They are re-exported so
+ * worker-side code can keep importing every pdfSniff type from one place.
+ */
+export type {
+  BBox,
+  PdfRegion,
+  PdfRegionFragment,
+  PdfRegionShape,
+} from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 
 /**
  * One run of text with a position. Normalised out of pdf.js's raw items so
@@ -82,39 +96,6 @@ export type ScoredTable = {
   confidenceNotes: readonly string[];
   headerRows: number;
   mergedCellCount: number;
-};
-
-/** What kind of content a region holds, which decides how it is extracted. */
-export type PdfRegionShape =
-  | "grid_table"
-  | "labelled_graphic"
-  | "repeating_blocks"
-  | "prose_measures";
-
-/** One page's worth of a region. A region spanning pages has several. */
-export type PdfRegionFragment = {
-  /** Zero-based, matching `PageGeometry.pageIndex`. */
-  page: number;
-  bbox: BBox;
-};
-
-/**
- * A rectangle (or text run) the user or a detector has marked for extraction.
- *
- * Deliberately carries resolved geometry rather than an ordinal like
- * "table 3". A sheet name is an identity Excel guarantees; a table ordinal is
- * an output of our own detector, so improving detection could silently
- * repoint a saved dataset at different data.
- */
-export type PdfRegion = {
-  id: string;
-  /** User-editable. Prefixes column names when regions are combined. */
-  label: string;
-  shape: PdfRegionShape;
-  detectionMode: PdfDetectionMode;
-  fragments: readonly PdfRegionFragment[];
-  /** Shape-specific settings. Read only by the matching extractor. */
-  options: Readonly<Record<string, unknown>>;
 };
 
 /** Why a single extracted value might be wrong, and how sure we are. */

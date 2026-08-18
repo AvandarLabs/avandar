@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { PdfFileDatasetParsers } from "$/models/datasets/PdfFileDataset/PdfFileDatasetParsers.ts";
+import { describe, expect, it } from "vitest";
 import type { PdfFileDatasetModel } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types.ts";
 
 const validRow: PdfFileDatasetModel["DBRead"] = {
@@ -11,14 +11,20 @@ const validRow: PdfFileDatasetModel["DBRead"] = {
   is_in_cloud_storage: true,
   size_in_bytes: 1024,
   has_original_file: true,
-  regions: [{ page: 4, bbox: [0, 0, 100, 200] }],
-  detection_mode: "lattice",
-  grid_x: [0, 50, 100],
-  grid_y: [0, 100, 200],
+  regions: [
+    {
+      id: "r1",
+      label: "Cases by district",
+      shape: "grid_table",
+      detectionMode: "lattice",
+      fragments: [{ page: 4, bbox: [0, 0, 100, 200] }],
+      options: { headerRows: 1, fillMergedCells: true },
+    },
+  ],
+  output_mode: "natural",
+  llm_model: null,
   page_range_start: 4,
   page_range_end: 9,
-  header_rows: 1,
-  fill_merged_cells: true,
   fingerprint: { headers: ["a", "b"], shape: [10, 2], hash: "abc123" },
 };
 
@@ -30,33 +36,39 @@ describe("PdfFileDatasetParsers", () => {
     expect(model.pageRangeEnd).toBe(9);
     expect(typeof model.pageRangeStart).toBe("number");
     expect(typeof model.pageRangeEnd).toBe("number");
-    expect(model.regions).toEqual([{ page: 4, bbox: [0, 0, 100, 200] }]);
+    expect(model.outputMode).toBe("natural");
+    expect(model.llmModel).toBeUndefined();
+    expect(model.regions).toEqual([
+      {
+        id: "r1",
+        label: "Cases by district",
+        shape: "grid_table",
+        detectionMode: "lattice",
+        fragments: [{ page: 4, bbox: [0, 0, 100, 200] }],
+        options: { headerRows: 1, fillMergedCells: true },
+      },
+    ]);
     expect(model.fingerprint).toEqual({
       headers: ["a", "b"],
       shape: [10, 2],
       hash: "abc123",
     });
-    expect(model.gridX).toEqual([0, 50, 100]);
-    expect(model.gridY).toEqual([0, 100, 200]);
-  });
-
-  it("yields undefined for grid_x/grid_y when null (e.g. tagged tables)", () => {
-    const model = PdfFileDatasetParsers.fromDBReadToModelRead({
-      ...validRow,
-      detection_mode: "tagged",
-      grid_x: null,
-      grid_y: null,
-    });
-
-    expect(model.gridX).toBeUndefined();
-    expect(model.gridY).toBeUndefined();
   });
 
   it("throws when a region is missing its bbox", () => {
     expect(() => {
       PdfFileDatasetParsers.fromDBReadToModelRead({
         ...validRow,
-        regions: [{ page: 4 }],
+        regions: [
+          {
+            id: "r1",
+            label: "x",
+            shape: "grid_table",
+            detectionMode: "manual",
+            fragments: [{ page: 4 }],
+            options: {},
+          },
+        ],
       });
     }).toThrow();
   });
@@ -68,5 +80,107 @@ describe("PdfFileDatasetParsers", () => {
         fingerprint: { headers: ["a", "b"], shape: [10, 2] },
       });
     }).toThrow();
+  });
+});
+
+describe("PdfFileDataset region parsing", () => {
+  it("parses a multi-region row into camelCase regions", () => {
+    const parsed = PdfFileDatasetParsers.fromDBReadToModelRead({
+      ...validRow,
+      output_mode: "observations",
+      llm_model: null,
+      page_range_start: null,
+      page_range_end: null,
+      fingerprint: { headers: ["state"], shape: [16, 2], hash: "abc" },
+      regions: [
+        {
+          id: "r1",
+          label: "Deaths by state",
+          shape: "labelled_graphic",
+          detectionMode: "manual",
+          fragments: [{ page: 0, bbox: [330, 175, 590, 465] }],
+          options: { ambiguityThreshold: 0.8 },
+        },
+        {
+          id: "r2",
+          label: "Headline figures",
+          shape: "repeating_blocks",
+          detectionMode: "stream",
+          fragments: [{ page: 1, bbox: [40, 600, 555, 700] }],
+          options: {},
+        },
+      ],
+    });
+
+    expect(parsed.outputMode).toBe("observations");
+    expect(parsed.llmModel).toBeUndefined();
+    expect(parsed.regions).toHaveLength(2);
+    expect(parsed.regions[0]!.shape).toBe("labelled_graphic");
+    expect(parsed.regions[0]!.fragments[0]!.bbox).toEqual([330, 175, 590, 465]);
+    expect(parsed.regions[1]!.shape).toBe("repeating_blocks");
+  });
+
+  it("keeps the model name of the model that extracted the rows", () => {
+    const parsed = PdfFileDatasetParsers.fromDBReadToModelRead({
+      ...validRow,
+      llm_model: "anthropic/claude-sonnet-4",
+    });
+
+    expect(parsed.llmModel).toBe("anthropic/claude-sonnet-4");
+  });
+
+  it("rejects a region with an unknown shape", () => {
+    // A shape we do not have an extractor for must fail loudly at the
+    // boundary rather than reaching a `match` that throws at extraction time.
+    expect(() => {
+      PdfFileDatasetParsers.fromDBReadToModelRead({
+        ...validRow,
+        regions: [
+          {
+            id: "r1",
+            label: "x",
+            shape: "sideways",
+            detectionMode: "manual",
+            fragments: [],
+            options: {},
+          },
+        ],
+      });
+    }).toThrow();
+  });
+
+  it("rejects a region with an unknown detection mode", () => {
+    expect(() => {
+      PdfFileDatasetParsers.fromDBReadToModelRead({
+        ...validRow,
+        regions: [
+          {
+            id: "r1",
+            label: "x",
+            shape: "grid_table",
+            detectionMode: "telepathy",
+            fragments: [],
+            options: {},
+          },
+        ],
+      });
+    }).toThrow();
+  });
+
+  it("defaults a region's options to an empty object when absent", () => {
+    const parsed = PdfFileDatasetParsers.fromDBReadToModelRead({
+      ...validRow,
+      regions: [
+        {
+          id: "r1",
+          label: "x",
+          shape: "grid_table",
+          detectionMode: "manual",
+          fragments: [],
+        },
+      ],
+    });
+
+    expect(parsed.regions[0]!.options).toEqual({});
   });
 });

@@ -734,15 +734,12 @@ export type Database = {
         Row: {
           created_at: string
           dataset_id: string
-          detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
-          fill_merged_cells: boolean
           fingerprint: Json
-          grid_x: Json | null
-          grid_y: Json | null
           has_original_file: boolean
-          header_rows: number
           id: string
           is_in_cloud_storage: boolean
+          llm_model: string | null
+          output_mode: Database["public"]["Enums"]["datasets__pdf_output_mode"]
           page_range_end: number | null
           page_range_start: number | null
           regions: Json
@@ -753,15 +750,12 @@ export type Database = {
         Insert: {
           created_at?: string
           dataset_id: string
-          detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
-          fill_merged_cells?: boolean
           fingerprint: Json
-          grid_x?: Json | null
-          grid_y?: Json | null
           has_original_file?: boolean
-          header_rows?: number
           id?: string
           is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
           page_range_end?: number | null
           page_range_start?: number | null
           regions: Json
@@ -772,15 +766,12 @@ export type Database = {
         Update: {
           created_at?: string
           dataset_id?: string
-          detection_mode?: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
-          fill_merged_cells?: boolean
           fingerprint?: Json
-          grid_x?: Json | null
-          grid_y?: Json | null
           has_original_file?: boolean
-          header_rows?: number
           id?: string
           is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
           page_range_end?: number | null
           page_range_start?: number | null
           regions?: Json
@@ -1730,14 +1721,11 @@ export type Database = {
           p_dataset_description: string
           p_dataset_id: string
           p_dataset_name: string
-          p_detection_mode: Database["public"]["Enums"]["datasets__pdf_detection_mode"]
-          p_fill_merged_cells: boolean
           p_fingerprint: Json
-          p_grid_x: Json
-          p_grid_y: Json
           p_has_original_file: boolean
-          p_header_rows: number
           p_is_in_cloud_storage: boolean
+          p_llm_model?: string
+          p_output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
           p_page_range_end: number
           p_page_range_start: number
           p_regions: Json
@@ -2126,6 +2114,12 @@ export type Database = {
         | "JSON"
         | "GEOMETRY"
       datasets__pdf_detection_mode: "tagged" | "lattice" | "stream" | "manual"
+      datasets__pdf_output_mode: "natural" | "observations"
+      datasets__pdf_region_shape:
+        | "grid_table"
+        | "labelled_graphic"
+        | "repeating_blocks"
+        | "prose_measures"
       datasets__source_type:
         | "csv_file"
         | "google_sheets"
@@ -2368,6 +2362,13 @@ export const Constants = {
         "GEOMETRY",
       ],
       datasets__pdf_detection_mode: ["tagged", "lattice", "stream", "manual"],
+      datasets__pdf_output_mode: ["natural", "observations"],
+      datasets__pdf_region_shape: [
+        "grid_table",
+        "labelled_graphic",
+        "repeating_blocks",
+        "prose_measures",
+      ],
       datasets__source_type: [
         "csv_file",
         "google_sheets",

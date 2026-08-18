@@ -17,25 +17,37 @@ create table public.datasets__pdf_file (
   -- datasets. Recorded here so a client can tell whether re-extraction is
   -- possible without probing storage.
   has_original_file boolean not null default false,
-  -- WHERE the extracted table physically sits, as one entry per page
-  -- fragment. A table spanning pages 4-7 has four entries. Shape:
-  --   [{ "page": 4, "bbox": [x0, y0, x1, y1] }, ...]
+  -- WHAT was extracted and WHERE it physically sits. One entry per region;
+  -- a dataset built from a map plus a KPI row has two. Shape:
+  --   [{
+  --      "id": "r1",
+  --      "label": "Deaths by state",
+  --      "shape": "labelled_graphic",
+  --      "detectionMode": "manual",
+  --      "fragments": [{ "page": 0, "bbox": [x0, y0, x1, y1] }],
+  --      "options": { ... shape-specific ... }
+  --    }, ...]
   --
   -- Deliberately NOT an ordinal index like "table 3". A sheet name is an
   -- identity Excel guarantees; a table ordinal is an output of our own
-  -- detector, so improving detection could silently repoint a saved
-  -- dataset at different data. Geometry is stable across detector
-  -- versions.
+  -- detector, so improving detection could silently repoint a saved dataset
+  -- at different data. Geometry is stable across detector versions.
+  --
+  -- Per-region settings (grid coordinates, header row count, merged-cell
+  -- fill, ambiguity threshold) live in `options` rather than as columns,
+  -- because a dataset can now hold regions of different shapes for which
+  -- those settings mean different things or nothing at all.
   regions jsonb not null,
-  -- Which signal produced this table.
-  detection_mode public.datasets__pdf_detection_mode not null,
-  -- Snapped grid line coordinates, so a re-parse reproduces the exact same
-  -- cell boundaries. Null for `tagged`, where the structure tree supplies
-  -- the grid directly.
-  grid_x jsonb,
-  grid_y jsonb,
+  -- How several regions combine. See the enum's comment.
+  output_mode public.datasets__pdf_output_mode not null default 'natural',
+  -- Which model produced any model-extracted rows, or null when the rows came
+  -- from rules alone.
+  --
+  -- A column rather than an inference: the workspace keeps a privacy log, so
+  -- "did a model see this document" must be answerable from the dataset row.
+  llm_model text,
   -- The page range the user limited detection to, if any. Inclusive, and
-  -- zero-based to match `regions[].page`.
+  -- zero-based to match `regions[].fragments[].page`.
   --
   -- Two plain integers rather than an `int4range`, deliberately. We never
   -- range-query this column, and PostgREST hands a range back as its text
@@ -43,10 +55,6 @@ create table public.datasets__pdf_file (
   -- no benefit.
   page_range_start integer,
   page_range_end integer,
-  -- Number of leading rows treated as header.
-  header_rows integer not null default 1,
-  -- Whether a value spanning several rows is repeated into each of them.
-  fill_merged_cells boolean not null default true,
   -- Snapshot of what was extracted at import time, compared on re-parse to
   -- detect drift. Shape:
   --   { "headers": [...], "shape": [rowCount, colCount], "hash": "..." }

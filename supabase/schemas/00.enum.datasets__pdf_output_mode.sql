@@ -1,0 +1,13 @@
+-- How several extracted regions combine into one dataset.
+--
+--   natural       - the regions share resolved headers and union into one
+--                   table with the source's own schema. A table continuing
+--                   across pages is this case.
+--   observations  - the regions have different schemas, so each extracted
+--                   value becomes a row of
+--                   (subject, metric, value, unit, period, provenance).
+--                   This is the shape that lets successive reports stack.
+--
+-- Keep new values at the end: moving one is not a rename, it forces a full
+-- rebuild of the type and a rewrite of every column using it.
+create type public.datasets__pdf_output_mode as enum('natural', 'observations');

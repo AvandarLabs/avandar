@@ -11,15 +11,73 @@ export type PdfFileDatasetId = UUID<ModelType>;
 /** How a PDF table's structure was determined. */
 export type PdfDetectionMode = "tagged" | "lattice" | "stream" | "manual";
 
+/** How several extracted regions combine into one dataset. */
+export type PdfOutputMode = "natural" | "observations";
+
+/*
+ * The region types below live here, rather than beside the extraction code in
+ * `src/workers/pdfSniff/types.ts`, for two reasons:
+ *
+ * 1. They are the persisted contract. They describe exactly what is stored in
+ *    the `datasets__pdf_file.regions` jsonb column, so they belong next to
+ *    the rest of this model, and the Zod schema in `PdfFileDatasetParsers.ts`
+ *    validates against them at the DB boundary.
+ * 2. `shared/` must stay resolvable under Deno. `pnpm type-check` runs
+ *    `deno check shared`, and the Deno import map (`/deno.json`) maps `$/` to
+ *    `shared/` but has no `@/` entry at all, so nothing here can import from
+ *    `src/`. Defining them in `src/` and importing them back would not
+ *    type-check, and would also be a cycle: `pdfSniff/types.ts` already
+ *    imports `PdfDetectionMode` from this file.
+ *
+ * `src/workers/pdfSniff/types.ts` re-exports these, so worker-side code can
+ * keep importing them from there. Please do not move them back.
+ */
+
+/** `[x0, y0, x1, y1]`, bottom-left and top-right, in PDF points. */
+export type BBox = readonly [number, number, number, number];
+
+/** What kind of content a region holds, which decides how it is extracted. */
+export type PdfRegionShape =
+  | "grid_table"
+  | "labelled_graphic"
+  | "repeating_blocks"
+  | "prose_measures";
+
 /**
- * A rectangle on one page, in PDF user-space points with the origin at the
+ * One page's worth of a region. A region spanning pages has several.
+ *
+ * The rectangle is in PDF user-space points with the origin at the
  * bottom-left, matching pdf.js's coordinate system.
  */
-export type PdfTableRegion = {
-  /** Zero-based page index. */
+export type PdfRegionFragment = {
+  /** Zero-based, matching `PageGeometry.pageIndex`. */
   page: number;
-  /** `[x0, y0, x1, y1]`, bottom-left and top-right corners. */
-  bbox: readonly [number, number, number, number];
+  bbox: BBox;
+};
+
+/**
+ * A rectangle (or text run) the user or a detector has marked for extraction.
+ *
+ * Deliberately carries resolved geometry rather than an ordinal like
+ * "table 3". A sheet name is an identity Excel guarantees; a table ordinal is
+ * an output of our own detector, so improving detection could silently
+ * repoint a saved dataset at different data.
+ */
+export type PdfRegion = {
+  id: string;
+  /** User-editable. Prefixes column names when regions are combined. */
+  label: string;
+  shape: PdfRegionShape;
+  detectionMode: PdfDetectionMode;
+  fragments: readonly PdfRegionFragment[];
+  /**
+   * Shape-specific settings, read only by the matching extractor. Grid
+   * coordinates, header row count, merged-cell fill and ambiguity threshold
+   * all live here rather than as columns, because one dataset can hold
+   * regions of different shapes for which those settings mean different
+   * things or nothing at all.
+   */
+  options: Readonly<Record<string, unknown>>;
 };
 
 /**
@@ -60,29 +118,28 @@ export type PdfFileDatasetRead = Model.Base<
     /** Whether the original PDF was retained. */
     hasOriginalFile: boolean;
 
-    /** Page fragments the table occupies, in reading order. */
-    regions: readonly PdfTableRegion[];
+    /**
+     * What was extracted and where it physically sits. One entry per region,
+     * so a dataset built from a map plus a KPI row has two.
+     */
+    regions: readonly PdfRegion[];
 
-    /** Which detection signal produced this table. */
-    detectionMode: PdfDetectionMode;
+    /** How the regions combine into one dataset. */
+    outputMode: PdfOutputMode;
 
-    /** Snapped column boundaries; undefined for `tagged`. */
-    gridX: readonly number[] | undefined;
-
-    /** Snapped row boundaries; undefined for `tagged`. */
-    gridY: readonly number[] | undefined;
+    /**
+     * Which model produced any model-extracted rows, or undefined when the
+     * rows came from rules alone. Stored rather than inferred because the
+     * workspace privacy log must be able to answer "did a model see this
+     * document" from the dataset row alone.
+     */
+    llmModel: string | undefined;
 
     /** First page detection was limited to, inclusive and zero-based. */
     pageRangeStart: number | undefined;
 
     /** Last page detection was limited to, inclusive and zero-based. */
     pageRangeEnd: number | undefined;
-
-    /** Number of leading rows treated as header. */
-    headerRows: number;
-
-    /** Whether merged cells are filled down into every row they span. */
-    fillMergedCells: boolean;
 
     /** Drift-detection snapshot taken at import time. */
     fingerprint: PdfTableFingerprint;
@@ -99,10 +156,7 @@ export type PdfFileDatasetModel = SupabaseCrudModelSpec<
     modelPrimaryKeyType: PdfFileDatasetId;
     modelTypes: {
       Read: PdfFileDatasetRead;
-      Insert: SetOptional<
-        PdfFileDatasetRead,
-        "createdAt" | "id" | "updatedAt"
-      >;
+      Insert: SetOptional<PdfFileDatasetRead, "createdAt" | "id" | "updatedAt">;
       Update: Partial<PdfFileDatasetRead>;
     };
   },

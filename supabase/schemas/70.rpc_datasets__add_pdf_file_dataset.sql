@@ -11,14 +11,13 @@
  * @param p_is_in_cloud_storage: Whether the raw file is stored in cloud storage
  * @param p_size_in_bytes: The size of the source PDF in bytes
  * @param p_has_original_file: Whether the original PDF was retained
- * @param p_regions: Page fragments the extracted table occupies
- * @param p_detection_mode: Which signal produced this table
- * @param p_grid_x: Snapped column boundary coordinates
- * @param p_grid_y: Snapped row boundary coordinates
+ * @param p_regions: The regions extracted from the PDF, each with its own
+ *   shape, geometry and shape-specific options
+ * @param p_output_mode: How several regions combine into one dataset
+ * @param p_llm_model: Which model produced any model-extracted rows, or null
+ *   when the rows came from rules alone
  * @param p_page_range_start: First page detection was limited to, inclusive and zero-based
  * @param p_page_range_end: Last page detection was limited to, inclusive and zero-based
- * @param p_header_rows: Number of leading rows treated as header
- * @param p_fill_merged_cells: Whether a value spanning several rows is repeated into each of them
  * @param p_fingerprint: Snapshot of what was extracted at import time
  *
  * @returns: The created dataset
@@ -33,14 +32,13 @@ create or replace function public.rpc_datasets__add_pdf_file_dataset (
   p_size_in_bytes bigint,
   p_has_original_file boolean,
   p_regions jsonb,
-  p_detection_mode public.datasets__pdf_detection_mode,
-  p_grid_x jsonb,
-  p_grid_y jsonb,
   p_page_range_start integer,
   p_page_range_end integer,
-  p_header_rows integer,
-  p_fill_merged_cells boolean,
-  p_fingerprint jsonb
+  p_fingerprint jsonb,
+  -- Trailing because Postgres requires every parameter after a defaulted one
+  -- to be defaulted too.
+  p_output_mode public.datasets__pdf_output_mode default 'natural',
+  p_llm_model text default null
 ) returns public.datasets as $$
 declare
   v_dataset public.datasets;
@@ -61,13 +59,10 @@ begin
     size_in_bytes,
     has_original_file,
     regions,
-    detection_mode,
-    grid_x,
-    grid_y,
+    output_mode,
+    llm_model,
     page_range_start,
     page_range_end,
-    header_rows,
-    fill_merged_cells,
     fingerprint
   ) values (
     v_dataset.id,
@@ -76,13 +71,10 @@ begin
     p_size_in_bytes,
     p_has_original_file,
     p_regions,
-    p_detection_mode,
-    p_grid_x,
-    p_grid_y,
+    p_output_mode,
+    p_llm_model,
     p_page_range_start,
     p_page_range_end,
-    p_header_rows,
-    p_fill_merged_cells,
     p_fingerprint
   );
 

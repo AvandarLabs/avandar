@@ -306,13 +306,35 @@ than enum value additions, so `db diff` handles them correctly and they do
 
 - [ ] **Step 6: Update the model types**
 
-In `PdfFileDataset.types.ts`, replace the flat fields with:
+**Correction, found during execution.** An earlier draft of this step had
+`PdfFileDataset.types.ts` import the region types from
+`@/workers/pdfSniff/types`. That is impossible in this repo, for three
+independent reasons: `type-check:deno` runs `deno check shared`, and the Deno
+import map defines `$/` but no `@/`, so it is a hard build break rather than a
+style preference; `src/workers/pdfSniff/types.ts` already imports
+`PdfDetectionMode` from this very file, so it would be a literal cycle; and the
+convention is one-way, with 1533 `src/` to `$/` imports and zero the other way.
+
+**The dependency runs the other way.** The four types that get persisted into
+the `regions` jsonb column (`BBox`, `PdfRegionShape`, `PdfRegionFragment`,
+`PdfRegion`) are **defined here in `shared/`**, and
+`src/workers/pdfSniff/types.ts` re-exports them so existing worker-side import
+sites keep working. Worker-runtime types that are never persisted (`TextItem`,
+`RuleSegment`, `PageGeometry`, `TextLine`, `CandidateTable`, `ScoredTable`,
+`PdfCellFlag`, `ExtractedTable`) stay in `src/workers/`.
+
+Also delete the now-dead `PdfTableRegion` from this file; it is structurally
+identical to `PdfRegionFragment`, and two names for one shape invites a later
+mismatch.
+
+The snippet below shows the fields, not the exact model wrapper. The real
+`PdfFileDatasetModel` is a `SupabaseCrudModelSpec` around a `Model.Base` named
+`PdfFileDatasetRead`, and the parser API is `fromDBReadToModelRead`, not
+`fromDBReadToModel`. Follow the real shapes.
 
 ```ts
-import type {
-  PdfRegion,
-  PdfRegionShape,
-} from "@/workers/pdfSniff/types";
+// Defined in this file, not imported: `shared/` must stay Deno-resolvable
+// and so cannot reach into `src/`. See the correction above.
 
 export type PdfOutputMode = "natural" | "observations";
 

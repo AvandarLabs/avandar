@@ -4,9 +4,9 @@ import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCata
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import type {
-  PdfDetectionMode,
+  PdfOutputMode,
+  PdfRegion,
   PdfTableFingerprint,
-  PdfTableRegion,
 } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
@@ -69,14 +69,14 @@ export type PdfDatasetInsertParams = BaseDatasetInsertParams & {
   isInCloudStorage: boolean;
   sizeInBytes: number;
   hasOriginalFile: boolean;
-  regions: readonly PdfTableRegion[];
-  detectionMode: PdfDetectionMode;
-  gridX?: readonly number[];
-  gridY?: readonly number[];
+  /** One entry per extracted region, each with its own shape and options. */
+  regions: readonly PdfRegion[];
+  /** Defaults to `natural` in the RPC when omitted. */
+  outputMode?: PdfOutputMode;
+  /** Omitted when the rows came from rules alone. */
+  llmModel?: string;
   pageRangeStart?: number;
   pageRangeEnd?: number;
-  headerRows: number;
-  fillMergedCells: boolean;
   fingerprint: PdfTableFingerprint;
 };
 

@@ -1,12 +1,12 @@
+import {
+  getOriginalFileExtension,
+  requiresOriginalFileRetention,
+} from "$/models/datasets/DatasetSource/DatasetSource";
 import { createServerApiClient } from "$/ServerApiClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import {
-  getOriginalFileExtension,
-  requiresOriginalFileRetention,
-} from "$/models/datasets/DatasetSource/DatasetSource";
 import type {
   DatasetColumnInput,
   DatasetDBRead,
@@ -139,13 +139,10 @@ function _makeInsertPdfFileDataset(
         p_size_in_bytes: params.sizeInBytes,
         p_has_original_file: params.hasOriginalFile,
         p_regions: params.regions,
-        p_detection_mode: params.detectionMode,
-        p_grid_x: params.gridX ?? null,
-        p_grid_y: params.gridY ?? null,
+        p_output_mode: params.outputMode ?? "natural",
+        p_llm_model: params.llmModel ?? null,
         p_page_range_start: params.pageRangeStart ?? null,
         p_page_range_end: params.pageRangeEnd ?? null,
-        p_header_rows: params.headerRows,
-        p_fill_merged_cells: params.fillMergedCells,
         p_fingerprint: params.fingerprint,
       },
     );

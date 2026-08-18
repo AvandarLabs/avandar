@@ -139,7 +139,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
           if (Model.isOfModelType(value, "DatasetColumn")) {
             const datasetColumn = value as DatasetColumn.T;
             const prevDatasetColumn = dataset.columns?.find((column) => {
-              return column.id === value.id;
+              return column.id === datasetColumn.id;
             });
             assertIsDefined(prevDatasetColumn);
 
