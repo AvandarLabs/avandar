@@ -74,3 +74,64 @@ export type ScoredTable = {
   headerRows: number;
   mergedCellCount: number;
 };
+
+/** What kind of content a region holds, which decides how it is extracted. */
+export type PdfRegionShape =
+  | "grid_table"
+  | "labelled_graphic"
+  | "repeating_blocks"
+  | "prose_measures";
+
+/** One page's worth of a region. A region spanning pages has several. */
+export type PdfRegionFragment = {
+  /** Zero-based, matching `PageGeometry.pageIndex`. */
+  page: number;
+  bbox: BBox;
+};
+
+/**
+ * A rectangle (or text run) the user or a detector has marked for extraction.
+ *
+ * Deliberately carries resolved geometry rather than an ordinal like
+ * "table 3". A sheet name is an identity Excel guarantees; a table ordinal is
+ * an output of our own detector, so improving detection could silently
+ * repoint a saved dataset at different data.
+ */
+export type PdfRegion = {
+  id: string;
+  /** User-editable. Prefixes column names when regions are combined. */
+  label: string;
+  shape: PdfRegionShape;
+  detectionMode: PdfDetectionMode;
+  fragments: readonly PdfRegionFragment[];
+  /** Shape-specific settings. Read only by the matching extractor. */
+  options: Readonly<Record<string, unknown>>;
+};
+
+/** Why a single extracted value might be wrong, and how sure we are. */
+export type PdfCellFlag = {
+  rowIndex: number;
+  columnIndex: number;
+  reason: "ambiguous_association" | "unmatched_label" | "unmatched_value";
+  /** Free text shown next to the flagged cell in the review grid. */
+  detail: string;
+};
+
+/**
+ * What every extractor returns, whatever shape it read and whether rules or a
+ * model produced it. Keeping this one type is what lets the review grid, type
+ * inference and import stay ignorant of which extractor ran.
+ */
+export type ExtractedTable = {
+  regionId: string;
+  /** `cells[rowIndex][columnIndex]`, header rows included. */
+  cells: readonly (readonly string[])[];
+  headerRows: number;
+  flags: readonly PdfCellFlag[];
+  extractedBy: "rules" | "model";
+  /**
+   * Where each row came from, parallel to `cells` minus the header rows.
+   * Powers "click a row, highlight it on the page".
+   */
+  rowProvenance: readonly { page: number; bbox: BBox }[];
+};
