@@ -82,6 +82,15 @@ export type RegionGeometry = {
   rules: readonly RuleSegment[];
 };
 
+/** A label made of one or more text items, with its centroid. */
+export type AssembledLabel = {
+  text: string;
+  cx: number;
+  cy: number;
+  bbox: BBox;
+  items: readonly TextItem[];
+};
+
 /** A run of text items sharing a baseline, in left-to-right order. */
 export type TextLine = {
   /** Baseline y, in PDF points from the page's bottom. */
