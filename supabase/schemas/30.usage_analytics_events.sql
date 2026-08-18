@@ -85,6 +85,13 @@ grant
 select
   on table public.usage_analytics_events to authenticated;
 
+grant
+select
+,
+  insert,
+update,
+delete on table public.usage_analytics_events to service_role;
+
 -- INSERT: authenticated clients may record only browser-owned event names as
 -- themselves. Database and server emitters use privileged writers that bypass
 -- this policy. A nullable workspace remains valid for client events emitted

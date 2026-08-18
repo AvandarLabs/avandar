@@ -29,7 +29,8 @@ select
 ,
   insert,
 update,
-delete on table public.attribute_mappings__dataset_column to authenticated;
+delete on table public.attribute_mappings__dataset_column to authenticated,
+service_role;
 
 -- Policies
 create policy "

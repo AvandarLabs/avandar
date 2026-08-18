@@ -41,7 +41,8 @@ select
 ,
   insert,
 update,
-delete on table public.tokens__google to authenticated;
+delete on table public.tokens__google to authenticated,
+service_role;
 
 -- Policies
 create policy "

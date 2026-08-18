@@ -46,7 +46,8 @@ select
 ,
   insert,
 update,
-delete on table public.workspace_invites to authenticated;
+delete on table public.workspace_invites to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select invites they sent from their workspace" on public.workspace_invites for

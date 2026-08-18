@@ -3,7 +3,7 @@ name: supabase-declarative-schema
 description: "MANDATORY for ALL Supabase schema changes. Use for any `create table`, `alter table`, column change, datatype, RLS policy, trigger, index, constraint, function, RPC, migration, or `supabase/schemas/` change. This skill overrides the base Supabase schema workflow."
 metadata:
   author: jpsyx
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Supabase Declarative Database Schema Management
@@ -13,7 +13,7 @@ metadata:
 ## Non-Negotiables
 
 1. Put all declarative schema SQL files in `supabase/schemas/`.
-2. Never create or edit `supabase/migrations/*.sql` directly for schema changes. Generate migrations from the declarative schema. The one exception is `storage.objects` and `storage.buckets`, which must be hand-written; see the Storage section.
+2. Never create or edit `supabase/migrations/*.sql` directly for schema changes. Generate migrations from the declarative schema. The exceptions are `storage.objects` / `storage.buckets` (see the Storage section) and table `GRANT` / `REVOKE` statements that `db diff` omitted (see Table privileges).
 3. Every schema file must be named `NN.<descriptive_name>.sql` where `NN` is a zero-padded two-digit index such as `00`, `01`, `10`, or `70`.
 4. Use descriptive names based on the entity in the file: `00.util_fns.sql`, `00.enum.user_role_type.sql`, `10.workspaces.sql`, `20.user_profiles.sql`, `70.rpc_create_workspace.sql`.
 5. Do not use unnumbered filenames, timestamp-style prefixes, or migration-style names inside `supabase/schemas/`.
@@ -24,7 +24,7 @@ metadata:
 ## Required File Layout
 
 Supabase applies `supabase/schemas/*.sql` in **lexicographic order** when it
-builds a database, so the two-digit prefix *is* the dependency graph. Read it
+builds a database, so the two-digit prefix _is_ the dependency graph. Read it
 as two levels: tens are broad layers, units are sub-layers within one.
 
 ### Tens are broad layers
@@ -101,7 +101,7 @@ When changing the schema, decide the file set in this order:
 ## Per-File Rules
 
 - One table per SQL file.
-- A table file must include that table's definition plus its relevant indexes, constraints, triggers, RLS policies, and table-specific helper functions.
+- A table file must include that table's definition plus its relevant indexes, constraints, triggers, RLS policies, table-specific helper functions, and Data API / `service_role` grants (see Table privileges).
 - One RPC function per SQL file.
 - One custom datatype per SQL file.
 - Do not create large grab-bag schema files for unrelated entities.
@@ -124,15 +124,60 @@ $$ language plpgsql;
 
 Use this shared trigger helper from table files that maintain an `updated_at` column.
 
+## Table privileges (`anon`, `authenticated`, `service_role`)
+
+`[db.migrations] schema_paths` is empty in this repo. Files under
+`supabase/schemas/` are the desired state for `db diff` only. They **never
+run** on `supabase db reset` or in CI. Only `supabase/migrations/` reaches a
+migrations-built database.
+
+Put grants in the table's own `NN.<table>.sql`, immediately under
+`enable row level security`:
+
+```sql
+alter table public.projects enable row level security;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.projects to authenticated,
+service_role;
+```
+
+- **`authenticated`:** the Data API / browser. Omit verbs the client must not
+  have (subscriptions are SELECT-only for `authenticated`; billing writes go
+  through `service_role`).
+- **`service_role`:** backend, edge functions, and e2e admin seeding. Grant
+  SELECT, INSERT, UPDATE, and DELETE on every public table the service role
+  must read or write. Postgres default privileges give `service_role` only
+  TRUNCATE, REFERENCES, and TRIGGER on a new table, not DML. A missing INSERT
+  grant fails as `permission denied for table <name>` (GIS e2e map seeding).
+- **`anon`:** only when there is a public route. Today that is SELECT on
+  `dashboards`. Do not grant `anon` on other tables.
+
+Do **not** keep a blanket `GRANT ... ON ALL TABLES IN SCHEMA public` in a
+`99.*` file. That statement is evaluated when the file runs, does not apply to
+tables created later, and never runs in CI.
+
+`supabase db diff` often omits privilege changes: default privileges already
+put some `service_role` ACL bits on the table, so the grant looks like a
+no-op to the diff. After generating a migration for a new table, grep the
+file for `to "service_role"`. If it is missing, add the grant by hand before
+committing. Do not edit already-applied create-table migrations; a later
+backfill (`20260818120000_grant_service_role_dml_on_public_tables.sql`) covers
+historical tables.
+
 ## Integrated Example
 
 If you are adding a new `projects` table that uses a custom enum and later exposing an RPC to create a project:
 
 1. Create the enum in a dedicated `00` file such as `00.enum.project_status.sql`.
 2. Create the table in its own file such as `10.projects.sql`.
-3. Put the `projects` table definition, indexes, constraints, triggers, RLS policies, and table-specific helper functions in `10.projects.sql`.
+3. Put the `projects` table definition, indexes, constraints, triggers, RLS policies, table-specific helper functions, and `authenticated` / `service_role` grants in `10.projects.sql`.
 4. Create the RPC in a higher-numbered dedicated file such as `70.rpc_create_project.sql`.
-5. After updating the declarative files, run `supabase stop` and then `supabase db diff -f <migration_name>`.
+5. After updating the declarative files, run `supabase stop` and then `supabase db diff -f <migration_name>`. Grep the generated migration for `to "service_role"` on `projects` and add the grant by hand if it is missing.
 
 ## Workflow
 
@@ -160,7 +205,9 @@ Then generate the migration:
 supabase db diff -f <migration_name>
 ```
 
-Use a descriptive migration name.
+Use a descriptive migration name. For a new table, confirm the generated
+file grants DML to `service_role`. If `db diff` omitted it, add the grant
+by hand (see Table privileges).
 
 ### 3. Roll Back by Editing Declarative State
 
@@ -217,9 +264,10 @@ A migration that merely mentions storage in passing, such as one adding a
 ### Rule 3: every statement must be idempotent
 
 ```sql
-insert into storage.buckets (id, name, public)
-values ('my_bucket', 'my_bucket', false)
-on conflict (id) do nothing;
+insert into
+  storage.buckets (id, name, public)
+values
+  ('my_bucket', 'my_bucket', false) on conflict (id) do nothing;
 
 drop policy if exists "Users can SELECT my_bucket" on storage.objects;
 

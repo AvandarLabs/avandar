@@ -32,7 +32,8 @@ select
 ,
   insert,
 update,
-delete on table public.dexie_dbs to authenticated;
+delete on table public.dexie_dbs to authenticated,
+service_role;
 
 -- Policies
 create policy "

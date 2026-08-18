@@ -45,7 +45,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets__csv_file to authenticated;
+delete on table public.datasets__csv_file to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__csv_file in their workspace" on public.datasets__csv_file for

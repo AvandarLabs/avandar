@@ -329,7 +329,8 @@ select
 ,
   insert,
 update,
-delete on table public.dashboards to authenticated;
+delete on table public.dashboards to authenticated,
+service_role;
 
 -- The only table `anon` can reach, via the public dashboard link.
 grant

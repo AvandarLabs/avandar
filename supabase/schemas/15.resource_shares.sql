@@ -146,7 +146,8 @@ select
 ,
   insert,
 update,
-delete on table public.resource_shares to authenticated;
+delete on table public.resource_shares to authenticated,
+service_role;
 
 create trigger tr__resource_shares__01_validate_resource_workspace before insert or
 update on public.resource_shares for each row
