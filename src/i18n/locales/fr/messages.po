@@ -398,9 +398,9 @@ msgstr "Mise en page avec barre latérale"
 msgid "Delete failed"
 msgstr "Échec de la suppression"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Dismiss"
-msgstr ""
+msgstr "Ignorer"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
@@ -1270,7 +1270,7 @@ msgstr "Nom de la colonne en SQL"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} m²"
-msgstr ""
+msgstr "{areaValue} m²"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
@@ -1301,7 +1301,7 @@ msgstr "Certaines données doivent provenir de jeux de données existants"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
-msgstr ""
+msgstr "Début de la plage temporelle : {startLabel}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -1622,7 +1622,7 @@ msgstr "Préréglages intégrés"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Select a data layer to buffer."
-msgstr ""
+msgstr "Sélectionnez une couche de données à mettre en zone tampon."
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -1700,7 +1700,7 @@ msgstr "Sélectionnez une source de données"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
-msgstr ""
+msgstr "Opacité"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -2022,7 +2022,7 @@ msgstr "Fonction d’agrégation « {funcName} » non prise en charge dans SEL
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 msgid "Annotations"
-msgstr ""
+msgstr "Annotations"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
@@ -2104,7 +2104,7 @@ msgstr "Exact"
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool is available when Spatial finishes loading."
-msgstr ""
+msgstr "Cet outil est disponible une fois le chargement de Spatial terminé."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2563,7 +2563,7 @@ msgstr "MapLibre, contributeurs OpenStreetMap"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
-msgstr ""
+msgstr "Supprimer l’annotation"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
@@ -2629,7 +2629,7 @@ msgstr "et est également égal à..."
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
 msgid "Apply area filter"
-msgstr ""
+msgstr "Appliquer le filtre de superficie"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
@@ -2844,7 +2844,7 @@ msgstr "Colonne 11"
 msgid "Column 7"
 msgstr "Colonne 7"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Feature"
 msgstr "Entité"
 
@@ -2863,7 +2863,8 @@ msgstr "Conservé pour une carte destinée à être imprimée : sinon, un lecteu
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Bind geometry on the selected layer to buffer it."
-msgstr ""
+msgstr "Associez une géométrie de la couche sélectionnée pour la mettre en zone "
+"tampon."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -3215,7 +3216,7 @@ msgstr "La clause WHERE utilise « {operator} » sur « {columnName} » avec
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Distance (meters)"
-msgstr ""
+msgstr "Distance (mètres)"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
@@ -3625,7 +3626,7 @@ msgstr "Soumettre"
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr ""
+msgstr "Cet outil nécessite DuckDB Spatial, qui n’est pas disponible."
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -3698,7 +3699,7 @@ msgstr "Épaisseur du contour"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
-msgstr ""
+msgstr "Fin de la plage temporelle : {endLabel}"
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3943,7 +3944,7 @@ msgstr "Sélectionner un fichier"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
-msgstr ""
+msgstr "{lengthValue} m"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -4093,7 +4094,7 @@ msgstr "Les CTE (clauses WITH) ne sont pas pris en charge dans le formulaire."
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} km²"
-msgstr ""
+msgstr "{areaValue} km²"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -4374,7 +4375,7 @@ msgstr "Impossible d’ouvrir le portail de facturation. Veuillez réessayer plu
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 msgid "Time column"
-msgstr ""
+msgstr "Colonne temporelle"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
@@ -4774,11 +4775,11 @@ msgstr "Le nom que vous souhaitez que les autres membres de l'équipe voient."
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an arrow"
-msgstr ""
+msgstr "Dessiner une flèche"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
-msgstr ""
+msgstr "Cet outil sera disponible dans une version ultérieure."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -4866,7 +4867,7 @@ msgstr "Aucun jeu de données enregistré trouvé."
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
-msgstr ""
+msgstr "Développer l’inspecteur"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5000,7 +5001,8 @@ msgstr "Nous avons détecté à la fois des informations personnelles potentiell
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
 "columns."
-msgstr ""
+msgstr "La mise en zone tampon nécessite une couche avec une géométrie "
+"compilée, et non des colonnes de latitude et de longitude."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -5050,7 +5052,7 @@ msgstr "Le partage a échoué"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "Measure readout"
-msgstr ""
+msgstr "Lecture de la mesure"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -5096,7 +5098,7 @@ msgstr "{mapped} lignes sur {total} mises en correspondance"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "La latitude et la longitude ont été identifiées à partir des noms de "
@@ -5522,7 +5524,7 @@ msgstr "Limite de tableaux de bord partagés atteinte"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
-msgstr ""
+msgstr "Zone tampon de {sourceName}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
@@ -5570,7 +5572,7 @@ msgstr "Envoyer un message"
 
 #: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
 msgid "Clear area filter"
-msgstr ""
+msgstr "Effacer le filtre de superficie"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
@@ -5610,7 +5612,7 @@ msgstr "Développer le panneau des couches"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Place text"
-msgstr ""
+msgstr "Placer du texte"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
@@ -5618,7 +5620,7 @@ msgstr "Couche"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Close a valid ring that does not cross itself."
-msgstr ""
+msgstr "Fermez un anneau valide qui ne se croise pas lui-même."
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
@@ -5911,7 +5913,7 @@ msgstr "Cette fonctionnalité n'est pas encore implémentée."
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Time range"
-msgstr ""
+msgstr "Plage temporelle"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -6253,7 +6255,7 @@ msgstr "Entrez le nom de l'ensemble de données"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
-msgstr ""
+msgstr "Sélectionnez une annotation sur la carte pour la modifier."
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
@@ -6355,7 +6357,7 @@ msgstr "... et {remainingCount} de plus"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Collapse the inspector"
-msgstr ""
+msgstr "Réduire l’inspecteur"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -6440,7 +6442,7 @@ msgstr "Service"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
-msgstr ""
+msgstr "{lengthValue} km"
 
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
@@ -6456,7 +6458,7 @@ msgstr "Réinitialiser l’application"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Play"
-msgstr ""
+msgstr "Lire"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6536,7 +6538,7 @@ msgstr "Partager ou publier ce {resourceLabel}"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Dissolve"
-msgstr ""
+msgstr "Dissoudre"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6826,7 +6828,7 @@ msgstr "Aucun des éléments ci-dessus"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "Isochrone from a point"
-msgstr ""
+msgstr "Isochrone à partir d’un point"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -7008,7 +7010,7 @@ msgstr "Aucune colonne disponible"
 msgid "Size by"
 msgstr "Dimensionner selon"
 
-#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+#: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "Redimensionner le panneau"
 
@@ -7030,7 +7032,7 @@ msgstr "Ajoutez une citation mise en avant..."
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw freehand"
-msgstr ""
+msgstr "Dessiner à main levée"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
@@ -7902,6 +7904,10 @@ msgstr "Rôle et groupes d'utilisateurs"
 msgid "Clear all"
 msgstr "Tout effacer"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+msgid "Close"
+msgstr "Fermer"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "Votre espace de travail a utilisé {currentSeatUsage} de ses "
@@ -8055,7 +8061,7 @@ msgstr "Supprimer les zones en dessous de"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Annotation text"
-msgstr ""
+msgstr "Texte de l’annotation"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
@@ -8082,7 +8088,7 @@ msgstr "L’expression SELECT de type « {exprType} » n’est pas prise en char
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
-msgstr ""
+msgstr "Dessiner une zone d’annotation"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

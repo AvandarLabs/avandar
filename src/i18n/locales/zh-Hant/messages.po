@@ -378,9 +378,9 @@ msgstr "側邊欄版面配置"
 msgid "Delete failed"
 msgstr "刪除失敗"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Dismiss"
-msgstr ""
+msgstr "關閉"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
@@ -1202,7 +1202,7 @@ msgstr "SQL 中的列名"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} m²"
-msgstr ""
+msgstr "{areaValue} m²"
 
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
@@ -1233,7 +1233,7 @@ msgstr "某些數據應來自現有數據集"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
-msgstr ""
+msgstr "時間範圍開始：{startLabel}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -1540,7 +1540,7 @@ msgstr "內建預設"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Select a data layer to buffer."
-msgstr ""
+msgstr "選取要建立緩衝區的資料圖層。"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -1614,7 +1614,7 @@ msgstr "選擇數據來源"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
-msgstr ""
+msgstr "不透明度"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -1916,7 +1916,7 @@ msgstr "SELECT 中不支援彙總函式「{funcName}」；已略過。"
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 msgid "Annotations"
-msgstr ""
+msgstr "註記"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
@@ -1996,7 +1996,7 @@ msgstr "確切"
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool is available when Spatial finishes loading."
-msgstr ""
+msgstr "Spatial 完成載入後即可使用此工具。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2427,7 +2427,7 @@ msgstr "MapLibre、OpenStreetMap 貢獻者"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
-msgstr ""
+msgstr "刪除註記"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
@@ -2490,7 +2490,7 @@ msgstr "並且也等於..."
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
 msgid "Apply area filter"
-msgstr ""
+msgstr "套用區域篩選條件"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
@@ -2692,7 +2692,7 @@ msgstr "第 11 欄"
 msgid "Column 7"
 msgstr "第 7 欄"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Feature"
 msgstr "圖徵"
 
@@ -2708,7 +2708,7 @@ msgstr "針對要列印的地圖保持開啟：否則讀者無法區分未回報
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Bind geometry on the selected layer to buffer it."
-msgstr ""
+msgstr "繫結所選圖層中的幾何資料，以建立緩衝區。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -3047,7 +3047,7 @@ msgstr "WHERE 子句對「{columnName}」使用「{operator}」，但右側為�
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Distance (meters)"
-msgstr ""
+msgstr "距離（公尺）"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
@@ -3441,7 +3441,7 @@ msgstr "提交"
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr ""
+msgstr "此工具需要 DuckDB Spatial，但目前無法使用。"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -3512,7 +3512,7 @@ msgstr "筆畫寬度"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
-msgstr ""
+msgstr "時間範圍結束：{endLabel}"
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3748,7 +3748,7 @@ msgstr "選擇檔案"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
-msgstr ""
+msgstr "{lengthValue} m"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -3893,7 +3893,7 @@ msgstr "表單不支援 CTE（WITH 子句）。"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} km²"
-msgstr ""
+msgstr "{areaValue} km²"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -4158,7 +4158,7 @@ msgstr "無法開啟帳單入口網站。請稍後再試。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 msgid "Time column"
-msgstr ""
+msgstr "時間欄"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
@@ -4538,11 +4538,11 @@ msgstr "您希望其他團隊成員看到的名稱。"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an arrow"
-msgstr ""
+msgstr "繪製箭頭"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
-msgstr ""
+msgstr "此工具將於後續版本推出。"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -4630,7 +4630,7 @@ msgstr "未找到已保存的資料集。"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
-msgstr ""
+msgstr "展開檢查器"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -4757,7 +4757,7 @@ msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語�
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
 "columns."
-msgstr ""
+msgstr "緩衝區需要包含已編譯幾何資料的圖層，不能使用緯度和經度欄。"
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -4807,7 +4807,7 @@ msgstr "分享失敗"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "Measure readout"
-msgstr ""
+msgstr "測量讀值"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4853,7 +4853,7 @@ msgstr "已對應 {mapped} / {total} 筆資料列"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "已根據欄名稱 {0} 和 {1} 比對緯度與經度。如果不正確，請在上方變更。"
@@ -5265,7 +5265,7 @@ msgstr "已達分享儀表板上限"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
-msgstr ""
+msgstr "{sourceName} 的緩衝區"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
@@ -5311,7 +5311,7 @@ msgstr "發送消息"
 
 #: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
 msgid "Clear area filter"
-msgstr ""
+msgstr "清除區域篩選條件"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
@@ -5348,7 +5348,7 @@ msgstr "展開圖層面板"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Place text"
-msgstr ""
+msgstr "放置文字"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
@@ -5356,7 +5356,7 @@ msgstr "圖層"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Close a valid ring that does not cross itself."
-msgstr ""
+msgstr "閉合有效且不自我交叉的環。"
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
@@ -5635,7 +5635,7 @@ msgstr "此功能尚未實現。"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Time range"
-msgstr ""
+msgstr "時間範圍"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -5958,7 +5958,7 @@ msgstr "輸入數據集名稱"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
-msgstr ""
+msgstr "在地圖上選取註記以進行編輯。"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
@@ -6057,7 +6057,7 @@ msgstr "... 和 {remainingCount} 個更多"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Collapse the inspector"
-msgstr ""
+msgstr "收合檢查器"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -6140,7 +6140,7 @@ msgstr "服務"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
-msgstr ""
+msgstr "{lengthValue} km"
 
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
@@ -6156,7 +6156,7 @@ msgstr "重設應用程式"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Play"
-msgstr ""
+msgstr "播放"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6232,7 +6232,7 @@ msgstr "分享或發布此{resourceLabel}"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Dissolve"
-msgstr ""
+msgstr "融合"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6512,7 +6512,7 @@ msgstr "以上皆非"
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "Isochrone from a point"
-msgstr ""
+msgstr "從點建立等時圈"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -6684,7 +6684,7 @@ msgstr "沒有可用的欄位"
 msgid "Size by"
 msgstr "大小依據"
 
-#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+#: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "調整抽屜大小"
 
@@ -6706,7 +6706,7 @@ msgstr "新增引文…"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw freehand"
-msgstr ""
+msgstr "徒手繪製"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
@@ -7537,6 +7537,10 @@ msgstr "角色與用戶群組"
 msgid "Clear all"
 msgstr "清除所有"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+msgid "Close"
+msgstr "關閉"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
@@ -7688,7 +7692,7 @@ msgstr "抑制低於以下值的區域"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Annotation text"
-msgstr ""
+msgstr "註記文字"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
@@ -7713,7 +7717,7 @@ msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
-msgstr ""
+msgstr "繪製註記區域"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"
