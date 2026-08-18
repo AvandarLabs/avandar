@@ -22,15 +22,20 @@ import {
 } from "../../DatasetImportForm/DatasetImportForm.types";
 import {
   CsvParseOptions,
+  PdfParseOptions,
   XlsxParseOptions,
 } from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
+import type { PageGeometry } from "@/workers/pdfSniff/types";
 
 type FileLoadOptions = {
   file: File;
   datasetId: Dataset.Id;
 };
 
-export type ParseManualFileOptions = CsvParseOptions | XlsxParseOptions;
+export type ParseManualFileOptions =
+  | CsvParseOptions
+  | XlsxParseOptions
+  | PdfParseOptions;
 
 type LoadAndParseFileOptions = FileLoadOptions & ParseManualFileOptions;
 
@@ -40,7 +45,30 @@ export type XlsxFileLoadResult = BaseLoadResult & {
   availableSheetNames: string[];
 } & DuckDbLoadXlsxResult;
 
-type FileLoadResult = CsvFileLoadResult | XlsxFileLoadResult;
+export type PdfFileLoadResult = BaseLoadResult & {
+  /**
+   * Identifies this particular load, so re-parsing remounts the import form.
+   * The CSV and XLSX results get theirs from the DuckDB load result; a PDF
+   * never touches DuckDB during the sniff, so it is minted here.
+   */
+  id: string;
+  type: "pdf";
+  pageCount: number;
+  /** Geometry for the pages read, so the picker can render and clip them. */
+  pages: readonly PageGeometry[];
+  /**
+   * `needs_selection` means the document parsed fine and is waiting for the
+   * user to choose a region. It is NOT an error, and the form must not treat
+   * it as one.
+   */
+  status: "needs_selection" | "extracted";
+  columns: DuckDbColumnSchema[];
+};
+
+type FileLoadResult =
+  | CsvFileLoadResult
+  | XlsxFileLoadResult
+  | PdfFileLoadResult;
 
 type UseLoadManualUploadFileResult = {
   loadFile: UseMutationResultTuple<FileLoadResult, LoadAndParseFileOptions>[0];
@@ -136,6 +164,27 @@ function _buildDataSourceMetadataFromLoadResult({
         };
       },
     )
+    .with({ type: "pdf" }, (pdfLoadResult): ManualUploadDataSourceMetadata => {
+      const pdfRequest =
+        loadAndParseOptions?.type === "pdf_file" ?
+          loadAndParseOptions
+        : undefined;
+      return {
+        sourceType: "pdf_file",
+        // A PDF is retained in full, so the cloud-storage toggle is the
+        // user's only say over whether the document leaves the device.
+        // Default it on, like the other file sources.
+        onlineStorageAllowed: true,
+        sizeInBytes: file.size,
+        datasetLoadResult: pdfLoadResult,
+        parseOptions: {
+          type: "pdf_file",
+          regions: pdfRequest?.regions ?? [],
+          pageRange: pdfRequest?.pageRange,
+          outputMode: pdfRequest?.outputMode ?? "natural",
+        },
+      };
+    })
     .exhaustive();
 }
 
@@ -240,6 +289,31 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             availableSheetNames: sniff.sheets,
           };
           pendingPreviewRowsRef.value = sniff.previewRows as UnknownRow[];
+          return loadResult;
+        })
+        .with({ type: "pdf_file" }, async (pdfParseOptions) => {
+          const { datasetId, pageRange } = pdfParseOptions;
+          const sniff = await LocalDatasetClient.startPdfImport({
+            datasetId,
+            workspaceId: workspace.id,
+            userId: user!.id as UserId,
+            file,
+            parseOptions: { pageRange },
+          });
+
+          // No regions yet, so no rows and no columns yet. This is the
+          // expected state immediately after upload, not a failure.
+          const loadResult: PdfFileLoadResult = {
+            datasetId,
+            numRows: 0,
+            id: uuid(),
+            type: "pdf",
+            pageCount: sniff.pageCount,
+            pages: sniff.pages,
+            status: "needs_selection",
+            columns: [],
+          };
+          pendingPreviewRowsRef.value = [];
           return loadResult;
         })
         .exhaustive();

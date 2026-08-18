@@ -21,6 +21,11 @@ const XlsxParseOptionsSchema = z.object({
   hasHeader: z.boolean().optional(),
 });
 
+const PdfParseOptionsSchema = z.object({
+  type: z.literal("pdf"),
+  pageRange: z.tuple([z.number(), z.number()]).readonly().optional(),
+});
+
 const DBReadSchema = z.object({
   datasetId: uuidType<DatasetId>(),
   workspaceId: uuidType<WorkspaceId>(),
@@ -38,6 +43,7 @@ const DBReadSchema = z.object({
   parseOptions: z.union([
     CsvParseOptionsSchema,
     XlsxParseOptionsSchema,
+    PdfParseOptionsSchema,
     z.undefined(),
   ]),
 });

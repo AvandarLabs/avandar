@@ -1,6 +1,7 @@
 import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
 import { match } from "ts-pattern";
 import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
+import { sniffPdfFile } from "@/clients/datasets/pdfSniff";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -19,8 +20,11 @@ import type {
 import type {
   LocalDataset,
   LocalDatasetCsvParseOptions,
+  LocalDatasetPdfParseOptions,
+  LocalDatasetSourceFileType,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
+import type { PdfSniffResult } from "@/workers/pdfSniff.worker";
 import type { ILogger } from "@avandar/logger";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
@@ -124,8 +128,10 @@ type LocalDatasetMutationContext = {
 };
 
 type PutParsingDatasetOptions = LocalImportParams<
-  LocalDatasetCsvParseOptions | LocalDatasetXlsxParseOptions
-> & { sourceFileType: "csv" | "xlsx" };
+  | LocalDatasetCsvParseOptions
+  | LocalDatasetXlsxParseOptions
+  | LocalDatasetPdfParseOptions
+> & { sourceFileType: LocalDatasetSourceFileType };
 
 type LocalDatasetMutationRecord = {
   startCsvImport: (
@@ -142,6 +148,11 @@ type LocalDatasetMutationRecord = {
       LocalImportParams<Omit<LocalDatasetXlsxParseOptions, "type">>
     >,
   ) => Promise<XlsxSniffResult>;
+  startPdfImport: (
+    params: Readonly<
+      LocalImportParams<Omit<LocalDatasetPdfParseOptions, "type">>
+    >,
+  ) => Promise<PdfSniffResult>;
   resumeImport: (
     params: Readonly<{ datasetId: DatasetId }>,
   ) => Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult | undefined>;
@@ -284,6 +295,42 @@ function _makeStartXlsxImport(
       workspaceId: params.workspaceId,
       userId: params.userId,
       source: { kind: "xlsx", file: params.file, options: parseOptions },
+    });
+    return sniff;
+  };
+}
+
+/**
+ * Reads a PDF's page geometry and stores the file as the retained original.
+ *
+ * Two things set this apart from the CSV and XLSX paths:
+ *
+ * - The stored bytes are pinned rather than cached. For a spreadsheet the
+ *   original is a short-lived resume cache that the LRU evictor and the
+ *   post-transcode cleanup are free to drop; for a PDF it is the only copy of
+ *   data that extraction is lossy against, so it has to survive both.
+ *   `_putParsingDataset` derives the pin from the source type, so this
+ *   function gets it by passing `sourceFileType: "pdf"`.
+ * - No background parquet transcoding is started. A PDF has no rows until the
+ *   user picks a region, so there is nothing to transcode yet.
+ */
+function _makeStartPdfImport(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["startPdfImport"] {
+  return async (params) => {
+    const logger = context.logger.appendName("startPdfImport");
+    logger.log("Storing PDF and reading geometry", {
+      datasetId: params.datasetId,
+      size: params.file.size,
+    });
+    const sniff = await sniffPdfFile({
+      file: params.file,
+      pageRange: params.parseOptions.pageRange,
+    });
+    await _putParsingDataset({
+      ...params,
+      sourceFileType: "pdf",
+      parseOptions: { type: "pdf", pageRange: params.parseOptions.pageRange },
     });
     return sniff;
   };
@@ -444,6 +491,7 @@ function _createLocalDatasetMutations(
   return {
     startCsvImport: _makeStartCsvImport(context),
     startXlsxImport: _makeStartXlsxImport(context),
+    startPdfImport: _makeStartPdfImport(context),
     resumeImport: _makeResumeImport(context),
     dropLocalDataset: _makeDropLocalDataset(context),
     fetchCloudDatasetToLocalStorage:
@@ -465,6 +513,7 @@ export const LocalDatasetClient = createUsableServiceClient(
     mutationFns: [
       "startCsvImport",
       "startXlsxImport",
+      "startPdfImport",
       "resumeImport",
       "dropLocalDataset",
       "fetchCloudDatasetToLocalStorage",

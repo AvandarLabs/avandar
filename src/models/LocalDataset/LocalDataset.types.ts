@@ -45,9 +45,26 @@ export type LocalDatasetXlsxParseOptions = {
   hasHeader?: boolean;
 };
 
+/**
+ * Parse options recorded for a PDF import. Unlike the CSV and XLSX shapes,
+ * these do not redrive a background transcode: a PDF has no rows until the
+ * user picks a region, so there is nothing to transcode. They record only how
+ * much of the document was read, so a reload can read the same pages again.
+ *
+ * The user's chosen regions are deliberately not here yet. Nothing can select
+ * one until the region picker exists, so persisting an always-empty list would
+ * be committing to a storage shape ahead of the feature that fills it.
+ */
+export type LocalDatasetPdfParseOptions = {
+  type: "pdf";
+  /** Inclusive, one-based page range the user limited reading to. */
+  pageRange?: readonly [number, number];
+};
+
 export type LocalDatasetParseOptions =
   | LocalDatasetCsvParseOptions
-  | LocalDatasetXlsxParseOptions;
+  | LocalDatasetXlsxParseOptions
+  | LocalDatasetPdfParseOptions;
 
 /**
  * This model tracks a locally-loaded dataset as a Parquet data blob.

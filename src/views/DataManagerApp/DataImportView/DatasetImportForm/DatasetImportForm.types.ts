@@ -1,11 +1,13 @@
 import type {
   CsvFileLoadResult,
+  PdfFileLoadResult,
   XlsxFileLoadResult,
 } from "../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   CsvParseOptions,
   FileParseOptions,
   GoogleSheetsParseOptions,
+  PdfParseOptions,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
 import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -47,9 +49,25 @@ export type CsvDataSourceMetadata = {
   parseOptions: CsvParseOptions;
 };
 
+export type PdfDataSourceMetadata = {
+  sourceType: "pdf_file";
+  onlineStorageAllowed: boolean;
+  sizeInBytes: number;
+
+  /** Geometry we read during the sniff, plus the selection status. */
+  datasetLoadResult: PdfFileLoadResult;
+
+  /**
+   * Options used to read the PDF. Used in case we need to re-read it, and
+   * carries the regions the user has picked (none, right after upload).
+   */
+  parseOptions: PdfParseOptions;
+};
+
 export type ManualUploadDataSourceMetadata =
   | XlsxDataSourceMetadata
-  | CsvDataSourceMetadata;
+  | CsvDataSourceMetadata
+  | PdfDataSourceMetadata;
 
 export type BaseLoadResult = {
   datasetId: Dataset.Id;
@@ -78,6 +96,7 @@ export type GoogleSheetsDataSourceMetadata = {
 export type DataSourceMetadata =
   | XlsxDataSourceMetadata
   | CsvDataSourceMetadata
+  | PdfDataSourceMetadata
   | GoogleSheetsDataSourceMetadata;
 
 export type DatasetImportFormProps = {

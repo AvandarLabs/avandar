@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { DatasetImportFeedback } from "./DatasetImportFeedback/DatasetImportFeedback";
 import { DatasetImportFields } from "./DatasetImportFields";
+import { isPdfAwaitingSelection } from "./isPdfAwaitingSelection";
 import { SaveDatasetButton } from "./SaveDatasetButton";
 import { useDatasetImportCopy } from "./useDatasetImportCopy";
 import { useDatasetImportValidation } from "./useDatasetImportValidation";
@@ -80,7 +81,12 @@ function useDatasetImportFormState(
       },
     ),
     saveButtonProps: {
-      disableSubmit: options.disableSubmit,
+      // Saving a PDF with no region picked would write a dataset with no
+      // columns and no rows, so the button stays disabled until there is
+      // something to save.
+      disableSubmit:
+        options.disableSubmit ||
+        isPdfAwaitingSelection(options.dataSourceMetadata),
       isOfflineBlocked: offline.isBlocked,
       isSavePending,
     },

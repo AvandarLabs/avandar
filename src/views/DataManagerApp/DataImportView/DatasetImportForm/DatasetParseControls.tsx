@@ -139,6 +139,12 @@ export function DatasetParseControls({
         </>
       );
     })
+    .with({ sourceType: "pdf_file" }, () => {
+      // Nothing to adjust yet. What a PDF import is parameterised by (which
+      // regions to extract) is chosen on the page itself, not here, and the
+      // picker that does that arrives in the next phase.
+      return <></>;
+    })
     .with({ sourceType: "google_sheets" }, (googleSheetsProps) => {
       const { parseOptions } = googleSheetsProps;
       return (

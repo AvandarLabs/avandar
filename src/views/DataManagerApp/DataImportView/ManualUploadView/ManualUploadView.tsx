@@ -33,7 +33,9 @@ type Props = BoxProps & {
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
-function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
+function _fileMimeTypeToSourceType(
+  file: File,
+): "csv_file" | "xlsx_file" | "pdf_file" {
   const lowerFileName = file.name.toLowerCase();
 
   // Check for CSV MIME type or extension
@@ -48,6 +50,14 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
     lowerFileName.endsWith(".xlsx")
   ) {
     return "xlsx_file";
+  }
+
+  // Check for PDF MIME type or extension
+  if (
+    file.type === MIMEType.APPLICATION_PDF ||
+    lowerFileName.endsWith(".pdf")
+  ) {
+    return "pdf_file";
   }
 
   // fallback: just check file extension for .xlsx last
@@ -173,13 +183,14 @@ export function ManualUploadView({
     <Box {...boxProps}>
       <Stack align="flex-start">
         <FileUploadForm
-          label={t`Upload a spreadsheet`}
-          description={t`Select an Excel or CSV file from your computer to import`}
+          label={t`Upload a file`}
+          description={t`Select an Excel, CSV or PDF file from your computer to import`}
           placeholder={t`Select file`}
           accept={[
             MIMEType.TEXT_CSV,
             MIMEType.APPLICATION_MS_EXCEL,
             MIMEType.APPLICATION_OPENXML_EXCEL,
+            MIMEType.APPLICATION_PDF,
           ]}
           fullWidth
           isSubmitting={isLoadingFile}

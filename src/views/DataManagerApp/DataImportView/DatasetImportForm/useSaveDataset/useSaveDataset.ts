@@ -20,6 +20,7 @@ import type {
   DataSourceMetadata,
 } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { PdfRegion } from "@/workers/pdfSniff/types";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -39,6 +40,18 @@ export type XlsxParseOptions = {
   numRowsToSkip?: number;
 };
 
+export type PdfParseOptions = {
+  type: "pdf_file";
+  /**
+   * Regions the user has chosen to extract. Empty until they pick one, which
+   * is the normal state immediately after upload.
+   */
+  regions?: readonly PdfRegion[];
+  /** Inclusive, one-based page range the user limited reading to. */
+  pageRange?: readonly [number, number];
+  outputMode?: "natural" | "observations";
+};
+
 export type GoogleSheetsParseOptions = {
   type: "google_sheets";
   numRowsToSkip?: number;
@@ -47,6 +60,7 @@ export type GoogleSheetsParseOptions = {
 export type FileParseOptions =
   | CsvParseOptions
   | XlsxParseOptions
+  | PdfParseOptions
   | GoogleSheetsParseOptions;
 
 function _duckDbColumnsToImportedColumns(
@@ -211,6 +225,16 @@ async function _saveXlsxDataset(
   });
 }
 
+/**
+ * Placeholder for the PDF save, which Phase B2 replaces once region
+ * extraction exists. Until then a PDF only ever reaches the form in the
+ * `needs_selection` state, which the save button is disabled for, so this
+ * throws rather than writing a dataset with no columns and no rows.
+ */
+function _savePdfDataset(): Promise<Dataset.T> {
+  return Promise.reject(new Error("Select a region before saving"));
+}
+
 function _saveDatasetFromValues(
   options: Readonly<{
     values: SaveDatasetValues;
@@ -232,6 +256,9 @@ function _saveDatasetFromValues(
     })
     .with({ sourceType: "xlsx_file" }, (payload) => {
       return _saveXlsxDataset({ context, payload });
+    })
+    .with({ sourceType: "pdf_file" }, () => {
+      return _savePdfDataset();
     })
     .exhaustive();
 }
