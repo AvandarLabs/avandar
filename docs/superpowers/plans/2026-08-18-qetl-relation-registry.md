@@ -933,6 +933,41 @@ describe("RelationRegistry", () => {
 Run: `pnpm test:frontend RelationRegistry`
 Expected: FAIL, cannot resolve `createRelationRegistry`.
 
+- [ ] **Step 2a: Add the capability/method consistency invariant**
+
+Added after the Tasks 3+4 review. `capabilities` and the `acquire` / `pushDown`
+methods are **independent fields**, so nothing stops a wrapper declaring
+`predicatePushdown: "full"` while omitting `pushDown`, or declaring
+`wholeRelationAcquirable: "yes"` while omitting `acquire`. A type-level fix
+(making `SourceWrapper` a discriminated union) would force every wrapper,
+including the ones that declare "none", to thread a variant tag through, which
+is real complexity for a mostly documentary benefit.
+
+Assert it at **registration** instead, where it is one check covering every
+wrapper, and where a wiring bug surfaces at startup rather than mid-query:
+
+```ts
+function _assertCapabilitiesMatchMethods(wrapper: SourceWrapper): void {
+  const { capabilities, name } = wrapper;
+  if (capabilities.predicatePushdown !== "none" && !wrapper.pushDown) {
+    throw new Error(
+      `Wrapper '${name}' declares predicatePushdown ` +
+        `'${capabilities.predicatePushdown}' but implements no pushDown.`,
+    );
+  }
+  if (capabilities.wholeRelationAcquirable !== "no" && !wrapper.acquire) {
+    throw new Error(
+      `Wrapper '${name}' declares wholeRelationAcquirable ` +
+        `'${capabilities.wholeRelationAcquirable}' but implements no acquire.`,
+    );
+  }
+}
+```
+
+Add two tests to the registry suite: a wrapper declaring pushdown without a
+`pushDown` method throws, and one declaring acquirability without `acquire`
+throws. Both messages must name the offending wrapper.
+
 - [ ] **Step 3: Implement the registry**
 
 ```ts
