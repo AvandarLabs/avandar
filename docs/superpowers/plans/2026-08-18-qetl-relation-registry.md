@@ -1681,6 +1681,33 @@ This keeps one wrapper per relation **kind** while preserving per-source-type
 behaviour. Record the consequence for spec 5: an open data **API** is still
 `kind: "dataset"`, so it becomes another entry in this map, not a new kind.
 
+- [ ] **Step 2b: Preserve three behaviours the characterization tests pinned**
+
+Task 5 observed these in the real code. Two contradict assumptions elsewhere in
+this plan, so read them before touching the dispatch.
+
+1. **`getDiceExtractors([])` does not short-circuit.** It still calls
+   `DatasetClient.getAll(where("id", "in", []))`. Only `getMissingDice`
+   early-returns on an empty list. Task 5's original wording claimed the
+   short-circuit for `getDiceExtractors`; that was wrong. Either preserve the
+   call or, if you remove it, **update the characterization test in the same
+   commit and say so**, because that is a deliberate behaviour change rather
+   than a refactor.
+2. **`google_sheets` rejects the whole batch, not one relation.** The throw
+   happens synchronously inside a `match` arm running inside `promiseFlatMap`,
+   so one unsupported dataset in a mixed request rejects the entire
+   `getDiceExtractors` call. There is no partial-failure result. The registry
+   cutover must keep that all-or-nothing semantics, or a page that today fails
+   cleanly will start rendering half its data.
+3. **Group ordering is emergent, not designed.** Results come out ordered by
+   the first appearance of each `sourceType` while scanning
+   `DatasetClient.getAll`'s return, which falls out of `makeBucketRecord`'s
+   object-key insertion order plus `Promise.all` preserving order. It is
+   neither the caller's id order nor alphabetical. A registry keyed differently
+   will change it. The characterization test pins the observed order, so if
+   your rewrite changes it the test fails: decide deliberately whether the new
+   order is acceptable rather than editing the test to match.
+
 - [ ] **Step 3: Replace the match statement**
 
 In `qetlDiceExtractors.ts`, delete `_getExtractorsForSourceType` and have
