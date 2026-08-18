@@ -52,6 +52,16 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 /** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
+/**
+ * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
+ * provenance and licence). Well under the 50-page import cap, so its page
+ * geometry sniff finishes quickly.
+ */
+export const FRONTIERS_PERU_PDF_PATH = path.join(
+  process.cwd(),
+  "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf",
+);
+
 /** Directory of GIS geometry, boundary, and point CSV fixtures. */
 const GIS_WAVE_B_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-b");
 

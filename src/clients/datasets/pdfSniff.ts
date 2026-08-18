@@ -23,6 +23,27 @@ export class PdfSniffRejection extends Error {
   }
 }
 
+type PdfSniffResponse = PdfSniffResult | PdfSniffProgress | PdfSniffError;
+
+/**
+ * Whether a message on the worker port is one of ours.
+ *
+ * The port is shared. `loadPdfJs.ts` imports `pdf.worker.mjs` inside the
+ * sniff worker, which makes pdf.js install its own handler on the same
+ * global scope and post its internal protocol traffic (starting with
+ * `{ action: "ready" }`) back to this listener. Those messages are not
+ * responses to our request and must be ignored rather than interpreted; the
+ * worker side already ignores foreign messages the same way
+ * (`request.type !== "sniff"`).
+ */
+function _isPdfSniffResponse(data: unknown): data is PdfSniffResponse {
+  if (typeof data !== "object" || data === null || !("type" in data)) {
+    return false;
+  }
+  const { type } = data as { type: unknown };
+  return type === "progress" || type === "result" || type === "error";
+}
+
 /**
  * Main-thread driver for the PDF sniff worker. Owns one worker per call,
  * spawns it, awaits the result, and terminates. Mirrors `sniffXlsxFile`.
@@ -39,25 +60,26 @@ export async function sniffPdfFile(params: {
   const worker = new PdfSniffWorker();
   try {
     return await new Promise<PdfSniffResult>((resolve, reject) => {
-      worker.addEventListener(
-        "message",
-        (
-          event: MessageEvent<
-            PdfSniffResult | PdfSniffProgress | PdfSniffError
-          >,
-        ) => {
-          const data = event.data;
-          if (data.type === "progress") {
-            params.onProgress?.(data);
-            return;
-          }
-          if (data.type === "result") {
-            resolve(data);
-            return;
-          }
-          reject(new PdfSniffRejection(data));
-        },
-      );
+      worker.addEventListener("message", (event: MessageEvent<unknown>) => {
+        const data = event.data;
+
+        // Anything pdf.js posts on this shared port would otherwise fall
+        // through to the reject below, which made every PDF import fail
+        // with an empty-message rejection.
+        if (!_isPdfSniffResponse(data)) {
+          return;
+        }
+
+        if (data.type === "progress") {
+          params.onProgress?.(data);
+          return;
+        }
+        if (data.type === "result") {
+          resolve(data);
+          return;
+        }
+        reject(new PdfSniffRejection(data));
+      });
       worker.addEventListener(
         "error",
         (event) => {
