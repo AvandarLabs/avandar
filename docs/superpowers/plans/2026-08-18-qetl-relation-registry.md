@@ -28,6 +28,15 @@ Read these before Task 1. They are enforced by `docs/rules/typescript.md` and
   A test asserting a field exists on a type is a plan failure; the compiler owns
   that. Test behaviour.
 - Split test files live in `__tests__/`.
+- **Naming correction, found during Task 2 dispatch.** `shared/models/` exposes
+  types through **namespace merging**, not a `T`-suffixed alias. See
+  `shared/models/ontology/Concept/Concept.ts`, which exports
+  `ConceptModule as Concept` alongside `export namespace Concept` declaring
+  `T` and `Id`. So the type is **`RelationRef.T`** and the functions are
+  `RelationRef.toTableName` / `RelationRef.fromTableName`, all from one
+  `RelationRef` symbol. Wherever a code sample below writes `RelationRefT`,
+  read `RelationRef.T`, and import the single `RelationRef` symbol rather than
+  two.
 
 **Commands:**
 
