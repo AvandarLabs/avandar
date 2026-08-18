@@ -9,7 +9,7 @@ import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
 import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
 import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
-import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
@@ -174,13 +174,13 @@ async function _runLatLngLayer(options: {
   workspaceId: Workspace.Id;
   overlay: MapOverlay;
 }): Promise<MapLayerDataResult> {
-  const queryResult = await runStructuredQuery({
+  const { result, didAutoLimit } = await runStructuredQueryWithMetadata({
     auth: "workspace",
     workspaceId: options.workspaceId,
     query: options.layer.source,
     rawSql: _getLatLngOverlayRawSql(options),
   });
-  return { type: "rows", queryResult };
+  return { type: "rows", queryResult: result, didAutoLimit };
 }
 
 function useDuckDbSpatialAvailability(): string {

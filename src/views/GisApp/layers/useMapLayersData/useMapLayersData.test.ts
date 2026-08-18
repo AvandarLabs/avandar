@@ -16,13 +16,13 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
   initializeDuckDbMock,
-  runStructuredQueryMock,
+  runStructuredQueryWithMetadataMock,
   runSpatialQueryMock,
   spatialAvailability,
 } = vi.hoisted(() => {
   return {
     initializeDuckDbMock: vi.fn(),
-    runStructuredQueryMock: vi.fn(),
+    runStructuredQueryWithMetadataMock: vi.fn(),
     runSpatialQueryMock: vi.fn(),
     spatialAvailability: { value: "available" },
   };
@@ -50,9 +50,14 @@ vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   };
 });
 
-vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
-  return { runStructuredQuery: runStructuredQueryMock };
-});
+vi.mock(
+  "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata",
+  () => {
+    return {
+      runStructuredQueryWithMetadata: runStructuredQueryWithMetadataMock,
+    };
+  },
+);
 
 const { useMapLayersData } =
   await import("@/views/GisApp/layers/useMapLayersData/useMapLayersData");
@@ -63,7 +68,7 @@ describe("useMapLayersData", () => {
   beforeEach(() => {
     initializeDuckDbMock.mockReset();
     initializeDuckDbMock.mockResolvedValue(undefined);
-    runStructuredQueryMock.mockReset();
+    runStructuredQueryWithMetadataMock.mockReset();
     runSpatialQueryMock.mockReset();
     spatialAvailability.value = "available";
   });
@@ -76,7 +81,10 @@ describe("useMapLayersData", () => {
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 1,
     };
-    runStructuredQueryMock.mockResolvedValue(queryResult);
+    runStructuredQueryWithMetadataMock.mockResolvedValue({
+      result: queryResult,
+      didAutoLimit: false,
+    });
 
     const { result } = renderHook(
       () => {
@@ -93,11 +101,14 @@ describe("useMapLayersData", () => {
       expect(result.current.get(layer.id)?.data).toEqual({
         type: "rows",
         queryResult,
+        didAutoLimit: false,
       });
     });
 
-    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
-    expect(runStructuredQueryMock.mock.calls[0]?.[0]).toMatchObject({
+    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0],
+    ).toMatchObject({
       query: layer.source,
     });
   });
@@ -115,7 +126,10 @@ describe("useMapLayersData", () => {
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 1,
     };
-    runStructuredQueryMock.mockResolvedValue(queryResult);
+    runStructuredQueryWithMetadataMock.mockResolvedValue({
+      result: queryResult,
+      didAutoLimit: false,
+    });
 
     const { result } = renderHook(
       () => {
@@ -138,18 +152,19 @@ describe("useMapLayersData", () => {
       expect(result.current.get(timedLayer.id)?.data).toEqual({
         type: "rows",
         queryResult,
+        didAutoLimit: false,
       });
     });
 
     expect(initializeDuckDbMock).not.toHaveBeenCalled();
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
-    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
-    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
-      "BETWEEN",
-    );
-    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).not.toContain(
-      "ST_",
-    );
+    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
+    ).toContain("BETWEEN");
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
+    ).not.toContain("ST_");
   });
 
   it("does not query a layer with no data source", () => {
@@ -166,7 +181,7 @@ describe("useMapLayersData", () => {
       { wrapper: wrapperForHook },
     );
 
-    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.data).toBeUndefined();
     expect(result.current.get(layer.id)?.isLoading).toBe(false);
   });
@@ -193,7 +208,7 @@ describe("useMapLayersData", () => {
       { wrapper: wrapperForHook },
     );
 
-    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.data).toBeUndefined();
     expect(result.current.get(layer.id)?.isLoading).toBe(false);
   });
@@ -213,9 +228,12 @@ describe("useMapLayersData", () => {
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 1,
     };
-    runStructuredQueryMock
-      .mockResolvedValueOnce(firstQueryResult)
-      .mockResolvedValueOnce(secondQueryResult);
+    runStructuredQueryWithMetadataMock
+      .mockResolvedValueOnce({ result: firstQueryResult, didAutoLimit: false })
+      .mockResolvedValueOnce({
+        result: secondQueryResult,
+        didAutoLimit: false,
+      });
 
     const { result } = renderHook(
       () => {
@@ -232,14 +250,16 @@ describe("useMapLayersData", () => {
       expect(result.current.get(firstLayer.id)?.data).toEqual({
         type: "rows",
         queryResult: firstQueryResult,
+        didAutoLimit: false,
       });
       expect(result.current.get(secondLayer.id)?.data).toEqual({
         type: "rows",
         queryResult: secondQueryResult,
+        didAutoLimit: false,
       });
     });
 
-    expect(runStructuredQueryMock).toHaveBeenCalledTimes(2);
+    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(2);
   });
 
   it("waits for Spatial capability before running a geometry layer", () => {
@@ -326,7 +346,7 @@ describe("useMapLayersData", () => {
       signal: expect.any(AbortSignal),
       workspaceId,
     });
-    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
   });
 
   it("reports unavailable Spatial for lat/lng when an aoi is applied", () => {
@@ -345,7 +365,7 @@ describe("useMapLayersData", () => {
       { wrapper: wrapperForHook },
     );
 
-    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.error?.message).toMatch(/spatial/i);
   });
@@ -366,7 +386,7 @@ describe("useMapLayersData", () => {
       { wrapper: wrapperForHook },
     );
 
-    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
     expect(initializeDuckDbMock).toHaveBeenCalledTimes(1);
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });
@@ -380,7 +400,10 @@ describe("useMapLayersData", () => {
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 1,
     };
-    runStructuredQueryMock.mockResolvedValue(queryResult);
+    runStructuredQueryWithMetadataMock.mockResolvedValue({
+      result: queryResult,
+      didAutoLimit: false,
+    });
 
     const { result } = renderHook(
       () => {
@@ -397,15 +420,59 @@ describe("useMapLayersData", () => {
       expect(result.current.get(layer.id)?.data).toEqual({
         type: "rows",
         queryResult,
+        didAutoLimit: false,
       });
     });
 
-    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
-    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
-      "ST_Point",
+    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
+    ).toContain("ST_Point");
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
+    ).toContain("ST_Intersects");
+  });
+
+  it("reports didAutoLimit when a plain lat/lng layer's overlay SQL cannot be built and the query was auto-limited", async () => {
+    // With no time range and no AOI, `compileLatLngOverlaySql` has nothing to
+    // add to the source SQL and returns undefined, so this layer runs as a
+    // structured query rather than caller-supplied raw SQL. That is the path
+    // through which `resolveManualQueryForExecution` can silently auto-limit
+    // a large dataset; this test asserts the flag survives to the result
+    // instead of being dropped.
+    const layer = createQueryableLayer();
+    const queryResult: QueryResult.T<UnknownRow> = {
+      id: uuid<QueryResult.Id>(),
+      data: [{ cases: 1 }],
+      columns: [{ name: "cases", dataType: "double" }],
+      numRows: 100,
+    };
+    runStructuredQueryWithMetadataMock.mockResolvedValue({
+      result: queryResult,
+      didAutoLimit: true,
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
     );
-    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
-      "ST_Intersects",
-    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data).toEqual({
+        type: "rows",
+        queryResult,
+        didAutoLimit: true,
+      });
+    });
+
+    expect(
+      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
+    ).toBeUndefined();
   });
 });
