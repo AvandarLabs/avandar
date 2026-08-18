@@ -61,13 +61,20 @@ alter table public.datasets__pdf_file enable row level security;
 -- REQUIRED, not optional. Supabase CLI 2.114.0 stopped auto-exposing new
 -- tables in `public`, so a table without this grant is unreachable through
 -- PostgREST no matter how correct its RLS is, and the failure is silent.
--- See the explanation in `supabase/schemas/99.grants.service_role.sql`.
+--
+-- `service_role` is granted here for the same reason it is on
+-- `datasets__xlsx_file`: server-side callers (edge functions, admin tooling,
+-- the E2E supabase admin helpers) bypass RLS and need table-level access.
+-- Omitting it also made the declared state disagree with the state the
+-- creating migration actually applied, so every `db diff` produced revokes
+-- that would have stripped service_role from this table.
 grant
 select
 ,
   insert,
 update,
-delete on table public.datasets__pdf_file to authenticated;
+delete on table public.datasets__pdf_file to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__pdf_file in their workspace" on public.datasets__pdf_file for
