@@ -1,6 +1,6 @@
 import { isDefined, prop } from "@avandar/utils";
-import { splitSqlStatements } from "./splitSqlStatements";
-import type { Statement } from "./splitSqlStatements";
+import { splitSqlStatements } from "../../lib/splitSqlStatements";
+import type { Statement } from "../../lib/splitSqlStatements";
 
 export type { Statement };
 

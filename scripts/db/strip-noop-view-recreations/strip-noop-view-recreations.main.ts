@@ -51,10 +51,10 @@
  * nothing.
  */
 
-import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
+import { getProjectIdFromConfig, makeSqlRunner } from "../lib/psql";
 import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
   CreateViewStatement,
@@ -64,84 +64,6 @@ import type {
 } from "./NoopViewRecreations/NoopViewRecreations";
 
 const PROBE_SCHEMA = "_noop_view_check";
-
-const PSQL_COMMON_ARGS = [
-  "--username",
-  "postgres",
-  "--dbname",
-  "postgres",
-  "--no-psqlrc",
-  "--tuples-only",
-  "--no-align",
-  "--set=ON_ERROR_STOP=on",
-] as const;
-
-// On the host, Postgres is published on 54322. Inside the container it
-// listens on its own 5432, so the host port would refuse the connection.
-const PSQL_HOST_ARGS = [
-  "--host",
-  "127.0.0.1",
-  "--port",
-  "54322",
-  ...PSQL_COMMON_ARGS,
-];
-const PSQL_CONTAINER_ARGS = [
-  "--host",
-  "127.0.0.1",
-  "--port",
-  "5432",
-  ...PSQL_COMMON_ARGS,
-];
-
-function _runPsqlCommand(
-  options: Readonly<{ file: string; args: readonly string[]; sql: string }>,
-): string {
-  const { file, args, sql } = options;
-  return execFileSync(file, [...args, "--command", sql], {
-    encoding: "utf8",
-    env: { ...process.env, PGPASSWORD: "postgres" },
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-}
-
-/** Returns a function that runs SQL against the local database. */
-function _makeSqlRunner(projectId: string): (sql: string) => string {
-  let useDocker: boolean | undefined = undefined;
-
-  return (sql: string): string => {
-    if (useDocker === undefined) {
-      // Prefer host `psql`. Fall back to `psql` inside the Supabase container,
-      // because not every machine that runs this repo has a local client.
-      useDocker = (() => {
-        try {
-          _runPsqlCommand({
-            file: "psql",
-            args: PSQL_HOST_ARGS,
-            sql: "select 1",
-          });
-          return false;
-        } catch {
-          return true;
-        }
-      })();
-    }
-    if (!useDocker) {
-      return _runPsqlCommand({ file: "psql", args: PSQL_HOST_ARGS, sql });
-    }
-    return _runPsqlCommand({
-      file: "docker",
-      args: [
-        "exec",
-        "-e",
-        "PGPASSWORD=postgres",
-        `supabase_db_${projectId}`,
-        "psql",
-        ...PSQL_CONTAINER_ARGS,
-      ],
-      sql,
-    });
-  };
-}
 
 function _doesLiveViewExist(
   options: Readonly<{ runSql: (sql: string) => string; qualified: string }>,
@@ -245,15 +167,6 @@ function _getMigrationFilePath(
     throw new Error("No migrations found.");
   }
   return path.join(migrationsDir, newest);
-}
-
-/** The Supabase project id from `supabase/config.toml`. */
-function _getProjectIdFromConfig(repoRoot: string): string {
-  return (
-    /^project_id\s*=\s*"([^"]+)"/m.exec(
-      readFileSync(path.join(repoRoot, "supabase", "config.toml"), "utf8"),
-    )?.[1] ?? "avandar"
-  );
 }
 
 /**
@@ -364,7 +277,7 @@ function main(): void {
   const migrationFile = _getMigrationFilePath({ repoRoot, explicitFile });
   const original = readFileSync(migrationFile, "utf8");
   const statements = NoopViewRecreations.getStatementsFromSql(original);
-  const runSql = _makeSqlRunner(_getProjectIdFromConfig(repoRoot));
+  const runSql = makeSqlRunner(getProjectIdFromConfig(repoRoot));
 
   console.log(`Migration: ${path.basename(migrationFile)}`);
   if (

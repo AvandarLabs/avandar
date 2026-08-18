@@ -58,12 +58,12 @@ alter table public.usage_analytics_events enable row level security;
 
 -- Browser-authenticated clients may set only event fields. Database-owned
 -- identity, time, and category columns keep their defaults or trigger values.
--- Column privileges are declared here because table-level INSERT would let a
--- caller backdate events and pollute time-series reporting.
-revoke insert on table public.usage_analytics_events
-from
-  authenticated;
-
+-- The INSERT grant is column-scoped rather than table-level because a
+-- table-level INSERT would let a caller backdate events, set their own
+-- `event_category`, and pollute time-series reporting.
+--
+-- `id`, `created_at`, and `event_category` are deliberately absent from the
+-- list: a column left out of a column-scoped grant cannot be written at all.
 grant insert (
   workspace_id,
   user_id,
