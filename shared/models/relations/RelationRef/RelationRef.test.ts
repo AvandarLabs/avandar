@@ -74,4 +74,15 @@ describe("RelationRef", () => {
       RelationRef.fromTableName(`concept_concept_${CONCEPT_ID}`),
     ).toBeUndefined();
   });
+
+  it("recognizes a bare UUID as UUID-shaped, in either case", () => {
+    expect(RelationRef.isUuid(DATASET_ID)).toBe(true);
+    expect(RelationRef.isUuid(DATASET_ID.toUpperCase())).toBe(true);
+  });
+
+  it("rejects a string that is not UUID-shaped", () => {
+    expect(RelationRef.isUuid("not-a-uuid")).toBe(false);
+    expect(RelationRef.isUuid(`${DATASET_ID}:extra`)).toBe(false);
+    expect(RelationRef.isUuid("")).toBe(false);
+  });
 });

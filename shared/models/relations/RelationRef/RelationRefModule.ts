@@ -87,4 +87,14 @@ export const RelationRefModule = {
 
     return undefined;
   },
+
+  /**
+   * Whether `value` is a bare UUID, case-insensitively. The same test
+   * `fromTableName` uses to tell a UUID-shaped id apart from a prefixed
+   * name, exposed so a caller that needs to validate a UUID-shaped
+   * component before embedding it in a delimited string (for example a
+   * cache principal key) has one definition to reuse rather than a second
+   * copy that could drift from this one.
+   */
+  isUuid: _isUuid,
 };
