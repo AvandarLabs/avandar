@@ -233,7 +233,7 @@ Values then take a two-step path so we own only the part DuckDB cannot know:
 ```
 cell text     "(1,234)"   "$45.3*"   "—"   "12%"   "−0.126"
    |  normalizeCellValue
-   v            "-1234"     "45.3"     ""   "0.12"   "-0.126"
+   v            "-1234"     "45.3"     ""   "12"     "-0.126"
    |  serialise to CSV in memory
    v  DuckDB-WASM read_csv + sniff_csv
               BIGINT      DOUBLE    NULL  DOUBLE   DOUBLE
@@ -250,6 +250,10 @@ tables routinely write `361 (84.7)` for count and percent. The normaliser must
 only treat parentheses as a sign when they wrap the *entire* cell value, never
 when they follow another number. Fixture
 `plos-one-ncd-mobile-phone-surveys.pdf` exists specifically to hold this line.
+
+Percent signs are stripped without rescaling: `12%` becomes `12`, not `0.12`.
+Rescaling would make an imported table disagree with the document a reader has
+open beside it, which is a worse failure than losing the unit.
 
 Multi-row headers flatten to `"2024 Q1"`. Merged cells fill down, and the
 preview reports how many cells were filled so the choice is visible.
