@@ -16,6 +16,7 @@ import type { UnknownObject } from "@avandar/utils";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ReactNode } from "react";
 
+/** Props for the post-parse half of the import form. */
 export type DatasetImportFeedbackProps = {
   castWarnings: readonly ColumnCastWarning[];
   columnErrors: readonly ImportedColumnError[];

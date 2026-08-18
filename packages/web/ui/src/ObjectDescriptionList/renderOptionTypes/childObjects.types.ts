@@ -1,4 +1,4 @@
-//! The set of child objects an `onSubmitChange` callback can receive.
+/** Nested object types reachable from a description-list root. */
 
 import type {
   DescribableObject,
@@ -23,10 +23,7 @@ type _GetChildObjectsHelper<T extends GenericRootData> =
   : T extends Array<infer U extends GenericRootData> ? _GetChildObjectsHelper<U>
   : never;
 
-/**
- * Utility function to get all the child objects of a given type. These are all
- * the types that could potentially be used in an `onSubmitChange` callback.
- */
+/** Child objects of `T` that an `onSubmitChange` callback can receive. */
 export type GetChildObjects<T extends GenericRootData> =
   T extends DescribableObject ?
     {

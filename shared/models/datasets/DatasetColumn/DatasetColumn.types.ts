@@ -90,17 +90,13 @@ export type DatasetColumnRead = Model.Base<
 >;
 
 /**
- * A dataset column as it exists during import, before the dataset is saved and
- * the column earns an `id`, a `datasetId`, and its timestamps.
+ * A dataset column as it exists during import, before the dataset is saved.
  *
- * Every import path builds these, the user may edit the `name`, `dataType`, and
- * `description` of each one while still on the import form, and
- * `makeDatasetColumnInputsFromImportedColumns` turns the final list into the
- * rows the insert RPCs take. The fields describing what the source actually
- * contained
- * (`originalName`, `originalDataType`, `detectedDataType`) are never editable,
- * so a rename or a re-type stays reversible and the stored parquet, which keeps
- * the original names and types, stays addressable.
+ * Import paths build these, and the user may edit `name`, `dataType`, and
+ * `description` on the form. `makeDatasetColumnInputsFromImportedColumns`
+ * turns the final list into insert-RPC rows. `originalName`,
+ * `originalDataType`, and `detectedDataType` are never editable, so a rename
+ * or re-type stays reversible and the stored parquet remains addressable.
  */
 export type ImportedDatasetColumn = SetOptional<
   Pick<
@@ -117,9 +113,7 @@ export type ImportedDatasetColumn = SetOptional<
   "description"
 >;
 
-/**
- * CRUD type definitions for the DatasetColumn model.
- */
+/** CRUD type definitions for the DatasetColumn model. */
 export type DatasetColumnModel = SupabaseCrudModelSpec<
   {
     tableName: "dataset_columns";

@@ -21,16 +21,12 @@ function _toProbeText(value: unknown): string | undefined {
 /**
  * Builds a query counting how many sampled values a cast would turn into null.
  *
- * The values are inlined as a `VALUES` list rather than read from a file,
- * because by the time the import form can offer a type change the CSV staging
- * file has been dropped and the parquet may still be transcoding. An inline
- * list needs no file and no dataset lease, and it puts the question to DuckDB
- * itself: `TRY_CAST` has enough quirks (`'7.9'` to `BIGINT` rounds to 8 rather
- * than failing, a bare date to `TIME` yields midnight) that reimplementing its
- * rules in TypeScript would drift from what the dataset's view actually does.
+ * The probe asks DuckDB rather than reimplementing `TRY_CAST` in TypeScript:
+ * `'7.9'` to `BIGINT` rounds to 8 rather than failing, and a bare date to
+ * `TIME` yields midnight, so a local checker would drift from what the
+ * dataset's view actually does.
  *
- * Returns `undefined` when there is nothing to ask about, since a `VALUES` list
- * needs at least one row.
+ * Returns `undefined` when there is nothing to ask about.
  */
 export function makeCastProbeSqlFromValues(
   options: Readonly<MakeCastProbeSqlOptions>,
@@ -39,6 +35,8 @@ export function makeCastProbeSqlFromValues(
   if (probeTexts.length === 0) {
     return undefined;
   }
+  // Inlined as a VALUES list: by the time the import form offers a type change
+  // the CSV staging file is gone, and the parquet may still be transcoding.
   const valuesList = probeTexts
     .map((probeText) => {
       return `('${escapeSqlSingleQuotedLiteral(probeText)}')`;

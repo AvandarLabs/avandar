@@ -1,3 +1,5 @@
+/** Render-option types for `ObjectDescriptionList`. */
+
 export type {
   AnyDescribableValueRenderOptions,
   BaseDescribableValueArrayRenderOptions,

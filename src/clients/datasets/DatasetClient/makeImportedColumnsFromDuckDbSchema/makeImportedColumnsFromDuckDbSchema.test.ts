@@ -1,3 +1,5 @@
+/** Tests seeding import-time columns from a DuckDB-reported schema. */
+
 import { prop, propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { makeImportedColumnsFromDuckDbSchema } from "./makeImportedColumnsFromDuckDbSchema";

@@ -3,12 +3,7 @@ import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogD
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Json } from "$/types/database.types";
 
-/**
- * Reads `metadata.table.column_names` from catalog pipeline metadata.
- *
- * @param metadata - Raw JSON from `catalog_entries__open_data.metadata`.
- * @returns Column names when present, otherwise `undefined`.
- */
+/** Reads `metadata.table.column_names` from catalog pipeline metadata. */
 function _getColumnNamesFromOpenDataMetadata(
   metadata: Json | undefined,
 ): string[] | undefined {
@@ -42,10 +37,9 @@ function _getColumnNamesFromOpenDataMetadata(
 
 /**
  * Makes open-data import columns from catalog column names alone.
+ *
  * Uses `VARCHAR` / `varchar` so Parquet loads without forced casts when types
  * match user expectations in Qetl.
- *
- * @param columnNames - Original column names from the catalog metadata.
  */
 function _makeImportedColumnsFromColumnNames(
   columnNames: readonly string[],
@@ -63,9 +57,7 @@ function _makeImportedColumnsFromColumnNames(
   });
 }
 
-/**
- * Stable order for catalog column rows: `display_order` then name.
- */
+/** Stable order for catalog column rows: `display_order` then name. */
 function _sortCatalogDatasetColumns(
   rows: readonly CatalogDatasetColumnRead[],
 ): CatalogDatasetColumnRead[] {
@@ -81,8 +73,6 @@ function _sortCatalogDatasetColumns(
 
 /**
  * Makes open-data import columns from `catalog_entries__dataset_column` rows.
- *
- * @param rows - Column rows for one open-data catalog entry.
  */
 function _makeImportedColumnsFromCatalogRows(
   rows: readonly CatalogDatasetColumnRead[],
@@ -107,12 +97,9 @@ function _makeImportedColumnsFromCatalogRows(
  *
  * These reach the insert RPC through
  * `makeDatasetColumnInputsFromImportedColumns` like every other source's
- * columns do, but open data never offers the user a column editor:
- * the catalog, not this workspace, owns what the columns are called and how
- * they are typed.
- *
- * @param options.catalogColumns - Rows from `catalog_entries__dataset_column`.
- * @param options.metadata - Legacy `catalog_entries__open_data.metadata` JSON.
+ * columns do, but open data never offers the user a column editor: the
+ * catalog, not this workspace, owns what the columns are called and how they
+ * are typed.
  */
 export function makeImportedColumnsFromOpenDataCatalog(options: {
   catalogColumns: readonly CatalogDatasetColumnRead[] | undefined;

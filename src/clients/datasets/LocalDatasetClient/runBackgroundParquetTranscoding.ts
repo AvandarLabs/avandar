@@ -47,18 +47,14 @@ function _getReconciledColumnUpdate(
 }
 
 /**
- * Reconciles the background parquet transcoding's authoritative column
- * schema against the Dataset's stored `detectedDataType`. For each name-matched
- * column whose detected type changed, we update the Supabase row + tally
- * for the warning toast.
+ * Reconciles the background parquet transcode's column schema against the
+ * dataset's stored `detectedDataType`.
  *
  * A column the user typed themselves keeps its `dataType`; only its
- * `detectedDataType` is corrected, so their choice survives. For every other
- * column `dataType` follows the corrected `detectedDataType`, because the
- * queryable type was only ever derived from it. Both fields must move together:
- * correcting `detectedDataType` alone flattens an XLSX import to text: its
- * sniff reports every column as `VARCHAR`, so each unedited column would keep a
- * `varchar` queryable type that no longer matches the parquet.
+ * `detectedDataType` is corrected. For every other column `dataType` follows
+ * the corrected `detectedDataType`. Both fields must move together: correcting
+ * `detectedDataType` alone flattens an XLSX import to text, because its sniff
+ * reports every column as `VARCHAR`.
  */
 async function _reconcileColumns(params: {
   datasetId: DatasetId;

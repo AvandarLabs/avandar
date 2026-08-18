@@ -24,14 +24,12 @@ type DatasetColumnRenderOptions = {
 /**
  * How a dataset column's editable fields are rendered in a description list.
  *
- * Shared by every surface that shows dataset columns (the import preview and a
- * saved dataset's metadata), so a type added to `AvaDataType` or a relabelled
- * field reaches all of them at once.
+ * Shared by every surface that shows dataset columns, so a type added to
+ * `AvaDataType` or a relabelled field reaches all of them at once.
  *
- * The type labels are translated here rather than by
- * `AvaDataType.toDisplayValue`, whose display names are plain English: a shared
- * model has no `t` in scope, and Lingui only extracts a macro from the scope
- * that binds it.
+ * Translate the type labels here rather than via `AvaDataType.toDisplayValue`:
+ * that helper's display names are plain English, a shared model has no `t` in
+ * scope, and Lingui only extracts a macro from the scope that binds it.
  */
 export function useDatasetColumnRenderOptions(): DatasetColumnRenderOptions {
   const { t } = useLingui();

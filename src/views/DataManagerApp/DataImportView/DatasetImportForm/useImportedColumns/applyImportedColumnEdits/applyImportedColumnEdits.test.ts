@@ -1,3 +1,5 @@
+/** Tests layering import-form edits over inferred columns. */
+
 import { propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { applyImportedColumnEdits } from "./applyImportedColumnEdits";

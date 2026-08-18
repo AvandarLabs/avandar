@@ -1,4 +1,4 @@
-//! How an object, and each of its keys, is rendered.
+/** How an object, and each of its keys, is rendered. */
 
 import type { DescribableValueArrayRenderOptions } from "./arrayRenderOptions.types";
 import type {
@@ -28,9 +28,7 @@ export type ObjectKeyRenderOptionsMap<
   : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
-/**
- * Options for how to render an entity object.
- */
+/** Options for how to render an entity object. */
 export type ObjectRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,

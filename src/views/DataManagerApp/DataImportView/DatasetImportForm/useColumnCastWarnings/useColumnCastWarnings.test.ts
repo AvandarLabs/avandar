@@ -1,3 +1,5 @@
+/** Tests preview-sample warnings for import-form type changes. */
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import { useColumnCastWarnings } from "./useColumnCastWarnings";

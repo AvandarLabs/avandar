@@ -1,3 +1,5 @@
+/** Tests the SQL that counts sampled values a cast would null. */
+
 import { describe, expect, it } from "vitest";
 import { makeCastProbeSqlFromValues } from "./makeCastProbeSqlFromValues";
 

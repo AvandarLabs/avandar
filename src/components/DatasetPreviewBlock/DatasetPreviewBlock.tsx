@@ -58,10 +58,6 @@ type Props = {
 /**
  * Shows what a dataset's rows and columns look like, optionally letting the
  * user correct the columns.
- *
- * The grid labels its columns with `name` while reading values by
- * `previewRowKey`, which is what lets a pending rename show up in the header
- * without the underlying rows having to be re-read or rewritten.
  */
 export function DatasetPreviewBlock({
   previewRows,

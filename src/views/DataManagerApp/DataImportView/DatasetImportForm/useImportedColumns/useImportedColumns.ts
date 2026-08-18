@@ -51,9 +51,10 @@ function _getInferredColumns(
 }
 
 /**
- * Identifies the parse that produced the current columns. A re-parse mints a
- * new load result, which is how edits made against the previous inference are
- * recognized as stale.
+ * Identifies the parse that produced the current columns.
+ *
+ * A re-parse mints a new load result, which is how edits made against the
+ * previous inference are recognized as stale.
  */
 function _getLoadResultId(dataSourceMetadata: DataSourceMetadata): string {
   return match(dataSourceMetadata)

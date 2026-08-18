@@ -1,3 +1,5 @@
+/** Tests which saved-column edits become DuckDB view replacements. */
+
 import { Model } from "@avandar/models";
 import { prop } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";

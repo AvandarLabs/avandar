@@ -1,3 +1,5 @@
+/** Tests what a saved-dataset column edit persists. */
+
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";

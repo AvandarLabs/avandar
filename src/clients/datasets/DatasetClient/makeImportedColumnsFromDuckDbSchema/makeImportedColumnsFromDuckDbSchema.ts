@@ -5,11 +5,9 @@ import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColum
 /**
  * Seeds the editable import-time column list from a schema DuckDB reported.
  *
- * Every file-backed import path (CSV, XLSX, Google Sheets) starts here, so the
- * form, the cast preview, and the insert payload all read one shape. The
- * DuckDB type becomes the original type, the detected type, and the initial
- * queryable type at once, and the queryable type is marked as not user-set so
- * a later re-parse is free to revise it.
+ * Every file-backed import path starts here so the form, the cast preview, and
+ * the insert payload all read one shape. The queryable type is not marked
+ * user-set, so a later re-parse is free to revise it.
  */
 export function makeImportedColumnsFromDuckDbSchema(
   columns: readonly DuckDbColumnSchema[],

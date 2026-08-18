@@ -1,3 +1,5 @@
+/** Tests detection of empty and duplicate import-form column names. */
+
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { getImportedColumnErrors } from "./getImportedColumnErrors";

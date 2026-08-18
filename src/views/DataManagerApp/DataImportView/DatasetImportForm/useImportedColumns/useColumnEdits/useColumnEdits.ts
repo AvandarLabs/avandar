@@ -19,11 +19,8 @@ export type ColumnEditsState = {
 /**
  * Holds column edits against the parse that produced the columns.
  *
- * Keyed by `loadResultId` rather than cleared on change, so a re-parse with a
- * different delimiter or sheet discards the edits instead of silently
- * reapplying choices the user made about a different set of columns.
- * Discarding on read (not in an effect) means the stale edits never reach a
- * render.
+ * A re-parse with a different delimiter or sheet discards the edits instead of
+ * silently reapplying choices the user made about a different set of columns.
  */
 export function useColumnEdits(loadResultId: string): ColumnEditsState {
   const [edits, setEdits] = useState<{
@@ -52,6 +49,8 @@ export function useColumnEdits(loadResultId: string): ColumnEditsState {
     [loadResultId],
   );
 
+  // Discard on read rather than in an effect, so stale edits never reach a
+  // render.
   return {
     activeEdits:
       edits.loadResultId === loadResultId ? edits.byColumnIdx : NO_EDITS,

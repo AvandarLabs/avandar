@@ -1,3 +1,5 @@
+/** Tests which dataset source types allow column edits on the import form. */
+
 import { DatasetSourceModule } from "$/models/datasets/DatasetSource/DatasetSourceModule/DatasetSourceModule.ts";
 import { describe, expect, it } from "vitest";
 import type { DatasetSourceType } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";

@@ -1,4 +1,4 @@
-//! How one primitive value is rendered, and which keys say so.
+/** How one primitive value is rendered, and which keys say so. */
 
 import { registry } from "@avandar/utils";
 import type {
@@ -79,6 +79,7 @@ export type PrimitiveValueRenderOptions<
   dateTimeZone?: FormattableTimezone;
 };
 
+/** Keys of `PrimitiveValueRenderOptions`, for picking them off a parent. */
 export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registry<
   keyof PrimitiveValueRenderOptions<unknown, GenericRootData>
 >().keys(

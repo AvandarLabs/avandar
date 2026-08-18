@@ -1,3 +1,5 @@
+/** Tests conversion of import-time columns into insert-RPC rows. */
+
 import { describe, expect, it } from "vitest";
 import { makeDatasetColumnInputsFromImportedColumns } from "./makeDatasetColumnInputsFromImportedColumns";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
