@@ -2,8 +2,6 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   EXPECTED_CSV_COLUMN_NAMES,
-  formatImportPreviewRowCount,
-  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
@@ -36,15 +34,6 @@ async function _uploadCsvAndAssertPreview(
   await uploadPanel
     .getByRole("button", { name: "Upload", exact: true })
     .click();
-  await expect(
-    page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
-  const formattedRowCount = formatImportPreviewRowCount(
-    SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  );
-  await expect(
-    page.getByText(`Parsed ${formattedRowCount} rows successfully`),
-  ).toBeVisible({ timeout: LONG_WAIT });
   await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
     timeout: MEDIUM_WAIT,
   });

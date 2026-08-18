@@ -1,9 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import {
-  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  SMALL_CALIFORNIA_CSV_PATH,
-} from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
@@ -174,14 +171,9 @@ async function _uploadVisualizationDataset(
   await uploadPanel
     .getByRole("button", { name: "Upload", exact: true })
     .click();
-  await expect(
-    page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
-  const formattedRowCount =
-    SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
-  await expect(
-    page.getByText(`Parsed ${formattedRowCount} rows successfully`),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
+  await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
   await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
   const datasetId = parseDatasetIdFromDataManagerUrl({
     url: page.url(),

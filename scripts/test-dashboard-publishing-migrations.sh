@@ -3,6 +3,7 @@
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
+database_url="$(supabase status -o json | jq -er '.DB_URL')"
 
 # Replays upgrade-critical data migrations against legacy-shaped fixtures.
 run_migration_replay() {
@@ -14,12 +15,8 @@ run_migration_replay() {
     sed -n '1,$p' "$prelude"
     sed -n '1,$p' "$migration"
     sed -n '1,$p' "$assertions"
-  } | PGPASSWORD=postgres psql \
+  } | psql "$database_url" \
     --set=ON_ERROR_STOP=on \
-    --host 127.0.0.1 \
-    --port 54322 \
-    --username postgres \
-    --dbname postgres \
     --no-psqlrc
 }
 
