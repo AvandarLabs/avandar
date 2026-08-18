@@ -57,10 +57,10 @@ import path from "node:path";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
-    CreateViewStatement,
-    Decision,
-    NoopVerdict,
-    Statement,
+  CreateViewStatement,
+  Decision,
+  NoopVerdict,
+  Statement,
 } from "./NoopViewRecreations/NoopViewRecreations";
 
 const PROBE_SCHEMA = "_noop_view_check";
