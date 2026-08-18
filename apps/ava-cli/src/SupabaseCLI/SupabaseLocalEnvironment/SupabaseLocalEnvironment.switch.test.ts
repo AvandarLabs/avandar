@@ -130,6 +130,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
       basePort: 55341,
       devServerPort: 6193,
       projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
     });
     expect(fake.files.get(CONFIG_PATH)).toContain("port = 55341");
     expect(fake.files.get(CONFIG_PATH)).toContain("port = 55342");
@@ -151,6 +152,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
       basePort: 55321,
       devServerPort: 6173,
       projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
     });
   });
 
@@ -170,6 +172,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
       basePort: 55321,
       devServerPort: 6173,
       projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
     });
   });
 

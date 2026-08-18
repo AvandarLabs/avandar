@@ -114,6 +114,33 @@ export type SupabaseLocalEnvironmentIO = {
   ) => Promise<CommandResult>;
   /** Runs the Supabase CLI with the supplied command arguments. */
   runSupabase: (commandArguments: readonly string[]) => Promise<CommandResult>;
+  /** Runs the repository seed against an explicitly addressed local stack. */
+  runSeed: (options: Readonly<SupabaseSeedTarget>) => Promise<CommandResult>;
+};
+
+/** The one local stack a seed run is allowed to write to. */
+export type SupabaseSeedTarget = {
+  supabaseUrl: string;
+  serviceRoleKey: string;
+};
+
+/**
+ * What the seed pass did after a switch activated.
+ *
+ * A failure is reported, never thrown: the stack it would have seeded is
+ * already running and correct, so a bad seed must not cost the user the switch.
+ */
+export type SupabaseSeedOutcome =
+  | { state: "seeded" }
+  | { state: "skipped" }
+  | { state: "failed"; message: string };
+
+/** The active project a completed switch left behind. */
+export type SupabaseSwitchResult = {
+  basePort: number;
+  devServerPort: number;
+  projectId: string;
+  seed: SupabaseSeedOutcome;
 };
 
 /** Everything a switch needs before it starts mutating local files. */
