@@ -6,15 +6,30 @@ import { WorkerMessageHandler } from "pdfjs-dist/legacy/build/pdf.worker.mjs";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
 // pdf.js normally off-loads parsing to its own nested worker, spawned from
-// `GlobalWorkerOptions.workerSrc`. This code already runs inside our sniff
-// worker, and spawning a worker from a worker is supported unevenly across
-// browsers, so we register the worker's message handler directly on
-// `globalThis` instead. pdf.js detects this ("mainThreadWorkerMessageHandler")
-// and runs the parser in-process rather than spawning anything.
+// `GlobalWorkerOptions.workerSrc`. Spawning a worker from a worker is
+// supported unevenly across browsers, so when this module is evaluated
+// inside a worker (our sniff worker, per this feature's design) we register
+// the worker's message handler directly on `globalThis` instead. pdf.js
+// detects this ("mainThreadWorkerMessageHandler") and parses in-process
+// rather than spawning anything.
+//
+// This is gated to worker contexts only. Registering it unconditionally
+// would also force main-thread callers into in-process parsing -- a realm-
+// wide side effect with no upside there, since a real browser main thread
+// can spawn a nested worker safely. `typeof importScripts === "function"`
+// is the standard worker-context feature test (a `DedicatedWorkerGlobalScope`
+// instanceof check would throw under jsdom, since that global doesn't exist
+// there). Vitest's jsdom environment reports `importScripts` as undefined,
+// same as a real main thread, so this gate does not affect the test suite:
+// pdf.js still parses successfully there because it separately detects
+// Node (`process` is defined under jsdom too) and falls back to a dynamic
+// `import()` of its own worker module, independent of this registration.
 const globalWithPdfjsWorker = globalThis as {
   pdfjsWorker?: { WorkerMessageHandler: typeof WorkerMessageHandler };
 };
-globalWithPdfjsWorker.pdfjsWorker = { WorkerMessageHandler };
+if (typeof (globalThis as { importScripts?: unknown }).importScripts === "function") {
+  globalWithPdfjsWorker.pdfjsWorker = { WorkerMessageHandler };
+}
 
 /**
  * Opens a PDF with pdf.js.
@@ -27,7 +42,7 @@ globalWithPdfjsWorker.pdfjsWorker = { WorkerMessageHandler };
  */
 export async function loadPdfDocument(
   data: Uint8Array,
-  options: { password?: string } = {},
+  options: Readonly<{ password?: string }> = {},
 ): Promise<PDFDocumentProxy & { destroy: () => Promise<void> }> {
   const loadingTask = pdfjs.getDocument({
     data,
