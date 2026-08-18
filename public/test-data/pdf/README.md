@@ -85,6 +85,13 @@ What it covers:
   glyph, so `84.7` extracts as `84<?>7`. This is the real-world version of the
   mojibake case, and it is the fixture that should drive the "we cannot read
   this text reliably" warning path.
+
+  **It is on pages 7 to 11, not throughout.** Measured private-use and
+  replacement characters per page: pages 5 and 6 have none, page 7 has 27,
+  page 8 has 173, page 9 has 127, page 10 has 146, page 11 has 67. Page 8 is
+  the densest and is what `extractPageGeometry.test.ts` reads. A test that
+  points at an early page will pass its parse and find nothing to warn about,
+  which looks identical to the detector being broken.
 - **Dashes as nulls.** Empty cells contain `-` rather than being empty.
 - **Shading as the only cell delimiter.** Table 4 uses shaded cells to mark
   significance (`Shaded cells = p<0.05`) with no ruling lines, so shading
