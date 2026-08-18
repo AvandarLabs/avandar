@@ -259,6 +259,55 @@ describe("DexieRelationCache.write", () => {
     expect(payloadRows[0]!.identityKey).toBe(rows[0]!.identityKey);
   });
 
+  it("supersedes the previous entry when only the source version changes, so two rows can never both satisfy the lookup", async () => {
+    // `identityKey` includes `versionToken` (section 4.3), so writing the
+    // same relation under a new source version produces a *different*
+    // primary key rather than overwriting the old row. `serves()`
+    // deliberately never compares `sourceVersion` (section 3: matching it at
+    // lookup would make every hit block on a network call). Put those two
+    // facts together and, without the single-live-entry supersede delete,
+    // the v1 and v2 rows would both satisfy `serves()` for the same
+    // principal, relation and definition, and nothing would decide which one
+    // answers a query: a false hit that could serve stale rows. The
+    // supersede delete in `_write` is the only thing standing between this
+    // test and that outcome.
+    await DexieRelationCache.write(
+      _makeWrite({
+        identity: { sourceVersion: "v1" },
+        payload: new Blob(["v1-bytes"]),
+      }),
+    );
+    await DexieRelationCache.write(
+      _makeWrite({
+        identity: { sourceVersion: "v2" },
+        payload: new Blob(["v2-bytes"]),
+      }),
+    );
+
+    const rows = await db.RelationCacheEntry.where("tableName")
+      .equals(DATASET_A)
+      .and((row) => {
+        return row.principalKey === WORKSPACE_PRINCIPAL;
+      })
+      .toArray();
+
+    // Exactly one row survives, and it is the v2 one.
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.sourceVersion).toBe("v2");
+
+    // The v1 payload went with it, so entry and payload stay in step.
+    const payloadRows = await db.RelationCachePayload.toArray();
+    expect(payloadRows).toHaveLength(1);
+    expect(payloadRows[0]!.identityKey).toBe(rows[0]!.identityKey);
+
+    // A lookup is unambiguous: it returns the surviving (v2) entry, not a
+    // choice between two candidates.
+    const hit = await DexieRelationCache.lookup(_makeKey());
+    expect(hit).toBeDefined();
+    expect(hit!.identityKey).toBe(rows[0]!.identityKey);
+    expect(hit!.sourceVersion).toBe("v2");
+  });
+
   it("never leaves an entry without its payload", async () => {
     await DexieRelationCache.write(_makeWrite());
 
