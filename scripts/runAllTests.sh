@@ -43,6 +43,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 pnpm test:frontend
+pnpm test:executed
 pnpm test:utils
 pnpm test:ava-cli
 pnpm test:etl
