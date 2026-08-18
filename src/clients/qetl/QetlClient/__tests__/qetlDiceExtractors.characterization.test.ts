@@ -38,7 +38,11 @@ const {
 function _withCacheChain(getAll: ReturnType<typeof vi.fn>) {
   return {
     withCache: () => {
-      return { withEnsureQueryData: () => ({ getAll }) };
+      return {
+        withEnsureQueryData: () => {
+          return { getAll };
+        },
+      };
     },
   };
 }
@@ -133,9 +137,7 @@ describe("getDiceExtractors", () => {
       await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
     const result = await getDiceExtractors([VIRTUAL_ID]);
 
-    expect(result).toEqual([
-      { dataset, sourceType: "virtual", sourceDataset },
-    ]);
+    expect(result).toEqual([{ dataset, sourceType: "virtual", sourceDataset }]);
   });
 
   it("pairs an open_data dataset with its source record", async () => {
@@ -173,6 +175,154 @@ describe("getDiceExtractors", () => {
     await expect(getDiceExtractors([GOOGLE_SHEETS_ID])).rejects.toThrow(
       "Google Sheets extraction is not supported yet",
     );
+  });
+
+  it("returns nothing when no dice are requested", async () => {
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+
+    await expect(getDiceExtractors([])).resolves.toEqual([]);
+    expect(csvGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("silently drops a dataset that has no source record", async () => {
+    const dataset = {
+      id: CSV_ID,
+      name: "csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    datasetGetAllMock.mockResolvedValue([dataset]);
+    csvGetAllMock.mockResolvedValue([]);
+
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+
+    await expect(getDiceExtractors([CSV_ID])).resolves.toEqual([]);
+  });
+
+  // The current code looks the dataset up with a non-null assertion
+  // (`options.datasetsById[sourceDataset.datasetId]!`), so a source record
+  // whose dataset is absent produces an extractor with an `undefined`
+  // dataset instead of an error. This pins that down as it is today.
+  it("emits an extractor with an undefined dataset for an orphan source record", async () => {
+    const dataset = {
+      id: CSV_ID,
+      name: "csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    const orphanSourceDataset = { datasetId: MISSING_ID, delimiter: "," };
+    datasetGetAllMock.mockResolvedValue([dataset]);
+    csvGetAllMock.mockResolvedValue([orphanSourceDataset]);
+
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const result = await getDiceExtractors([CSV_ID]);
+
+    expect(result).toEqual([
+      {
+        dataset: undefined,
+        sourceType: "csv_file",
+        sourceDataset: orphanSourceDataset,
+      },
+    ]);
+  });
+
+  // The throw inside the `google_sheets` match arm happens synchronously
+  // inside `promiseFlatMap`, so it rejects the whole call rather than the
+  // one unsupported relation. A batch that also asks for a supported type
+  // gets no partial result: the csv_file bucket is never observed.
+  it("rejects the entire mixed batch when one dataset is google_sheets, yielding no partial result", async () => {
+    const csvDataset = {
+      id: CSV_ID,
+      name: "csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    const googleSheetsDataset = {
+      id: GOOGLE_SHEETS_ID,
+      name: "google sheets dataset",
+      sourceType: "google_sheets" as const,
+      workspaceId: "workspace-1",
+    };
+    const csvSourceDataset = { datasetId: CSV_ID, delimiter: "," };
+    datasetGetAllMock.mockResolvedValue([csvDataset, googleSheetsDataset]);
+    csvGetAllMock.mockResolvedValue([csvSourceDataset]);
+
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+
+    await expect(
+      getDiceExtractors([CSV_ID, GOOGLE_SHEETS_ID]),
+    ).rejects.toThrow("Google Sheets extraction is not supported yet");
+  });
+
+  it("matches multiple csv_file datasets in one call by their own datasetId", async () => {
+    const firstDataset = {
+      id: CSV_ID,
+      name: "first csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    const secondDataset = {
+      id: XLSX_ID,
+      name: "second csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    const firstSourceDataset = { datasetId: CSV_ID, delimiter: "," };
+    const secondSourceDataset = { datasetId: XLSX_ID, delimiter: ";" };
+    datasetGetAllMock.mockResolvedValue([firstDataset, secondDataset]);
+    // Returned in reverse of the datasets' order, to confirm matching is by
+    // `datasetId` and not by position.
+    csvGetAllMock.mockResolvedValue([secondSourceDataset, firstSourceDataset]);
+
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const result = await getDiceExtractors([CSV_ID, XLSX_ID]);
+
+    expect(result).toEqual([
+      {
+        dataset: secondDataset,
+        sourceType: "csv_file",
+        sourceDataset: secondSourceDataset,
+      },
+      {
+        dataset: firstDataset,
+        sourceType: "csv_file",
+        sourceDataset: firstSourceDataset,
+      },
+    ]);
+  });
+
+  it("scopes each source type's getAll call to only that bucket's ids", async () => {
+    const csvDataset = {
+      id: CSV_ID,
+      name: "csv dataset",
+      sourceType: "csv_file" as const,
+      workspaceId: "workspace-1",
+    };
+    const virtualDataset = {
+      id: VIRTUAL_ID,
+      name: "virtual dataset",
+      sourceType: "virtual" as const,
+      workspaceId: "workspace-1",
+    };
+    datasetGetAllMock.mockResolvedValue([csvDataset, virtualDataset]);
+    csvGetAllMock.mockResolvedValue([]);
+    virtualGetAllMock.mockResolvedValue([]);
+
+    const { getDiceExtractors } =
+      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    await getDiceExtractors([CSV_ID, VIRTUAL_ID]);
+
+    expect(csvGetAllMock).toHaveBeenCalledWith({
+      where: { dataset_id: { in: [CSV_ID] } },
+    });
+    expect(virtualGetAllMock).toHaveBeenCalledWith({
+      where: { dataset_id: { in: [VIRTUAL_ID] } },
+    });
   });
 
   it("dispatches a mixed request to each source's extractor, in the order source types are first seen in the dataset list (observed, not asserted as designed)", async () => {
@@ -213,20 +363,28 @@ describe("getDiceExtractors", () => {
 
     const { getDiceExtractors } =
       await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([
-      VIRTUAL_ID,
-      CSV_ID,
-      OPEN_DATA_ID,
-    ]);
+    const result = await getDiceExtractors([VIRTUAL_ID, CSV_ID, OPEN_DATA_ID]);
 
     // Observed: groups come out in the order their source type is first
     // encountered while scanning `datasets` (virtual, then csv_file, then
     // open_data), matching the mocked getAll() return order above, not the
     // order of the ids passed to getDiceExtractors.
     expect(result).toEqual([
-      { dataset: virtualDataset, sourceType: "virtual", sourceDataset: virtualSourceDataset },
-      { dataset: csvDataset, sourceType: "csv_file", sourceDataset: csvSourceDataset },
-      { dataset: openDataDataset, sourceType: "open_data", sourceDataset: openDataSourceDataset },
+      {
+        dataset: virtualDataset,
+        sourceType: "virtual",
+        sourceDataset: virtualSourceDataset,
+      },
+      {
+        dataset: csvDataset,
+        sourceType: "csv_file",
+        sourceDataset: csvSourceDataset,
+      },
+      {
+        dataset: openDataDataset,
+        sourceType: "open_data",
+        sourceDataset: openDataSourceDataset,
+      },
     ]);
   });
 });
