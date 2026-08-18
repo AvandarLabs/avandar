@@ -1,8 +1,7 @@
 /**
  * Auxiliary chat types not yet promoted to dedicated models under
  * `shared/models/chat/`. These cover clarifications, dashboard-block
- * generation, retry context, voice hints, session secrets, consent acks, and
- * the OpenRouter models endpoint envelope.
+ * generation, retry context, voice hints, session secrets, and consent acks.
  *
  * Shared by both the frontend (`src/`) and the edge function
  * (`supabase/functions/chat/`). The frontend imports through the `$/` alias
@@ -104,6 +103,8 @@ export type ChatClarifyResponseShape =
       query: string;
       column: string;
       multi: boolean;
+      /** Prompt-derived values to test against local discovery results. */
+      candidateValues: string[];
     };
 
 export type ChatClarifyRequest = {

@@ -11,3 +11,8 @@ src/i18n/locales/*/messages.ts
 
 # pgTap / psql scripts; prettier-plugin-sql cannot parse meta-commands (\set, …)
 supabase/tests/**/*.sql
+
+# Migration upgrade-test fixtures. These reconstruct an exact pre-migration
+# schema and are concatenated with a migration at run time, so keep them
+# byte-stable rather than reflowed.
+supabase/migration-upgrade-tests/**/*.sql

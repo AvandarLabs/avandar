@@ -54,7 +54,7 @@ vi.mock("@/hooks/users/useCurrentUserProfile", () => {
   };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       QueryKeys: {
@@ -139,6 +139,7 @@ function _makeDashboard(overrides: Partial<Dashboard.T> = {}): Dashboard.T {
     slug: undefined,
     description: undefined,
     isPublic: false,
+    visibility: "draft",
     isRestricted: false,
     ownerId: "00000000-0000-4000-8000-0000000000bb" as UserId,
     ownerProfileId: "00000000-0000-4000-8000-0000000000cc" as UserProfileId,

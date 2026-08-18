@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { formatNumber } from "@avandar/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APIClient } from "@/clients/APIClient";
-import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { act, render, RenderOptions, screen, waitFor } from "@/test-utils";
@@ -113,10 +113,13 @@ vi.mock("@/clients/datasets/DatasetQueryClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       insertGoogleSheetsDataset: vi.fn(),
+      useGetAll: (): [[], boolean] => {
+        return [[], false];
+      },
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];
@@ -277,7 +280,7 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
   const result = Papa.parse<UnknownObject>(text, {
     dynamicTyping: true,
     header: true,
-    preview: AppConfig.dataManagerApp.maxPreviewRows,
+    preview: GlobalAppConfig.dataManagerApp.maxPreviewRows,
     skipEmptyLines: true,
   });
 

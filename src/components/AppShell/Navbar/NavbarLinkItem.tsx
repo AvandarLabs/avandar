@@ -3,7 +3,7 @@ import { Box, Flex, Group, Text } from "@mantine/core";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline/isAppLinkAvailableOffline";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 
 type Props = {
   item: NavbarLink;
@@ -22,7 +22,7 @@ export function NavbarLinkItem({
     <>
       <Box mr="xs">{icon}</Box>
       <Text span fw={500} className={css.collapsibleText}>
-        {link.label}
+        {link.label()}
       </Text>
     </>
   );

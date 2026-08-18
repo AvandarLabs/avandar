@@ -171,7 +171,7 @@ insert into public.dashboards (
   owner_profile_id,
   name,
   description,
-  is_public,
+  visibility,
   config
 )
 values
@@ -182,10 +182,51 @@ values
     'f1003001-0000-4000-8000-000000000001'::uuid,
     'seed owner dash',
     '',
-    false,
+    'draft',
     '{}'::jsonb
   )
 on conflict (id) do nothing;
+
+insert into public.dashboards (
+  id,
+  workspace_id,
+  owner_id,
+  owner_profile_id,
+  name,
+  description,
+  visibility,
+  config
+)
+values
+  (
+    'f100b030-0000-4000-8000-000000000030'::uuid,
+    'f1001001-0000-4000-8000-000000000001'::uuid,
+    'f1000001-0000-4000-8000-000000000001'::uuid,
+    'f1003001-0000-4000-8000-000000000001'::uuid,
+    'editor shared dash',
+    '',
+    'draft',
+    '{}'::jsonb
+  )
+on conflict (id) do nothing;
+
+insert into public.resource_shares (
+  resource_type,
+  resource_id,
+  workspace_id,
+  principal_type,
+  principal_id,
+  role
+)
+values
+  (
+    'dashboard'::public.resource_type,
+    'f100b030-0000-4000-8000-000000000030'::uuid,
+    'f1001001-0000-4000-8000-000000000001'::uuid,
+    'user'::public.share_principal_type,
+    'f1000002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level
+  );
 
 insert into public.datasets (
   id,
@@ -215,7 +256,7 @@ insert into public.dashboards (
   owner_profile_id,
   name,
   description,
-  is_public,
+  visibility,
   config
 )
 values
@@ -226,7 +267,7 @@ values
     'f1003001-0000-4000-8000-000000000001'::uuid,
     'disposable owner dash',
     '',
-    false,
+    'draft',
     '{}'::jsonb
   )
 on conflict (id) do nothing;
@@ -285,7 +326,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'f100b001-0000-4000-8000-000000000001'::uuid,
@@ -294,7 +335,7 @@ select
       'f1003002-0000-4000-8000-000000000002'::uuid,
       'editor dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_dash_home$
@@ -384,7 +425,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'f100b002-0000-4000-8000-000000000002'::uuid,
@@ -393,7 +434,7 @@ select
       'f1003002-0000-4000-8000-000000000002'::uuid,
       'cross dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_dash_foreign$,
@@ -419,7 +460,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'f100b003-0000-4000-8000-000000000003'::uuid,
@@ -428,7 +469,7 @@ select
       'f1003001-0000-4000-8000-000000000001'::uuid,
       'owner dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_dash_owner$
@@ -647,7 +688,7 @@ select
   );
 
 select
-  lives_ok (
+  throws_ok (
     $del_dash_editor$
     set local role authenticated;
 
@@ -658,22 +699,19 @@ select
         true
       );
 
-    do $chk$
-    declare
-      v_deleted int;
-    begin
-      delete from public.dashboards
-      where
-        id = 'f100b020-0000-4000-8000-000000000020'::uuid;
-
-      get diagnostics v_deleted = row_count;
-
-      if v_deleted > 0 then
-        raise exception 'Global editor deleted owner dashboard'
-          using errcode = 'insufficient_privilege';
-      end if;
-    end $chk$;
-    $del_dash_editor$
+    update public.dashboards
+    set
+      visibility = 'draft',
+      snapshot_transition_kind = 'delete',
+      snapshot_transition_revision = 'f100be01-0000-4000-8000-000000000001'::uuid,
+      snapshot_transition_prior_revision = snapshot_revision,
+      snapshot_transition_prior_visibility = visibility
+    where
+      id = 'f100b030-0000-4000-8000-000000000030'::uuid;
+    $del_dash_editor$,
+    '42501',
+    'new row violates row-level security policy for table "dashboards"',
+    'an editor cannot acquire a dashboard delete transition'
   );
 
 set local role postgres;
@@ -713,6 +751,7 @@ select
     $del_dash_owner$
     do $chk$
     declare
+      v_claimed int;
       v_deleted int;
     begin
       delete from public.dashboards
@@ -721,8 +760,31 @@ select
 
       get diagnostics v_deleted = row_count;
 
-      if v_deleted <> 1 then
-        raise exception 'owner delete dashboard expected one row'
+      if v_deleted <> 0 then
+        raise exception 'owner deleted dashboard without a transition'
+          using errcode = 'insufficient_privilege';
+      end if;
+
+      update public.dashboards
+      set
+        visibility = 'draft',
+        snapshot_transition_kind = 'delete',
+        snapshot_transition_revision = 'f100be02-0000-4000-8000-000000000002'::uuid,
+        snapshot_transition_prior_revision = snapshot_revision,
+        snapshot_transition_prior_visibility = visibility
+      where
+        id = 'f100b020-0000-4000-8000-000000000020'::uuid;
+
+      get diagnostics v_claimed = row_count;
+
+      delete from public.dashboards
+      where
+        id = 'f100b020-0000-4000-8000-000000000020'::uuid;
+
+      get diagnostics v_deleted = row_count;
+
+      if v_claimed <> 1 or v_deleted <> 1 then
+        raise exception 'owner delete transition expected one deleted row'
           using errcode = 'insufficient_privilege';
       end if;
     end $chk$;

@@ -35,6 +35,12 @@ and run its rules just like an inline phase. Split a phase out to a
 readability. There is no cap on how many phases or referenced rulesets the
 repo can add; add as many as the codebase needs and they all run.
 
+A delegated phase is a gate and a pointer, nothing else. Do not explain why
+it was split out: this file is loaded into every review, and a note about
+file organization instructs the reviewer to do nothing while costing context
+in every run. Rationale for a ruleset belongs at the top of that ruleset,
+where the person applying it is already reading.
+
 Because each declared phase and each referenced ruleset counts as a real
 phase, they also feed the skill's sub-agent fan-out decision and each fans
 out as its own find lane. So the number of phases below (inline **and**
@@ -209,6 +215,23 @@ when the gate matches.
   For each hit, confirm the call opts into `ALWAYS_REFETCH_ON_MOUNT`
   and that any dependent control and label follow the two rules above.
 
+### Phase: `-`-prefixed files under `src/routes/`
+
+- **Gate:** the diff adds or renames a file whose basename starts with `-`
+  under `src/routes/`. Skip otherwise.
+- **Rule:** the general module checklist flags a `-` prefix, but TanStack
+  Router treats `src/routes/` as its `routesDirectory` and skips any file
+  whose basename starts with the ignore prefix `-`. A colocated route test is
+  therefore **required** to carry that prefix, or the router would try to turn
+  it into a route. So:
+  - A colocated test for a route module **may** use the `-` prefix, and should
+    sit next to the route it covers, named after it:
+    `src/routes/.../d/$slugOrId.tsx` → `src/routes/.../d/-$slugOrId.test.tsx`.
+  - Nothing else under `src/routes/` may use the prefix. A component, hook,
+    helper, or type that merely wants to hide from the router is a unit in the
+    wrong place: move it into the owning view directory under `src/views/`
+    (or `src/components/`) and import it from the route.
+
 ### Phase: AvaPage schema migrations
 
 - **Gate:** the diff touches any file under
@@ -216,12 +239,6 @@ when the gate matches.
 - **Reference:** this phase's rules live in
   [`references/avapage-schema-migrations.md`](references/avapage-schema-migrations.md).
   Open it and run it as its own phase.
-- **Why it is split out:** it carries a review _method_ (establish the
-  current schema version and read a module's full, adjacent header rules
-  before flagging a "frozen snapshot / no live imports" violation) that a
-  past review got wrong, mis-flagging the current-version migration's
-  intended `V<N>_VizConfig = VizConfig` alias as a bug. The detail belongs in
-  its own file rather than bloating this entry point.
 
 ### Phase: utils package reference
 
@@ -234,47 +251,6 @@ when the gate matches.
   general "utility reuse" principle is covered by the skill; this
   phase just records the in-repo README path.
 
-### Phase: Supabase session `null` normalization
-
-- **Gate:** the diff introduces a `null` (a `| null` type, a `= null`
-  initializer, or a `return null`) on a value derived from a Supabase
-  auth/session call (`refreshSession`, `getSession`, `getUser`, etc.).
-  Skip if no such `null` is introduced.
-- **Rule:** the skill's general `null`-vs-`undefined` rule applies (own
-  signatures use `undefined`; normalize external `null` at the boundary
-  with `?? undefined`). This phase records the in-repo specifics:
-  - The canonical normalization pattern lives in
-    `src/clients/AuthClient.ts` — `getCurrentSession` returns
-    `Promise<Session | undefined>` and does `return data.session ??
-undefined`. New code that wraps a Supabase session call should follow
-    that shape rather than propagating `Session | null` outward.
-  - The **one** place `null` is legitimate is the `onAuthStateChange`
-    callback parameter (`(event, session: Session | null) => ...`), whose
-    type Supabase dictates. Keep `null` there; normalize everywhere else.
-
-  This is bad (our own module owns these signatures, so they should be
-  `undefined`):
-
-  ```ts
-  let onSessionExpired: (() => void) | null = null;
-
-  async function doRefresh(): Promise<Session | null> {
-    const { data } = await AvaSupabase.db().auth.refreshSession();
-    return data.session;
-  }
-  ```
-
-  This is good:
-
-  ```ts
-  let onSessionExpired: (() => void) | undefined = undefined;
-
-  async function doRefresh(): Promise<Session | undefined> {
-    const { data } = await AvaSupabase.db().auth.refreshSession();
-    return data.session ?? undefined;
-  }
-  ```
-
 ### Phase: E2E tests (Playwright)
 
 - **Gate:** the diff includes any file under `tests/e2e/` (specs,
@@ -282,10 +258,15 @@ undefined`. New code that wraps a Supabase session call should follow
 - **Reference:** this phase's rules live in
   [`references/e2e-tests.md`](references/e2e-tests.md). Open it and run it
   as its own phase.
-- **Why it is split out:** the E2E ruleset is large (running specs, UI vs
-  direct-DB writes, client-side navigation, minimal seeding, resilient
-  controlled-input sets, the large-parse fresh-browser policy, cleanup, and
-  timeouts) and was bloating this entry point.
+
+### Phase: copy functions
+
+- **Gate:** the diff adds or renames a function that returns user-facing copy,
+  or touches any file under `shared/copy/` or any nested `copy/` directory.
+  Skip otherwise.
+- **Reference:** this phase's rules live in
+  [`references/copy-functions.md`](references/copy-functions.md). Open it and
+  run it as its own phase.
 
 ### Phase: internationalization (Lingui)
 

@@ -29,14 +29,20 @@ create table public.tokens__google (
   -- space-separated list of scopes.
   scope text not null,
   -- Constraint: all user_id,google_account_id pairs must be unique
-  unique (
-    user_id,
-    google_account_id
-  )
+  unique (user_id, google_account_id)
 );
 
 -- Enable row level security
 alter table public.tokens__google enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.tokens__google to authenticated,
+service_role;
 
 -- Policies
 create policy "

@@ -3,7 +3,7 @@ import {
   suggestNextVersion,
   validateReleaseVersion,
 } from "@ava-cli/ReleaseCLI/releaseVersionUtils/releaseVersionUtils";
-import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCLI/runPreflight";
+import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 
 /**
  * Resolving the two versions a release needs, from the command line when they

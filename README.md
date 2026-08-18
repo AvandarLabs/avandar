@@ -91,11 +91,19 @@ the product into something that truly serves your mission.
    pnpm dev
    ```
 
+   This serves the app on `http://127.0.0.1:5173`, or on the port
+   `AVA_VITE_DEV_PORT` names in `.env.development`. `ava supabase switch` sets
+   that variable so a switched worktree gets a dev-server port of its own and
+   several worktrees can run `pnpm dev` at the same time; `ava supabase
+   restore` puts it back. Run `ava supabase status` to see which local Supabase
+   project, ports, and keys the current worktree is pointed at.
+
 ### End-to-end tests (Playwright)
 
 Playwright runs against the app URL in `playwright.config.ts` (default
-`http://127.0.0.1:5173`). The config can start Vite automatically unless a
-server is already running.
+`http://127.0.0.1:5173`, or `AVA_VITE_DEV_PORT` when a switch has moved this
+worktree's dev server). The config can start Vite automatically unless a server
+is already running.
 
 **Install browsers once** (and again after upgrading `@playwright/test`):
 
@@ -174,7 +182,7 @@ when touching cross-cutting areas (for example, dataset source types).
      `Read` variant fully required, and then we specify the optional fields.
    - If your `Read` variant has a discriminated union, you will need sub-types for
      each part of the union, and then reference them in the `Insert` and `Update`
-     variants. See [EntityFieldConfig.types.ts](src/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts)
+     variants. See [ConceptAttribute.types.ts](shared/models/ontology/ConceptAttribute/ConceptAttribute.types.ts)
      for an example. This is because if you apply `Partial<>` or `SetRequired<>`
      to the full object, TypeScript loses the discriminated union and treats it
      as a regular union. Splitting up the union into types and applying

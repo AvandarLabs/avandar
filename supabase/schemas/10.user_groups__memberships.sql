@@ -3,20 +3,32 @@ create table public.user_group_memberships (
   user_group_id uuid not null references public.user_groups (id) on update cascade on delete cascade,
   user_id uuid not null references auth.users (id) on update cascade on delete cascade,
   created_at timestamptz not null default now(),
-  constraint user_group_memberships__group_user unique (
-    user_group_id,
-    user_id
-  )
+  constraint user_group_memberships__group_user unique (user_group_id, user_id)
 );
 
 create index idx_user_group_memberships__user_id on public.user_group_memberships (user_id);
 
-create index idx_user_group_memberships__user_group_id on public.user_group_memberships (
-  user_group_id
-);
+create index idx_user_group_memberships__user_group_id on public.user_group_memberships (user_group_id);
 
 -- Enable row level security
 alter table public.user_group_memberships enable row level security;
+
+-- Data API privileges.
+--
+-- No UPDATE for the Data API: membership rows are added and removed, never
+-- edited in place. `service_role` still gets full DML for backend writes.
+grant
+select
+,
+  insert,
+  delete on table public.user_group_memberships to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.user_group_memberships to service_role;
 
 create policy "Members can select user_group_memberships" on public.user_group_memberships for
 select
@@ -47,9 +59,7 @@ with
         public.user_groups ug
       where
         ug.id = public.user_group_memberships.user_group_id and
-        public.util__is_settings_admin (
-          ug.workspace_id
-        )
+        public.util__is_settings_admin (ug.workspace_id)
     )
   );
 
@@ -61,9 +71,7 @@ create policy "Settings admins can delete user_group_memberships" on public.user
       public.user_groups ug
     where
       ug.id = public.user_group_memberships.user_group_id and
-      public.util__is_settings_admin (
-        ug.workspace_id
-      )
+      public.util__is_settings_admin (ug.workspace_id)
   )
 );
 

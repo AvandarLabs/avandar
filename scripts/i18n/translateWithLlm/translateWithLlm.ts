@@ -10,7 +10,7 @@
  * can write each translation back into the catalog without re-ordering
  * or losing comments.
  *
- * Most callers should use the higher-level `pnpm i18n:update-translations`
+ * Most callers should use the higher-level `pnpm translations`
  * orchestrator (extract → translate → compile). Run this script directly via
  * `pnpm vite-script scripts/i18n/translateWithLlm/translateWithLlm.ts --help`
  * for scoped runs without re-extracting or recompiling.
@@ -33,11 +33,11 @@
 import process from "node:process";
 import { main } from "./main";
 
+export { CatalogTranslator } from "./catalogTranslator";
 export { PoCatalog } from "./poCatalog";
-export type { PoEntry, ParsedPo } from "./poCatalog";
+export type { ParsedPo, PoEntry } from "./poCatalog";
 export { TranslationCli } from "./translationCli";
 export type { CliOptions, ParseArgsResult } from "./translationCli";
-export { CatalogTranslator } from "./catalogTranslator";
 
 // Skip the auto-run when imported under Vitest (so tests can pull in the
 // pure helpers without spinning up the CLI). Vitest sets `VITEST=true`

@@ -17,6 +17,12 @@ export type ReleaseCommands = Readonly<{
   readGit: (args: readonly string[]) => string | undefined;
   /** Runs a read-only command and reports success separately from output. */
   tryGit: (args: readonly string[]) => CommandResult;
+  /**
+   * Runs a read-only command other than git, e.g. `gh`. Always executed, even
+   * on a dry run: a read changes nothing, and a dry run that skipped its reads
+   * would report a different verdict than the real thing.
+   */
+  readCommand: (command: string, args: readonly string[]) => CommandResult;
   /** Runs a mutating command, echoing it. Skipped (but echoed) on dry runs. */
   mutate: (command: string, args: readonly string[]) => CommandResult;
   /** Runs a mutating command without echoing it (for cleanup after failure). */
@@ -67,6 +73,10 @@ export function createReleaseCommands(
 
     tryGit: (args: readonly string[]): CommandResult => {
       return _runCommand("git", args, repoRoot);
+    },
+
+    readCommand: (command: string, args: readonly string[]): CommandResult => {
+      return _runCommand(command, args, repoRoot);
     },
 
     mutate: (command: string, args: readonly string[]): CommandResult => {

@@ -138,6 +138,26 @@ function _readPragma(db: AvaSqliteDatabase, name: string): unknown {
   return Object.values(row)[0];
 }
 
+function _readGeneratedColumnNames(
+  options: Readonly<{
+    db: AvaSqliteDatabase;
+    table: string;
+  }>,
+): Set<string> {
+  const { db, table } = options;
+  const columns = db
+    .query<
+      { hidden: number; name: string },
+      []
+    >(`pragma table_xinfo(${_quoteIdent(table)});`)
+    .all();
+  return new Set(
+    columns.flatMap((column) => {
+      return column.hidden < 2 ? [] : [column.name];
+    }),
+  );
+}
+
 function _insertRowsTransactionally(
   db: AvaSqliteDatabase,
   table: string,
@@ -145,22 +165,25 @@ function _insertRowsTransactionally(
 ): void {
   // Take the column set from the first row; Supabase REST returns a
   // dense shape (every row carries every column).
-  const cols = Object.keys(rows[0]!);
-  const colsClause = cols.map(_quoteIdent).join(", ");
-  const placeholders = cols
+  const generatedColumnNames = _readGeneratedColumnNames({ db, table });
+  const columnNames = Object.keys(rows[0]!).filter((columnName) => {
+    return !generatedColumnNames.has(columnName);
+  });
+  const columnsClause = columnNames.map(_quoteIdent).join(", ");
+  const placeholders = columnNames
     .map(() => {
       return "?";
     })
     .join(", ");
-  const sql = `insert into ${_quoteIdent(table)} (${colsClause}) values (${placeholders})`;
+  const sql = `insert into ${_quoteIdent(table)} (${columnsClause}) values (${placeholders})`;
   const stmt = db.prepare(sql);
 
   const tx = db.transaction((batch: ReadonlyArray<Record<string, unknown>>) => {
     batch.forEach((row) => {
       stmt.run(
         ..._bindValues(
-          cols.map((col) => {
-            return row[col] ?? null;
+          columnNames.map((columnName) => {
+            return row[columnName] ?? null;
           }),
         ),
       );

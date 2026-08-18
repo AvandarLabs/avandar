@@ -75,9 +75,7 @@ describe("buildShareSummary", () => {
       workspaceShareRole: null,
       ...baseLookups,
     });
-    expect(flat(spans)).toBe(
-      "This dataset is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dataset.");
   });
 
   it("describes general app access when unrestricted with no direct shares", () => {
@@ -89,6 +87,19 @@ describe("buildShareSummary", () => {
     });
     expect(flat(spans)).toBe(
       "This dataset is accessible to anyone with Data Sources Viewer permission.",
+    );
+  });
+
+  it("describes a surviving workspace share on a restricted resource", () => {
+    const spans = buildShareSummary({
+      shares: [],
+      isRestricted: true,
+      workspaceShareRole: "editor",
+      ...baseLookups,
+    });
+
+    expect(flat(spans)).toBe(
+      "This dataset is accessible to anyone with Data Sources Editor permission.",
     );
   });
 
@@ -149,6 +160,19 @@ describe("buildShareSummary", () => {
     expect(text).not.toContain("Avandar Labs");
   });
 
+  it("appends a surviving workspace share when restricted", () => {
+    const spans = buildShareSummary({
+      shares: [userShare("s-1", "u-1", "editor")],
+      isRestricted: true,
+      workspaceShareRole: "viewer",
+      ...baseLookups,
+    });
+
+    expect(flat(spans)).toBe(
+      "This dataset is shared with: William Farr, and anyone with Data Sources Viewer permission.",
+    );
+  });
+
   it("joins multiple user + group shares with comma-and (restricted)", () => {
     const spans = buildShareSummary({
       shares: [
@@ -183,9 +207,7 @@ describe("buildShareSummary", () => {
       userById: {},
       groupById: {},
     });
-    expect(flat(spans)).toBe(
-      "This dashboard is currently only accessible to its owner.",
-    );
+    expect(flat(spans)).toBe("Only you have access to this dashboard.");
   });
 
   it("uses ', and' only before the very last fragment", () => {
@@ -202,5 +224,56 @@ describe("buildShareSummary", () => {
     expect(text).toContain(
       "all members of Analytics, all members of Public datasets, and anyone with Data Sources Editor permission",
     );
+  });
+});
+
+describe("publication", () => {
+  const base = {
+    shares: [],
+    isRestricted: true,
+    workspaceShareRole: null,
+    resourceType: "dashboard" as const,
+    workspaceName: "Acme",
+    userById: {},
+    groupById: {},
+  };
+
+  it("says nothing about publication when the resource has none", () => {
+    const spans = buildShareSummary({ ...base, publication: undefined });
+    expect(
+      spans
+        .map((span) => {
+          return span.kind === "text" && span.text;
+        })
+        .join(""),
+    ).not.toContain("Published");
+  });
+
+  it("reports a draft dashboard as not published", () => {
+    const spans = buildShareSummary({ ...base, publication: "draft" });
+    expect(spans.at(-1)).toEqual({
+      kind: "text",
+      text: " Not published yet.",
+    });
+  });
+
+  it("names the workspace for an internally published dashboard", () => {
+    const spans = buildShareSummary({ ...base, publication: "workspace" });
+    expect(spans.at(-2)).toEqual({
+      kind: "pill",
+      label: "Acme",
+      variant: "workspace",
+    });
+  });
+
+  it("warns that the people list stops governing reads once public", () => {
+    const spans = buildShareSummary({ ...base, publication: "public" });
+    expect(
+      spans
+        .map((span) => {
+          return span.kind === "text" ? span.text : "";
+        })
+        .join(""),
+    ).toContain("anyone with the link can view it");
   });
 });

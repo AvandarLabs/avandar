@@ -1,6 +1,6 @@
 import { getValue } from "@utils/objects/getValue/getValue.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
-import type { Paths } from "type-fest";
+import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 
 /**
  * Returns a getter function that returns the value of a property at a given
@@ -11,9 +11,9 @@ import type { Paths } from "type-fest";
  */
 export function prop<
   T extends object,
-  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(path: K): (obj: T) => V {
   return (obj: T) => {
@@ -33,11 +33,13 @@ export function prop2<X extends string>(
   path: X,
 ): <
   T extends object,
-  K extends X extends ([Paths<T>] extends [never] ? keyof T : Paths<T>) ? X
+  K extends (
+    X extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>) ? X
+  )
   : PropTypeError<X>,
   V extends K extends PropTypeError<X> ? PropTypeError<X>
   : K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
+  : K extends ObjectPaths<T> ? PathValue<T, K>
   : never,
 >(
   obj: T,

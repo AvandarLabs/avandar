@@ -20,6 +20,8 @@ type Props = {
   title: string;
   onClose: () => void;
   onBack: () => void;
+  /** Called with the wall-clock duration after a successful export only. */
+  onExported: (durationMs: number) => void;
 };
 
 const MAX_DISPLAY_WIDTH = 900;
@@ -31,6 +33,7 @@ export function PdfAnnotator({
   title,
   onClose,
   onBack,
+  onExported,
 }: Props): ReactNode {
   const { t } = useLingui();
   const { baseCanvas, isCapturing } = usePdfDashboardCapture(sourceElement);
@@ -50,6 +53,7 @@ export function PdfAnnotator({
     filename,
     title,
     onClose,
+    onExported,
   });
 
   // Derive display dimensions from the captured canvas.

@@ -1,5 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { openDataExplorerDrawerTab } from "./helpers/dataExplorerFlow";
 import {
   deleteAllDashboardsForOwner,
   deleteDashboardsByIds,
@@ -116,14 +117,24 @@ test.describe("Data Explorer: save viz to dashboard", () => {
 
       // Step 4: Switch to bar chart via the Visualization Type select. The
       // viz state manager auto-picks reasonable x/y axes from the result
-      // columns, so we don't need to fill the axis subform. The select
-      // sits below the fold in the left sidebar; `.click()` auto-scrolls.
+      // columns, so we don't need to fill the axis subform.
+      //
+      // The select lives in the drawer's tab rail, which renders it only while
+      // the drawer is open on the Visualizations tab, so open that tab first.
+      await openDataExplorerDrawerTab({ page, tab: "visualizations" });
+
       const vizTypeSelect = page.getByRole("combobox", {
         name: /visualization type/i,
       });
-      await vizTypeSelect.scrollIntoViewIfNeeded();
       await vizTypeSelect.click();
       await page.getByRole("option", { name: /^bar chart$/i }).click();
+
+      // Settle on the picker echoing the choice before waiting on the chart, so
+      // a click Mantine swallowed is reported as such instead of as a chart
+      // that never rendered.
+      await expect(vizTypeSelect).toHaveValue(/^bar chart$/i, {
+        timeout: SHORT_WAIT,
+      });
       await expect(page.locator(".recharts-bar").first()).toBeVisible({
         timeout: MEDIUM_WAIT,
       });

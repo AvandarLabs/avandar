@@ -1,4 +1,26 @@
+import { DashboardSeedHelpers } from "./DashboardSeedHelpers";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
+type SeedDashboardOptions = {
+  admin: SupabaseClient;
+  workspaceId: string;
+  ownerEmail: string;
+  name: string;
+  /** Sets `is_restricted`; defaults to `false`. */
+  isRestricted?: boolean;
+} & (
+  | {
+      /** Draft is the default fixture visibility. */
+      visibility?: "draft";
+      snapshotRevision?: undefined;
+    }
+  | {
+      /** A committed audience requires the matching snapshot generation. */
+      visibility: Exclude<Dashboard.Visibility, "draft">;
+      snapshotRevision: string;
+    }
+);
 
 /**
  * Inserts a blank dashboard owned by the given user. Returns the new dashboard
@@ -7,95 +29,61 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * for tests that exercise the "save to dashboard" flow against pre-existing
  * empty dashboards.
  */
-export async function seedDashboard(options: {
-  admin: SupabaseClient;
-  workspaceId: string;
-  ownerEmail: string;
-  name: string;
-}): Promise<string> {
-  const { admin, workspaceId, ownerEmail, name } = options;
-
-  const { data: ownerUserIdRaw, error: ownerLookupError } = await admin.rpc(
-    "util__get_user_id_by_email",
-    { p_email: ownerEmail },
-  );
-  if (ownerLookupError) {
-    throw new Error(
-      `Could not find owner user by email "${ownerEmail}": ${ownerLookupError.message}`,
-    );
-  }
-  const ownerUserId = ownerUserIdRaw as string;
-
-  const { data: ownerProfile, error: profileError } = await admin
-    .from("user_profiles")
-    .select("id")
-    .eq("user_id", ownerUserId)
-    .eq("workspace_id", workspaceId)
-    .maybeSingle();
-  if (profileError) {
-    throw new Error(`profile lookup failed: ${profileError.message}`);
-  }
-  if (!ownerProfile) {
-    throw new Error(
-      `No user_profile row for user_id ${ownerUserId} in workspace ${workspaceId}`,
-    );
-  }
-
-  const now = new Date().toISOString();
-  const config = {
-    root: {
-      props: {
-        schemaVersion: 2,
-        author: "",
-        containerMaxWidth: { unit: "%", value: 100 },
-        horizontalPadding: "md",
-        isAuthorHidden: false,
-        isPublishedAtHidden: false,
-        isSubtitleHidden: false,
-        isTitleHidden: false,
-        publishedAt: "",
-        subtitle: "",
-        title: name,
-        verticalPadding: "lg",
-      },
-    },
-    content: [],
+export async function seedDashboard(
+  options: Readonly<SeedDashboardOptions>,
+): Promise<string> {
+  const {
+    admin,
+    workspaceId,
+    ownerEmail,
+    name,
+    isRestricted = false,
+  } = options;
+  const owner = await DashboardSeedHelpers.getOwner({
+    admin,
+    ownerEmail,
+    workspaceId,
+  });
+  const dashboardSeed = {
+    admin,
+    config: DashboardSeedHelpers.makeDashboardConfigFromContent({
+      content: [],
+      title: name,
+    }),
+    failureMessage: "Failed to seed dashboard",
+    isRestricted,
+    missingRowMessage: "Dashboard seed returned no row",
+    name,
+    owner,
+    slug: `e2e-seed-${crypto.randomUUID().slice(0, 8)}`,
+    workspaceId,
   };
-
-  const { data: inserted, error: insertError } = await admin
-    .from("dashboards")
-    .insert({
-      workspace_id: workspaceId,
-      owner_id: ownerUserId,
-      owner_profile_id: ownerProfile.id,
-      name,
-      slug: `e2e-seed-${crypto.randomUUID().slice(0, 8)}`,
-      is_public: false,
-      is_restricted: false,
-      config,
-      created_at: now,
-      updated_at: now,
-    })
-    .select("id")
-    .single();
-
-  if (insertError) {
-    throw new Error(`Failed to seed dashboard: ${insertError.message}`);
+  if (options.visibility === undefined || options.visibility === "draft") {
+    return DashboardSeedHelpers.insertDashboard({
+      ...dashboardSeed,
+      visibility: "draft",
+    });
   }
-  if (!inserted) {
-    throw new Error("Dashboard seed returned no row");
+  const snapshotRevision = options.snapshotRevision;
+  if (snapshotRevision === undefined) {
+    throw new Error("Committed dashboard seeds require a snapshot revision");
   }
-
-  return inserted.id;
+  return DashboardSeedHelpers.insertDashboard({
+    ...dashboardSeed,
+    snapshotRevision,
+    visibility: options.visibility,
+  });
 }
 
 /**
  * Deletes the given dashboards by id (best-effort).
  */
-export async function deleteDashboardsByIds(options: {
-  admin: SupabaseClient;
-  dashboardIds: string[];
-}): Promise<void> {
+export async function deleteDashboardsByIds(
+  options: Readonly<{
+    admin: SupabaseClient;
+    dashboardIds: readonly string[];
+  }>,
+): Promise<void> {
   if (options.dashboardIds.length === 0) {
     return;
   }
@@ -112,11 +100,13 @@ export async function deleteDashboardsByIds(options: {
  * Deletes every dashboard in a workspace owned by the given user.
  * Used to pre-clean state for tests that assert the "no dashboards" path.
  */
-export async function deleteAllDashboardsForOwner(options: {
-  admin: SupabaseClient;
-  workspaceId: string;
-  ownerEmail: string;
-}): Promise<void> {
+export async function deleteAllDashboardsForOwner(
+  options: Readonly<{
+    admin: SupabaseClient;
+    workspaceId: string;
+    ownerEmail: string;
+  }>,
+): Promise<void> {
   const { data: ownerUserIdRaw, error: lookupError } = await options.admin.rpc(
     "util__get_user_id_by_email",
     {

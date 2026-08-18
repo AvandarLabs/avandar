@@ -50,7 +50,14 @@ export function FreeTextBody({
           }
         }}
       />
-      <Group justify="flex-end" gap="xs">
+      <Group
+        justify="flex-end"
+        gap="xs"
+        bg="blue.0"
+        bottom={0}
+        pos="sticky"
+        pt="xs"
+      >
         <Button
           size="xs"
           onClick={onSubmitAnswer}

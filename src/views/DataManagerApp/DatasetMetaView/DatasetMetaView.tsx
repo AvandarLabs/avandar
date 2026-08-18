@@ -15,13 +15,13 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useEffect, useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
-import { AppConfig } from "@/config/AppConfig";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -58,7 +58,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [previewData, isLoadingPreviewData] =
     DatasetQueryClient.useGetPreviewData({
       datasetId: dataset.id,
-      numRows: AppConfig.dataManagerApp.maxPreviewRows,
+      numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
       workspaceId: workspace.id,
     });
   const [datasetColumns, isLoadingDatasetColumns] =

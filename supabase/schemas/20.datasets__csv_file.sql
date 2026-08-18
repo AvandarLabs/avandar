@@ -39,6 +39,15 @@ create table public.datasets__csv_file (
 -- Enable row level security
 alter table public.datasets__csv_file enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__csv_file to authenticated,
+service_role;
+
 -- Policies
 create policy "User can select datasets__csv_file in their workspace" on public.datasets__csv_file for
 select

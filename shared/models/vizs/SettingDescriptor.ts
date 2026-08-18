@@ -1,3 +1,4 @@
+import type { ObjectPaths } from "@avandar/utils";
 /**
  * # Setting vs. control: viz settings nomenclature
  *
@@ -15,7 +16,7 @@
  *   is "what the user uses to change it".
  *
  * Every setting maps to exactly one control. A `SettingDescriptor` binds
- * them together: it points to a setting (a typed `Paths<TConfig>` key),
+ * them together: it points to a setting (a typed `ObjectPaths<TConfig>` key),
  * declares the {@link ControlSpec} that should render it, and carries
  * metadata such as `label`, `group`, and (for series-level settings)
  * `composable`.
@@ -27,7 +28,6 @@
  * control widget the user clicks.
  */
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
-import type { Paths } from "type-fest";
 
 /**
  * The groups a setting can be clustered under in a settings form.
@@ -122,7 +122,7 @@ export type ControlSpec =
  */
 export type ChartSettingDescriptor<TConfig> = {
   /** Typed dotted path into the viz config. */
-  key: Paths<TConfig> & string;
+  key: ObjectPaths<TConfig> & string;
   /** Label shown next to the control in the form. */
   label: string;
   /** Optional group used to cluster related settings. */
@@ -139,7 +139,7 @@ export type ChartSettingDescriptor<TConfig> = {
  */
 export type SeriesSettingDescriptor<TSeries> = {
   /** Typed dotted path into the series object. */
-  key: Paths<TSeries> & string;
+  key: ObjectPaths<TSeries> & string;
   /** Label shown next to the control in the form. */
   label: string;
   /** Optional group used to cluster related settings. */
@@ -201,12 +201,7 @@ export type AnyVizSettingDescriptors = {
   series: readonly AnySeriesSettingDescriptor[];
 };
 
-/**
- * Empty descriptor registry. Used by viz modules that have not yet
- * been refactored to use the descriptor-driven form (single-series
- * vizs like pie, funnel, scatter, bubble, table). Their forms remain
- * hand-coded for now and can be migrated later.
- */
+/** Empty descriptor registry for pie, funnel, and table modules. */
 export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],
   series: [],

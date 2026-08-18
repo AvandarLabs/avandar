@@ -5,9 +5,9 @@ import { Badge, Group, Text } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -29,9 +29,9 @@ type Props = {
 
 /**
  * A select component for selecting a data source, which can be
- * a dataset or an entity config.
+ * a dataset or a concept.
  *
- * This component loads the list of datasets and entity configs on its own.
+ * This component loads the list of datasets and concepts on its own.
  * This component supports controlled and uncontrolled behavior and can be used
  * with `useForm`.
  */
@@ -69,12 +69,12 @@ export function QueryDataSourceSelect({
   const [datasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const [entityConfigs] = EntityConfigClient.useGetAll(
+  const [concepts] = ConceptClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const dataSources: QueryDataSource[] = useMemo(() => {
-    return [...(datasets ?? []), ...(entityConfigs ?? [])];
-  }, [datasets, entityConfigs]);
+    return [...(datasets ?? []), ...(concepts ?? [])];
+  }, [datasets, concepts]);
 
   useOnBecomesDefined(dataSources, (dsources) => {
     if (isControlled) {
@@ -128,7 +128,7 @@ export function QueryDataSourceSelect({
 
     if (
       datasetBucketsByType.size === 1 &&
-      (!entityConfigs || entityConfigs.length === 0)
+      (!concepts || concepts.length === 0)
     ) {
       return buildDatasetOptions(
         (datasets ?? []).map((dataset) => {
@@ -176,13 +176,13 @@ export function QueryDataSourceSelect({
       ...groups,
       {
         group: t`Profiles`,
-        items: makeSelectOptions(entityConfigs ?? [], {
+        items: makeSelectOptions(concepts ?? [], {
           valueKey: "id",
           labelKey: "name",
         }),
       },
     ];
-  }, [datasets, entityConfigs, unqueryableOfflineIds, t]);
+  }, [datasets, concepts, unqueryableOfflineIds, t]);
 
   const onDataSourceChange = (newDataSourceId: QueryDataSourceId | null) => {
     const newDataSource =

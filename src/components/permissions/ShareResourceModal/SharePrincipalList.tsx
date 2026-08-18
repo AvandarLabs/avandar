@@ -1,5 +1,5 @@
+import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-import { useShareCopy } from "./shareCopy";
 import { SharePrincipalRow } from "./SharePrincipalRow/SharePrincipalRow";
 import type {
   ResourceShareRow,
@@ -19,6 +19,8 @@ export type DisplayShare = ResourceShareRow & {
 type Props = {
   shares: readonly DisplayShare[];
   resourceType: ResourceType;
+  /** Renders every row inert, for a caller who may not write share rows. */
+  isReadOnly?: boolean;
   onRoleChange: (share: DisplayShare, role: RoleLevel) => void;
   onToggleRequiresAppAccess: (share: DisplayShare, next: boolean) => void;
   onRemove: (share: DisplayShare) => void;
@@ -32,15 +34,15 @@ type Props = {
 export function SharePrincipalList({
   shares,
   resourceType,
+  isReadOnly = false,
   onRoleChange,
   onToggleRequiresAppAccess,
   onRemove,
 }: Props): JSX.Element {
-  const shareCopy = useShareCopy();
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {shareCopy.peopleWithAccessHeading}
+        <Trans>People with access</Trans>
       </Text>
       {shares.map((share) => {
         return (
@@ -50,6 +52,7 @@ export function SharePrincipalList({
             displayName={share.displayName}
             resourceType={resourceType}
             isOwnerRow={share.isOwnerRow}
+            isReadOnly={isReadOnly}
             onRoleChange={(role) => {
               return onRoleChange(share, role);
             }}

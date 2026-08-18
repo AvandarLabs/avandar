@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import type { UnknownObject } from "@avandar/utils";
+import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import type { Paths, Simplify } from "type-fest";
+import type { Simplify } from "type-fest";
 
 type GetPathTail<Path, PathHead extends string> =
   Path extends `${PathHead}.${infer Tail}` ? Tail : never;
@@ -46,7 +46,7 @@ type GetInputPropsFn = (
 
 export type GetKeyAndPropsFn<
   FormValues extends UnknownObject,
-  FormPath extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 > = <
   BasePathOrFullPaths extends readonly FormPath[] | (string & FormPath),
   PathTail extends BasePathOrFullPaths extends string ?
@@ -66,7 +66,7 @@ export type GetKeyAndPropsFn<
 export function useKeysAndPropsCallback<
   FormValues extends UnknownObject,
   TransformValues = FormValues,
-  FormPath extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 >(
   form: MantineUseFormReturnType<FormValues, TransformValues>,
 ): GetKeyAndPropsFn<FormValues, FormPath> {

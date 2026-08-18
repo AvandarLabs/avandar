@@ -1,0 +1,22 @@
+.sizeLegend {
+  display: block;
+  max-height: 96px;
+  min-width: 140px;
+  width: 100%;
+}
+
+.sizeLegendCircle {
+  fill: none;
+  stroke: var(--mantine-color-text);
+  stroke-width: 1;
+}
+
+.sizeLegendLeader {
+  stroke: var(--ava-border-strong);
+  stroke-width: 1;
+}
+
+.sizeLegendLabel {
+  fill: var(--mantine-color-text);
+  font-size: 10px;
+}

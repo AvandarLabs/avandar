@@ -2,6 +2,7 @@ import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
 import { withNewMembers } from "@avandar/modules";
 import { withQueryHooks } from "@avandar/query-hooks";
+import { matchLiteral } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ILogger } from "@avandar/logger";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -167,8 +168,11 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           const logger = baseLogger.appendName("getResourceSharingState");
           logger.log("fetch sharing state", options);
 
-          const resourceTable =
-            options.resourceType === "dashboard" ? "dashboards" : "datasets";
+          const resourceTable = matchLiteral(options.resourceType, {
+            dashboard: "dashboards",
+            dataset: "datasets",
+            map: "maps",
+          } as const);
 
           const [{ data: resourceRow }, { data: shareRows }] =
             await Promise.all([
@@ -248,7 +252,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         },
 
         /**
-         * Sets `is_restricted` on a dashboard or dataset row.
+         * Sets `is_restricted` on a dashboard, dataset, or map row.
          */
         setResourceRestricted: async (options: {
           workspaceId: WorkspaceId;
@@ -258,13 +262,41 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         }): Promise<void> => {
           const logger = baseLogger.appendName("setResourceRestricted");
           logger.log("set restricted", options);
-          const resourceTable =
-            options.resourceType === "dashboard" ? "dashboards" : "datasets";
+          const resourceTable = matchLiteral(options.resourceType, {
+            dashboard: "dashboards",
+            dataset: "datasets",
+            map: "maps",
+          } as const);
           await dbClient
             .from(resourceTable)
             .update({ is_restricted: options.isRestricted })
             .eq("id", options.resourceId)
             .eq("workspace_id", options.workspaceId)
+            .throwOnError();
+        },
+
+        /**
+         * Makes a resource private to its owner: clears every non-owner share
+         * and sets `is_restricted`, atomically.
+         *
+         * Owner-only, enforced by the RPC. `workspaceId` is deliberately not a
+         * parameter: the function derives it from the resource row, and a
+         * second client-supplied copy could disagree with it.
+         */
+        makeResourcePrivate: async (
+          options: Readonly<{
+            resourceType: ResourceType;
+            resourceId: string;
+          }>,
+        ): Promise<void> => {
+          const logger = baseLogger.appendName("makeResourcePrivate");
+          logger.log("make resource private", options);
+
+          await dbClient
+            .rpc("rpc_resources__make_private", {
+              p_resource_type: options.resourceType,
+              p_resource_id: options.resourceId,
+            })
             .throwOnError();
         },
       }),
@@ -276,6 +308,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         "upsertResourceShare",
         "deleteResourceShare",
         "setResourceRestricted",
+        "makeResourcePrivate",
       ],
     });
   });

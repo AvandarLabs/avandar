@@ -13,8 +13,10 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { render } from "@/test-utils";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 
@@ -22,6 +24,7 @@ const mantineBarChartMock = vi.fn();
 const mantineLineChartMock = vi.fn();
 const mantineRadarChartMock = vi.fn();
 const mantineCompositeChartMock = vi.fn();
+const mantineScatterChartMock = vi.fn();
 
 vi.mock("@mantine/charts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/charts")>();
@@ -42,6 +45,10 @@ vi.mock("@mantine/charts", async (importOriginal) => {
     CompositeChart: (props: unknown) => {
       mantineCompositeChartMock(props);
       return <div data-testid="mantine-composite" />;
+    },
+    ScatterChart: (props: unknown) => {
+      mantineScatterChartMock(props);
+      return <div data-testid="mantine-scatter" />;
     },
   };
 });
@@ -65,6 +72,7 @@ beforeEach(() => {
   mantineLineChartMock.mockClear();
   mantineRadarChartMock.mockClear();
   mantineCompositeChartMock.mockClear();
+  mantineScatterChartMock.mockClear();
 });
 
 function renderBar(config: BarChartVizConfig): void {
@@ -383,6 +391,230 @@ describe("RadarChart — series settings reach Mantine", () => {
     expect(
       lastProps<{ withLegend: boolean }>(mantineRadarChartMock).withLegend,
     ).toBe(false);
+  });
+});
+
+describe("BarChart: axis scale and rotation", () => {
+  it("passes an explicit Y domain and generated ticks", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { yAxis: { min: 0, max: 120000, tickInterval: 24000 } },
+    });
+    const props = lastProps<{
+      yAxisProps?: { domain?: unknown; ticks?: number[] };
+    }>(mantineBarChartMock);
+    expect(props.yAxisProps?.domain).toEqual([0, 120000]);
+    expect(props.yAxisProps?.ticks).toEqual([
+      0, 24000, 48000, 72000, 96000, 120000,
+    ]);
+  });
+
+  it("derives the Y domain from the data when only an interval is set", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { yAxis: { tickInterval: 1 } },
+    });
+    const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
+      mantineBarChartMock,
+    );
+    expect(props.yAxisProps?.ticks).toEqual([0, 1, 2, 3]);
+  });
+
+  it("sums stacked series when deriving the Y extent", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      layout: "stack",
+      series: [
+        { renderAs: "bar", key: "v" },
+        { renderAs: "bar", key: "w" },
+      ],
+      chartStyle: { yAxis: { tickInterval: 6 } },
+    });
+    // Row sums are 6, 6, 6, so the derived high lands on the first tick
+    // past the data rather than on the largest single value (3).
+    const props = lastProps<{ yAxisProps?: { domain?: unknown } }>(
+      mantineBarChartMock,
+    );
+    expect(props.yAxisProps?.domain).toEqual([0, 6]);
+  });
+
+  it("ignores value settings on the category X axis", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { xAxis: { min: 0, max: 10 } },
+    });
+    const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
+      mantineBarChartMock,
+    );
+    expect(props.xAxisProps?.domain).toBeUndefined();
+  });
+
+  it("rotates X tick labels and grows the axis to fit them", () => {
+    // Axis height is estimated from the longest tick label, and the
+    // one-character categories in `DATA` stay under Recharts' 30px
+    // floor however they are rotated. These labels are long enough
+    // that a correctly sized axis has to grow past it.
+    render(
+      <AvandarAppProvider>
+        <BarChart
+          data={[
+            { x: "September 2024", v: 1 },
+            { x: "October 2024", v: 2 },
+          ]}
+          height={400}
+          xAxisKey="x"
+          series={BAR_BASELINE.series}
+          chartStyle={{ xAxis: { tickAngle: -90 } }}
+        />
+      </AvandarAppProvider>,
+    );
+    const props = lastProps<{
+      xAxisProps?: {
+        tick?: { angle?: number; textAnchor?: string };
+        interval?: number;
+        height?: number;
+      };
+    }>(mantineBarChartMock);
+    expect(props.xAxisProps?.tick?.angle).toBe(-90);
+    expect(props.xAxisProps?.tick?.textAnchor).toBe("end");
+    expect(props.xAxisProps?.interval).toBe(0);
+    expect(props.xAxisProps?.height).toBeGreaterThan(30);
+  });
+
+  it("adds no domain or ticks when no axis settings are configured", () => {
+    renderBar(BAR_BASELINE);
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; height?: unknown };
+      yAxisProps?: { domain?: unknown; ticks?: unknown };
+    }>(mantineBarChartMock);
+    expect(props.yAxisProps?.domain).toBeUndefined();
+    expect(props.yAxisProps?.ticks).toBeUndefined();
+    expect(props.xAxisProps?.height).toBeUndefined();
+  });
+});
+
+describe("LineChart: axis scale and rotation", () => {
+  it("passes an explicit Y domain and generated ticks", () => {
+    renderLine({
+      ...LINE_BASELINE,
+      chartStyle: { yAxis: { min: 0, max: 10, tickInterval: 5 } },
+    });
+    const props = lastProps<{
+      yAxisProps?: { domain?: unknown; ticks?: number[] };
+    }>(mantineLineChartMock);
+    expect(props.yAxisProps?.domain).toEqual([0, 10]);
+    expect(props.yAxisProps?.ticks).toEqual([0, 5, 10]);
+  });
+
+  it("never stacks when deriving the Y extent", () => {
+    renderLine({
+      ...LINE_BASELINE,
+      series: [
+        { renderAs: "line", key: "v" },
+        { renderAs: "line", key: "w" },
+      ],
+      chartStyle: { yAxis: { tickInterval: 1 } },
+    });
+    // Largest single value is 5, not the row sum of 6.
+    const props = lastProps<{ yAxisProps?: { domain?: unknown } }>(
+      mantineLineChartMock,
+    );
+    expect(props.yAxisProps?.domain).toEqual([0, 5]);
+  });
+
+  it("rotates X tick labels", () => {
+    renderLine({
+      ...LINE_BASELINE,
+      chartStyle: { xAxis: { tickAngle: 45 } },
+    });
+    const props = lastProps<{
+      xAxisProps?: { tick?: { angle?: number; textAnchor?: string } };
+    }>(mantineLineChartMock);
+    expect(props.xAxisProps?.tick?.angle).toBe(45);
+    expect(props.xAxisProps?.tick?.textAnchor).toBe("start");
+  });
+});
+
+function _renderScatter(chartStyle?: ChartStyle): void {
+  render(
+    <AvandarAppProvider>
+      <ScatterChart
+        data={DATA}
+        series={[{ key: "w", xKey: "v" }]}
+        chartStyle={chartStyle}
+      />
+    </AvandarAppProvider>,
+  );
+}
+
+describe("ScatterChart: both axes are value axes", () => {
+  it("bounds the X axis", () => {
+    _renderScatter({ xAxis: { min: 0, max: 4, tickInterval: 1 } });
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; ticks?: number[] };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.domain).toEqual([0, 4]);
+    expect(props.xAxisProps?.ticks).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it("bounds the Y axis", () => {
+    _renderScatter({ yAxis: { min: 0, max: 40, tickInterval: 20 } });
+    const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
+      mantineScatterChartMock,
+    );
+    expect(props.yAxisProps?.ticks).toEqual([0, 20, 40]);
+  });
+
+  it("derives the X extent from the xKey column, not the Y column", () => {
+    _renderScatter({ xAxis: { tickInterval: 1 } });
+    const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
+      mantineScatterChartMock,
+    );
+    // `v` runs 1 to 3, so the derived domain is 0 to 3. Reading `w`
+    // instead would give 0 to 5, which is what this case rules out.
+    expect(props.xAxisProps?.domain).toEqual([0, 3]);
+  });
+
+  it("prefers a configured axis label over the derived column name", () => {
+    _renderScatter({ xAxis: { label: "Spend" } });
+    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
+    expect(props.xAxisLabel).toBe("Spend");
+  });
+
+  it("derives the axis label from the column when unset", () => {
+    _renderScatter(undefined);
+    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
+    expect(props.xAxisLabel).toBe("v");
+  });
+
+  it("labels each axis exactly once", () => {
+    _renderScatter({ xAxis: { label: "Spend" } });
+    const props = lastProps<{
+      xAxisLabel?: string;
+      xAxisProps?: { label?: unknown };
+    }>(mantineScatterChartMock);
+    // Recharts renders both an axis `label` prop and any `<Label>`
+    // child, so exactly one of these two may be set.
+    expect(props.xAxisLabel).toBe("Spend");
+    expect(props.xAxisProps?.label).toBeUndefined();
+  });
+
+  it("rotates X tick labels", () => {
+    _renderScatter({ xAxis: { tickAngle: -90 } });
+    const props = lastProps<{
+      xAxisProps?: { tick?: { angle?: number }; interval?: number };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.tick?.angle).toBe(-90);
+    expect(props.xAxisProps?.interval).toBe(0);
+  });
+
+  it("adds no domain or ticks when nothing is configured", () => {
+    _renderScatter(undefined);
+    const props = lastProps<{
+      xAxisProps?: { domain?: unknown; ticks?: unknown };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.domain).toBeUndefined();
+    expect(props.xAxisProps?.ticks).toBeUndefined();
   });
 });
 

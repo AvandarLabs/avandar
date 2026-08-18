@@ -4,6 +4,7 @@ import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/Clar
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useClarificationSubmission } from "./useClarificationSubmission";
+import { useDiscoveryRecovery } from "./useDiscoveryRecovery";
 import { useDiscoveryResolver } from "./useDiscoveryResolver";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 
@@ -19,6 +20,8 @@ export function PendingClarificationBlock(): React.ReactNode {
     userId: user?.id,
     workspaceId: workspace.id,
   });
+  const onRequestDifferentDiscovery =
+    useDiscoveryRecovery(pendingClarification);
 
   return pendingClarification ?
       <Box px="md" pb="xs">
@@ -26,6 +29,7 @@ export function PendingClarificationBlock(): React.ReactNode {
           request={pendingClarification}
           onAnswer={onSubmit}
           resolveDiscovery={resolveDiscovery}
+          onRequestDifferentDiscovery={onRequestDifferentDiscovery}
         />
       </Box>
     : null;

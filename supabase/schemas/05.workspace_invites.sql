@@ -1,7 +1,4 @@
-create type public.workspace_invites__status as enum(
-  'pending',
-  'accepted'
-);
+create type public.workspace_invites__status as enum('pending', 'accepted');
 
 create table public.workspace_invites (
   -- Primary key: the invite ID
@@ -36,8 +33,21 @@ create table public.workspace_invites (
   updated_at timestamptz not null default now()
 );
 
+create index idx_workspace_invites__pending_email on public.workspace_invites (lower(email))
+where
+  invite_status = 'pending';
+
 -- Enable row level security
 alter table public.workspace_invites enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.workspace_invites to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select invites they sent from their workspace" on public.workspace_invites for

@@ -21,18 +21,9 @@ export enum FeatureFlag {
   DisableSelfRegistration = "disable-self-registration",
 
   /**
-   * Require a sign up code to register. A user's signup code and email
-   * combination must match an email/signup-code combination in the
-   * waitlist_signups table.
-   *
-   * This flag takes precedence over the DisableSelfRegistration flag.
-   */
-  RequireSignUpCode = "require-sign-up-code",
-
-  /**
-   * Disable manual entity fields. Users are not allowed to manually change
-   * the values of entity fields. This will be removed once the feature is
-   * ready.
+   * Disable manually entered attributes. Users are not allowed to manually
+   * change the values of concept attributes. This will be removed once the
+   * feature is ready.
    */
   DisableManualData = "disable-manual-data",
 
@@ -70,10 +61,7 @@ export enum FeatureFlag {
 }
 
 export const FeatureFlagConfig = {
-  [FeatureFlag.DisableSelfRegistration]: {
-    waitlistURL: "https://avandarlabs.com/waitlist",
-  },
-  [FeatureFlag.RequireSignUpCode]: undefined,
+  [FeatureFlag.DisableSelfRegistration]: undefined,
   [FeatureFlag.DisableManualData]: undefined,
   [FeatureFlag.DisableGeoExplorer]: undefined,
   [FeatureFlag.DisableProfileManager]: undefined,

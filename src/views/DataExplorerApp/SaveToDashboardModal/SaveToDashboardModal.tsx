@@ -5,7 +5,7 @@ import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo, useState } from "react";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
@@ -221,7 +221,6 @@ export function SaveToDashboardModal({
         name: trimmedName,
         description: undefined,
         slug: undefined,
-        isPublic: false,
         config: seededConfig,
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),

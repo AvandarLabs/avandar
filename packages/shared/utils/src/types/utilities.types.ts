@@ -32,10 +32,17 @@ export type SnakeCase<T extends string> = StringToSnakeCase<T>;
 /**
  * Get all the entries of an object as an array of tuples that preserve the
  * mapping between key and value.
+ *
+ * The `-?` strips the optional modifier from the intermediate mapped type. It
+ * does not change the value type: `T[K]` still includes `undefined` for an
+ * optional property, which is accurate. Without it, indexing an object type
+ * that has optional keys yields `| undefined` for the whole tuple, so the
+ * entry cannot be destructured (`must have a '[Symbol.iterator]()' method`)
+ * even though `Object.entries` never produces an undefined entry.
  */
 export type Entries<T> = Array<
   {
-    [K in keyof T]: [K, T[K]];
+    [K in keyof T]-?: [K, T[K]];
   }[keyof T]
 >;
 

@@ -47,14 +47,25 @@ create table public.catalog_entries__open_data (
   notes text,
   -- Additional metadata about the dataset
   metadata jsonb,
-  constraint unique_parquet_file_pipeline unique (
-    parquet_file_name,
-    pipeline_name
-  )
+  constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name)
 );
 
 -- Enable row level security
 alter table public.catalog_entries__open_data enable row level security;
+
+-- Data API privileges.
+--
+-- Read-only: the open data catalog is populated by the backend.
+grant
+select
+  on table public.catalog_entries__open_data to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.catalog_entries__open_data to service_role;
 
 -- Policies
 create policy "User can select open data catalog entries" on public.catalog_entries__open_data for

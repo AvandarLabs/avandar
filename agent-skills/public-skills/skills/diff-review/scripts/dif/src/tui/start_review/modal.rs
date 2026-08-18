@@ -112,17 +112,11 @@ pub const fn title() -> &'static str {
 /// The renderer wraps these to the modal width, so they are written as whole
 /// sentences rather than pre-wrapped lines.
 #[must_use]
-pub fn body_lines(comparison_label: &str) -> Vec<String> {
+pub fn body_lines() -> Vec<String> {
     vec![
-        format!("No prepared diff review exists for {comparison_label}."),
+        "No prepared diff guide or comments exist.".to_owned(),
         String::new(),
-        "The diff is already live in your browser, and any comment you leave is \
-         saved and queued to the LLM either way."
-            .to_owned(),
-        String::new(),
-        "Start a diff review now? Yes runs /diff-review in the LLM pane; No just \
-         closes this and changes nothing."
-            .to_owned(),
+        "Would you like to prepare them right now?".to_owned(),
     ]
 }
 
@@ -172,16 +166,5 @@ mod tests {
             start_review_modal.accept(),
             Outcome::StartReview("/diff-review develop".to_owned())
         );
-    }
-
-    #[test]
-    fn body_names_the_comparison_and_both_answers() {
-        let text = body_lines("@ develop").join(" ");
-
-        assert!(text.contains("@ develop"), "names the comparison");
-        assert!(text.contains("/diff-review"), "says what Yes runs");
-        assert!(text.contains("changes nothing"), "says what No does");
-        // The diff being usable regardless is the reason declining is safe.
-        assert!(text.contains("already live"));
     }
 }

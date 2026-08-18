@@ -25,8 +25,8 @@ export function useSpotlightActions(
       SpotlightLinks.dataManagerHome(workspaceSlug),
       SpotlightLinks.dataImport(workspaceSlug),
       SpotlightLinks.dataExplorer(workspaceSlug),
-      SpotlightLinks.entityDesignerHome(workspaceSlug),
-      SpotlightLinks.entityDesignerCreatorView(workspaceSlug),
+      SpotlightLinks.ontologyDesignerHome(workspaceSlug),
+      SpotlightLinks.ontologyDesignerCreatorView(workspaceSlug),
     ];
 
     return spotlightLinks.map(
@@ -37,7 +37,7 @@ export function useSpotlightActions(
       }): SpotlightActionData | SpotlightActionGroupData => {
         return {
           id: link.key,
-          label: link.label,
+          label: link.label(),
           description: spotlightDescription,
           leftSection: icon,
           onClick: () => {

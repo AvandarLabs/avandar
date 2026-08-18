@@ -20,6 +20,15 @@ create table public.workspaces (
 -- RLS and policies are in `18.user_workspace_policies.sql`
 alter table public.workspaces enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.workspaces to authenticated,
+service_role;
+
 /**
  * Trigger the `updated_at` update.
  */
@@ -28,6 +37,4 @@ update on public.workspaces for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-create index idx_workspaces__owner_id on public.workspaces (
-  owner_id
-);
+create index idx_workspaces__owner_id on public.workspaces (owner_id);

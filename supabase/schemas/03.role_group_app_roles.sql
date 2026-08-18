@@ -8,17 +8,21 @@ create table public.role_group_app_roles (
   role public.role_level not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint role_group_app_roles__role_group_id_app unique (
-    role_group_id,
-    app
-  )
+  constraint role_group_app_roles__role_group_id_app unique (role_group_id, app)
 );
 
-create index idx_role_group_app_roles__role_group_id on public.role_group_app_roles (
-  role_group_id
-);
+create index idx_role_group_app_roles__role_group_id on public.role_group_app_roles (role_group_id);
 
 alter table public.role_group_app_roles enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.role_group_app_roles to authenticated,
+service_role;
 
 create trigger tr_role_group_app_roles__set_updated_at before
 update on public.role_group_app_roles for each row

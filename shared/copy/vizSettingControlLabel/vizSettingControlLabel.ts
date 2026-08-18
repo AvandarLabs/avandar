@@ -45,10 +45,17 @@ function _labelMessages(): Record<string, string> {
     "Vertical gridlines": t`Vertical gridlines`,
     "X axis label": t`X axis label`,
     "X axis label color": t`X axis label color`,
+    "X axis label rotation": t`X axis label rotation`,
+    "X axis maximum": t`X axis maximum`,
+    "X axis minimum": t`X axis minimum`,
     "X axis tick color": t`X axis tick color`,
+    "X axis tick interval": t`X axis tick interval`,
     "Y axis label": t`Y axis label`,
     "Y axis label color": t`Y axis label color`,
+    "Y axis maximum": t`Y axis maximum`,
+    "Y axis minimum": t`Y axis minimum`,
     "Y axis tick color": t`Y axis tick color`,
+    "Y axis tick interval": t`Y axis tick interval`,
   };
 }
 

@@ -1,13 +1,13 @@
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Radio, SegmentedControl, Stack, Table, Text } from "@mantine/core";
+import { appLabel } from "$/copy/appLabel";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import type {
-  AppType,
   RoleLevel,
   UserAppRolesMatrix,
-} from "$/models/Permissions/Permissions.types";
+} from "$/models/Permissions/Permissions";
 
 type AppTypeCellValue = RoleLevel | "none";
 
@@ -17,19 +17,6 @@ const CELL_OPTIONS: readonly AppTypeCellValue[] = [
   "editor",
   "admin",
 ] as const;
-
-/** Returns a localized display label for an app type. */
-function useAppTypeLabel(): (app: AppType) => string {
-  const { t } = useLingui();
-  return (app: AppType) => {
-    return matchLiteral(app, {
-      data_sources: t`Data Sources`,
-      data_explorer: t`Data Explorer`,
-      dashboards: t`Dashboards`,
-      settings: t`Settings`,
-    });
-  };
-}
 
 /** Returns a localized display label for a role-matrix cell value. */
 function useCellValueLabel(): (cell: AppTypeCellValue) => string {
@@ -84,7 +71,6 @@ export function WorkspaceAppRoleMatrixForm({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const presetRoleData = usePresetRoleData();
-  const appTypeToLabel = useAppTypeLabel();
   const appTypeCellValueToLabel = useCellValueLabel();
   return (
     <Stack gap="md">
@@ -129,7 +115,7 @@ export function WorkspaceAppRoleMatrixForm({
               <Table.Tr key={app}>
                 <Table.Td>
                   <Text size="sm" fw={500}>
-                    {appTypeToLabel(app)}
+                    {appLabel(app)}
                   </Text>
                 </Table.Td>
                 {CELL_OPTIONS.map((cell) => {
@@ -147,7 +133,7 @@ export function WorkspaceAppRoleMatrixForm({
                           });
                         }}
                         disabled={disabled}
-                        aria-label={`${appTypeToLabel(app)} ${appTypeCellValueToLabel(cell)}`}
+                        aria-label={`${appLabel(app)} ${appTypeCellValueToLabel(cell)}`}
                       />
                     </Table.Td>
                   );

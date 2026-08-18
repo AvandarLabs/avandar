@@ -439,7 +439,7 @@ values
     true
   );
 
-select plan(17);
+select plan(20);
 
 -- 1 Owner
 set local role authenticated;
@@ -1294,6 +1294,138 @@ select is(
   null::public.role_level,
   'dataset share requires_app_access=true dropped when member lacks data_sources app role'
 );
+
+-- ---------------------------------------------------------------------------
+-- P1: Settings Admins do not get access to resources private to their owner.
+-- See docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
+-- ---------------------------------------------------------------------------
+set local role postgres;
+
+-- A dashboard owned by bob, restricted, with zero shares: private to bob.
+insert into public.dashboards (
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
+)
+values (
+  '90005090-0000-4000-8000-000000000090'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  '90000003-0000-4000-8000-000000000003'::uuid,
+  (
+    select up.id from public.user_profiles up
+    where up.user_id = '90000003-0000-4000-8000-000000000003'::uuid
+      and up.workspace_id = '90001001-0000-4000-8000-000000000001'::uuid
+  ),
+  'bob private dashboard',
+  '{}'::jsonb,
+  true,
+  'draft',
+  null
+);
+
+-- Same, but public. Public is never private (spec 4.2).
+insert into public.dashboards (
+  id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
+  visibility, snapshot_revision
+)
+values (
+  '90005091-0000-4000-8000-000000000091'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  '90000003-0000-4000-8000-000000000003'::uuid,
+  (
+    select up.id from public.user_profiles up
+    where up.user_id = '90000003-0000-4000-8000-000000000003'::uuid
+      and up.workspace_id = '90001001-0000-4000-8000-000000000001'::uuid
+  ),
+  'bob public restricted dashboard',
+  '{}'::jsonb,
+  true,
+  'public',
+  '90005191-0000-4000-8000-000000000091'::uuid
+);
+
+-- Make alice a Settings Admin so the short-circuit is the grant under test.
+insert into public.role_groups (id, workspace_id, name, is_builtin)
+values (
+  '9000cf90-0000-4000-8000-000000000090'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'P1 Settings Admin',
+  false
+)
+on conflict do nothing;
+
+insert into public.role_group_app_roles (role_group_id, app, role)
+values (
+  '9000cf90-0000-4000-8000-000000000090'::uuid,
+  'settings'::public.app_type,
+  'admin'::public.role_level
+)
+on conflict do nothing;
+
+update public.workspace_memberships
+   set role_group_id = '9000cf90-0000-4000-8000-000000000090'::uuid
+ where workspace_id = '90001001-0000-4000-8000-000000000001'::uuid
+   and user_id = '90000002-0000-4000-8000-000000000002'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000002-0000-4000-8000-000000000002"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005090-0000-4000-8000-000000000090'::uuid
+  ),
+  null::public.role_level,
+  'P1: settings admin gets no role on a dashboard private to its owner'
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005091-0000-4000-8000-000000000091'::uuid
+  )::text,
+  'admin'::text,
+  'P1: settings admin keeps admin on a public dashboard even when restricted'
+);
+
+set local role postgres;
+
+-- Sharing it to a third party stops it being private, so the admin returns.
+insert into public.resource_shares (
+  id, workspace_id, resource_type, resource_id, principal_type, principal_id, role
+)
+values (
+  '90006090-0000-4000-8000-000000000090'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'dashboard',
+  '90005090-0000-4000-8000-000000000090'::uuid,
+  'user',
+  '90000001-0000-4000-8000-000000000001'::uuid,
+  'viewer'
+);
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000002-0000-4000-8000-000000000002"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005090-0000-4000-8000-000000000090'::uuid
+  )::text,
+  'admin'::text,
+  'P1: settings admin regains admin once the resource is shared with anyone'
+);
+
+set local role postgres;
 
 select * from finish();
 

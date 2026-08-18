@@ -1,25 +1,19 @@
-import { useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
 import type { ChatClarifyResponseShape } from "$/types/chat.types";
-
-const CLARIFICATION_NONE_OF_ABOVE = "__none_of_above__" as const;
-const CLARIFICATION_SOMETHING_ELSE = "__something_else__" as const;
-
-function useClarificationNoneOfAboveLabel(): string {
-  const { t } = useLingui();
-  return t`None of the above`;
-}
-
-function useClarificationSomethingElseLabel(): string {
-  const { t } = useLingui();
-  return t`Something else…`;
-}
 
 /** Answer submitted through the clarification card. */
 export type ClarificationSubmitAnswer =
   | { kind: "none_of_above" }
   | { kind: "preset"; value: string | string[] }
   | { kind: "custom"; text: string };
+
+/** Handles a clarification answer and reports whether it was accepted. */
+export type ClarificationAnswerHandler = (
+  parameters: Readonly<{
+    answer: Readonly<ClarificationSubmitAnswer>;
+    isInternalDiscovery?: boolean;
+  }>,
+) => boolean | void | Promise<boolean | void>;
 
 function _formatForThread(answer: Readonly<ClarificationSubmitAnswer>): string {
   return match(answer)
@@ -58,10 +52,10 @@ function _needsCrossBoundary(
 
 /** Formats and classifies clarification answers for chat submission. */
 export const ClarificationAnswer = {
-  noneOfAbove: CLARIFICATION_NONE_OF_ABOVE,
-  somethingElse: CLARIFICATION_SOMETHING_ELSE,
-  useNoneOfAboveLabel: useClarificationNoneOfAboveLabel,
-  useSomethingElseLabel: useClarificationSomethingElseLabel,
+  /** Sentinel for rejecting every offered clarification option. */
+  noneOfAbove: "__none_of_above__" as const,
+  /** Sentinel for submitting an answer outside the offered options. */
+  somethingElse: "__something_else__" as const,
   formatForThread: _formatForThread,
   needsCrossBoundary: _needsCrossBoundary,
 };

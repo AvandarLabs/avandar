@@ -63,7 +63,7 @@ pub fn draw_start_review(f: &mut Frame, start_review_modal: &StartReviewModal, a
 
 /// The modal's rows: a padding row, the body, the buttons, then the key hints.
 fn build_lines(start_review_modal: &StartReviewModal) -> Vec<Line<'static>> {
-    let body = modal::body_lines(start_review_modal.comparison_label())
+    let body = modal::body_lines()
         .into_iter()
         .map(|text| {
             Line::from(vec![

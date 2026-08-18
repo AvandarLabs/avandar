@@ -2,6 +2,10 @@ import type { UUID } from "@avandar/utils";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 
+export type {
+  DuckDbSpatialAvailability, // prettier-ignore
+} from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+
 /**
  * The CSV Reject Scans Table returns the following information:
  */
@@ -234,3 +238,9 @@ export type DuckDbStructuredQuery = {
    */
   castTimestampsToISO?: boolean;
 };
+
+/**
+ * An object representing a row with unknown column types.
+ * This is very similar to `UnknownObject` except that keys can only be strings.
+ */
+export type UnknownRow = Record<string, unknown>;

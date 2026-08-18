@@ -42,7 +42,7 @@
   same-kind exports with no single primary one (a `*.types.ts` type collection, a
   `*.constants.ts` bundle, or a group of sibling helpers).
 - Comments describe the present, never the past. Do not write what a file,
-  function, type, or module *used to* do, what it was renamed from, what an
+  function, type, or module _used to_ do, what it was renamed from, what an
   earlier implementation looked like, or why it was changed. Git history already
   records that. A reader gets no help from it and has to work out which half of
   the comment still applies, and the claim rots as soon as the next change
@@ -131,6 +131,68 @@
   const myString = `Hello ${name}`;
   ```
 
+- Do not introduce indirection that the inline form does not need. A named
+  binding used in exactly one place makes the reader jump to a second location
+  to learn something the call site could have shown them outright. When the
+  value is small, inlining it is the more readable option, so choose that.
+
+  Inline when all of these hold:
+  - The binding is referenced exactly once.
+  - It is a top-level `const` or a `_`-prefixed helper in the same file.
+  - Inlined, it adds 5 lines or fewer at the use site. An object literal with
+    4 or fewer properties and a function body of a single statement both
+    qualify.
+
+  This is bad:
+
+  ```ts
+  const metadata = {
+    custom: {
+      isDiscoveryContinuation: true,
+    },
+  } as const;
+
+  function _isInternal(messageMetadata: MessageMetadata): boolean {
+    return messageMetadata?.custom?.isDiscoveryContinuation === true;
+  }
+
+  export const DiscoveryContinuationMessage = {
+    metadata,
+    isInternal: _isInternal,
+  };
+  ```
+
+  This is good:
+
+  ```ts
+  export const DiscoveryContinuationMessage = {
+    metadata: {
+      custom: {
+        isDiscoveryContinuation: true,
+      },
+    } as const,
+
+    isInternal: (messageMetadata: MessageMetadata): boolean => {
+      return messageMetadata?.custom?.isDiscoveryContinuation === true;
+    },
+  };
+  ```
+
+  Keep the separate binding when any of these apply:
+  - It is referenced more than once, now or by a test.
+  - Inlining would push the enclosing literal or function past 5 added lines,
+    where the extra nesting costs more than the jump.
+  - The name is the only thing explaining an otherwise opaque value, such as a
+    magic number or a regular expression.
+  - It exists to give a value a stable identity, such as a module-level empty
+    array used as a default for a prop or a hook dependency. Inlining it would
+    build a new value on every call and defeat the reference check.
+  - It is recursive, or a `const` whose use would precede its declaration.
+
+  This rule runs before the helper-prefix and helper-ordering rules below. Those
+  say how to write a helper that should exist; this one asks whether it should
+  exist at all.
+
 ## Naming Conventions
 
 - Use PascalCase for React components, classes, singleton class instances, or
@@ -152,6 +214,189 @@
 
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
+- A function that turns one value into another must name both sides, either in
+  the function name alone or in the receiver plus the function name. Start by
+  asking what the receiver is:
+
+  **Step 1: is the receiver the source or the target?** The receiver is the
+  module, namespace, or object the function hangs off (`MapLayer` in
+  `MapLayer.toGeoBinding`). A free function has no receiver at all.
+  - The receiver **is the source** when the value being converted is a
+    `MapLayer` and the receiver is `MapLayer`.
+  - The receiver **is the target** when the value being produced is a
+    `GeoBinding` and the receiver is `GeoBinding`.
+  - The receiver is **neither** when it is a general grouping name that does
+    not name either side, such as `MapUtils`, `Formatters`, or `DateHelpers`.
+
+  **Step 2: pick the shape.** Only a receiver that names one of the two sides
+  lets the name drop that half. A receiver that names neither side supplies
+  nothing, so the function name must still spell out both halves, exactly as a
+  free function does:
+
+  | Shape                                 | Use when                           |
+  | ------------------------------------- | ---------------------------------- |
+  | `[Source].to[Target]`                 | Receiver is the source, converting |
+  | `[Source].get[Target]`                | Receiver is the source, looking up |
+  | `[Target].from[Source]`               | Receiver is the target             |
+  | `[Receiver].make[Target]From[Source]` | Receiver is neither, new value     |
+  | `[Receiver].get[Target]From[Source]`  | Receiver is neither, value inside  |
+  | `make[Target]From[Source]`            | Free function, new value           |
+  | `get[Target]From[Source]`             | Free function, value inside source |
+
+  When the receiver names a side, the method takes the missing half from it and
+  must never repeat it: `MapLayer.toGeoBinding(layer)`, not
+  `MapLayer.mapLayerToGeoBinding(layer)` and not
+  `MapLayer.resolveGeoBinding(layer)`. When the receiver names neither side, the
+  full form is still required: `MapUtils.makeGeoBindingFromMapLayer(layer)`, not
+  `MapUtils.toGeoBinding(layer)`, because `MapUtils` leaves the source unnamed.
+
+  Free functions have no receiver, so they must spell out both halves, and they
+  never use `To`: write `makeFeatureCollectionFromRows(rows)`, not
+  `rowsToFeatureCollection(rows)` and not `toFeatureCollection(rows)`.
+
+  Choose between `make`, `get`, and `to` by what the function does:
+  - `make` constructs a new object or a value of a new type out of the source.
+    `makeMapSpecFromLayerSpecs`, `makeFeatureCollectionFromRows`.
+  - `get` returns something logically contained in the source, directly or
+    indirectly: a nested value, a display label, a derived property, a
+    filtered or looked-up subset. `getBoundsFromFeatureCollection`,
+    `getFiniteNumberFromValue`, `MapLayer.getQueryableFields(layer)`.
+  - `to` converts the whole receiver into another representation of itself.
+    `MapLayer.toGeoBinding(layer)`, `Dataset.toCsv(dataset)`.
+
+  `to` and `get` are equally valid on a receiver that names the source, so pick
+  the one that describes the work: `to` implies conversion, `get` implies
+  fetching, filtering, or looking up. Prefer `MapLayer.getFieldById(layer, id)`
+  over `MapLayer.toFieldById(layer, id)`, because nothing is being converted.
+
+  Never name a conversion `resolve...`. It names neither side, so the reader
+  learns nothing about what went in or what comes out. The same goes for
+  reaching for `compute...`, `build...`, or `create...` on a function that is
+  really one of the shapes above: fewer prefixes, each carrying real
+  information, beats a wide vocabulary of near-synonyms.
+
+  This is bad:
+
+  ```ts
+  // Names neither side: what goes in, and what comes back?
+  MapLayer.resolveGeoBinding(layer);
+  // Free function using `To`, and the source is unnamed.
+  toFeatureCollection({ rows, binding });
+  // `MapUtils` is neither side, so the source is left unnamed.
+  MapUtils.toGeoBinding(layer);
+  // Near-synonym prefixes for the same kind of work.
+  computeBounds(featureCollection);
+  createMapSpec(layerSpecs);
+  ```
+
+  This is good:
+
+  ```ts
+  MapLayer.toGeoBinding(layer);
+  MapLayer.getQueryableFields(layer);
+  MapUtils.makeGeoBindingFromMapLayer(layer);
+  makeFeatureCollectionFromRows({ rows, binding });
+  getBoundsFromFeatureCollection(featureCollection);
+  makeMapSpecFromLayerSpecs(layerSpecs);
+  ```
+
+  This rule covers exported functions that convert, derive, or look up a value.
+  It does not rename an action (`syncMap`, `applyMapStyles`), a predicate
+  (`isMapLayerQueryable`), or a constructor with no source (`makeEmpty`).
+
+  Non-exported `_`-prefixed helpers do not need the verbose form, because their
+  only callers are in the same file and can see the source: `_build...` is the
+  right name for one that assembles a piece of a value (`_buildCircleRadius`,
+  `_buildDropReports`). `_resolve...` is still never allowed. The ban on
+  `resolve` is about the word carrying no information, which is just as true
+  inside a file as across one, and `_build` says the same thing better. The
+  exception is the promise sense of the word, where a function settles a
+  pending promise (`_resolveCompletionWaiters`): that names an action, not a
+  conversion.
+
+- User-facing copy is the one conversion excluded from the shapes above. A
+  function whose whole job is to produce a piece of copy is named after the
+  copy it returns, with no prefix: `appLabel(app)`, `vizTypeLabel(vizType)`,
+  `resourceTypeLabel(type)`. These live in `shared/copy/`, or in a `copy/`
+  directory nested inside the one sub-system that uses them.
+
+  **Before applying this exception, prove the function is copy.** Both tests
+  below must pass. They are mechanical on purpose: "it produces text a user
+  reads" is a judgement call, and every misfiling of a plain conversion has
+  come from making that call generously.
+
+  1. **Lingui or it is not copy.** Every string the function returns is
+     produced by a Lingui macro in the function's own body: `` t`…` ``,
+     `` msg`…` ``, or `i18n._(msg`…`)`. A function with no macro in it
+     returns data, not copy, however user-facing the data eventually
+     becomes. Copy is always translated, so an untranslated string is proof
+     the function is something else.
+  2. **It returns `string`, not a literal union.** The return type is
+     `string`, or a record whose values are all `string`. A string-literal
+     union return type (`AppType`, `ResourceType`, `"gis" | "dashboards"`)
+     means the function returns a key the program branches on, not text a
+     person reads. That is a conversion and it takes a conversion name.
+
+  Fail either test and the function is an ordinary conversion: it takes one
+  of the four shapes, and it does **not** go in a `copy/` directory. Feeding
+  a copy function is not a qualification. "It exists only to produce the
+  argument for `appLabel`, so it lives beside the copy that consumes it" is
+  the rationalization to watch for; proximity to copy is not copy.
+
+  A `copy/` directory contains copy functions and nothing else. A helper,
+  lookup table, or type map that copy happens to call belongs with the rest
+  of the sub-system's code, under its own conversion name.
+
+  This is bad (no Lingui macro, and the return type is a literal union, so
+  this is a conversion wearing a copy name in a copy directory):
+
+  ```ts
+  // src/components/permissions/ShareResourceModal/copy/appForResource.ts
+  export function appForResource(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  // .../ShareResourceModal/getAppTypeFromResourceType/getAppTypeFromResourceType.ts
+  export function getAppTypeFromResourceType(type: ResourceType): AppType {
+    return matchLiteral(type, {
+      dashboard: "dashboards",
+      dataset: "data_sources",
+      map: "gis",
+    } as const);
+  }
+  ```
+
+  The absence of a prefix is the signal. A prefix would tell the reader that
+  data is being converted, when what is really happening is that a string of
+  translated text is being named, and the call site should read as that text
+  where it is used. It also keeps copy call sites short in JSX, where they are
+  usually inline inside other markup.
+
+  This is bad:
+
+  ```ts
+  // Verbose, and reads like a data conversion rather than a label.
+  <Text>{getAppLabelFromAppType(app)}</Text>
+  ```
+
+  This is good:
+
+  ```ts
+  <Text>{appLabel(app)}</Text>
+  ```
+
+  The exception is only for functions that return copy and nothing else. A
+  function that takes copy as one input among several and returns data still
+  follows the naming shapes above.
+
 - Naming exceptions:
   - "E2E" should always stay fully uppercased or fully lowercased
     Examples: `e2eCreds` or `MyE2ETest`
@@ -159,6 +404,37 @@
 ## Types
 
 - **Never** use `any`.
+- **Never use `as unknown as T` unless the compiler genuinely cannot resolve
+  the relationship.** Routing a value through `unknown` disables every
+  assignability check between the two types, so the cast keeps compiling after
+  the shapes drift apart and the mismatch surfaces at runtime instead.
+
+  When you encounter an `as unknown as T`, remove it and see what the compiler
+  says:
+  - No error: leave it removed. The cast was noise.
+  - An error: fix the underlying type _without_ casting. Usually the real
+    problem is upstream, such as a parameter or field typed `unknown` that
+    should carry a real type.
+  - Only when no fix is possible because the code is already well-structured,
+    fall back to a cast, and prefer the narrowest one that compiles (a single
+    `as T` over `as unknown as T`). Add a comment saying why it is needed.
+
+  The legitimate case is a type too complex for TypeScript to resolve safely,
+  which in practice means complicated generics: a typed dotted path such as
+  `Paths<TConfig>` cannot be satisfied by a runtime `string`.
+
+  ```ts
+  // Bad - the prop is typed `unknown`, so every use needs a cast
+  type Props = { tooltipProps?: unknown };
+  <Chart tooltipProps={tooltipProps as never} />;
+
+  // Good - type the prop, and no cast is needed anywhere
+  type Props = {
+    tooltipProps?: ComponentProps<typeof Chart>["tooltipProps"];
+  };
+  <Chart tooltipProps={tooltipProps} />;
+  ```
+
 - Use `as const` for literals that never change.
 - Use `type` instead of `interface`. **Only** use `interface` for OOP-style
   interfaces implemented by a class.
@@ -298,6 +574,45 @@
   };
   ```
 
+- Declare local helper functions above the exported function that uses them. A
+  file reads helpers first and its public entry point last, so anyone reading
+  from the top meets a helper before the call that depends on it and never has
+  to jump downward to find out what a call does. Types, constants, and a
+  component's `Props` alias still come first, above the helpers.
+
+  Function declarations hoist, so for `function` helpers this is a readability
+  rule rather than a correctness one. For `const` arrow helpers it is also a
+  correctness rule: using one above its declaration is a runtime TDZ error.
+
+  Three cases are allowed to break the order: a file with several exports and
+  no single entry point (keep each helper beside the export it serves), a
+  helper shared by several exports (put it above the first of them), and
+  mutual recursion (no order satisfies the rule).
+
+  Examples:
+
+  ```ts
+  // Bad - the reader hits `_formatTotal` before it is declared
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+  ```
+
+  ```ts
+  // Good - helpers first, the exported entry point last
+  function _formatTotal(invoice: Invoice): string {
+    return invoice.total.toFixed(2);
+  }
+
+  export function formatInvoice(invoice: Invoice): string {
+    return `${invoice.id}: ${_formatTotal(invoice)}`;
+  }
+  ```
+
 ### Import/export declarations
 
 - Type imports/exports always use the `type` keyword.
@@ -317,7 +632,7 @@
   export. Name the file after what a reader would consider the main export (the
   function or the module object). For example, a file that exports `detectBias`,
   a supporting `MAX_BIAS_SCORE` constant, and some exported types should still be
-  named `detectBias.ts`. (A file whose exports are *only* constants follows the
+  named `detectBias.ts`. (A file whose exports are _only_ constants follows the
   `*.constants.ts` rule below instead.)
 - If a file intentionally exports a collection of helper or utility functions,
   name the file after the collection's shared purpose and suffix it with either
@@ -346,6 +661,7 @@
     tracks state (and needs its generated getters/setters) or composes behavior
     via mixins. Do not reach for `createModule` merely to group stateless
     functions: a plain object is sufficient and lighter.
+
 - When a module can not be encapsulated in a single file, create a directory
   to represent the module. Some examples of when a module should be a directory
   are: when a module has a `.test` file, has tightly-coupled helper functions,
@@ -358,6 +674,46 @@
     | MyComponent.tsx
     | MyComponent.test.tsx
     | SubComponent.tsx
+  ```
+
+- **Never give a module its own directory until it has a second file.** A
+  directory exists to bundle a unit's colocated siblings into one logical
+  unit, so a `<Name>/` directory holding only `<Name>.<ext>` groups nothing
+  while costing a redundant segment on every import
+  (`.../useDrawerResize/useDrawerResize`). A standalone module stays flat
+  beside its peers; create the directory at the moment a second co-named file
+  (a `.test`, a `.module.css`, a `.types`, a sub-component) actually appears,
+  and collapse the directory again if that sibling goes away. This applies to
+  components, hooks, and plain `.ts` modules alike.
+
+  Exceptions: 1) the directory also contains subdirectories, so it is a real
+  grouping node; 2) a framework assigns the directory meaning, such as a route
+  segment, so the path is not free to change. A category directory that groups
+  by topic rather than by unit (`auth/useAuth.ts`) is not affected: its single
+  child is not named after it.
+
+  This is bad (each nested directory holds exactly one file):
+
+  ```plaintext
+  DataExplorerDrawer
+    | DataExplorerDrawer.tsx
+    | useDrawerResize
+      | useDrawerResize.ts
+    | QueryTabPanel
+      | QueryTabPanel.tsx
+  ```
+
+  This is good (the lone files sit with their parent; only the unit that really
+  has siblings keeps a directory):
+
+  ```plaintext
+  DataExplorerDrawer
+    | DataExplorerDrawer.tsx
+    | useDrawerResize.ts
+    | QueryTabPanel.tsx
+    | DrawerHeight
+      | DrawerHeight.ts
+      | DrawerHeight.test.ts
   ```
 
 - **Never colocate route components with a `-` prefix under `src/routes/`.**
@@ -396,38 +752,66 @@
   files exporting the contents of our libraries in `packages/`.
 - As soon as a file has another co-named file (e.g. `MyFile.tsx` and
   `MyFile.test.tsx`) then you must create an equally-named directory to
-  couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
-- The converse also holds: a module with no co-named sibling must NOT get a
-  directory of its own. A directory exists to group siblings, so
-  `MyFile/MyFile.tsx` with nothing beside it is a directory that groups
-  nothing, and it costs a redundant path segment on every import
-  (`.../MyFile/MyFile`). Leave the lone file next to its parent
-  (`.../MyFile.tsx`) and create the directory at the moment a second
-  co-named file appears. This applies to every kind of module: components,
-  hooks, and plain `.ts` modules alike.
+  couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`. The
+  converse is the single-file directory rule above: remove the directory again
+  once a unit is back to one file.
 
-  This is bad (each directory holds exactly one file):
+  **A directory couples only the one unit it is named after.** Judge each base
+  name separately rather than judging the directory once. Being inside a
+  `Foo/` directory looks like the rule is already satisfied for everything in
+  it, and it is not: `Foo.ts` + `Foo.test.ts` are coupled by the directory and
+  stay flat inside it, while every other co-named pair beside them is its own
+  unit and needs its own directory.
 
-  ```text
-  DataExplorerDrawer/
-    DataExplorerDrawer.tsx
-    useDrawerResize/
-      useDrawerResize.ts
-    QueryTabPanel/
-      QueryTabPanel.tsx
+  Two kinds of file legitimately stay flat next to those pairs: a lone file
+  with no co-named sibling, and a `<Dir>.types.ts` / `<Dir>.constants.ts` that
+  belongs to the directory as a whole rather than to any one unit in it. That
+  second case is why a grouping directory may hold `<Dir>.types.ts` with no
+  `<Dir>.ts` beside it at all.
+
+  This is bad (six units share one directory, so its listing is a wall of
+  near-duplicate base names):
+
+  ```plaintext
+  MapLayerSpatialQuery
+    | MapLayerSpatialQuery.types.ts
+    | MapLayerSpatialQuery.constants.ts
+    | compileMapLayerSpatialQuery.ts
+    | compileMapLayerSpatialQuery.test.ts
+    | buildGeometryExpression.ts
+    | buildGeometryExpression.test.ts
+    | ...
   ```
 
-  This is good (the lone files sit with their parent; only the unit that
-  really has siblings keeps a directory):
+  This is good (every co-named pair gets its own directory; the two
+  directory-level files stay flat because they describe the group):
 
-  ```text
-  DataExplorerDrawer/
-    DataExplorerDrawer.tsx
-    useDrawerResize.ts
-    QueryTabPanel.tsx
-    DrawerHeight/
-      DrawerHeight.ts
-      DrawerHeight.test.ts
+  ```plaintext
+  MapLayerSpatialQuery
+    | MapLayerSpatialQuery.types.ts
+    | MapLayerSpatialQuery.constants.ts
+    | compileMapLayerSpatialQuery
+      | compileMapLayerSpatialQuery.ts
+      | compileMapLayerSpatialQuery.test.ts
+    | buildGeometryExpression
+      | buildGeometryExpression.ts
+      | buildGeometryExpression.test.ts
+  ```
+
+  And this is the mixed case, where the directory is named after one of its
+  own units (`classifyLayerValues.ts` stays flat because the directory already
+  couples it; its siblings do not):
+
+  ```plaintext
+  classifyLayerValues
+    | classifyLayerValues.ts
+    | classifyLayerValues.test.ts
+    | makeJenksBreaks
+      | makeJenksBreaks.ts
+      | makeJenksBreaks.test.ts
+    | normalizeLayerValue
+      | normalizeLayerValue.ts
+      | normalizeLayerValue.test.ts
   ```
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
@@ -620,6 +1004,52 @@ type AuditLogEntry = Readonly<{
 
 - **One component per file.**
 - Split up components into logical sub-components. Avoid monolithic components.
+- **A top-level function that returns only a JSX block must be its own
+  component, in its own file.** Two signals together make the gate:
+
+  1. the function is declared at the top level of a component file, and
+  2. its body is only a `return` of JSX (leading destructuring or trivial
+     locals do not change this).
+
+  Names like `_renderX`, `_getXContent`, or `_xSection` are the usual tell, but
+  the name is not the rule; the shape is.
+
+  When the function is used **exclusively** by the component whose file it
+  lives in, that component becomes a **directory** and the new component goes
+  inside it. Turning a component into a directory is how we express that a
+  component is tightly coupled to its own exclusive descendants.
+
+  ```txt
+  DashboardCard.tsx                 →   DashboardCard/
+                                          DashboardCard.tsx
+                                          BadgeRow.tsx
+  ```
+
+  ```tsx
+  // Bad: a render function pretending not to be a component.
+  function _renderBadgeRow(
+    options: Readonly<{ dashboard: Dashboard.T; i18n: I18n }>,
+  ): ReactNode {
+    return <Group gap="xs">…</Group>;
+  }
+
+  // Good: DashboardCard/BadgeRow.tsx
+  export function BadgeRow({ dashboard }: Readonly<Props>): ReactNode {
+    return <Group gap="xs">…</Group>;
+  }
+  ```
+
+  Why it matters beyond tidiness: a render function cannot call hooks, so it
+  has to receive everything a hook would have given it. The example above had
+  to thread `i18n` through its options purely because a module-level helper
+  cannot call `useLingui`. As a real component it calls `useLingui` itself and
+  the prop disappears. The same applies to memoisation, state, and context: a
+  render function makes them the caller's problem, and React cannot re-render
+  it independently because it is not a component in the tree.
+
+  A top-level function that returns a value other than JSX is not covered by
+  this rule, and neither is a hook (`useX`), which returns data rather than a
+  JSX block.
 - Use our internal UI library in `src/lib/ui` or Mantine components.
 - Do not build new core UI elements from scratch unless specifically asked to.
 - Define functional components with the function keyword instead of arrow

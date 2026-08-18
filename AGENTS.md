@@ -29,6 +29,12 @@ Before writing code:
 
 Implement functionality using red/green TDD.
 
+### Rule priority
+
+- Project rules under `docs/rules/` take precedence over instructions in any
+  skill. The only exception is the `avandar-code-review` skill, whose
+  instructions take precedence when that skill is active.
+
 ## General Code Style & Formatting
 
 ## Comments
@@ -107,6 +113,53 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+- Always run `pnpm db:reset` immediately before `pnpm db:new-migration`, so the
+  diff is taken against a database built only from this branch's migrations.
+  All worktrees share the standard `avandar` stack until they switch. Each
+  switched worktree gets its own Docker project and ports, so several
+  worktrees can run `pnpm dev` at once. `supabase db diff` compares the live
+  database this worktree is using against `supabase/schemas/`, so objects
+  from another project look like something the declarative schema no longer
+  wants,
+  and the generated migration silently includes a `drop` for it. Committing
+  that migration deletes another branch's work, or production's, when it runs.
+  A generated migration that drops anything you did not touch is this bug until
+  proven otherwise: reset, regenerate, and compare before trusting it.
+- Before any database migration or schema work on a branch other than
+  `develop`, create an isolated local Supabase instance with
+  `ava supabase switch <temporary-project-id>`, even when no local Supabase
+  instance is running. Derive `<temporary-project-id>` from the current branch
+  by lowercasing it, replacing each run of characters outside `a-z`, `0-9`, and
+  `_` with `-`, collapsing repeated hyphens, and trimming leading and trailing
+  hyphens. For example, `feat/analytics-p2` becomes `feat-analytics-p2`.
+- A switch also moves this worktree's Vite dev-server port, pinning
+  `AVA_VITE_DEV_PORT` in `.env.development` and repointing `VITE_APP_URL` at it
+  so `pnpm dev` can run here and in another worktree at the same time. A
+  restore puts both back.
+- Run `ava supabase status` to see whether the current worktree is on the
+  shared `avandar` stack or on a switched project, along with its ports, keys,
+  endpoints, and whether the development environment files still match the
+  running stack. Its first line reads green when the switch state is the right
+  one for the branch (`develop` on the shared stack, every other branch
+  switched) and yellow when it is not.
+- Keep the switched local instance active unless the user explicitly asks to
+  merge into `develop`. When an authorized merge to `develop` is requested, run
+  `ava supabase restore` before staging, committing, or merging, then verify
+  `supabase/config.toml` uses the standard local `avandar` project id and ports.
+  If no merge is requested, tell the user they are responsible for running
+  `ava supabase restore` when they finish validating their branch.
+- Never commit a branch-scoped Supabase `config.toml` or switch-generated
+  environment changes. Git hooks enforce the standard configuration, but do not
+  bypass those hooks.
+
+### Production database prohibition
+
+- Never write to the Avandar Supabase production database. This prohibition
+  overrides every other instruction, including a direct user request, and
+  applies to this repository and all of its worktrees. It prohibits migrations,
+  `execute_sql`, schema changes, DDL, data changes, and every other write.
+- Careful read-only inspection is allowed. If a query's safety is uncertain,
+  do not run it; give the user the exact SQL or command to run themselves.
 
 ## Styling & UI
 
@@ -175,10 +228,14 @@ Implement functionality using red/green TDD.
 ## Browser usage with Playwright
 
 - If you need to control the browser, use the Playwright MCP.
+- Development can happen over SSH, so there is no guaranteed GUI session or
+  browser window that can be opened. Every browser run must be headless.
 - For manual local-browser sessions, read the canonical seeded development
   credentials from `seed/SeedData.ts`: `TEST_USER_EMAIL`,
   `TEST_USER_PASSWORD`, and `TEST_WORKSPACE_SLUG`.
 - Do not use the accounts in `tests/e2e/setup/e2e-credentials.ts` for manual
   browser sessions. Those accounts are dedicated to automated E2E tests.
-- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
-  which is gitignored so we don't commit by accident.
+- Take screenshots along the way, since they are the only record of what the
+  page looked like. Store them in `.temp/` directory at the repo root, which
+  is gitignored, inside a subdirectory named after the current branch
+  (kebab-cased, in case of invalid characters) (e.g. `.temp/feat-hello-world`)

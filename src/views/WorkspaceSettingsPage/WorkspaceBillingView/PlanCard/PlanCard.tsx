@@ -11,15 +11,15 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
-import { SUPPORT_EMAIL } from "$/config/AppConfig";
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { notifyExpiredSession } from "@/utils/notifications/notifyExpiredSession";
+import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";
 import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
@@ -124,7 +124,7 @@ export function PlanCard(props: Props): JSX.Element {
           t`We were unable to update your subscription. Please contact ${SUPPORT_EMAIL}`,
         );
       },
-      queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+      queriesToInvalidate: getPlanChangeQueriesToInvalidate(),
     });
   const selectedPlan =
     type === "free" ?

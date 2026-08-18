@@ -2,6 +2,7 @@
 import type {
   DatasetColumnId,
   DatasetColumnModel,
+  ImportedDatasetColumn,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 
 export { DatasetColumnParsers } from "$/models/datasets/DatasetColumn/DatasetColumnParsers.ts";
@@ -10,4 +11,5 @@ export namespace DatasetColumn {
   export type T<K extends keyof DatasetColumnModel = "Read"> =
     DatasetColumnModel[K];
   export type Id = DatasetColumnId;
+  export type Imported = ImportedDatasetColumn;
 }

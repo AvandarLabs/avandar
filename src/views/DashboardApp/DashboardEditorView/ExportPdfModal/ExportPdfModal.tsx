@@ -1,23 +1,21 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Alert, Box, Button, Group, Stack, Text } from "@mantine/core";
-import { Render as PuckPageRender } from "@puckeditor/core";
-import {
-  IconArrowRight,
-  IconFileExport,
-  IconPencil,
-} from "@tabler/icons-react";
+import { useLingui } from "@lingui/react/macro";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
-import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
+import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
+import { DashboardPdfAnalyticsPayloads } from "@/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads";
+import { HiddenDashboardRender } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/HiddenDashboardRender";
+import { PdfAnnotationStep } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationStep";
 import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
+import { PdfExportChoice } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice";
+import { runTimedExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/runTimedExport/runTimedExport";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -26,12 +24,142 @@ type Props = {
 
 type Step = "choose" | "snapshot" | "annotate";
 
+type PdfDashboardRender = {
+  avaPageMetadata: ReturnType<typeof getAvaPageMetadataFromDashboard>;
+  filename: string;
+  puckConfig: ReturnType<typeof useDashboardPuckConfig>;
+  puckData: ReturnType<typeof upgradeAvaPageData>;
+};
+
+type DirectPdfExportOptions = {
+  dashboard: Dashboard.T;
+  onExported: (durationMs: number) => void;
+  filename: string;
+  onClose: () => void;
+  renderContainerRef: RefObject<HTMLDivElement | null>;
+  setIsExporting: Dispatch<SetStateAction<boolean>>;
+};
+
+/**
+ * Builds the one callback both export paths report through, so the payload is
+ * assembled in a single place and the two paths can only differ by `mode`.
+ */
+function usePdfExportedLogger(dashboard: Dashboard.T): (
+  options: Readonly<{
+    durationMs: number;
+    mode: AnalyticsEventPayloads["dashboard.pdf_exported"]["mode"];
+  }>,
+) => void {
+  return useCallback(
+    (options): void => {
+      void AnalyticsClient.logEvent({
+        event: "dashboard.pdf_exported",
+        workspaceId: dashboard.workspaceId,
+        app: "dashboards",
+        payload: DashboardPdfAnalyticsPayloads.fromExported({
+          dashboard,
+          durationMs: options.durationMs,
+          mode: options.mode,
+        }),
+      });
+    },
+    [dashboard],
+  );
+}
+
 function buildPdfFilenameFromDashboardName(dashboardName: string): string {
   const filenameBase = (dashboardName || "dashboard")
     .toLowerCase()
     .replace(/[^a-z0-9-]+/gu, "-")
     .replace(/^-+|-+$/gu, "");
   return `${filenameBase || "dashboard"}.pdf`;
+}
+
+function usePdfDashboardRender(
+  dashboard: Readonly<Dashboard.T>,
+): PdfDashboardRender {
+  const { t, i18n } = useLingui();
+  const puckConfig = useDashboardPuckConfig({
+    dashboardTitle: dashboard.name,
+    workspaceId: dashboard.workspaceId,
+    dashboardId: dashboard.id,
+    i18n,
+  });
+  const puckData = useMemo(() => {
+    const config = dashboard.config as AvaPageGenericData;
+    return upgradeAvaPageData({
+      ...config,
+      root: {
+        ...config.root,
+        props: {
+          ...config.root.props,
+          title: dashboard.name || t`Untitled dashboard`,
+          schemaVersion: getVersionFromAvaPageData(config),
+        },
+      },
+    });
+  }, [dashboard, t]);
+  const avaPageMetadata = useMemo(() => {
+    return getAvaPageMetadataFromDashboard({ dashboard, surface: "editor" });
+  }, [dashboard]);
+  return {
+    avaPageMetadata,
+    filename: buildPdfFilenameFromDashboardName(dashboard.name),
+    puckConfig,
+    puckData,
+  };
+}
+
+function useDirectPdfExport(
+  options: Readonly<DirectPdfExportOptions>,
+): () => Promise<void> {
+  const { t } = useLingui();
+  const {
+    dashboard,
+    filename,
+    onClose,
+    onExported,
+    renderContainerRef,
+    setIsExporting,
+  } = options;
+  return useCallback(async (): Promise<void> => {
+    const element = renderContainerRef.current;
+    if (!element) {
+      notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
+      return;
+    }
+    setIsExporting(true);
+    try {
+      await runTimedExport({
+        runExport: async () => {
+          await PdfExport.captureAndDownloadPdf({
+            element,
+            filename,
+            title: dashboard.name || t`Untitled dashboard`,
+          });
+        },
+        onExported,
+      });
+      notifySuccess(t`PDF downloaded.`);
+      onClose();
+    } catch (error: unknown) {
+      console.error(error);
+      notifyError({
+        title: t`Couldn't export PDF`,
+        message: t`Please try again. The PDF was not created.`,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  }, [
+    dashboard.name,
+    filename,
+    onClose,
+    onExported,
+    renderContainerRef,
+    setIsExporting,
+    t,
+  ]);
 }
 
 /**
@@ -48,153 +176,66 @@ function buildPdfFilenameFromDashboardName(dashboardName: string): string {
  * using `<PuckPageRender>` directly (not the Puck editor frame), so the
  * editor chrome doesn't show up in the snapshot.
  */
-export function ExportPdfModal({ dashboard, onClose }: Props): ReactNode {
-  const { t, i18n } = useLingui();
+export function ExportPdfModal({
+  dashboard,
+  onClose,
+}: Readonly<Props>): ReactNode {
+  const { t } = useLingui();
   const [step, setStep] = useState<Step>("choose");
   const renderContainerRef = useRef<HTMLDivElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-
-  const puckConfig = useDashboardPuckConfig({
-    dashboardTitle: dashboard.name,
-    workspaceId: dashboard.workspaceId,
-    dashboardId: dashboard.id,
-    i18n,
+  const render = usePdfDashboardRender(dashboard);
+  const logPdfExported = usePdfExportedLogger(dashboard);
+  // Each path reports its own mode, and both are memoized rather than inlined
+  // so the callbacks below stay stable across renders.
+  const onDirectExported = useCallback(
+    (durationMs: number): void => {
+      logPdfExported({ durationMs, mode: "direct" });
+    },
+    [logPdfExported],
+  );
+  const onAnnotatedExported = useCallback(
+    (durationMs: number): void => {
+      logPdfExported({ durationMs, mode: "annotated" });
+    },
+    [logPdfExported],
+  );
+  const onDirectExport = useDirectPdfExport({
+    dashboard,
+    filename: render.filename,
+    onClose,
+    onExported: onDirectExported,
+    renderContainerRef,
+    setIsExporting,
   });
-
-  const puckData = useMemo(() => {
-    const cfg = dashboard.config as unknown as AvaPageGenericData;
-    const data = {
-      ...cfg,
-      root: {
-        ...cfg.root,
-        props: {
-          ...cfg.root.props,
-          title: dashboard.name || t`Untitled dashboard`,
-          schemaVersion: getVersionFromAvaPageData(cfg),
-        },
-      },
-    };
-    return upgradeAvaPageData(data);
-  }, [dashboard, t]);
-
-  const avaPageMetadata = useMemo(() => {
-    return getAvaPageMetadataFromDashboard(dashboard);
-  }, [dashboard]);
-
-  const filename = buildPdfFilenameFromDashboardName(dashboard.name);
-
-  const onDirectExport = useCallback(async (): Promise<void> => {
-    if (!renderContainerRef.current) {
-      notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
-      return;
-    }
-    setIsExporting(true);
-    try {
-      await PdfExport.captureAndDownloadPdf({
-        element: renderContainerRef.current,
-        filename,
-        title: dashboard.name || t`Untitled dashboard`,
-      });
-      notifySuccess(t`PDF downloaded.`);
-      onClose();
-    } catch (error: unknown) {
-      console.error(error);
-      notifyError({
-        title: t`Couldn't export PDF`,
-        message: t`Please try again. The PDF was not created.`,
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  }, [filename, dashboard.name, onClose, t]);
-
-  // Always-mounted hidden render container so html2canvas can capture from
-  // it. Positioned off-screen but at a fixed width so the layout matches a
-  // standard letter-size PDF page.
   const hiddenRender = (
-    <Box
-      ref={renderContainerRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: "-10000px",
-        width: 1100,
-        background: "white",
-        zIndex: -1,
-      }}
-      aria-hidden
-    >
-      <DashboardFilterStateManager.Provider>
-        <PuckPageRender
-          config={puckConfig}
-          data={puckData}
-          metadata={avaPageMetadata}
-        />
-      </DashboardFilterStateManager.Provider>
-    </Box>
+    <HiddenDashboardRender
+      avaPageMetadata={render.avaPageMetadata}
+      puckConfig={render.puckConfig}
+      puckData={render.puckData}
+      renderContainerRef={renderContainerRef}
+    />
   );
 
-  if (step === "choose") {
-    return (
-      <Stack gap="md">
-        {hiddenRender}
-        <Alert color="blue" variant="light">
-          <Text size="sm">
-            <Trans>
-              Export this dashboard as a PDF, or sketch on it first. Annotations
-              support text, arrows, and freehand drawing with adjustable
-              roughness (RoughJS).
-            </Trans>
-          </Text>
-        </Alert>
-
-        <Stack gap="sm">
-          <Button
-            size="md"
-            variant="outline"
-            leftSection={<IconFileExport size={18} />}
-            rightSection={<IconArrowRight size={16} />}
-            loading={isExporting}
-            onClick={onDirectExport}
-            justify="space-between"
-          >
-            <Trans>Export as PDF</Trans>
-          </Button>
-          <Button
-            size="md"
-            leftSection={<IconPencil size={18} />}
-            rightSection={<IconArrowRight size={16} />}
-            onClick={() => {
-              return setStep("annotate");
-            }}
-            justify="space-between"
-          >
-            <Trans>Annotate, then export</Trans>
-          </Button>
-        </Stack>
-
-        <Group justify="flex-end">
-          <Button variant="subtle" color="neutral" onClick={onClose}>
-            <Trans>Cancel</Trans>
-          </Button>
-        </Group>
-      </Stack>
-    );
-  }
-
-  // Annotate step
-  return (
-    <Stack gap="sm">
-      {hiddenRender}
-      <PdfAnnotator
-        sourceElement={renderContainerRef.current ?? undefined}
-        filename={filename}
-        title={dashboard.name || t`Untitled dashboard`}
-        onClose={onClose}
-        onBack={() => {
-          return setStep("choose");
+  return step === "choose" ?
+      <PdfExportChoice
+        hiddenRender={hiddenRender}
+        isExporting={isExporting}
+        onAnnotate={() => {
+          setStep("annotate");
         }}
+        onClose={onClose}
+        onDirectExport={onDirectExport}
       />
-    </Stack>
-  );
+    : <PdfAnnotationStep
+        filename={render.filename}
+        hiddenRender={hiddenRender}
+        onBack={() => {
+          setStep("choose");
+        }}
+        onClose={onClose}
+        onExported={onAnnotatedExported}
+        sourceElement={renderContainerRef.current ?? undefined}
+        title={dashboard.name || t`Untitled dashboard`}
+      />;
 }

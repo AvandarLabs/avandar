@@ -20,14 +20,20 @@ create table public.dexie_dbs (
   created_at timestamptz not null default now(),
   -- Timestamp of the last time this dexie db was sync'd
   last_seen_at timestamptz not null default now(),
-  constraint dexie_dbs_unique_user_db_id unique (
-    db_id,
-    user_id
-  )
+  constraint dexie_dbs_unique_user_db_id unique (db_id, user_id)
 );
 
 -- Enable row level security
 alter table public.dexie_dbs enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.dexie_dbs to authenticated,
+service_role;
 
 -- Policies
 create policy "

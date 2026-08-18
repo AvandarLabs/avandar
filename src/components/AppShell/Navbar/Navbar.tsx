@@ -23,7 +23,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { APP_NAME } from "$/config/AppConfig";
+import { APP_NAME } from "$/config/GlobalAppConfig";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";
@@ -32,11 +32,11 @@ import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import type { AppLink } from "@/config/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {

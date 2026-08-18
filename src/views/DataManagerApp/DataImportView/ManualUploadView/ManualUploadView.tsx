@@ -7,10 +7,8 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useEffect, useRef, useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifyError } from "@/utils/notifications/notify";
-import {
-  DatasetImportForm,
-  ManualUploadDataSourceMetadata,
-} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import { useLoadManualUploadFile } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type { ParseManualFileOptions } from "./useLoadManualUploadFile/useLoadManualUploadFile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

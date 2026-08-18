@@ -18,9 +18,10 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 export function useVizConfigPFieldConfig(options: {
   workspaceId: Workspace.Id | undefined;
   dashboardId: Dashboard.Id;
+  snapshotRevision?: string;
 }): CustomField<VizConfig.T> {
   const { t } = useLingui();
-  const { workspaceId, dashboardId } = options;
+  const { workspaceId, dashboardId, snapshotRevision } = options;
 
   const render = useCallback(
     ({ value, onChange }: AvaPageFieldProps<VizConfig.T>) => {
@@ -30,10 +31,11 @@ export function useVizConfigPFieldConfig(options: {
           onChange={onChange}
           workspaceId={workspaceId}
           dashboardId={dashboardId}
+          snapshotRevision={snapshotRevision ?? ""}
         />
       );
     },
-    [workspaceId, dashboardId],
+    [workspaceId, dashboardId, snapshotRevision],
   );
 
   return useMemo(() => {

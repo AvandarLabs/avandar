@@ -1,105 +1,157 @@
-import { Tooltip } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { Group, Select, Stack, Text } from "@mantine/core";
-import { IconBuilding } from "@tabler/icons-react";
+import { matchLiteral } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Group, Stack, Text } from "@mantine/core";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource, useShareCopy } from "../shareCopy";
+import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
+import { GeneralAccessSelect } from "./GeneralAccessSelect";
+import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
+import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { I18n } from "@lingui/core";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { ReactNode } from "react";
+
+// Only one `ShareGeneralAccess` renders per modal, so a static id is safe:
+// there is no risk of two instances colliding in the same document.
+const _PUBLIC_OPTION_DISABLED_REASON_ID = "share-general-access-public-reason";
 
 type Props = {
   resourceType: ResourceType;
-  isRestricted: boolean;
+  value: GeneralAccessValue;
+  isOwner: boolean;
+  isBusy: boolean;
   workspaceShareRole: RoleLevel | null;
-  onChange: (next: { isRestricted: boolean; role: RoleLevel | null }) => void;
+  /** False for resource types with no published form; hides the option. */
+  isPublicOptionAvailable: boolean;
+  /** Set when the option is visible but not selectable. */
+  publicOptionDisabledReason: string | undefined;
+  onChange: (nextValue: GeneralAccessValue) => void;
+  onWorkspaceRoleChange: (role: RoleLevel) => void;
 };
 
 /**
- * "General access" section: a single dropdown that toggles between
- * `Restricted` (no workspace-wide share, hides the role picker) and
- * `Anyone in {AppLabel}` (a `workspace`-principal share at the chosen
- * role). The orchestrator decides how to persist the change.
+ * What the currently selected access shape actually means, spelled out for the
+ * dropdown's tooltip.
+ *
+ * Takes `i18n` and resolves `msg` descriptors rather than taking the `t` from
+ * `useLingui()`: a translate function threaded in as a parameter is a runtime
+ * value the extractor cannot follow, so those sentences would never reach the
+ * catalogs.
+ */
+function _getGeneralAccessTooltip(
+  options: Readonly<{
+    value: GeneralAccessValue;
+    isOwner: boolean;
+    app: string;
+    resource: string;
+    i18n: I18n;
+  }>,
+): string {
+  const { value, isOwner, app, resource, i18n } = options;
+  return matchLiteral(value, {
+    private: () => {
+      return isOwner ?
+          i18n._(
+            msg`Only you can access this ${resource}. Everyone else loses access, including workspace admins.`,
+          )
+        : i18n._(msg`Only the owner can make this ${resource} private.`);
+    },
+    restricted: () => {
+      return i18n._(
+        msg`Only the people and groups listed below can access this ${resource}.`,
+      );
+    },
+    workspace: () => {
+      return i18n._(
+        msg`Every workspace member who can open the ${app} app gets this role on this ${resource}, in addition to whatever's listed below.`,
+      );
+    },
+    public: () => {
+      return i18n._(
+        msg`Anyone with the link can view this ${resource}. People and groups below still control who can edit it.`,
+      );
+    },
+  });
+}
+
+/**
+ * "General access" section: a single dropdown over the three access shapes
+ * (`Only me`, `Restricted`, and `Anyone in {AppLabel}`), plus a role picker
+ * that only appears for the workspace-wide option.
  */
 export function ShareGeneralAccess({
   resourceType,
-  isRestricted,
+  value,
+  isOwner,
+  isBusy,
   workspaceShareRole,
+  isPublicOptionAvailable,
+  publicOptionDisabledReason,
   onChange,
-}: Props): JSX.Element {
-  const { t } = useLingui();
-  const shareCopy = useShareCopy();
-  const app = appLabel(appForResource(resourceType));
+  onWorkspaceRoleChange,
+}: Readonly<Props>): ReactNode {
+  const { t, i18n } = useLingui();
+  const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
-
-  const generalValue: "restricted" | "workspace" =
-    isRestricted ? "restricted" : "workspace";
-
-  const generalOptions = [
-    { value: "restricted", label: t`Restricted` },
-    { value: "workspace", label: t`Anyone in ${app}` },
-  ];
+  const showPublicOptionDisabledReason =
+    isPublicOptionAvailable && publicOptionDisabledReason !== undefined;
 
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {shareCopy.generalAccessHeading}
+        <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        <Tooltip
-          label={
-            generalValue === "restricted" ?
-              shareCopy.restrictedOptionTooltip(resource)
-            : shareCopy.workspaceOptionTooltip(resource, app)
+        <GeneralAccessSelect
+          value={value}
+          isBusy={isBusy}
+          generalOptions={GeneralAccessModule.makeDropdownOptionsFromLabels({
+            isOwner,
+            labels: {
+              private: t`Only me`,
+              restricted: t`Restricted`,
+              workspace: t`Anyone in ${app}`,
+              public: t`Anyone with the link`,
+            },
+            isPublicOptionAvailable,
+            isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
+          })}
+          tooltip={_getGeneralAccessTooltip({
+            value,
+            isOwner,
+            app,
+            resource,
+            i18n,
+          })}
+          ariaLabel={t`General access`}
+          describedById={
+            showPublicOptionDisabledReason ?
+              _PUBLIC_OPTION_DISABLED_REASON_ID
+            : undefined
           }
-          multiline
-          w={320}
-        >
-          <Select
-            flex={1}
-            leftSection={<IconBuilding size={16} aria-hidden />}
-            data={generalOptions}
-            value={generalValue}
-            allowDeselect={false}
-            onChange={(value) => {
-              if (value === "restricted") {
-                onChange({ isRestricted: true, role: null });
-              } else if (value === "workspace") {
-                onChange({
-                  isRestricted: false,
-                  role: workspaceShareRole ?? "viewer",
-                });
-              }
-            }}
-            aria-label={t`General access`}
+          onChange={onChange}
+        />
+        {value === "workspace" ?
+          <ShareWorkspaceRoleSelect
+            role={workspaceShareRole}
+            isDisabled={isBusy}
+            onChange={onWorkspaceRoleChange}
           />
-        </Tooltip>
-        {generalValue === "workspace" ?
-          <Tooltip label={shareCopy.roleSelectTooltip}>
-            <Select
-              w={120}
-              data={[
-                { value: "viewer", label: t`Viewer` },
-                { value: "editor", label: t`Editor` },
-                { value: "admin", label: t`Admin` },
-              ]}
-              value={workspaceShareRole ?? "viewer"}
-              allowDeselect={false}
-              onChange={(value) => {
-                if (value) {
-                  onChange({
-                    isRestricted: false,
-                    role: value as RoleLevel,
-                  });
-                }
-              }}
-              aria-label={t`Role for everyone in the workspace`}
-            />
-          </Tooltip>
         : null}
       </Group>
+      {showPublicOptionDisabledReason ?
+        <Text id={_PUBLIC_OPTION_DISABLED_REASON_ID} size="xs" c="dimmed">
+          {publicOptionDisabledReason}
+        </Text>
+      : null}
       <Text size="xs" c="dimmed">
-        {shareCopy.generalAccessHelper}
+        <Trans>
+          Controls the default for the rest of the workspace. People without app
+          access still need a direct share below.
+        </Trans>
       </Text>
     </Stack>
   );

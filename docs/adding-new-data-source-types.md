@@ -195,11 +195,11 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `src/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer.tsx` | Uses `QueryDataSourceSelect`; grouping changes apply automatically once §Data Explorer is updated. |
 
-### Entity Manager (dataset-backed fields)
+### Individual Manager (dataset-backed fields)
 
 | File / area                                                  | Why                                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------------------- |
-| `src/components/EntityManagerApp/SingleEntityView/index.tsx` | `SourceBadge` for provenance — badge list must support new type. |
+| `src/views/IndividualManagerApp/SingleIndividualView/index.tsx` | `SourceBadge` for provenance — badge list must support new type. |
 
 ### Tests & fixtures
 

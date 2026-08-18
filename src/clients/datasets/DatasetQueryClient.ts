@@ -5,7 +5,7 @@ import { objectKeys, promiseReduce, sqlTemplate, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";

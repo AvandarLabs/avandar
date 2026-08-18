@@ -1,9 +1,10 @@
 import { MIMEType } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
@@ -243,7 +244,7 @@ export async function startDatasetUpload(options: {
 
       DatasetUploadProgressStore.markError(datasetId, errorMessage);
       notifyError({
-        title: "Unable to sync dataset online",
+        title: t`Unable to sync dataset online`,
         message: errorMessage,
       });
       throw error;

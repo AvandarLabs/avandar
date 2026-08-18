@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { RootLayout } from "@/components/layouts/RootLayout/RootLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({
   component: WorkspaceRootLayout,
@@ -13,20 +13,18 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
   }): Promise<Workspace.WithSubscription | undefined> => {
     const { queryClient } = context;
     const { workspaceSlug } = params;
-    const workspaces = await WorkspaceClient.withCache(queryClient)
-      .withFetchQuery()
-      .getWorkspacesOfCurrentUser();
+    const workspaces = await WorkspaceClient.getWorkspacesOfCurrentUser();
+    queryClient.setQueryData(
+      WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+      workspaces,
+    );
     const workspaceToLoad = workspaces.find(propEq("slug", workspaceSlug));
     if (!workspaceToLoad) {
       throw redirect({ to: AppLinks.invalidWorkspace.to });
     }
 
-    // We've fetched the workspace, but we never really consume it by using
-    // the route's `useLoaderData()` API. We only used this `loader` function
-    // in order to load the workspace into the QueryClient cache. All our
-    // react components will use `useQuery` under the hood which will
-    // fetch from this same cache, but will make sure we don't show
-    // any stale data.
+    // `useCurrentWorkspace` reads this loader value as the authoritative
+    // workspace context for descendants of this route.
     return workspaceToLoad;
   },
 });
