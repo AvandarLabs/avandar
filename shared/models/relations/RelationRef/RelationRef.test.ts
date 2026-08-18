@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
-import type { Concept } from "$/models/ontology/Concept/Concept.ts";
+import { describe, expect, it } from "vitest";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const CONCEPT_ID = "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1" as Concept.Id;
@@ -57,5 +57,21 @@ describe("RelationRef", () => {
 
   it("returns undefined for an empty string", () => {
     expect(RelationRef.fromTableName("")).toBeUndefined();
+  });
+
+  it("recognises an uppercase uuid as a concept without changing its case", () => {
+    const uppercaseId = CONCEPT_ID.toUpperCase() as Concept.Id;
+    const tableName = `concept_${uppercaseId}`;
+
+    expect(RelationRef.fromTableName(tableName)).toEqual({
+      kind: "concept",
+      id: uppercaseId,
+    });
+  });
+
+  it("returns undefined for a doubly-prefixed name, rather than stripping only the outer prefix", () => {
+    expect(
+      RelationRef.fromTableName(`concept_concept_${CONCEPT_ID}`),
+    ).toBeUndefined();
   });
 });

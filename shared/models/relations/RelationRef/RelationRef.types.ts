@@ -1,5 +1,5 @@
-import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 
 /**
  * A reference to a dataset, identified by the dataset's own id. A dataset's
