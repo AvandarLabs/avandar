@@ -8,8 +8,8 @@
 **Related:** `src/clients/qetl/`, `src/clients/DuckDbClient/`,
 `shared/models/queries/QueryDataSource/`,
 `shared/models/queries/StructuredQuery/structuredQueryToSql/`,
-`supabase/schemas/10.datasets.sql`, `.temp/qetl/proposal-questions.md` (Q7, Q8,
-Q20, Q24), `.temp/qetl/proposal-questions-2.md` (Q46, Q47, Q48, Q49)
+`supabase/schemas/10.datasets.sql`, `src/lib/sql/DuckDbSqlAnalyzer/`,
+`.temp/qetl/proposal-questions.md` (Q7, Q8, Q20, Q24), `.temp/qetl/proposal-questions-2.md` (Q46, Q47, Q48, Q49)
 
 ---
 
@@ -68,14 +68,36 @@ applied to it.
 The parallel branch is the problem this spec removes the need for. A concept
 should be a source like any other, resolved through one path.
 
-### 1.4 Relation identification is a substring scan
+### 1.4 Relation identification sees datasets and nothing else
 
-`WorkspaceQetlClient` supplies `getDiceFromSql`, which finds the datasets a
-statement touches by testing `rawSql.includes(datasetId)` against every dataset
-id in the workspace. That cannot distinguish a table reference from a UUID
-appearing inside a string literal or a comment, it cannot see a concept at all,
-and it is the input the authorization check in spec 2 will depend on. A wrong
-answer there is either an outage or a hole.
+**Corrected during planning, 2026-08-18.** An earlier draft of this spec said
+relation identification was a `rawSql.includes(datasetId)` substring scan, and
+proposed replacing it with a `node-sql-parser` pass. **Both halves were wrong**,
+and the correction matters because it deletes most of a task.
+
+`WorkspaceQetlClient.ts:118-125` no longer scans. It calls
+**`DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences`**
+(`src/lib/sql/DuckDbSqlAnalyzer/`, 1,297 lines across 9 files, 22 tests), a
+**fail-closed static dataset-effect analyzer** built on its own DuckDB
+tokenizer. It already does everything this spec was going to ask for, and two
+things it was not:
+
+| Concern | Status |
+|---|---|
+| UUID inside a string literal must not count | Done: *"extracts UUID tables while ignoring UUID string literals"* |
+| CTE names must not count | Done: *"ignores a UUID-shaped CTE alias"*, *"scopes CTE aliases without suppressing qualified real tables"* |
+| DDL and mutation targets must not count as reads | Done: *"distinguishes mutation targets from read sources"*, *"rejects mutating statements"*, plus `COPY` direction and `DELETE`/`MERGE USING` handling |
+| Fail closed, never return a partial answer | Done: *"rejects dynamic table and query sources without returning partial IDs"*; the public entry point **throws** on `unsafe` or `mutating` |
+| DuckDB-only syntax must not break analysis | Done, and better than proposed: *"supports DuckDB EXCLUDE, QUALIFY, and PIVOT syntax"*. It uses **its own tokenizer, not `node-sql-parser`**, so the PostgreSQL-dialect throw that `sqlToStructuredQuery.ts:118` suffers does not apply here at all |
+
+**So the only real gap is the return type.** It returns `string[]` of dataset
+UUIDs, so it cannot see a concept, which means it cannot answer "which relations
+does this statement touch" once concepts are relations. That is what spec 2's
+authorization check will consume, and a wrong answer there is either an outage or
+a hole.
+
+The task is therefore **extend, do not build**: teach the analyzer to return
+`RelationRef[]`. Section 6 specifies that narrowly.
 
 ### 1.5 Nothing can be executed against a real engine
 
@@ -101,7 +123,8 @@ protect.
 3. A **registry** resolving a relation reference to its wrapper.
 4. Adding a source means **registering a wrapper and declaring capabilities**,
    editing no match statement.
-5. **AST-based relation identification** replacing the substring scan.
+5. **Relation identification that can see a concept**, by extending the existing
+   `DuckDbSqlAnalyzer` rather than replacing it.
 6. The **renaming** in proposal section 6.2, so later specs are not written in
    dead vocabulary.
 7. An **executed test harness**, so specs 2 through 6 can assert rows.
@@ -118,10 +141,11 @@ bounded:
 - Catalog caps and the LLM-facing surface (spec 6)
 - Any change to `StructuredQuery` itself, or to raw SQL behaviour
 
-**Behaviour change budget: as close to zero as the renames allow.** This spec is
-a refactor plus one genuine fix (1.4). Every existing source type must behave
-identically afterwards, including `google_sheets` continuing to throw. That is
-what makes it safe to land first.
+**Behaviour change budget: zero.** This spec is a pure refactor. Every existing
+source type behaves identically afterwards, including `google_sheets` continuing
+to throw, and every existing statement resolves to the same relations. The
+analyzer extension in section 6 adds a relation kind that no wrapper resolves
+yet. That is what makes it safe to land first.
 
 ---
 
@@ -406,34 +430,50 @@ fix a reordering of two named steps instead of an untangling.
 
 ## 6. Relation identification
 
-`extractReferencedRelations` replaces `getDiceFromSql`. Input: a SQL string.
-Output: the base relations it reads.
+**Extend `DuckDbSqlAnalyzer`; do not write a new extractor.** Section 1.4
+explains why: it already filters CTE names, excludes mutation targets from reads,
+tolerates DuckDB-only syntax, and fails closed. Rewriting that on
+`node-sql-parser` would be a regression, because `node-sql-parser`'s
+`postgresql` dialect throws on `QUALIFY` and `SELECT * EXCLUDE`, which the
+analyzer's own tokenizer handles.
 
-Implementation uses `node-sql-parser`, already a dependency with eight non-test
-importers. Its `tableList` returns entries shaped
-`"{operation}::{database}::{table}"`, from which:
+**The change is the return type, and only that.**
 
-- **Discard non-`select` entries.** A `create` entry is a DDL target, a table
-  being written, not read.
-- **Discard names bound by a `WITH` in the same statement.** A CTE name is not a
-  relation; it is defined in the statement itself.
-- **Map the remainder** through `tableNameToRelationRef`.
+```ts
+// today, in DuckDbSqlAnalyzer.types.ts
+{ kind: "read"; datasetIds: string[] }
 
-Both filters are required, not defensive. Executed against the real entity
-generation statement, `tableList` returns five entries of which two are a CTE
-name and a DDL target. Passing them through unfiltered asks the authorization
-check in spec 2 whether the principal may read a CTE, the answer is no, and a
-live path returns `forbidden` on every call.
+// after
+{ kind: "read"; relations: RelationRef[] }
+```
 
-**Fail closed on a parse error.** `GROUP BY ALL`, `QUALIFY`,
-`SELECT * EXCLUDE` and lambda syntax genuinely throw under the parser's
-`postgresql` dialect, because `sqlToStructuredQuery.ts:118` parses DuckDB SQL as
-PostgreSQL. A statement whose relations cannot be extracted returns
-`unsupported`. It must never run unchecked: failing open here would serve cached
-rows with no access check at all, which is the hole spec 2 exists to close.
+A bare UUID token maps to `{ kind: "dataset", id }`. A prefixed token
+(`concept_<uuid>`) maps to its kind, through `tableNameToRelationRef`
+(section 4.1). A token that is neither is not a relation this system owns and is
+already excluded by the analyzer's UUID-shape check, so nothing new is needed
+for the negative case.
 
-**This is the one behaviour change in this spec**, and it is a fix. The substring
-scan matches a UUID inside a string literal or comment; the AST does not.
+`extractReferencedRelations` becomes a **thin adapter** over the analyzer,
+living with the wrappers, whose job is to convert an analysis into refs and to
+translate the analyzer's `throw` into the `unsupported` outcome that proposal
+section 10 defines. It is the seam spec 2's `authorize` calls, so it exists as a
+named function even though it is small.
+
+**Two properties must be preserved, and tested for, because spec 2 depends on
+them:**
+
+1. **Fail closed.** The analyzer throws on `unsafe` and `mutating`. The adapter
+   must convert that to `unsupported`, never to an empty list. An empty list
+   reads as "this statement touches nothing", so authorization would pass and
+   cached rows would be served with no access check. That is the exact hole spec
+   2 exists to close.
+2. **No partial answers.** The analyzer already refuses to return partial ids
+   when it meets a dynamic boundary. The adapter must not soften that.
+
+**Behaviour change in this spec: none here.** Dataset identification is already
+correct. The extension adds a kind that no wrapper resolves yet, so the observable
+result for every existing statement is unchanged, which is what makes it safe to
+land in a refactor-only spec.
 
 ---
 
@@ -550,7 +590,7 @@ fails loudly.
 | Area | Test |
 |---|---|
 | `RelationRef` | Round-trip for each kind. A bare UUID resolves to `dataset`. A prefixed name resolves to its kind. Output is a valid quoted DuckDB identifier |
-| `extractReferencedRelations` | Executed. CTE names discarded. DDL targets discarded. A UUID inside a string literal is **not** returned (the old scan's bug). Parse failure returns `unsupported`, never an empty list |
+| `extractReferencedRelations` | The analyzer's own 22 tests already cover CTE aliases, string literals, mutation targets and DuckDB syntax; **do not duplicate them**. Test only the adapter: a bare UUID becomes a `dataset` ref, a prefixed name becomes its kind, and an analyzer `throw` becomes `unsupported` and **never an empty list** |
 | `RelationCapabilities` | A declaration exists for every registered wrapper, iterated from the registry so a new wrapper cannot omit one. `grantedScope` matches what `getAuthURL.ts` actually requests |
 | `SourceWrapper` narrowing | Type-level: a wrapper declaring `predicatePushdown: "none"` has no `pushDown`; calling it fails to compile |
 | `RelationRegistry` | Resolves each kind. Unknown ref returns undefined, not a throw. Duplicate `kind` registration throws in development |
