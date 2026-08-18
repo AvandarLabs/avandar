@@ -194,6 +194,14 @@ by every signed-in user of every workspace, silently.
 - **`anon`:** only when there is a public route. Today that is SELECT on
   `dashboards`. Do not grant `anon` on anything else.
 
+Each grant names its own table. Never write a blanket
+`grant ... on all tables in schema public` in a schema file: it is evaluated once
+when the file runs, so it silently misses every table added afterwards, and the
+per-table declaration is what `db diff` reads to build the migration.
+`20260818120000_grant_service_role_dml_on_public_tables.sql` is that statement
+used correctly, as a one-time backfill inside a migration. That is a repair, not
+a declaration.
+
 Column-scoped grants work the same way. A new table has `attacl = NULL` on every
 column, so declare only the allowed column list:
 
