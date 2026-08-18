@@ -1800,12 +1800,33 @@ git mv PublicQetlClient PublicQuerySession
 | `PublicQetlClient` | `PublicQuerySession` |
 | `getDiceExtractors` | `getRelationSources` |
 | `getMissingDice` | `probeRelationCache` |
-| `getDiceFromSql` | `extractReferencedRelations` |
+| `getDiceFromSql` | **`getQueryDependencies`** |
 | `DiceExtractor` | `RelationSource` |
 | `ExtractedFact` | `AcquiredRelationBytes` |
 | `insertToStorageCache` (facts param) | keep name, rename param `facts` to `relations` |
 
 Follow the compiler: `pnpm type-check` lists every site.
+
+**Why `getQueryDependencies` and not `extractReferencedRelations`.** Corrected
+after Task 8 shipped: that name is **already taken** by
+`src/clients/qetl/wrappers/extractReferencedRelations/`, the analyzer adapter
+that converts SQL into `RelationRef[]`. Two different things must not carry one
+name, and these are confusingly adjacent, so a reader would assume the runner
+option *is* the adapter.
+
+They are genuinely different. The adapter is a **pure syntactic conversion**,
+SQL to refs. The runner option is a **session-scoped policy hook** answering
+"which relations does this statement depend on, as far as this session can
+see", which is why `WorkspaceQetlClient` filters to workspace datasets and the
+public session answers differently.
+
+`queryDependencies` is already the codebase's word for the result: it is the
+parameter name at `QetlClient.ts:19`, `QetlClient.types.ts:61` and `:103`, it is
+what `getMissingDice` takes, and `getDiceFromSql`'s result is assigned to
+`const queryDependencies` at `qetlQueryRunner.ts:70`. Five sites, one word. A
+near-miss like `getReferencedRelations` would sit one verb from the adapter and
+keep the ambiguity; "dependencies" carries the resolved-and-filtered sense that
+"referenced relations" does not.
 
 - [ ] **Step 3: Update the doc comments that still say "dice", "cube" or "facts"**
 
