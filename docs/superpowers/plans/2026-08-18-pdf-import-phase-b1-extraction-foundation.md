@@ -97,7 +97,7 @@ the loop.
 | `src/workers/pdfSniff.worker.ts` | Worker entry: geometry only | 9 |
 | `src/clients/datasets/pdfSniff.ts` | Main-thread driver | 9 |
 | `src/clients/datasets/pdfTableToColumns.ts` | Cells to CSV for DuckDB typing | 10 |
-| `src/clients/datasets/pdfFingerprint.ts` | Drift fingerprint | 11 |
+| `src/clients/datasets/pdfTableFingerprint.ts` | Drift fingerprint | 11 |
 | `.../ManualUploadView/PdfTablePicker/PdfPagePreview.tsx` | Canvas render with overlay | 12 |
 
 ---
