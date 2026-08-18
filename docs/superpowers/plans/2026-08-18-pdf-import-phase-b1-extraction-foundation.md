@@ -2746,17 +2746,42 @@ static import that pulled it in and make it dynamic.
 
 - [ ] **Step 3: Manual verification against real files**
 
-Start the app and drag each of these onto the import dropzone:
+**Done as an E2E test instead, and it was worth it.** This repo already has a
+Playwright suite with auth and workspace fixtures, so case 1 below became
+`tests/e2e/pdf-import.spec.ts` rather than a one-off click-through: a real
+Chromium upload of the 10-page tagged fixture, asserting the "No region
+selected yet" alert, the *absence* of the "Data processing failed" and "No rows
+were read successfully" strings, a disabled save button, and no uncaught page
+errors.
 
-1. `public/test-data/pdf/frontiers-peru-child-health-insurance.pdf`.
-   Expected: the file is accepted, page geometry is read with a progress
-   indicator, the preview panel says "Select a region on the page to see data",
-   and the save button is disabled. **No error is shown**, because nothing has
-   failed.
+Running it for real caught a fully blocking bug that every unit test missed:
+**no PDF could be imported in a browser at all.** Inside the sniff worker,
+`loadPdfJs` imports `pdf.worker.mjs`, which makes pdf.js install its own
+handler on the same worker global and post its internal protocol traffic
+(starting with `{ action: "ready" }`) to the main thread. `sniffPdfFile`
+treated every message that was not `progress` or `result` as a rejection, so
+that first pdf.js message rejected the promise with an empty error. Under jsdom
+the worker-context branch never runs and there is no shared port, so unit tests
+could not see it. Fixed with a `_isPdfSniffResponse` guard mirroring the one
+the worker side already had.
+
+The lesson generalises to B2 and B3: **anything involving the worker port needs
+at least one real-browser test.** jsdom cannot model it.
+
+Cases 2 and 3 remain unverified and are carried forward:
+
 2. A password-protected PDF. Expected: the password-required message, not a
-   generic failure.
-3. Any document over 50 pages. Expected: the `too_many_pages` message asking
-   for a page range.
+   generic failure. Needs a password-protected fixture, which the repo does not
+   have.
+3. A document over 50 pages. Expected: the `too_many_pages` message asking for
+   a page range. The tagged fixture is 10 pages; the largest committed fixture
+   is 17.
+
+**Environment gotcha when running the E2E suite here:** `playwright.config.ts`
+reuses an existing dev server, and a vite server from another worktree may be
+squatting port 5173 while pointing at a different Supabase, which fails sign-in
+with "Invalid login credentials". Run with `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199`
+(or any free port) so Playwright starts vite from this worktree.
 
 - [ ] **Step 4: Confirm the original PDF is retained**
 
