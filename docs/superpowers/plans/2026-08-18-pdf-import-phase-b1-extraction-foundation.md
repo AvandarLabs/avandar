@@ -818,7 +818,7 @@ const MIN_RULE_LENGTH = 8;
 const SCANNED_PAGE_MAX_TEXT_ITEMS = 10;
 
 /** Codepoints in the Unicode private use area, plus the replacement char. */
-const UNMAPPED_CHAR = /[-�]/gu;
+const UNMAPPED_CHAR = /[\uE000-\uF8FF\uFFFD]/gu;
 
 function _unmappedCharRatio(text: string): number {
   if (text.length === 0) {
