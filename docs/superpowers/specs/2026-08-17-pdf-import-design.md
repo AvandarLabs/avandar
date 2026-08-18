@@ -236,7 +236,7 @@ cell text     "(1,234)"   "$45.3*"   "—"   "12%"   "−0.126"
    v            "-1234"     "45.3"     ""   "12"     "-0.126"
    |  serialise to CSV in memory
    v  DuckDB-WASM read_csv + sniff_csv
-              BIGINT      DOUBLE    NULL  DOUBLE   DOUBLE
+              BIGINT      DOUBLE    NULL  BIGINT   DOUBLE
 ```
 
 `normalizeCellValue` handles accounting-style parenthesised negatives, currency
