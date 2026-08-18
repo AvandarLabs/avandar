@@ -377,8 +377,30 @@ unresolvable ref must become `needs_clarification` rather than an exception
 (proposal section 10).
 
 **Ordering rule: registration order is resolution order**, first `handles` wins.
-Ambiguity is a programming error, so `register` throws in development when two
-wrappers claim the same `kind`.
+Ambiguity is a programming error, so registration throws when two wrappers claim
+the same `kind`.
+
+**One wrapper per relation kind, not per source type.** Found while planning:
+`csv_file`, `xlsx_file`, `open_data`, `virtual` and `google_sheets` are all
+`kind: "dataset"`, so a registry keyed on kind cannot hold five wrappers for
+them, and the duplicate-kind guard would reject the attempt. The resolution is a
+**composite dataset wrapper** that dispatches on `dataset.sourceType` internally:
+
+```text
+RelationRegistry            keyed by kind
+  DatasetWrapper            kind: "dataset"
+    -> csv_file | xlsx_file | open_data   parquet acquisition
+    -> virtual                            recursive QETL
+    -> google_sheets                       throws, until spec 4
+  ConceptWrapper            kind: "concept"
+```
+
+The inner dispatch is a `Record<sourceType, acquire>`, not a `match`, so adding
+a source type is a map entry. **Consequence for spec 5:** an open data *API* is
+still `kind: "dataset"`, so it is another entry in that map rather than a new
+kind, and it inherits dataset authorization unchanged. A new kind is warranted
+only when the thing is not a `datasets` row at all, as a concept is not, and as
+comments and documents will not be.
 
 ### 4.5 `QueryMediator`: what replaces the match statements
 
