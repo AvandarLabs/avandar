@@ -19,6 +19,19 @@ vi.mock("@/views/GisApp/MapCanvas/useMapStyleSync", () => {
 vi.mock("@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync", () => {
   return { useMapViewSync: vi.fn() };
 });
+vi.mock(
+  "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures",
+  () => {
+    return {
+      useMapToolGestures: () => {
+        return { inProgressVertices: [], invalidRingStatus: undefined };
+      },
+    };
+  },
+);
+vi.mock("@/views/GisApp/MapCanvas/useMapChromeOverlays", () => {
+  return { useMapChromeOverlays: vi.fn() };
+});
 
 const MAP_INSTANCE = {} as MapInstance;
 describe("MapCanvas", () => {

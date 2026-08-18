@@ -6,6 +6,8 @@ import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
   createGridBinLayerFixture,
   getCellMathSql,
+  withAoiOverlay,
+  withEmptyOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
 
 describe("compileMapLayerSpatialQuery grid bin", () => {
@@ -14,11 +16,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
     (grid) => {
       const fixture = createGridBinLayerFixture({ grid, minCellCount: 5 });
       const { rawSql, family, sourcePropertyColumnNames } =
-        compileMapLayerSpatialQuery({
-          ...fixture,
-          zoomBand: 6,
-          simplificationReferenceLatitude: 12.5,
-        });
+        compileMapLayerSpatialQuery(
+          withEmptyOverlay({
+            ...fixture,
+            zoomBand: 6,
+            simplificationReferenceLatitude: 12.5,
+          }),
+        );
 
       [
         "source_rows",
@@ -51,11 +55,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
 
   it("bins squares by fixed meter columns and rows", () => {
     const fixture = createGridBinLayerFixture({ grid: "square" });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 6,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 6,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(getCellMathSql(rawSql)).toContain("floor(");
     expect(rawSql).toContain("ST_MakeEnvelope");
@@ -63,11 +69,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
 
   it("bins hexes by rounded axial coordinates", () => {
     const fixture = createGridBinLayerFixture({ grid: "hex" });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 6,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 6,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(getCellMathSql(rawSql)).toContain("sqrt(3)");
     expect(rawSql).toContain("ST_MakePolygon");
@@ -75,11 +83,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
 
   it("quotes a hostile point identifier in compiled bin SQL", () => {
     const fixture = createGridBinLayerFixture({ grid: "square" });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 3,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 3,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
     const hostileName = 'shape"; DROP TABLE maps; --';
     const quotedName = '"shape""; DROP TABLE maps; --"';
 
@@ -92,11 +102,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
       grid: "square",
       sourceCrs: 4258,
     });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 3,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 3,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain("TRY(ST_Transform(TRY(ST_GeomFromText");
     expect(rawSql).toContain("'EPSG:4258'");
@@ -104,11 +116,13 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
 
   it("suppresses below-threshold cells without any reportable count", () => {
     const fixture = createGridBinLayerFixture({ grid: "hex", minCellCount: 5 });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 6,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 6,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain("contributor_count < 5");
     expect(rawSql).toContain("THEN 'suppressed'");
@@ -122,27 +136,33 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
 
   it("suppresses nothing when the layer is not aggregate only", () => {
     const fixture = createGridBinLayerFixture({ grid: "square" });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 6,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 6,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain("contributor_count < 0");
   });
 
   it("keeps cell math identical while zoom changes cell simplification", () => {
     const fixture = createGridBinLayerFixture({ grid: "hex", minCellCount: 5 });
-    const lowZoom = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 4,
-      simplificationReferenceLatitude: 12.5,
-    }).rawSql;
-    const highZoom = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 12,
-      simplificationReferenceLatitude: 12.5,
-    }).rawSql;
+    const lowZoom = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 4,
+        simplificationReferenceLatitude: 12.5,
+      }),
+    ).rawSql;
+    const highZoom = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 12,
+        simplificationReferenceLatitude: 12.5,
+      }),
+    ).rawSql;
 
     expect(getCellMathSql(highZoom)).toEqual(getCellMathSql(lowZoom));
     expect(highZoom).not.toEqual(lowZoom);
@@ -153,18 +173,20 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
       grid: "square",
       minCellCount: 5,
     });
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer: fixture.layer,
-      metadata: {
-        ...fixture.metadata,
-        normalizationDenominator: {
-          type: "queryColumn",
-          columnName: "population",
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer: fixture.layer,
+        metadata: {
+          ...fixture.metadata,
+          normalizationDenominator: {
+            type: "queryColumn",
+            columnName: "population",
+          },
         },
-      },
-      zoomBand: 6,
-      simplificationReferenceLatitude: 0,
-    });
+        zoomBand: 6,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain(
       'sum("population") AS "__avandar_denominator"', // prettier-ignore
@@ -178,18 +200,39 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
     });
 
     expect(() => {
-      return compileMapLayerSpatialQuery({
-        layer: fixture.layer,
-        metadata: {
-          ...fixture.metadata,
-          normalizationDenominator: {
-            type: "boundaryColumn",
-            columnName: "population",
+      return compileMapLayerSpatialQuery(
+        withEmptyOverlay({
+          layer: fixture.layer,
+          metadata: {
+            ...fixture.metadata,
+            normalizationDenominator: {
+              type: "boundaryColumn",
+              columnName: "population",
+            },
           },
-        },
+          zoomBand: 6,
+          simplificationReferenceLatitude: 0,
+        }),
+      );
+    }).toThrow(/denominator/i);
+  });
+
+  it("intersects point_geometry with the aoi before binning", () => {
+    const fixture = createGridBinLayerFixture({ grid: "square" });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withAoiOverlay({
+        ...fixture,
         zoomBand: 6,
         simplificationReferenceLatitude: 0,
-      });
-    }).toThrow(/denominator/i);
+      }),
+    );
+
+    const pointIntersectIndex = rawSql.search(
+      /ST_Intersects\s*\(\s*point_geometry/,
+    );
+    const binnedIndex = rawSql.indexOf("binned_points AS (");
+    expect(pointIntersectIndex).toBeGreaterThanOrEqual(0);
+    expect(binnedIndex).toBeGreaterThan(pointIntersectIndex);
+    expect(rawSql).toContain('ST_Intersects("__avandar_geometry"');
   });
 });

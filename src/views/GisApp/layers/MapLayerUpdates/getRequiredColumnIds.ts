@@ -27,6 +27,9 @@ function _getGeoBindingColumnIds(
     .with({ type: "aggregatePointsToBoundaries" }, () => {
       return [];
     })
+    .with({ type: "bufferOfLayer" }, () => {
+      return [];
+    })
     .exhaustive();
 }
 
@@ -72,6 +75,7 @@ export function getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       : undefined,
       layer.symbology.type === "heatmap" ? layer.symbology.weight : undefined,
       ..._getColorColumnIds(color),
+      layer.timeColumn,
     ].filter(isDefined),
   );
 }

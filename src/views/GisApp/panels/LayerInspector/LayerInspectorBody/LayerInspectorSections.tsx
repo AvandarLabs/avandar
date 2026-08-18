@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
+  layers?: readonly MapLayer.T[];
   viewState: MapLayerViewState | undefined;
   onLayerChange: LayerChangeHandler;
   filterFocusRequest?: number;
@@ -20,9 +21,12 @@ type Props = {
   onOpenClassification: () => void;
 };
 
+const EMPTY_LAYERS: readonly MapLayer.T[] = [];
+
 /** Renders the inspector's stacked editing sections for a selected layer. */
 export function LayerInspectorSections({
   layer,
+  layers = EMPTY_LAYERS,
   viewState,
   onLayerChange,
   filterFocusRequest,
@@ -38,7 +42,11 @@ export function LayerInspectorSections({
           onOpenMatchReport={onOpenMatchReport}
         />
       </div>
-      <DataSection layer={layer} onLayerChange={onLayerChange} />
+      <DataSection
+        layer={layer}
+        layers={layers}
+        onLayerChange={onLayerChange}
+      />
       <StyleSection
         layer={layer}
         onLayerChange={onLayerChange}
@@ -49,6 +57,7 @@ export function LayerInspectorSections({
         layer={layer}
         onLayerChange={onLayerChange}
         focusRequest={filterFocusRequest}
+        showApplyAoiFilterSwitch={layer.geoBinding?.type !== "bufferOfLayer"}
       />
       <PopupSection layer={layer} onLayerChange={onLayerChange} />
       <LegendSection layer={layer} onLayerChange={onLayerChange} />

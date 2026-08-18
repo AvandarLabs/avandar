@@ -67,6 +67,16 @@ function withFilters(
   return { ...layer, source: { ...layer.source, filters } };
 }
 
+/** Sets whether the map AOI excludes this layer's features. */
+function _withApplyAoiFilter(
+  options: Readonly<{ layer: MapLayer.T; applyAoiFilter: boolean }>,
+): MapLayer.T {
+  const { layer, applyAoiFilter } = options;
+  return applyAoiFilter === layer.applyAoiFilter ?
+      layer
+    : { ...layer, applyAoiFilter };
+}
+
 /** Patches the layer's legend. */
 function withLegend(
   options: Readonly<{
@@ -107,6 +117,7 @@ export const layerMetaUpdates = {
   withManualBreaks,
   withSensitivity,
   withFilters,
+  withApplyAoiFilter: _withApplyAoiFilter,
   withLegend,
   withName,
   withVisibility,

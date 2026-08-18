@@ -1,6 +1,7 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
+import { LowConfidenceMatchCallout } from "@/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout";
 import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
@@ -20,30 +21,26 @@ export function CoordinateBindingStatus({
   hasCoordinateCandidates,
 }: Props): ReactNode {
   const { t } = useLingui();
-  if (isBound && guess) {
-    return (
-      <Callout>
-        {t`Latitude and longitude were matched from the column names ${guess.latitudeColumnName} and ${guess.longitudeColumnName}. Change them above if that is wrong.`}
-      </Callout>
-    );
-  }
-  if (hasCoordinateCandidates) {
-    return (
+  return (
+    isBound ?
+      guess?.confidence === "low" ?
+        <LowConfidenceMatchCallout
+          key={`${guess.latitudeColumnName}:${guess.longitudeColumnName}`}
+          guess={guess}
+        />
+      : null
+    : hasCoordinateCandidates ?
       <Callout color="warning">
         {t`Pick both a latitude and a longitude column. One on its own plots every point on a diagonal line, which looks like a result and is not.`}
       </Callout>
-    );
-  }
-  if (!layer.source.dataSource) {
-    return null;
-  }
-  return (
-    <Callout color="warning">
-      <Stack gap="xs">
-        <span>
-          {t`No column in ${layer.source.dataSource.name} holds coordinates. Boundary joins arrive in a later release, so pick a different source.`}
-        </span>
-      </Stack>
-    </Callout>
+    : layer.source.dataSource ?
+      <Callout color="warning">
+        <Stack gap="xs">
+          <span>
+            {t`No column in ${layer.source.dataSource.name} holds coordinates. Boundary joins arrive in a later release, so pick a different source.`}
+          </span>
+        </Stack>
+      </Callout>
+    : null
   );
 }

@@ -1,4 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { makeOutputAoiPredicateSql } from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
 import { makeNormalizedBoundaryKeyFromValueExpression } from "../makeNormalizedBoundaryKeyFromValueExpression/makeNormalizedBoundaryKeyFromValueExpression";
 import {
@@ -10,6 +11,7 @@ import {
   GEOMETRY_COLUMN,
 } from "./compileMapLayerSpatialQuery.constants";
 import {
+  getAppliedAoiFromCompileOptions,
   makeFamilyExpressionFromGeometrySql,
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
@@ -23,6 +25,7 @@ import type {
   CompileOptions,
   CompileSourceOptions,
 } from "./compileMapLayerSpatialQuery.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type BoundaryJoinBinding = Extract<
@@ -252,12 +255,18 @@ function _buildMatchDiagnostics(isAggregateOnly: boolean): string {
 function _buildBoundaryFeatureRowsCte(options: {
   geometry: string;
   denominator: string;
+  aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const properties = MapLayerSpatialFeatureProperties;
+  const outputAoiWhere =
+    options.aoi ?
+      `\n  WHERE ${makeOutputAoiPredicateSql(options.geometry, options.aoi)}`
+    : "";
   return `feature_rows AS (
   SELECT json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(${options.geometry})),
     'properties', json_object(
       '${properties.featureId}', boundary.boundary_feature_id,
+      '${properties.boundaryKey}', boundary.boundary_key,
       '${properties.boundaryName}', boundary.boundary_name,
       '${properties.state}', CASE WHEN area_values.boundary_feature_id IS NULL THEN 'noData' ELSE 'value' END,
       '${properties.value}', ${quoteSqlIdentifier(properties.value)},
@@ -265,7 +274,7 @@ function _buildBoundaryFeatureRowsCte(options: {
       '${properties.contributorCount}', ${quoteSqlIdentifier(properties.contributorCount)}
     )) AS feature
   FROM unambiguous_boundaries boundary
-  LEFT JOIN area_values USING (boundary_feature_id)
+  LEFT JOIN area_values USING (boundary_feature_id)${outputAoiWhere}
 )`;
 }
 
@@ -299,8 +308,9 @@ function _getJoinDenominatorSql(
 function _buildBoundaryJoinOutput(options: {
   isAggregateOnly: boolean;
   denominatorType: "queryColumn" | "boundaryColumn" | undefined;
+  aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
-  const { isAggregateOnly, denominatorType } = options;
+  const { isAggregateOnly, denominatorType, aoi } = options;
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
   const featureAlias = quoteSqlIdentifier(
     MapLayerSpatialQueryColumns.featureCollection,
@@ -314,6 +324,7 @@ function _buildBoundaryJoinOutput(options: {
 ${_buildBoundaryFeatureRowsCte({
   geometry,
   denominator: _getJoinDenominatorSql(denominatorType),
+  aoi,
 })},
 ${_buildBoundaryDiagnosticSummaryCte(geometry)}
 SELECT json_object('type', 'FeatureCollection',
@@ -342,6 +353,7 @@ export function compileBoundaryJoinQuery(
 ${_buildBoundaryJoinOutput({
   isAggregateOnly,
   denominatorType: options.metadata.normalizationDenominator?.type,
+  aoi: getAppliedAoiFromCompileOptions(options),
 })}`;
   return makeSpatialQueryPlan({
     compile: options,

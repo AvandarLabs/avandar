@@ -21,6 +21,8 @@ type Fixtures = {
   dataSource: QueryDataSource.T;
   latitudeColumn: QueryColumn.T;
   longitudeColumn: QueryColumn.T;
+  yColumn: QueryColumn.T;
+  xColumn: QueryColumn.T;
   nameColumn: QueryColumn.T;
   geometryColumn: QueryColumn.T;
   sourceColumns: QueryColumn.T[];
@@ -92,12 +94,16 @@ function _createNumericColumn(name: string): QueryColumn.T {
 export function createFixtures(): Fixtures {
   const latitudeColumn = _createNumericColumn("Lat");
   const longitudeColumn = _createNumericColumn("Long_");
+  const yColumn = _createNumericColumn("y");
+  const xColumn = _createNumericColumn("x");
   const nameColumn = _createNumericColumn("Name");
   const geometryColumn = _createNumericColumn("Geometry");
   return {
     dataSource: createDataset(),
     latitudeColumn,
     longitudeColumn,
+    yColumn,
+    xColumn,
     nameColumn,
     geometryColumn,
     sourceColumns: [latitudeColumn, longitudeColumn],
@@ -224,6 +230,23 @@ export function createBoundLayer(): MapLayer.Standard {
       type: "latLngColumns",
       latitude: fixtures.latitudeColumn.id,
       longitude: fixtures.longitudeColumn.id,
+    },
+  };
+}
+
+/** A bound layer whose coordinates were guessed from `y` and `x`. */
+export function createXyBoundLayer(): MapLayer.Standard {
+  return {
+    ...createLayer({
+      source: {
+        ...createLayer().source,
+        queryColumns: [fixtures.yColumn, fixtures.xColumn],
+      },
+    }),
+    geoBinding: {
+      type: "latLngColumns",
+      latitude: fixtures.yColumn.id,
+      longitude: fixtures.xColumn.id,
     },
   };
 }

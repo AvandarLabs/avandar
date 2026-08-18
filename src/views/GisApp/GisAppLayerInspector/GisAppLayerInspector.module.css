@@ -1,0 +1,7 @@
+.gisAppLayerInspectorEmptyState {
+  color: var(--mantine-color-dimmed);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-sm);
+  text-align: center;
+}

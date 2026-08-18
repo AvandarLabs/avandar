@@ -1,6 +1,6 @@
 import { MapTopBar } from "@/views/GisApp/shell/MapTopBar/MapTopBar";
 import { useGisAppTopBarActions } from "@/views/GisApp/useGisAppTopBarActions";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
 type Props = { app: GisAppState };

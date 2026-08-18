@@ -1,92 +1,93 @@
-import { msg } from "@lingui/core/macro";
+import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import {
-  IconCircleDashed,
-  IconPencil,
-  IconPointer,
-  IconRuler2,
-  IconSearch,
-  IconVector,
-} from "@tabler/icons-react";
-import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
-import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
-import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
-import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
-import type { I18n } from "@lingui/core";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { MapToolClusterToolbar } from "@/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar";
+import { MeasureReadout } from "@/views/GisApp/shell/MapToolCluster/MeasureReadout";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 
-type MapToolDefinition = {
-  key: string;
-  icon: ReactNode;
-  label: string;
-  reason: string;
+type Props = {
+  mapToolMode: MapToolMode;
+  onMapToolModeChange: (mode: MapToolMode) => void;
+  selectedLayer?: MapLayer.T;
+  updateConfig?: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;
+  measureVertices?: ReadonlyArray<[number, number]>;
+  layers?: readonly MapLayer.T[];
+  featureCollections?: ReadonlyMap<MapLayer.Id, GeoJSON.FeatureCollection>;
+  requestFitBounds?: (bounds: MapBounds) => void;
 };
 
-/** Returns the map tools that are currently unavailable. */
-function _getMapToolDefinitions(i18n: I18n): MapToolDefinition[] {
-  const unavailableReason = i18n._(msg`This tool is not available.`);
-  return [
-    {
-      key: "area",
-      icon: <IconVector size={17} stroke={1.6} />,
-      label: i18n._(msg`Draw an area to filter by`),
-      reason: unavailableReason,
-    },
-    {
-      key: "measure",
-      icon: <IconRuler2 size={17} stroke={1.6} />,
-      label: i18n._(msg`Measure distance and area`),
-      reason: unavailableReason,
-    },
-    {
-      key: "buffer",
-      icon: <IconCircleDashed size={17} stroke={1.6} />,
-      label: i18n._(msg`Buffer around a layer`),
-      reason: unavailableReason,
-    },
-    {
-      key: "annotate",
-      icon: <IconPencil size={17} stroke={1.6} />,
-      label: i18n._(msg`Annotate the map`),
-      reason: unavailableReason,
-    },
-  ];
+const EMPTY_MEASURE_VERTICES: ReadonlyArray<[number, number]> = [];
+
+function _insertBufferLayer(options: {
+  selectedLayer: MapLayer.T | undefined;
+  updateConfig: Props["updateConfig"];
+  name: string;
+  distanceMeters: number;
+  dissolve: boolean;
+}): void {
+  const { selectedLayer, updateConfig, name, distanceMeters, dissolve } =
+    options;
+  if (!selectedLayer || !updateConfig) {
+    return;
+  }
+  updateConfig((current) => {
+    return AvaMapConfig.withBufferLayerInserted({
+      config: current,
+      sourceLayerId: selectedLayer.id,
+      distanceMeters,
+      dissolve,
+      name,
+    });
+  });
+}
+
+function useBufferConfirmHandler(
+  selectedLayer: MapLayer.T | undefined,
+  updateConfig: Props["updateConfig"],
+): (options: { distanceMeters: number; dissolve: boolean }) => void {
+  const { t } = useLingui();
+  return ({ distanceMeters, dissolve }) => {
+    if (!selectedLayer) {
+      return;
+    }
+    const sourceName = selectedLayer.name;
+    _insertBufferLayer({
+      selectedLayer,
+      updateConfig,
+      name: t`Buffer of ${sourceName}`,
+      distanceMeters,
+      dissolve,
+    });
+  };
 }
 
 /** Renders the stable toolbar layout and its available tool states. */
-export function MapToolCluster(): ReactNode {
-  const { i18n } = useLingui();
-  const tools = _getMapToolDefinitions(i18n);
-  const unavailableReason = i18n._(msg`This tool is not available.`);
+export function MapToolCluster({
+  mapToolMode,
+  onMapToolModeChange,
+  selectedLayer,
+  updateConfig,
+  measureVertices = EMPTY_MEASURE_VERTICES,
+  layers,
+  featureCollections,
+  requestFitBounds = noop,
+}: Readonly<Props>): ReactNode {
+  const onBufferConfirm = useBufferConfirmHandler(selectedLayer, updateConfig);
   return (
-    <div
-      className={css.mapToolCluster}
-      id={GIS_SKIP_TARGET_IDS.toolCluster}
-      role="toolbar"
-      aria-label={i18n._(msg`Map tools`)}
-      tabIndex={-1}
-    >
-      <PanMapTool
-        label={i18n._(msg`Pan and select`)}
-        icon={<IconPointer size={17} stroke={1.6} />}
+    <>
+      <MeasureReadout vertices={measureVertices} />
+      <MapToolClusterToolbar
+        mapToolMode={mapToolMode}
+        onMapToolModeChange={onMapToolModeChange}
+        selectedLayer={selectedLayer}
+        onBufferConfirm={onBufferConfirm}
+        layers={layers}
+        featureCollections={featureCollections}
+        requestFitBounds={requestFitBounds}
       />
-      <span className={css.mapToolClusterSeparator} aria-hidden />
-      {tools.map((tool) => {
-        return (
-          <UnavailableMapTool
-            key={tool.key}
-            icon={tool.icon}
-            label={tool.label}
-            reason={tool.reason}
-          />
-        );
-      })}
-      <span className={css.mapToolClusterSeparator} aria-hidden />
-      <UnavailableMapTool
-        icon={<IconSearch size={17} stroke={1.6} />}
-        label={i18n._(msg`Go to a coordinate or P-code`)}
-        reason={unavailableReason}
-      />
-    </div>
+    </>
   );
 }

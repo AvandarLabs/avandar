@@ -116,6 +116,14 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     }).toThrow(/dynamic/i);
   });
 
+  it("treats json_each like unnest when exploding a UUID table's JSON", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT * FROM "${DATASET_ID}", json_each('{"features":[]}')`,
+      ),
+    ).toEqual([DATASET_ID]);
+  });
+
   it("rejects mutating statements and uninspectable table functions", () => {
     expect(() => {
       DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(

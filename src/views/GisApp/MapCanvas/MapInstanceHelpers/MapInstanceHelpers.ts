@@ -100,6 +100,9 @@ function _createMapClickHandler(
 ): (event: maplibregl.MapMouseEvent) => void {
   const { map, latestValues } = options;
   return (event) => {
+    if (latestValues.mapToolModeRef.current.type !== "pan") {
+      return;
+    }
     const layerIds = latestValues.interactiveLayerIdsRef.current.filter(
       (layerId) => {
         return map.getLayer(layerId);

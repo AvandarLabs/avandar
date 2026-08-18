@@ -3,9 +3,10 @@ import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapI
 import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useAttachMapInstance";
 import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";
-import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize";
+import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize/useMapWindowResize";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapFeatureClickHandler } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
@@ -37,6 +38,7 @@ type UseMapInstanceInput = {
   view: AvaMapConfig.ViewState;
   interactiveLayerIds: readonly string[];
   onFeatureClick: MapFeatureClickHandler;
+  mapToolMode: MapToolMode;
 };
 
 /** Presents the mutable refs and style counter as the hook's public result. */
@@ -69,6 +71,7 @@ export function useMapInstance({
   view,
   interactiveLayerIds,
   onFeatureClick,
+  mapToolMode,
 }: UseMapInstanceInput): MapInstance {
   const instanceRefs = useMapInstanceRefs();
   const { mapRef, appliedSpecRef, appliedStyleKeyRef, isStyleSwapPendingRef } =
@@ -79,6 +82,7 @@ export function useMapInstance({
     basemap,
     interactiveLayerIds,
     onFeatureClick,
+    mapToolMode,
   });
   useAttachMapInstance({
     containerRef,
@@ -88,7 +92,7 @@ export function useMapInstance({
     latestValues,
     setStyleLoadCount,
   });
-  useMapWindowResize(mapRef);
+  useMapWindowResize(mapRef, containerRef);
 
   return useMemo(() => {
     return _createMapInstanceResult({

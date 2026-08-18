@@ -296,7 +296,7 @@ msgstr "Maelezo ya Profaili"
 msgid "Upload Excel"
 msgstr "Pakia Excel"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "Go to a coordinate or P-code"
 msgstr "Nenda kwenye kiwianishi au P-code"
 
@@ -347,7 +347,7 @@ msgstr "Aina za safu zilizogundulika kwa {changedCount} safu katika "
 "\"{sourceFileName}\" zilitofautiana na muonekano wa kuagiza na "
 "zimeandikwa upya kwa thamani halisi."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "Jiometri"
 
@@ -391,6 +391,10 @@ msgstr "Mpangilio wa upau wa pembeni"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete failed"
 msgstr "Kufuta kumeshindwa"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+msgid "Dismiss"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
@@ -475,7 +479,7 @@ msgstr "Ongeza chati ya mistari inayoonyesha mwelekeo katika {datasetName} kwa "
 msgid "Show legend"
 msgstr "Onyesha ufafanuzi"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Pan and select"
 msgstr "Sogeza na uchague"
 
@@ -1123,7 +1127,7 @@ msgstr "Pikseli za maelezo za kuondoa katika ukuzaji wa sasa. Weka sifuri ili "
 msgid "Copied"
 msgstr "Imeandikwa"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
 msgstr "Pima umbali na eneo"
 
@@ -1245,9 +1249,14 @@ msgstr "Nakala iliyochapishwa bado inahudumia hadhira ya awali. Tumia kitufe "
 msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} m²"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Confirm"
 msgstr "Thibitisha"
 
@@ -1270,6 +1279,10 @@ msgstr "Mwombe mmiliki wa dashibodi akushirikishe."
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "Data fulani inapaswa kuja kutoka kwa seti za data zilizopo"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Start of time range: {startLabel}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -1469,7 +1482,7 @@ msgstr "Vichujio vya chati hii"
 msgid "Align"
 msgstr "Pangilia"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
 msgstr "Buffer kuzunguka tabaka"
 
@@ -1488,6 +1501,7 @@ msgstr "Uchunguzi umeshindikana."
 msgid "{code} - UTM south zone {0}"
 msgstr "{code} - ukanda wa kusini wa UTM {0}"
 
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "Shikilia Alt na ubonyeze kishale cha juu au chini ili kusogeza tabaka "
@@ -1584,6 +1598,10 @@ msgstr "Kitambulisho cha nafasi ya kazi lazima kiwe na urefu wa angalau herufi "
 msgid "Built-in presets"
 msgstr "Mipangilio iliyojengwa ndani"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Select a data layer to buffer."
+msgstr ""
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
@@ -1656,6 +1674,10 @@ msgstr "Pengo"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "Chagua chanzo cha data"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Opacity"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -1968,6 +1990,11 @@ msgstr "Pointi 1"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Kazi ya jumlisha isiyotumika \"{funcName}\" katika SELECT; imerukwa."
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+msgid "Annotations"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
 msgstr "Cluster na Heat zinahitaji binding kamili inayozalisha pointi."
@@ -2044,6 +2071,11 @@ msgstr "Sasisho la vizuizi limefeli"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
 msgstr "Kamili"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool is available when Spatial finishes loading."
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2256,6 +2288,7 @@ msgstr "Buni query ili kuunda picha hii."
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Select a column"
 msgstr "Chagua safu"
@@ -2494,6 +2527,10 @@ msgstr "Rangi ya mistari ya gridi"
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre, wachangiaji wa OpenStreetMap"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Delete annotation"
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
 msgstr "Chagua aina ya chati hapo juu ili kuisanidi."
@@ -2554,6 +2591,10 @@ msgstr "Hujachagua mhimili wa X"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "na pia ni sawa na..."
+
+#: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
+msgid "Apply area filter"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
@@ -2781,6 +2822,10 @@ msgstr "Imeachwa ikiwa imewashwa kwa ramani itakayochapishwa: msomaji hawezi "
 "vinginevyo kutofautisha eneo ambalo halikuripoti chochote na eneo "
 "lililoripoti sifuri."
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Bind geometry on the selected layer to buffer it."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "Onyesha nukta"
@@ -2873,10 +2918,6 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 msgstr "{0} safu zimebainishwa. Angalia taarifa za safu hapa chini ili "
 "kuhakikisha ni sahihi."
-
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
-msgid "This tool is not available."
-msgstr "Zana hii haipatikani."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -3130,6 +3171,11 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 "chenye orodha isiyo ya literal."
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Distance (meters)"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "Kiolezo cha URL"
@@ -3356,6 +3402,7 @@ msgstr "Hakuna mipango inapatikana."
 msgid "Try a different lookup"
 msgstr "Jaribu utafutaji tofauti"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr "Upana wa muhtasari"
@@ -3530,6 +3577,11 @@ msgstr "Hakuna faili iliyochaguliwa"
 msgid "Submit"
 msgstr "Wasilisha"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs DuckDB Spatial, which is unavailable."
+msgstr ""
+
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "dashibodi"
@@ -3597,6 +3649,10 @@ msgstr "Unda"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr "Upana wa mstari"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "End of time range: {endLabel}"
+msgstr ""
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3698,7 +3754,8 @@ msgstr "Endelea kwenye ofisi yako"
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
 msgstr "Weka maelezo kwenye ramani"
 
@@ -3834,6 +3891,10 @@ msgstr "Lebele, mfano. Mkoa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "Chagua faili"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} m"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -3982,6 +4043,10 @@ msgstr "Mpangilio wa eneo"
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "CTEs (vifungu vya WITH) havitumiki katika fomu."
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} km²"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "Haipatikani"
@@ -4071,6 +4136,7 @@ msgstr "Ungependa kubadilisha URL maalum?"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -4252,6 +4318,10 @@ msgstr "Hii itafuta kabisa <0>{0}</0> na data yake yote. Hatua hii haiwezi "
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "Imeshindikana kufungua tovuti ya malipo. Tafadhali jaribu tena baadaye."
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
+msgid "Time column"
+msgstr ""
+
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
@@ -4332,7 +4402,7 @@ msgstr " Bado haijachapishwa."
 msgid "Cancel URL change"
 msgstr "Ghairi mabadiliko ya URL"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 msgid "Draw an area to filter by"
 msgstr "Chora eneo la kuchuja kwa"
 
@@ -4348,7 +4418,7 @@ msgstr "Pata jumla ya thamani"
 msgid "Type your answer..."
 msgstr "Andika jibu lako..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns are available when Spatial finishes loading."
 msgstr "Safu wima za jiometri zinapatikana Spatial inapomaliza kupakia."
 
@@ -4430,6 +4500,10 @@ msgstr "Wakati"
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
 msgstr "Chati ya pau"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "That coordinate is out of range."
+msgstr "Kuratibu hiyo iko nje ya masafa yanayokubalika."
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureAction.tsx
 msgid "Open the record"
@@ -4622,7 +4696,7 @@ msgstr "Mpango wako wa sasa unakuruhusu tu kushiriki au kuchapisha {maxAllowed, 
 "plural, one {dashibodi #} other {dashibodi #}}. Boresha hadi mpango "
 "wetu wa Starter au Impact ili kushiriki dashibodi nyingi utakavyo."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
 msgstr "Unganisha na mipaka"
 
@@ -4638,6 +4712,14 @@ msgstr "Dashibodi imefutwa kwa mafanikio!"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "Jina unalotaka wanachama wengine wa timu waone."
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an arrow"
+msgstr ""
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "This tool arrives in a later release."
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -4722,6 +4804,10 @@ msgstr "Radiusi ya kundi"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Expand the inspector"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -4850,6 +4936,11 @@ msgid "We detected both potential personal information and language that may "
 msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha "
 "katika jibu la AI. Angalia zote hapa chini."
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
+"columns."
+msgstr ""
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
 msgstr "Inaonekana kwenye ukubwa huu wa skrini pekee."
@@ -4895,6 +4986,10 @@ msgstr "Kunja paneli ya pembeni"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "Kushiriki kumeshindwa"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "Measure readout"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -5159,6 +5254,10 @@ msgstr "Fungua upande wa sidebar"
 msgid "Upload dataset"
 msgstr "Pakia dataset"
 
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No matching P-code."
+msgstr "Hakuna P-code inayolingana."
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
@@ -5357,7 +5456,11 @@ msgstr "Ingia tena"
 msgid "Shared dashboard limit reached"
 msgstr "Kikomo cha dashibodi zilizoshirikiwa kimefikiwa"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+msgid "Buffer of {sourceName}"
+msgstr ""
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
 msgstr "Safu wima za jiometri zinahitaji DuckDB Spatial, ambayo haipatikani."
 
@@ -5400,6 +5503,10 @@ msgstr "Andika aya yako hapa..."
 msgid "Send message"
 msgstr "Tuma ujumbe"
 
+#: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
+msgid "Clear area filter"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
 msgstr "Imekopiwa!"
@@ -5435,9 +5542,17 @@ msgstr "Onyesha maeneo kamili?"
 msgid "Expand the layer panel"
 msgstr "Panua paneli ya safu"
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Place text"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "Safu"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Close a valid ring that does not cross itself."
+msgstr ""
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
@@ -5722,6 +5837,10 @@ msgstr "Usindikaji wa data umeshindwa"
 msgid "This feature is not implemented yet."
 msgstr "Kipengele hiki hakijatekelezwa bado."
 
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Time range"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
@@ -5876,7 +5995,7 @@ msgstr "Mipangilio ya chati huonekana baada ya hoja kurejesha baadhi ya safu."
 msgid "{0} areas are suppressed"
 msgstr "Maeneo {0} yamefichwa"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
 msgstr "Jumlisha pointi kulingana na mipaka"
 
@@ -6056,6 +6175,10 @@ msgstr "Punguza ufikiaji wa programu"
 msgid "Enter dataset name"
 msgstr "Ingiza jina la seti ya data"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Select an annotation on the map to edit it."
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
 msgstr "Latitudo au longitudo ni tupu"
@@ -6154,6 +6277,10 @@ msgstr "Uvumilivu wa kurahisisha"
 msgid "... and {remainingCount} more"
 msgstr "... na {remainingCount} zaidi"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Collapse the inspector"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "Tu kile kilichoulizwa"
@@ -6235,6 +6362,10 @@ msgstr "Hakuna safu za nambari"
 msgid "Service"
 msgstr "Huduma"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} km"
+msgstr ""
+
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "Hakuna kitu kingine cha kupakia"
@@ -6246,6 +6377,10 @@ msgstr "Imeshindikana kuweka kuwa ya faragha"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "Weka upya programu"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Play"
+msgstr ""
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6319,6 +6454,11 @@ msgstr "Hifadhi"
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr "Shiriki au chapisha {resourceLabel} hii"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Dissolve"
+msgstr ""
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6566,7 +6706,7 @@ msgstr "Inahifadhi"
 msgid "Role for new share"
 msgstr "Jukumu la kushiriki mpya"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "Zana za ramani"
 
@@ -6603,6 +6743,10 @@ msgstr "Kushoto"
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "Hakuna kati ya hapo juu"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "Isochrone from a point"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -6676,6 +6820,10 @@ msgstr "Tarehe ya kuchapishwa"
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
 msgstr "Ramani hii bado haina tabaka"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No boundary layer on this map to look up a P-code."
+msgstr "Hakuna safu ya mipaka kwenye ramani hii ya kutafuta P-code."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
@@ -6796,6 +6944,10 @@ msgstr "H2"
 msgid "Add a pull quote..."
 msgstr "Ongeza nukuu inayosisitiza..."
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw freehand"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
 msgstr "Kwa"
@@ -6842,7 +6994,7 @@ msgstr "Safu ya chanzo"
 msgid "Number of columns"
 msgstr "Idadi ya safu"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Latitude and longitude columns"
 msgstr "Safu wima za latitudo na longitudo"
@@ -7030,6 +7182,7 @@ msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
 msgstr "Chanzo"
@@ -7120,7 +7273,7 @@ msgstr "Inasawazisha dataset mtandaoni..."
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "Ongeza mfululizo kuchagua ni safu ipi ya nambari inayoendesha chati."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "Safu wima ya jiometri"
@@ -7201,7 +7354,7 @@ msgstr "Chagua preset ya eneo la kazi au ubinafsishe kwa kila programu. Vikundi 
 "vya watumiaji vinadhibiti muunganisho wa ufikiaji wa dataset na "
 "dashibodi."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "Panga katika gridi"
 
@@ -7801,6 +7954,10 @@ msgstr "Huru"
 msgid "Suppress areas below"
 msgstr "Kandamiza maeneo yaliyo chini ya"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Annotation text"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY inarejelea safu wima \"{columnName}\" ambayo haipo kwenye "
@@ -7822,6 +7979,10 @@ msgstr "Kuinua mpango hadi {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "Usemi wa SELECT wa aina \"{exprType}\" hautumiki na fomu."
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an annotation area"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

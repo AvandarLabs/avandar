@@ -4,6 +4,7 @@ import type {
   AreaAggregation as AreaAggregationType,
   AreaGeoBinding as AreaGeoBindingType,
   BoundarySourceRef as BoundarySourceRefType,
+  BufferOfLayerBinding as BufferOfLayerBindingType,
   GeoBindingColumnNames as GeoBindingColumnNamesType,
   GeoBinding as GeoBindingType,
   GeometryEncoding as GeometryEncodingType,
@@ -68,6 +69,7 @@ export namespace MapLayer {
   export type AreaGeoBinding = AreaGeoBindingType;
   export type PointBinding = PointBindingType;
   export type GridBinBinding = GridBinBindingType;
+  export type BufferOfLayerBinding = BufferOfLayerBindingType;
   export type BoundarySource = BoundarySourceRefType;
   export type GeometryEncoding = GeometryEncodingType;
   export type GeometryFamily = GeometryFamilyType;

@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T | undefined;
+  layers?: readonly MapLayer.T[];
   viewState: MapLayerViewState | undefined;
   onLayerChange: LayerChangeHandler;
   filterFocusRequest?: number;
@@ -20,6 +21,8 @@ type Props = {
   onOpenClassification: () => void;
   onCloseMatchReport: () => void;
 };
+
+const EMPTY_LAYERS: readonly MapLayer.T[] = [];
 
 function _shouldShowFocusedView(options: {
   inspectorView: LayerInspectorView;
@@ -37,6 +40,7 @@ function _shouldShowFocusedView(options: {
 /** Renders the selected layer's inspector sections. */
 export function LayerInspectorBody({
   layer,
+  layers = EMPTY_LAYERS,
   viewState,
   onLayerChange,
   filterFocusRequest,
@@ -67,6 +71,7 @@ export function LayerInspectorBody({
   return (
     <LayerInspectorSections
       layer={layer}
+      layers={layers}
       viewState={viewState}
       onLayerChange={onLayerChange}
       filterFocusRequest={filterFocusRequest}

@@ -1,0 +1,11 @@
+.canvasDrawerRoot {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.canvasDrawerRoot[data-chrome="true"] {
+  background: var(--ava-surface-body);
+  border-top: 1px solid var(--ava-border-default);
+}

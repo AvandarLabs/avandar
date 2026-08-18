@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { MapFurnitureBar } from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
 type Props = { app: GisAppState };
