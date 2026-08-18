@@ -3,6 +3,7 @@ import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import Dexie from "dexie";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   AvaDexieVersionManager,
@@ -18,13 +19,18 @@ const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
 const DATASET_A = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const DATASET_B = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 
+const WORKSPACE_ID = "44444444-4444-4444-8444-444444444444";
+const OTHER_WORKSPACE_ID = "55555555-5555-4555-8555-555555555555";
+const USER_ID = "66666666-6666-4666-8666-666666666666";
+const OTHER_USER_ID = "77777777-7777-4777-8777-777777777777";
+
 const WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
-  workspaceId: "workspace-1",
-  userId: "user-1",
+  workspaceId: WORKSPACE_ID,
+  userId: USER_ID,
 });
 const OTHER_WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
-  workspaceId: "workspace-2",
-  userId: "user-2",
+  workspaceId: OTHER_WORKSPACE_ID,
+  userId: OTHER_USER_ID,
 });
 const PUBLIC_PRINCIPAL = makePrincipalKeyFromPublicSession({
   bucket: "published",
@@ -347,6 +353,58 @@ describe("DexieRelationCache.evict", () => {
     const payloads = await db.RelationCachePayload.toArray();
     expect(payloads).toHaveLength(1);
     expect(payloads[0]!.identityKey).toBe(survivors[0]!.identityKey);
+  });
+
+  it("reads its candidates and deletes them inside one transaction, so a write can never land between the read and the delete", async () => {
+    // A revoked principal's cache entry must not survive eviction. If the
+    // candidate read and the delete ran in separate transactions, a `write`
+    // landing between them would create a row the read never saw, and that
+    // row would survive: revocation would stop being sticky. Reproducing
+    // that interleaving directly is not possible in this harness (Dexie and
+    // fake-indexeddb serialize same-realm operations, so there is no way to
+    // force a `write` to land in the gap between a bare read and a later
+    // transaction), so this asserts the structural property that closes the
+    // gap instead: the read and every delete run inside the very same
+    // Dexie transaction object.
+    await DexieRelationCache.write(_makeWrite());
+
+    const transactionsSeen: unknown[] = [];
+    const originalWhere = db.RelationCacheEntry.where.bind(
+      db.RelationCacheEntry,
+    );
+    const originalBulkDelete = db.RelationCacheEntry.bulkDelete.bind(
+      db.RelationCacheEntry,
+    );
+
+    const whereSpy = vi
+      .spyOn(db.RelationCacheEntry, "where")
+      .mockImplementation((index) => {
+        transactionsSeen.push(Dexie.currentTransaction);
+        return originalWhere(index);
+      });
+    const bulkDeleteSpy = vi
+      .spyOn(db.RelationCacheEntry, "bulkDelete")
+      .mockImplementation((keys) => {
+        transactionsSeen.push(Dexie.currentTransaction);
+        return originalBulkDelete(keys);
+      });
+
+    await DexieRelationCache.evict(
+      [{ kind: "dataset", id: DATASET_A }],
+      WORKSPACE_PRINCIPAL,
+    );
+
+    whereSpy.mockRestore();
+    bulkDeleteSpy.mockRestore();
+
+    // Both the read and the delete ran, and both saw a live transaction.
+    expect(transactionsSeen).toHaveLength(2);
+    transactionsSeen.forEach((transaction) => {
+      expect(transaction).toBeTruthy();
+    });
+    // ...and it was the *same* transaction both times, not two separate
+    // ones: that is what makes the read-then-delete atomic.
+    expect(new Set(transactionsSeen).size).toBe(1);
   });
 });
 

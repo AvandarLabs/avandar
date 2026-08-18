@@ -13,9 +13,13 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const OTHER_DATASET_ID = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 
+const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111";
+const OTHER_WORKSPACE_ID = "22222222-2222-4222-8222-222222222222";
+const USER_ID = "33333333-3333-4333-8333-333333333333";
+
 const WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
-  workspaceId: "workspace-1",
-  userId: "user-1",
+  workspaceId: WORKSPACE_ID,
+  userId: USER_ID,
 });
 
 function _makeIdentity(
@@ -34,10 +38,49 @@ describe("makePrincipalKeyFromWorkspaceSession", () => {
   it("builds the workspace principal form", () => {
     expect(
       makePrincipalKeyFromWorkspaceSession({
-        workspaceId: "ws1",
-        userId: "u1",
+        workspaceId: WORKSPACE_ID,
+        userId: USER_ID,
       }),
-    ).toBe("w:ws1:u1");
+    ).toBe(`w:${WORKSPACE_ID}:${USER_ID}`);
+  });
+
+  it("rejects a userId that could carry the ':' delimiter", () => {
+    expect(() => {
+      return makePrincipalKeyFromWorkspaceSession({
+        workspaceId: WORKSPACE_ID,
+        userId: "b:c",
+      });
+    }).toThrow();
+  });
+
+  it("rejects a workspaceId that could carry the ':' delimiter", () => {
+    expect(() => {
+      return makePrincipalKeyFromWorkspaceSession({
+        workspaceId: "a:b",
+        userId: USER_ID,
+      });
+    }).toThrow();
+  });
+
+  it("never lets two different (workspaceId, userId) pairs collide on one principal key", () => {
+    // Both embed raw with no delimiter check, `{ workspaceId: "a", userId:
+    // "b:c" }` and `{ workspaceId: "a:b", userId: "c" }` would otherwise both
+    // serialize to "w:a:b:c": two different principals sharing one cache
+    // key, which is the exact false hit this cache exists to prevent. The
+    // UUID assertion rejects both non-UUID pairs outright, so the collision
+    // can never be constructed.
+    expect(() => {
+      return makePrincipalKeyFromWorkspaceSession({
+        workspaceId: "a",
+        userId: "b:c",
+      });
+    }).toThrow();
+    expect(() => {
+      return makePrincipalKeyFromWorkspaceSession({
+        workspaceId: "a:b",
+        userId: "c",
+      });
+    }).toThrow();
   });
 });
 
@@ -88,8 +131,8 @@ describe("makeIdentityTokensFromIdentity", () => {
     const b = await makeIdentityTokensFromIdentity(
       _makeIdentity({
         principal: makePrincipalKeyFromWorkspaceSession({
-          workspaceId: "workspace-2",
-          userId: "user-1",
+          workspaceId: OTHER_WORKSPACE_ID,
+          userId: USER_ID,
         }),
       }),
     );

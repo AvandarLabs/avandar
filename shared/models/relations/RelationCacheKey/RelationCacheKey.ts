@@ -15,6 +15,22 @@ import type { SourceVersion } from "$/models/relations/RelationCapabilities/Rela
  */
 const SNAPSHOT_REVISION_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
+/**
+ * Matches a bare UUID, case-insensitively. `RelationRefModule.ts` defines
+ * the same pattern but does not export it, so this is a second copy rather
+ * than a shared one; keep the two in sync if either changes.
+ *
+ * `workspaceId` and `userId` are asserted against this before they are
+ * embedded raw in a workspace principal key: both are compile-time-only
+ * brands over `string` with no runtime validation elsewhere (`userId` is
+ * cast straight from `session.user.id`), so without this check a value
+ * containing `:` could make two different principals collide on one key,
+ * for example `{ workspaceId: "a", userId: "b:c" }` and
+ * `{ workspaceId: "a:b", userId: "c" }` both producing `"w:a:b:c"`.
+ */
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** The exact identity, resolved into the tokens `serves` compares by. */
 export type RelationCacheIdentityTokens = {
   principalKey: PrincipalKey;
@@ -66,11 +82,22 @@ async function _getDefinitionToken(
 
 /**
  * Builds the workspace-session principal key: `w:<workspaceId>:<userId>`.
+ *
+ * @throws if either component is not a bare UUID, which is what stops two
+ *   different principals from colliding on one key through a stray `:`.
  */
 export function makePrincipalKeyFromWorkspaceSession(params: {
   workspaceId: string;
   userId: string;
 }): PrincipalKey {
+  assert(
+    UUID_PATTERN.test(params.workspaceId),
+    `workspaceId "${params.workspaceId}" must be a UUID`,
+  );
+  assert(
+    UUID_PATTERN.test(params.userId),
+    `userId "${params.userId}" must be a UUID`,
+  );
   return `w:${params.workspaceId}:${params.userId}`;
 }
 

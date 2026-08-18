@@ -74,6 +74,27 @@ async function _getSupersededIdentityKeys(
     });
 }
 
+/**
+ * Deletes both rows for every identity key in `identityKeys`. Does **not**
+ * open its own transaction: every caller must already be running inside an
+ * `AvaDexie.DB.transaction("rw", RelationCacheEntry, RelationCachePayload,
+ * ...)` block, so the read that produced `identityKeys` and this delete
+ * commit atomically. That atomicity is what makes eviction (and revocation,
+ * which is built on it) stick: a `write` landing between the read and the
+ * delete would otherwise create a row the read never saw, and that row
+ * would survive.
+ */
+async function _bulkDeleteEntriesAndPayloads(
+  identityKeys: readonly string[],
+): Promise<void> {
+  if (identityKeys.length === 0) {
+    return;
+  }
+  const mutableKeys = [...identityKeys];
+  await AvaDexie.DB.RelationCacheEntry.bulkDelete(mutableKeys);
+  await AvaDexie.DB.RelationCachePayload.bulkDelete(mutableKeys);
+}
+
 async function _write(write: RelationCacheWrite): Promise<void> {
   const tokens = await makeIdentityTokensFromIdentity(write.identity);
   const now = Date.now();
@@ -99,10 +120,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
     AvaDexie.DB.RelationCachePayload,
     async () => {
       const supersededKeys = await _getSupersededIdentityKeys(entry);
-      if (supersededKeys.length > 0) {
-        await AvaDexie.DB.RelationCacheEntry.bulkDelete(supersededKeys);
-        await AvaDexie.DB.RelationCachePayload.bulkDelete(supersededKeys);
-      }
+      await _bulkDeleteEntriesAndPayloads(supersededKeys);
       await AvaDexie.DB.RelationCacheEntry.put(entry);
       await AvaDexie.DB.RelationCachePayload.put({
         identityKey: entry.identityKey,
@@ -118,24 +136,6 @@ async function _touch(identityKey: string): Promise<void> {
   });
 }
 
-async function _deleteEntriesAndPayloads(
-  identityKeys: readonly string[],
-): Promise<void> {
-  if (identityKeys.length === 0) {
-    return;
-  }
-  const mutableKeys = [...identityKeys];
-  await AvaDexie.DB.transaction(
-    "rw",
-    AvaDexie.DB.RelationCacheEntry,
-    AvaDexie.DB.RelationCachePayload,
-    async () => {
-      await AvaDexie.DB.RelationCacheEntry.bulkDelete(mutableKeys);
-      await AvaDexie.DB.RelationCachePayload.bulkDelete(mutableKeys);
-    },
-  );
-}
-
 async function _evict(
   refs: readonly RelationRef.T[],
   principal: PrincipalKey,
@@ -145,19 +145,33 @@ async function _evict(
       return RelationRef.toTableName(ref);
     }),
   );
-  const candidates = await AvaDexie.DB.RelationCacheEntry.where(
-    "principalKey",
-  )
-    .equals(principal)
-    .toArray();
-  const victimKeys = candidates
-    .filter((entry) => {
-      return tableNames.has(entry.tableName);
-    })
-    .map((entry) => {
-      return entry.identityKey;
-    });
-  await _deleteEntriesAndPayloads(victimKeys);
+  // The candidate read and the delete run in one transaction, the same way
+  // `_write` reads its superseded siblings and deletes them: atomicity here
+  // is what makes a revocation stick rather than just tidy bookkeeping. A
+  // `write` for this principal landing between a bare read and a separate
+  // delete transaction would create a row this scan never saw, and that row
+  // would survive the eviction, letting a revoked principal keep a live
+  // cache entry.
+  await AvaDexie.DB.transaction(
+    "rw",
+    AvaDexie.DB.RelationCacheEntry,
+    AvaDexie.DB.RelationCachePayload,
+    async () => {
+      const candidates = await AvaDexie.DB.RelationCacheEntry.where(
+        "principalKey",
+      )
+        .equals(principal)
+        .toArray();
+      const victimKeys = candidates
+        .filter((entry) => {
+          return tableNames.has(entry.tableName);
+        })
+        .map((entry) => {
+          return entry.identityKey;
+        });
+      await _bulkDeleteEntriesAndPayloads(victimKeys);
+    },
+  );
 }
 
 /**
@@ -194,11 +208,24 @@ function _selectEvictionVictims(
 }
 
 async function _evictToBudget(budgetBytes: number): Promise<void> {
-  const entries = await AvaDexie.DB.RelationCacheEntry.orderBy(
-    "lastQueriedAt",
-  ).toArray();
-  const victimKeys = _selectEvictionVictims(entries, budgetBytes);
-  await _deleteEntriesAndPayloads(victimKeys);
+  // Same atomicity rationale as `_evict`: reading the candidates and
+  // deleting them in one transaction keeps a concurrent write from landing
+  // in between. A miss here is benign on its own (the byte total can
+  // overshoot by one write until the next pass, a false miss in the safe
+  // direction), but leaving one eviction path atomic and this one not would
+  // read as though the gap were deliberate rather than an oversight.
+  await AvaDexie.DB.transaction(
+    "rw",
+    AvaDexie.DB.RelationCacheEntry,
+    AvaDexie.DB.RelationCachePayload,
+    async () => {
+      const entries = await AvaDexie.DB.RelationCacheEntry.orderBy(
+        "lastQueriedAt",
+      ).toArray();
+      const victimKeys = _selectEvictionVictims(entries, budgetBytes);
+      await _bulkDeleteEntriesAndPayloads(victimKeys);
+    },
+  );
 }
 
 /**
