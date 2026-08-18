@@ -1,9 +1,25 @@
 # PDF import: structured table extraction
 
-**Status:** design approved, not yet implemented
+**Status:** partly superseded; see below
 **Date:** 2026-08-17
 **Branch:** `feat/pdf-import`
 **Linear:** depends on AVA-317; defers AVA-316
+
+> **Partly superseded by
+> [`2026-08-18-pdf-region-extraction-design.md`](./2026-08-18-pdf-region-extraction-design.md).**
+>
+> Reading the two situation reports named as the v0 merge gate showed that
+> neither contains a single table, so the detector specified here would extract
+> nothing from either. Three items this spec listed as future phases (manual
+> region selection, qualitative extraction, and LLM-driven extraction) are now
+> v0 scope and are designed in that document.
+>
+> What remains authoritative here: the choice of `pdfjs-dist`, the in-browser
+> and in-worker architecture, the three detection signals, value normalisation
+> and DuckDB typing, storage and retention, and the general error handling. The
+> phase structure is restructured (see Phase restructure in the newer spec), and
+> the `datasets__pdf_file` columns described under Data model are reorganised
+> there.
 
 ## Summary
 
@@ -31,9 +47,13 @@ a parallel one.
 
 ## Non-goals for phase 1
 
-OCR, manual region selection, qualitative extraction, LLM-driven extraction,
-and creating several datasets from one file. All are recorded under
+OCR and creating several datasets from one file. Both are recorded under
 [Future phases](#future-phases).
+
+**Changed since this was written.** Manual region selection, qualitative
+extraction and LLM-driven extraction were non-goals here and are now v0 scope,
+designed in
+[`2026-08-18-pdf-region-extraction-design.md`](./2026-08-18-pdf-region-extraction-design.md).
 
 ## Decisions
 
@@ -352,13 +372,17 @@ Recorded here so the phase-1 boundary is deliberate rather than accidental.
 - **OCR for scanned documents.** Promoted to a first-class roadmap item:
   scanned documents are a confirmed part of the user corpus, and phase 1 can
   only diagnose them, not read them.
-- **Manual region selection.** Drag or nudge a rectangle. The `manual`
-  detection mode and the geometry-based source pointer already accommodate it.
+- ~~**Manual region selection.**~~ **Promoted to v0.** The `manual` detection
+  mode and the geometry-based source pointer accommodated it as intended.
 - **Page selection UI** beyond a simple range.
-- **Qualitative extraction.** Tag sentences or passages for extraction rather
-  than tabular cells.
-- **LLM-driven extraction.** Draw a region and prompt, for reports where the
-  statistics live in prose rather than a table.
+- ~~**Qualitative extraction.**~~ **Promoted to v0** as the repeating-blocks
+  and prose-measurement shapes.
+- ~~**LLM-driven extraction.**~~ **Promoted to v0**, as an opt-in assist behind
+  the existing consent gate rather than the primary path.
+- **Chart geometry reading.** Recovering values from an unlabelled plotted
+  series by calibrating vector path vertices against the axis scale. Identified
+  while reading the OCHA weekly trend chart and deliberately deferred, since
+  every result is an estimate.
 - **Multi-dataset creation** (AVA-316). One upload producing N datasets, which
   needs a new batched creation flow through `ManualUploadView`,
   `DatasetImportForm`, and `useSaveDataset`. Multi-sheet Excel workbooks get
