@@ -117,7 +117,19 @@ export type ScoredTable = {
 
 /** Why a single extracted value might be wrong, and how sure we are. */
 export type PdfCellFlag = {
+  /**
+   * Row this flag belongs to, indexed into the data rows (header rows
+   * excluded).
+   *
+   * **`-1` means the flag is region-level, not cell-level**, and both indices
+   * are then `-1`. That is how an extractor reports something true of the
+   * whole region rather than of one value: a number it found with no label
+   * near it, or a prose region where it read far fewer figures than the
+   * region contains. The review grid must render these as region-level notes
+   * and must not treat `-1` as a coordinate.
+   */
   rowIndex: number;
+  /** Column within the row, or `-1` for a region-level flag. */
   columnIndex: number;
   reason: "ambiguous_association" | "unmatched_label" | "unmatched_value";
   /** Free text shown next to the flagged cell in the review grid. */
