@@ -87,7 +87,6 @@ function _setCommandSuccess(
   });
 }
 
-
 function _expectDockerCommands(
   options: Readonly<{
     projectRoot: string;
