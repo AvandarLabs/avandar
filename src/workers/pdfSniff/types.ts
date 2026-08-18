@@ -60,6 +60,15 @@ export type CandidateTable = {
   cells: ReadonlyArray<readonly string[]>;
 };
 
+/** A run of text items sharing a baseline, in left-to-right order. */
+export type TextLine = {
+  /** Baseline y, in PDF points from the page's bottom. */
+  y: number;
+  items: readonly TextItem[];
+  /** The line's items joined with single spaces. */
+  text: string;
+};
+
 /** A candidate after page-span merging and scoring. */
 export type ScoredTable = {
   /** Page fragments in reading order. A single-page table has one. */
