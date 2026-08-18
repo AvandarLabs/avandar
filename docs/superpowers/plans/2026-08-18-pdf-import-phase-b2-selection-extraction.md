@@ -806,7 +806,29 @@ export type AssembledLabel = {
 
 - [ ] **Step 4: Write the implementation**
 
-Create `src/workers/pdfSniff/assembleLabels.ts`:
+**Correction, found during execution.** The union-find implementation below is
+wrong, and its own test suite catches it: "merges three fragments into one
+label" fails, producing `WEST NORTH` and `KORDOFAN` instead of one label.
+
+The reason is worth understanding, because it is a property of the problem
+rather than a typo. Union-find does a **single pairwise pass over the original
+items**. `WEST`'s centre is 112.5 and `NORTH`'s is 143; `KORDOFAN`'s is 125.
+Neither is within `STACKED_MAX_CENTRE_DELTA` (12) of `KORDOFAN` on its own, at
+12.5 and 18. But `WEST` and `NORTH` merge on the same line first, and the
+*merged* label's centre is 129, only 4 from `KORDOFAN`. A pairwise pass can
+never find that, because it never re-evaluates against merged geometry.
+
+**The shipped implementation is agglomerative instead**: it tracks clusters
+with a running bbox and mean baseline, and repeatedly finds and merges the
+first mergeable pair, recomputing cluster geometry after each merge, until no
+pair remains. See `src/workers/pdfSniff/assembleLabels.ts`.
+
+All four tuning constants are unchanged, and so are the two rules. The fix is
+procedural, not a relaxed tolerance. Do not "simplify" it back to a single
+pass.
+
+The code below is kept for the constants and the two merge rules, which are
+correct. Take the merge procedure from the shipped file.
 
 ```ts
 import type { AssembledLabel, BBox, TextItem } from "./types";
