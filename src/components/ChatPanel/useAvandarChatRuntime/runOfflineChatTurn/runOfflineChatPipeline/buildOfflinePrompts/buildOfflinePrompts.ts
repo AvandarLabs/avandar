@@ -29,22 +29,29 @@ const REFINEMENT_HINTS =
 function aliasesFromSchema(
   schema: OfflineChatSchema,
 ): readonly SqlTableAlias.T[] {
-  return SqlTableAlias.fromDatasets(schema.datasets);
+  return SqlTableAlias.fromSchema({
+    datasets: schema.datasets,
+    concepts: schema.concepts ?? [],
+  });
 }
 
 function aliasForDatasetId(
   datasetId: string,
   aliases: readonly SqlTableAlias.T[],
 ): string | undefined {
-  return aliases.find(propEq("datasetId", datasetId))?.alias;
+  const match = aliases.find((entry) => {
+    return entry.kind === "dataset" && entry.datasetId === datasetId;
+  });
+  return match?.alias;
 }
 
 function formatSchema(schema: OfflineChatSchema): string {
   const block = SqlTableAlias.formatSchemaBlock({
     aliases: aliasesFromSchema(schema),
     columns: schema.columns,
+    conceptAttributes: schema.conceptAttributes ?? [],
   });
-  return `Available datasets (SQL FROM must use the alias, never a label):\n${block}`;
+  return `Available datasets and concepts (SQL FROM must use the alias, never a label):\n${block}`;
 }
 
 function formatAllowedTablesList(schema: OfflineChatSchema): string {
@@ -83,7 +90,7 @@ function formatOpenDatasetHint(
 
 function formatOfflineSqlSchemaNotes(): string {
   return `Rules:
-- SQL FROM / JOIN targets must be the quoted aliases above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "t0").
+- SQL FROM / JOIN targets must be the quoted aliases above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "t0" or FROM "c0").
 - Do not invent datasets or system tables (pg_database, information_schema).
 - Use only column names listed next to each alias. Never invent columns.
 - Do not invent WHERE literal values unless the user named them.
@@ -134,7 +141,7 @@ ${formatSchema(args.schema)}
 User question:
 ${args.lastUserPrompt}
 
-Pick the dataset alias (t0, t1, …; not a label) you will use. Set proceed false if materially ambiguous.
+Pick the dataset or concept alias (t0, t1, … / c0, c1, …; not a label) you will use. Set proceed false if materially ambiguous.
 
 Respond with ONLY valid JSON (no markdown fence):
 {

@@ -26,6 +26,7 @@ export async function runChatAttemptsWithEscalation(
     lastUserPrompt: string;
     priorClarifications: number;
     datasets?: ReadonlyArray<{ id: string; name: string }>;
+    concepts?: ReadonlyArray<{ id: string; name: string }>;
   }>,
 ): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
   const {
@@ -35,6 +36,7 @@ export async function runChatAttemptsWithEscalation(
     lastUserPrompt,
     priorClarifications,
     datasets,
+    concepts,
   } = options;
 
   let attemptCount = 0;
@@ -53,6 +55,7 @@ export async function runChatAttemptsWithEscalation(
       lastUserPrompt,
       priorClarifications,
       datasets,
+      concepts,
     });
   };
 

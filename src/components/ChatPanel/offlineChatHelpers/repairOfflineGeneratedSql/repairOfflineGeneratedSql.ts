@@ -37,7 +37,13 @@ export type RepairOfflineGeneratedSqlResult = {
 function buildAllowedTableIdSet(
   schema: OfflineChatSchema,
 ): ReadonlySet<string> {
-  return new Set(schema.datasets.map(prop("id")));
+  const datasetIds = schema.datasets.map(prop("id"));
+  const conceptTableNames = SqlTableAlias.fromConcepts(
+    schema.concepts ?? [],
+  ).map((entry) => {
+    return entry.tableName;
+  });
+  return new Set([...datasetIds, ...conceptTableNames]);
 }
 
 function applyParseFailureHeuristics(
@@ -73,6 +79,7 @@ function remapTableInFromList(
   fromList: unknown,
   args: {
     datasets: OfflineChatSchema["datasets"];
+    concepts: OfflineChatSchema["concepts"];
     lastUserPrompt: string;
     preferredDatasetId?: string;
   },
@@ -92,6 +99,7 @@ function remapTableInFromList(
       datasets: args.datasets,
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
+      concepts: args.concepts ?? [],
     });
     if (matched && matched.id !== tableName) {
       item.table = matched.id;
@@ -113,6 +121,7 @@ function remapTablesInSelectAst(
   if (
     remapTableInFromList(ast.from, {
       datasets: args.schema.datasets,
+      concepts: args.schema.concepts,
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
     })
@@ -233,7 +242,10 @@ export function repairOfflineGeneratedSql(
 
   let sql = args.sql.trim();
 
-  const aliases = SqlTableAlias.fromDatasets(args.schema.datasets);
+  const aliases = SqlTableAlias.fromSchema({
+    datasets: args.schema.datasets,
+    concepts: args.schema.concepts ?? [],
+  });
   const sqlWithIds = SqlTableAlias.applyToSql(sql, aliases);
   if (sqlWithIds !== sql) {
     appliedSteps.push("apply_sql_table_aliases");

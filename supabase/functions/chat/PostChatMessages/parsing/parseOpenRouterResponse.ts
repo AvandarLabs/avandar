@@ -27,6 +27,7 @@ export function parseOpenRouterResponse(options: {
   lastUserPrompt: string;
   priorClarifications: number;
   datasets?: ReadonlyArray<{ id: string; name: string }>;
+  concepts?: ReadonlyArray<{ id: string; name: string }>;
 }): ParsedAttempt {
   const calls: OpenRouterToolCall[] = options.message?.tool_calls ?? [];
   let generatedSql: ChatResponse.GeneratedSql | undefined;
@@ -89,17 +90,19 @@ export function parseOpenRouterResponse(options: {
       dashboardBlock,
     },
     options.datasets ?? [],
+    options.concepts ?? [],
   );
 }
 
 function applySqlTableAliasesToParsedAttempt(
   parsed: ParsedAttempt,
   datasets: ReadonlyArray<{ id: string; name: string }>,
+  concepts: ReadonlyArray<{ id: string; name: string }>,
 ): ParsedAttempt {
-  if (datasets.length === 0) {
+  if (datasets.length === 0 && concepts.length === 0) {
     return parsed;
   }
-  const aliases = SqlTableAlias.fromDatasets(datasets);
+  const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
   const generatedSql =
     parsed.generatedSql ?
       {

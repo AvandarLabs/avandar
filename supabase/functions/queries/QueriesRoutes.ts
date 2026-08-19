@@ -1,43 +1,14 @@
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import { z } from "zod";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types.ts";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 if (!openaiApiKey) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
-}
-
-type QueryDataset = { id: string; name: string };
-type QueryColumn = { dataset_id: string; name: string; data_type: string };
-
-async function _fetchWorkspaceQuerySchema(args: {
-  supabaseClient: AvaSupabaseClient;
-  workspaceId: string;
-}): Promise<{ datasets: QueryDataset[]; columns: QueryColumn[] }> {
-  const { data: datasets } = await args.supabaseClient
-    .from("datasets")
-    .select("id, name")
-    .eq("workspace_id", args.workspaceId)
-    .throwOnError();
-  if (datasets.length === 0) {
-    return { datasets: [], columns: [] };
-  }
-  const { data: columns } = await args.supabaseClient
-    .from("dataset_columns")
-    .select("dataset_id, name, data_type")
-    .eq("workspace_id", args.workspaceId)
-    .in(
-      "dataset_id",
-      datasets.map((dataset) => {
-        return dataset.id;
-      }),
-    )
-    .throwOnError();
-  return { datasets, columns };
 }
 
 async function _requestGeneratedSql(args: {
@@ -71,13 +42,19 @@ async function _requestGeneratedSql(args: {
   return sql;
 }
 
-function _sqlWithDatasetIds(
+function _sqlWithRelationIds(
   sql: string,
-  datasets: readonly QueryDataset[],
+  schema: {
+    datasets: ReadonlyArray<{ id: string; name: string }>;
+    concepts: ReadonlyArray<{ id: string; name: string }>;
+  },
 ): string {
   return SqlTableAlias.applyToSql(
     cleanLlmGeneratedSql(sql),
-    SqlTableAlias.fromDatasets(datasets),
+    SqlTableAlias.fromSchema({
+      datasets: schema.datasets,
+      concepts: schema.concepts,
+    }),
   );
 }
 
@@ -99,15 +76,21 @@ export const QueriesRoutes = defineRoutes<QueriesAPI>("queries", {
       .action(async ({ queryParams, pathParams, supabaseClient }) => {
         const { workspaceId } = pathParams;
         const { prompt } = queryParams;
-        const { datasets, columns } = await _fetchWorkspaceQuerySchema({
+        const schema = await fetchWorkspaceSchema({
           supabaseClient,
           workspaceId,
         });
         const rawSql = await _requestGeneratedSql({
           prompt,
-          systemPrompt: buildSqlSystemPrompt({ prompt, datasets, columns }),
+          systemPrompt: buildSqlSystemPrompt({
+            prompt,
+            datasets: schema.datasets,
+            columns: schema.columns,
+            concepts: schema.concepts,
+            conceptAttributes: schema.conceptAttributes,
+          }),
         });
-        return { sql: _sqlWithDatasetIds(rawSql, datasets) };
+        return { sql: _sqlWithRelationIds(rawSql, schema) };
       }),
   },
 });
