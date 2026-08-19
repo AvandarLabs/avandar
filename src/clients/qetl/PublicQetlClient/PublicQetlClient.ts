@@ -177,6 +177,16 @@ export type IPublicQetlClient = Module<
 
 /**
  * Executes SQL only against the immutable snapshot committed by a dashboard.
+ *
+ * This path deliberately has no workspace membership check, unlike
+ * `WorkspaceQetlClient`. It is authorized structurally instead: the reachable
+ * dataset ids are exactly the ones `PublicDatasetParquetStorageClient` lists
+ * for the requested snapshot revision, `_getReferencedPublishedDatasetIds`
+ * intersects the SQL's table references with that list, and
+ * `assertPublicSnapshotDatasetOwners` rejects a table loaded by any other
+ * snapshot. A dataset outside the snapshot therefore yields nothing, so a
+ * membership check would add a second, parallel authorization mechanism
+ * without narrowing what this client can read.
  */
 export const PublicQetlClient = createModule("PublicQetlClient", {
   builder: () => {

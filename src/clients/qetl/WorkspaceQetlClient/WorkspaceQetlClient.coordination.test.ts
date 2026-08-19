@@ -9,21 +9,52 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
-const WORKSPACE_ID = "55555555-5555-4555-8555-555555555555" as Workspace.Id;
 
-const { datasetGetAllMock, dropTableViewAndFileMock } = vi.hoisted(() => {
+// `vi.mock` factories are hoisted above every other statement, so ids the
+// mocks need live here rather than in a plain `const`, which would be in its
+// temporal dead zone when a factory runs.
+const { datasetGetAllMock, dropTableViewAndFileMock, ids } = vi.hoisted(() => {
   return {
     datasetGetAllMock: vi.fn(),
     dropTableViewAndFileMock: vi.fn(),
+    ids: {
+      userId: "66666666-6666-4666-8666-666666666666",
+      workspaceId: "55555555-5555-4555-8555-555555555555",
+    },
   };
 });
+
+const WORKSPACE_ID = ids.workspaceId as Workspace.Id;
 
 vi.mock("@/clients/AuthClient/AuthClient", () => {
   return {
     AuthClient: {
       getCurrentSession: vi.fn(async () => {
-        return { user: { id: "66666666-6666-4666-8666-666666666666" } };
+        return { user: { id: ids.userId } };
       }),
+    },
+  };
+});
+
+vi.mock("@/clients/WorkspaceClient", () => {
+  return {
+    WorkspaceClient: {
+      QueryKeys: {
+        getWorkspacesOfCurrentUser: () => {
+          return ["Workspace", "getWorkspacesOfCurrentUser"];
+        },
+      },
+      withCache: () => {
+        return {
+          withFetchQuery: () => {
+            return {
+              getWorkspacesOfCurrentUser: async () => {
+                return [{ id: ids.workspaceId }];
+              },
+            };
+          },
+        };
+      },
     },
   };
 });

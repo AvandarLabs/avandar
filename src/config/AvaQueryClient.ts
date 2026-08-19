@@ -1,5 +1,6 @@
 import { getIsOnline } from "@avandar/browser-utils";
 import { QueryClient } from "@tanstack/react-query";
+import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { SessionExpiredError } from "$/ServerApiClient";
 
 const MINUTE_MS = 60 * 1000;
@@ -32,6 +33,12 @@ export const AvaQueryClient = new QueryClient({
       // once and gave up, so a retry would just repeat a failing 401.
       retry: (failureCount: number, error: unknown) => {
         if (error instanceof SessionExpiredError) {
+          return false;
+        }
+        // An authorization refusal is a decision, not a fault. Retrying it
+        // repeats the same membership read and reaches the same answer, so it
+        // only delays the error the caller is waiting on.
+        if (error instanceof WorkspaceMembershipDenied) {
           return false;
         }
         return getIsOnline() ? failureCount < 1 : false;

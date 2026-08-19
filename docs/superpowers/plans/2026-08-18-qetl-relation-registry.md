@@ -1799,7 +1799,7 @@ git mv PublicQetlClient PublicQuerySession
 | `WorkspaceQetlClient` | `WorkspaceQuerySession` |
 | `PublicQetlClient` | `PublicQuerySession` |
 | `getDiceExtractors` | `getRelationSources` |
-| `getMissingDice` | `probeRelationCache` |
+| `getMissingDice` | **`getRelationsNotInMemory`** |
 | `getDiceFromSql` | **`getQueryDependencies`** |
 | `DiceExtractor` | `RelationSource` |
 | `ExtractedFact` | `AcquiredRelationBytes` |

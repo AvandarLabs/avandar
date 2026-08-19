@@ -1,10 +1,10 @@
 import { createModule } from "@avandar/modules";
 import { prop, where } from "@avandar/utils";
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
 import { QetlClientFactory } from "@/clients/qetl/QetlClient/QetlClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
@@ -166,17 +166,13 @@ export const WorkspaceQetlClient = createModule("WorkspaceQetlClient", {
         returnType?: "js" | "parquet";
         signal?: AbortSignal;
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
-        const session = await AuthClient.getCurrentSession();
-        if (!session?.user) {
-          throw new Error(
-            "Cannot run query because user is not authenticated.",
-          );
-        }
+        // The assertion owns the session read and hands back the principal it
+        // verified, so a query costs one session read rather than two. That
+        // read is a keychain IPC round trip on desktop, and column summaries
+        // issue several queries per column.
+        const userId = await assertWorkspaceMembership({ workspaceId });
 
-        const client = await getClient({
-          workspaceId,
-          userId: session.user.id as UserId,
-        });
+        const client = await getClient({ workspaceId, userId });
 
         if (returnType === "parquet") {
           return await client.runQuery({

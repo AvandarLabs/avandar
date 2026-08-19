@@ -11,7 +11,7 @@
 }
 
 .clusterFeatureTablePagination {
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   display: flex;
   justify-content: center;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
 }

@@ -519,14 +519,24 @@ section 9 exist**.
 |---|---|
 | `QetlClient` | `QueryMediator` |
 | `WorkspaceQetlClient`, `PublicQetlClient` | `WorkspaceQuerySession`, `PublicQuerySession` |
-| `getDiceExtractors` (`qetlDiceExtractors.ts:138`) | `extractReferencedRelations` |
-| `getMissingDice` (`qetlDiceExtractors.ts:31`) | `probeRelationCache` |
-| `qetlDiceExtractors.ts` | `relationResolution.ts` |
+| `getDiceExtractors` (`qetlDiceExtractors.ts:138`) | `getRelationSources` |
+| `getMissingDice` (`qetlDiceExtractors.ts:31`) | `getRelationsNotInMemory` |
+| `qetlDiceExtractors.ts` | `getRelationSources.ts` |
 | `qetlFactLoading.ts` | `relationLoading.ts` |
 | `EtlService.prepareFacts` | deleted (identity function) |
 | "facts" | "rows" |
 | "memory cube" | `QueryableRelationCache` (spec 2 builds it) |
 | "storage cube" | `StorageRelationCache` (spec 2 builds it) |
+
+**`probe` is reserved for `RelationCachePort`. Nothing else may be a probe.**
+The first pass at this table renamed `getMissingDice` to `probeRelationCache`,
+which collided with `RelationCachePort.probe()`: two functions named for probing
+the relation cache, at two different tiers, one eventually calling the other.
+`getMissingDice` returns the relations that were missing, so it is a `get...`
+returning a list, and `getRelationsNotInMemory` says which tier it consulted
+without borrowing the word. This is the same collision as `getDiceFromSql`, which
+became `getQueryDependencies` rather than `extractReferencedRelations` for the
+same reason.
 
 Why the vocabulary goes, in one sentence: a *dice* is a multidimensional interval
 of coordinates, and `getDiceFromSql` returns dataset ids found by substring
