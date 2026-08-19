@@ -66,6 +66,7 @@ button {
   /* z-indexes */
   --mantine-z-index-app-shell-main: ;
   --mantine-z-index-app-chrome: ;
+  --mantine-z-index-floating-panel: ;
   --mantine-z-index-modal: ;
 
   /* other colors */
@@ -76,10 +77,14 @@ button {
   /* animation presets */
   --ava-animation-duration-ooze-in: ;
   --ava-animation-duration-swipe-out: ;
+  --ava-animation-duration-pop-in: ;
   --ava-animation-duration-reduced: ;
   --ava-animation-easing-spring: ;
   --ava-animation-easing-swipe-out: ;
+  --ava-animation-easing-pop: ;
   --ava-animate-swipe-translate-x: ;
+  --ava-animate-pop-in-from-transform: ;
+  --ava-animate-pop-in-from-filter: ;
   --ava-animate-origin-x: ;
   --ava-animate-origin-y: ;
 }

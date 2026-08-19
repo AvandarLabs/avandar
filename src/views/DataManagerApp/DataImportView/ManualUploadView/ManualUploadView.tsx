@@ -3,6 +3,8 @@ import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
@@ -71,7 +73,10 @@ function _ManualUploadImportForm(
         setDataSourceMetadata(metadata);
       }}
       isProcessing={isReparsePending}
-      onAfterSave={onAfterSave}
+      onAfterSave={(savedDataset) => {
+        NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
+        onAfterSave?.();
+      }}
       onRequestDataReparse={onRequestDataReparse}
     />
   );
@@ -93,20 +98,24 @@ export function ManualUploadView({
   return (
     <Box {...boxProps}>
       <Stack align="flex-start">
-        <FileUploadForm
-          label={t`Upload a file`}
-          description={t`Select an Excel, CSV or PDF file from your computer to import`}
-          placeholder={t`Select file`}
-          accept={[
-            MIMEType.TEXT_CSV,
-            MIMEType.APPLICATION_MS_EXCEL,
-            MIMEType.APPLICATION_OPENXML_EXCEL,
-            MIMEType.APPLICATION_PDF,
-          ]}
-          fullWidth
-          isSubmitting={manualUpload.isLoadingFile && previewRows === undefined}
-          onSubmit={manualUpload.onFileSubmit}
-        />
+        <Box {...NuxAnchors.props(NuxAnchors.ids.datasetUploadForm)}>
+          <FileUploadForm
+            label={t`Upload a file`}
+            description={t`Select an Excel, CSV or PDF file from your computer to import`}
+            placeholder={t`Select file`}
+            accept={[
+              MIMEType.TEXT_CSV,
+              MIMEType.APPLICATION_MS_EXCEL,
+              MIMEType.APPLICATION_OPENXML_EXCEL,
+              MIMEType.APPLICATION_PDF,
+            ]}
+            fullWidth
+            isSubmitting={
+              manualUpload.isLoadingFile && previewRows === undefined
+            }
+            onSubmit={manualUpload.onFileSubmit}
+          />
+        </Box>
         {previewRows && uploadedFile && dataSourceMetadata ?
           <_ManualUploadImportForm
             uploadedFile={uploadedFile}

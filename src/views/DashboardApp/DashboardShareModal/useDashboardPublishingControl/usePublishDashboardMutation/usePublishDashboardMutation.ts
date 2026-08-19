@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -43,6 +44,11 @@ export function usePublishDashboardMutation(
         workspaceId: updatedDashboard.workspaceId,
         app: "dashboards",
       });
+      if (currentDashboard.visibility === "draft") {
+        NuxEvents.emit("dashboard.published", {
+          dashboardId: updatedDashboard.id,
+        });
+      }
       onPublished(updatedDashboard);
     },
     onError: (error: Error) => {

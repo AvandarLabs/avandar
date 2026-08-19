@@ -1383,6 +1383,39 @@ export type Database = {
           },
         ]
       }
+      user_nux_progress: {
+        Row: {
+          catch_up_suppressed: boolean
+          completed_milestones: string[]
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["nux_status"]
+          tutorial_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          catch_up_suppressed?: boolean
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          catch_up_suppressed?: boolean
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string
@@ -2127,6 +2160,7 @@ export type Database = {
         | "open_data"
         | "xlsx_file"
         | "pdf_file"
+      nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2377,6 +2411,7 @@ export const Constants = {
         "xlsx_file",
         "pdf_file",
       ],
+      nux_status: ["not_started", "in_progress", "completed", "dismissed"],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],

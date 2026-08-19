@@ -1,0 +1,48 @@
+.nuxCompletionBurst {
+  inset: -1.75rem;
+  pointer-events: none;
+  position: absolute;
+}
+
+.nuxCompletionBurstParticle {
+  animation: nux-completion-burst 720ms var(--ava-animation-easing-out) both;
+  animation-delay: var(--burst-delay);
+  background: var(--burst-tone);
+  border-radius: 999px;
+  height: 0.42rem;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--burst-angle)) translateY(0);
+  width: 0.42rem;
+}
+
+.nuxCompletionBurstSpark {
+  border-radius: 2px;
+  height: 0.72rem;
+  width: 0.16rem;
+}
+
+@keyframes nux-completion-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--burst-angle)) translateY(0)
+      scale(0.4);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--burst-angle))
+      translateY(-2.9rem) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nuxCompletionBurst {
+    display: none;
+  }
+}

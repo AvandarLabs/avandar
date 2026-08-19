@@ -7,6 +7,7 @@ import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
+import { NuxOpenChatPanelEffect } from "@/components/Nux/NuxTour/useNuxOpenChatPanel/NuxOpenChatPanelEffect";
 import css from "./ChatPanel.module.css";
 
 /**
@@ -24,22 +25,25 @@ export function ChatPanel(): React.ReactNode {
     context.app !== "data-explorer" && context.app !== "dashboards";
 
   return (
-    <Box h="100%" py="xs" pr="xs">
-      <Stack
-        h="100%"
-        bdrs="md"
-        className={clsx(css.shell, disabled && css.chatPanelShellDisabled)}
-        gap={0}
-      >
-        <ChatPanelHeader
-          onNewChatClick={startNewChat}
-          onClose={dispatch.close}
-        />
-        <AssistantRuntimeProvider runtime={runtime}>
-          <ChatViewTranscriptSync />
-          <ChatThread />
-        </AssistantRuntimeProvider>
-      </Stack>
-    </Box>
+    <>
+      <NuxOpenChatPanelEffect />
+      <Box h="100%" py="xs" pr="xs">
+        <Stack
+          h="100%"
+          bdrs="md"
+          className={clsx(css.shell, disabled && css.chatPanelShellDisabled)}
+          gap={0}
+        >
+          <ChatPanelHeader
+            onNewChatClick={startNewChat}
+            onClose={dispatch.close}
+          />
+          <AssistantRuntimeProvider runtime={runtime}>
+            <ChatViewTranscriptSync />
+            <ChatThread />
+          </AssistantRuntimeProvider>
+        </Stack>
+      </Box>
+    </>
   );
 }

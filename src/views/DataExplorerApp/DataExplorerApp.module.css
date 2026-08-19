@@ -1,0 +1,14 @@
+/*
+ * Thin strip at the top of the chart. The canvas itself is viewport-tall, so
+ * a tooltip anchored to it with `bottom` placement still clips; this hook is
+ * the laid-out target Joyride parks against while the spotlight covers the
+ * full canvas.
+ */
+.canvasTooltipAnchor {
+  height: 8px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}

@@ -1,8 +1,9 @@
 import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button } from "@mantine/core";
+import { Box, Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
 import type { ButtonProps } from "@mantine/core";
@@ -76,35 +77,41 @@ export function DashboardShareButton({
   const isPublished =
     dashboard !== undefined && dashboard.visibility !== "draft";
   return (
-    <Tooltip label={tooltip}>
-      <Button
-        size={size}
-        variant={isPublished ? "filled" : "default"}
-        color={
-          isPublished ?
-            dashboard.visibility === "public" ?
-              "orange"
-            : "teal"
-          : undefined
-        }
-        leftSection={<IconShare size={16} />}
-        data-disabled={isDisabled || undefined}
-        aria-disabled={isDisabled || undefined}
-        onClick={(event) => {
-          if (!dashboard || isDisabled) {
-            event.preventDefault();
-            return;
+    <Box
+      component="span"
+      display="inline-flex"
+      {...NuxAnchors.props(NuxAnchors.ids.dashboardShareButton)}
+    >
+      <Tooltip label={tooltip}>
+        <Button
+          size={size}
+          variant={isPublished ? "filled" : "default"}
+          color={
+            isPublished ?
+              dashboard.visibility === "public" ?
+                "orange"
+              : "teal"
+            : undefined
           }
-          const resourceName = dashboard.name;
-          _openDashboardShareModal({
-            dashboard,
-            hasUnsavedChanges,
-            title: t`Share “${resourceName}”`,
-          });
-        }}
-      >
-        <Trans>Share</Trans>
-      </Button>
-    </Tooltip>
+          leftSection={<IconShare size={16} />}
+          data-disabled={isDisabled || undefined}
+          aria-disabled={isDisabled || undefined}
+          onClick={(event) => {
+            if (!dashboard || isDisabled) {
+              event.preventDefault();
+              return;
+            }
+            const resourceName = dashboard.name;
+            _openDashboardShareModal({
+              dashboard,
+              hasUnsavedChanges,
+              title: t`Share “${resourceName}”`,
+            });
+          }}
+        >
+          <Trans>Share</Trans>
+        </Button>
+      </Tooltip>
+    </Box>
   );
 }

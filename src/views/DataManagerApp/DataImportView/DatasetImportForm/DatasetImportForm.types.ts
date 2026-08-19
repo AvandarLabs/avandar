@@ -140,8 +140,11 @@ export type DatasetImportFormProps = {
    * Optional callback fired after the dataset is saved successfully.
    * Used by the app-wide import modal to close itself before the
    * default post-save navigation runs.
+   *
+   * Receives the dataset that was just saved. Callers that do not need it can
+   * declare no parameters.
    */
-  onAfterSave?: () => void;
+  onAfterSave?: (savedDataset: Dataset.T) => void;
 
   /**
    * If set, this callback is invoked with the saved dataset instead of

@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useMemo } from "react";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { DatasetImportFeedback } from "./DatasetImportFeedback/DatasetImportFeedback";
 import { DatasetImportFields } from "./DatasetImportFields";
@@ -126,7 +127,10 @@ export function DatasetImportForm({
   });
 
   return (
-    <form onSubmit={state.onSubmit}>
+    <form
+      {...NuxAnchors.props(NuxAnchors.ids.datasetImportForm)}
+      onSubmit={state.onSubmit}
+    >
       <Stack>
         <DatasetImportFields {...state.fieldProps} />
         <DatasetImportFeedback {...state.feedbackProps} />

@@ -31,7 +31,7 @@ function _makeHeadlineAdvice(
     report.isExpectedForBranch ? undefined
     : report.isSwitched ?
       "   Run `ava supabase restore` to put $branch$ back on the shared stack."
-    : "   Every unswitched worktree writes to this database. Run `ava supabase switch <project-id>` to isolate this branch."
+    : "   Every unswitched worktree writes to this database. Run `ava supabase switch` to isolate this branch."
   );
 }
 

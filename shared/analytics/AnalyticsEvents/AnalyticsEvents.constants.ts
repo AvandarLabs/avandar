@@ -28,6 +28,11 @@ export const CLIENT_ANALYTICS_EVENT_NAMES = [
   "dashboard.pdf_exported",
   "chat.message_sent",
   "chat.sql_generated",
+  "nux.started",
+  "nux.milestone_completed",
+  "nux.dismissed",
+  "nux.completed",
+  "nux.restarted",
 ] as const;
 
 /**

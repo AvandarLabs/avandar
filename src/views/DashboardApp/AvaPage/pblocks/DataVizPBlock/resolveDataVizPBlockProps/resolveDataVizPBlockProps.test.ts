@@ -120,4 +120,35 @@ describe("resolveDataVizPBlockProps", () => {
       expect(next.vizConfig.series[0]?.renderAs).toBe("line");
     }
   });
+
+  it("does not rewrite persisted props on Puck's load pass", () => {
+    const props: Partial<DataVizPBlockProps> = {
+      nlQuery: { prompt: "p", rawSql: "s", generations: [] },
+      vizType: "table",
+      vizConfig: { vizType: "table" },
+    };
+    const next = resolveDataVizPBlockProps({
+      props,
+      changed: { vizType: true, vizConfig: true, nlQuery: true },
+      trigger: "load",
+    });
+    expect(next).toBe(props);
+    expect(next).not.toHaveProperty("globalFilterSubscription");
+    expect(next).not.toHaveProperty("localFilters");
+  });
+
+  it("does not convert vizConfig on load even when vizType disagrees", () => {
+    const props: Partial<DataVizPBlockProps> = {
+      nlQuery: { prompt: "", rawSql: "", generations: [] },
+      vizType: "bar",
+      vizConfig: { vizType: "table" },
+    };
+    const next = resolveDataVizPBlockProps({
+      props,
+      changed: { vizType: true },
+      trigger: "load",
+    });
+    expect(next.vizConfig).toEqual({ vizType: "table" });
+    expect(next.vizType).toBe("bar");
+  });
 });

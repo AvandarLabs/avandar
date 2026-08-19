@@ -17,6 +17,10 @@ describe("PublishingActions", () => {
     expect(
       screen.getByRole("button", { name: "Publish to workspace" }),
     ).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Publish to workspace" })
+        .parentElement,
+    ).toHaveAttribute("data-nux", "dashboard-publish-button");
   });
 
   it("labels a downgrade as making the dashboard internal", () => {

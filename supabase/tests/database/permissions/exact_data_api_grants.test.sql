@@ -34,7 +34,8 @@ with public_tables as (
       'catalog_entries__open_data',
       'subscriptions',
       'usage_analytics_events',
-      'user_group_memberships'
+      'user_group_memberships',
+      'user_nux_progress'
     )
 ), expected_table_privileges as (
   select
@@ -77,6 +78,14 @@ with public_tables as (
     false
   from
     unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
+  union all
+  select
+    'user_nux_progress',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
   union all
   select
     'dashboards',

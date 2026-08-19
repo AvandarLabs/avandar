@@ -180,6 +180,7 @@
     "qrcode": "^1.5.4",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-joyride": "3.2.0",
     "react-querybuilder": "^8.16.1",
     "react-syntax-highlighter": "^16.1.1",
     "recharts": "^3.8.1",

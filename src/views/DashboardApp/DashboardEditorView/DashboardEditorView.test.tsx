@@ -32,7 +32,7 @@ vi.mock("@puckeditor/core/puck.css", () => {
 });
 
 vi.mock("@puckeditor/core", async () => {
-  const { createElement } = await import("react");
+  const { createElement, useEffect } = await import("react");
 
   type PuckProps = {
     data: { content: unknown[]; root: { props: Record<string, unknown> } };
@@ -41,6 +41,17 @@ vi.mock("@puckeditor/core", async () => {
   };
 
   function PuckMock({ data, onChange, overrides }: PuckProps): ReactElement {
+    useEffect(() => {
+      onChange({
+        ...data,
+        content: [...data.content],
+        root: { ...data.root, props: { ...data.root.props } },
+      });
+      // Puck's load resolve fires once after mount, not on every data identity
+      // change. Matching that keeps this mock from looping.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only echo
+    }, []);
+
     return createElement(
       "div",
       { "data-testid": "puck-mock" },
@@ -343,6 +354,42 @@ describe("DashboardEditorView", () => {
     expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
       "data-has-unsaved-changes",
       "false",
+    );
+  });
+});
+
+function EditorRevisionProbe(): ReactNode {
+  const { editorRevision } = DashboardEditorStateManager.useState();
+  return <span data-testid="editor-revision">{String(editorRevision)}</span>;
+}
+
+describe("DashboardEditorView Puck remount", () => {
+  it("does not remount Puck when the dashboard record is a new object with the same id", () => {
+    const dashboard = _makeDashboard();
+    const { rerender } = renderWithProviders(
+      <>
+        <EditorRevisionProbe />
+        <DashboardEditorView
+          dashboard={dashboard}
+          workspaceSlug="test-workspace"
+        />
+      </>,
+    );
+    const revisionAfterMount =
+      screen.getByTestId("editor-revision").textContent;
+
+    rerender(
+      <>
+        <EditorRevisionProbe />
+        <DashboardEditorView
+          dashboard={{ ...dashboard }}
+          workspaceSlug="test-workspace"
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId("editor-revision")).toHaveTextContent(
+      revisionAfterMount ?? "",
     );
   });
 });

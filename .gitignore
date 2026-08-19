@@ -87,6 +87,9 @@ worktrees/
 # Difit session comments
 .difit/
 
+# Superpowers brainstorm mockups (local visual companion)
+.superpowers/
+
 # Temporary working files
 .temp/
 
