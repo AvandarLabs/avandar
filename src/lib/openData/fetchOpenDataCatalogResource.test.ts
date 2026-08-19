@@ -32,8 +32,7 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 function _session(accessToken: string | undefined) {
   return {
     data: {
-      session:
-        accessToken === undefined ? null : { access_token: accessToken },
+      session: accessToken === undefined ? null : { access_token: accessToken },
     },
   };
 }

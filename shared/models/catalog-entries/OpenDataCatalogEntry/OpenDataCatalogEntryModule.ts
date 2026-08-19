@@ -20,7 +20,12 @@ function _pipelineAccess(
   ) {
     return undefined;
   }
-  return { kind: "pipeline_parquet", parquetFileName, pipelineName, pipelineRunId };
+  return {
+    kind: "pipeline_parquet",
+    parquetFileName,
+    pipelineName,
+    pipelineRunId,
+  };
 }
 
 /**

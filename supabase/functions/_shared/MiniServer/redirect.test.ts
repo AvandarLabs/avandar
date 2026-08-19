@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isRedirect, redirect } from "@sbfn/_shared/MiniServer/redirect.ts";
+import { describe, expect, it } from "vitest";
 
 const APP_URL = "http://localhost:5173/data";
 

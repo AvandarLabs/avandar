@@ -1,11 +1,11 @@
 /** Pins mediator column projection: subset hits, wider misses, growFrom. */
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import {
   clearQueryableRelationColumns,
   rememberQueryableColumns,
 } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
@@ -133,9 +133,8 @@ vi.mock("@/clients/datasets/source-datasets/CsvFileDatasetClient", () => {
 let QueryMediatorFactory: typeof QueryMediatorFactoryType;
 
 beforeAll(async () => {
-  ({ QueryMediatorFactory } = await import(
-    "@/clients/qetl/QueryMediator/QueryMediator"
-  ));
+  ({ QueryMediatorFactory } =
+    await import("@/clients/qetl/QueryMediator/QueryMediator"));
 });
 
 function _cacheKey(columns: readonly string[] | "all"): RelationCacheKey {

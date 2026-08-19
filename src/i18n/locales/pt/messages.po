@@ -40,13 +40,6 @@ msgstr "Ainda não há registros"
 msgid "Return online to view or make the page available offline."
 msgstr "Retorne online para visualizar ou tornar a página disponível offline."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "The columns mirror what this document printed. Regions that disagree "
-#~ "about their columns are still split out."
-#~ msgstr "As colunas reproduzem o que foi impresso neste documento. As regiões "
-#~ "que apresentam divergências entre si quanto às colunas continuam "
-#~ "separadas."
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -331,14 +324,6 @@ msgid "A saved dataset or column reference is no longer available. Choose a "
 msgstr "Um conjunto de dados salvo ou uma referência de coluna não está mais "
 "disponível. Escolha uma substituição no inspetor da camada."
 
-#. placeholder {0}: layer.source.dataSource.name
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-#~ "release, so pick a different source."
-#~ msgstr "Nenhuma coluna em {0} contém coordenadas. As associações de limites "
-#~ "estarão disponíveis em uma versão futura, então escolha uma fonte "
-#~ "diferente."
-
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
@@ -367,7 +352,7 @@ msgstr "Filtros de linha"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the printed columns"
-msgstr ""
+msgstr "Manter as colunas impressas"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
@@ -1313,14 +1298,6 @@ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "Recomendado se você tiver 16 GB de RAM e executar o Avandar junto com "
 "outros aplicativos."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every value becomes its own row, stamped with the document's title, "
-#~ "organisation and date. Two reports of the same kind then stack into one "
-#~ "series."
-#~ msgstr "Cada valor se torna sua própria linha, identificado pelo título, pela "
-#~ "organização e pela data do documento. Em seguida, dois relatórios do "
-#~ "mesmo tipo são agrupados em uma única série."
-
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "Bem-vindo ao seu primeiro espaço de trabalho"
@@ -1661,7 +1638,7 @@ msgstr "Intervalo das marcações do eixo Y"
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "{0}, and {remainingCount} more naming the page and the document"
-msgstr ""
+msgstr "{0} e mais {remainingCount}, nomeando a página e o documento"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "The assistant read nothing we could use. Kept the rule-based results."
@@ -1770,7 +1747,7 @@ msgstr "Adicione um membro ou grupo de usuários para conceder acesso. Use o "
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the table's columns"
-msgstr ""
+msgstr "Manter as colunas da tabela"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.tsx
 msgid "Heat radius"
@@ -1962,7 +1939,7 @@ msgstr "Escolha um plano que funcione melhor para seu espaço de trabalho."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these blocks"
-msgstr ""
+msgstr "Linhas destes blocos"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -2430,7 +2407,7 @@ msgstr "Por padrão, usamos um link direto baseado em UUID."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
-msgstr ""
+msgstr "Leituras com colunas de origem"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
@@ -2499,10 +2476,6 @@ msgstr "Escreva um nome de campo entre chaves para preenchê-lo com o recurso "
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Não foi possível encontrar um conjunto de dados conhecido "
 "correspondente a \"{tableName}\"."
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "As printed"
-#~ msgstr "Conforme impresso"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -3139,7 +3112,9 @@ msgstr "é"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "No column in {0} was recognized as a coordinate by name. Pick the "
 "latitude and longitude columns above, or bind a geometry column instead."
-msgstr ""
+msgstr "Nenhuma coluna em {0} foi reconhecida pelo nome como uma coordenada. "
+"Selecione acima as colunas de latitude e longitude ou associe uma "
+"coluna de geometria."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -3459,7 +3434,7 @@ msgstr "Um tipo de registro que você gerencia"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
-msgstr ""
+msgstr "Linhas destas {regionCount} regiões"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3480,13 +3455,6 @@ msgstr "Preenchimento"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "Tema"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every number becomes its own row, labelled with what it measures, its "
-#~ "unit, the page it came from, and the document's title, organisation and "
-#~ "date. Text carrying no number is dropped. Choose this to stack several "
-#~ "reports of the same kind into one series."
-#~ msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -3622,7 +3590,7 @@ msgstr "Capturando painel…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
-msgstr ""
+msgstr "Manter as medições como encontradas"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -4101,10 +4069,6 @@ msgstr "Imagem"
 msgid "Hide X axis"
 msgstr "Ocultar eixo X"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "One row per measurement"
-#~ msgstr "Uma linha por medição"
-
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Localizações exatas"
@@ -4135,10 +4099,6 @@ msgstr "Mantivemos os resultados baseados em regras."
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "Indisponível offline"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Rows"
-#~ msgstr "Linhas"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
@@ -4257,7 +4217,7 @@ msgstr "Cópia de {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
-msgstr ""
+msgstr "Uma linha por número"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
@@ -4352,10 +4312,6 @@ msgstr "O formulário oferece suporte apenas a consultas SELECT."
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "Aviso"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Keep the printed table"
-#~ msgstr ""
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -4680,7 +4636,7 @@ msgstr "Conectores"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this graphic"
-msgstr ""
+msgstr "Linhas deste gráfico"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Seats purchased successfully"
@@ -5424,7 +5380,7 @@ msgstr "Erro ao salvar o conjunto de dados: {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "No columns yet"
-msgstr ""
+msgstr "Nenhuma coluna ainda"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
@@ -5961,7 +5917,7 @@ msgstr "Frequência de atualização"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
-msgstr ""
+msgstr "Linhas deste gráfico"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -6063,7 +6019,7 @@ msgstr "Isto não pode ser desfeito."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
-msgstr ""
+msgstr "Linhas desta tabela"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -6812,7 +6768,7 @@ msgstr "Este conjunto de dados agora reflete o conteúdo atual da planilha."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
-msgstr ""
+msgstr "Linhas deste texto"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6851,13 +6807,6 @@ msgstr "Quando ativado, os membros deste grupo só têm acesso se já tiverem "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
 msgstr "Divisor"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Columns stay as this document printed them, and regions printing the "
-#~ "same columns stack into one table. Regions whose columns disagree have "
-#~ "no shared set of columns to keep, so those fall back to one row per "
-#~ "number."
-#~ msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
@@ -7423,7 +7372,8 @@ msgstr "Google Sheets"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
 "printed columns to keep."
-msgstr ""
+msgstr "Nenhuma das regiões selecionadas produziu linhas ainda, portanto não há "
+"colunas impressas para manter."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Name for {columnLabel}"
@@ -8080,10 +8030,6 @@ msgstr "Redimensionar painel"
 msgid "Horizontal padding"
 msgstr "Preenchimento horizontal"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Table shape"
-#~ msgstr ""
-
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
 msgstr "Conjunto de dados pronto"
@@ -8528,7 +8474,7 @@ msgstr "Arquivo carregado com sucesso"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
-msgstr ""
+msgstr "Manter os campos do bloco"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
@@ -8580,7 +8526,7 @@ msgstr "{0} m"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings only"
-msgstr ""
+msgstr "Somente leituras"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -8760,7 +8706,7 @@ msgstr "Digite seu endereço de e-mail"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Chosen from what we detected. Switch it if that reads wrong."
-msgstr ""
+msgstr "Escolhido com base no que detectamos. Altere se isso estiver incorreto."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
@@ -9300,7 +9246,10 @@ msgstr "Suprimir áreas abaixo de"
 msgid "{0} print different columns, so there is no shared set of columns to "
 "keep and every number goes on its own row. Remove a region, or change "
 "what one is read as, to get the choice back."
-msgstr ""
+msgstr "{0} imprime colunas diferentes, portanto não há um conjunto de colunas "
+"compartilhado para manter e cada número é colocado em sua própria "
+"linha. Remova uma região ou altere a forma como uma delas é "
+"interpretada para recuperar essa opção."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx

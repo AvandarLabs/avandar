@@ -26,7 +26,11 @@ export type OpenDataAcquisitionFailure =
    */
   | { code: "resource-is-remote-api"; ckanResourceId: string; urlType: string }
   /** The resource is a format this code cannot read, such as an archive. */
-  | { code: "resource-format-unsupported"; ckanResourceId: string; format: string }
+  | {
+      code: "resource-format-unsupported";
+      ckanResourceId: string;
+      format: string;
+    }
   /**
    * The live format differs from the one recorded when the entry was written.
    */

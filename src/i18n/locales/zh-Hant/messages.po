@@ -38,11 +38,6 @@ msgstr "尚無記錄"
 msgid "Return online to view or make the page available offline."
 msgstr "返回線上以查看或使頁面可離線使用。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "The columns mirror what this document printed. Regions that disagree "
-#~ "about their columns are still split out."
-#~ msgstr "欄位會如實反映此文件的列印內容。欄位不一致的區域仍會分開呈現。"
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -314,12 +309,6 @@ msgid "A saved dataset or column reference is no longer available. Choose a "
 "replacement in the layer inspector."
 msgstr "已無法使用已儲存的資料集或欄位參照。請在圖層檢查器中選擇替代項目。"
 
-#. placeholder {0}: layer.source.dataSource.name
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-#~ "release, so pick a different source."
-#~ msgstr "{0} 中沒有任何欄位包含座標。邊界連接將在後續版本推出，請選擇其他來源。"
-
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
@@ -347,7 +336,7 @@ msgstr "行過濾器"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the printed columns"
-msgstr ""
+msgstr "保留列印出的欄位"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
@@ -1251,12 +1240,6 @@ msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "如果您有 16 GB RAM，且會與其他應用程式一起執行 Avandar，建議使用此選項。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every value becomes its own row, stamped with the document's title, "
-#~ "organisation and date. Two reports of the same kind then stack into one "
-#~ "series."
-#~ msgstr "每個值都會成為獨立的一列，並附上文件標題、組織和日期。相同類型的兩份報告會接續成為同一個序列。"
-
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "歡迎來到您的第一個工作區"
@@ -1586,7 +1569,7 @@ msgstr "Y 軸刻度間隔"
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "{0}, and {remainingCount} more naming the page and the document"
-msgstr ""
+msgstr "{0}，以及另外 {remainingCount} 個命名頁面和文件"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "The assistant read nothing we could use. Kept the rule-based results."
@@ -1689,7 +1672,7 @@ msgstr "新增成員或使用者群組以授予存取權限。使用上方的「
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the table's columns"
-msgstr ""
+msgstr "保留表格的欄位"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.tsx
 msgid "Heat radius"
@@ -1876,7 +1859,7 @@ msgstr "選擇最適合您工作區的計劃。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these blocks"
-msgstr ""
+msgstr "來自這些區塊的列"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -2325,7 +2308,7 @@ msgstr "預設使用直接以 UUID 為基礎的連結。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
-msgstr ""
+msgstr "包含來源欄位的讀值"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
@@ -2389,10 +2372,6 @@ msgstr "在大括號中輸入欄位名稱，即可從點選的圖徵填入內容
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "找不到與「{tableName}」相符的已知資料集。"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "As printed"
-#~ msgstr "依列印內容"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -2998,7 +2977,7 @@ msgstr "是"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "No column in {0} was recognized as a coordinate by name. Pick the "
 "latitude and longitude columns above, or bind a geometry column instead."
-msgstr ""
+msgstr "{0} 中沒有任何欄位的名稱被辨識為座標。請在上方選取緯度和經度欄位，或改為繫結幾何欄位。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -3305,7 +3284,7 @@ msgstr "您管理的一種記錄"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
-msgstr ""
+msgstr "來自這 {regionCount} 個區域的列"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3326,13 +3305,6 @@ msgstr "內距"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "主題"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every number becomes its own row, labelled with what it measures, its "
-#~ "unit, the page it came from, and the document's title, organisation and "
-#~ "date. Text carrying no number is dropped. Choose this to stack several "
-#~ "reports of the same kind into one series."
-#~ msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -3462,7 +3434,7 @@ msgstr "捕捉儀表板中…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
-msgstr ""
+msgstr "依原樣保留測量值"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -3925,10 +3897,6 @@ msgstr "圖片"
 msgid "Hide X axis"
 msgstr "隱藏 X 軸"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "One row per measurement"
-#~ msgstr "每筆測量值一列"
-
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "精確位置"
@@ -3959,10 +3927,6 @@ msgstr "已保留規則式結果。"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "離線不可用"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Rows"
-#~ msgstr "列"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
@@ -4080,7 +4044,7 @@ msgstr "{0} 份副本"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
-msgstr ""
+msgstr "每個數字一列"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
@@ -4173,10 +4137,6 @@ msgstr "表單僅支援 SELECT 查詢。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "免責聲明"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Keep the printed table"
-#~ msgstr ""
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -4494,7 +4454,7 @@ msgstr "連接器"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this graphic"
-msgstr ""
+msgstr "來自這個圖像的列"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Seats purchased successfully"
@@ -5213,7 +5173,7 @@ msgstr "保存資料集時出錯：{0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "No columns yet"
-msgstr ""
+msgstr "尚無欄位"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
@@ -5736,7 +5696,7 @@ msgstr "更新頻率"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
-msgstr ""
+msgstr "來自這張圖表的列"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -5836,7 +5796,7 @@ msgstr "這無法撤銷。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
-msgstr ""
+msgstr "來自這張表格的列"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -6560,7 +6520,7 @@ msgstr "此資料集現在反映工作表的目前內容。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
-msgstr ""
+msgstr "來自這段文字的列"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6597,13 +6557,6 @@ msgstr "當啟用時，該組的成員僅在他們已經在工作區中擁有 {a
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
 msgstr "分隔線"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Columns stay as this document printed them, and regions printing the "
-#~ "same columns stack into one table. Regions whose columns disagree have "
-#~ "no shared set of columns to keep, so those fall back to one row per "
-#~ "number."
-#~ msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
@@ -7149,7 +7102,7 @@ msgstr "Google Sheets"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
 "printed columns to keep."
-msgstr ""
+msgstr "目前選取的區域尚未產生任何列，因此沒有可保留的列印欄位。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Name for {columnLabel}"
@@ -7782,10 +7735,6 @@ msgstr "調整抽屜大小"
 msgid "Horizontal padding"
 msgstr "水平內距"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Table shape"
-#~ msgstr ""
-
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
 msgstr "數據集已準備好"
@@ -8218,7 +8167,7 @@ msgstr "檔案成功載入"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
-msgstr ""
+msgstr "保留區塊欄位"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
@@ -8270,7 +8219,7 @@ msgstr "{0} 公尺"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings only"
-msgstr ""
+msgstr "僅讀值"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -8438,7 +8387,7 @@ msgstr "輸入您的電子郵件地址"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Chosen from what we detected. Switch it if that reads wrong."
-msgstr ""
+msgstr "根據偵測結果選取。如果顯示不正確，請切換選項。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
@@ -8965,7 +8914,7 @@ msgstr "抑制低於以下值的區域"
 msgid "{0} print different columns, so there is no shared set of columns to "
 "keep and every number goes on its own row. Remove a region, or change "
 "what one is read as, to get the choice back."
-msgstr ""
+msgstr "{0} 個列印出的欄位不同，因此沒有可保留的共用欄位集，每個數字都會各自佔一列。請移除一個區域，或變更其中一個區域的讀取方式，即可恢復此選項。"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx

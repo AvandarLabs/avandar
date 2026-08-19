@@ -64,7 +64,9 @@ describe("projectParquetBlob", () => {
   it("selects the requested columns from read_parquet with no DISTINCT, GROUP BY, or ORDER BY", async () => {
     const { projectParquetBlob } =
       await import("@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob");
-    const parquetBlob = new Blob(["src"], { type: "application/vnd.apache.parquet" });
+    const parquetBlob = new Blob(["src"], {
+      type: "application/vnd.apache.parquet",
+    });
 
     const result = await projectParquetBlob({
       client: _client() as DuckDbClientOperations,

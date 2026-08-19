@@ -7,8 +7,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
-import type { ChatProposedCaseType } from "$/types/chat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DEATHS_DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATASET_ID = "0f2c9f3e-bbbb-4bbb-8ccc-ddddeeeeffff";
@@ -182,11 +182,9 @@ describe("CaseTypeDraftBlock", () => {
   it("shows each dataset's own join key", () => {
     render(<CaseTypeDraftBlock />);
 
-    const joinKeys = screen
-      .getAllByLabelText("Join key")
-      .filter((element) => {
-        return element.tagName === "INPUT";
-      });
+    const joinKeys = screen.getAllByLabelText("Join key").filter((element) => {
+      return element.tagName === "INPUT";
+    });
     expect(joinKeys).toHaveLength(2);
     expect(joinKeys[0]).toHaveValue("fips");
     expect(joinKeys[1]).toHaveValue("county_fips");

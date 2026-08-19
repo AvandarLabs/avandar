@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -211,9 +211,8 @@ describe("PublicQuerySession.runQuery", () => {
 
     // The tier itself, not just the key. Handing this session the workspace
     // tier is the cross-visibility bug that reordering the probe made hot.
-    const { LocalPublicDatasetRelationCache } = await import(
-      "@/clients/qetl/RelationCache/LocalPublicDatasetRelationCache/LocalPublicDatasetRelationCache"
-    );
+    const { LocalPublicDatasetRelationCache } =
+      await import("@/clients/qetl/RelationCache/LocalPublicDatasetRelationCache/LocalPublicDatasetRelationCache");
     expect(qetlOptions.relationCache).toBe(LocalPublicDatasetRelationCache);
 
     expect(qetlOptions.principalKey).toBe(

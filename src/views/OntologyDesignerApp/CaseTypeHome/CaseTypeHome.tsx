@@ -37,9 +37,7 @@ export function CaseTypeHome({
           <Trans>Case types</Trans>
         </Title>
         <Text c="dimmed" maw={560}>
-          <Trans>
-            Each case type is a kind of record you manage.
-          </Trans>
+          <Trans>Each case type is a kind of record you manage.</Trans>
         </Text>
       </header>
       {isLoading ?

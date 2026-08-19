@@ -45,7 +45,9 @@ function CaseTypeDraftCardContainer({
   const [datasetColumns] = DatasetColumnClient.useGetAll(
     where("dataset_id", "in", sourceDatasetIds),
   );
-  const [datasets] = DatasetClient.useGetAll(where("id", "in", sourceDatasetIds));
+  const [datasets] = DatasetClient.useGetAll(
+    where("id", "in", sourceDatasetIds),
+  );
 
   const columnNamesById = useMemo(() => {
     return _makeNamesById(datasetColumns);

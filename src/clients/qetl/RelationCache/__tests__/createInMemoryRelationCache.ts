@@ -44,9 +44,7 @@ export function createInMemoryRelationCache(): RelationCachePort & {
         growFrom: RelationCacheEntry | undefined;
       }> = [];
       keys.forEach((key) => {
-        const stored = entriesByKey.get(
-          toKey(key.principal, key.relation.id),
-        );
+        const stored = entriesByKey.get(toKey(key.principal, key.relation.id));
         if (stored === undefined) {
           misses.push({ key, growFrom: undefined });
           return;

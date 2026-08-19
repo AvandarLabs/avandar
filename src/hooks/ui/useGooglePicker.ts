@@ -128,37 +128,39 @@ export function useGooglePicker({
     ) {
       return undefined;
     }
-    return new pickerAPI.PickerBuilder()
-      .addView(_spreadsheetView(pickerAPI))
-      .setOAuthToken(accessToken)
-      .setDeveloperKey(_getGooglePickerAPIKey())
-      .setAppId(_getGooglePickerAppId())
-      // Parents the iframe on this page. Without it Google uses the last
-      // loaded resource (often `/favicon.ico`) and the dialog never appears.
-      .setOrigin(window.location.origin)
-      .setMaxItems(1)
-      .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
-      .setCallback((response: GPickerResponseObject) => {
-        if (
-          response.action === pickerAPI.Action.PICKED &&
-          response.viewToken?.[0] === pickerAPI.ViewId.SPREADSHEETS &&
-          isNonEmptyArray(response.docs)
-        ) {
-          onGoogleSheetPicked({
-            document: response.docs[0],
-            googleAccount: selectedAccount,
-          });
-          return;
-        }
-        if (response.action === pickerAPI.Action.CANCEL) {
-          onCancel();
-          return;
-        }
-        if (response.action === pickerAPI.Action.ERROR) {
-          onError(response);
-        }
-      })
-      .build();
+    return (
+      new pickerAPI.PickerBuilder()
+        .addView(_spreadsheetView(pickerAPI))
+        .setOAuthToken(accessToken)
+        .setDeveloperKey(_getGooglePickerAPIKey())
+        .setAppId(_getGooglePickerAppId())
+        // Parents the iframe on this page. Without it Google uses the last
+        // loaded resource (often `/favicon.ico`) and the dialog never appears.
+        .setOrigin(window.location.origin)
+        .setMaxItems(1)
+        .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
+        .setCallback((response: GPickerResponseObject) => {
+          if (
+            response.action === pickerAPI.Action.PICKED &&
+            response.viewToken?.[0] === pickerAPI.ViewId.SPREADSHEETS &&
+            isNonEmptyArray(response.docs)
+          ) {
+            onGoogleSheetPicked({
+              document: response.docs[0],
+              googleAccount: selectedAccount,
+            });
+            return;
+          }
+          if (response.action === pickerAPI.Action.CANCEL) {
+            onCancel();
+            return;
+          }
+          if (response.action === pickerAPI.Action.ERROR) {
+            onError(response);
+          }
+        })
+        .build()
+    );
   }, [
     pickerAPI,
     accessToken,

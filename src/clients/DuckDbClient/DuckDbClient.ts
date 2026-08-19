@@ -2,7 +2,6 @@ import { sniffCsvFile } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { loadCsvIntoDuckDb } from "@/clients/DuckDbClient/duckDbCsvLoad";
 import { loadParquetIntoDuckDb } from "@/clients/DuckDbClient/duckDbParquetLoad";
-import { projectParquetBlob as projectParquetBlobWithClient } from "@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob";
 import {
   forEachDuckDbQueryPage,
   getDuckDbQueryPage,
@@ -19,6 +18,7 @@ import {
 } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import { loadXlsxIntoDuckDb } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import { makeDuckDbConnectionManager } from "@/clients/DuckDbClient/makeDuckDbConnectionManager";
+import { projectParquetBlob as projectParquetBlobWithClient } from "@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob";
 import { Logger } from "@/utils/Logger";
 import type { SniffCsvOptions } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";

@@ -52,9 +52,7 @@ function _covidCase(
     name: "COVID case",
     description: "A COVID-19 case record",
     allowManualCreation: false,
-    identities: [
-      { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
-    ],
+    identities: [{ datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID }],
     attributes: [
       {
         name: "Status",
@@ -251,8 +249,10 @@ describe("createdCaseTypeToFormValues", () => {
     });
 
     const keyAttributes = formValues.attributes.filter((attribute) => {
-      return attribute.mappings.datasetColumn.datasetColumnId ===
-        CENSUS_KEY_COLUMN_ID;
+      return (
+        attribute.mappings.datasetColumn.datasetColumnId ===
+        CENSUS_KEY_COLUMN_ID
+      );
     });
     expect(keyAttributes).toHaveLength(1);
     expect(keyAttributes[0]?.name).toBe("County code");

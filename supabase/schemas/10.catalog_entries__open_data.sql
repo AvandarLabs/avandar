@@ -75,38 +75,38 @@ create table public.catalog_entries__open_data (
   -- negative half is what stops a row from setting everything and meaning
   -- nothing.
   constraint catalog_entries__open_data__pipeline_access_complete check (
-    access_kind <> 'pipeline_parquet'
-    or (
-      parquet_file_name is not null
-      and pipeline_name is not null
-      and pipeline_run_id is not null
-      and api_service is null
-      and api_base_url is null
-      and api_resource_id is null
-      and api_resource_format is null
+    access_kind <> 'pipeline_parquet' or
+    (
+      parquet_file_name is not null and
+      pipeline_name is not null and
+      pipeline_run_id is not null and
+      api_service is null and
+      api_base_url is null and
+      api_resource_id is null and
+      api_resource_format is null
     )
   ),
   -- An API entry names its service, instance, dataset and resource, and
   -- carries no pipeline column.
   constraint catalog_entries__open_data__api_access_complete check (
-    access_kind <> 'api_resource'
-    or (
-      api_service is not null
-      and api_base_url is not null
-      and api_resource_id is not null
-      and api_resource_format is not null
-      and external_dataset_id is not null
-      and parquet_file_name is null
-      and pipeline_name is null
-      and pipeline_run_id is null
+    access_kind <> 'api_resource' or
+    (
+      api_service is not null and
+      api_base_url is not null and
+      api_resource_id is not null and
+      api_resource_format is not null and
+      external_dataset_id is not null and
+      parquet_file_name is null and
+      pipeline_name is null and
+      pipeline_run_id is null
     )
   ),
   -- Resource bytes are fetched from this host, so it must be TLS. Some CKAN
   -- resources point at upstream APIs over plain HTTP; those are rejected here
   -- rather than downloaded.
   constraint catalog_entries__open_data__api_base_url_is_https check (
-    api_base_url is null
-    or api_base_url like 'https://%'
+    api_base_url is null or
+    api_base_url like 'https://%'
   )
 );
 

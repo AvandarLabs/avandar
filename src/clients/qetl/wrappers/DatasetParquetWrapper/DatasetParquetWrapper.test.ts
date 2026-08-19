@@ -259,7 +259,9 @@ describe("DatasetParquetWrapper", () => {
       id: CATALOG_ENTRY_ID,
       accessKind: "api_resource",
     });
-    const csvBytes = new TextEncoder().encode("a,b\n1,2") as Uint8Array<ArrayBuffer>;
+    const csvBytes = new TextEncoder().encode(
+      "a,b\n1,2",
+    ) as Uint8Array<ArrayBuffer>;
     const parquetBlob = new Blob(["transcoded"]);
     const transcodeCsvToParquet = vi.fn().mockResolvedValue(parquetBlob);
     const wrapper = createDatasetParquetWrapper({

@@ -40,11 +40,7 @@ export function getAuthURL(authState: {
     // list against stored scopes; assert it against what this function
     // requests. `prompt: "consent"` below is what makes a re-authentication
     // actually re-issue on the narrower list.
-    scope: [
-      "openid",
-      "email",
-      "https://www.googleapis.com/auth/drive.file",
-    ],
+    scope: ["openid", "email", "https://www.googleapis.com/auth/drive.file"],
     state: JSON.stringify(authState),
   });
 

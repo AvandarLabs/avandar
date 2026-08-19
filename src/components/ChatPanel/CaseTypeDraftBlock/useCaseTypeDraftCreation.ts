@@ -5,17 +5,15 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
 import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
-import type { ChatProposedCaseType } from "$/types/chat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 /**
  * Persists a reviewed draft through the same path the concept creator form
  * uses, and clears the card only once the insert succeeds so a failure leaves
  * the user's edits recoverable.
  */
-export function useCaseTypeDraftCreation(
-  workspaceId: Workspace.Id,
-): {
+export function useCaseTypeDraftCreation(workspaceId: Workspace.Id): {
   isCreating: boolean;
   createCaseType: (draft: ChatProposedCaseType) => Promise<void>;
 } {

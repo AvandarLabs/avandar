@@ -1,10 +1,10 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
 import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
 import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
-import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
@@ -24,13 +24,10 @@ const MAX_RESOURCE_BYTES = 25 * 1024 * 1024;
 const EXPOSED_HEADERS = "X-Ava-Content-Kind, X-Ava-Source-Version";
 
 function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
-  return new Response(
-    JSON.stringify({ error: { code: error.failure.code } }),
-    {
-      status: statusFromOpenDataFailure(error.failure.code),
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    },
-  );
+  return new Response(JSON.stringify({ error: { code: error.failure.code } }), {
+    status: statusFromOpenDataFailure(error.failure.code),
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
 
 /**

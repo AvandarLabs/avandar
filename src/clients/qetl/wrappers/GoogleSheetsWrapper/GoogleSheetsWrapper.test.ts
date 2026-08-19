@@ -114,9 +114,7 @@ describe("GoogleSheetsWrapper", () => {
     const wrapper = createGoogleSheetsWrapper();
 
     await expect(wrapper.describe(DATASET_REF, CONTEXT)).resolves.toEqual({
-      columns: [
-        { name: "district", dataType: "VARCHAR", isArray: false },
-      ],
+      columns: [{ name: "district", dataType: "VARCHAR", isArray: false }],
     });
   });
 

@@ -39,12 +39,6 @@ msgstr "No records yet"
 msgid "Return online to view or make the page available offline."
 msgstr "Return online to view or make the page available offline."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "The columns mirror what this document printed. Regions that disagree "
-#~ "about their columns are still split out."
-#~ msgstr "The columns mirror what this document printed. Regions that disagree "
-#~ "about their columns are still split out."
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -323,13 +317,6 @@ msgid "A saved dataset or column reference is no longer available. Choose a "
 "replacement in the layer inspector."
 msgstr "A saved dataset or column reference is no longer available. Choose a "
 "replacement in the layer inspector."
-
-#. placeholder {0}: layer.source.dataSource.name
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-#~ "release, so pick a different source."
-#~ msgstr "No column in {0} holds coordinates. Boundary joins arrive in a later "
-#~ "release, so pick a different source."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
@@ -1287,14 +1274,6 @@ msgstr "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every value becomes its own row, stamped with the document's title, "
-#~ "organisation and date. Two reports of the same kind then stack into one "
-#~ "series."
-#~ msgstr "Every value becomes its own row, stamped with the document's title, "
-#~ "organisation and date. Two reports of the same kind then stack into one "
-#~ "series."
 
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
@@ -2458,10 +2437,6 @@ msgstr "Write a field name in braces to fill it from the clicked feature, for "
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Could not find a known dataset matching \"{tableName}\"."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "As printed"
-#~ msgstr "As printed"
-
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Data Visualization"
@@ -3429,16 +3404,6 @@ msgstr "Padding"
 msgid "Theme"
 msgstr "Theme"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every number becomes its own row, labelled with what it measures, its "
-#~ "unit, the page it came from, and the document's title, organisation and "
-#~ "date. Text carrying no number is dropped. Choose this to stack several "
-#~ "reports of the same kind into one series."
-#~ msgstr "Every number becomes its own row, labelled with what it measures, its "
-#~ "unit, the page it came from, and the document's title, organisation and "
-#~ "date. Text carrying no number is dropped. Choose this to stack several "
-#~ "reports of the same kind into one series."
-
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "Register"
@@ -4044,10 +4009,6 @@ msgstr "Image"
 msgid "Hide X axis"
 msgstr "Hide X axis"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "One row per measurement"
-#~ msgstr "One row per measurement"
-
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Exact locations"
@@ -4078,10 +4039,6 @@ msgstr "Kept the rule-based results."
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "Unavailable offline"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Rows"
-#~ msgstr "Rows"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
@@ -4294,10 +4251,6 @@ msgstr "The form only supports SELECT queries."
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "Disclaimer"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Keep the printed table"
-#~ msgstr "Keep the printed table"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -6768,16 +6721,6 @@ msgstr "When on, members of this group only get access if they already have "
 msgid "Divider"
 msgstr "Divider"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Columns stay as this document printed them, and regions printing the "
-#~ "same columns stack into one table. Regions whose columns disagree have "
-#~ "no shared set of columns to keep, so those fall back to one row per "
-#~ "number."
-#~ msgstr "Columns stay as this document printed them, and regions printing the "
-#~ "same columns stack into one table. Regions whose columns disagree have "
-#~ "no shared set of columns to keep, so those fall back to one row per "
-#~ "number."
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "Lower bound"
@@ -7986,10 +7929,6 @@ msgstr "Resize drawer"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "Horizontal padding"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Table shape"
-#~ msgstr "Table shape"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"

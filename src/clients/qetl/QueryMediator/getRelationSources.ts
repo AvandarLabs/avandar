@@ -6,6 +6,7 @@ import {
   prop,
   where,
 } from "@avandar/utils";
+import { coversColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
@@ -16,7 +17,6 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { coversColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type {
   DatasetsById,
   DatasetsBySourceType,

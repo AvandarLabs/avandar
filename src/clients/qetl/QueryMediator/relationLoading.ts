@@ -6,6 +6,7 @@ import {
   prop,
   where,
 } from "@avandar/utils";
+import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
@@ -14,7 +15,6 @@ import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegist
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Logger } from "@/utils/Logger";
-import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   AcquiredRelationBytes,

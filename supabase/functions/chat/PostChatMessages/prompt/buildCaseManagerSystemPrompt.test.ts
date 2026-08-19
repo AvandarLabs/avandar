@@ -55,7 +55,12 @@ describe("buildCaseManagerSystemPrompt", () => {
     const prompt = buildCaseManagerSystemPrompt({
       datasets: [{ id: "dataset-1", name: "long-us-deaths.csv" }],
       columns: [
-        { dataset_id: "dataset-1", id: "column-1", name: "state", data_type: "varchar" },
+        {
+          dataset_id: "dataset-1",
+          id: "column-1",
+          name: "state",
+          data_type: "varchar",
+        },
       ],
       concepts: [],
     });

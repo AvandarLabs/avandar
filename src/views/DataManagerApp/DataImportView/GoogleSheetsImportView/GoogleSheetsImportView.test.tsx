@@ -1,19 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import * as XLSX from "xlsx";
+import { fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as XLSX from "xlsx";
 import { APIClient } from "@/clients/APIClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import {
-  act,
-  render,
-  RenderOptions,
-  screen,
-  waitFor,
-} from "@/test-utils";
-import { fireEvent } from "@testing-library/react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
+import { act, render, RenderOptions, screen, waitFor } from "@/test-utils";
 import { Logger } from "@/utils/Logger";
+import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
@@ -601,9 +595,8 @@ describe("GoogleSheetsImportView", () => {
   });
 
   it("names the failure when Drive refuses the export as too large", async () => {
-    const { GoogleDriveError } = await import(
-      "@/clients/google/GoogleDriveClient/GoogleDriveError"
-    );
+    const { GoogleDriveError } =
+      await import("@/clients/google/GoogleDriveClient/GoogleDriveError");
     getGoogleSheetXlsxExportMock.mockRejectedValue(
       new GoogleDriveError({
         code: "export-too-large",
@@ -625,9 +618,8 @@ describe("GoogleSheetsImportView", () => {
   });
 
   it("tells the user to re-pick when the per-file grant is gone", async () => {
-    const { GoogleDriveError } = await import(
-      "@/clients/google/GoogleDriveClient/GoogleDriveError"
-    );
+    const { GoogleDriveError } =
+      await import("@/clients/google/GoogleDriveClient/GoogleDriveError");
     getGoogleSheetXlsxExportMock.mockRejectedValue(
       new GoogleDriveError({ code: "file-not-accessible", status: 404 }),
     );

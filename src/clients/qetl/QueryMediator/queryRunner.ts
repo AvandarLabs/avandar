@@ -1,4 +1,4 @@
-import { makeBucketRecord, where, type UnknownObject } from "@avandar/utils";
+import { makeBucketRecord, where } from "@avandar/utils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -26,6 +26,7 @@ import type {
   RunLeasedQueryOptions,
   RunQetlQueryOptions,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { UnknownObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 

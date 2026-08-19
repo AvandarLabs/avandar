@@ -187,14 +187,15 @@ export function useCaseTypeDraftEditor(
         const isDuplicate = current.manualEntryAttributes.some((attribute) => {
           return attribute.name === trimmedName;
         });
-        return isDuplicate ? current
-          : {
+        return isDuplicate ? current : (
+            {
               ...current,
               manualEntryAttributes: [
                 ...current.manualEntryAttributes,
                 { name: trimmedName, isIncluded: true },
               ],
-            };
+            }
+          );
       });
     },
   };

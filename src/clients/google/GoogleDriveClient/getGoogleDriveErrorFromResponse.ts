@@ -1,7 +1,5 @@
-import {
-  GoogleDriveError,
-  type GoogleDriveErrorCode,
-} from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import type { GoogleDriveErrorCode } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
 
 /**
  * Drive's error envelope, as much of it as this module reads.

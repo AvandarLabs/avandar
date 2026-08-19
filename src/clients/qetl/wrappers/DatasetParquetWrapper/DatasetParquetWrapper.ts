@@ -9,8 +9,8 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   RelationCapabilities,
   SourceVersion,

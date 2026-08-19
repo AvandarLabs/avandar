@@ -208,7 +208,9 @@ function _collectSqlColumns(
   );
 }
 
-function _getSqlColumnsByDatasetId(rawSql: string): ColumnSetByDatasetId | "all" {
+function _getSqlColumnsByDatasetId(
+  rawSql: string,
+): ColumnSetByDatasetId | "all" {
   const sqlDatasetIds = _getSqlDatasetIds(rawSql);
   if (sqlDatasetIds === undefined) {
     return "all";

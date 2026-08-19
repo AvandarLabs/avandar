@@ -277,7 +277,11 @@ describe("getRelationSources", () => {
 
     expect(result).toEqual(
       expect.arrayContaining([
-        { dataset: csvDataset, sourceType: "csv_file", sourceDataset: csvSourceDataset },
+        {
+          dataset: csvDataset,
+          sourceType: "csv_file",
+          sourceDataset: csvSourceDataset,
+        },
         {
           dataset: googleSheetsDataset,
           sourceType: "google_sheets",

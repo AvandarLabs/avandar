@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
+import { describe, expect, it } from "vitest";
 import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
 
 /**

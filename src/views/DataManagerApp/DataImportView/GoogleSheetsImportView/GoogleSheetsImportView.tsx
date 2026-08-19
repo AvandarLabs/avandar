@@ -71,9 +71,7 @@ type Props = BoxProps & {
 };
 
 /** Wraps workbook bytes in the `File` the local import mutation takes. */
-function _makeWorkbookFile(
-  workbook: Readonly<ExportedWorkbook>,
-): File {
+function _makeWorkbookFile(workbook: Readonly<ExportedWorkbook>): File {
   return new File(
     [new Blob([workbook.xlsxBytes])],
     `${workbook.spreadsheetName}.xlsx`,
@@ -337,9 +335,8 @@ export function GoogleSheetsImportView({
         <Callout color="warning" messageSize="sm">
           <Text component="div" size="sm">
             <Trans>
-              New connectors are being added every month.
-               If there is a database or
-              service you use that you need to connect to,{" "}
+              New connectors are being added every month. If there is a database
+              or service you use that you need to connect to,{" "}
               <UnstyledButton
                 type="button"
                 aria-label={t`Request a data source connection via feedback`}
@@ -452,8 +449,7 @@ export function GoogleSheetsImportView({
               // scoped, so every tab is in these bytes.
               onRequestParse({
                 newDatasetId: uuid() as Dataset.Id,
-                datasetIdToDrop:
-                  dataSourceMetadata.datasetLoadResult.datasetId,
+                datasetIdToDrop: dataSourceMetadata.datasetLoadResult.datasetId,
                 documentId: dataSourceMetadata.googleDocumentId,
                 googleAccountId: dataSourceMetadata.googleAccountId,
                 workbook: exportedWorkbook,

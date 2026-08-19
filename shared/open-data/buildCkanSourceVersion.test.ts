@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { buildCkanSourceVersion } from "$/open-data/buildCkanSourceVersion.ts";
+import { describe, expect, it } from "vitest";
 import type { CkanResource } from "$/open-data/CkanClient/CkanClient.types.ts";
 
 const CONTENT_HASH = "32e316c0337f8a9b9117999a595f8e86";
@@ -44,9 +44,7 @@ describe("buildCkanSourceVersion", () => {
 
   it("returns undefined when neither a hash nor a modified time is reported", () => {
     expect(
-      buildCkanSourceVersion(
-        _resource({ hash: "", last_modified: undefined }),
-      ),
+      buildCkanSourceVersion(_resource({ hash: "", last_modified: undefined })),
     ).toBeUndefined();
   });
 

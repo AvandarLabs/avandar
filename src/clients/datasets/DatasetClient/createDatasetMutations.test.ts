@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DatasetMutationConfig } from "@/clients/datasets/DatasetClient/DatasetClient.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ILogger } from "@avandar/logger";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const { rpcMock } = vi.hoisted(() => {
   return { rpcMock: vi.fn() };
@@ -70,9 +70,8 @@ const BASE_PARAMS = {
 async function _insert(
   overrides: Readonly<{ sheetName?: string }> = {},
 ): Promise<Record<string, unknown>> {
-  const { createDatasetMutations } = await import(
-    "@/clients/datasets/DatasetClient/createDatasetMutations"
-  );
+  const { createDatasetMutations } =
+    await import("@/clients/datasets/DatasetClient/createDatasetMutations");
   await createDatasetMutations(CONFIG).insertGoogleSheetsDataset({
     ...BASE_PARAMS,
     ...overrides,

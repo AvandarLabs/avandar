@@ -1,5 +1,5 @@
-import type { CkanResource } from "$/open-data/CkanClient/CkanClient.types.ts";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
+import type { CkanResource } from "$/open-data/CkanClient/CkanClient.types.ts";
 
 /**
  * Marks a token built from CKAN's content hash, which is the stronger of the

@@ -1,9 +1,9 @@
 import { MIMEType } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { uuid } from "$/lib/uuid";
+import { normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import { registerParquetFile } from "@/clients/DuckDbClient/duckDbFileRegistry";
-import { normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
 

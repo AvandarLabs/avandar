@@ -1,5 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Checkbox,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";

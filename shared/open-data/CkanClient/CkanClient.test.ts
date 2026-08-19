@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import { createCkanClient } from "$/open-data/CkanClient/CkanClient.ts";
 import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { describe, expect, it, vi } from "vitest";
 import type { OpenDataHttp } from "$/open-data/CkanClient/CkanClient.types.ts";
 
 const BASE_URL = "https://data.humdata.org";
@@ -188,10 +188,7 @@ describe("CkanClient.getPackage", () => {
         ckanDatasetId: DATASET_ID,
       }),
     ).rejects.toSatisfy((error: unknown) => {
-      return OpenDataAcquisitionFailed.is(
-        error,
-        "ckan-authorization-required",
-      );
+      return OpenDataAcquisitionFailed.is(error, "ckan-authorization-required");
     });
   });
 

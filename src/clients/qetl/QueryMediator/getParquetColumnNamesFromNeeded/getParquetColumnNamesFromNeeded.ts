@@ -1,4 +1,7 @@
-import { coversColumns, normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import {
+  coversColumns,
+  normalizeColumns,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey";
 
 /** The names a dataset column uses in DuckDB (`name`) and in Parquet. */
 export type DatasetColumnNames = {
@@ -33,10 +36,7 @@ export function getParquetColumnNamesFromNeeded(
   }
   const parquetNames = normalizeColumns(
     options.needed.map((neededName) => {
-      return _getOriginalNameFromNeededName(
-        neededName,
-        options.datasetColumns,
-      );
+      return _getOriginalNameFromNeededName(neededName, options.datasetColumns);
     }),
   );
   if (parquetNames === "all") {

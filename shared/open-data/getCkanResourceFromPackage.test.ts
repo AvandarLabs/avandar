@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { getCkanResourceFromPackage } from "$/open-data/getCkanResourceFromPackage.ts";
 import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { describe, expect, it } from "vitest";
 import type {
   CkanPackage,
   CkanResource,

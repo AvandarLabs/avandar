@@ -94,10 +94,7 @@ export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
         action: "package_show",
         query: { id: ckanDatasetId },
       });
-      const result = _getActionResult(
-        "package_show",
-        await http.getJson(url),
-      );
+      const result = _getActionResult("package_show", await http.getJson(url));
       const wire = CkanPackageSchema.parse(result);
       return {
         id: wire.id,

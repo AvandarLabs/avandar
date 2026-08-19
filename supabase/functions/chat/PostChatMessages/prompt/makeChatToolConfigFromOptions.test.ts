@@ -79,8 +79,8 @@ describe("makeChatToolConfigFromOptions", () => {
     const propose = tools.find((tool) => {
       return tool.function.name === "proposeCaseType";
     });
-    const { sourceDatasets, attributes } = propose!.function.parameters
-      .properties;
+    const { sourceDatasets, attributes } =
+      propose!.function.parameters.properties;
 
     // An array, so a case type is never confined to a single dataset, and each
     // entry must carry its own join key or the concept cannot be built.

@@ -5,8 +5,8 @@ import type {
   AttributeFormValues,
   ConceptFormSubmitValues,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { Workspace } from "$/models/Workspace/Workspace";

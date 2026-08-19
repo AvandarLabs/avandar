@@ -24,7 +24,7 @@ function _installFakeWebLocks(): {
   const descriptor = Object.getOwnPropertyDescriptor(navigator, "locks");
 
   const fakeLocks = {
-    request: async <Result,>(
+    request: async <Result>(
       name: string,
       callback: () => Promise<Result>,
     ): Promise<Result> => {

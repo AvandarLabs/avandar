@@ -6,8 +6,8 @@
  * A draft spanning several datasets is the normal case, so the join keys each
  * source is matched on are covered here too.
  */
-import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
 import { describe, expect, it } from "vitest";
+import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
 import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DEATHS_DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";

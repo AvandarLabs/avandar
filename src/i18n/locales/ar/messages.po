@@ -39,12 +39,6 @@ msgstr "لا توجد سجلات بعد"
 msgid "Return online to view or make the page available offline."
 msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها متاحة دون اتصال."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "The columns mirror what this document printed. Regions that disagree "
-#~ "about their columns are still split out."
-#~ msgstr "تعكس الأعمدة ما طُبع في هذا المستند. وتظل المناطق التي تختلف أعمدتها "
-#~ "مفصولة."
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
@@ -326,13 +320,6 @@ msgid "A saved dataset or column reference is no longer available. Choose a "
 msgstr "لم يعد بالإمكان الوصول إلى مجموعة البيانات المحفوظة أو مرجع العمود. "
 "اختر بديلاً في مفتش الطبقة."
 
-#. placeholder {0}: layer.source.dataSource.name
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-#~ "release, so pick a different source."
-#~ msgstr "لا يحتوي أي عمود في {0} على إحداثيات. ستتوفر عمليات الربط بالحدود في "
-#~ "إصدار لاحق، لذا اختر مصدراً مختلفاً."
-
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
@@ -360,7 +347,7 @@ msgstr "فلاتر الصفوف"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the printed columns"
-msgstr ""
+msgstr "الاحتفاظ بالأعمدة المطبوعة"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
@@ -1289,13 +1276,6 @@ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 16 جيجابايت وتُشغّل Avandar إلى "
 "جانب تطبيقات أخرى."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every value becomes its own row, stamped with the document's title, "
-#~ "organisation and date. Two reports of the same kind then stack into one "
-#~ "series."
-#~ msgstr "تتحول كل قيمة إلى صف مستقل، مرفقة بعنوان المستند واسم المؤسسة والتاريخ. "
-#~ "ثم تتراص تقريران من النوع نفسه في سلسلة واحدة."
-
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة بك"
@@ -1634,7 +1614,7 @@ msgstr "الفاصل بين تدريجات المحور Y"
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "{0}, and {remainingCount} more naming the page and the document"
-msgstr ""
+msgstr "{0}، و{remainingCount} إضافية تسمّي الصفحة والمستند"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "The assistant read nothing we could use. Kept the rule-based results."
@@ -1742,7 +1722,7 @@ msgstr "أضف عضوًا أو مجموعة مستخدمين لمنح الوصو
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the table's columns"
-msgstr ""
+msgstr "الاحتفاظ بأعمدة الجدول"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.tsx
 msgid "Heat radius"
@@ -1932,7 +1912,7 @@ msgstr "اختر خطة تناسب مساحة العمل الخاصة بك بش�
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these blocks"
-msgstr ""
+msgstr "الصفوف من هذه الكتل"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
@@ -2392,7 +2372,7 @@ msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إ�
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
-msgstr ""
+msgstr "القراءات مع أعمدة المصدر"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
@@ -2458,10 +2438,6 @@ msgstr "اكتب اسم حقل بين قوسين معقوفين لملئه من 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "تعذّر العثور على مجموعة بيانات معروفة تطابق \"{tableName}\"."
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "As printed"
-#~ msgstr "كما طُبع"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -3086,7 +3062,8 @@ msgstr "يساوي"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
 msgid "No column in {0} was recognized as a coordinate by name. Pick the "
 "latitude and longitude columns above, or bind a geometry column instead."
-msgstr ""
+msgstr "لم يتم التعرّف على أي عمود في {0} على أنه إحداثي بالاسم. اختر عمودي خط "
+"العرض وخط الطول أعلاه، أو اربط عمودًا هندسيًا بدلًا من ذلك."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -3403,7 +3380,7 @@ msgstr "نوع من السجلات التي تديرها"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from these {regionCount} regions"
-msgstr ""
+msgstr "الصفوف من هذه المناطق وعددها {regionCount}"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3424,13 +3401,6 @@ msgstr "حشوة"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "السمة"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Every number becomes its own row, labelled with what it measures, its "
-#~ "unit, the page it came from, and the document's title, organisation and "
-#~ "date. Text carrying no number is dropped. Choose this to stack several "
-#~ "reports of the same kind into one series."
-#~ msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -3564,7 +3534,7 @@ msgstr "جارٍ التقاط اللوحة…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
-msgstr ""
+msgstr "الاحتفاظ بالقياسات كما هي"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -4037,10 +4007,6 @@ msgstr "صورة"
 msgid "Hide X axis"
 msgstr "إخفاء المحور X"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "One row per measurement"
-#~ msgstr "صف واحد لكل قياس"
-
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "المواقع الدقيقة"
@@ -4071,10 +4037,6 @@ msgstr "تم الإبقاء على النتائج المستندة إلى الق
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "غير متاح دون اتصال"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Rows"
-#~ msgstr "الصفوف"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"
@@ -4193,7 +4155,7 @@ msgstr "نسخة {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "One row per number"
-msgstr ""
+msgstr "صف واحد لكل رقم"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
@@ -4288,10 +4250,6 @@ msgstr "يدعم النموذج استعلامات SELECT فقط."
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
 msgstr "إخلاء المسؤولية"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Keep the printed table"
-#~ msgstr ""
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -4613,7 +4571,7 @@ msgstr "الموصلات"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this graphic"
-msgstr ""
+msgstr "الصفوف من هذا الرسم"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Seats purchased successfully"
@@ -5344,7 +5302,7 @@ msgstr "خطأ في حفظ مجموعة البيانات: {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "No columns yet"
-msgstr ""
+msgstr "لا توجد أعمدة بعد"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
@@ -5876,7 +5834,7 @@ msgstr "تكرار التحديث"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
-msgstr ""
+msgstr "الصفوف من هذا المخطط"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -5977,7 +5935,7 @@ msgstr "لا يمكن التراجع عن هذا."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
-msgstr ""
+msgstr "الصفوف من هذا الجدول"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -6711,7 +6669,7 @@ msgstr "تعكس مجموعة البيانات هذه الآن المحتوى ا
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
-msgstr ""
+msgstr "الصفوف من هذا النص"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6749,13 +6707,6 @@ msgstr "عند التشغيل، يحصل أعضاء هذه المجموعة عل
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
 msgstr "فاصل"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Columns stay as this document printed them, and regions printing the "
-#~ "same columns stack into one table. Regions whose columns disagree have "
-#~ "no shared set of columns to keep, so those fall back to one row per "
-#~ "number."
-#~ msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
@@ -7316,7 +7267,8 @@ msgstr "جداول بيانات Google"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
 "printed columns to keep."
-msgstr ""
+msgstr "لم تنتج أي من المناطق المحددة صفوفًا بعد، لذا لا توجد أعمدة مطبوعة "
+"للاحتفاظ بها."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Name for {columnLabel}"
@@ -7964,10 +7916,6 @@ msgstr "تغيير حجم لوحة السحب"
 msgid "Horizontal padding"
 msgstr "الحشو الأفقي"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
-#~ msgid "Table shape"
-#~ msgstr ""
-
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset ready"
 msgstr "مجموعة البيانات جاهزة"
@@ -8407,7 +8355,7 @@ msgstr "تم تحميل الملف بنجاح"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
-msgstr ""
+msgstr "الاحتفاظ بحقوقول الكتلة"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
@@ -8459,7 +8407,7 @@ msgstr "{0} م"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings only"
-msgstr ""
+msgstr "القراءات فقط"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -8636,7 +8584,7 @@ msgstr "أدخل عنوان بريدك الإلكتروني"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Chosen from what we detected. Switch it if that reads wrong."
-msgstr ""
+msgstr "تم الاختيار بناءً على ما اكتشفناه. بدّله إذا لم تكن القراءة صحيحة."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
@@ -9171,7 +9119,9 @@ msgstr "استبعاد المناطق الأقل من"
 msgid "{0} print different columns, so there is no shared set of columns to "
 "keep and every number goes on its own row. Remove a region, or change "
 "what one is read as, to get the choice back."
-msgstr ""
+msgstr "تطبع {0} أعمدة مختلفة، لذا لا توجد مجموعة أعمدة مشتركة يمكن الاحتفاظ "
+"بها، وسيُوضَع كل رقم في صف مستقل. أزل منطقة أو غيّر طريقة قراءتها "
+"لاستعادة هذا الخيار."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
