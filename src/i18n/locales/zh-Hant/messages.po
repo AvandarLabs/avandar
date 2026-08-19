@@ -779,7 +779,7 @@ msgstr "所有欄位"
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Resize annotation text"
-msgstr ""
+msgstr "調整註解文字大小"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
@@ -5045,7 +5045,7 @@ msgstr "原始元數據（JSON）"
 
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
-msgstr ""
+msgstr "清除註解"
 
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -6393,7 +6393,7 @@ msgstr "版面配置"
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Move annotation text"
-msgstr ""
+msgstr "移動註解文字"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
@@ -7336,7 +7336,7 @@ msgstr "工作區 ID 不得包含空格"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
-msgstr ""
+msgstr "在此輸入文字"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."

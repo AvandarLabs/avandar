@@ -813,7 +813,7 @@ msgstr "Todos los campos"
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Resize annotation text"
-msgstr ""
+msgstr "Cambiar el tamaño del texto de la anotación"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
@@ -5264,7 +5264,7 @@ msgstr "Metadatos en bruto (JSON)"
 
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
-msgstr ""
+msgstr "Borrar anotaciones"
 
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -6661,7 +6661,7 @@ msgstr "Diseño"
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Move annotation text"
-msgstr ""
+msgstr "Mover el texto de la anotación"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
@@ -7641,7 +7641,7 @@ msgstr "El ID del espacio de trabajo no puede contener espacios"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
-msgstr ""
+msgstr "Ingrese su texto aquí"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
