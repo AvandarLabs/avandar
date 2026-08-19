@@ -590,7 +590,7 @@ msgstr "特大"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "log"
-msgstr ""
+msgstr "記錄"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save to dashboard\"."
@@ -632,7 +632,7 @@ msgstr "有爭議或未確定的邊界"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete map?"
-msgstr ""
+msgstr "要刪除地圖嗎？"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
@@ -860,7 +860,7 @@ msgstr "搜尋數據目錄以將開放數據集添加到您的工作區。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
-msgstr ""
+msgstr "第一個刻度值"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -1986,7 +1986,7 @@ msgstr "儲存網址"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Map deleted"
-msgstr ""
+msgstr "地圖已刪除"
 
 #: src/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
@@ -2164,7 +2164,7 @@ msgstr "在下方輸入或粘貼電子郵件。您的工作區將按成員計費
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} was deleted."
-msgstr ""
+msgstr "已刪除 {0}。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -2742,7 +2742,7 @@ msgstr "圖層"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
 "pt)"
-msgstr ""
+msgstr "Y 軸 {0} 至 {1}、{scaleLabel}，符合 {2} 個刻度（最大誤差 {residual} pt）"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3435,7 +3435,7 @@ msgstr "角色"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a second labelled tick on the y-axis."
-msgstr ""
+msgstr "在 Y 軸上按一下第二個有標籤的刻度。"
 
 #. placeholder {0}: columnIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -5971,7 +5971,7 @@ msgstr "永久刪除此工作區及其所有資料。此動作無法復原。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
 msgid "Click a point on the axis"
-msgstr ""
+msgstr "在軸上按一下點"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Extract with the assistant"
@@ -6696,7 +6696,7 @@ msgstr "簡化容差"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} and its layers will be removed. This cannot be undone."
-msgstr ""
+msgstr "{0} 及其圖層將會移除。此操作無法復原。"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -6712,7 +6712,7 @@ msgstr "僅查詢的內容"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Apply calibration"
-msgstr ""
+msgstr "套用校準"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
@@ -7483,7 +7483,7 @@ msgstr "緯度與經度欄"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "linear"
-msgstr ""
+msgstr "線性"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -7830,7 +7830,7 @@ msgstr "檔案成功載入"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete the map {0}"
-msgstr ""
+msgstr "刪除地圖 {0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
@@ -8220,7 +8220,7 @@ msgstr "請查看數據並確保其正確。一旦確認，數據集將與此數
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Calibrate manually"
-msgstr ""
+msgstr "手動校準"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Choose Displace or Aggregate only when the layer holds protection or "
@@ -8484,7 +8484,7 @@ msgstr "第 10 欄"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
-msgstr ""
+msgstr "在 Y 軸上按一下有標籤的刻度。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -8624,4 +8624,4 @@ msgstr "刪除數據集失敗：{0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Second tick value"
-msgstr ""
+msgstr "第二個刻度值"

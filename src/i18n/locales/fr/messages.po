@@ -620,7 +620,7 @@ msgstr "Très grand"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "log"
-msgstr ""
+msgstr "journal"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save to dashboard\"."
@@ -663,7 +663,7 @@ msgstr "Limite contestée ou indéterminée"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete map?"
-msgstr ""
+msgstr "Supprimer la carte a0?"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
@@ -908,7 +908,7 @@ msgstr "Recherchez dans le catalogue de données pour ajouter des ensembles de "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
-msgstr ""
+msgstr "Valeur de la première graduation"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -2094,7 +2094,7 @@ msgstr "Enregistrer l’URL"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Map deleted"
-msgstr ""
+msgstr "Carte supprimée"
 
 #: src/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
@@ -2287,7 +2287,7 @@ msgstr "Tapez ou collez un e-mail ci-dessous. Votre espace de travail sera "
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} was deleted."
-msgstr ""
+msgstr "{0} a été supprimé."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -2899,7 +2899,8 @@ msgstr "Calques"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
 "pt)"
-msgstr ""
+msgstr "Axe Y de {0} à {1}, {scaleLabel}, correspond à {2} graduations (erreur "
+"maximale a0: {residual} pt)"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3631,7 +3632,7 @@ msgstr "Rôle"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a second labelled tick on the y-axis."
-msgstr ""
+msgstr "Cliquez sur une deuxième graduation étiquetée de l’axe Y."
 
 #. placeholder {0}: columnIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -6266,7 +6267,7 @@ msgstr "Supprime définitivement cet espace de travail ainsi que toutes ses "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
 msgid "Click a point on the axis"
-msgstr ""
+msgstr "Cliquez sur un point de l’axe"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Extract with the assistant"
@@ -7031,7 +7032,7 @@ msgstr "Tolérance de simplification"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} and its layers will be removed. This cannot be undone."
-msgstr ""
+msgstr "{0} et ses calques seront supprimés. Cette action est irréversible."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -7047,7 +7048,7 @@ msgstr "Juste ce qui a été interrogé"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Apply calibration"
-msgstr ""
+msgstr "Appliquer l’étalonnage"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
@@ -7849,7 +7850,7 @@ msgstr "Colonnes de latitude et de longitude"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "linear"
-msgstr ""
+msgstr "linéaire"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -8210,7 +8211,7 @@ msgstr "Fichier chargé avec succès"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete the map {0}"
-msgstr ""
+msgstr "Supprimer la carte {0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
@@ -8623,7 +8624,7 @@ msgstr "Veuillez examiner les données et vous assurer qu'elles sont correctes. 
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Calibrate manually"
-msgstr ""
+msgstr "Étalonner manuellement"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Choose Displace or Aggregate only when the layer holds protection or "
@@ -8894,7 +8895,7 @@ msgstr "Colonne 10"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
-msgstr ""
+msgstr "Cliquez sur une graduation étiquetée de l’axe Y."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -9039,4 +9040,4 @@ msgstr "Échec de la suppression du jeu de données : {0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Second tick value"
-msgstr ""
+msgstr "Valeur de la deuxième graduation"

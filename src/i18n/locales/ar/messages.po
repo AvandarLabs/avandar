@@ -604,7 +604,7 @@ msgstr "كبير جدًا"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "log"
-msgstr ""
+msgstr "سجل"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save to dashboard\"."
@@ -647,7 +647,7 @@ msgstr "حدّ فاصل متنازع عليه أو غير محدد"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete map?"
-msgstr ""
+msgstr "هل تريد حذف الخريطة؟"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
@@ -883,7 +883,7 @@ msgstr "ابحث في كتالوج البيانات لإضافة مجموعات 
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
-msgstr ""
+msgstr "قيمة التدريج الأول"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -2040,7 +2040,7 @@ msgstr "حفظ عنوان URL"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Map deleted"
-msgstr ""
+msgstr "تم حذف الخريطة"
 
 #: src/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents.ts
 msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
@@ -2226,7 +2226,7 @@ msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه. س�
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} was deleted."
-msgstr ""
+msgstr "تم حذف {0}."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -2821,7 +2821,8 @@ msgstr "الطبقات"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
 "pt)"
-msgstr ""
+msgstr "المحور ص من {0} إلى {1}، {scaleLabel}، يلائم {2} تدريجات (الخطأ الأقصى "
+"{residual} نقطة)"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3534,7 +3535,7 @@ msgstr "الدور"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a second labelled tick on the y-axis."
-msgstr ""
+msgstr "انقر على تدريج مُسمّى ثانٍ على المحور ص."
 
 #. placeholder {0}: columnIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -6112,7 +6113,7 @@ msgstr "يحذف مساحة العمل هذه وجميع بياناتها نها
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
 msgid "Click a point on the axis"
-msgstr ""
+msgstr "انقر على نقطة على المحور"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Extract with the assistant"
@@ -6856,7 +6857,7 @@ msgstr "سماحية التبسيط"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} and its layers will be removed. This cannot be undone."
-msgstr ""
+msgstr "ستتم إزالة {0} وطبقاته. لا يمكن التراجع عن هذا الإجراء."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
@@ -6872,7 +6873,7 @@ msgstr "فقط ما تم استعلامه"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Apply calibration"
-msgstr ""
+msgstr "تطبيق المعايرة"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
@@ -7657,7 +7658,7 @@ msgstr "أعمدة خط العرض وخط الطول"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "linear"
-msgstr ""
+msgstr "خطي"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -8011,7 +8012,7 @@ msgstr "تم تحميل الملف بنجاح"
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete the map {0}"
-msgstr ""
+msgstr "حذف الخريطة {0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
@@ -8414,7 +8415,7 @@ msgstr "يرجى إلقاء نظرة على البيانات والتأكد من
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Calibrate manually"
-msgstr ""
+msgstr "المعايرة يدويًا"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Choose Displace or Aggregate only when the layer holds protection or "
@@ -8682,7 +8683,7 @@ msgstr "العمود 10"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
-msgstr ""
+msgstr "انقر على تدريج مُسمّى على المحور ص."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
@@ -8823,4 +8824,4 @@ msgstr "فشل حذف مجموعة البيانات: {0}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Second tick value"
-msgstr ""
+msgstr "قيمة التدريج الثاني"
