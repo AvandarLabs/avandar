@@ -1,3 +1,7 @@
+import {
+  coversColumns,
+  normalizeColumns,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type {
   RelationCacheEntry,
   RelationCachePort,
@@ -9,14 +13,10 @@ import type {
  *
  * Faithful in the ways the mediator depends on: an entry is only served to the
  * principal that wrote it, `probe` returns hits and misses without touching a
- * payload, and `readPayload` is a separate call that can independently return
- * nothing so the "metadata survived, payload did not" path is reachable.
- *
- * Deliberately simplified where the mediator does not exercise the port yet:
- * matching ignores `definition` and treats every entry as `columns: "all"`,
- * because nothing projects columns or carries a defining text so far. When
- * column projection lands, this fake has to grow the superset reuse rule or it
- * will quietly pass tests the real port would fail.
+ * payload, `readPayload` is a separate call that can independently return
+ * nothing so the "metadata survived, payload did not" path is reachable, and
+ * column coverage uses `coversColumns` so a finite entry does not serve a
+ * wider request. Matching still ignores `definition`.
  */
 export function createInMemoryRelationCache(): RelationCachePort & {
   /** Drops a payload while leaving its metadata, to test a torn write. */
@@ -47,11 +47,15 @@ export function createInMemoryRelationCache(): RelationCachePort & {
         const stored = entriesByKey.get(
           toKey(key.principal, key.relation.id),
         );
-        if (stored) {
-          hits.push({ key, entry: stored.entry });
-        } else {
+        if (stored === undefined) {
           misses.push({ key, growFrom: undefined });
+          return;
         }
+        if (coversColumns(stored.entry.columns, key.columns)) {
+          hits.push({ key, entry: stored.entry });
+          return;
+        }
+        misses.push({ key, growFrom: stored.entry });
       });
       return { hits, misses };
     },
@@ -78,7 +82,7 @@ export function createInMemoryRelationCache(): RelationCachePort & {
           principalKey: write.identity.principal,
           tableName: write.identity.relation.id,
           definitionToken: "",
-          columns: write.columns,
+          columns: normalizeColumns(write.columns),
           staleAt: undefined,
         },
         payload: write.payload,

@@ -190,6 +190,32 @@ export async function makePreparedRelationCacheKeyFromKey(
 }
 
 /**
+ * Sorts and deduplicates a finite column set. `"all"` is unchanged.
+ */
+export function normalizeColumns(
+  columns: readonly string[] | "all",
+): readonly string[] | "all" {
+  if (columns === "all") {
+    return "all";
+  }
+  return [...new Set(columns)].sort();
+}
+
+/**
+ * The column set that covers both sides. `"all"` absorbs anything; two
+ * finite sets are sorted and deduplicated.
+ */
+export function unionColumnSets(
+  left: readonly string[] | "all",
+  right: readonly string[] | "all",
+): readonly string[] | "all" {
+  if (left === "all" || right === "all") {
+    return "all";
+  }
+  return normalizeColumns([...left, ...right]);
+}
+
+/**
  * Whether a cached column set covers a requested one. `"all"` cached covers
  * anything; a finite cached set never covers a request for `"all"`. Column
  * names are compared case-sensitively by decision: DuckDB preserves case in

@@ -61,7 +61,14 @@ export type RelationSource =
 export type AcquiredRelationBytes = {
   datasetId: Dataset.Id;
   parquetBlob: Blob;
+  /** The columns actually held in `parquetBlob`. */
+  columns: readonly string[] | "all";
 };
+
+/** Per-dataset column sets a query needs, or `"all"` when unknown. */
+export type NeededColumnsByDatasetId = Readonly<
+  Record<string, readonly string[] | "all">
+>;
 
 /** The per-workspace or per-snapshot policy a query runner is built from. */
 export type QetlRunnerOptions = {
