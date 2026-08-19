@@ -45,6 +45,18 @@ function _joinLines(lines: readonly TextLine[]): string {
 }
 
 /**
+ * The region's lines joined back into one run of text.
+ *
+ * Exported because the model-assist path has to send the region's text and
+ * only the region's text. Sharing this function is what guarantees the
+ * assistant sees exactly what the rules saw: the box the user drew, not the
+ * page around it and not the document.
+ */
+export function joinRegionText(region: RegionGeometry): string {
+  return _joinLines(groupLines(region.textItems));
+}
+
+/**
  * Reads measurements out of a region of running prose.
  *
  * Lines are joined before sentences are split, because a line break inside a
@@ -55,7 +67,7 @@ export function extractProseMeasures(
   region: RegionGeometry,
   options: { regionId: string },
 ): ExtractedTable {
-  const text = _joinLines(groupLines(region.textItems));
+  const text = joinRegionText(region);
 
   const measurements = text.split(SENTENCE_SPLIT).flatMap((sentence) => {
     return extractMeasurements(sentence);

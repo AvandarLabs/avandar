@@ -1,31 +1,24 @@
-import {
-  ActionIcon,
-  Alert,
-  Badge,
-  Box,
-  Group,
-  Pagination,
-  Paper,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+import { Alert, Box, Group, Pagination, Stack, Text } from "@mantine/core";
 import { useCallback, useMemo, useState } from "react";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { PdfPagePreview } from "./PdfPagePreview";
+import { PdfRegionCard } from "./PdfRegionCard";
 import { PdfRegionOverlay } from "./PdfRegionOverlay";
+import {
+  KEPT_RULE_RESULTS,
+  runRegionModelAssist,
+} from "./runRegionModelAssist";
 import type { Highlight } from "./PdfPagePreview";
+import type { AssistStatus } from "./PdfRegionCard";
 import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion";
-import type { BBox, PdfRegion, PdfRegionShape } from "@/workers/pdfSniff/types";
+import type {
+  BBox,
+  ExtractedTable,
+  PageGeometry,
+  PdfRegion,
+} from "@/workers/pdfSniff/types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
-
-const SHAPE_OPTIONS: ReadonlyArray<{ value: PdfRegionShape; label: string }> = [
-  { value: "grid_table", label: "Table" },
-  { value: "labelled_graphic", label: "Labelled graphic (map, chart, tiles)" },
-  { value: "repeating_blocks", label: "Repeating labelled blocks" },
-  { value: "prose_measures", label: "Numbers in prose" },
-];
 
 const PREVIEW_WIDTH = 420;
 
@@ -35,11 +28,22 @@ const FALLBACK_PAGE_SIZE = { widthPt: 595, heightPt: 842 };
 type Props = {
   file: File;
   pageCount: number;
+  /** Page geometry, so a region's own text can be read for the assist. */
+  pages: readonly PageGeometry[];
   regions: readonly PdfRegion[];
+  /** What extraction produced, one per region. */
+  tables: readonly ExtractedTable[];
   classifications: Readonly<Record<string, RegionClassification>>;
   activeRegionId: string | null;
+  workspaceId: Workspace.Id;
+  /** Undefined while the session is still loading; the assist needs it. */
+  userId: string | undefined;
   onRegionsChange: (regions: readonly PdfRegion[]) => void;
   onActiveRegionChange: (regionId: string) => void;
+  /** Called with a region's table once model rows have been merged in. */
+  onTableChange: (table: ExtractedTable) => void;
+  /** Records which model contributed, so the save can write `llm_model`. */
+  onLlmModelUsed: (llmModel: string) => void;
 };
 
 /**
@@ -53,17 +57,35 @@ type Props = {
 export function PdfRegionPicker({
   file,
   pageCount,
+  pages,
   regions,
+  tables,
   classifications,
   activeRegionId,
+  workspaceId,
+  userId,
   onRegionsChange,
   onActiveRegionChange,
+  onTableChange,
+  onLlmModelUsed,
 }: Readonly<Props>): ReactNode {
   const [pageIndex, setPageIndex] = useState(0);
   const [scale, setScale] = useState(
     PREVIEW_WIDTH / FALLBACK_PAGE_SIZE.widthPt,
   );
   const [pageSize, setPageSize] = useState(FALLBACK_PAGE_SIZE);
+  const [assistStatuses, setAssistStatuses] = useState<
+    Readonly<Record<string, AssistStatus>>
+  >({});
+  const isOnline = useIsOnline();
+
+  const tablesByRegionId = useMemo(() => {
+    return new Map(
+      tables.map((table) => {
+        return [table.regionId, table];
+      }),
+    );
+  }, [tables]);
 
   const updateRegion = (id: string, patch: Partial<PdfRegion>): void => {
     onRegionsChange(
@@ -89,6 +111,60 @@ export function PdfRegionPicker({
       },
     ]);
     onActiveRegionChange(id);
+  };
+
+  const setAssistStatus = (regionId: string, status: AssistStatus): void => {
+    setAssistStatuses((currentStatuses) => {
+      return { ...currentStatuses, [regionId]: status };
+    });
+  };
+
+  /**
+   * Runs the assist for one region and reports what happened.
+   *
+   * A thrown error is caught rather than surfaced, because the promise this
+   * feature makes is that the rule-based rows survive whatever the network
+   * does. The table is replaced only on the one path that produced rows.
+   */
+  const handleAssist = async (
+    region: PdfRegion,
+    ruleTable: ExtractedTable,
+  ): Promise<void> => {
+    if (userId === undefined) {
+      setAssistStatus(region.id, {
+        isRunning: false,
+        message: `You need to be signed in to ask the assistant. ${KEPT_RULE_RESULTS}`,
+      });
+      return;
+    }
+    setAssistStatus(region.id, { isRunning: true });
+    try {
+      const outcome = await runRegionModelAssist({
+        pages,
+        region,
+        ruleTable,
+        workspaceId,
+        userId,
+      });
+      if (outcome.kind === "skipped") {
+        setAssistStatus(region.id, {
+          isRunning: false,
+          message: outcome.message,
+        });
+        return;
+      }
+      onTableChange(outcome.table);
+      onLlmModelUsed(outcome.llmModel);
+      setAssistStatus(region.id, {
+        isRunning: false,
+        message: `Added ${outcome.addedRowCount} rows from the assistant. Check them before saving.`,
+      });
+    } catch {
+      setAssistStatus(region.id, {
+        isRunning: false,
+        message: `Could not reach the assistant. ${KEPT_RULE_RESULTS}`,
+      });
+    }
   };
 
   /*
@@ -165,90 +241,35 @@ export function PdfRegionPicker({
         )}
 
         {regions.map((region) => {
-          const classification = classifications[region.id];
+          const table = tablesByRegionId.get(region.id);
           return (
-            <Paper
+            <PdfRegionCard
               key={region.id}
-              withBorder
-              p="sm"
-              onClick={() => {
+              region={region}
+              table={table}
+              classification={classifications[region.id]}
+              isActive={region.id === activeRegionId}
+              assistStatus={assistStatuses[region.id]}
+              isOnline={isOnline}
+              onSelect={() => {
                 onActiveRegionChange(region.id);
               }}
-              style={{
-                cursor: "pointer",
-                borderColor:
-                  region.id === activeRegionId ?
-                    "var(--mantine-color-blue-5)"
-                  : undefined,
+              onPatch={(patch) => {
+                updateRegion(region.id, patch);
               }}
-            >
-              <Stack gap="xs">
-                <Group justify="space-between" wrap="nowrap">
-                  <TextInput
-                    size="xs"
-                    aria-label={`Name of ${region.label}`}
-                    value={region.label}
-                    onChange={(event) => {
-                      updateRegion(region.id, {
-                        label: event.currentTarget.value,
-                      });
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
-                    aria-label={`Remove ${region.label}`}
-                    onClick={(event) => {
-                      // Otherwise the click also reaches the card and makes
-                      // the region we are deleting the active one.
-                      event.stopPropagation();
-                      onRegionsChange(
-                        regions.filter((other) => {
-                          return other.id !== region.id;
-                        }),
-                      );
-                    }}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Group>
-
-                <Select
-                  size="xs"
-                  label="Read as"
-                  data={[...SHAPE_OPTIONS]}
-                  value={region.shape}
-                  allowDeselect={false}
-                  onChange={(value) => {
-                    if (value) {
-                      updateRegion(region.id, {
-                        shape: value as PdfRegionShape,
-                      });
-                    }
-                  }}
-                />
-
-                {classification && (
-                  <Group gap="xs" align="flex-start" wrap="nowrap">
-                    <Badge
-                      size="xs"
-                      color={
-                        classification.confidence === "high" ? "green"
-                        : classification.confidence === "medium" ?
-                          "yellow"
-                        : "gray"
-                      }
-                    >
-                      {classification.confidence}
-                    </Badge>
-                    <Text size="xs" c="dimmed">
-                      {classification.evidence.join(" ")}
-                    </Text>
-                  </Group>
-                )}
-              </Stack>
-            </Paper>
+              onRemove={() => {
+                onRegionsChange(
+                  regions.filter((other) => {
+                    return other.id !== region.id;
+                  }),
+                );
+              }}
+              onAssist={() => {
+                if (table) {
+                  void handleAssist(region, table);
+                }
+              }}
+            />
           );
         })}
       </Stack>
