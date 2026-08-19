@@ -25,7 +25,10 @@ function _Wrapper({
       initialStateOverrides={{
         isOpen: false,
         isAvailable: true,
+        layout: "docked",
+        caseDesignSessionNonce: 0,
         pendingClarification: undefined,
+        pendingCaseTypeDraft: undefined,
       }}
     >
       <NuxStateManager.Provider

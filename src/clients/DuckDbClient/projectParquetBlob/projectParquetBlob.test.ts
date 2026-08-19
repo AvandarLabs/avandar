@@ -33,7 +33,9 @@ function _client(): Pick<DuckDbClientOperations, "getDb" | "runRawQuery"> {
   };
 }
 
-const LEASE = { datasetIds: new Set<string>() } as unknown as DatasetDuckDbLease;
+const LEASE = {
+  datasetIds: new Set<string>(),
+} as unknown as DatasetDuckDbLease;
 
 beforeEach(() => {
   vi.clearAllMocks();

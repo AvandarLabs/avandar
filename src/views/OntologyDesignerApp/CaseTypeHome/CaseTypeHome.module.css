@@ -1,6 +1,6 @@
 .page {
-  max-width: 72rem;
   margin-inline: auto;
+  max-width: 72rem;
   padding-bottom: var(--mantine-spacing-xl);
 }
 
@@ -13,11 +13,11 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
   gap: var(--mantine-spacing-lg);
+  grid-template-columns: 1fr;
 }
 
-@media (min-width: 48em) {
+@media (width >= 48em) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -55,21 +55,20 @@
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
   align-items: stretch;
-  gap: var(--mantine-spacing-md);
-  width: 100%;
-  margin: 0;
-  padding: var(--mantine-spacing-lg);
-  text-align: left;
-  cursor: pointer;
   background: var(--ava-surface-raised);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-md);
   box-shadow: var(--mantine-shadow-sm);
   color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
   font: inherit;
+  gap: var(--mantine-spacing-md);
+  margin: 0;
+  padding: var(--mantine-spacing-lg);
+  text-align: left;
   transition:
     transform var(--ava-animation-duration-normal)
       var(--ava-animation-easing-out),
@@ -77,13 +76,14 @@
       var(--ava-animation-easing-out),
     border-color var(--ava-animation-duration-normal)
       var(--ava-animation-easing-out);
+  width: 100%;
 }
 
 .card:hover,
 .card:focus-visible {
-  transform: translateY(-2px);
   border-color: var(--mantine-color-primary-3);
   box-shadow: var(--mantine-shadow-md);
+  transform: translateY(-2px);
 }
 
 .card:focus-visible {
@@ -92,10 +92,10 @@
 }
 
 .footer {
+  border-top: 1px solid var(--ava-border-default);
   display: flex;
   justify-content: flex-end;
   padding-top: var(--mantine-spacing-sm);
-  border-top: 1px solid var(--ava-border-default);
 }
 
 .openHint {
@@ -105,19 +105,7 @@
 }
 
 .createCard {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--mantine-spacing-sm);
-  min-height: 220px;
-  width: 100%;
-  margin: 0;
-  padding: var(--mantine-spacing-lg);
-  text-align: center;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
   background: linear-gradient(
     180deg,
     var(--mantine-color-primary-0),
@@ -125,17 +113,29 @@
   );
   border: 1.5px dashed var(--mantine-color-primary-3);
   border-radius: var(--mantine-radius-md);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: var(--mantine-spacing-sm);
+  justify-content: center;
+  margin: 0;
+  min-height: 220px;
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
   transition:
     border-color var(--ava-animation-duration-normal)
       var(--ava-animation-easing-out),
     background-color var(--ava-animation-duration-normal)
       var(--ava-animation-easing-out);
+  width: 100%;
 }
 
 .createCard:hover,
 .createCard:focus-visible {
-  border-color: var(--mantine-color-primary-6);
   background: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-6);
 }
 
 .createCard:focus-visible {

@@ -1,4 +1,7 @@
-/** Pins in-memory cache superset reuse: subset hits, wider misses with growFrom. */
+/**
+ * Pins in-memory cache superset reuse: subset hits, wider misses with
+ * growFrom.
+ */
 
 import { describe, expect, it } from "vitest";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";

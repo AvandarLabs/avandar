@@ -1,7 +1,7 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .field {
@@ -9,8 +9,8 @@
 }
 
 .source {
-  font-family: var(--mantine-font-family-monospace);
   color: var(--mantine-color-neutral-5);
+  font-family: var(--mantine-font-family-monospace);
 }
 
 .value {

@@ -434,7 +434,7 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
   it("still refuses a qualified name ending in a staging table name", () => {
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-        `SELECT * FROM other.\"ava_staging_individuals_${CONCEPT_ID}\"`,
+        `SELECT * FROM other."ava_staging_individuals_${CONCEPT_ID}"`,
       ),
     ).toEqual({
       kind: "unsafe",

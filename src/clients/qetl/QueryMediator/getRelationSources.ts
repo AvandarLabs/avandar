@@ -10,6 +10,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -84,6 +85,21 @@ async function _getXlsxExtractors(
   });
 }
 
+async function _getPdfExtractors(
+  options: Readonly<SourceRecordReaderOptions>,
+): Promise<RelationSource[]> {
+  const sources = await PdfFileDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "pdf_file",
+      sourceDataset,
+    };
+  });
+}
+
 async function _getVirtualExtractors(
   options: Readonly<SourceRecordReaderOptions>,
 ): Promise<RelationSource[]> {
@@ -138,7 +154,7 @@ async function _getGoogleSheetsExtractors(
  * A `Record` keyed by the source-type union rather than a `match`, which keeps
  * the exhaustiveness the `match` gave (adding a source type fails to compile
  * here until it has an entry) while making a new source one entry instead of a
- * new branch. The five readers stay separate because each pairs its own literal
+ * new branch. The readers stay separate because each pairs its own literal
  * source type with its own source-record type, and `RelationSource` is a
  * discriminated union over exactly that pairing: one generic reader would admit
  * mismatched combinations the union forbids.
@@ -149,6 +165,7 @@ const _EXTRACTOR_READER_BY_SOURCE_TYPE: Record<
 > = {
   csv_file: _getCsvExtractors,
   xlsx_file: _getXlsxExtractors,
+  pdf_file: _getPdfExtractors,
   virtual: _getVirtualExtractors,
   open_data: _getOpenDataExtractors,
   google_sheets: _getGoogleSheetsExtractors,

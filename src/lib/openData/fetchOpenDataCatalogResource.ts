@@ -46,7 +46,9 @@ export async function fetchOpenDataCatalogResource(
 
   return {
     contentKind,
-    bytes: new Uint8Array(await response.arrayBuffer()) as Uint8Array<ArrayBuffer>,
+    bytes: new Uint8Array(
+      await response.arrayBuffer(),
+    ) as Uint8Array<ArrayBuffer>,
     sourceVersion: response.headers.get("X-Ava-Source-Version") ?? undefined,
   };
 }
