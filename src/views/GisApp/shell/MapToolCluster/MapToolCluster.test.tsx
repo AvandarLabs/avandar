@@ -8,13 +8,13 @@ import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@/test-utils";
 import {
-    createFakeMap,
-    emitWindowPointer,
+  createFakeMap,
+  emitWindowPointer,
 } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import {
-    AreaToolHarness,
-    MeasureToolHarness,
+  AreaToolHarness,
+  MeasureToolHarness,
 } from "@/views/GisApp/shell/MapToolCluster/mapToolClusterHarness";
 import type { FeatureFlag } from "@/config/FeatureFlagConfig";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";

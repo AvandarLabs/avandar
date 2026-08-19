@@ -66,33 +66,30 @@ export function useMapPanPolicy({ mapRef, mapToolMode }: Options): void {
     },
     [isAltPanHeld, isPointerDown, mapRef, mapToolMode],
   );
-  useEffect(
-    function bindAltPanKeys() {
-      const onKeyDown = (event: KeyboardEvent): void => {
-        if (event.key !== "Alt" || _isTypingTarget(event.target)) {
-          return;
-        }
-        setIsAltPanHeld(true);
-      };
-      const onKeyUp = (event: KeyboardEvent): void => {
-        if (event.key === "Alt") {
-          setIsAltPanHeld(false);
-        }
-      };
-      const onBlur = (): void => {
+  useEffect(function bindAltPanKeys() {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== "Alt" || _isTypingTarget(event.target)) {
+        return;
+      }
+      setIsAltPanHeld(true);
+    };
+    const onKeyUp = (event: KeyboardEvent): void => {
+      if (event.key === "Alt") {
         setIsAltPanHeld(false);
-      };
-      window.addEventListener("keydown", onKeyDown);
-      window.addEventListener("keyup", onKeyUp);
-      window.addEventListener("blur", onBlur);
-      return () => {
-        window.removeEventListener("keydown", onKeyDown);
-        window.removeEventListener("keyup", onKeyUp);
-        window.removeEventListener("blur", onBlur);
-      };
-    },
-    [],
-  );
+      }
+    };
+    const onBlur = (): void => {
+      setIsAltPanHeld(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
   useEffect(
     function bindPointerDownCursor() {
       const canvas = mapRef.current?.getCanvas();

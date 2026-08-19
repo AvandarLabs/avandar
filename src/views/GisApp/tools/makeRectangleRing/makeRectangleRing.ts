@@ -1,7 +1,12 @@
 type Vertex = readonly [number, number];
 
-/** Closed rectangle ring from two opposite corners, or empty when area is zero. */
-export function makeRectangleRing(a: Vertex, b: Vertex): [number, number][] {
+/**
+ * Closed rectangle ring from two opposite corners, or empty when area is zero.
+ */
+export function makeRectangleRing(
+  a: Vertex,
+  b: Vertex,
+): Array<[number, number]> {
   const minLng = Math.min(a[0], b[0]);
   const maxLng = Math.max(a[0], b[0]);
   const minLat = Math.min(a[1], b[1]);

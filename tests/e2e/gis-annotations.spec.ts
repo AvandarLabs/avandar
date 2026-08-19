@@ -3,8 +3,8 @@ import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
 import { seedAvaMap } from "./helpers/seedAvaMap";
 import {
-    createSupabaseAdminClient,
-    getWorkspaceIdBySlug,
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";

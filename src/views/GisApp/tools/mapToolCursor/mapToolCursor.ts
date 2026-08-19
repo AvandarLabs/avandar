@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
 import {
-    ARROW_CURSOR,
-    PENCIL_CURSOR,
-    POLYGON_CURSOR,
+  ARROW_CURSOR,
+  PENCIL_CURSOR,
+  POLYGON_CURSOR,
 } from "@/views/GisApp/tools/mapToolCursor/mapToolCursorImages";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 

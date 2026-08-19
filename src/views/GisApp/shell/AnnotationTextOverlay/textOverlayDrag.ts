@@ -1,6 +1,6 @@
 import {
-    MAP_TOOL_TEXT_SIZE_MAX_PX,
-    MAP_TOOL_TEXT_SIZE_MIN_PX,
+  MAP_TOOL_TEXT_SIZE_MAX_PX,
+  MAP_TOOL_TEXT_SIZE_MIN_PX,
 } from "@/views/GisApp/tools/MapToolGesture.constants";
 import type { Map as MapLibreMap } from "maplibre-gl";
 
@@ -69,11 +69,7 @@ export function applyTextOverlayDrag(
 ): void {
   if (drag.type === "move") {
     const [lng, lat] = _clientToLngLat(map, event.clientX, event.clientY);
-    const start = _clientToLngLat(
-      map,
-      drag.startClient.x,
-      drag.startClient.y,
-    );
+    const start = _clientToLngLat(map, drag.startClient.x, drag.startClient.y);
     onMove([
       drag.startLngLat[0] + (lng - start[0]),
       drag.startLngLat[1] + (lat - start[1]),

@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import type {
-    MapLayerSpec,
-    MapSpec,
+  MapLayerSpec,
+  MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 

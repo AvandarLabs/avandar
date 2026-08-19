@@ -130,16 +130,17 @@ describe("overlay updaters", () => {
       featureId: first.id,
       nextFeatures: [replacement],
     });
-    expect(split.annotations.features.map((feature) => feature.id)).toEqual([
-      replacement.id,
-      second.id,
-    ]);
+    expect(
+      split.annotations.features.map((feature) => {
+        return feature.id;
+      }),
+    ).toEqual([replacement.id, second.id]);
     expect(
       AvaMapConfig.withAnnotationFeaturesReplaced({
         config: split,
         featureId: replacement.id,
         nextFeatures: [],
-      }).annotations.features.map((feature) => feature.id),
+      }).annotations.features.map((feature) => {return feature.id}),
     ).toEqual([second.id]);
   });
 });

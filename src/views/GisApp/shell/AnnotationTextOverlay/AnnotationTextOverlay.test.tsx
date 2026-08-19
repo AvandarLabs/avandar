@@ -7,9 +7,9 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
 import {
-    createFakeMap,
-    emitTargetPointer,
-    emitWindowPointer,
+  createFakeMap,
+  emitTargetPointer,
+  emitWindowPointer,
 } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 
 function _makeTextFeature(

@@ -1,15 +1,15 @@
 import { useHotkeys } from "@mantine/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
+import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
 import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayerSelection";
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
-import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
-import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -156,9 +156,9 @@ function useSelectCreatedAnnotation(options: {
 }
 
 /** Collects the map state, data rendering, and interaction callbacks. */
-export function useGisAppState(
-  avaMap: AvaMap.T,
-): ReturnType<typeof useGisAppMapCallbacks> &
+export function useGisAppState(avaMap: AvaMap.T): ReturnType<
+  typeof useGisAppMapCallbacks
+> &
   ReturnType<typeof useGisAppCanvas> &
   ReturnType<typeof useGisAppChrome> &
   ReturnType<typeof useAvaMapEditor> &

@@ -2,14 +2,14 @@ import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 import css from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.module.css";
 import {
-    applyTextOverlayDrag,
-    beginTextMoveDrag,
-    beginTextResizeDrag,
-    endTextOverlayDrag,
+  applyTextOverlayDrag,
+  beginTextMoveDrag,
+  beginTextResizeDrag,
+  endTextOverlayDrag,
 } from "@/views/GisApp/shell/AnnotationTextOverlay/textOverlayDrag";
 import {
-    MAP_TOOL_TEXT_SIZE_MAX_PX,
-    MAP_TOOL_TEXT_SIZE_MIN_PX,
+  MAP_TOOL_TEXT_SIZE_MAX_PX,
+  MAP_TOOL_TEXT_SIZE_MIN_PX,
 } from "@/views/GisApp/tools/MapToolGesture.constants";
 import type { TextOverlayDrag } from "@/views/GisApp/shell/AnnotationTextOverlay/textOverlayDrag";
 import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";

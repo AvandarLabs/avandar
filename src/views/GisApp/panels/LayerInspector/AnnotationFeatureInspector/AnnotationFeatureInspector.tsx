@@ -1,11 +1,11 @@
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
-    Button,
-    ColorInput,
-    NumberInput,
-    Stack,
-    TextInput,
+  Button,
+  ColorInput,
+  NumberInput,
+  Stack,
+  TextInput,
 } from "@mantine/core";
 import { useEffect } from "react";
 import { match } from "ts-pattern";

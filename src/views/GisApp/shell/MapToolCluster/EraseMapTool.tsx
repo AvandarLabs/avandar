@@ -10,7 +10,9 @@ type Props = {
   onMapToolModeChange: (mode: MapToolMode) => void;
 };
 
-/** Eraser tool: removes pencil strokes in pieces and other annotations whole. */
+/**
+ * Eraser tool: removes pencil strokes in pieces and other annotations whole.
+ */
 export function EraseMapTool({
   mapToolMode,
   onMapToolModeChange,

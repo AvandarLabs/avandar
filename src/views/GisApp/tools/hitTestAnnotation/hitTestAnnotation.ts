@@ -35,7 +35,7 @@ function _distanceToSegment(point: Point, start: Point, end: Point): number {
 }
 
 function _hitsPolyline(
-  coordinates: ReadonlyArray<Vertex>,
+  coordinates: readonly Vertex[],
   options: Options,
 ): boolean {
   return coordinates.some((vertex, index) => {
@@ -53,9 +53,14 @@ function _hitsPolyline(
   });
 }
 
-function _hitsText(feature: Extract<AvaMapConfig.AnnotationFeature, { kind: "text" }>, options: Options): boolean {
+function _hitsText(
+  feature: Extract<AvaMapConfig.AnnotationFeature, { kind: "text" }>,
+  options: Options,
+): boolean {
   const anchor = options.project(feature.geometry.coordinates);
-  return _distance(options.eraser, anchor) <= options.radiusPx + feature.sizePx / 2;
+  return (
+    _distance(options.eraser, anchor) <= options.radiusPx + feature.sizePx / 2
+  );
 }
 
 function _hitsArea(

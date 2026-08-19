@@ -6,13 +6,13 @@ import { match } from "ts-pattern";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
 import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
 import {
-    attachAoiGestures,
-    attachMeasureGestures,
+  attachAoiGestures,
+  attachMeasureGestures,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
 import type {
-    AoiGestureCallbacks,
-    MeasureGestureCallbacks,
+  AoiGestureCallbacks,
+  MeasureGestureCallbacks,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Map as MapLibreMap } from "maplibre-gl";

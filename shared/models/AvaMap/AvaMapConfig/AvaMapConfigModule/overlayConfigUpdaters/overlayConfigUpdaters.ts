@@ -1,12 +1,12 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type {
-    AnnotationFeature,
-    AnnotationFeatureId,
-    AnnotationLayer,
-    AoiPolygon,
-    AvaMapConfigRead,
-    TimeRange,
+  AnnotationFeature,
+  AnnotationFeatureId,
+  AnnotationLayer,
+  AoiPolygon,
+  AvaMapConfigRead,
+  TimeRange,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 
 /** Empty annotation overlay: visible, no features. */

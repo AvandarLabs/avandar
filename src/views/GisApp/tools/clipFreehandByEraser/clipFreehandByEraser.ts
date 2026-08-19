@@ -94,7 +94,7 @@ function _appendKeptSegment(pieces: Point[][], a: Point, b: Point): void {
 }
 
 type Options = {
-  coordinates: ReadonlyArray<Vertex>;
+  coordinates: readonly Vertex[];
   eraser: Point;
   radiusPx: number;
   project: (vertex: Vertex) => Point;
@@ -102,7 +102,9 @@ type Options = {
 };
 
 /** Remaining freehand polylines after a screen-space eraser dab. */
-export function clipFreehandByEraser(options: Options): [number, number][][] {
+export function clipFreehandByEraser(
+  options: Options,
+): Array<Array<[number, number]>> {
   const { coordinates, eraser, radiusPx, project, unproject } = options;
   const screenPieces: Point[][] = [];
   coordinates.forEach((vertex, index) => {
@@ -110,11 +112,14 @@ export function clipFreehandByEraser(options: Options): [number, number][][] {
     if (!nextVertex) {
       return;
     }
-    _keptSegmentPieces(project(vertex), project(nextVertex), eraser, radiusPx).forEach(
-      ([start, end]) => {
-        _appendKeptSegment(screenPieces, start, end);
-      },
-    );
+    _keptSegmentPieces(
+      project(vertex),
+      project(nextVertex),
+      eraser,
+      radiusPx,
+    ).forEach(([start, end]) => {
+      _appendKeptSegment(screenPieces, start, end);
+    });
   });
   return screenPieces
     .filter((piece) => {

@@ -6,15 +6,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@/test-utils";
 import { AnnotateHarness } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateHarness";
 import {
-    createFakeMap,
-    emitTargetPointer,
-    emitWindowPointer,
-    openAnnotateSubCluster,
+  createFakeMap,
+  emitTargetPointer,
+  emitWindowPointer,
+  openAnnotateSubCluster,
 } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import {
-    makeFreehandAnnotationFeature,
-    makeTextAnnotationFeature,
+  makeFreehandAnnotationFeature,
+  makeTextAnnotationFeature,
 } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 
 const spatialAvailability = vi.hoisted(() => {
@@ -452,11 +452,13 @@ describe("AnnotateMapTool", () => {
 
     expect(config.annotations.features).toHaveLength(2);
     expect(
-      config.annotations.features.every((feature) => feature.kind === "freehand"),
+      config.annotations.features.every(
+        (feature) => {return feature.kind === "freehand"},
+      ),
     ).toBe(true);
-    expect(config.annotations.features.map((feature) => feature.id)).not.toContain(
-      stroke.id,
-    );
+    expect(
+      config.annotations.features.map((feature) => {return feature.id}),
+    ).not.toContain(stroke.id);
   });
 
   it("does not erase while Alt is held", () => {
