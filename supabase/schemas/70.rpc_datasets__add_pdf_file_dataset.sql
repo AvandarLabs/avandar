@@ -81,3 +81,54 @@ begin
   return v_dataset;
 end;
 $$ language plpgsql security invoker;
+
+-- Function privileges.
+--
+-- REQUIRED, not optional. Postgres grants EXECUTE on every new function to
+-- PUBLIC, and no `alter default privileges` declaration can suppress that, so
+-- a function is the one object class that cannot be denied by default. Without
+-- this block the RPC is callable by `anon`, which is how it was born: its live
+-- ACL read `=X/postgres anon=X/postgres`.
+--
+-- Only `authenticated` invokes it. The single caller is the browser client in
+-- `src/clients/datasets/DatasetClient/createDatasetMutations.ts`; nothing
+-- server-side calls it, so `service_role` is deliberately not granted.
+revoke all on function public.rpc_datasets__add_pdf_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  boolean,
+  jsonb,
+  integer,
+  integer,
+  jsonb,
+  public.datasets__pdf_output_mode,
+  text
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_datasets__add_pdf_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  boolean,
+  jsonb,
+  integer,
+  integer,
+  jsonb,
+  public.datasets__pdf_output_mode,
+  text
+) to authenticated;

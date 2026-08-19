@@ -25,17 +25,37 @@ pnpm exec eslint .
 pnpm build
 ```
 
-For the browser tests you need local Supabase up (`pnpm db:reset` if not) and:
+For the browser tests you need a local Supabase stack up, and:
 
 ```bash
 pnpm fetch-gate-fixtures        # downloads the IMC PDF, verifies SHA-256
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199 npx playwright test tests/e2e/pdf-import.spec.ts
+npx playwright test tests/e2e/pdf-import.spec.ts
 ```
 
-**That port override is not optional.** `playwright.config.ts` reuses an
-existing dev server, and a vite instance from another worktree may be squatting
-5173 while pointing at a *different* Supabase. The symptom is a sign-in failure
-reading "Invalid login credentials", which looks nothing like the actual cause.
+**Whether you need a port override depends on whether this worktree is
+switched.** `playwright.config.ts` resolves its base URL as
+`PLAYWRIGHT_BASE_URL ?? http://127.0.0.1:${AVA_VITE_DEV_PORT || 5173}`, so the
+correct invocation differs by setup:
+
+- **Switched worktree (recommended).** `ava supabase switch <projectId>` starts
+  an isolated Supabase project for this branch, seeds it, and pins both its
+  ports and `AVA_VITE_DEV_PORT` into `.env.development`. Playwright reads that
+  pin and finds the right port by itself, so run the command above with **no
+  override**. Setting `PLAYWRIGHT_BASE_URL` here is actively wrong: it points
+  Playwright away from the port the switch assigned. Verify the pin with
+  `grep AVA_VITE_DEV_PORT .env.development`, and cross-check it against the
+  port `ava supabase switch` printed ("`pnpm dev` will serve this worktree on
+  port NNNN").
+- **Shared stack (not switched).** Every worktree shares one Supabase on the
+  standard ports, `AVA_VITE_DEV_PORT` is unset, and Playwright falls back to
+  5173, where a vite instance from another worktree may be squatting while
+  pointing at a *different* Supabase. Pass an explicit free port instead:
+  `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199 npx playwright test tests/e2e/pdf-import.spec.ts`.
+  The symptom of getting this wrong is a sign-in failure reading "Invalid login
+  credentials", which looks nothing like the actual cause.
+
+Prefer the switch. Besides fixing the port problem at the source, it keeps this
+branch's seven PDF migrations out of every other worktree's `supabase db diff`.
 
 ### What the gate proves
 
@@ -339,11 +359,19 @@ the seven `analytics` view pairs.
 
 ## 5. Environment notes
 
-- **Local Supabase** must be running for `pnpm test:db` and the E2E. `pnpm db:reset`
-  rebuilds and seeds.
-- **Port 5173 may be squatted** by another worktree's dev server pointing at a
-  different Supabase. Always run Playwright with
-  `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199`.
+- **Local Supabase** must be running for `pnpm test:db` and the E2E. Prefer
+  `ava supabase switch <projectId>`, which starts an isolated project for this
+  worktree and seeds it; `pnpm db:reset` rebuilds and seeds whichever stack is
+  currently selected. On the shared stack the branch is 7 migrations ahead, and
+  running `pnpm test:db` against it fails in three files
+  (`storage_original_file_object_names`, `exact_data_api_grants`,
+  `resource_deleted_triggers`) purely because those migrations are unapplied.
+  Confirm with `supabase migration list --local` before believing a failure.
+- **Port selection is automatic once switched.** The switch pins
+  `AVA_VITE_DEV_PORT` in `.env.development` and `playwright.config.ts` reads it,
+  so Playwright needs no override. Only on the unswitched shared stack do you
+  need `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199`, because another worktree's
+  dev server may be squatting 5173 against a different Supabase. See section 1.
 - **The IMC gate fixture is gitignored** (no confirmed redistribution licence).
   Run `pnpm fetch-gate-fixtures` to download it; the script verifies SHA-256
   **before** writing, because ReliefWeb returns HTTP 202 with an HTML challenge
@@ -368,5 +396,10 @@ Run the gate and the E2E. If both pass, the branch still does what it claims:
 ```bash
 pnpm fetch-gate-fixtures
 pnpm vitest run src/workers/pdfSniff/gateDocuments.test.ts
-PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199 npx playwright test tests/e2e/pdf-import.spec.ts
+
+# Switched worktree (recommended): no override, Playwright reads AVA_VITE_DEV_PORT.
+npx playwright test tests/e2e/pdf-import.spec.ts
+
+# Shared, unswitched stack only:
+# PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199 npx playwright test tests/e2e/pdf-import.spec.ts
 ```
