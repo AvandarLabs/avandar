@@ -267,6 +267,7 @@ function _pdfLoadResult(
     pageCount: 3,
     pages: [],
     status: "extracted",
+    outputMode: "natural",
     regions: [],
     columns: [_duckDbColumn("subject"), _duckDbColumn("value")],
     tables: [],

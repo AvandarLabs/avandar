@@ -58,7 +58,7 @@ export function PdfParseControls({
   onDataSourceMetadataChange,
   onRequestDataReparse,
 }: Readonly<Props>): ReactNode {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
   const loadResult = metadata.datasetLoadResult;

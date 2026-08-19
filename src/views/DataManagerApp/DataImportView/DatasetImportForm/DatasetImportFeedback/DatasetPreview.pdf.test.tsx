@@ -44,6 +44,8 @@ function _pdfDataSourceMetadata(): PdfDataSourceMetadata {
       pageCount: 3,
       pages: [],
       status: "needs_selection",
+      // No region picked yet, so no extraction has settled on a row shape.
+      outputMode: undefined,
       regions: [],
       columns: [],
       tables: [],
