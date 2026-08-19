@@ -65,7 +65,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
           onClose={app.closeInspector}
           feature={app.selectedFeature}
           cluster={app.selectedCluster}
-          popup={app.selectedLayer?.popup}
+          layer={app.selectedLayer}
           canvasRef={mapSurfaceRef}
           mapRef={app.mapInstance.mapRef}
           onRowClick={app.onRowClick}

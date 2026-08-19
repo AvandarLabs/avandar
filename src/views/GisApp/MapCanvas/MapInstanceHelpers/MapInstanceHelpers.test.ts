@@ -245,15 +245,31 @@ describe("MapInstanceHelpers.zoomToCluster", () => {
     });
   });
 
-  it("does nothing when the source cannot expand clusters", () => {
+  it("does nothing when the source cannot expand clusters", async () => {
     mapLibreMapMock.getSource.mockReturnValue(undefined);
 
-    MapInstanceHelpers.zoomToCluster(mapLibreMapMock as never, {
+    await MapInstanceHelpers.zoomToCluster(mapLibreMapMock as never, {
       sourceId: "ava-map-source-clinics",
       clusterId: 42,
       coordinates: [-73.9, 40.7],
     });
 
+    expect(mapLibreMapMock.easeTo).not.toHaveBeenCalled();
+  });
+
+  it("rejects the returned promise so a caller can surface the failure", async () => {
+    const getClusterExpansionZoom = vi
+      .fn()
+      .mockRejectedValue(new Error("network down"));
+    mapLibreMapMock.getSource.mockReturnValue({ getClusterExpansionZoom });
+
+    await expect(
+      MapInstanceHelpers.zoomToCluster(mapLibreMapMock as never, {
+        sourceId: "ava-map-source-clinics",
+        clusterId: 42,
+        coordinates: [-73.9, 40.7],
+      }),
+    ).rejects.toThrow("network down");
     expect(mapLibreMapMock.easeTo).not.toHaveBeenCalled();
   });
 });

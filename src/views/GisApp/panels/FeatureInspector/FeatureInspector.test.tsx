@@ -1,8 +1,8 @@
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ComponentProps } from "react";
 
 vi.mock(
@@ -33,10 +33,13 @@ const CLUSTER: ClusterSelection = {
   layerId: "ava-map-layer-clinics",
 };
 
-function _makePopup(urlTemplate: string): MapLayer.Popup {
+function _makeLayerWithPopup(urlTemplate: string): MapLayer.T {
   return {
-    columnIds: "all",
-    action: { label: "Open case", urlTemplate },
+    ...MapLayer.makeEmpty("Cases"),
+    popup: {
+      columnIds: "all",
+      action: { label: "Open case", urlTemplate },
+    },
   };
 }
 
@@ -51,7 +54,7 @@ function _renderInspector(
       }}
       feature={FEATURE}
       cluster={undefined}
-      popup={undefined}
+      layer={undefined}
       canvasRef={createRef<HTMLDivElement>()}
       mapRef={{ current: undefined }}
       onRowClick={vi.fn()}
@@ -83,7 +86,7 @@ describe("FeatureInspector", () => {
 
   it("renders an allowed popup URL with feature values", () => {
     _renderInspector({
-      popup: _makePopup("https://example.test/cases/{case_id}"),
+      layer: _makeLayerWithPopup("https://example.test/cases/{case_id}"),
     });
 
     expect(screen.getByRole("link", { name: "Open case" })).toHaveAttribute(
@@ -93,7 +96,7 @@ describe("FeatureInspector", () => {
   });
 
   it("does not render a link for an unsafe popup URL", () => {
-    _renderInspector({ popup: _makePopup("javascript:alert(1)") });
+    _renderInspector({ layer: _makeLayerWithPopup("javascript:alert(1)") });
 
     expect(
       screen.queryByRole("link", { name: "Open case" }),

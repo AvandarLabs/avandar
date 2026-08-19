@@ -10,11 +10,13 @@ import {
   useClusterLeavesPage,
 } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/useClusterLeavesPage/useClusterLeavesPage";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { ReactNode, RefObject } from "react";
 
 type Props = {
   cluster: ClusterSelection;
+  layer: MapLayer.T | undefined;
   mapRef: RefObject<MapLibreMap | undefined>;
   onRowClick: (feature: GeoJSON.Feature) => void;
 };
@@ -26,11 +28,13 @@ type Props = {
  */
 export function ClusterFeatureTable({
   cluster,
+  layer,
   mapRef,
   onRowClick,
 }: Props): ReactNode {
   const { t } = useLingui();
   const [page, setPage] = useState(1);
+  const [zoomError, setZoomError] = useState(false);
   const pageState = useClusterLeavesPage({
     mapRef,
     sourceId: cluster.sourceId,
@@ -44,9 +48,13 @@ export function ClusterFeatureTable({
 
   const onZoomToCluster = (): void => {
     const map = mapRef.current;
-    if (map) {
-      MapInstanceHelpers.zoomToCluster(map, cluster);
+    if (!map) {
+      return;
     }
+    setZoomError(false);
+    MapInstanceHelpers.zoomToCluster(map, cluster).catch(() => {
+      setZoomError(true);
+    });
   };
 
   return (
@@ -64,16 +72,22 @@ export function ClusterFeatureTable({
           {t`Zoom to cluster`}
         </Button>
       </Group>
+      {zoomError ?
+        <Text c="red" size="xs" px="sm" pb="xs">
+          {t`Could not zoom to this cluster.`}
+        </Text>
+      : null}
       {pageState.status === "loading" ?
         <Group justify="center" p="md">
           <Loader role="status" aria-label={t`Loading features`} size="sm" />
         </Group>
       : pageState.status === "error" ?
         <Text c="red" size="sm" p="md">
-          {t`Could not load this cluster's features. Try again.`}
+          {t`Could not load this cluster's features.`}
         </Text>
       : <ClusterFeatureTableBody
           leaves={pageState.leaves}
+          layer={layer}
           page={page}
           totalPages={totalPages}
           onPageChange={setPage}

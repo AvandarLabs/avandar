@@ -29,8 +29,8 @@ type Props = {
   /** Returns from a drilled-into feature to its originating cluster table. */
   onBackToTable: () => void;
 
-  /** The popup config of the layer the feature or cluster came from. */
-  popup: MapLayer.Popup | undefined;
+  /** The layer the feature or cluster came from, source of its popup config. */
+  layer: MapLayer.T | undefined;
 };
 
 /**
@@ -42,13 +42,14 @@ export function FeatureInspector({
   onClose,
   feature,
   cluster,
-  popup,
+  layer,
   canvasRef,
   mapRef,
   onRowClick,
   onBackToTable,
 }: Props): ReactNode {
   const { t } = useLingui();
+  const popup = layer?.popup;
   const properties: Record<string, unknown> = feature?.properties ?? {};
   const showTable = cluster !== undefined && feature === undefined;
   const showBackToTable = cluster !== undefined && feature !== undefined;
@@ -68,6 +69,7 @@ export function FeatureInspector({
           {showTable && cluster ?
             <ClusterFeatureTable
               cluster={cluster}
+              layer={layer}
               mapRef={mapRef}
               onRowClick={onRowClick}
             />

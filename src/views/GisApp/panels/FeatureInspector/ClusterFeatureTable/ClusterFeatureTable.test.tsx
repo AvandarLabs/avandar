@@ -1,6 +1,13 @@
+import { Model } from "@avandar/models";
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
 
@@ -24,6 +31,37 @@ function _makeFeature(id: number, name: string): GeoJSON.Feature {
     id,
     geometry: { type: "Point", coordinates: [0, 0] },
     properties: { name },
+  };
+}
+
+function _makeDatasetColumn(name: string): DatasetColumn.T {
+  const now = new Date().toISOString();
+  return Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: uuid<Dataset.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    name,
+    originalName: name,
+    originalDataType: "VARCHAR",
+    dataType: "varchar",
+    detectedDataType: "VARCHAR",
+    description: undefined,
+    columnIdx: 0,
+  });
+}
+
+/** A layer whose popup shows every column of a query with these names. */
+function _makeLayerWithColumns(columnNames: readonly string[]): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Cases");
+  const queryColumns = columnNames.map((name) => {
+    return QueryColumn.makeFromDatasetColumn(_makeDatasetColumn(name));
+  });
+  return {
+    ...layer,
+    source: { ...layer.source, queryColumns },
+    popup: { columnIds: "all", action: undefined },
   };
 }
 
@@ -67,6 +105,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -87,6 +126,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -108,6 +148,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -125,6 +166,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -142,6 +184,58 @@ describe("ClusterFeatureTable", () => {
     });
   });
 
+  it("keeps the same columns across pages even when their leaves carry different property keys", async () => {
+    // The layer's popup shows every query column ("all"), and its query has
+    // two columns. Page 1's leaf only carries "name"; page 2's leaf only
+    // carries "region" (as happens with sparse/optional fields). The header
+    // must stay [name, region] on both pages: it comes from the layer's
+    // query, not from whatever properties a given page's leaves happen to
+    // carry.
+    const layer = _makeLayerWithColumns(["name", "region"]);
+    const getClusterLeaves = vi
+      .fn()
+      .mockResolvedValueOnce([_makeFeature(1, "Clinic A")])
+      .mockResolvedValueOnce([
+        {
+          type: "Feature" as const,
+          id: 2,
+          geometry: { type: "Point" as const, coordinates: [0, 0] },
+          properties: { region: "North" },
+        },
+      ]);
+    const { mapRef } = _makeMapRef(getClusterLeaves);
+
+    render(
+      <ClusterFeatureTable
+        cluster={CLUSTER}
+        layer={layer}
+        mapRef={mapRef}
+        onRowClick={vi.fn()}
+      />,
+    );
+    await screen.findByText("Clinic A");
+
+    const page1Headers = screen.getAllByRole("columnheader").map((header) => {
+      return header.textContent;
+    });
+    expect(page1Headers).toEqual(["name", "region", ""]);
+
+    fireEvent.click(screen.getByRole("button", { name: "2" }));
+    await waitFor(() => {
+      expect(getClusterLeaves).toHaveBeenLastCalledWith(
+        42,
+        CLUSTER_LEAVES_PAGE_SIZE,
+        CLUSTER_LEAVES_PAGE_SIZE,
+      );
+    });
+    await screen.findByText("North");
+
+    const page2Headers = screen.getAllByRole("columnheader").map((header) => {
+      return header.textContent;
+    });
+    expect(page2Headers).toEqual(["name", "region", ""]);
+  });
+
   it("opens the single-feature view for the row that was clicked", async () => {
     const getClusterLeaves = vi
       .fn()
@@ -155,6 +249,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={onRowClick}
       />,
@@ -166,7 +261,7 @@ describe("ClusterFeatureTable", () => {
     expect(onRowClick).toHaveBeenCalledWith(_makeFeature(2, "Clinic B"));
   });
 
-  it("opens the row's feature on Enter for keyboard users", async () => {
+  it("opens the row's feature from its keyboard-reachable view button", async () => {
     const getClusterLeaves = vi
       .fn()
       .mockResolvedValue([_makeFeature(1, "Clinic A")]);
@@ -176,16 +271,44 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={onRowClick}
       />,
     );
-    const row = await screen.findByRole("button", { name: /Clinic A/i });
+    const viewButton = await screen.findByRole("button", {
+      name: /view details for clinic a/i,
+    });
 
-    row.focus();
-    fireEvent.keyDown(row, { key: "Enter" });
+    viewButton.focus();
+    fireEvent.click(viewButton);
 
     expect(onRowClick).toHaveBeenCalledWith(_makeFeature(1, "Clinic A"));
+  });
+
+  it("keeps each row a real table row rather than overriding it with role=button", async () => {
+    const getClusterLeaves = vi
+      .fn()
+      .mockResolvedValue([_makeFeature(1, "Clinic A")]);
+    const { mapRef } = _makeMapRef(getClusterLeaves);
+
+    render(
+      <ClusterFeatureTable
+        cluster={CLUSTER}
+        layer={undefined}
+        mapRef={mapRef}
+        onRowClick={vi.fn()}
+      />,
+    );
+    await screen.findByText("Clinic A");
+
+    const [row] = screen.getAllByRole("row").filter((candidate) => {
+      return candidate.textContent?.includes("Clinic A");
+    });
+
+    expect(row).toBeDefined();
+    expect(row).not.toHaveAttribute("role", "button");
+    expect(screen.getAllByRole("cell")[0]).toHaveTextContent("Clinic A");
   });
 
   it("zooms to the cluster's expansion zoom instead of duplicating the easeTo call", async () => {
@@ -198,6 +321,7 @@ describe("ClusterFeatureTable", () => {
     render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -213,6 +337,30 @@ describe("ClusterFeatureTable", () => {
       center: [-73.9, 40.7],
       zoom: 14,
     });
+  });
+
+  it("surfaces feedback when the zoom request fails, instead of failing silently", async () => {
+    const getClusterLeaves = vi
+      .fn()
+      .mockResolvedValue([_makeFeature(1, "Clinic A")]);
+    const { mapRef, getClusterExpansionZoom } = _makeMapRef(getClusterLeaves);
+    getClusterExpansionZoom.mockRejectedValue(new Error("offline"));
+
+    render(
+      <ClusterFeatureTable
+        cluster={CLUSTER}
+        layer={undefined}
+        mapRef={mapRef}
+        onRowClick={vi.fn()}
+      />,
+    );
+    await screen.findByText("Clinic A");
+
+    fireEvent.click(screen.getByRole("button", { name: /zoom to cluster/i }));
+
+    expect(
+      await screen.findByText(/could not zoom to this cluster/i),
+    ).toBeInTheDocument();
   });
 
   it("resolves to the newer cluster's leaves when an older request settles later", async () => {
@@ -235,6 +383,7 @@ describe("ClusterFeatureTable", () => {
     const { rerender } = render(
       <ClusterFeatureTable
         cluster={CLUSTER}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,
@@ -244,6 +393,7 @@ describe("ClusterFeatureTable", () => {
     rerender(
       <ClusterFeatureTable
         cluster={secondCluster}
+        layer={undefined}
         mapRef={mapRef}
         onRowClick={vi.fn()}
       />,

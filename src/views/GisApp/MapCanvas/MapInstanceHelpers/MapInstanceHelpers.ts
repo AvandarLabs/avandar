@@ -97,18 +97,25 @@ function _makeClusterSelectionFromFeature(
   };
 }
 
-/** Eases the camera to the zoom level where a cluster's points expand. */
+/**
+ * Eases the camera to the zoom level where a cluster's points expand.
+ *
+ * Returns the underlying request as a promise, rather than firing it and
+ * forgetting it, so a caller behind a user-facing control (the table's
+ * "Zoom to cluster" button) can catch a rejection and tell the user rather
+ * than let it disappear silently.
+ */
 function _zoomToCluster(
   map: MapLibreMap,
   cluster: Readonly<
     Pick<ClusterSelection, "clusterId" | "coordinates" | "sourceId">
   >,
-): void {
+): Promise<void> {
   const source = map.getSource<maplibregl.GeoJSONSource>(cluster.sourceId);
   if (!source || !("getClusterExpansionZoom" in source)) {
-    return;
+    return Promise.resolve();
   }
-  void source.getClusterExpansionZoom(cluster.clusterId).then((zoom) => {
+  return source.getClusterExpansionZoom(cluster.clusterId).then((zoom) => {
     map.easeTo({ center: cluster.coordinates, zoom });
   });
 }
