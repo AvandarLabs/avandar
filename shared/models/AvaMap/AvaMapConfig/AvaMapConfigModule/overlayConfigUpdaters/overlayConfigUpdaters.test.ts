@@ -140,7 +140,9 @@ describe("overlay updaters", () => {
         config: split,
         featureId: replacement.id,
         nextFeatures: [],
-      }).annotations.features.map((feature) => {return feature.id}),
+      }).annotations.features.map((feature) => {
+        return feature.id;
+      }),
     ).toEqual([second.id]);
   });
 });

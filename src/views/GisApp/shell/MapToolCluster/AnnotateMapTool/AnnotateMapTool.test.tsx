@@ -452,12 +452,14 @@ describe("AnnotateMapTool", () => {
 
     expect(config.annotations.features).toHaveLength(2);
     expect(
-      config.annotations.features.every(
-        (feature) => {return feature.kind === "freehand"},
-      ),
+      config.annotations.features.every((feature) => {
+        return feature.kind === "freehand";
+      }),
     ).toBe(true);
     expect(
-      config.annotations.features.map((feature) => {return feature.id}),
+      config.annotations.features.map((feature) => {
+        return feature.id;
+      }),
     ).not.toContain(stroke.id);
   });
 
