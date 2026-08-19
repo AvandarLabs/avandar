@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions/nuxActions";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
+import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions/nuxActions";
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
@@ -210,4 +210,3 @@ describe("nuxActions.completeMilestone unmarked list", () => {
     expect(nextState.userUnmarkedMilestones).toEqual([]);
   });
 });
-

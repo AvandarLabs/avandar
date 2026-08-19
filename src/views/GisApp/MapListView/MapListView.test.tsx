@@ -1,8 +1,9 @@
 import { Model } from "@avandar/models";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { modals } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { act, fireEvent, render, screen } from "@/test-utils";
 import { MapListView } from "@/views/GisApp/MapListView/MapListView";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { User } from "$/models/User/User";
@@ -11,16 +12,20 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
   insertMock,
+  deleteMock,
   navigateMock,
   permissionMock,
   useInsertOptionsMock,
+  useDeleteOptionsMock,
   useCurrentUserProfileMock,
 } = vi.hoisted(() => {
   return {
     insertMock: vi.fn(),
+    deleteMock: vi.fn(),
     navigateMock: vi.fn(),
     permissionMock: vi.fn(),
     useInsertOptionsMock: vi.fn(),
+    useDeleteOptionsMock: vi.fn(),
     useCurrentUserProfileMock: vi.fn(),
   };
 });
@@ -58,6 +63,10 @@ vi.mock("@/clients/maps/AvaMapClient/AvaMapClient", () => {
       useInsert: (options: unknown) => {
         useInsertOptionsMock(options);
         return [insertMock, false];
+      },
+      useDelete: (options: unknown) => {
+        useDeleteOptionsMock(options);
+        return [deleteMock, false];
       },
     },
   };
@@ -144,8 +153,14 @@ function _makeMap(overrides: Partial<AvaMap.T> = {}): AvaMap.T {
 }
 
 describe("MapListView", () => {
+  const openConfirmModalMock = vi.fn<typeof modals.openConfirmModal>();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    openConfirmModalMock.mockReturnValue("delete-map");
+    vi.spyOn(modals, "openConfirmModal").mockImplementation(
+      openConfirmModalMock,
+    );
     permissionMock.mockReturnValue(true);
     useCurrentUserProfileMock.mockReturnValue([
       {
@@ -154,6 +169,12 @@ describe("MapListView", () => {
       },
       false,
     ]);
+    deleteMock.mockImplementation(() => {
+      const options = useDeleteOptionsMock.mock.lastCall?.[0] as {
+        onSuccess?: () => void;
+      };
+      options.onSuccess?.();
+    });
     insertMock.mockImplementation((args: { data: AvaMap.T }) => {
       const options = useInsertOptionsMock.mock.lastCall?.[0] as {
         onSuccess?: (avaMap: AvaMap.T) => void;
@@ -242,5 +263,52 @@ describe("MapListView", () => {
     fireEvent.click(createButton);
 
     expect(insertMock).toHaveBeenCalledOnce();
+  });
+
+  it("deletes a map after the confirmation is accepted", () => {
+    const avaMap = _makeMap({ name: "Population map" });
+
+    render(<MapListView avaMaps={[avaMap]} workspaceSlug="test-workspace" />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Delete the map Population map" }),
+    );
+
+    const confirmOptions = openConfirmModalMock.mock.lastCall?.[0];
+    expect(confirmOptions?.title).toBe("Delete map?");
+    expect(confirmOptions?.children).toContain("cannot be undone");
+    expect(deleteMock).not.toHaveBeenCalled();
+
+    act(() => {
+      confirmOptions?.onConfirm?.();
+    });
+
+    expect(deleteMock).toHaveBeenCalledWith({
+      id: "00000000-0000-4000-8000-000000000001",
+    });
+  });
+
+  it("keeps a map when the delete confirmation is dismissed", () => {
+    const avaMap = _makeMap({ name: "Population map" });
+
+    render(<MapListView avaMaps={[avaMap]} workspaceSlug="test-workspace" />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Delete the map Population map" }),
+    );
+
+    expect(openConfirmModalMock).toHaveBeenCalledOnce();
+    expect(deleteMock).not.toHaveBeenCalled();
+  });
+
+  it("hides map deletion from a view-only user", () => {
+    permissionMock.mockReturnValue(false);
+    const avaMap = _makeMap({ name: "Population map" });
+
+    render(<MapListView avaMaps={[avaMap]} workspaceSlug="test-workspace" />);
+
+    expect(
+      screen.queryByRole("button", { name: "Delete the map Population map" }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -11,9 +11,7 @@ const { logEventMock } = vi.hoisted(() => {
   return { logEventMock: vi.fn() };
 });
 
-let publishOnSuccess:
-  | ((updatedDashboard: Dashboard.T) => void)
-  | undefined;
+let publishOnSuccess: ((updatedDashboard: Dashboard.T) => void) | undefined;
 
 vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
