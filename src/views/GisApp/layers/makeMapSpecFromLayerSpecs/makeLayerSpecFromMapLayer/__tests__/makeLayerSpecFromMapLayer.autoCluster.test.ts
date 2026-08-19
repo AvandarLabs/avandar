@@ -22,8 +22,19 @@ function _makePointFeatureCollection(
 }
 
 describe("makeLayerSpecFromMapLayer auto-clustering", () => {
-  it("clusters a circle-symbology point layer above the threshold", () => {
-    const layer = MapLayer.makeEmpty("Cases");
+  it("clusters a circle-symbology point layer above the threshold, carrying its configured radius to the unclustered layer", () => {
+    // A deliberately non-default radius: asserting the default would pass
+    // even if the unclustered layer ignored the layer's own configuration
+    // and fell back to a hardcoded size.
+    const layer = {
+      ...MapLayer.makeEmpty("Cases"),
+      symbology: {
+        type: "circle" as const,
+        radius: 17,
+        color: { type: "single" as const, color: "#123456" },
+        stroke: { width: 1, color: "#ffffff" },
+      },
+    };
     const spec = makeLayerSpecFromMapLayer({
       layer,
       featureCollection: _makePointFeatureCollection(
@@ -45,6 +56,7 @@ describe("makeLayerSpecFromMapLayer auto-clustering", () => {
       "get",
       "point_count_abbreviated",
     ]);
+    expect(spec.layers[2]?.paint["circle-radius"]).toBe(17);
   });
 
   it("does not cluster a circle-symbology point layer at or below the threshold", () => {
@@ -63,7 +75,7 @@ describe("makeLayerSpecFromMapLayer auto-clustering", () => {
     expect(spec.layers[0]?.type).toBe("circle");
   });
 
-  it("clusters a proportionalSymbol point layer above the threshold", () => {
+  it("never auto-clusters a proportionalSymbol layer, since size there encodes a value rather than a count", () => {
     const base = MapLayer.makeEmpty("Cases");
     const layer = {
       ...base,
@@ -82,12 +94,16 @@ describe("makeLayerSpecFromMapLayer auto-clustering", () => {
       featureCollection: _makePointFeatureCollection(
         CLUSTER_AUTO_THRESHOLD + 1,
       ),
-      stats: { valueDomain: undefined },
+      stats: { valueDomain: [0, 100] },
+      valueColumnName: "cases",
     });
 
-    expect(spec.sources[`ava-map-source-${layer.id}`]).toMatchObject({
-      cluster: true,
+    expect(spec.sources[`ava-map-source-${layer.id}`]).toEqual({
+      type: "geojson",
+      data: expect.objectContaining({ type: "FeatureCollection" }),
     });
+    expect(spec.layers).toHaveLength(1);
+    expect(spec.layers[0]?.type).toBe("circle");
     expect(spec.layers[0]?.paint["circle-color"]).toBe("#ef4444");
   });
 

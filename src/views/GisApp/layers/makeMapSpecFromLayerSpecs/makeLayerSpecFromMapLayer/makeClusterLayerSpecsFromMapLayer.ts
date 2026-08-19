@@ -1,17 +1,24 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type {
+  CircleRadiusValue,
+  MapLayerSpec,
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
 
 /**
  * Paint a clustered point source needs, independent of the symbology that
- * produced it: a native `cluster` symbology and an auto-clustered `circle` or
- * `proportionalSymbol` layer both resolve to this shape before rendering.
+ * produced it: a native `cluster` symbology and an auto-clustered `circle`
+ * layer both resolve to this shape before rendering. `radius` is the
+ * unclustered circle's size, carried through explicitly because an
+ * auto-clustered layer has no `cluster` symbology to read a shared radius
+ * from.
  */
 export type ClusterPaint = {
   color: string | ExpressionSpecification;
   stroke: MapLayer.Stroke;
+  radius: CircleRadiusValue;
 };
 
 type ClusterLayerOptions = {
@@ -96,7 +103,7 @@ function _buildUnclusteredCircleLayerSpec(
     paint: {
       "circle-color": paint.color,
       "circle-opacity": 0.8,
-      "circle-radius": MapLayer.defaultSymbolRadius,
+      "circle-radius": paint.radius,
       "circle-stroke-width": paint.stroke.width,
       "circle-stroke-color": [
         "case",

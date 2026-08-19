@@ -200,7 +200,11 @@ function _makeMapLayerSpecs(
       return makeClusterLayerSpecsFromMapLayer({
         layer: options.layer,
         sourceId: options.sourceId,
-        paint: { color: symbology.color.color, stroke: symbology.stroke },
+        paint: {
+          color: symbology.color.color,
+          stroke: symbology.stroke,
+          radius: MapLayer.defaultSymbolRadius,
+        },
       });
     },
     heatmap: () => {
@@ -215,32 +219,46 @@ function _makeMapLayerSpecs(
   });
 }
 
-/** True for the two point symbologies eligible to auto-cluster. */
+/**
+ * True only for `circle`, the one point symbology eligible to auto-cluster.
+ *
+ * `proportionalSymbol` is deliberately excluded, even though it is also a
+ * point symbology. There, symbol size encodes a data value; clustering makes
+ * size encode a point count instead. Auto-clustering a proportional-symbol
+ * layer would silently swap what the same visual channel means, which is the
+ * same class of defect as the hidden row cap this feature replaces: the map
+ * keeps looking authoritative while meaning something the reader was never
+ * told. A `circle` layer has no such channel to corrupt, since every circle
+ * is the same size regardless of the count clustering has grouped under it,
+ * so clustering only adds honest new information (the count label).
+ *
+ * A `proportionalSymbol` layer above the threshold renders unclustered and
+ * may render slowly; that is accepted deliberately, since slow and honest
+ * beats fast and misleading. Its author can still opt into `cluster`
+ * symbology explicitly, which is an informed choice rather than one made for
+ * them. Do not widen this to `proportionalSymbol` without solving the
+ * meaning-swap problem first.
+ */
 function _isAutoClusterableSymbology(
   symbology: MapLayer.Symbology,
-): symbology is Extract<
-  MapLayer.Symbology,
-  { type: "circle" | "proportionalSymbol" }
-> {
-  return symbology.type === "circle" || symbology.type === "proportionalSymbol";
+): symbology is Extract<MapLayer.Symbology, { type: "circle" }> {
+  return symbology.type === "circle";
 }
 
 /**
- * Builds cluster paint from a point layer's own color and stroke, since an
- * auto-clustered layer has no `cluster` symbology to read paint from. This
- * only reads the layer's symbology; it never writes back to it, so the
- * user's chosen circle or proportional-symbol styling survives switching
- * zoom levels or feature counts.
+ * Builds cluster paint from a circle layer's own color, stroke, and radius,
+ * since an auto-clustered layer has no `cluster` symbology to read paint
+ * from. This only reads the layer's symbology; it never writes back to it,
+ * so the user's chosen circle styling survives switching zoom levels or
+ * feature counts.
  */
 function _getAutoClusterPaint(
-  symbology: Extract<
-    MapLayer.Symbology,
-    { type: "circle" | "proportionalSymbol" }
-  >,
+  symbology: Extract<MapLayer.Symbology, { type: "circle" }>,
 ) {
   return {
     color: makeColorExpressionFromColor(symbology.color),
     stroke: symbology.stroke,
+    radius: symbology.radius,
   };
 }
 
@@ -248,10 +266,10 @@ function _getAutoClusterPaint(
  * Turns one layer plus its data into MapLibre sources and layers.
  *
  * Pure: the same inputs always produce the same JSON, which is what makes
- * paint decisions unit-testable. A `circle` or `proportionalSymbol` layer
- * renders clustered once its feature count passes
- * {@link CLUSTER_AUTO_THRESHOLD}, without changing the persisted symbology:
- * clustering here is a rendering decision, made fresh on every call.
+ * paint decisions unit-testable. A `circle` layer renders clustered once its
+ * feature count passes {@link CLUSTER_AUTO_THRESHOLD}, without changing the
+ * persisted symbology: clustering here is a rendering decision, made fresh on
+ * every call.
  *
  * @param params The layer to render and the data and statistics behind it.
  * @param params.layer The persisted layer, carrying symbology and sensitivity.

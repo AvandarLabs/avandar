@@ -1,6 +1,7 @@
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import {
@@ -18,12 +19,14 @@ const {
   initializeDuckDbMock,
   runStructuredQueryWithMetadataMock,
   runSpatialQueryMock,
+  resolveManualQueryForExecutionMock,
   spatialAvailability,
 } = vi.hoisted(() => {
   return {
     initializeDuckDbMock: vi.fn(),
     runStructuredQueryWithMetadataMock: vi.fn(),
     runSpatialQueryMock: vi.fn(),
+    resolveManualQueryForExecutionMock: vi.fn(),
     spatialAvailability: { value: "available" },
   };
 });
@@ -50,6 +53,33 @@ vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
   };
 });
 
+vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
+  return {
+    PublicQetlClient: { runQuery: vi.fn() },
+  };
+});
+
+vi.mock(
+  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
+  () => {
+    return {
+      AttributeAssertionClient: { getConceptExtension: vi.fn() },
+    };
+  },
+);
+
+// Only consulted by `runStructuredQueryWithMetadata` when `rawSql` is
+// undefined. A separate test loads the real implementation to prove a
+// resolvable lat/lng layer never reaches it.
+vi.mock(
+  "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution",
+  () => {
+    return {
+      resolveManualQueryForExecution: resolveManualQueryForExecutionMock,
+    };
+  },
+);
+
 vi.mock(
   "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata",
   () => {
@@ -61,6 +91,10 @@ vi.mock(
 
 const { useMapLayersData } =
   await import("@/views/GisApp/layers/useMapLayersData/useMapLayersData");
+const { runStructuredQueryWithMetadata: realRunStructuredQueryWithMetadata } =
+  await vi.importActual<
+    typeof import("@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata")
+  >("@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata");
 
 describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
@@ -70,6 +104,7 @@ describe("useMapLayersData", () => {
     initializeDuckDbMock.mockResolvedValue(undefined);
     runStructuredQueryWithMetadataMock.mockReset();
     runSpatialQueryMock.mockReset();
+    resolveManualQueryForExecutionMock.mockReset();
     spatialAvailability.value = "available";
   });
 
@@ -433,24 +468,27 @@ describe("useMapLayersData", () => {
     ).toContain("ST_Intersects");
   });
 
-  it("passes real raw SQL for a plain lat/lng layer with no AOI or time range, never falling back to the workspace auto-limit gate", async () => {
-    // `runStructuredQueryWithMetadata` only lets
-    // `resolveManualQueryForExecution` auto-limit a large dataset when it
-    // receives `rawSql: undefined` for a workspace caller.
-    // `compileLatLngOverlaySql` always returns the source SQL now, even with
-    // no AOI and no time range, so a plain lat/lng layer can no longer be
-    // silently capped at 100 rows: this asserts the map path always supplies
-    // real SQL instead of `undefined`.
+  it("runs a plain lat/lng layer over a large dataset with no injected LIMIT and without consulting the auto-limit resolver", async () => {
+    // Wires in the real `runStructuredQueryWithMetadata` (rather than the
+    // mock every other test in this file uses) so this proves the actual
+    // guarantee: `resolveManualQueryForExecution` is not merely uncalled in
+    // some mock's bookkeeping, it is not consulted by the real execution
+    // path, and the SQL that reaches `WorkspaceQetlClient.runQuery` is the
+    // compiled overlay SQL verbatim, with no LIMIT clause appended anywhere
+    // along the way.
+    runStructuredQueryWithMetadataMock.mockImplementation(
+      realRunStructuredQueryWithMetadata,
+    );
     const layer = createQueryableLayer();
-    const queryResult: QueryResult.T<UnknownRow> = {
+    const expectedSql = structuredQueryToSql(layer.source);
+    // A dataset this large is exactly the scenario the hidden 100-row cap
+    // used to bite: no filter, and well past the 50,000-row auto-limit
+    // threshold `resolveManualQueryForExecution` would otherwise apply.
+    runSpatialQueryMock.mockResolvedValue({
       id: uuid<QueryResult.Id>(),
       data: [{ cases: 1 }],
       columns: [{ name: "cases", dataType: "double" }],
       numRows: 100_000,
-    };
-    runStructuredQueryWithMetadataMock.mockResolvedValue({
-      result: queryResult,
-      didAutoLimit: false,
     });
 
     const { result } = renderHook(
@@ -465,15 +503,14 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(layer.id)?.data).toEqual({
-        type: "rows",
-        queryResult,
-        didAutoLimit: false,
-      });
+      expect(result.current.get(layer.id)?.data?.type).toBe("rows");
     });
 
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).toEqual(expect.any(String));
+    expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
+    expect(expectedSql).not.toMatch(/limit/i);
+    expect(runSpatialQueryMock).toHaveBeenCalledWith({
+      rawSql: expectedSql,
+      workspaceId,
+    });
   });
 });
