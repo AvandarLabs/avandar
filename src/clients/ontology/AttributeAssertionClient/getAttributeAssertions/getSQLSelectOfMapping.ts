@@ -1,5 +1,8 @@
 import { match } from "ts-pattern";
-import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
+import {
+  getEntityKeyComparisonSql,
+  getRowNumberedViewName,
+} from "@/clients/DuckDbClient/duckDbSqlText";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 
 /**
@@ -29,6 +32,11 @@ export function getSQLSelectOfMapping({
   externalIdsTable?: string;
   externalIdColumn?: string;
 }): string {
+  const keyComparison = getEntityKeyComparisonSql({
+    externalIdsTable,
+    externalIdColumn,
+    primaryKeyColumnName,
+  });
   return match(ruleType)
     .with("first", () => {
       // Reads the auxiliary row-numbered view rather than the dataset's public
@@ -50,7 +58,7 @@ export function getSQLSelectOfMapping({
           SELECT "${selectColumnName}"
           FROM "${getRowNumberedViewName(datasetId)}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
           ORDER BY dataset.file_row_number
           LIMIT 1
         ) AS "${outputColumnName}"
@@ -63,7 +71,7 @@ export function getSQLSelectOfMapping({
           SELECT "${selectColumnName}"
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
           GROUP BY "${selectColumnName}"
           ORDER BY COUNT(*) DESC, "${selectColumnName}"
           LIMIT 1
@@ -77,7 +85,7 @@ export function getSQLSelectOfMapping({
           SELECT CAST(SUM("${selectColumnName}") AS DOUBLE)
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
         ) AS "${outputColumnName}"
       `;
     })
@@ -88,7 +96,7 @@ export function getSQLSelectOfMapping({
           SELECT CAST(AVG("${selectColumnName}") AS DOUBLE)
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
         ) AS "${outputColumnName}"
       `;
     })
@@ -99,7 +107,7 @@ export function getSQLSelectOfMapping({
           SELECT CAST(COUNT("${selectColumnName}") AS DOUBLE)
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
         ) AS "${outputColumnName}"
       `;
     })
@@ -110,7 +118,7 @@ export function getSQLSelectOfMapping({
           SELECT CAST(MAX("${selectColumnName}") AS DOUBLE)
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
         ) AS "${outputColumnName}"
       `;
     })
@@ -121,7 +129,7 @@ export function getSQLSelectOfMapping({
           SELECT CAST(MIN("${selectColumnName}") AS DOUBLE)
           FROM "${datasetId}" dataset
           WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+            ${keyComparison}
         ) AS "${outputColumnName}"
       `;
     })

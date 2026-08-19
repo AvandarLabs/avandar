@@ -87,6 +87,10 @@ msgstr "Otro"
 msgid "More actions for the layer {layerName}"
 msgstr "Más acciones para la capa {layerName}"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one tab in this spreadsheet."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "Ejecuta una consulta para ver los resultados."
@@ -199,7 +203,7 @@ msgstr "Invitar a un miembro"
 msgid "Ask Avandar"
 msgstr "Preguntar a Avandar"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
 msgstr "Ocurrió un error al cargar el archivo"
 
@@ -319,6 +323,10 @@ msgstr "Avandar"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "Por favor, revise su correo electrónico para un enlace de confirmación."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is not available"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
@@ -631,8 +639,8 @@ msgid "Dataset failed to process"
 msgstr "El conjunto de datos no se pudo procesar."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " {numRejectedRows} rows were rejected"
-msgstr "Se rechazaron {numRejectedRows} filas"
+#~ msgid " {numRejectedRows} rows were rejected"
+#~ msgstr "Se rechazaron {numRejectedRows} filas"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Replying…"
@@ -649,6 +657,10 @@ msgstr "Permitir múltiples valores"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
 msgstr "Llama 3.1 8B (sin conexión)"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Picker error"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -1403,6 +1415,10 @@ msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "El ID del espacio de trabajo debe tener menos de {SLUG_MAX_LENGTH} "
 "caracteres"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "Refreshed from Google Sheets"
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
 "workspace owner to get a new invitation."
@@ -1586,6 +1602,10 @@ msgstr "Gestionar asientos en el portal de facturación →"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
 msgstr "Mostrar ubicaciones exactas"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not load this cluster's features."
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
@@ -1924,8 +1944,8 @@ msgid "Paragraph"
 msgstr "Párrafo"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File was partially loaded"
-msgstr "El archivo se cargó parcialmente"
+#~ msgid "File was partially loaded"
+#~ msgstr "El archivo se cargó parcialmente"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
@@ -2394,6 +2414,11 @@ msgstr "La cláusula WHERE usa \"{operator}\" con un lado derecho no nulo; solo 
 msgid ", and "
 msgstr ", y "
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
+"access may have been removed. Pick the sheet again to restore access."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
 msgstr "Contraseña actualizada con éxito"
@@ -2523,6 +2548,10 @@ msgstr "Alcance de datos"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Previsualización de datos"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Your Google connection expired"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -2816,7 +2845,7 @@ msgstr "Columna 11"
 msgid "Column 7"
 msgstr "Columna 7"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Feature"
 msgstr "Función"
 
@@ -2907,6 +2936,10 @@ msgstr "Máximo del eje X"
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "p. ej. brote-de-colera-2024"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Refresh from Google Sheets"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
@@ -3192,6 +3225,10 @@ msgstr "Distancia (metros)"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "Plantilla de URL"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google is rate limiting this request"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3489,6 +3526,10 @@ msgstr "Ir al portal de facturación"
 msgid "Clear log"
 msgstr "Limpiar registro"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is too large"
+msgstr ""
+
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
 msgstr "Nuevo mapa"
@@ -3614,6 +3655,7 @@ msgid "Hex"
 msgstr "Hexágono"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Tab"
 msgstr "Pestaña"
 
@@ -3704,6 +3746,10 @@ msgstr "Columna de geometría de límites"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "Escribe o pega un correo electrónico a continuación."
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Zoom to cluster"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
@@ -3874,6 +3920,11 @@ msgstr "La impresión y la exportación a PDF estarán disponibles en una versi�
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Cuenta cuántas filas hay en {datasetName}"
+
+#. placeholder {0}: _getRowLabel(leaf, columns)
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
+msgid "View details for {0}"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
@@ -4047,6 +4098,7 @@ msgstr "Modelo instruct de 7B de alta calidad. Ideal para esquemas difíciles y 
 "SQL complejo sin conexión."
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "Ver"
 
@@ -4801,6 +4853,10 @@ msgstr "Mostrar la capa {layerName}"
 msgid "Create a new account"
 msgstr "Crear una nueva cuenta"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Reconnect your Google account and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "Dirección"
@@ -4828,6 +4884,10 @@ msgstr "No se encontraron conjuntos de datos guardados."
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
 msgstr "Expandir el inspector"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The tab has a header row"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5381,8 +5441,8 @@ msgid "Member"
 msgstr "Miembro"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " over 1000 rows were rejected"
-msgstr "más de 1000 filas fueron rechazadas"
+#~ msgid " over 1000 rows were rejected"
+#~ msgstr "más de 1000 filas fueron rechazadas"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -5495,6 +5555,10 @@ msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "Cada serie es una columna numérica trazada en el valor radial. Elige el "
 "eje de categoría a continuación."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "The Google file picker could not be opened. Please try again."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -5894,6 +5958,10 @@ msgstr "Facturación"
 msgid "Profile Name"
 msgstr "Nombre del perfil"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "This dataset now reflects the current contents of the sheet."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
@@ -5933,8 +6001,8 @@ msgid "Divider"
 msgstr "Separador"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr "Se procesaron {numSuccessRows} filas con éxito, pero {numRejectedStr}"
+#~ msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
+#~ msgstr "Se procesaron {numSuccessRows} filas con éxito, pero {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -6375,10 +6443,10 @@ msgstr "No pudimos actualizar su suscripción. Por favor, contacte a "
 "{SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under "
-"maintenance."
-msgstr "El conector de Google Sheets está deshabilitado mientras esta función "
-"está en mantenimiento."
+#~ msgid "Google sheets connector is disabled while this feature is under "
+#~ "maintenance."
+#~ msgstr "El conector de Google Sheets está deshabilitado mientras esta función "
+#~ "está en mantenimiento."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -6644,6 +6712,10 @@ msgstr "Visualizaciones"
 msgid "Alt text"
 msgstr "Texto alternativo"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Please try again in a moment."
+msgstr ""
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "Cambiar espacio de trabajo"
@@ -6706,6 +6778,11 @@ msgstr "Su espacio de trabajo está en el plan Gratuito, que admite hasta 5 "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
 msgstr "Tono"
+
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "{0} features"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -6825,6 +6902,11 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "Para cada conjunto de datos que has agregado, especifica qué columnas "
 "deben usarse para identificar de manera única un {conceptName}."
 
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Features in cluster ({0})"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "¿Hacer privado «{resourceName}»?"
@@ -6832,6 +6914,14 @@ msgstr "¿Hacer privado «{resourceName}»?"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "Esta URL personalizada ya está en uso"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Drive access is not configured for this deployment."
+msgstr ""
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Loading features"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -7629,13 +7719,18 @@ msgstr "Colores de rebanado"
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet failed to load"
 msgstr "Error al cargar Google Sheet"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "Escribe la frase de confirmación"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
+"sheet and try again."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
@@ -7835,6 +7930,10 @@ msgstr "La entidad no se pudo cargar"
 msgid "Used to sign in to your account."
 msgstr "Se utiliza para iniciar sesión en tu cuenta."
 
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not zoom to this cluster."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "Agregue la URL de una imagen para mostrar una figura."
@@ -7915,6 +8014,10 @@ msgstr "Compartir"
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "Conjunto de datos completo"
+
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to results"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"

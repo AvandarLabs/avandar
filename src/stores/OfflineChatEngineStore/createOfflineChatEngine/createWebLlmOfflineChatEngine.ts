@@ -1,4 +1,5 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { buildWebLlmChatOpts } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/offlineChatContextWindow";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
@@ -19,9 +20,12 @@ type MlcEngine = {
   };
 };
 
+export type WebLlmChatOpts = { context_window_size: number };
+
 export type WebLlmEngineFactory = (
   mlcModelId: string,
   initProgressCallback?: (report: { text: string; progress: number }) => void,
+  chatOpts?: WebLlmChatOpts,
 ) => Promise<MlcEngine>;
 
 /**
@@ -40,12 +44,20 @@ export function createWebLlmOfflineChatEngine(args: {
     if (!enginePromise) {
       enginePromise = (async () => {
         if (args.factory) {
-          return args.factory(catalog.mlcModelId, args.onDownloadProgress);
+          return args.factory(
+            catalog.mlcModelId,
+            args.onDownloadProgress,
+            buildWebLlmChatOpts(),
+          );
         }
         const { CreateMLCEngine } = await import("@mlc-ai/web-llm");
-        return (await CreateMLCEngine(catalog.mlcModelId, {
-          initProgressCallback: args.onDownloadProgress,
-        })) as MlcEngine;
+        return (await CreateMLCEngine(
+          catalog.mlcModelId,
+          {
+            initProgressCallback: args.onDownloadProgress,
+          },
+          buildWebLlmChatOpts(),
+        )) as MlcEngine;
       })();
     }
     return enginePromise;

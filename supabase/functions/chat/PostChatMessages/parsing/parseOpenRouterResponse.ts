@@ -2,6 +2,7 @@ import { parseClarify } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.t
 import { parseDashboardBlock } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type {
   OpenRouterMessage,
   OpenRouterToolCall,
@@ -27,6 +28,7 @@ export function parseOpenRouterResponse(options: {
   isDashboards: boolean;
   lastUserPrompt: string;
   priorClarifications: number;
+  datasets?: ReadonlyArray<{ id: string; name: string }>;
 }): ParsedAttempt {
   const calls: OpenRouterToolCall[] = options.message?.tool_calls ?? [];
   let generatedSql: ChatResponse.GeneratedSql | undefined;
@@ -86,10 +88,54 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
+  return applySqlTableAliasesToParsedAttempt(
+    {
+      text: options.attemptText,
+      generatedSql,
+      clarification,
+      dashboardBlock,
+    },
+    options.datasets ?? [],
+  );
+}
+
+function applySqlTableAliasesToParsedAttempt(
+  parsed: ParsedAttempt,
+  datasets: ReadonlyArray<{ id: string; name: string }>,
+): ParsedAttempt {
+  if (datasets.length === 0) {
+    return parsed;
+  }
+  const aliases = SqlTableAlias.fromDatasets(datasets);
+  const generatedSql =
+    parsed.generatedSql ?
+      {
+        ...parsed.generatedSql,
+        sql: SqlTableAlias.applyToSql(parsed.generatedSql.sql, aliases),
+      }
+    : undefined;
+  const clarification = applySqlTableAliasesToClarification(
+    parsed.clarification,
+    aliases,
+  );
+  return { ...parsed, generatedSql, clarification };
+}
+
+function applySqlTableAliasesToClarification(
+  clarification: ChatClarifyRequest | undefined,
+  aliases: readonly SqlTableAlias.T[],
+): ChatClarifyRequest | undefined {
+  if (clarification?.responseShape.kind !== "discovery") {
+    return clarification;
+  }
   return {
-    text: options.attemptText,
-    generatedSql,
-    clarification,
-    dashboardBlock,
+    ...clarification,
+    responseShape: {
+      ...clarification.responseShape,
+      query: SqlTableAlias.applyToSql(
+        clarification.responseShape.query,
+        aliases,
+      ),
+    },
   };
 }

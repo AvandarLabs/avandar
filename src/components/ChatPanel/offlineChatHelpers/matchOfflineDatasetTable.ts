@@ -1,4 +1,5 @@
 import { propEq } from "@avandar/utils";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { fuzzyMatchOfflineDatasetByName } from "./fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
@@ -46,6 +47,12 @@ export function matchOfflineDatasetTable(args: {
   const ref = stripTableQuotes(args.tableRef);
   if (!ref || FORBIDDEN_TABLE_NAMES.has(ref.toLowerCase())) {
     return undefined;
+  }
+
+  const aliases = SqlTableAlias.fromDatasets(args.datasets);
+  const aliasDatasetId = SqlTableAlias.getDatasetIdFromAlias(ref, aliases);
+  if (aliasDatasetId) {
+    return args.datasets.find(propEq("id", aliasDatasetId));
   }
 
   const exact = exactDatasetMatch(ref, args.datasets);

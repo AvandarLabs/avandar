@@ -1,9 +1,9 @@
 /**
- * Tests that Google Sheets still refuses, and stays declared as unsound to
- * fetch partially.
+ * Tests that Google Sheets acquires a named tab as Parquet and describes it
+ * from stored columns.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 import type { ILogger } from "@avandar/logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -20,37 +20,121 @@ const CONTEXT = {
   logger: console as unknown as ILogger,
 };
 
-describe("GoogleSheetsWrapper", () => {
-  it("refuses to acquire, preserving today's behaviour", async () => {
-    const wrapper = createGoogleSheetsWrapper();
+const { datasetColumnGetAllMock } = vi.hoisted(() => {
+  return { datasetColumnGetAllMock: vi.fn() };
+});
 
-    await expect(
-      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
-    ).rejects.toThrow("Google Sheets data fetching is not supported yet");
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      withCache: () => {
+        return {
+          withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+        };
+      },
+    },
+  };
+});
+
+describe("GoogleSheetsWrapper", () => {
+  it("acquires the named tab as parquet and reports the Drive version", async () => {
+    const parquetBlob = new Blob(["sheet-parquet"]);
+    const readXlsx = vi.fn().mockResolvedValue({ parquetBlob });
+    const getSheetSource = vi.fn().mockResolvedValue({
+      googleDocumentId: "1sheetFileId",
+      sheetName: "Kenya",
+      googleAccountId: "google-account-1",
+    });
+    const getAccessToken = vi.fn().mockResolvedValue("ya29.test-token");
+    const driveFetch = vi.fn(async (url: string) => {
+      if (url.includes("fields=version")) {
+        return new Response(JSON.stringify({ version: "42" }), { status: 200 });
+      }
+      return new Response(Uint8Array.from([0x50, 0x4b]), { status: 200 });
+    });
+    const wrapper = createGoogleSheetsWrapper({
+      getSheetSource,
+      getAccessToken,
+      readXlsx,
+      driveFetch,
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(readXlsx).toHaveBeenCalledWith(
+      expect.objectContaining({ sheet: "Kenya" }),
+    );
+    expect(acquired).toEqual({
+      ref: DATASET_REF,
+      parquetBlob,
+      sourceVersion: "42",
+    });
   });
 
-  it("refuses to describe, preserving today's behaviour", async () => {
-    const wrapper = createGoogleSheetsWrapper();
+  it("passes a null stored tab through so the reader uses the first sheet", async () => {
+    const readXlsx = vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) });
+    const wrapper = createGoogleSheetsWrapper({
+      getSheetSource: async () => {
+        return {
+          googleDocumentId: "1sheetFileId",
+          sheetName: null,
+          googleAccountId: "google-account-1",
+        };
+      },
+      getAccessToken: async () => {
+        return "ya29.test-token";
+      },
+      readXlsx,
+      driveFetch: async (url) => {
+        if (url.includes("fields=version")) {
+          return new Response(JSON.stringify({ version: "1" }), {
+            status: 200,
+          });
+        }
+        return new Response(Uint8Array.from([0x50, 0x4b]), { status: 200 });
+      },
+    });
 
-    await expect(wrapper.describe(DATASET_REF, CONTEXT)).rejects.toThrow(
-      "Google Sheets extraction is not supported yet",
+    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
+
+    expect(readXlsx).toHaveBeenCalledWith(
+      expect.objectContaining({ sheet: undefined }),
     );
   });
 
-  // A deliberate change detector, and the only capability assertion here. This
-  // trio is what makes stitching two partial Sheets fetches into one relation
-  // unsound: no filter can reduce a fetch, no row can be re-identified across
-  // fetches, and two calls do not share a snapshot. Anyone relaxing one of
-  // these is changing a soundness argument, so the change should not be silent.
+  it("describes a sheet from its stored columns", async () => {
+    datasetColumnGetAllMock.mockResolvedValue([
+      { name: "district", dataType: "varchar" },
+    ]);
+    const wrapper = createGoogleSheetsWrapper();
+
+    await expect(wrapper.describe(DATASET_REF, CONTEXT)).resolves.toEqual({
+      columns: [
+        { name: "district", dataType: "VARCHAR", isArray: false },
+      ],
+    });
+  });
+
   it("keeps declaring the combination that makes partial acquisition unsound", () => {
     const { capabilities } = createGoogleSheetsWrapper();
 
     expect(capabilities.predicatePushdown).toBe("none");
     expect(capabilities.rowIdentity).toBe("none");
     expect(capabilities.multiCallAtomicity).toBe(false);
+    expect(capabilities.acquisitionUnit).toEqual({ kind: "whole-relation" });
     expect(capabilities.quotaScope).toEqual({
-      kind: "project-global",
-      readsPerMinute: 300,
+      kind: "per-host",
+      host: "www.googleapis.com",
     });
+    expect(capabilities.grantedScope).toEqual([
+      "openid",
+      "email",
+      "https://www.googleapis.com/auth/drive.file",
+    ]);
   });
 });

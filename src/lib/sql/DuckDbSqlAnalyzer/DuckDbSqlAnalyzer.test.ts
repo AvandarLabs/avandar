@@ -346,4 +346,50 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       mutatedDatasetIds: [DATASET_ID],
     });
   });
+  // An `ava_rows_<datasetId>` view reads the dataset's own registered parquet
+  // file, so it has to be reported as a read of that dataset. Reporting it as
+  // an opaque internal table would let raw SQL reach a dataset the workspace
+  // allowlist never authorized, and reporting nothing at all (which is what
+  // happened before) refuses the statement outright, which silently disables
+  // every `first` value picker.
+  it("reads a row-numbered view as a read of the dataset it exposes", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_rows_${DATASET_ID}" dataset`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+    });
+  });
+
+  // The positive control for the case above: the prefix alone must not make a
+  // name inspectable. Only a real dataset id behind it does.
+  it("still refuses a row-numbered name that is not a dataset id", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_rows_whatever"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
+
+  // The concept spine is deliberately not a relation name, so a statement that
+  // names one cannot be analyzed. That is what forces the concept view's
+  // definition to be run as trusted internal SQL, and it is also what stops raw
+  // user SQL from reading another workspace's spine out of the shared catalog.
+  it("refuses a statement that names a concept spine table", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "concept_${CONCEPT_ID}__individuals"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
 });

@@ -1,4 +1,5 @@
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { getTableNameFromRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import {
   getCopyDirectionKeywordIndexes,
   getCopyRelationSourceIndexes,
@@ -199,6 +200,23 @@ function _getAnalysisFromIdentifierSource(
   }
   if (tableName !== undefined && isRelationTableName(tableName)) {
     return _readSourceAnalysis([tableName]);
+  }
+  // An `ava_rows_<datasetId>` view reads the dataset's own registered parquet
+  // file, so it is a read of that dataset: it is reported as that dataset
+  // rather than as an opaque internal table, which is what makes it inherit the
+  // dataset's lease and the workspace allowlist that gates it. Treating it as
+  // contributing nothing would let raw SQL read a dataset the caller was never
+  // authorized for.
+  const rowNumberedTableName =
+    tableName === undefined ? undefined : (
+      getTableNameFromRowNumberedViewName(tableName)
+    );
+  if (
+    identifier.parts.length === 1 &&
+    rowNumberedTableName !== undefined &&
+    isRelationTableName(rowNumberedTableName)
+  ) {
+    return _readSourceAnalysis([rowNumberedTableName]);
   }
   if (
     identifier.parts.length === 1 &&

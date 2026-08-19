@@ -3,6 +3,7 @@ import type {
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -12,6 +13,8 @@ import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenData
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 /** A column whose stored name or type differs from the source data. */
 export type ColumnReplacement = {
@@ -63,14 +66,37 @@ export type AcquiredRelationBytes = {
 /** The per-workspace or per-snapshot policy a query runner is built from. */
 export type QetlRunnerOptions = {
   getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
+  /**
+   * Plans the concept relations one statement names, and refuses the statement
+   * when it names one the caller may not read.
+   *
+   * Optional because only a session with ontology access can answer it. A
+   * session that supplies none (the public snapshot path, which has no ontology
+   * and stores raw SQL naming `concept_<uuid>` that nothing on that path can
+   * interpret) leaves a concept reference unresolved, so the query fails on a
+   * missing table rather than answering from whatever happens to be in the
+   * catalog.
+   */
+  planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
   getDuckDbLeaseDatasetIds?: (
     queryDependencies: readonly Dataset.Id[],
   ) => Promise<Dataset.Id[]>;
   duckDbReadMode?: "public" | "workspace";
   publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
-  insertToStorageCache: (
-    relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
-  ) => Promise<void>;
+  /**
+   * The storage tier this session may read and write, and the principal every
+   * entry in it is scoped to.
+   *
+   * These replace the old `insertToStorageCache` callback, which only wrote.
+   * Reading went to `LocalDataset` unconditionally, so a public snapshot query
+   * probed the **workspace** store: it wrote its bytes to `LocalPublicDataset`
+   * and then never read them back. Holding a port instead means a session can
+   * only reach its own tier, and the public implementation refuses a
+   * workspace-form principal structurally rather than by a predicate someone
+   * has to remember to write.
+   */
+  relationCache: RelationCachePort;
+  principalKey: PrincipalKey;
   prepareDuckDbDatasets?: (
     params: Readonly<{
       datasetIds: readonly Dataset.Id[];
@@ -107,6 +133,8 @@ export type QetlRunQuery = {
 export type RunLeasedQueryOptions = {
   datasetDuckDbLease: DatasetDuckDbLease;
   queryDependencies: readonly Dataset.Id[];
+  /** Concept relations to register once the datasets they read are loaded. */
+  conceptRelations: readonly ConceptRelationPlan[];
   rawSql: string;
   returnType: "parquet" | "js";
   signal?: AbortSignal;

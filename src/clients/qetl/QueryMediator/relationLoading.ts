@@ -4,11 +4,9 @@ import {
   makeIdLookupRecord,
   promiseMap,
   prop,
-  propEq,
   where,
 } from "@avandar/utils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
@@ -19,13 +17,19 @@ import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoo
 import type {
   AcquiredRelationBytes,
   ColumnReplacement,
-  QetlRunnerOptions,
   QetlRunQuery,
   RelationSource,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { ILogger } from "@avandar/logger";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
+import type {
+  PrincipalKey,
+  RelationCacheKey,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 type FetchRelationSourceOptions = {
   relationSource: RelationSource;
@@ -71,41 +75,232 @@ function _isVirtualRelationSource(
   return relationSource.sourceType === "virtual";
 }
 
-async function _getCachedRelationBytes(
+function _isGoogleSheetsRelationSource(
   relationSource: Readonly<RelationSource>,
-): Promise<AcquiredRelationBytes | undefined> {
-  const localDataset = await LocalDatasetClient.getById({
-    id: relationSource.dataset.id,
-  });
-  return localDataset?.parseStatus === "ready" && localDataset.parquetData ?
-      {
-        datasetId: relationSource.dataset.id,
-        parquetBlob: localDataset.parquetData,
+): relationSource is Extract<RelationSource, { sourceType: "google_sheets" }> {
+  return relationSource.sourceType === "google_sheets";
+}
+
+function _googleSheetsSourceByDatasetId(
+  relationSources: readonly RelationSource[],
+): Record<string, GoogleSheetsDataset.T> {
+  return Object.fromEntries(
+    relationSources.filter(_isGoogleSheetsRelationSource).map((source) => {
+      return [source.dataset.id, source.sourceDataset];
+    }),
+  );
+}
+
+function _lookupsForFetch(relationSources: readonly RelationSource[]) {
+  return {
+    datasetsById: makeIdLookupRecord(relationSources.map(prop("dataset"))),
+    rawSqlByDatasetId: Object.fromEntries(
+      relationSources.filter(_isVirtualRelationSource).map((relationSource) => {
+        return [relationSource.dataset.id, relationSource.sourceDataset.rawSql];
+      }),
+    ),
+    googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
+  };
+}
+
+function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
+  return {
+    readGoogleSheetXlsx: async ({
+      datasetId,
+      xlsxBytes,
+      sheet,
+    }: {
+      datasetId: Dataset.Id;
+      xlsxBytes: Uint8Array<ArrayBuffer>;
+      sheet: string | undefined;
+    }) => {
+      const loaded = await DuckDbClient.loadXlsx({
+        tableName: datasetId,
+        fileBytes: xlsxBytes,
+        sheet,
+        datasetDuckDbLease,
+      });
+      return { parquetBlob: loaded.parquetData };
+    },
+    transcodeCsvToParquet: async ({
+      datasetId,
+      bytes,
+    }: {
+      datasetId: Dataset.Id;
+      bytes: Uint8Array<ArrayBuffer>;
+    }) => {
+      const loaded = await DuckDbClient.loadCsv({
+        tableName: datasetId,
+        fileText: new TextDecoder().decode(bytes),
+        datasetDuckDbLease,
+      });
+      return loaded.parquetData;
+    },
+  };
+}
+
+function _createRegistryForFetch(
+  options: Readonly<{
+    relationSources: readonly RelationSource[];
+    datasetDuckDbLease: DatasetDuckDbLease;
+    runQuery: QetlRunQuery;
+  }>,
+): RelationRegistry {
+  const lookups = _lookupsForFetch(options.relationSources);
+  return createDefaultRegistry({
+    ..._leaseBoundTranscoders(options.datasetDuckDbLease),
+    getRawSql: async (ref) => {
+      const rawSql = lookups.rawSqlByDatasetId[ref.id];
+      if (rawSql === undefined) {
+        throw new Error(
+          `Virtual dataset '${ref.id}' is not among the relations to fetch`,
+        );
       }
-    : undefined;
+      return rawSql;
+    },
+    getDataset: async (id) => {
+      const dataset = lookups.datasetsById[id];
+      if (!dataset) {
+        throw new Error(`Dataset '${id}' is not among the relations to fetch`);
+      }
+      return dataset;
+    },
+    getGoogleSheetsSource: async (id) => {
+      const source = lookups.googleSheetsByDatasetId[id];
+      if (!source) {
+        throw new Error(
+          `Google Sheets dataset '${id}' is not among the relations to fetch`,
+        );
+      }
+      return source;
+    },
+    runParquetQuery: ({ rawSql }) => {
+      return options.runQuery({
+        rawSql,
+        returnType: "parquet",
+        datasetDuckDbLease: options.datasetDuckDbLease,
+      });
+    },
+  });
+}
+
+/**
+ * The cache key for one whole dataset relation under one principal.
+ *
+ * `definition` and `sourceVersion` are undefined because a plain dataset has
+ * no defining text and no freshness token yet; `columns` is `"all"` because
+ * nothing projects columns yet. Each becomes real work of its own, and the key
+ * shape already carries them so that work does not have to reshape the store.
+ */
+function _toWholeDatasetCacheKey(
+  options: Readonly<{ datasetId: Dataset.Id; principalKey: PrincipalKey }>,
+): RelationCacheKey {
+  return {
+    principal: options.principalKey,
+    relation: { kind: "dataset", id: options.datasetId },
+    definition: undefined,
+    sourceVersion: undefined,
+    columns: "all",
+  };
+}
+
+/**
+ * Splits relations into the ones the storage cache can already serve and the
+ * ones that still have to be acquired.
+ *
+ * **This runs ahead of source dispatch, which is the ordering spec 2
+ * establishes.** It used to sit inside per-source fetching, so every relation
+ * paid for its source-record read before anyone asked whether the bytes were
+ * already on disk. Two things follow from moving it.
+ *
+ * A cache hit now costs no dataset-record read at all, which is the whole
+ * point: the common case for a returning user is that every relation is
+ * already cached.
+ *
+ * And a cached relation no longer has to be *acquirable* to be served. A
+ * previously imported Google Sheet whose bytes are already in the storage
+ * cache is served from there without a Drive round-trip. Uncached Sheets
+ * relations are acquired through `GoogleSheetsWrapper`.
+ *
+ * **Authorization must already have happened.** Nothing here reads a dataset
+ * record, so nothing here can check which workspace a relation belongs to. The
+ * ids reaching this function are the ones `getQueryDependencies` returned, and
+ * for the workspace session that is `assertWorkspaceRelations`, which refuses a
+ * relation outside the workspace rather than dropping it. Serving cached bytes
+ * for an unauthorized relation would otherwise be exactly the hole that probe
+ * reordering is warned about.
+ */
+export async function probeStorageRelationCache(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    relationCache: RelationCachePort;
+    principalKey: PrincipalKey;
+  }>,
+): Promise<{
+  cachedRelations: AcquiredRelationBytes[];
+  uncachedDatasetIds: Dataset.Id[];
+}> {
+  if (options.datasetIds.length === 0) {
+    return { cachedRelations: [], uncachedDatasetIds: [] };
+  }
+
+  const { hits } = await options.relationCache.probe(
+    options.datasetIds.map((datasetId) => {
+      return _toWholeDatasetCacheKey({
+        datasetId,
+        principalKey: options.principalKey,
+      });
+    }),
+  );
+
+  // A hit is only a hit once its payload is actually readable. Metadata and
+  // payload are separate rows, so an interrupted write, or an eviction that
+  // removed one but not the other, leaves an entry that probes as servable and
+  // reads as nothing. Treating that as a miss re-acquires, instead of handing
+  // the query an empty relation.
+  const readHits = await promiseMap(hits, async (hit) => {
+    const payload = await options.relationCache.readPayload(hit.entry);
+    if (payload === undefined) {
+      return undefined;
+    }
+    // Stamps the LRU ordering key, so a relation that keeps being queried is
+    // not the one the byte budget evicts next.
+    await options.relationCache.touch(hit.entry.identityKey);
+    if (hit.key.relation.kind !== "dataset") {
+      return undefined;
+    }
+    return {
+      datasetId: hit.key.relation.id,
+      parquetBlob: payload,
+    };
+  });
+  const cachedRelations = readHits.filter(isDefined);
+  const servedDatasetIds = new Set(cachedRelations.map(prop("datasetId")));
+
+  return {
+    cachedRelations,
+    uncachedDatasetIds: options.datasetIds.filter((datasetId) => {
+      return !servedDatasetIds.has(datasetId);
+    }),
+  };
 }
 
 /**
  * Fetches one relation's bytes, through the wrapper the registry resolves.
  *
- * The local cache probe stays ahead of resolution, exactly where it is today: a
- * wrapper never consults a cache, so the probe belongs to this layer. Moving it
- * behind authorization is spec 2's change, not this one.
+ * The storage cache is **not** consulted here: `probeStorageRelationCache` ran
+ * before dispatch, so everything reaching this function is already known to be
+ * a miss. A wrapper must never consult a cache either, which is why the probe
+ * belongs to the mediator rather than to either side of this call.
  *
  * `workspaceId` comes from the dataset record rather than from session state,
- * which is what `_downloadStoredDatasetFact` did before this and is why no
- * workspace has to be threaded down from the query runner. The public session
- * has no workspace of its own, so deriving it per relation is what lets both
- * sessions share one path.
+ * which is why no workspace has to be threaded down from the query runner. The
+ * public session has no workspace of its own, so deriving it per relation is
+ * what lets both sessions share one path.
  */
 async function _fetchRelationSource(
   options: Readonly<FetchRelationSourceOptions>,
 ): Promise<AcquiredRelationBytes> {
-  const cachedBytes = await _getCachedRelationBytes(options.relationSource);
-  if (cachedBytes) {
-    return cachedBytes;
-  }
-
   const { dataset } = options.relationSource;
   const ref = { kind: "dataset", id: dataset.id } as const;
   const wrapper = getWrapperForRef(options.relationRegistry, ref);
@@ -138,48 +333,7 @@ export async function fetchRelationBytes(
     runQuery: QetlRunQuery;
   }>,
 ): Promise<AcquiredRelationBytes[]> {
-  // Every relation source already carries the dataset and, when virtual, the
-  // defining SQL that `getRelationSources` read. The registry resolves from
-  // those maps rather than querying again, because acquisition must not cost a
-  // read the old dispatch did not make.
-  const datasetsById = makeIdLookupRecord(
-    options.relationSources.map(prop("dataset")),
-  );
-  const rawSqlByDatasetId = Object.fromEntries(
-    options.relationSources
-      .filter(_isVirtualRelationSource)
-      .map((relationSource) => {
-        return [relationSource.dataset.id, relationSource.sourceDataset.rawSql];
-      }),
-  );
-  // One registry per call, with the caller's lease closed over: a virtual
-  // dataset's defining SQL is itself a QETL query and has to run under the same
-  // lease, or it races the outer query on the shared queryable relation cache.
-  const relationRegistry = createDefaultRegistry({
-    getRawSql: async (ref) => {
-      const rawSql = rawSqlByDatasetId[ref.id];
-      if (rawSql === undefined) {
-        throw new Error(
-          `Virtual dataset '${ref.id}' is not among the relations to fetch`,
-        );
-      }
-      return rawSql;
-    },
-    getDataset: async (id) => {
-      const dataset = datasetsById[id];
-      if (!dataset) {
-        throw new Error(`Dataset '${id}' is not among the relations to fetch`);
-      }
-      return dataset;
-    },
-    runParquetQuery: ({ rawSql }) => {
-      return options.runQuery({
-        rawSql,
-        returnType: "parquet",
-        datasetDuckDbLease: options.datasetDuckDbLease,
-      });
-    },
-  });
+  const relationRegistry = _createRegistryForFetch(options);
 
   return options.relationSources.reduce<Promise<AcquiredRelationBytes[]>>(
     async (priorBytesPromise, relationSource) => {
@@ -200,23 +354,47 @@ export async function fetchRelationBytes(
 }
 
 /**
- * Writes fetched relations to the storage relation cache and loads them into
- * the queryable relation cache.
+ * Writes newly acquired relations to the storage tier and loads every relation
+ * into the queryable tier.
+ *
+ * `relationsToStore` is passed separately rather than derived, because the
+ * caller already knows which relations came out of the cache and which were
+ * just acquired. Deriving it here used to mean a `LocalDataset` read per query
+ * purely to ask "did we already have this", which the probe upstream has
+ * already answered.
+ *
+ * A write failure does not fail the query. The bytes are in hand and the
+ * queryable tier is about to receive them, so a full disk costs the next
+ * query a re-fetch rather than costing this one its result.
  */
 export async function loadRelationBytes(
   options: Readonly<{
     relations: readonly AcquiredRelationBytes[];
+    relationsToStore: readonly AcquiredRelationBytes[];
     datasetDuckDbLease: DatasetDuckDbLease;
-    insertToStorageCache: QetlRunnerOptions["insertToStorageCache"];
+    relationCache: RelationCachePort;
+    principalKey: PrincipalKey;
   }>,
 ): Promise<void> {
-  const storedFacts = await LocalDatasetClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("datasetId", "in", options.relations.map(prop("datasetId"))));
-  const factsToCache = options.relations.filter((relation) => {
-    return !storedFacts.some(propEq("datasetId", relation.datasetId));
+  await promiseMap(options.relationsToStore, async (relation) => {
+    try {
+      await options.relationCache.write({
+        identity: {
+          principal: options.principalKey,
+          relation: { kind: "dataset", id: relation.datasetId },
+          definition: undefined,
+          sourceVersion: undefined,
+        },
+        columns: "all",
+        payload: relation.parquetBlob,
+      });
+    } catch (error) {
+      _relationLogger.error(
+        `Failed to cache relation ${relation.datasetId}; the query continues`,
+        { error },
+      );
+    }
   });
-  await options.insertToStorageCache(factsToCache);
   const columns = await DatasetColumnClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
     .getAll(

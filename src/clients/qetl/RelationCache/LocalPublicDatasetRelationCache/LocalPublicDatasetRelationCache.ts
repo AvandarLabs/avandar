@@ -46,12 +46,13 @@ type PublicPrincipalParts = {
  * `undefined` when `principal` is not that form. A workspace-session
  * principal (`w:<workspaceId>:<userId>`) always fails this check before any
  * `LocalPublicDataset` row is even read, which is what keeps this port
- * structurally unable to serve one. None of `bucket`, `dashboardId`, or
- * `snapshotRevision` may contain the `:` delimiter (the bucket is a closed
- * enum, `dashboardId` is a UUID, and `makePrincipalKeyFromPublicSession`
- * already asserts the pattern on `snapshotRevision`), so a round trip
- * through that same builder is what confirms the split recovered them
- * losslessly rather than merely looking plausible.
+ * structurally unable to serve one. None of the three segments can contain the
+ * `:` delimiter: the bucket is a closed enum, `dashboardId` is a UUID, and
+ * `makePrincipalKeyFromPublicSession` percent-encodes `snapshotRevision`. That
+ * last one is why the revision segment is decoded here before anything
+ * compares it against a row, whose `snapshotRevision` column holds the raw
+ * value. A round trip through the same builder then confirms the split
+ * recovered the parts losslessly rather than merely looking plausible.
  */
 function _parsePublicPrincipalKey(
   principal: PrincipalKey,
@@ -72,7 +73,7 @@ function _parsePublicPrincipalKey(
   const candidate: PublicPrincipalParts = {
     bucket,
     dashboardId: dashboardId as Dashboard.Id,
-    snapshotRevision,
+    snapshotRevision: decodeURIComponent(snapshotRevision),
   };
   try {
     if (makePrincipalKeyFromPublicSession(candidate) !== principal) {

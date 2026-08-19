@@ -30,4 +30,19 @@ export const GlobalAppConfig = {
     /** Maximum number of rows to preview */
     maxPreviewRows: 200,
   },
+
+  /** Timing values that several runtimes must agree on. */
+  timing: {
+    /**
+     * How long a Google Sheet's Drive `File.version` may be reused before it is
+     * read again.
+     *
+     * A read-throttle on the version check, not a staleness allowance. Without
+     * it a dashboard with six Sheets-backed charts issues six metadata calls
+     * per render pass. The cost is that an edit made inside the window is not
+     * noticed until it closes, and the explicit "Refresh from Google Sheets"
+     * action is the escape hatch that makes that acceptable.
+     */
+    googleSheetFreshnessDebounceMs: 60_000,
+  },
 } as const;

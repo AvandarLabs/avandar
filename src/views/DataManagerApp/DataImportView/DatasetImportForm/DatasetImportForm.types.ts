@@ -8,7 +8,7 @@ import type {
   GoogleSheetsParseOptions,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
-import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UnknownObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -57,8 +57,15 @@ export type BaseLoadResult = {
 };
 
 export type GoogleSheetsLoadResult = BaseLoadResult & {
-  rawText: string;
-  sheetLoadMetadata: DuckDbLoadCsvResult;
+  /**
+   * Every tab the exported workbook contains, read out of the workbook itself
+   * rather than from the Sheets API. This is what the tab selector offers, and
+   * reading it from the same bytes the transcode reads is what guarantees a tab
+   * the user picks is a tab `read_xlsx` can find.
+   */
+  availableSheetNames: string[];
+
+  sheetLoadMetadata: DuckDbLoadXlsxResult;
   spreadsheetName: string;
 };
 

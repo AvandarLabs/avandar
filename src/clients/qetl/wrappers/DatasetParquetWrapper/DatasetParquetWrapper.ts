@@ -9,14 +9,26 @@ import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParque
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type {
+  RelationCapabilities,
+  SourceVersion,
+} from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
+import type { OpenDataContentKind } from "$/open-data/acquireOpenDataResource";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
+
+/** Bytes fetched from an API-backed catalog entry, before any transcode. */
+export type FetchedApiOpenDataResource = {
+  contentKind: OpenDataContentKind;
+  bytes: Uint8Array<ArrayBuffer>;
+  sourceVersion: SourceVersion | undefined;
+};
 
 const CAPABILITIES = {
   relations: "single",
@@ -35,10 +47,9 @@ const CAPABILITIES = {
   maxBytesPerCall: "unbounded",
 
   /**
-   * Nothing here reports a cheap change token today: stored Parquet carries no
-   * version we read, and the open data catalog entry's modified time is not
-   * consulted. `none` matches `readFreshness` being absent, so the mediator
-   * never believes it has a freshness answer for these sources.
+   * Stored Parquet carries no version we read. An API-backed catalog entry
+   * does produce a token, which `acquire` returns on that path; csv and xlsx
+   * still report none.
    */
   freshnessSignal: "none",
 
@@ -53,6 +64,17 @@ const CAPABILITIES = {
   quotaScope: { kind: "none" },
   grantedScope: [],
 } satisfies RelationCapabilities;
+
+type FetchedParquet = {
+  parquetBlob: Blob;
+  sourceVersion: SourceVersion | undefined;
+};
+
+function _parquetBlobFromBytes(bytes: Uint8Array<ArrayBuffer>): Blob {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return new Blob([copy]);
+}
 
 type DatasetParquetWrapperOptions = {
   /**
@@ -71,6 +93,23 @@ type DatasetParquetWrapperOptions = {
    * re-reading here would add a query the old dispatch never made.
    */
   getDataset?: (id: Dataset.Id) => Promise<Dataset.T>;
+
+  /**
+   * Fetches one API-backed catalog resource through the open-data edge
+   * function. Injected so a test drives the branch without a network.
+   */
+  fetchApiOpenDataResource?: (
+    catalogEntryId: OpenDataCatalogEntry.Id,
+  ) => Promise<FetchedApiOpenDataResource>;
+
+  /**
+   * Transcodes CSV bytes into Parquet. Bound to the caller's DuckDB lease so
+   * acquisition does not race the outer query.
+   */
+  transcodeCsvToParquet?: (params: {
+    datasetId: Dataset.Id;
+    bytes: Uint8Array<ArrayBuffer>;
+  }) => Promise<Blob>;
 };
 
 /**
@@ -122,12 +161,78 @@ async function _downloadStoredParquet(
 }
 
 /**
- * Downloads an `open_data` dataset from the Parquet URL its catalog entry
- * names. The catalog entry read is deliberately uncached, as it is today.
+ * Downloads a pipeline-produced `open_data` dataset from the Parquet URL its
+ * catalog entry names. The catalog entry read is deliberately uncached, as it
+ * is today.
+ */
+async function _downloadPipelineOpenDataParquet(
+  dataset: Readonly<Dataset.T>,
+  catalogEntry: Readonly<{
+    canonicalUrls?: readonly string[];
+  }>,
+): Promise<FetchedParquet> {
+  const parquetUrl = catalogEntry.canonicalUrls?.find((url) => {
+    return url.toLowerCase().endsWith(".parquet");
+  });
+  if (!parquetUrl) {
+    throw new Error(`No Parquet URL in catalog for dataset '${dataset.name}'`);
+  }
+  const response = await fetch(parquetUrl);
+  if (!response.ok) {
+    throw new Error(
+      `Open data Parquet download failed: ${response.statusText}`,
+    );
+  }
+  return { parquetBlob: await response.blob(), sourceVersion: undefined };
+}
+
+async function _downloadApiOpenData(
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    catalogEntryId: OpenDataCatalogEntry.Id;
+    fetchApiOpenDataResource?: DatasetParquetWrapperOptions["fetchApiOpenDataResource"];
+    transcodeCsvToParquet?: DatasetParquetWrapperOptions["transcodeCsvToParquet"];
+  }>,
+): Promise<FetchedParquet> {
+  const fetchApi = options.fetchApiOpenDataResource;
+  if (!fetchApi) {
+    throw new Error(
+      `No API open-data fetch for catalog entry '${options.catalogEntryId}'`,
+    );
+  }
+  const acquisition = await fetchApi(options.catalogEntryId);
+  if (acquisition.contentKind !== "csv") {
+    return {
+      parquetBlob: _parquetBlobFromBytes(acquisition.bytes),
+      sourceVersion: acquisition.sourceVersion,
+    };
+  }
+  const transcode = options.transcodeCsvToParquet;
+  if (!transcode) {
+    throw new Error(
+      `No CSV transcode for catalog entry '${options.catalogEntryId}'`,
+    );
+  }
+  return {
+    parquetBlob: await transcode({
+      datasetId: options.datasetId,
+      bytes: acquisition.bytes,
+    }),
+    sourceVersion: acquisition.sourceVersion,
+  };
+}
+
+/**
+ * Downloads an `open_data` dataset: pipeline Parquet from its catalog URL, or
+ * an API-backed resource through the injected edge-function fetch.
  */
 async function _downloadOpenDataParquet(
   dataset: Readonly<Dataset.T>,
-): Promise<Blob> {
+  apiOptions: Readonly<{
+    fetchApiOpenDataResource?: DatasetParquetWrapperOptions["fetchApiOpenDataResource"];
+    transcodeCsvToParquet?: DatasetParquetWrapperOptions["transcodeCsvToParquet"];
+  }>,
+): Promise<FetchedParquet> {
   const sourceDatasets = await OpenDataDatasetClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
     .getAll(where("dataset_id", "in", [dataset.id]));
@@ -140,32 +245,34 @@ async function _downloadOpenDataParquet(
   const catalogEntry = await OpenDataCatalogEntryClient.getOne(
     where("id", "eq", sourceDataset.catalogEntryId),
   );
-  const parquetUrl = catalogEntry?.canonicalUrls?.find((url) => {
-    return url.toLowerCase().endsWith(".parquet");
-  });
-  if (!parquetUrl) {
-    throw new Error(`No Parquet URL in catalog for dataset '${dataset.name}'`);
+  if (catalogEntry?.accessKind === "api_resource") {
+    return await _downloadApiOpenData({
+      datasetId: dataset.id,
+      catalogEntryId: catalogEntry.id,
+      ...apiOptions,
+    });
   }
-  const response = await fetch(parquetUrl);
-  if (!response.ok) {
-    throw new Error(
-      `Open data Parquet download failed: ${response.statusText}`,
-    );
-  }
-  return await response.blob();
+  return await _downloadPipelineOpenDataParquet(dataset, catalogEntry ?? {});
 }
 
 async function _fetchParquetFromSource(
   ref: DatasetRef,
   getDataset: (id: Dataset.Id) => Promise<Dataset.T>,
-): Promise<Blob> {
+  apiOptions: Readonly<{
+    fetchApiOpenDataResource?: DatasetParquetWrapperOptions["fetchApiOpenDataResource"];
+    transcodeCsvToParquet?: DatasetParquetWrapperOptions["transcodeCsvToParquet"];
+  }>,
+): Promise<FetchedParquet> {
   const dataset = await getDataset(ref.id);
   return match(dataset.sourceType)
-    .with("csv_file", "xlsx_file", (sourceType) => {
-      return _downloadStoredParquet(dataset, sourceType);
+    .with("csv_file", "xlsx_file", async (sourceType) => {
+      return {
+        parquetBlob: await _downloadStoredParquet(dataset, sourceType),
+        sourceVersion: undefined,
+      };
     })
     .with("open_data", () => {
-      return _downloadOpenDataParquet(dataset);
+      return _downloadOpenDataParquet(dataset, apiOptions);
     })
     .with("virtual", "google_sheets", (sourceType) => {
       throw new Error(
@@ -189,11 +296,10 @@ export function createDatasetParquetWrapper(
   options: Readonly<DatasetParquetWrapperOptions> = {},
 ): SourceWrapper<DatasetRef> {
   const getDataset = options.getDataset ?? _getDataset;
-  const fetchParquet =
-    options.fetchParquet ??
-    ((ref: DatasetRef) => {
-      return _fetchParquetFromSource(ref, getDataset);
-    });
+  const apiOptions = {
+    fetchApiOpenDataResource: options.fetchApiOpenDataResource,
+    transcodeCsvToParquet: options.transcodeCsvToParquet,
+  };
 
   return {
     name: "dataset-parquet",
@@ -210,11 +316,19 @@ export function createDatasetParquetWrapper(
     // The column subset is ignored: these sources project nothing, and a
     // returned superset satisfies the request.
     acquire: async ({ ref }): Promise<AcquiredRelation> => {
-      return {
+      if (options.fetchParquet) {
+        return {
+          ref,
+          parquetBlob: await options.fetchParquet(ref),
+          sourceVersion: undefined,
+        };
+      }
+      const fetched = await _fetchParquetFromSource(
         ref,
-        parquetBlob: await fetchParquet(ref),
-        sourceVersion: undefined,
-      };
+        getDataset,
+        apiOptions,
+      );
+      return { ref, ...fetched };
     },
   };
 }

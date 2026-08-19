@@ -20,15 +20,52 @@ function _getGooglePickerAPIKey(): string {
   return key;
 }
 
+/**
+ * The Cloud project number the Picker reports as the picking app.
+ *
+ * This is what ties a pick to the OAuth client whose per-file `drive.file`
+ * grant Google records, so a Picker built without it hands back a file id the
+ * app has no grant for, and the subsequent Drive export answers 404 as though
+ * the file did not exist. It must be the same Cloud project as
+ * `GOOGLE_CLIENT_ID`, and it is that value's numeric prefix.
+ *
+ * Throws rather than returning `undefined` so a missing deployment variable
+ * fails where it can be diagnosed, instead of downstream on an export.
+ */
+function _getGooglePickerAppId(): string {
+  const appId = import.meta.env.VITE_GOOGLE_PICKER_APP_ID;
+  if (!appId) {
+    throw new Error("Google Picker app id is not defined");
+  }
+  return appId;
+}
+
 type UseGooglePickerOptions = {
   onGoogleSheetPicked?: (params: {
     document: GPickerDocumentObject;
     googleAccount: GoogleToken;
   }) => void;
+
+  /**
+   * Called when the user dismisses the Picker. A dismissal is a decision, not a
+   * failure, so this exists only so the caller can clear whatever pending state
+   * it set before opening the Picker and leave no orphaned spinner.
+   */
+  onCancel?: () => void;
+
+  /**
+   * Called when the Picker itself fails. Worth surfacing loudly: the most
+   * likely cause is an app id that does not match the OAuth client's Cloud
+   * project, and swallowing it makes that misconfiguration look like a scope
+   * problem on the export instead.
+   */
+  onError?: (response: GPickerResponseObject) => void;
 };
 
 export function useGooglePicker({
   onGoogleSheetPicked = noop,
+  onCancel = noop,
+  onError = noop,
 }: UseGooglePickerOptions): {
   isGoogleAuthenticated: boolean;
   picker: GPicker | undefined;
@@ -76,6 +113,7 @@ export function useGooglePicker({
         .addView(sheetsView)
         .setOAuthToken(accessToken) // get the accessToken
         .setDeveloperKey(_getGooglePickerAPIKey()) // get my developer key
+        .setAppId(_getGooglePickerAppId())
         .setMaxItems(1)
         .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
         .setCallback((response: GPickerResponseObject) => {
@@ -88,12 +126,27 @@ export function useGooglePicker({
               document: response.docs[0],
               googleAccount: selectedAccount,
             });
+            return;
+          }
+          if (response.action === pickerAPI.Action.CANCEL) {
+            onCancel();
+            return;
+          }
+          if (response.action === pickerAPI.Action.ERROR) {
+            onError(response);
           }
         })
         .build();
     }
     return undefined;
-  }, [pickerAPI, accessToken, onGoogleSheetPicked, selectedAccount]);
+  }, [
+    pickerAPI,
+    accessToken,
+    onGoogleSheetPicked,
+    onCancel,
+    onError,
+    selectedAccount,
+  ]);
 
   const isLoadingGoogleAuthState = isLoadingUser || isLoadingTokens;
   const isLoadingAPI = isLoadingGoogleAuthState || isLoadingPickerAPI;

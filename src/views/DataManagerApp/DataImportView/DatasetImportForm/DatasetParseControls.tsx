@@ -140,21 +140,58 @@ export function DatasetParseControls({
       );
     })
     .with({ sourceType: "google_sheets" }, (googleSheetsProps) => {
-      const { parseOptions } = googleSheetsProps;
+      const { parseOptions, datasetLoadResult } = googleSheetsProps;
+      const sheetOptions = datasetLoadResult.availableSheetNames.map(
+        (sheetName) => {
+          return { value: sheetName, label: sheetName };
+        },
+      );
+      const hasSingleSheet = sheetOptions.length === 1;
+
+      // No rows-to-skip control here, unlike the CSV and XLSX branches. Sheets
+      // reads through `read_xlsx`, which cannot express a row skip without the
+      // sheet's exact used range, and a Google Sheets user can delete preamble
+      // rows in the sheet itself.
       return (
-        <NumberInput
-          label={t`Number of rows to skip`}
-          value={parseOptions.numRowsToSkip ?? 0}
-          onChange={(value) => {
-            return onDataSourceMetadataChange({
-              ...googleSheetsProps,
-              parseOptions: {
-                ...parseOptions,
-                numRowsToSkip: Number(value),
-              },
-            });
-          }}
-        />
+        <>
+          <Tooltip
+            label={t`There is only one tab in this spreadsheet.`}
+            disabled={!hasSingleSheet}
+          >
+            <Select
+              label={t`Tab`}
+              data={sheetOptions}
+              value={
+                parseOptions.sheetName ??
+                datasetLoadResult.sheetLoadMetadata.sheet ??
+                null
+              }
+              disabled={hasSingleSheet}
+              onChange={(value) => {
+                return onDataSourceMetadataChange({
+                  ...googleSheetsProps,
+                  parseOptions: {
+                    ...parseOptions,
+                    sheetName: value ?? undefined,
+                  },
+                });
+              }}
+            />
+          </Tooltip>
+          <Checkbox
+            label={t`The tab has a header row`}
+            checked={parseOptions.hasHeader ?? true}
+            onChange={(event) => {
+              return onDataSourceMetadataChange({
+                ...googleSheetsProps,
+                parseOptions: {
+                  ...parseOptions,
+                  hasHeader: event.currentTarget.checked,
+                },
+              });
+            }}
+          />
+        </>
       );
     })
     .exhaustive(() => {

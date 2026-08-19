@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -187,7 +188,11 @@ describe("PublicQuerySession.runQuery", () => {
     expect(createMock).toHaveBeenCalledTimes(3);
   });
 
-  it("writes the committed snapshot revision into the Dexie cache", async () => {
+  it("scopes its storage tier to the committed snapshot revision", async () => {
+    // The session used to carry the revision in an `insertToStorageCache`
+    // callback that only wrote. It now carries it in the principal every cache
+    // entry is keyed by, which is what also governs reads: a query against one
+    // revision cannot be served an entry written under another.
     vi.resetModules();
     const { PublicQuerySession } =
       await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
@@ -198,18 +203,33 @@ describe("PublicQuerySession.runQuery", () => {
       visibility: "public",
       snapshotRevision: THIRD_REVISION,
     });
-    const qetlOptions = createMock.mock.calls.at(-1)?.[0] as {
-      insertToStorageCache: (
-        relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
-      ) => Promise<void>;
-    };
-    await qetlOptions.insertToStorageCache([
-      { datasetId: DATASET_ID, parquetBlob: new Blob(["snapshot"]) },
-    ]);
 
-    expect(bulkInsertMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: [expect.objectContaining({ snapshotRevision: THIRD_REVISION })],
+    const qetlOptions = createMock.mock.calls.at(-1)?.[0] as {
+      principalKey: string;
+      relationCache: unknown;
+    };
+
+    // The tier itself, not just the key. Handing this session the workspace
+    // tier is the cross-visibility bug that reordering the probe made hot.
+    const { LocalPublicDatasetRelationCache } = await import(
+      "@/clients/qetl/RelationCache/LocalPublicDatasetRelationCache/LocalPublicDatasetRelationCache"
+    );
+    expect(qetlOptions.relationCache).toBe(LocalPublicDatasetRelationCache);
+
+    expect(qetlOptions.principalKey).toBe(
+      makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: DASHBOARD_ID,
+        snapshotRevision: THIRD_REVISION,
+      }),
+    );
+    // Negative control: a different revision must not produce the same key,
+    // or the assertion above would hold no matter what the session did.
+    expect(qetlOptions.principalKey).not.toBe(
+      makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: DASHBOARD_ID,
+        snapshotRevision: `${THIRD_REVISION}-other`,
       }),
     );
   });

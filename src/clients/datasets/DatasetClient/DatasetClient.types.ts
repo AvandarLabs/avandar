@@ -64,6 +64,12 @@ export type GoogleSheetsDatasetInsertParams = BaseDatasetInsertParams & {
   rowsToSkip: number;
   googleAccountId: string;
   googleDocumentId: string;
+
+  /**
+   * The spreadsheet tab this dataset reads. Omit only for a caller that cannot
+   * know it; the stored `null` then means the workbook's first tab.
+   */
+  sheetName?: string;
 };
 
 /**

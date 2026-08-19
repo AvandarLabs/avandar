@@ -34,16 +34,16 @@ own phase with a dedicated agent, because the hazard is silent rather than loud.
 
 Seven of the eight resolve by taking one side wholesale. **One does not.**
 
-| File | Resolution |
-| --- | --- |
-| `shared/models/relations/RelationCacheKey/RelationCacheKey.ts` | Take **impl** (229 lines vs 183) |
-| `shared/models/relations/RelationCacheKey/RelationCacheKey.test.ts` | Take **impl** |
-| `shared/models/relations/RelationCachePort/RelationCachePort.types.ts` | Take **impl** (113 lines vs 72; registry's predates the `probe()` reshape) |
-| `src/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache.ts` | Take **impl** (396 lines vs 232) |
-| `src/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache.test.ts` | Take **impl** |
-| `src/views/GisApp/layers/useMapLayersData/useMapLayersData.ts` | Take **impl** (clustering work supersedes the cherry-picked `a4a7e210`) |
-| `src/views/GisApp/layers/useMapLayersData/useMapLayersData.test.ts` | Take **impl** |
-| `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.ts` | **Combine both sides. See 1.2.** |
+| File                                                                           | Resolution                                                                 |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `shared/models/relations/RelationCacheKey/RelationCacheKey.ts`                 | Take **impl** (229 lines vs 183)                                           |
+| `shared/models/relations/RelationCacheKey/RelationCacheKey.test.ts`            | Take **impl**                                                              |
+| `shared/models/relations/RelationCachePort/RelationCachePort.types.ts`         | Take **impl** (113 lines vs 72; registry's predates the `probe()` reshape) |
+| `src/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache.ts`      | Take **impl** (396 lines vs 232)                                           |
+| `src/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache.test.ts` | Take **impl**                                                              |
+| `src/views/GisApp/layers/useMapLayersData/useMapLayersData.ts`                 | Take **impl** (clustering work supersedes the cherry-picked `a4a7e210`)    |
+| `src/views/GisApp/layers/useMapLayersData/useMapLayersData.test.ts`            | Take **impl**                                                              |
+| `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.ts`              | **Combine both sides. See 1.2.**                                           |
 
 Plus one rename that git flags but does not conflict:
 `src/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient.membership.test.ts`
@@ -154,15 +154,15 @@ lane's diff disjoint from every other lane's, which is the whole point.
 Five lanes can start **immediately and concurrently**. Two must wait for the
 merge.
 
-| Lane | What | Base branch | Starts |
-| --- | --- | --- | --- |
-| **M** | The merge (section 1) | `feat/qetl-impl` | now |
-| **A** | Cross-tab lock | `feat/qetl-impl` | now (in progress, this session) |
-| **B** | HDX / open data API generalisation | `feat/qetl-impl` | now |
-| **C** | Google Sheets connector | `feat/qetl-impl` | now |
-| **E** | Adversarial review of the registry's 7 tasks | `feat/qetl-registry` | now (read-only) |
-| **D** | Virtual-dataset invalidation | merged tree | after M |
-| **F** | Column projection, entity-key-sorted Parquet | merged tree | after M |
+| Lane  | What                                         | Base branch          | Starts                          |
+| ----- | -------------------------------------------- | -------------------- | ------------------------------- |
+| **M** | The merge (section 1)                        | `feat/qetl-impl`     | now                             |
+| **A** | Cross-tab lock                               | `feat/qetl-impl`     | now (in progress, this session) |
+| **B** | HDX / open data API generalisation           | `feat/qetl-impl`     | now                             |
+| **C** | Google Sheets connector                      | `feat/qetl-impl`     | now                             |
+| **E** | Adversarial review of the registry's 7 tasks | `feat/qetl-registry` | now (read-only)                 |
+| **D** | Virtual-dataset invalidation                 | merged tree          | after M                         |
+| **F** | Column projection, entity-key-sorted Parquet | merged tree          | after M                         |
 
 ### Lane A: cross-tab lock (this session, `feat/qetl-impl`)
 
@@ -185,7 +185,7 @@ introduce a second locking mechanism beside it.**
 
 **Conflict surface: none.** `DatasetDuckDbCoordinator.ts` is touched by neither
 the registry branch nor any of the 8 conflicted files, so this lane merges
-cleanly whenever it lands. `duckDbRawQuery.ts` *is* touched by the registry
+cleanly whenever it lands. `duckDbRawQuery.ts` _is_ touched by the registry
 branch, which is exactly why this lane must not edit it.
 
 ### Lane B: HDX / open data API generalisation (new worktree)
@@ -218,10 +218,10 @@ Generalize the open data catalog to API-backed entries and land HDX.
   console blockers left.
 - **Run `ava supabase switch` first.** This lane carries a schema migration.
   Worktrees share one local Supabase project by default, but `ava supabase
-  switch` starts an **isolated local Supabase project for the current branch**,
+switch` starts an **isolated local Supabase project for the current branch**,
   which is exactly what makes migration work safe to run beside other lanes.
   Confirm with `ava supabase status`, validate with `ava supabase migrations
-  validate`, and `ava supabase restore` when the lane closes. Schema work does
+validate`, and `ava supabase restore` when the lane closes. Schema work does
   **not** serialize the lanes.
 
 ### Lane E: adversarial review of the registry's seven tasks (read-only)
@@ -309,7 +309,10 @@ cross-tab write serialised under the real lock.
 
 ## 6. The DAG
 
-Rendered to `~/Downloads/qetl-dag.png` and `.svg`.
+Rendered to `~/Downloads/qetl-dag.png` and `.svg`, and to `qetl-dag.png` /
+`.svg` / `.mmd` at the worktree root. Regenerated 2026-08-19 after chat
+aliases landed. Public-share concept queries are punted. Current focus:
+S3·9 workspace-explorer demo.
 
 ```mermaid
 ---
@@ -328,39 +331,41 @@ config:
 ---
 flowchart TD
 
-  M["<b>M · THE MERGE</b><br/>registry → impl · 8 conflicts<br/><i>WorkspaceQuerySession.ts<br/>needs BOTH sides</i>"]
-  A["<b>A · Cross-tab lock</b><br/>navigator.locks behind<br/>DatasetDuckDbLease<br/><i>this session</i>"]
-  B["<b>B · HDX / open data</b><br/>API-backed catalog<br/>+ fetch module"]
-  C["<b>C · Google Sheets</b><br/>Picker appId, tab column,<br/>files.export, File.version"]
-  E["<b>E · Adversarial review</b><br/>registry tasks 6-14<br/><i>read-only · owed</i>"]
-  S4a["<b>S3·4a · Concept spine</b><br/>loadConceptSpine.ts"]
-  S4b["<b>S3·4b · Column resolver</b><br/>attrs → columns"]
+  M["<b>✓ M · THE MERGE</b><br/>registry → impl"]
+  A["<b>✓ A · Cross-tab lock</b><br/>navigator.locks behind<br/>DatasetDuckDbLease"]
+  B["<b>✓ B · HDX / open data</b><br/>merged into impl<br/>worktree removed"]
+  C["<b>✓ C · Google Sheets</b><br/>merged into impl<br/>worktree removed"]
+  CHAT["<b>✓ Chat aliases</b><br/>t0/t1 rewritten to ids<br/>worktree removed"]
+  E["<b>E · Adversarial review</b><br/>registry tasks 6-14<br/><i>skipped · owed</i>"]
+  S4a["<b>✓ S3·4a · Concept spine</b><br/>loadConceptSpine.ts"]
+  S4b["<b>✓ S3·4b · Column builder</b><br/>attrs → columns"]
 
-  MB{{"<b>MERGE POINT 1</b> · one base: cache + registry + mediator<br/><i>bar: git diff vs impl empty for every impl-owned path</i>"}}
+  MB{{"<b>✓ MERGE POINT 1</b> · cache + registry + mediator<br/><i>B, C, concepts, sql-alias, chat aliases on impl</i>"}}
 
-  P["<b>P · Cache probe wiring</b><br/>spec 2 · Task 12 cont.<br/><i>MUST carry per-relation authz</i>"]
+  P["<b>✓ P · Cache probe wiring</b><br/>storage probe ahead of dispatch"]
   D["<b>D · Virtual-dataset<br/>invalidation</b>"]
-  G["<b>G · SQL alias bug</b><br/>alias vs ORDER BY name<br/><i>fix + pinned test together</i>"]
-  S5["<b>S3·5 · Concept ref expansion</b><br/><i>+ workspace allowlist</i>"]
-  S8["<b>S3·8 · generateIndividuals</b><br/>bare UUID breaks invariant"]
-  EF["<b>E-fix</b><br/>apply review findings"]
-  IA["<b>A-int</b><br/>nothing to wire"]
-  IB["<b>B-int</b><br/>one fn body in<br/>DatasetParquetWrapper"]
-  IC["<b>C-int</b><br/>GoogleSheetsWrapper body<br/>+ capability flip"]
+  G["<b>✓ G · SQL alias bug</b><br/>ORDER BY from aggregations map"]
+  S5["<b>✓ S3·5 · Concept ref expansion</b><br/>+ workspace allowlist"]
+  S8["<b>✓ S3·8 · generateIndividuals</b><br/>prefixed staging table"]
+  EF["<b>E-fix</b><br/>apply review findings<br/><i>blocked on E</i>"]
+  IA["<b>✓ A-int</b><br/>already behind the lease"]
+  IB["<b>✓ B-int</b><br/>DatasetParquetWrapper<br/>API fetch + CSV transcode"]
+  IC["<b>✓ C-int</b><br/>GoogleSheetsWrapper.acquire<br/>+ capability flip"]
 
   F["<b>F · Column projection</b><br/>+ Parquet sorted by entity key"]
-  S6["<b>S3·6 · Open the concept path</b><br/>delete throw :48-50 AND<br/>open aggregation gate :84<br/><i>TOP RISK</i>"]
+  S6["<b>✓ S3·6 · Open the concept path</b><br/>throw gone, aggregation gate open"]
 
-  S7["<b>S3·7 · Delete _runConceptQuery</b>"]
+  S7["<b>S3·7 · Delete _runConceptQuery</b><br/><i>dead path when form is in sync</i>"]
 
-  S9["<b>S3·9 · Rehearsal</b><br/>2 concepts charted + joined,<br/>one joined to a dataset<br/>w/ filter, group, sort"]
+  S9["<b>► S3·9 · Rehearsal / DEMO</b><br/>workspace explorer<br/>concept query with joins"]
 
-  PUB["<b>Concepts on a public link</b><br/>no ontology access<br/><i>UNSOLVED · CUT FIRST</i>"]
+  PUB["<b>Concepts on a public link</b><br/>no ontology on PublicQuerySession<br/><i>PUNTED · private dashboards only</i>"]
 
   X1["&nbsp;&nbsp;<b>PHASE 1 EXIT</b>&nbsp;&nbsp;"]
   X2["&nbsp;&nbsp;<b>SPEC 3 EXIT</b>&nbsp;&nbsp;"]
 
   M --> MB
+  CHAT --> MB
   MB --> P & D & G & S5 & S8 & EF & IA & IB & IC
   A --> IA
   B --> IB
@@ -374,26 +379,26 @@ flowchart TD
   G --> S6
   S6 --> S7
   S6 --> S9
-  S7 --> S9
+  S7 -.-> S9
   S8 --> S9
   S9 -.-> PUB
 
   IA & IB & IC & D & F --> X1
   S9 --> X2
 
-  LEGEND["<b>QETL work DAG</b> · 2026-08-19<br/><br/><b>green</b> · startable right now, zero shared files<br/><b>amber</b> · merge point, everything downstream waits<br/><b>blue</b> · unblocked only once its parents land<br/><b>red</b> · highest risk or unsolved<br/><b>dotted</b> · optional, first thing to cut"]
+  LEGEND["<b>QETL work DAG</b> · 2026-08-19<br/><i>feat/qetl-impl · demo path is workspace explorer</i><br/><br/><b>green ✓</b> · landed on impl<br/><b>amber ►</b> · current focus: explorer concept joins<br/><b>blue</b> · still to do, not demo-blocking<br/><b>grey dashed</b> · skipped / punted / leftover cleanup<br/><b>dotted</b> · optional, not in this demo"]
 
-  classDef ready fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
-  classDef mergeNode fill:#fde68a,stroke:#b45309,stroke-width:3px,color:#451a03
+  classDef done fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#064e3b
+  classDef now fill:#fde68a,stroke:#d97706,stroke-width:3px,color:#78350f
   classDef seq fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e
-  classDef risk fill:#fee2e2,stroke:#dc2626,stroke-width:3px,color:#7f1d1d
+  classDef owed fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 4,color:#374151
   classDef exit fill:#ede9fe,stroke:#7c3aed,stroke-width:3px,color:#3b0764
   classDef lg fill:#ffffff,stroke:#d0d7de,stroke-width:1px,color:#24292f
 
-  class A,B,C,E,S4a,S4b ready
-  class M,MB mergeNode
-  class P,D,G,S5,S8,EF,IA,IB,IC,F,S7,S9 seq
-  class S6,PUB risk
+  class M,A,B,C,CHAT,S4a,S4b,MB,P,G,S5,S8,IA,IB,IC,S6 done
+  class S9 now
+  class D,F seq
+  class E,EF,S7,PUB owed
   class X1,X2 exit
   class LEGEND lg
 ```

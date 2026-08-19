@@ -1,5 +1,6 @@
 import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 
@@ -22,12 +23,12 @@ function isSpatialPrompt(prompt: string): boolean {
 
 /**
  * Build the schema-aware system prompt used for natural-language → DuckDB SQL
- * generation. Shared between the `queries` edge function (used by the manual
- * "AI query" tab) and the new `chat` edge function (used by the persistent
- * chat panel) so both endpoints stay in sync.
+ * generation. Shared between the `chat` edge function surfaces so they stay
+ * in sync.
  *
- * The schema is sent as a compact listing (one line per dataset + one line
- * per column), not as JSON, to keep token cost low.
+ * The schema is a compact alias listing (one line per dataset, columns inline),
+ * not JSON, to keep the character budget low. Dataset UUIDs are rewritten
+ * after the model returns SQL.
  */
 export function buildSqlSystemPrompt(args: {
   prompt: string;
@@ -35,29 +36,19 @@ export function buildSqlSystemPrompt(args: {
   columns: readonly DatasetColumn[];
 }): string {
   const { prompt, datasets, columns } = args;
+  const aliases = SqlTableAlias.fromDatasets(datasets);
+  const schemaBlock = SqlTableAlias.formatSchemaBlock({ aliases, columns });
 
   return `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.
 
 Available datasets:
-${datasets
-  .map((d) => {
-    return `- ${d.name} (table name: "${d.id}")`;
-  })
-  .join("\n")}
-
-Schema:
-${columns
-  .map((c) => {
-    return `- "${c.name}" (${c.data_type}) in table "${c.dataset_id}"`;
-  })
-  .join("\n")}
+${schemaBlock}
 
 Notes:
 
-- Dataset names are for semantic convenience only. The tables in SQL are named
-  after the dataset UUIDs, not the dataset names.
-- The SQL query should reference the dataset IDs instead of names.
-- Wrap all table IDs and column names in quotation marks, to avoid syntax errors.
+- SQL FROM / JOIN targets must be the aliases above (t0, t1, …), never a label
+  or filename. Wrap aliases and column names in double quotes.
+- Do not invent datasets or columns.
 - The query will run in DuckDB and should only use DuckDB functions supported
   by DuckDB.
 

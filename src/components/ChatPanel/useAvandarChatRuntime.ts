@@ -13,6 +13,7 @@ import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpe
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
+import { offlineChatOverflowAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/offlineChatOverflow";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { tryExecuteOfflineSql } from "@/components/ChatPanel/useAvandarChatRuntime/tryExecuteOfflineSql";
@@ -149,6 +150,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     fixingQuery: t`Fixing query…`,
     noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
     metadataQuery: t`Here is a query based on your workspace metadata.`,
+    contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
   });
 
   useEffect(
@@ -174,6 +176,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         fixingQuery: t`Fixing query…`,
         noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
         metadataQuery: t`Here is a query based on your workspace metadata.`,
+        contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
       };
     },
     [dashboardEditorState, pageContext, parseSql, t, user, workspace],
@@ -454,29 +457,42 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
               ],
             };
           }
-          const offlineResult = await runOfflineChatTurn({
-            workspace: workspaceRef.current,
-            pageContext: currentPageContext,
-            messages: apiMessages,
-            navigatorOnLine: navigator.onLine,
-            localChatModelId,
-            copy: copyRef.current,
-            executeSql:
-              currentPageContext.app === "data-explorer" ?
-                tryExecuteOfflineSql
-              : undefined,
-          });
-          return applyResponse(
-            Model.make("ChatResponse", {
-              assistantText: offlineResult.assistantText,
-              ...(offlineResult.generatedSql ?
-                { generatedSql: offlineResult.generatedSql }
-              : {}),
-              ...(offlineResult.clarification ?
-                { clarification: offlineResult.clarification }
-              : {}),
-            }),
-          );
+          try {
+            const offlineResult = await runOfflineChatTurn({
+              workspace: workspaceRef.current,
+              pageContext: currentPageContext,
+              messages: apiMessages,
+              navigatorOnLine: navigator.onLine,
+              localChatModelId,
+              copy: copyRef.current,
+              executeSql:
+                currentPageContext.app === "data-explorer" ?
+                  tryExecuteOfflineSql
+                : undefined,
+            });
+            return applyResponse(
+              Model.make("ChatResponse", {
+                assistantText: offlineResult.assistantText,
+                ...(offlineResult.generatedSql ?
+                  { generatedSql: offlineResult.generatedSql }
+                : {}),
+                ...(offlineResult.clarification ?
+                  { clarification: offlineResult.clarification }
+                : {}),
+              }),
+            );
+          } catch (error) {
+            const overflowText = offlineChatOverflowAssistantText(
+              error,
+              copyRef.current.contextWindowExceeded,
+            );
+            if (overflowText) {
+              return {
+                content: [{ type: "text" as const, text: overflowText }],
+              };
+            }
+            throw error;
+          }
         };
 
         if (initialRuntimeMode.kind === "local") {

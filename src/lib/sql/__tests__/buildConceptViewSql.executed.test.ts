@@ -18,6 +18,7 @@ import { describe, expect, it } from "vitest";
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
@@ -216,6 +217,31 @@ describe("buildConceptViewSql", () => {
     const rows = await _queryView([NOTE]);
 
     expect(rows[0]).toEqual({ external_id: "p1", note: null });
+  });
+
+  // Why the loader has to mark this statement trusted internal SQL, asserted
+  // against the real analyzer rather than reasoned about. The view's `FROM` is
+  // the spine table, whose name deliberately resolves to no relation, so the
+  // fail-closed analyzer cannot account for it and reports
+  // `uninspectable-source`. `runRawQuery` accepts that reason *only* for
+  // trusted internal SQL, so a loader that forgot the flag would fail every
+  // concept query at runtime while every test of this builder still passed.
+  //
+  // The contributing datasets are still reported, which is what keeps the lease
+  // and the workspace table assertions applying to them: dataset A is reached
+  // only through its `ava_rows_` view, and it appears here anyway.
+  it("emits SQL the analyzer can only accept as trusted internal SQL", () => {
+    const viewSql = buildConceptViewSql({
+      viewName: CONCEPT_VIEW,
+      spineTableName: SPINE,
+      attributeColumns: [AGE, REGION, TAGS, NOTE],
+    });
+
+    expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(viewSql)).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [DATASET_A, DATASET_B],
+    });
   });
 
   // Byte-identical SQL for unchanged metadata, regardless of input order, is

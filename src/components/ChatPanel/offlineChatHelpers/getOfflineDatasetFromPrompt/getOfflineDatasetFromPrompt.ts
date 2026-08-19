@@ -15,11 +15,11 @@ const MIN_LABEL_MATCH_SCORE = 2;
  * and token heuristics first, then a fuzzy match of the dataset names
  * against the prompt text, then falls back to the currently open dataset.
  */
-export function resolveOfflineDataset(args: {
+export function getOfflineDatasetFromPrompt(args: {
   schema: OfflineChatSchema;
   lastUserPrompt: string;
   openDatasetId?: string;
-  /** When analyze JSON includes a valid table name, it wins. */
+  /** When analyze JSON includes a valid table alias or id, it wins. */
   analyzeTableName?: string;
 }): OfflineChatSchemaDataset | undefined {
   const analyzeRef = args.analyzeTableName?.trim();

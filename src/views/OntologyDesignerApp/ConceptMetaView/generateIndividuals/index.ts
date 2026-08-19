@@ -10,6 +10,7 @@ import {
 import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
@@ -73,11 +74,16 @@ export async function generateIndividuals(
       identifierMappingsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
+  // The rows are staged under a prefixed name rather than the concept's bare
+  // id, because a bare UUID in a table name always means a dataset. See
+  // `getStagingIndividualsTableName`.
+  const stagingTableName = getStagingIndividualsTableName(concept.id);
+
   await WorkspaceQuerySession.runQuery({
     rawSql: sqlTemplate(`
-      DROP TABLE IF EXISTS "$conceptId$";
+      DROP TABLE IF EXISTS "$stagingTableName$";
 
-      CREATE TABLE "$conceptId$" AS (
+      CREATE TABLE "$stagingTableName$" AS (
         -- Find all external IDs
         WITH external_ids AS (
           SELECT
@@ -102,6 +108,7 @@ export async function generateIndividuals(
     `).parse({
       workspaceId: concept.workspaceId,
       conceptId: concept.id,
+      stagingTableName,
       externalIdSelectors: identifierMappings
         .map((mapping) => {
           const column = mappingColumnsLookup[mapping.id]!;
@@ -127,22 +134,34 @@ export async function generateIndividuals(
   // optimization that can be done to only upsert new rows or rows that have
   // a new name. There is no need to upsert rows that already exist and have
   // not changed.
-  const jobSummary = await DuckDbClient.forEachQueryPage<
-    Individual.T<"DBRead">
-  >({
-    query: { tableName: concept.id, castTimestampsToISO: true },
-    callback: async (page) => {
-      await IndividualClient.crudFunctions.bulkInsert({
-        data: page.data,
-        upsert: true,
-        onConflict: {
-          columnNames: ["external_id", "concept_id"],
-          ignoreDuplicates: false,
-        },
-        logger: Logger,
-      });
-    },
-  });
+  try {
+    const jobSummary = await DuckDbClient.forEachQueryPage<
+      Individual.T<"DBRead">
+    >({
+      query: { tableName: stagingTableName, castTimestampsToISO: true },
+      callback: async (page) => {
+        await IndividualClient.crudFunctions.bulkInsert({
+          data: page.data,
+          upsert: true,
+          onConflict: {
+            columnNames: ["external_id", "concept_id"],
+            ignoreDuplicates: false,
+          },
+          logger: Logger,
+        });
+      },
+    });
 
-  Logger.log(`Finished upserting all pages`, jobSummary);
+    Logger.log(`Finished upserting all pages`, jobSummary);
+  } finally {
+    // Postgres holds the individuals once the upsert is done, so nothing reads
+    // the staging table afterwards. Dropped in a `finally` rather than after
+    // the upsert so a failed run does not leave it in the catalog either.
+    await WorkspaceQuerySession.runQuery({
+      rawSql: sqlTemplate(`DROP TABLE IF EXISTS "$stagingTableName$";`).parse({
+        stagingTableName,
+      }),
+      workspaceId: concept.workspaceId,
+    });
+  }
 }

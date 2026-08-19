@@ -28,6 +28,7 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
+import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -50,6 +51,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
+  const [refreshGoogleSheetDataset, isRefreshPending] =
+    useRefreshGoogleSheetDataset();
   const [sourceDataset, isLoadingSourceDataset] =
     DatasetClient.useGetSourceDataset({
       datasetId: dataset.id,
@@ -253,44 +256,70 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             }}
           />
 
-          <Button
-            color="danger"
-            mt="lg"
-            onClick={() => {
-              modals.openConfirmModal({
-                title: t`Delete dataset`,
-                children: (
-                  <Text>
-                    <Trans>
-                      Are you sure you want to delete {dataset.name}?
-                    </Trans>
-                  </Text>
-                ),
-                labels: { confirm: t`Delete`, cancel: t`Cancel` },
-                confirmProps: {
-                  color: "danger",
-                  loading: isDeletePending,
-                },
-                onConfirm: () => {
-                  deleteDataset(
-                    { id: dataset.id },
-                    {
-                      onSuccess: () => {
-                        navigate(AppLinks.dataManagerHome(workspace.slug));
-                        notifications.show({
-                          title: t`Dataset deleted`,
-                          message: t`${dataset.name} deleted successfully`,
-                          color: "green",
-                        });
+          <Group mt="lg">
+            {/*
+              Google Sheets is the one source type whose rows can change under
+              the dataset without anyone re-importing it. The freshness check is
+              throttled, so this is the escape hatch for a user who has just
+              edited the sheet and does not want to wait for the window to
+              close.
+            */}
+            {(
+              dataset.sourceType === "google_sheets" &&
+              sourceDataset?.__type === "GoogleSheetsDataset"
+            ) ?
+              <Button
+                variant="default"
+                loading={isRefreshPending}
+                onClick={() => {
+                  refreshGoogleSheetDataset({
+                    datasetId: dataset.id,
+                    sourceDataset,
+                  });
+                }}
+              >
+                <Trans>Refresh from Google Sheets</Trans>
+              </Button>
+            : null}
+
+            <Button
+              color="danger"
+              onClick={() => {
+                modals.openConfirmModal({
+                  title: t`Delete dataset`,
+                  children: (
+                    <Text>
+                      <Trans>
+                        Are you sure you want to delete {dataset.name}?
+                      </Trans>
+                    </Text>
+                  ),
+                  labels: { confirm: t`Delete`, cancel: t`Cancel` },
+                  confirmProps: {
+                    color: "danger",
+                    loading: isDeletePending,
+                  },
+                  onConfirm: () => {
+                    deleteDataset(
+                      { id: dataset.id },
+                      {
+                        onSuccess: () => {
+                          navigate(AppLinks.dataManagerHome(workspace.slug));
+                          notifications.show({
+                            title: t`Dataset deleted`,
+                            message: t`${dataset.name} deleted successfully`,
+                            color: "green",
+                          });
+                        },
                       },
-                    },
-                  );
-                },
-              });
-            }}
-          >
-            <Trans>Delete Dataset</Trans>
-          </Button>
+                    );
+                  },
+                });
+              }}
+            >
+              <Trans>Delete Dataset</Trans>
+            </Button>
+          </Group>
         </Paper>
       </Stack>
     </Container>

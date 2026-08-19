@@ -8,6 +8,7 @@ import {
 } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
@@ -107,15 +108,21 @@ async function _getOpenDataExtractors(
 }
 
 /**
- * Refuses `google_sheets`, which has no acquisition path yet.
- *
- * Rejecting rather than returning an empty list is deliberate and is what the
- * characterization tests pin: one unsupported dataset fails the whole batch, so
- * a page that cannot show all of its data shows none of it rather than silently
- * showing part.
+ * Pairs `google_sheets` datasets with their stored Drive file and tab.
  */
-async function _refuseGoogleSheetsExtractors(): Promise<RelationSource[]> {
-  throw new Error("Google Sheets extraction is not supported yet");
+async function _getGoogleSheetsExtractors(
+  options: Readonly<SourceRecordReaderOptions>,
+): Promise<RelationSource[]> {
+  const sources = await GoogleSheetsDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "google_sheets",
+      sourceDataset,
+    };
+  });
 }
 
 /**
@@ -124,7 +131,7 @@ async function _refuseGoogleSheetsExtractors(): Promise<RelationSource[]> {
  * A `Record` keyed by the source-type union rather than a `match`, which keeps
  * the exhaustiveness the `match` gave (adding a source type fails to compile
  * here until it has an entry) while making a new source one entry instead of a
- * new branch. The four readers stay separate because each pairs its own literal
+ * new branch. The five readers stay separate because each pairs its own literal
  * source type with its own source-record type, and `RelationSource` is a
  * discriminated union over exactly that pairing: one generic reader would admit
  * mismatched combinations the union forbids.
@@ -137,7 +144,7 @@ const _EXTRACTOR_READER_BY_SOURCE_TYPE: Record<
   xlsx_file: _getXlsxExtractors,
   virtual: _getVirtualExtractors,
   open_data: _getOpenDataExtractors,
-  google_sheets: _refuseGoogleSheetsExtractors,
+  google_sheets: _getGoogleSheetsExtractors,
 };
 
 async function _getExtractorsForSourceType(

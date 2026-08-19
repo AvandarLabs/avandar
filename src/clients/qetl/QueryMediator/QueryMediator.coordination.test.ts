@@ -1,12 +1,15 @@
 /** Tests QETL dataset leases through final DuckDB query execution. */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const VIRTUAL_DATASET_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;
 const SECOND_VIRTUAL_DATASET_ID =
   "44444444-4444-4444-8444-444444444444" as Dataset.Id;
+const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
+let fakeRelationCache = createInMemoryRelationCache();
 
 type Deferred = {
   promise: Promise<void>;
@@ -127,6 +130,15 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  fakeRelationCache = createInMemoryRelationCache();
+  // `clearAllMocks` clears recorded calls but leaves queued
+  // `mockResolvedValueOnce` values in place. These two are the only mocks
+  // configured with a queue, and a test that does not consume its whole queue
+  // would otherwise hand the leftover to the next test as its first answer,
+  // which fails far from the cause and looks like a hang rather than a wrong
+  // value. Reset them explicitly, then restore the default below.
+  datasetGetAllMock.mockReset();
+  sourceDatasetGetAllMock.mockReset();
   getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
   localDatasetGetAllMock.mockResolvedValue([]);
   localDatasetGetByIdMock.mockResolvedValue(undefined);
@@ -175,8 +187,12 @@ function _configureVirtualDependencyMocks(workspaceId: string): void {
     sourceType: "virtual" as const,
     workspaceId,
   };
+  // One dataset per call, because the real client reads
+  // `where("id", "in", ids)` and cannot return a dataset that was not asked
+  // for. The outer query dispatches only the virtual relation; the base is
+  // reached by the nested query the virtual wrapper runs.
   datasetGetAllMock
-    .mockResolvedValueOnce([virtualDataset, baseDataset])
+    .mockResolvedValueOnce([virtualDataset])
     .mockResolvedValueOnce([baseDataset]);
   sourceDatasetGetAllMock
     .mockResolvedValueOnce([
@@ -186,10 +202,16 @@ function _configureVirtualDependencyMocks(workspaceId: string): void {
       },
     ])
     .mockResolvedValue([{ datasetId: DATASET_ID }]);
-  localDatasetGetByIdMock.mockImplementation(async ({ id }) => {
-    return id === VIRTUAL_DATASET_ID ? undefined : (
-        { parseStatus: "ready", parquetData: new Blob(["cached"]) }
-      );
+  // The base dataset is already in the storage tier; the virtual one is not.
+  void fakeRelationCache.write({
+    identity: {
+      principal: PRINCIPAL_KEY,
+      relation: { kind: "dataset", id: DATASET_ID },
+      definition: undefined,
+      sourceVersion: undefined,
+    },
+    columns: "all",
+    payload: new Blob(["cached"]),
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
   runRawQueryMock.mockImplementation(async (_sql, options) => {
@@ -226,10 +248,15 @@ function _configureVirtualSiblingData(workspaceId: string): void {
       },
     ])
     .mockResolvedValue([{ datasetId: DATASET_ID }]);
-  localDatasetGetByIdMock.mockImplementation(async ({ id }) => {
-    return id === DATASET_ID ?
-        { parseStatus: "ready", parquetData: new Blob(["cached"]) }
-      : undefined;
+  void fakeRelationCache.write({
+    identity: {
+      principal: PRINCIPAL_KEY,
+      relation: { kind: "dataset", id: DATASET_ID },
+      definition: undefined,
+      sourceVersion: undefined,
+    },
+    columns: "all",
+    payload: new Blob(["cached"]),
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
 }
@@ -270,7 +297,8 @@ describe("QueryMediator DuckDB coordination", () => {
       getQueryDependencies: async () => {
         return [DATASET_ID];
       },
-      insertToStorageCache: async () => {},
+      relationCache: fakeRelationCache,
+      principalKey: PRINCIPAL_KEY,
     });
 
     const queryPromise = qetlClient.runQuery({
@@ -297,7 +325,8 @@ describe("QueryMediator DuckDB coordination", () => {
       getDuckDbLeaseDatasetIds: async () => {
         return [VIRTUAL_DATASET_ID, DATASET_ID];
       },
-      insertToStorageCache: async () => {},
+      relationCache: fakeRelationCache,
+      principalKey: PRINCIPAL_KEY,
     });
     const completedBeforeTimeout = await Promise.race([
       qetlClient
@@ -339,7 +368,8 @@ describe("QueryMediator DuckDB coordination", () => {
       getDuckDbLeaseDatasetIds: async () => {
         return [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID, DATASET_ID];
       },
-      insertToStorageCache: async () => {},
+      relationCache: fakeRelationCache,
+      principalKey: PRINCIPAL_KEY,
     });
     const queryPromise = qetlClient.runQuery({
       rawSql: `SELECT * FROM "${VIRTUAL_DATASET_ID}" JOIN "${SECOND_VIRTUAL_DATASET_ID}" ON true`,

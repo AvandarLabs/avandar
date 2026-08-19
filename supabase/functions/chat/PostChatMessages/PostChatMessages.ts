@@ -166,6 +166,7 @@ export const PostChatMessages = POST({
           isDashboards,
           lastUserPrompt,
           priorClarifications,
+          datasets: schema.datasets,
         }));
       } catch (error) {
         await emitChatTurnAnalytics({

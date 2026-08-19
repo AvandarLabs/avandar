@@ -64,8 +64,11 @@ vi.mock("@avandar/clients", () => {
   };
 });
 
-vi.mock("@avandar/logger", () => {
+// Overlays the real module so only `withLogger` is substituted. A full
+// replacement broke as soon as the import graph reached one more export.
+vi.mock("@avandar/logger", async (importOriginal) => {
   return {
+    ...(await importOriginal<object>()),
     withLogger: (
       _client: object,
       builder: (logger: typeof loggerMock) => object,
@@ -91,33 +94,12 @@ vi.mock("@avandar/query-hooks", () => {
   };
 });
 
-vi.mock("@avandar/utils", () => {
-  return {
-    isDefined: <Value>(value: Value | undefined): value is Value => {
-      return value !== undefined;
-    },
-    prop: <Key extends PropertyKey>(key: Key) => {
-      return <Value extends Record<Key, unknown>>(value: Value) => {
-        return value[key];
-      };
-    },
-    propEq: <Key extends PropertyKey>(key: Key, expectedValue: unknown) => {
-      return <Value extends Record<Key, unknown>>(value: Value) => {
-        return value[key] === expectedValue;
-      };
-    },
-    propIsDefined: <Key extends PropertyKey>(key: Key) => {
-      return <Value extends Record<Key, unknown>>(value: Value) => {
-        return value[key] !== undefined;
-      };
-    },
-    promiseMap: async <Value, Result>(
-      values: readonly Value[],
-      mapper: (value: Value) => Promise<Result>,
-    ) => {
-      return await Promise.all(values.map(mapper));
-    },
-  };
+// Spreads the real module rather than re-declaring the handful of helpers this
+// path happens to use. Those re-declarations were behaviourally identical to
+// the originals, so the only thing the hand-rolled version added was a failure
+// every time the import graph reached one more export.
+vi.mock("@avandar/utils", async (importOriginal) => {
+  return { ...(await importOriginal<object>()) };
 });
 
 vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {

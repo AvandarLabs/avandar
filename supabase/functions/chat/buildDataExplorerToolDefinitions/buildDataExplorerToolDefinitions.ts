@@ -25,7 +25,7 @@ const GENERATE_SQL_TOOL = {
         sql: {
           type: "string",
           description:
-            "Valid DuckDB SELECT. Wrap all table IDs and column names in double quotes.",
+            "Valid DuckDB SELECT. Use the short table aliases from the schema (t0, t1, …). Wrap aliases and column names in double quotes.",
         },
       },
       required: ["sql"],

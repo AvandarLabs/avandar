@@ -96,12 +96,45 @@ describe("makePrincipalKeyFromPublicSession", () => {
     ).toBe(`p:published:${DASHBOARD_ID}:rev.1_2-A`);
   });
 
-  it("rejects a snapshotRevision that could carry the ':' delimiter", () => {
+  it("encodes a snapshotRevision that carries the ':' delimiter", () => {
+    // Revisions are ISO-8601 timestamps in this system, so every real one
+    // contains colons. Rejecting them, which this used to do, made the public
+    // principal impossible to build. Encoding keeps the delimiter safe instead.
+    const key = makePrincipalKeyFromPublicSession({
+      bucket: "published",
+      dashboardId: DASHBOARD_ID,
+      snapshotRevision: "2026-08-14T00:00:00.000Z",
+    });
+
+    expect(key).toBe(
+      `p:published:${DASHBOARD_ID}:2026-08-14T00%3A00%3A00.000Z`,
+    );
+    expect(key.split(":")).toHaveLength(4);
+  });
+
+  it("keeps two revisions that differ only around the delimiter distinct", () => {
+    // The property the old assertion was protecting: no two distinct
+    // principals may collide on one key.
+    const first = makePrincipalKeyFromPublicSession({
+      bucket: "published",
+      dashboardId: DASHBOARD_ID,
+      snapshotRevision: "a:b",
+    });
+    const second = makePrincipalKeyFromPublicSession({
+      bucket: "published",
+      dashboardId: DASHBOARD_ID,
+      snapshotRevision: "a%3Ab",
+    });
+
+    expect(first).not.toBe(second);
+  });
+
+  it("rejects an empty snapshotRevision", () => {
     expect(() => {
       return makePrincipalKeyFromPublicSession({
         bucket: "published",
         dashboardId: DASHBOARD_ID,
-        snapshotRevision: "rev:1",
+        snapshotRevision: "",
       });
     }).toThrow();
   });

@@ -313,23 +313,44 @@ describe("LocalPublicDatasetRelationCache.write", () => {
     ).rejects.toThrow(/public-session principal/);
   });
 
-  it("throws when the principal's snapshotRevision fails the pattern the round trip enforces, even though the prefix, segment count and bucket are otherwise valid", async () => {
+  it("throws when the principal's snapshotRevision segment is not what the builder would emit, even though the prefix, segment count and bucket are otherwise valid", async () => {
     // Isolates the round-trip check inside _parsePublicPrincipalKey: the
-    // segment count, "p" prefix and bucket membership all pass here, so
-    // only the round trip's re-validation of snapshotRevision (via
-    // makePrincipalKeyFromPublicSession's own assert) can reject this.
-    const invalidSnapshotRevisionPrincipal = `p:${BUCKET}:${DASHBOARD_ID}:abc!def`;
+    // segment count, "p" prefix and bucket membership all pass here, so only
+    // the round trip can reject this. A raw space is the case that survives
+    // percent-encoding: it decodes to itself but re-encodes to "%20", so the
+    // rebuilt key differs from the one handed in.
+    const unencodedRevisionPrincipal = `p:${BUCKET}:${DASHBOARD_ID}:a b`;
 
     await expect(
       LocalPublicDatasetRelationCache.write(
         _makeWrite({
-          identity: { principal: invalidSnapshotRevisionPrincipal },
+          identity: { principal: unencodedRevisionPrincipal },
         }),
       ),
     ).rejects.toThrow(/public-session principal/);
 
     const rows = await db.LocalPublicDataset.toArray();
     expect(rows).toHaveLength(0);
+  });
+
+  it("accepts an ISO-8601 snapshotRevision, which is what the system actually mints", async () => {
+    // The regression this whole encoding change exists for: every real
+    // revision contains colons, so the builder used to throw and the public
+    // tier could not be constructed at all.
+    const isoRevision = "2026-08-14T00:00:00.000Z";
+    const principal = makePrincipalKeyFromPublicSession({
+      bucket: BUCKET,
+      dashboardId: DASHBOARD_ID,
+      snapshotRevision: isoRevision,
+    });
+
+    await LocalPublicDatasetRelationCache.write(
+      _makeWrite({ identity: { principal } }),
+    );
+
+    const rows = await db.LocalPublicDataset.toArray();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.snapshotRevision).toBe(isoRevision);
   });
 
   it("retries once after a quota-exceeded failure and succeeds", async () => {

@@ -1,9 +1,7 @@
 /**
  * Characterization tests for the source-type dispatch in
- * `getRelationSources.ts`, ahead of replacing its `ts-pattern` match with a
- * registry lookup. These pin down current behavior, including behavior that
- * looks wrong (the `google_sheets` throw), so a later refactor can be checked
- * against them without editing any assertion here.
+ * `getRelationSources.ts`. These pin the pairing of each source type to its
+ * source record, including `google_sheets` now that acquisition is wired.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -23,6 +21,7 @@ const {
   xlsxGetAllMock,
   virtualGetAllMock,
   openDataGetAllMock,
+  googleSheetsGetAllMock,
   getTableOrViewNamesMock,
 } = vi.hoisted(() => {
   return {
@@ -31,6 +30,7 @@ const {
     xlsxGetAllMock: vi.fn(),
     virtualGetAllMock: vi.fn(),
     openDataGetAllMock: vi.fn(),
+    googleSheetsGetAllMock: vi.fn(),
     getTableOrViewNamesMock: vi.fn(),
   };
 });
@@ -67,6 +67,12 @@ vi.mock("@/clients/datasets/source-datasets/OpenDataDatasetClient", () => {
   return { OpenDataDatasetClient: _withCacheChain(openDataGetAllMock) };
 });
 
+vi.mock("@/clients/datasets/source-datasets/GoogleSheetsDatasetClient", () => {
+  return {
+    GoogleSheetsDatasetClient: _withCacheChain(googleSheetsGetAllMock),
+  };
+});
+
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return { DuckDbClient: { getTableOrViewNames: getTableOrViewNamesMock } };
 });
@@ -78,6 +84,7 @@ beforeEach(() => {
   xlsxGetAllMock.mockResolvedValue([]);
   virtualGetAllMock.mockResolvedValue([]);
   openDataGetAllMock.mockResolvedValue([]);
+  googleSheetsGetAllMock.mockResolvedValue([]);
   getTableOrViewNamesMock.mockResolvedValue([]);
 });
 
@@ -160,21 +167,28 @@ describe("getRelationSources", () => {
     ]);
   });
 
-  it("throws for google_sheets datasets, which are not supported yet", async () => {
+  it("pairs a google_sheets dataset with its source record", async () => {
     const dataset = {
       id: GOOGLE_SHEETS_ID,
       name: "google sheets dataset",
       sourceType: "google_sheets" as const,
       workspaceId: "workspace-1",
     };
+    const sourceDataset = {
+      datasetId: GOOGLE_SHEETS_ID,
+      googleDocumentId: "1sheetFileId",
+      sheetName: "Kenya",
+    };
     datasetGetAllMock.mockResolvedValue([dataset]);
+    googleSheetsGetAllMock.mockResolvedValue([sourceDataset]);
 
     const { getRelationSources } =
       await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([GOOGLE_SHEETS_ID]);
 
-    await expect(getRelationSources([GOOGLE_SHEETS_ID])).rejects.toThrow(
-      "Google Sheets extraction is not supported yet",
-    );
+    expect(result).toEqual([
+      { dataset, sourceType: "google_sheets", sourceDataset },
+    ]);
   });
 
   it("returns nothing when no relations are requested", async () => {
@@ -229,11 +243,7 @@ describe("getRelationSources", () => {
     ]);
   });
 
-  // The throw inside the `google_sheets` match arm happens synchronously
-  // inside `promiseFlatMap`, so it rejects the whole call rather than the
-  // one unsupported relation. A batch that also asks for a supported type
-  // gets no partial result: the csv_file bucket is never observed.
-  it("rejects the entire mixed batch when one dataset is google_sheets, yielding no partial result", async () => {
+  it("pairs google_sheets and csv_file datasets in the same batch", async () => {
     const csvDataset = {
       id: CSV_ID,
       name: "csv dataset",
@@ -247,15 +257,30 @@ describe("getRelationSources", () => {
       workspaceId: "workspace-1",
     };
     const csvSourceDataset = { datasetId: CSV_ID, delimiter: "," };
+    const sheetsSourceDataset = {
+      datasetId: GOOGLE_SHEETS_ID,
+      googleDocumentId: "1sheetFileId",
+      sheetName: "Kenya",
+    };
     datasetGetAllMock.mockResolvedValue([csvDataset, googleSheetsDataset]);
     csvGetAllMock.mockResolvedValue([csvSourceDataset]);
+    googleSheetsGetAllMock.mockResolvedValue([sheetsSourceDataset]);
 
     const { getRelationSources } =
       await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([CSV_ID, GOOGLE_SHEETS_ID]);
 
-    await expect(
-      getRelationSources([CSV_ID, GOOGLE_SHEETS_ID]),
-    ).rejects.toThrow("Google Sheets extraction is not supported yet");
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { dataset: csvDataset, sourceType: "csv_file", sourceDataset: csvSourceDataset },
+        {
+          dataset: googleSheetsDataset,
+          sourceType: "google_sheets",
+          sourceDataset: sheetsSourceDataset,
+        },
+      ]),
+    );
+    expect(result).toHaveLength(2);
   });
 
   it("matches multiple csv_file datasets in one call by their own datasetId", async () => {

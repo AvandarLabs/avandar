@@ -164,6 +164,13 @@ export type Database = {
       }
       catalog_entries__open_data: {
         Row: {
+          access_kind: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url: string | null
+          api_resource_format: string | null
+          api_resource_id: string | null
+          api_service:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls: string[] | null
           coverage_end_date: string | null
           coverage_start_date: string | null
@@ -179,14 +186,21 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
-          parquet_file_name: string
-          pipeline_name: string
-          pipeline_run_id: string
+          parquet_file_name: string | null
+          pipeline_name: string | null
+          pipeline_run_id: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string
         }
         Insert: {
+          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
@@ -202,14 +216,21 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
-          parquet_file_name: string
-          pipeline_name: string
-          pipeline_run_id: string
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
         }
         Update: {
+          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
@@ -225,9 +246,9 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
-          parquet_file_name?: string
-          pipeline_name?: string
-          pipeline_run_id?: string
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -634,6 +655,7 @@ export type Database = {
           google_document_id: string
           id: string
           rows_to_skip: number
+          sheet_name: string | null
           updated_at: string
           workspace_id: string
         }
@@ -644,6 +666,7 @@ export type Database = {
           google_document_id: string
           id?: string
           rows_to_skip?: number
+          sheet_name?: string | null
           updated_at?: string
           workspace_id: string
         }
@@ -654,6 +677,7 @@ export type Database = {
           google_document_id?: string
           id?: string
           rows_to_skip?: number
+          sheet_name?: string | null
           updated_at?: string
           workspace_id?: string
         }
@@ -1598,6 +1622,7 @@ export type Database = {
           p_google_account_id: string
           p_google_document_id: string
           p_rows_to_skip?: number
+          p_sheet_name?: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_workspace_id: string
         }
         Returns: {
@@ -1964,6 +1989,10 @@ export type Database = {
         | "count"
         | "max"
         | "min"
+      catalog_entries__open_data__access_kind:
+        | "pipeline_parquet"
+        | "api_resource"
+      catalog_entries__open_data__api_service: "ckan"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       dashboard_snapshot_transition_kind:
         | "publish"
@@ -2201,6 +2230,11 @@ export const Constants = {
         "max",
         "min",
       ],
+      catalog_entries__open_data__access_kind: [
+        "pipeline_parquet",
+        "api_resource",
+      ],
+      catalog_entries__open_data__api_service: ["ckan"],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       dashboard_snapshot_transition_kind: [
         "publish",

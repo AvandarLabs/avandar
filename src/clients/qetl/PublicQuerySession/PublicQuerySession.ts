@@ -1,10 +1,11 @@
 import { createModule } from "@avandar/modules";
-import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient/LocalPublicDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
+import { LocalPublicDatasetRelationCache } from "@/clients/qetl/RelationCache/LocalPublicDatasetRelationCache/LocalPublicDatasetRelationCache";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type {
@@ -70,37 +71,6 @@ function _getReferencedPublishedDatasetIds(
   });
 }
 
-async function _insertFactsIntoCache(
-  options: Readonly<
-    Pick<
-      CreateQetlClientOptions,
-      "bucket" | "dashboardId" | "snapshotRevision"
-    > & {
-      relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
-    }
-  >,
-): Promise<void> {
-  const { bucket, dashboardId, relations, snapshotRevision } = options;
-  const downloadedAt = new Date().toISOString();
-  await LocalPublicDatasetClient.bulkInsert({
-    upsert: true,
-    onConflict: {
-      columnNames: ["dashboardId", "datasetId"],
-      ignoreDuplicates: false,
-    },
-    data: relations.map(({ datasetId, parquetBlob }) => {
-      return {
-        bucket,
-        dashboardId,
-        datasetId,
-        parquetData: parquetBlob,
-        snapshotRevision,
-        downloadedAt,
-      };
-    }),
-  });
-}
-
 function _createQetlClient(
   options: Readonly<CreateQetlClientOptions>,
 ): IQueryMediator {
@@ -116,14 +86,18 @@ function _createQetlClient(
     getDuckDbLeaseDatasetIds: async () => {
       return [...publishedDatasetIds];
     },
-    insertToStorageCache: async (relations) => {
-      await _insertFactsIntoCache({
-        bucket,
-        dashboardId,
-        relations,
-        snapshotRevision,
-      });
-    },
+    // The public tier, scoped to this exact published snapshot. This is what
+    // closes the cross-visibility gap: the read path used to go to
+    // `LocalDataset` for every session, so a public query probed the workspace
+    // store while writing its own bytes somewhere that was never read back.
+    // `LocalPublicDatasetRelationCache` decodes the principal and refuses a
+    // workspace-form one, so it cannot serve one even by mistake.
+    relationCache: LocalPublicDatasetRelationCache,
+    principalKey: makePrincipalKeyFromPublicSession({
+      bucket,
+      dashboardId,
+      snapshotRevision,
+    }),
     prepareDuckDbDatasets: async ({ datasetIds }) => {
       DatasetDuckDbCoordinator.assertPublicSnapshotDatasetOwners({
         datasetIds,

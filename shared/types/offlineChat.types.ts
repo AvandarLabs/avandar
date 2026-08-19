@@ -53,7 +53,10 @@ export type OfflineChatEngine = {
 export type OfflineAnalyzeResult = {
   summary: string;
   proceed: boolean;
-  /** Valid workspace dataset UUID from analyze JSON when the model obeys. */
+  /**
+   * Valid workspace dataset alias or id from analyze JSON when the model
+   * obeys.
+   */
   tableName?: string;
   clarifyQuestion?: string;
   clarifyOptions?: string[];

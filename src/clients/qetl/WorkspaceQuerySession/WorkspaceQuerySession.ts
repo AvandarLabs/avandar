@@ -1,19 +1,23 @@
 import { createModule } from "@avandar/modules";
 import { prop, where } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
 import { assertWorkspaceRelations } from "@/clients/qetl/assertWorkspaceRelations/assertWorkspaceRelations";
+import { getConceptRelationPlansFromSql } from "@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql";
 import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
+import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Module } from "@avandar/modules";
 import type { EmptyObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -58,34 +62,29 @@ async function _getAllWorkspaceDatasetIds(
   ).map(prop("id"));
 }
 
-async function _insertWorkspaceRelations(
-  options: Readonly<{
-    relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
-    userId: UserId;
-    workspaceId: Workspace.Id;
-  }>,
-): Promise<void> {
-  await LocalDatasetClient.bulkInsert({
-    upsert: true,
-    onConflict: { columnNames: ["datasetId"], ignoreDuplicates: false },
-    data: options.relations.map(({ datasetId, parquetBlob }) => {
-      return {
-        datasetId,
-        parquetData: parquetBlob,
-        workspaceId: options.workspaceId,
-        userId: options.userId,
-        parseStatus: "ready" as const,
-        parseStartedAt: undefined,
-        parseFailedReason: undefined,
-        sourceBytes: undefined,
-        sourceFileName: undefined,
-        sourceFileType: undefined,
-        sourceFileSize: undefined,
-        lastSourceAccessedAt: undefined,
-        parseOptions: undefined,
-      };
-    }),
-  });
+/**
+ * Every concept id the workspace owns.
+ *
+ * This is the other half of the relation allowlist, and spec 3 calls it the
+ * highest-risk line in the spec: a concept relation is named
+ * `concept_<uuid>` in SQL, and without an intersection against this list a
+ * `concept_<uuid>` belonging to another workspace would be planned and loaded
+ * from a session that has no business reading it. The dataset half of the gate
+ * has always existed; adding concepts to the loading path without adding them
+ * here would open exactly the hole the dataset half closes.
+ *
+ * Read through the shared query cache for the same reason the dataset list is:
+ * it is consulted once per query that names a concept, and a concept-free query
+ * never reaches it at all.
+ */
+async function _getAllWorkspaceConceptIds(
+  workspaceId: Workspace.Id,
+): Promise<Concept.Id[]> {
+  return (
+    await ConceptClient.withCache(AvaQueryClient)
+      .withEnsureQueryData()
+      .getAll(where("workspace_id", "eq", workspaceId))
+  ).map(prop("id"));
 }
 
 async function _prepareWorkspaceDatasets(
@@ -127,10 +126,26 @@ function _createWorkspaceQetlClient(
           DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(rawSql),
       });
     },
-    getDuckDbLeaseDatasetIds: getAllDatasetIds,
-    insertToStorageCache: async (relations) => {
-      await _insertWorkspaceRelations({ ...options, relations });
+    planConceptRelations: async (rawSql) => {
+      return await getConceptRelationPlansFromSql({
+        rawSql,
+        allowlist: {
+          getAllowedConceptIds: async () => {
+            return await _getAllWorkspaceConceptIds(options.workspaceId);
+          },
+          getAllowedDatasetIds: getAllDatasetIds,
+        },
+      });
     },
+    getDuckDbLeaseDatasetIds: getAllDatasetIds,
+    // The workspace tier, scoped to this workspace and this user. A public
+    // session holds `LocalPublicDatasetRelationCache` instead, so neither can
+    // reach the other's entries by construction rather than by a predicate.
+    relationCache: DexieRelationCache,
+    principalKey: makePrincipalKeyFromWorkspaceSession({
+      workspaceId: options.workspaceId,
+      userId: options.userId,
+    }),
     prepareDuckDbDatasets: _prepareWorkspaceDatasets,
   });
 }

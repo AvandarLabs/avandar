@@ -1,5 +1,8 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
+import {
+  getEntityKeyComparisonSql,
+  getRowNumberedViewName,
+} from "@/clients/DuckDbClient/duckDbSqlText";
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
@@ -124,14 +127,21 @@ function _buildArraySelector(
 ): string {
   const rowsView = quoteSqlIdentifier(getRowNumberedViewName(column.datasetId));
   const valueColumn = quoteSqlIdentifier(column.selectColumnName);
-  const primaryKey = quoteSqlIdentifier(column.primaryKeyColumnName);
+  // The same text comparison every value-picker rule uses, for the same
+  // reason: the spine's key is Postgres `text` and the dataset's key column is
+  // whatever its parquet file says.
+  const keyComparison = getEntityKeyComparisonSql({
+    externalIdsTable: SPINE_ALIAS,
+    externalIdColumn: EXTERNAL_ID_COLUMN,
+    primaryKeyColumnName: column.primaryKeyColumnName,
+  });
 
   return `
         -- Collect every contributed value, in a deterministic order
         (
           SELECT COALESCE(list(dataset.${valueColumn} ORDER BY dataset.file_row_number), [])
           FROM ${rowsView} dataset
-          WHERE ${SPINE_ALIAS}.${quoteSqlIdentifier(EXTERNAL_ID_COLUMN)} = dataset.${primaryKey}
+          WHERE ${keyComparison}
         ) AS ${quoteSqlIdentifier(column.attributeName)}
       `;
 }

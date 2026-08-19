@@ -10,12 +10,6 @@ import type {
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
 /**
- * A `snapshotRevision` may never carry the `:` principal-key delimiter, so it
- * is asserted rather than hashed: the raw value stays readable in the key.
- */
-const SNAPSHOT_REVISION_PATTERN = /^[A-Za-z0-9_.-]+$/;
-
-/**
  * The only two snapshot bucket names a public principal may embed, mirrored
  * from `SnapshotStorageUtils.PUBLIC_BUCKET_NAME` / `PRIVATE_BUCKET_NAME`
  * (`src/clients/storage/PublicDatasetParquetStorageClient/
@@ -116,9 +110,16 @@ export function makePrincipalKeyFromWorkspaceSession(params: {
  * make two different principals collide on one key, the same defect class
  * fixed for `makePrincipalKeyFromWorkspaceSession`.
  *
+ * **`snapshotRevision` is percent-encoded rather than constrained.** It used
+ * to be asserted against `[A-Za-z0-9_.-]+`, which no real revision satisfies:
+ * the system mints ISO-8601 timestamps such as `2026-08-14T00:00:00.000Z`, and
+ * the colons in those made this builder throw. Encoding removes every `:`
+ * while staying injective, so the delimiter safety the assertion was protecting
+ * is preserved and a real revision can actually be used. Callers that split a
+ * key back apart must `decodeURIComponent` that segment.
+ *
  * @throws if `bucket` is not one of the known snapshot bucket names, if
- *   `dashboardId` is not a bare UUID, or if `snapshotRevision` does not
- *   match `[A-Za-z0-9_.-]+`.
+ *   `dashboardId` is not a bare UUID, or if `snapshotRevision` is empty.
  */
 export function makePrincipalKeyFromPublicSession(params: {
   bucket: string;
@@ -134,10 +135,12 @@ export function makePrincipalKeyFromPublicSession(params: {
     `dashboardId "${params.dashboardId}" must be a UUID`,
   );
   assert(
-    SNAPSHOT_REVISION_PATTERN.test(params.snapshotRevision),
-    `snapshotRevision "${params.snapshotRevision}" must match ${SNAPSHOT_REVISION_PATTERN}`,
+    params.snapshotRevision.length > 0,
+    "snapshotRevision must not be empty",
   );
-  return `p:${params.bucket}:${params.dashboardId}:${params.snapshotRevision}`;
+  return `p:${params.bucket}:${params.dashboardId}:${encodeURIComponent(
+    params.snapshotRevision,
+  )}`;
 }
 
 /**

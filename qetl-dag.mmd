@@ -1,0 +1,86 @@
+---
+config:
+  theme: base
+  themeVariables:
+    fontFamily: "ui-sans-serif, -apple-system, Segoe UI, sans-serif"
+    fontSize: 14px
+    lineColor: "#8b949e"
+    primaryTextColor: "#1c2128"
+  flowchart:
+    curve: basis
+    nodeSpacing: 32
+    rankSpacing: 80
+    padding: 14
+---
+flowchart TD
+
+  M["<b>✓ M · THE MERGE</b><br/>registry → impl"]
+  A["<b>✓ A · Cross-tab lock</b><br/>navigator.locks behind<br/>DatasetDuckDbLease"]
+  B["<b>✓ B · HDX / open data</b><br/>merged into impl<br/>worktree removed"]
+  C["<b>✓ C · Google Sheets</b><br/>merged into impl<br/>worktree removed"]
+  CHAT["<b>✓ Chat aliases</b><br/>t0/t1 rewritten to ids<br/>worktree removed"]
+  E["<b>E · Adversarial review</b><br/>registry tasks 6-14<br/><i>skipped · owed</i>"]
+  S4a["<b>✓ S3·4a · Concept spine</b><br/>loadConceptSpine.ts"]
+  S4b["<b>✓ S3·4b · Column builder</b><br/>attrs → columns"]
+
+  MB{{"<b>✓ MERGE POINT 1</b> · cache + registry + mediator<br/><i>B, C, concepts, sql-alias, chat aliases on impl</i>"}}
+
+  P["<b>✓ P · Cache probe wiring</b><br/>storage probe ahead of dispatch"]
+  D["<b>D · Virtual-dataset<br/>invalidation</b>"]
+  G["<b>✓ G · SQL alias bug</b><br/>ORDER BY from aggregations map"]
+  S5["<b>✓ S3·5 · Concept ref expansion</b><br/>+ workspace allowlist"]
+  S8["<b>✓ S3·8 · generateIndividuals</b><br/>prefixed staging table"]
+  EF["<b>E-fix</b><br/>apply review findings<br/><i>blocked on E</i>"]
+  IA["<b>✓ A-int</b><br/>already behind the lease"]
+  IB["<b>✓ B-int</b><br/>DatasetParquetWrapper<br/>API fetch + CSV transcode"]
+  IC["<b>✓ C-int</b><br/>GoogleSheetsWrapper.acquire<br/>+ capability flip"]
+
+  F["<b>F · Column projection</b><br/>+ Parquet sorted by entity key"]
+  S6["<b>✓ S3·6 · Open the concept path</b><br/>throw gone, aggregation gate open"]
+
+  S7["<b>S3·7 · Delete _runConceptQuery</b><br/><i>dead path when form is in sync</i>"]
+
+  S9["<b>► S3·9 · Rehearsal / DEMO</b><br/>workspace explorer<br/>concept query with joins"]
+
+  PUB["<b>Concepts on a public link</b><br/>no ontology on PublicQuerySession<br/><i>PUNTED · private dashboards only</i>"]
+
+  X1["&nbsp;&nbsp;<b>PHASE 1 EXIT</b>&nbsp;&nbsp;"]
+  X2["&nbsp;&nbsp;<b>SPEC 3 EXIT</b>&nbsp;&nbsp;"]
+
+  M --> MB
+  CHAT --> MB
+  MB --> P & D & G & S5 & S8 & EF & IA & IB & IC
+  A --> IA
+  B --> IB
+  C --> IC
+  E --> EF
+  S4a --> S5
+  S4b --> S5
+
+  P --> F
+  S5 --> S6
+  G --> S6
+  S6 --> S7
+  S6 --> S9
+  S7 -.-> S9
+  S8 --> S9
+  S9 -.-> PUB
+
+  IA & IB & IC & D & F --> X1
+  S9 --> X2
+
+  LEGEND["<b>QETL work DAG</b> · 2026-08-19<br/><i>feat/qetl-impl · demo path is workspace explorer</i><br/><br/><b>green ✓</b> · landed on impl<br/><b>amber ►</b> · current focus: explorer concept joins<br/><b>blue</b> · still to do, not demo-blocking<br/><b>grey dashed</b> · skipped / punted / leftover cleanup<br/><b>dotted</b> · optional, not in this demo"]
+
+  classDef done fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#064e3b
+  classDef now fill:#fde68a,stroke:#d97706,stroke-width:3px,color:#78350f
+  classDef seq fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e
+  classDef owed fill:#f3f4f6,stroke:#6b7280,stroke-width:2px,stroke-dasharray: 5 4,color:#374151
+  classDef exit fill:#ede9fe,stroke:#7c3aed,stroke-width:3px,color:#3b0764
+  classDef lg fill:#ffffff,stroke:#d0d7de,stroke-width:1px,color:#24292f
+
+  class M,A,B,C,CHAT,S4a,S4b,MB,P,G,S5,S8,IA,IB,IC,S6 done
+  class S9 now
+  class D,F seq
+  class E,EF,S7,PUB owed
+  class X1,X2 exit
+  class LEGEND lg

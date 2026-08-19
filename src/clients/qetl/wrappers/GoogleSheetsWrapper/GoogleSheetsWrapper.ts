@@ -1,31 +1,71 @@
+import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
+import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
+import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
+import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import type { SourceWrapper } from "$/models/relations/SourceWrapper/SourceWrapper.types";
+import type {
+  AcquiredRelation,
+  SourceWrapper,
+} from "$/models/relations/SourceWrapper/SourceWrapper.types";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
+type GoogleSheetSource = Pick<
+  GoogleSheetsDataset.T,
+  "googleDocumentId" | "sheetName" | "googleAccountId"
+>;
+
+type GoogleSheetParquetRelation = { parquetBlob: Blob };
+
+/**
+ * Dependencies the Sheets wrapper closes over so it never imports a client
+ * singleton. The relation loader already holds the source record and the
+ * DuckDB lease, and it passes both through here.
+ */
+export type GoogleSheetsWrapperOptions = {
+  /** The stored Sheets row for one dataset. */
+  getSheetSource: (id: Dataset.Id) => Promise<GoogleSheetSource>;
+
+  /** A live Google access token for the stored account. */
+  getAccessToken: () => Promise<string>;
+
+  /**
+   * Reads one tab out of exported workbook bytes and returns Parquet. Bound
+   * to the caller's DuckDB lease so acquisition does not race the outer query.
+   * `datasetId` is the bare table the lease already covers.
+   */
+  readXlsx: (params: {
+    datasetId: Dataset.Id;
+    xlsxBytes: Uint8Array<ArrayBuffer>;
+    sheet: string | undefined;
+  }) => Promise<GoogleSheetParquetRelation>;
+
+  /** Injected Drive transport; omitted in production, where `fetch` is used. */
+  driveFetch?: GoogleDriveFetch;
+};
+
 const CAPABILITIES = {
-  /** One spreadsheet exposes one relation per named tab. */
-  relations: "named-tabs",
+  /**
+   * One dataset row is one tab. The tab lives on the source record rather
+   * than on `RelationRef`, so a consumer cannot enumerate tabs from the ref.
+   */
+  relations: "single",
 
   /**
-   * A call names one A1 range of one tab and gets that range whole. Subranges
-   * are addressable, but only by position, which is why paging a large sheet
-   * is possible and combining pages into one consistent relation is not.
+   * Drive `files.export` returns the whole workbook in one call. Which tab
+   * becomes a relation is a `read_xlsx` argument, not a positional subrange.
    */
-  acquisitionUnit: { kind: "whole-range", positionalSubranges: true },
+  acquisitionUnit: { kind: "whole-relation" },
 
-  /**
-   * `values.get` accepts a range and nothing else: no filter, no ordering, no
-   * aggregate. This is the declaration that stops anyone designing a Sheets
-   * query optimizer.
-   */
   predicatePushdown: "none",
   aggregatePushdown: false,
   wholeRelationAcquirable: "yes",
   maxRowsPerCall: "unbounded",
 
-  /** Google caps a response at roughly 10 MB, where it caps no row count. */
+  /** Drive caps exported content at roughly 10 MB. */
   maxBytesPerCall: 10 * 1024 * 1024,
 
   /** Drive reports `File.version`, which changes when the file changes. */
@@ -39,28 +79,74 @@ const CAPABILITIES = {
   rowIdentity: "none",
   multiCallAtomicity: false,
 
-  /**
-   * The Sheets API's read quota is 300 reads per minute per *project*, shared
-   * across every tenant, so one workspace's import can throttle everyone.
-   */
-  quotaScope: { kind: "project-global", readsPerMinute: 300 },
+  /** Drive rate-limits per host after the connector stopped calling Sheets. */
+  quotaScope: { kind: "per-host", host: "www.googleapis.com" },
 
-  // Target scopes. `getAuthURL.ts` still requests `auth/spreadsheets`;
-  // spec 4 drops it. Asserted against the request in spec 4, not here.
-  grantedScope: ["openid", "email", "auth/drive.file"],
+  grantedScope: [
+    "openid",
+    "email",
+    "https://www.googleapis.com/auth/drive.file",
+  ],
 } satisfies RelationCapabilities;
 
+async function _acquireGoogleSheet(
+  options: Readonly<{
+    ref: DatasetRef;
+    wrapperOptions: GoogleSheetsWrapperOptions;
+  }>,
+): Promise<AcquiredRelation> {
+  const { ref, wrapperOptions } = options;
+  const source = await wrapperOptions.getSheetSource(ref.id);
+  const accessToken = await wrapperOptions.getAccessToken();
+  const acquired = await acquireGoogleSheetRelation({
+    fileId: source.googleDocumentId,
+    accessToken,
+    sheetName: source.sheetName,
+    readXlsx: async ({ xlsxBytes, sheet }) => {
+      return await wrapperOptions.readXlsx({
+        datasetId: ref.id,
+        xlsxBytes,
+        sheet,
+      });
+    },
+    driveFetch: wrapperOptions.driveFetch,
+  });
+  return {
+    ref,
+    parquetBlob: acquired.relation.parquetBlob,
+    sourceVersion: acquired.sourceVersion,
+  };
+}
+
+function _missingSheetSource(): Promise<never> {
+  throw new Error("Google Sheets acquisition needs the stored source record");
+}
+
+function _missingAccessToken(): Promise<never> {
+  throw new Error("No Google token is available for this user");
+}
+
+function _missingReadXlsx(): Promise<never> {
+  throw new Error("Google Sheets acquisition needs an XLSX reader");
+}
+
 /**
- * Declares what Google Sheets can be asked. Acquisition still refuses: making
- * it work is spec 4, and this wrapper exists so that spec adds a method body
- * rather than a branch.
+ * Acquires one Google Sheets tab as Parquet via Drive `files.export`.
  *
- * `acquire` is present and throws, which is exactly what happens today.
- * Omitting it instead would be a behaviour change, and this spec's budget is
- * zero. The two messages are the two the source-type match statement throws:
- * one when a Sheets dataset is resolved, one when its rows are fetched.
+ * `acquire` is present because the capabilities declare the relation
+ * acquirable. The source record, token, and XLSX reader arrive as options so
+ * this wrapper never re-reads what the relation loader already holds.
  */
-export function createGoogleSheetsWrapper(): SourceWrapper<DatasetRef> {
+export function createGoogleSheetsWrapper(
+  options: Readonly<Partial<GoogleSheetsWrapperOptions>> = {},
+): SourceWrapper<DatasetRef> {
+  const wrapperOptions: GoogleSheetsWrapperOptions = {
+    getSheetSource: options.getSheetSource ?? _missingSheetSource,
+    getAccessToken: options.getAccessToken ?? _missingAccessToken,
+    readXlsx: options.readXlsx ?? _missingReadXlsx,
+    driveFetch: options.driveFetch,
+  };
+
   return {
     name: "google-sheets",
     capabilities: CAPABILITIES,
@@ -69,12 +155,22 @@ export function createGoogleSheetsWrapper(): SourceWrapper<DatasetRef> {
       return ref.kind === "dataset";
     },
 
-    describe: async () => {
-      throw new Error("Google Sheets extraction is not supported yet");
+    describe: async (ref) => {
+      return await readDatasetRelationSchema(ref.id);
     },
 
-    acquire: async () => {
-      throw new Error("Google Sheets data fetching is not supported yet");
+    acquire: async ({ ref }) => {
+      return await _acquireGoogleSheet({ ref, wrapperOptions });
+    },
+
+    readFreshness: async (ref) => {
+      const source = await wrapperOptions.getSheetSource(ref.id);
+      return await getGoogleSheetFreshness({
+        datasetId: ref.id,
+        fileId: source.googleDocumentId,
+        accessToken: await wrapperOptions.getAccessToken(),
+        driveFetch: wrapperOptions.driveFetch,
+      });
     },
   };
 }

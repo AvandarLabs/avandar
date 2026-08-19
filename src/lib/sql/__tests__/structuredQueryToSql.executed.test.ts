@@ -16,16 +16,19 @@
 import { Model } from "@avandar/models";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { describe, expect, it } from "vitest";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { DuckDBConnection } from "@duckdb/node-api";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 import type {
   QueryColumnId,
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type { QueryJoin } from "$/models/queries/StructuredQuery/QueryJoin.types";
 import type {
@@ -33,6 +36,23 @@ import type {
   PartialStructuredQuery,
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+
+/**
+ * A concept, and the table name the emitter has to derive for it.
+ *
+ * The concept cases below stand the view up by hand rather than through
+ * `buildConceptViewSql` and the spine loader, because those are another lane's
+ * work and are not wired into relation loading yet. What this suite owns is the
+ * emitter: that a `Concept` source resolves to `RelationRef.toTableName`'s
+ * spelling, and that group-by and aggregation reach a `ConceptAttribute`. A
+ * hand-built table is enough to hold both, and it stays honest because the
+ * name is derived here the same way the emitter derives it.
+ */
+const _CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc";
+const _CONCEPT_TABLE_NAME = RelationRef.toTableName({
+  kind: "concept",
+  id: _CONCEPT_ID as Concept.Id,
+});
 
 /** The DDL every case in this suite runs before its query. */
 const _FIXTURE_SQL = `
@@ -53,6 +73,13 @@ const _FIXTURE_SQL = `
     ('north', 100),
     ('south', 50)
   ) AS t(pop_key, population);
+
+  CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
+    ('p1', 'North', 5),
+    ('p2', 'North', 2),
+    ('p3', 'South', 3),
+    ('p4', 'East', 1)
+  ) AS t(external_id, region, headcount);
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -86,13 +113,46 @@ function _makeColumn(args: {
   }) as unknown as QueryColumnRead;
 }
 
+/** The concept the concept cases query, as a `QueryDataSource` model row. */
+function _makeConcept(): ConceptModel["Read"] {
+  return Model.make("Concept", {
+    id: _CONCEPT_ID,
+    name: "Household",
+  }) as unknown as ConceptModel["Read"];
+}
+
 /**
- * Builds a structured query over `tableName` with the given columns. The
+ * A query column wrapping a concept attribute. Everything the emitter reads
+ * off a base column, the `name` and the `dataType`, a `ConceptAttribute`
+ * carries too, which is why the aggregation pass needs no second arm for it.
+ */
+function _makeConceptAttributeColumn(args: {
+  id: string;
+  name: string;
+  dataType?: string;
+  aggregation?: QueryAggregationTypeT;
+}): QueryColumnRead {
+  return Model.make("QueryColumn", {
+    id: args.id as QueryColumnId,
+    baseColumn: Model.make("ConceptAttribute", {
+      id: `ca_${args.name}`,
+      name: args.name,
+      dataType: args.dataType ?? "varchar",
+      isLabel: false,
+      isIdentifier: false,
+      isArray: false,
+    }),
+    aggregation: args.aggregation,
+  }) as unknown as QueryColumnRead;
+}
+
+/**
+ * Builds a structured query over `dataSource` with the given columns. The
  * `aggregations` map is derived from each column's own `aggregation` so the
  * two stay consistent, which is what the app does.
  */
 function _makeQuery(args: {
-  tableName: string;
+  dataSource: QueryDataSource;
   columns: readonly QueryColumnRead[];
   filters?: QueryFilterGroup;
   having?: QueryFilterGroup;
@@ -111,7 +171,7 @@ function _makeQuery(args: {
   return Model.make("StructuredQuery", {
     id: "q1" as StructuredQueryId,
     version: 1 as const,
-    dataSource: _makeDataset(args.tableName),
+    dataSource: args.dataSource,
     queryColumns: args.columns,
     orderByColumn: args.orderByColumn,
     orderByDirection: args.orderByDirection,
@@ -169,7 +229,7 @@ describe("structuredQueryToSql executed", () => {
 
     const sql = structuredQueryToSql(
       _makeQuery({
-        tableName: "cases",
+        dataSource: _makeDataset("cases"),
         columns: [district, total],
         filters: {
           type: "group",
@@ -205,7 +265,7 @@ describe("structuredQueryToSql executed", () => {
 
     const sql = structuredQueryToSql(
       _makeQuery({
-        tableName: "districts",
+        dataSource: _makeDataset("districts"),
         columns: [label, population],
         joins: [
           {
@@ -246,7 +306,7 @@ describe("structuredQueryToSql executed", () => {
 
     const sql = structuredQueryToSql(
       _makeQuery({
-        tableName: "cases",
+        dataSource: _makeDataset("cases"),
         columns: [district, cnt],
         orderByColumn: cnt.id,
         orderByDirection: "desc",
@@ -271,7 +331,7 @@ describe("structuredQueryToSql executed", () => {
 
     const sql = structuredQueryToSql(
       _makeQuery({
-        tableName: "cases",
+        dataSource: _makeDataset("cases"),
         columns: [district, total],
         having: {
           type: "group",
@@ -298,14 +358,14 @@ describe("structuredQueryToSql executed", () => {
     ]);
   });
 
-  it("emits SQL DuckDB rejects when ordering by an aggregated column", async () => {
-    // `structuredQueryToSql` derives the ORDER BY name from the query
-    // column's own `aggregation` field, but derives the SELECT alias from
-    // the query's `aggregations` map. When only the map carries the
-    // aggregation the two disagree: the alias is `sum(cnt)` while the
-    // ORDER BY says the bare `cnt`, which is neither grouped nor
-    // aggregated, so DuckDB rejects the statement. This test pins that
-    // behaviour; it turns red the moment the two naming paths are unified.
+  it("orders by an aggregation carried only by the aggregations map", async () => {
+    // The two copies of a column's aggregation, the query's `aggregations`
+    // map and the column's own `aggregation` field, are maintained
+    // independently. Here only the map carries the sum, which is what used to
+    // make the emitter alias `sum(cnt)` in the SELECT list while naming the
+    // bare `cnt` in the ORDER BY: a column that is neither grouped nor
+    // aggregated, which DuckDB rejects outright. Executing the SQL is the
+    // assertion that matters; a string comparison passed the broken version.
     const district = _makeColumn({ id: "qc_1_district", name: "district" });
     const total = _makeColumn({
       id: "qc_2_cnt",
@@ -314,7 +374,7 @@ describe("structuredQueryToSql executed", () => {
     });
 
     const query = _makeQuery({
-      tableName: "cases",
+      dataSource: _makeDataset("cases"),
       columns: [district, total],
       orderByColumn: total.id,
       orderByDirection: "desc",
@@ -325,25 +385,192 @@ describe("structuredQueryToSql executed", () => {
     } as PartialStructuredQuery;
 
     const sql = structuredQueryToSql(withMapOnlyAggregation);
-    expect(sql).toContain('order by "cnt" desc');
-    await expect(_runQuery(sql)).rejects.toThrow(/GROUP BY|Binder Error/i);
+    // North sums to 7, South to 3 and East to 1, so a descending sort on the
+    // aggregate is a different order from a descending sort on `cnt`, whose
+    // largest single row is North's 5.
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { district: "North", "sum(cnt)": 7 },
+      { district: "South", "sum(cnt)": 3 },
+      { district: "East", "sum(cnt)": 1 },
+    ]);
   });
 
-  it("throws rather than emitting SQL for a Concept data source", () => {
-    // Characterizes the guard at the top of `structuredQueryToSql`. When
-    // the Concept path becomes queryable this assertion must change.
+  it("orders by the bare column when only the column field carries the aggregation", async () => {
+    // The other direction of the same disagreement, and the reason the map is
+    // the emitter's source of truth rather than the column: the map says
+    // `none`, so no aggregate is emitted and no GROUP BY is either. An ORDER
+    // BY taken from the column's field would name `sum(cnt)`, an alias that
+    // appears nowhere in the statement.
     const district = _makeColumn({ id: "qc_1_district", name: "district" });
-    const query = _makeQuery({ tableName: "cases", columns: [district] });
-    const conceptQuery = {
+    const total = _makeColumn({
+      id: "qc_2_cnt",
+      name: "cnt",
+      dataType: "number",
+      aggregation: "sum",
+    });
+
+    const query = _makeQuery({
+      dataSource: _makeDataset("cases"),
+      columns: [district, total],
+      orderByColumn: total.id,
+      orderByDirection: "desc",
+    });
+    const withColumnOnlyAggregation = {
       ...query,
-      dataSource: Model.make("Concept", {
-        id: "concept_1",
-        name: "Case",
-      }) as unknown as ConceptModel["Read"],
+      aggregations: { ...query.aggregations, [total.id]: "none" },
     } as PartialStructuredQuery;
 
-    expect(() => {
-      return structuredQueryToSql(conceptQuery);
-    }).toThrow("Querying Concepts through DuckDB is not supported.");
+    const sql = structuredQueryToSql(withColumnOnlyAggregation);
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { district: "North", cnt: 5 },
+      { district: "South", cnt: 3 },
+      { district: "North", cnt: 2 },
+      { district: "East", cnt: 1 },
+    ]);
+  });
+
+  it("orders by the bare column when the map has no entry for it", async () => {
+    // A column absent from the map is not aggregated, because the aggregate
+    // pass only walks the map's entries. Falling back to the column's own
+    // field for a missing key would name an alias no SELECT item emits, so
+    // absent and `none` have to behave the same way.
+    const district = _makeColumn({ id: "qc_1_district", name: "district" });
+    const total = _makeColumn({
+      id: "qc_2_cnt",
+      name: "cnt",
+      dataType: "number",
+      aggregation: "sum",
+    });
+
+    const query = _makeQuery({
+      dataSource: _makeDataset("cases"),
+      columns: [district, total],
+      orderByColumn: total.id,
+      orderByDirection: "desc",
+    });
+    const { [total.id]: _dropped, ...aggregationsWithoutTotal } =
+      query.aggregations;
+    const withNoAggregationEntry = {
+      ...query,
+      aggregations: aggregationsWithoutTotal,
+    } as PartialStructuredQuery;
+
+    const sql = structuredQueryToSql(withNoAggregationEntry);
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { district: "North", cnt: 5 },
+      { district: "South", cnt: 3 },
+      { district: "North", cnt: 2 },
+      { district: "East", cnt: 1 },
+    ]);
+  });
+
+  it("selects from a Concept source through its prefixed table name", async () => {
+    // This used to throw outright. The rows come back only if the FROM names
+    // `concept_<uuid>`, because that is the only name the fixture created:
+    // `_CONCEPT_ID` alone is not a table here, so a bare id would fail to bind.
+    const externalId = _makeConceptAttributeColumn({
+      id: "qc_1_external_id",
+      name: "external_id",
+    });
+    const region = _makeConceptAttributeColumn({
+      id: "qc_2_region",
+      name: "region",
+    });
+
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        dataSource: _makeConcept(),
+        columns: [externalId, region],
+        orderByColumn: externalId.id,
+        orderByDirection: "asc",
+        limit: 2,
+      }),
+    );
+
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { external_id: "p1", region: "North" },
+      { external_id: "p2", region: "North" },
+    ]);
+  });
+
+  it("groups and aggregates a Concept's attributes", async () => {
+    // The regression guard for the aggregation gate. With the gate narrowed to
+    // `DatasetColumn` this returns all four ungrouped rows instead: the query
+    // still compiles and the rows still look like data, which is exactly why
+    // executing it is the only assertion that catches it.
+    const region = _makeConceptAttributeColumn({
+      id: "qc_1_region",
+      name: "region",
+      aggregation: "group_by",
+    });
+    const headcount = _makeConceptAttributeColumn({
+      id: "qc_2_headcount",
+      name: "headcount",
+      dataType: "number",
+      aggregation: "sum",
+    });
+
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        dataSource: _makeConcept(),
+        columns: [region, headcount],
+        orderByColumn: headcount.id,
+        orderByDirection: "desc",
+      }),
+    );
+
+    // North's two households sum to 7, so the aggregate's descending order is
+    // a different order from `headcount`'s, whose largest single row is 5.
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { region: "North", "sum(headcount)": 7 },
+      { region: "South", "sum(headcount)": 3 },
+      { region: "East", "sum(headcount)": 1 },
+    ]);
+  });
+
+  it("filters a Concept's attributes before aggregating", async () => {
+    // Filters, having, joins and limits were always relation-agnostic: they
+    // work on quoted column names against a table name, so they start working
+    // on a concept the moment the name resolves. One case holds that claim
+    // rather than a suite that repeats every dataset case.
+    const region = _makeConceptAttributeColumn({
+      id: "qc_1_region",
+      name: "region",
+      aggregation: "group_by",
+    });
+    const headcount = _makeConceptAttributeColumn({
+      id: "qc_2_headcount",
+      name: "headcount",
+      dataType: "number",
+      aggregation: "sum",
+    });
+
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        dataSource: _makeConcept(),
+        columns: [region, headcount],
+        filters: {
+          type: "group",
+          combinator: "AND",
+          rules: [
+            {
+              type: "rule",
+              columnName: "headcount",
+              operator: ">",
+              value: 1,
+            },
+          ],
+        },
+        orderByColumn: region.id,
+        orderByDirection: "asc",
+      }),
+    );
+
+    // `p4` is East's only household and its headcount of 1 is filtered out, so
+    // East disappears rather than summing to zero.
+    await expect(_runQuery(sql)).resolves.toEqual([
+      { region: "North", "sum(headcount)": 7 },
+      { region: "South", "sum(headcount)": 3 },
+    ]);
   });
 });

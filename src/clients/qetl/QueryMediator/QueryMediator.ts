@@ -5,15 +5,23 @@ import type {
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { Module } from "@avandar/modules";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 export type IQueryMediator = Module<
   "QueryMediator",
   {
     /** Get the necessary relation to answer the given SQL query. */
     getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
+    /**
+     * Plan the concept relations the query names, refusing any the caller may
+     * not read. Optional: a session with no ontology access supplies none.
+     */
+    planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
     /** Expand direct dependencies to every dataset lease the query may need. */
     getDuckDbLeaseDatasetIds?: (
       queryDependencies: readonly Dataset.Id[],
@@ -23,10 +31,10 @@ export type IQueryMediator = Module<
     /** Identifies the public snapshot expected to own final read tables. */
     publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
 
-    /** Insert the given relations into the local storage cache. */
-    insertToStorageCache: (
-      relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
-    ) => Promise<void>;
+    /** The storage tier this session reads and writes. */
+    relationCache: RelationCachePort;
+    /** The principal every entry in that tier is scoped to. */
+    principalKey: PrincipalKey;
     /** Prepares ownership state after the query's dataset leases are held. */
     prepareDuckDbDatasets?: (
       params: Readonly<{

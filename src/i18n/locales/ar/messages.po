@@ -86,6 +86,10 @@ msgstr "أخرى"
 msgid "More actions for the layer {layerName}"
 msgstr "المزيد من الإجراءات للطبقة {layerName}"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one tab in this spreadsheet."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "قم بتشغيل استعلام لرؤية النتائج."
@@ -196,7 +200,7 @@ msgstr "دعوة عضو"
 msgid "Ask Avandar"
 msgstr "اسأل أفاندار"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
 msgstr "حدث خطأ أثناء تحميل الملف"
 
@@ -315,6 +319,10 @@ msgstr "أفاندار"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is not available"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
@@ -623,8 +631,8 @@ msgid "Dataset failed to process"
 msgstr "فشل معالجة مجموعة البيانات"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " {numRejectedRows} rows were rejected"
-msgstr "تم رفض {numRejectedRows} صفوف"
+#~ msgid " {numRejectedRows} rows were rejected"
+#~ msgstr "تم رفض {numRejectedRows} صفوف"
 
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Replying…"
@@ -641,6 +649,10 @@ msgstr "السماح بقيم متعددة"
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.1 8B (offline)"
 msgstr "Llama 3.1 8B (دون اتصال)"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Picker error"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -1382,6 +1394,10 @@ msgstr "خريطة {0}"
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "يجب أن يكون معرّف مساحة العمل أقصر من {SLUG_MAX_LENGTH} حرفًا"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "Refreshed from Google Sheets"
+msgstr ""
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
 "workspace owner to get a new invitation."
@@ -1562,6 +1578,10 @@ msgstr "إدارة المقاعد في بوابة الفوترة →"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
 msgstr "إظهار المواقع الدقيقة"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not load this cluster's features."
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
@@ -1893,8 +1913,8 @@ msgid "Paragraph"
 msgstr "فقرة"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File was partially loaded"
-msgstr "تم تحميل الملف جزئيًا"
+#~ msgid "File was partially loaded"
+#~ msgstr "تم تحميل الملف جزئيًا"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
@@ -2351,6 +2371,11 @@ msgstr "تستخدم عبارة WHERE العامل \"{operator}\" مع قيمة 
 msgid ", and "
 msgstr ", و"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
+"access may have been removed. Pick the sheet again to restore access."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
 msgstr "تم تحديث كلمة المرور بنجاح"
@@ -2479,6 +2504,10 @@ msgstr "نطاق البيانات"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "معاينة البيانات"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Your Google connection expired"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -2768,7 +2797,7 @@ msgstr "العمود 11"
 msgid "Column 7"
 msgstr "العمود 7"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Feature"
 msgstr "ميزة"
 
@@ -2857,6 +2886,10 @@ msgstr "الحد الأقصى للمحور X"
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Refresh from Google Sheets"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
@@ -3135,6 +3168,10 @@ msgstr "المسافة (بالمتر)"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "قالب URL"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google is rate limiting this request"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3427,6 +3464,10 @@ msgstr "اذهب إلى بوابة الفوترة"
 msgid "Clear log"
 msgstr "مسح السجل"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is too large"
+msgstr ""
+
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
 msgstr "خريطة جديدة"
@@ -3552,6 +3593,7 @@ msgid "Hex"
 msgstr "سداسي"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Tab"
 msgstr "علامة تبويب"
 
@@ -3642,6 +3684,10 @@ msgstr "عمود الشكل الهندسي للحدود"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Zoom to cluster"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
@@ -3811,6 +3857,11 @@ msgstr "سيتوفر التصدير إلى الطباعة وPDF في إصدار 
 msgid "Count how many rows there are in {datasetName}"
 msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
+#. placeholder {0}: _getRowLabel(leaf, columns)
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
+msgid "View details for {0}"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "جارٍ إنشاء SQL…"
@@ -3979,6 +4030,7 @@ msgstr "نموذج instruct عالي الجودة بحجم 7B. الأفضل لل
 "دون اتصال بالإنترنت."
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "عرض"
 
@@ -4715,6 +4767,10 @@ msgstr "إظهار الطبقة {layerName}"
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Reconnect your Google account and try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "الاتجاه"
@@ -4742,6 +4798,10 @@ msgstr "لم يتم العثور على مجموعات بيانات محفوظة
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
 msgstr "توسيع المفتش"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The tab has a header row"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5285,8 +5345,8 @@ msgid "Member"
 msgstr "العضو"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " over 1000 rows were rejected"
-msgstr "تم رفض أكثر من 1000 صف"
+#~ msgid " over 1000 rows were rejected"
+#~ msgstr "تم رفض أكثر من 1000 صف"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -5397,6 +5457,10 @@ msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، �
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. اختر محور الفئة أدناه."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "The Google file picker could not be opened. Please try again."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -5787,6 +5851,10 @@ msgstr "الفوترة"
 msgid "Profile Name"
 msgstr "اسم الملف الشخصي"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "This dataset now reflects the current contents of the sheet."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Visualization Type"
@@ -5825,8 +5893,8 @@ msgid "Divider"
 msgstr "فاصل"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numRejectedStr}"
+#~ msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
+#~ msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -6261,9 +6329,9 @@ msgid "We were unable to update your subscription. Please contact "
 msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال بـ {SUPPORT_EMAIL}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under "
-"maintenance."
-msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
+#~ msgid "Google sheets connector is disabled while this feature is under "
+#~ "maintenance."
+#~ msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -6524,6 +6592,10 @@ msgstr "التصورات"
 msgid "Alt text"
 msgstr "النص البديل"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Please try again in a moment."
+msgstr ""
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
@@ -6585,6 +6657,11 @@ msgstr "مساحتك على خطة مجانية، التي تدعم حتى 5 م�
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
 msgstr "النبرة"
+
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "{0} features"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -6703,6 +6780,11 @@ msgid "For each dataset you've added, please specify which columns should be "
 msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها "
 "لتحديد {conceptName} بشكل فريد."
 
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Features in cluster ({0})"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
@@ -6710,6 +6792,14 @@ msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Drive access is not configured for this deployment."
+msgstr ""
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Loading features"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -7496,13 +7586,18 @@ msgstr "قطع الألوان"
 msgid "Save changes"
 msgstr "احفظ التغييرات"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet failed to load"
 msgstr "فشل تحميل ورقة Google"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "اكتب عبارة التأكيد"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
+"sheet and try again."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
@@ -7700,6 +7795,10 @@ msgstr "فشل تحميل الكيان"
 msgid "Used to sign in to your account."
 msgstr "يستخدم لتسجيل الدخول إلى حسابك."
 
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not zoom to this cluster."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "أضف عنوان URL لصورة لعرض شكل."
@@ -7780,6 +7879,10 @@ msgstr "مشاركة"
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
+
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to results"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"

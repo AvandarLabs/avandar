@@ -29,6 +29,18 @@ const SCHEMA = {
 } as const;
 
 describe("repairOfflineGeneratedSql", () => {
+  it("rewrites short table aliases to dataset ids before other repair", () => {
+    const result = repairOfflineGeneratedSql({
+      sql: 'SELECT * FROM "t0" LIMIT 10',
+      schema: SCHEMA,
+      lastUserPrompt: "preview rows",
+    });
+
+    expect(result.sql).toContain(`FROM "${DEATHS_ID}"`);
+    expect(result.sql).not.toContain('"t0"');
+    expect(result.appliedSteps).toContain("apply_sql_table_aliases");
+  });
+
   it("remaps covid_deaths and converts TOP to LIMIT", () => {
     const result = repairOfflineGeneratedSql({
       sql: 'SELECT TOP 100 * FROM "covid_deaths"',
