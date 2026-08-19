@@ -70,6 +70,7 @@ export function LineChart({
       tooltipProps,
       styleProps,
       valueFormatter: formatChartNumber,
+      chartStyle,
     });
   }
 

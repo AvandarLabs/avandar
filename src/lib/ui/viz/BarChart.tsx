@@ -89,6 +89,7 @@ export function BarChart({
       tooltipProps,
       styleProps,
       valueFormatter,
+      chartStyle,
     });
   }
 
