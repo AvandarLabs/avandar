@@ -316,9 +316,9 @@ msgstr "已無法使用已儲存的資料集或欄位參照。請在圖層檢查
 
 #. placeholder {0}: layer.source.dataSource.name
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-"release, so pick a different source."
-msgstr "{0} 中沒有任何欄位包含座標。邊界連接將在後續版本推出，請選擇其他來源。"
+#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
+#~ "release, so pick a different source."
+#~ msgstr "{0} 中沒有任何欄位包含座標。邊界連接將在後續版本推出，請選擇其他來源。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
@@ -2972,6 +2972,12 @@ msgstr "小於或等於"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
 msgstr "是"
+
+#. placeholder {0}: layer.source.dataSource.name
+#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+msgid "No column in {0} was recognized as a coordinate by name. Pick the "
+"latitude and longitude columns above, or bind a geometry column instead."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"

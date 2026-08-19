@@ -34,13 +34,18 @@ export function CoordinateBindingControls({
   }
   return (
     <>
-      {hasCoordinateCandidates || isBound ?
-        <CoordinateColumnSelects
-          layer={layer}
-          dataSourceId={dataSourceId}
-          onLayerChange={onLayerChange}
-        />
-      : null}
+      {/*
+       * The pickers render whenever there is a source to pick from, not only
+       * when the name guesser recognized a pair. A source whose coordinate
+       * columns are named in a way the guesser misses is exactly the case that
+       * needs a manual choice, and hiding the pickers there left the layer with
+       * no way to bind at all.
+       */}
+      <CoordinateColumnSelects
+        layer={layer}
+        dataSourceId={dataSourceId}
+        onLayerChange={onLayerChange}
+      />
       <CoordinateBindingStatus
         layer={layer}
         guess={guess}

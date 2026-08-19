@@ -45,16 +45,49 @@ function _normalizeColumnName(name: string): string {
   return name.toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "");
 }
 
+/**
+ * Whether a name is one of `names` carrying at most one qualifier word.
+ *
+ * Real boundary exports rarely name a column plain `lat`: HDX admin extracts
+ * ship `center_lat` and `center_lon`, and other sources ship `centroid_lat` or
+ * `lat_dd`. Matching only the whole name left every one of those unrecognized,
+ * which is what the dead-end "no column holds coordinates" message reported.
+ *
+ * The one-qualifier limit is what keeps this from reading a name that merely
+ * begins with a coordinate word: `center_lat` is a qualified latitude, while
+ * `lat_updated_at` is a timestamp that happens to start the same way. Matching
+ * whole words rather than substrings is what keeps `flat` and `platitude` out.
+ * It applies only to the high-confidence names, because `x` and `y` are single
+ * letters that qualify plenty of columns holding no coordinate at all.
+ */
+function _hasQualifiedName(name: string, names: ReadonlySet<string>): boolean {
+  const parts = _normalizeColumnName(name)
+    .split(/[^a-z0-9]+/)
+    .filter((part) => {
+      return part.length > 0;
+    });
+  return (
+    parts.length === 2 &&
+    parts.some((part) => {
+      return names.has(part);
+    })
+  );
+}
+
 /** Finds the first numeric column whose normalized name is in `names`. */
 function _findNumericColumn(
   columns: readonly GeoBindingCandidateColumn[],
   names: ReadonlySet<string>,
+  { allowQualified = false }: { allowQualified?: boolean } = {},
 ): GeoBindingCandidateColumn | undefined {
   return columns.filter(prop("isNumeric")).find(
     propPasses<GeoBindingCandidateColumn, "name", string>(
       "name",
       (name): name is string => {
-        return names.has(_normalizeColumnName(name));
+        return (
+          names.has(_normalizeColumnName(name)) ||
+          (allowQualified && _hasQualifiedName(name, names))
+        );
       },
     ),
   );
@@ -79,10 +112,12 @@ export function getGeoBindingGuessFromColumns(
   const highLatitude = _findNumericColumn(
     columns,
     HIGH_CONFIDENCE_LATITUDE_NAMES,
+    { allowQualified: true },
   );
   const highLongitude = _findNumericColumn(
     columns,
     HIGH_CONFIDENCE_LONGITUDE_NAMES,
+    { allowQualified: true },
   );
   const latitude =
     highLatitude ?? _findNumericColumn(columns, LOW_CONFIDENCE_LATITUDE_NAMES);
