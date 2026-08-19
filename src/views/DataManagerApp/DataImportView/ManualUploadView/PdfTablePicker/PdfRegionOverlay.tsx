@@ -9,12 +9,45 @@ const MIN_DRAG_PX = 4;
 type Props = {
   width: number;
   height: number;
-  /** Canvas pixels per PDF point. */
+  /**
+   * Canvas pixels per PDF point, used only when the surface has not been laid
+   * out. See {@link _pixelsPerPoint}.
+   */
   scale: number;
   /** Page height in PDF points, needed to flip the y axis. */
   pageHeight: number;
   onRegionDrawn: (bbox: BBox) => void;
 };
+
+/**
+ * CSS pixels per PDF point, measured from the surface the user dragged on.
+ *
+ * The `scale` prop cannot answer this. It is the canvas's own scale: how many
+ * BITMAP pixels `PdfPagePreview` drew one point as. A pointer event reports
+ * CSS pixels, and the two are not the same number here, because every size in
+ * this preview goes through Mantine's `rem()` scaling. `--mantine-scale` is
+ * 0.9 between 1200 and 1408 CSS pixels of viewport and 0.8 below that (see
+ * `src/index.css`), so a 420-point-wide preview is displayed 378 or 336
+ * pixels wide while its bitmap stays 420.
+ *
+ * Dividing a pointer offset by the bitmap scale therefore reports a region
+ * nobody drew. Measured in a real browser at `--mantine-scale: 0.9`, a box
+ * dragged around the OCHA choropleth came back as [274, 489, 513, 638]
+ * instead of the [305, 450, 570, 615] it covered on screen, which cuts six
+ * states off the bottom of the map and silently extracts the wrong figures.
+ *
+ * Measuring the surface is right under that, under browser zoom, and under a
+ * flex layout that squeezed the preview. The prop stays as the fallback for
+ * an environment with no layout at all, where every rect is zero.
+ */
+function _pixelsPerPoint(options: {
+  rect: DOMRect | undefined;
+  pageHeight: number;
+  fallbackScale: number;
+}): number {
+  const measured = (options.rect?.height ?? 0) / options.pageHeight;
+  return measured > 0 ? measured : options.fallbackScale;
+}
 
 /**
  * Transparent drag surface sitting over the rendered page.
@@ -92,8 +125,13 @@ export function PdfRegionOverlay({
 
         // Screen pixels to PDF points, with y flipped. Normalised so a box
         // dragged up and to the left still reads x0 < x1 and y0 < y1.
+        const pixelsPerPoint = _pixelsPerPoint({
+          rect: surfaceRef.current?.getBoundingClientRect(),
+          pageHeight,
+          fallbackScale: scale,
+        });
         const toPoints = (px: number): number => {
-          return px / scale;
+          return px / pixelsPerPoint;
         };
         const x0 = toPoints(Math.min(start.x, end.x));
         const x1 = toPoints(Math.max(start.x, end.x));

@@ -37,6 +37,44 @@ describe("PdfRegionOverlay", () => {
     expect(onRegionDrawn).toHaveBeenCalledWith([20, 708, 220, 808]);
   });
 
+  it("measures its own surface rather than trusting the canvas scale", () => {
+    /*
+     * The regression this pins was found only by driving a browser. The
+     * `scale` prop counts BITMAP pixels per point, but a pointer event
+     * reports CSS pixels, and Mantine's `--mantine-scale` displays the
+     * preview at 0.9 or 0.8 of its bitmap size on the viewport widths a
+     * laptop or tablet has. Below, the surface is laid out at 0.9 of the
+     * `scale` it was handed, exactly as it is at `--mantine-scale: 0.9`.
+     *
+     * Reading the offsets against the handed-down 0.5 would report
+     * [20, 708, 220, 808]: a region the user did not draw, ~11% short in
+     * both axes and shifted down the page by the y flip.
+     */
+    const onRegionDrawn = vi.fn();
+    render(
+      <PdfRegionOverlay
+        width={300}
+        height={424}
+        scale={0.5}
+        pageHeight={848}
+        onRegionDrawn={onRegionDrawn}
+      />,
+    );
+
+    const surface = screen.getByTestId("pdf-region-overlay");
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 270, 381.6),
+    );
+
+    fireEvent.pointerDown(surface, { clientX: 9, clientY: 18 });
+    fireEvent.pointerMove(surface, { clientX: 99, clientY: 63 });
+    fireEvent.pointerUp(surface, { clientX: 99, clientY: 63 });
+
+    // 381.6 rendered pixels over an 848-point page is 0.45 pixels per point,
+    // so x runs 9/0.45 = 20 to 99/0.45 = 220, and y flips to 848-140 = 708.
+    expect(onRegionDrawn).toHaveBeenCalledWith([20, 708, 220, 808]);
+  });
+
   it("ignores a click that does not drag", () => {
     // Without this, every click on the page creates a zero-area region.
     const onRegionDrawn = vi.fn();
