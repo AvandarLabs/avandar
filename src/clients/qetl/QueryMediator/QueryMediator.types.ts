@@ -24,7 +24,7 @@ export type ColumnReplacement = {
 };
 
 /** A dataset paired with the source record that says how to fetch it. */
-export type DiceExtractor =
+export type RelationSource =
   | {
       sourceType: "csv_file";
       sourceDataset: CsvFileDataset.T;
@@ -51,19 +51,25 @@ export type DiceExtractor =
       sourceDataset: XlsxFileDataset.T;
     };
 
-/** One dataset's parquet bytes, ready to load into the memory cube. */
-export type ExtractedFact = { datasetId: Dataset.Id; parquetBlob: Blob };
+/**
+ * One dataset's parquet bytes, ready to load into the queryable relation
+ * cache.
+ */
+export type AcquiredRelationBytes = {
+  datasetId: Dataset.Id;
+  parquetBlob: Blob;
+};
 
 /** The per-workspace or per-snapshot policy a query runner is built from. */
 export type QetlRunnerOptions = {
-  getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+  getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
   getDuckDbLeaseDatasetIds?: (
     queryDependencies: readonly Dataset.Id[],
   ) => Promise<Dataset.Id[]>;
   duckDbReadMode?: "public" | "workspace";
   publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
   insertToStorageCache: (
-    facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
+    relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
   ) => Promise<void>;
   prepareDuckDbDatasets?: (
     params: Readonly<{

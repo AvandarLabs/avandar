@@ -24,11 +24,12 @@ import {
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { getAttributeAssertions } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getAttributeAssertions";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import type { ServiceClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
@@ -195,16 +196,21 @@ function createAttributeAssertionClient(): WithLogger<
                     );
 
                     const extractedValues = singleton(
-                      await WorkspaceQetlClient.runQuery<
+                      await WorkspaceQuerySession.runQuery<
                         Record<ConceptAttributeId, unknown>
                       >({
                         workspaceId: individual.workspaceId,
                         rawSql: sqlTemplate(`
-                          -- Get all rows matching this external_id
+                          -- Get all rows matching this external_id.
+                          -- Reads the auxiliary row-numbered view, not the
+                          -- dataset's public view, so \`file_row_number\` is
+                          -- available: it is what makes the \`first\` rule
+                          -- deterministic instead of an unordered LIMIT 1.
                           WITH individual_rows AS (
                             SELECT
-                              $columnNames$
-                            FROM "$datasetTableName$"
+                              $columnNames$,
+                              file_row_number
+                            FROM "$rowNumberedViewName$"
                             WHERE "$primaryKeyColumnName$" = '$externalId$'
                           )
 
@@ -215,7 +221,8 @@ function createAttributeAssertionClient(): WithLogger<
                           columnNames: columnNames
                             .map(wrapString('"'))
                             .join(", "),
-                          datasetTableName: datasetId,
+                          rowNumberedViewName:
+                            getRowNumberedViewName(datasetId),
                           primaryKeyColumnName: pkeyColumn.name,
                           externalId: individual.externalId,
                           columnNameValueSelectors: requestedMappings
@@ -226,23 +233,33 @@ function createAttributeAssertionClient(): WithLogger<
                               const attributeId = ext.conceptAttributeId;
                               return match(ext)
                                 .with({ valuePickerRuleType: "first" }, () => {
+                                  // ORDER BY is the correctness fix, not a
+                                  // preference: without it this is LIMIT 1 over
+                                  // an unordered scan and the value changes
+                                  // between page loads with no data change.
                                   return `
-                                      -- Get the first value
+                                      -- Get the first value, deterministically
                                       (SELECT "${colName}"
                                       FROM individual_rows
+                                      ORDER BY file_row_number
                                       LIMIT 1) AS "${attributeId}"
                                     `;
                                 })
                                 .with(
                                   { valuePickerRuleType: "most_frequent" },
                                   () => {
+                                    // The tie-break matters: COUNT(*) DESC
+                                    // alone is non-deterministic whenever two
+                                    // values are equally frequent. Matches
+                                    // `getSQLSelectOfMapping`; the two copies
+                                    // must agree on a tie.
                                     return `
                                       -- Get the most frequent value
                                       (SELECT "${colName}"
                                       FROM individual_rows
                                       WHERE "${colName}" IS NOT NULL
                                       GROUP BY "${colName}"
-                                      ORDER BY COUNT(*) DESC
+                                      ORDER BY COUNT(*) DESC, "${colName}"
                                       LIMIT 1) AS "${attributeId}"
                                     `;
                                   },

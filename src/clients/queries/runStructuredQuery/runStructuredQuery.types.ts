@@ -34,7 +34,7 @@ export type RunStructuredQueryParams = StructuredQueryAuth & {
   isStructuredQueryInSync?: boolean;
 };
 
-/** A query result plus the execution facts analytics records about it. */
+/** A query result plus the execution relations analytics records about it. */
 export type RunStructuredQueryResult = {
   result: QueryResult.T<UnknownRow>;
   /**

@@ -47,9 +47,9 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
   return {
-    WorkspaceQetlClient: { runQuery: runSpatialQueryMock },
+    WorkspaceQuerySession: { runQuery: runSpatialQueryMock },
   };
 });
 
@@ -473,7 +473,7 @@ describe("useMapLayersData", () => {
     // mock every other test in this file uses) so this proves the actual
     // guarantee: `resolveManualQueryForExecution` is not merely uncalled in
     // some mock's bookkeeping, it is not consulted by the real execution
-    // path, and the SQL that reaches `WorkspaceQetlClient.runQuery` is the
+    // path, and the SQL that reaches `WorkspaceQuerySession.runQuery` is the
     // compiled overlay SQL verbatim, with no LIMIT clause appended anywhere
     // along the way.
     runStructuredQueryWithMetadataMock.mockImplementation(

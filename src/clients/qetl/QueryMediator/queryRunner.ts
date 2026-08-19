@@ -1,20 +1,20 @@
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
-  getDiceExtractors,
-  getMissingDice,
-} from "@/clients/qetl/QetlClient/qetlDiceExtractors";
+  getRelationSources,
+  probeRelationCache,
+} from "@/clients/qetl/QueryMediator/getRelationSources";
 import {
-  fetchDiceFacts,
-  loadDiceFacts,
-} from "@/clients/qetl/QetlClient/qetlFactLoading";
+  fetchRelationBytes,
+  loadRelationBytes,
+} from "@/clients/qetl/QueryMediator/relationLoading";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   QetlRunnerOptions,
   QetlRunQuery,
   RunLeasedQueryOptions,
   RunQetlQueryOptions,
-} from "@/clients/qetl/QetlClient/QetlClient.types";
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { UnknownObject } from "@avandar/utils";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
@@ -30,15 +30,15 @@ async function _runLeasedQuery<RowObject extends UnknownObject>(
     datasetIds: queryOptions.queryDependencies,
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
   });
-  const missingDice = await getMissingDice(queryOptions.queryDependencies);
-  const extractors = await getDiceExtractors(missingDice);
-  const fetchedFacts = await fetchDiceFacts({
-    extractors,
+  const missingDice = await probeRelationCache(queryOptions.queryDependencies);
+  const relationSources = await getRelationSources(missingDice);
+  const fetchedRelationBytes = await fetchRelationBytes({
+    relationSources,
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     runQuery: options.runQuery,
   });
-  await loadDiceFacts({
-    facts: fetchedFacts,
+  await loadRelationBytes({
+    relations: fetchedRelationBytes,
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     insertToStorageCache: runnerOptions.insertToStorageCache,
   });
@@ -67,7 +67,7 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   }>,
 ): Promise<Blob | QueryResult.T<RowObject>> {
   options.queryOptions.signal?.throwIfAborted();
-  const queryDependencies = await options.runnerOptions.getDiceFromSql(
+  const queryDependencies = await options.runnerOptions.getQueryDependencies(
     options.queryOptions.rawSql,
   );
   const leaseDatasetIds =

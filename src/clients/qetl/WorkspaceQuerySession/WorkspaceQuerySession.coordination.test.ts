@@ -85,11 +85,11 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
+vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
   return {
-    QetlClientFactory: {
+    QueryMediatorFactory: {
       create: (options: {
-        getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+        getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
         prepareDuckDbDatasets?: (params: {
           datasetIds: readonly Dataset.Id[];
           datasetDuckDbLease: DatasetDuckDbLease;
@@ -97,7 +97,7 @@ vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
       }) => {
         return {
           runQuery: async ({ rawSql }: { rawSql: string }) => {
-            const datasetIds = await options.getDiceFromSql(rawSql);
+            const datasetIds = await options.getQueryDependencies(rawSql);
             const { runCoordinatedDatasetDuckDbOperation } =
               DatasetDuckDbCoordinator;
             return await runCoordinatedDatasetDuckDbOperation({
@@ -142,13 +142,13 @@ beforeEach(() => {
   );
 });
 
-describe("WorkspaceQetlClient DuckDB coordination", () => {
+describe("WorkspaceQuerySession DuckDB coordination", () => {
   it("ignores eligible dataset IDs used only as literals or CTE aliases", async () => {
-    const { WorkspaceQetlClient } =
-      await import("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient");
+    const { WorkspaceQuerySession } =
+      await import("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession");
 
     await expect(
-      WorkspaceQetlClient.runQuery({
+      WorkspaceQuerySession.runQuery({
         rawSql: [
           `WITH "${DATASET_ID}" AS (`,
           `SELECT '${DATASET_ID}' AS dataset_id`,
@@ -170,11 +170,11 @@ describe("WorkspaceQetlClient DuckDB coordination", () => {
         snapshotRevision: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       },
     });
-    const { WorkspaceQetlClient } =
-      await import("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient");
+    const { WorkspaceQuerySession } =
+      await import("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession");
 
     await expect(
-      WorkspaceQetlClient.runQuery({
+      WorkspaceQuerySession.runQuery({
         rawSql: `SELECT * FROM "${DATASET_ID}"`,
         workspaceId: WORKSPACE_ID,
       }),

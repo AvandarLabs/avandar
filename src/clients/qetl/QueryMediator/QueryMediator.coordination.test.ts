@@ -255,7 +255,7 @@ function _configureVirtualSiblingQueries(
   });
 }
 
-describe("QetlClient DuckDB coordination", () => {
+describe("QueryMediator DuckDB coordination", () => {
   it("finishes a dataset query before a later writer can replace its table", async () => {
     const queryStarted = _createDeferred();
     const queryMayFinish = _createDeferred();
@@ -264,10 +264,10 @@ describe("QetlClient DuckDB coordination", () => {
       await queryMayFinish.promise;
       return { data: [{ value: "workspace" }] };
     });
-    const { QetlClientFactory } =
-      await import("@/clients/qetl/QetlClient/QetlClient");
-    const qetlClient = QetlClientFactory.create({
-      getDiceFromSql: async () => {
+    const { QueryMediatorFactory } =
+      await import("@/clients/qetl/QueryMediator/QueryMediator");
+    const qetlClient = QueryMediatorFactory.create({
+      getQueryDependencies: async () => {
         return [DATASET_ID];
       },
       insertToStorageCache: async () => {},
@@ -286,10 +286,10 @@ describe("QetlClient DuckDB coordination", () => {
   it("reuses an outer lease while materializing a virtual dependency", async () => {
     const workspaceId = "11111111-1111-4111-8111-111111111111";
     _configureVirtualDependencyMocks(workspaceId);
-    const { QetlClientFactory } =
-      await import("@/clients/qetl/QetlClient/QetlClient");
-    const qetlClient = QetlClientFactory.create({
-      getDiceFromSql: async (rawSql) => {
+    const { QueryMediatorFactory } =
+      await import("@/clients/qetl/QueryMediator/QueryMediator");
+    const qetlClient = QueryMediatorFactory.create({
+      getQueryDependencies: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID) ?
             [VIRTUAL_DATASET_ID]
           : [DATASET_ID];
@@ -328,10 +328,10 @@ describe("QetlClient DuckDB coordination", () => {
       firstQueryMayFinish,
       state: queryState,
     });
-    const { QetlClientFactory } =
-      await import("@/clients/qetl/QetlClient/QetlClient");
-    const qetlClient = QetlClientFactory.create({
-      getDiceFromSql: async (rawSql) => {
+    const { QueryMediatorFactory } =
+      await import("@/clients/qetl/QueryMediator/QueryMediator");
+    const qetlClient = QueryMediatorFactory.create({
+      getQueryDependencies: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID) ?
             [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
           : [DATASET_ID];

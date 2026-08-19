@@ -5,11 +5,11 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
-import { QetlClientFactory } from "@/clients/qetl/QetlClient/QetlClient";
+import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { IQetlClient } from "@/clients/qetl/QetlClient/QetlClient";
+import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Module } from "@avandar/modules";
 import type { EmptyObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -18,7 +18,7 @@ import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type IWorkspaceQetlClient = Module<
-  "WorkspaceQetlClient",
+  "WorkspaceQuerySession",
   EmptyObject,
   {
     runQuery: {
@@ -57,9 +57,9 @@ async function _getAllWorkspaceDatasetIds(
   ).map(prop("id"));
 }
 
-async function _insertWorkspaceFacts(
+async function _insertWorkspaceRelations(
   options: Readonly<{
-    facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
+    relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
     userId: UserId;
     workspaceId: Workspace.Id;
   }>,
@@ -67,7 +67,7 @@ async function _insertWorkspaceFacts(
   await LocalDatasetClient.bulkInsert({
     upsert: true,
     onConflict: { columnNames: ["datasetId"], ignoreDuplicates: false },
-    data: options.facts.map(({ datasetId, parquetBlob }) => {
+    data: options.relations.map(({ datasetId, parquetBlob }) => {
       return {
         datasetId,
         parquetData: parquetBlob,
@@ -110,12 +110,12 @@ async function _prepareWorkspaceDatasets(
 
 function _createWorkspaceQetlClient(
   options: Readonly<WorkspaceQetlClientOptions>,
-): IQetlClient {
+): IQueryMediator {
   const getAllDatasetIds = async (): Promise<Dataset.Id[]> => {
     return await _getAllWorkspaceDatasetIds(options.workspaceId);
   };
-  return QetlClientFactory.create({
-    getDiceFromSql: async (rawSql) => {
+  return QueryMediatorFactory.create({
+    getQueryDependencies: async (rawSql) => {
       const referencedIds = new Set(
         DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(rawSql),
       );
@@ -124,8 +124,8 @@ function _createWorkspaceQetlClient(
       });
     },
     getDuckDbLeaseDatasetIds: getAllDatasetIds,
-    insertToStorageCache: async (facts) => {
-      await _insertWorkspaceFacts({ ...options, facts });
+    insertToStorageCache: async (relations) => {
+      await _insertWorkspaceRelations({ ...options, relations });
     },
     prepareDuckDbDatasets: _prepareWorkspaceDatasets,
   });
@@ -133,11 +133,11 @@ function _createWorkspaceQetlClient(
 
 function _createGetWorkspaceQetlClient(): (
   options: Readonly<WorkspaceQetlClientOptions>,
-) => Promise<IQetlClient> {
-  const clientCache: Record<`${Workspace.Id}_${UserId}`, IQetlClient> = {};
+) => Promise<IQueryMediator> {
+  const clientCache: Record<`${Workspace.Id}_${UserId}`, IQueryMediator> = {};
   return async (
     options: Readonly<WorkspaceQetlClientOptions>,
-  ): Promise<IQetlClient> => {
+  ): Promise<IQueryMediator> => {
     const cacheKey = `${options.workspaceId}_${options.userId}` as const;
     const cachedClient = clientCache[cacheKey];
     if (cachedClient) {
@@ -150,7 +150,7 @@ function _createGetWorkspaceQetlClient(): (
 }
 
 /** Runs QETL queries against datasets belonging to the active workspace. */
-export const WorkspaceQetlClient = createModule("WorkspaceQetlClient", {
+export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
   builder: () => {
     const getClient = _createGetWorkspaceQetlClient();
 

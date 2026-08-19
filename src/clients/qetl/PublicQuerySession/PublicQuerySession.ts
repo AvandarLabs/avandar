@@ -1,12 +1,12 @@
 import { createModule } from "@avandar/modules";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient/LocalPublicDatasetClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import { QetlClientFactory } from "@/clients/qetl/QetlClient/QetlClient";
+import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { IQetlClient } from "@/clients/qetl/QetlClient/QetlClient";
+import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type {
   PublishedVisibility,
   SnapshotBucketName,
@@ -25,7 +25,7 @@ type PublicQetlQueryParams = {
 };
 
 type CachedClient = {
-  client: IQetlClient;
+  client: IQueryMediator;
   publishedDatasetIds: readonly Dataset.Id[];
 };
 
@@ -76,11 +76,11 @@ async function _insertFactsIntoCache(
       CreateQetlClientOptions,
       "bucket" | "dashboardId" | "snapshotRevision"
     > & {
-      facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
+      relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
     }
   >,
 ): Promise<void> {
-  const { bucket, dashboardId, facts, snapshotRevision } = options;
+  const { bucket, dashboardId, relations, snapshotRevision } = options;
   const downloadedAt = new Date().toISOString();
   await LocalPublicDatasetClient.bulkInsert({
     upsert: true,
@@ -88,7 +88,7 @@ async function _insertFactsIntoCache(
       columnNames: ["dashboardId", "datasetId"],
       ignoreDuplicates: false,
     },
-    data: facts.map(({ datasetId, parquetBlob }) => {
+    data: relations.map(({ datasetId, parquetBlob }) => {
       return {
         bucket,
         dashboardId,
@@ -103,24 +103,24 @@ async function _insertFactsIntoCache(
 
 function _createQetlClient(
   options: Readonly<CreateQetlClientOptions>,
-): IQetlClient {
+): IQueryMediator {
   const { bucket, dashboardId, publishedDatasetIds, snapshotRevision } =
     options;
   const owner = { bucket, dashboardId, snapshotRevision } as const;
-  return QetlClientFactory.create({
+  return QueryMediatorFactory.create({
     duckDbReadMode: "public",
     publicSnapshotDuckDbOwner: owner,
-    getDiceFromSql: async (rawSql) => {
+    getQueryDependencies: async (rawSql) => {
       return _getReferencedPublishedDatasetIds({ publishedDatasetIds, rawSql });
     },
     getDuckDbLeaseDatasetIds: async () => {
       return [...publishedDatasetIds];
     },
-    insertToStorageCache: async (facts) => {
+    insertToStorageCache: async (relations) => {
       await _insertFactsIntoCache({
         bucket,
         dashboardId,
-        facts,
+        relations,
         snapshotRevision,
       });
     },
@@ -165,7 +165,7 @@ async function _getClient(
 
 /** Public query client contract for committed dashboard snapshots. */
 export type IPublicQetlClient = Module<
-  "PublicQetlClient",
+  "PublicQuerySession",
   EmptyObject,
   {
     /** Executes one SQL query against the committed snapshot revision. */
@@ -188,7 +188,7 @@ export type IPublicQetlClient = Module<
  * membership check would add a second, parallel authorization mechanism
  * without narrowing what this client can read.
  */
-export const PublicQetlClient = createModule("PublicQetlClient", {
+export const PublicQuerySession = createModule("PublicQuerySession", {
   builder: () => {
     const clientCache: ClientCache = {};
     return {

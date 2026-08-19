@@ -17,7 +17,8 @@ import type { RefObject } from "react";
  * The parts of the query observer the emitter reads.
  *
  * Narrowed to exactly these two so a caller cannot be misread as supplying the
- * run's own facts: every payload field is built from the run record instead.
+ * run's own relations: every payload field is built from the run record
+ * instead.
  */
 export type QueryAnalyticsObserverState = Pick<
   UseQueryResult<QueryResult.T<UnknownRow>>,

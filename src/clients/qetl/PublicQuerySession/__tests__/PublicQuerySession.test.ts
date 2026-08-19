@@ -25,9 +25,9 @@ vi.mock("@avandar/modules", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
+vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
   return {
-    QetlClientFactory: { create: createMock },
+    QueryMediatorFactory: { create: createMock },
   };
 });
 
@@ -55,10 +55,12 @@ beforeEach(() => {
   vi.clearAllMocks();
   listDatasetIdsForDashboardMock.mockResolvedValue([DATASET_ID]);
   createMock.mockImplementation(
-    (options: { getDiceFromSql: (rawSql: string) => Promise<string[]> }) => {
+    (options: {
+      getQueryDependencies: (rawSql: string) => Promise<string[]>;
+    }) => {
       return {
         runQuery: async ({ rawSql }: { rawSql: string }) => {
-          return { rows: await options.getDiceFromSql(rawSql) };
+          return { rows: await options.getQueryDependencies(rawSql) };
         },
       };
     },
@@ -69,14 +71,14 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("PublicQetlClient.runQuery", () => {
+describe("PublicQuerySession.runQuery", () => {
   it("resolves constant query_table sources from the published dataset list", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
     await expect(
-      PublicQetlClient.runQuery({
+      PublicQuerySession.runQuery({
         rawSql: `SELECT * FROM query_table('${DATASET_ID}')`,
         dashboardId: DASHBOARD_ID,
         visibility: "public",
@@ -87,11 +89,11 @@ describe("PublicQetlClient.runQuery", () => {
 
   it("rejects uninspectable sources in public queries", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
     await expect(
-      PublicQetlClient.runQuery({
+      PublicQuerySession.runQuery({
         rawSql: "SELECT * FROM query_table(dataset_name)",
         dashboardId: DASHBOARD_ID,
         visibility: "public",
@@ -99,7 +101,7 @@ describe("PublicQetlClient.runQuery", () => {
       }),
     ).rejects.toThrow(/dynamic/i);
     await expect(
-      PublicQetlClient.runQuery({
+      PublicQuerySession.runQuery({
         rawSql: `SELECT * FROM read_parquet('${DATASET_ID}.parquet')`,
         dashboardId: DASHBOARD_ID,
         visibility: "public",
@@ -110,11 +112,11 @@ describe("PublicQetlClient.runQuery", () => {
 
   it("ignores eligible dataset IDs used only as literals or CTE aliases", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
     await expect(
-      PublicQetlClient.runQuery({
+      PublicQuerySession.runQuery({
         rawSql: [
           `WITH "${DATASET_ID}" AS (`,
           `SELECT '${DATASET_ID}' AS dataset_id`,
@@ -129,16 +131,16 @@ describe("PublicQetlClient.runQuery", () => {
 
   it("caches clients by visibility and lists snapshot datasets from the mapped bucket", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "public",
       snapshotRevision: FIRST_REVISION,
     });
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "workspace",
@@ -160,22 +162,22 @@ describe("PublicQetlClient.runQuery", () => {
 
   it("does not reuse the old public client after public-workspace-public", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "public",
       snapshotRevision: FIRST_REVISION,
     });
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "workspace",
       snapshotRevision: SECOND_REVISION,
     });
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "public",
@@ -187,10 +189,10 @@ describe("PublicQetlClient.runQuery", () => {
 
   it("writes the committed snapshot revision into the Dexie cache", async () => {
     vi.resetModules();
-    const { PublicQetlClient } =
-      await import("@/clients/qetl/PublicQetlClient/PublicQetlClient");
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
 
-    await PublicQetlClient.runQuery({
+    await PublicQuerySession.runQuery({
       rawSql: `select * from ${DATASET_ID}`,
       dashboardId: DASHBOARD_ID,
       visibility: "public",
@@ -198,7 +200,7 @@ describe("PublicQetlClient.runQuery", () => {
     });
     const qetlOptions = createMock.mock.calls.at(-1)?.[0] as {
       insertToStorageCache: (
-        facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
+        relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
       ) => Promise<void>;
     };
     await qetlOptions.insertToStorageCache([

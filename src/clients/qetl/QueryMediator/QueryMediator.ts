@@ -1,5 +1,5 @@
 import { createModuleFactory } from "@avandar/modules";
-import { createQetlQueryRunner } from "@/clients/qetl/QetlClient/qetlQueryRunner";
+import { createQetlQueryRunner } from "@/clients/qetl/QueryMediator/queryRunner";
 import type {
   DatasetDuckDbLease,
   PublicSnapshotDuckDbOwner,
@@ -9,11 +9,11 @@ import type { Module } from "@avandar/modules";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
-export type IQetlClient = Module<
-  "QetlClient",
+export type IQueryMediator = Module<
+  "QueryMediator",
   {
-    /** Get the necessary dice to answer the given SQL query. */
-    getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+    /** Get the necessary relation to answer the given SQL query. */
+    getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
     /** Expand direct dependencies to every dataset lease the query may need. */
     getDuckDbLeaseDatasetIds?: (
       queryDependencies: readonly Dataset.Id[],
@@ -23,9 +23,9 @@ export type IQetlClient = Module<
     /** Identifies the public snapshot expected to own final read tables. */
     publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
 
-    /** Insert the given facts into the local storage cache. */
+    /** Insert the given relations into the local storage cache. */
     insertToStorageCache: (
-      facts: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
+      relations: ReadonlyArray<{ datasetId: Dataset.Id; parquetBlob: Blob }>,
     ) => Promise<void>;
     /** Prepares ownership state after the query's dataset leases are held. */
     prepareDuckDbDatasets?: (
@@ -62,24 +62,22 @@ export type IQetlClient = Module<
  * Based heavily on Baldacci et. al. (2017)
  * "Qetl: An approach to on-demand ETL from non-owned data sources."
  *
- * In this implementation, the data cube is a two-layer storage system: there
- * is a local in-memory cube (a DuckDB database) from which data is ultimately
- * queried to generate the output data. We will refer to this as the MemoryCube.
- * There is a layer above this with more local storage capacity, which we will
- * refer to as the "storage cube." IndexedDB is used as the storage cube.
- * The storage cube is not used for querying, but as an on-disk cache to
- * easily load data into the Memory Cube and reduce the number of network
- * requests that must be done.
+ * In this implementation the relation cache has two tiers. The
+ * `QueryableRelationCache` is a local DuckDB database, and it is the only tier
+ * queries actually read from. Above it sits the `StorageRelationCache`, backed
+ * by IndexedDB, which has more capacity but is never queried: it is an on-disk
+ * cache that makes loading a relation into the queryable tier cheap and cuts
+ * the number of network requests.
  *
  * Future work will allow this to be abstracted to any database, so that
  * SQLite WASM can be used for transactional Qetl.
  *
  * TODO(jpsyx): this is **far** from a real Qetl implementation. Currently
  * it only operates on full datasets rather than doing any filtering of data,
- * dice management, fact loading, or any other optimizations.
+ * relation management, relation loading, or any other optimizations.
  */
-export const QetlClientFactory = createModuleFactory<IQetlClient>(
-  "QetlClient",
+export const QueryMediatorFactory = createModuleFactory<IQueryMediator>(
+  "QueryMediator",
   {
     childBuilder: (module) => {
       return { runQuery: createQetlQueryRunner(module.getState()) };

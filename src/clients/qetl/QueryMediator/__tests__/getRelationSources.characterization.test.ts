@@ -1,6 +1,6 @@
 /**
  * Characterization tests for the source-type dispatch in
- * `qetlDiceExtractors.ts`, ahead of replacing its `ts-pattern` match with a
+ * `getRelationSources.ts`, ahead of replacing its `ts-pattern` match with a
  * registry lookup. These pin down current behavior, including behavior that
  * looks wrong (the `google_sheets` throw), so a later refactor can be checked
  * against them without editing any assertion here.
@@ -81,7 +81,7 @@ beforeEach(() => {
   getTableOrViewNamesMock.mockResolvedValue([]);
 });
 
-describe("getDiceExtractors", () => {
+describe("getRelationSources", () => {
   it("pairs a csv_file dataset with its source record", async () => {
     const dataset = {
       id: CSV_ID,
@@ -93,9 +93,9 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     csvGetAllMock.mockResolvedValue([sourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([CSV_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([CSV_ID]);
 
     expect(result).toEqual([
       { dataset, sourceType: "csv_file", sourceDataset },
@@ -113,9 +113,9 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     xlsxGetAllMock.mockResolvedValue([sourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([XLSX_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([XLSX_ID]);
 
     expect(result).toEqual([
       { dataset, sourceType: "xlsx_file", sourceDataset },
@@ -133,9 +133,9 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     virtualGetAllMock.mockResolvedValue([sourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([VIRTUAL_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([VIRTUAL_ID]);
 
     expect(result).toEqual([{ dataset, sourceType: "virtual", sourceDataset }]);
   });
@@ -151,9 +151,9 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     openDataGetAllMock.mockResolvedValue([sourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([OPEN_DATA_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([OPEN_DATA_ID]);
 
     expect(result).toEqual([
       { dataset, sourceType: "open_data", sourceDataset },
@@ -169,19 +169,19 @@ describe("getDiceExtractors", () => {
     };
     datasetGetAllMock.mockResolvedValue([dataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
 
-    await expect(getDiceExtractors([GOOGLE_SHEETS_ID])).rejects.toThrow(
+    await expect(getRelationSources([GOOGLE_SHEETS_ID])).rejects.toThrow(
       "Google Sheets extraction is not supported yet",
     );
   });
 
-  it("returns nothing when no dice are requested", async () => {
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+  it("returns nothing when no relations are requested", async () => {
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
 
-    await expect(getDiceExtractors([])).resolves.toEqual([]);
+    await expect(getRelationSources([])).resolves.toEqual([]);
     expect(csvGetAllMock).not.toHaveBeenCalled();
   });
 
@@ -195,10 +195,10 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     csvGetAllMock.mockResolvedValue([]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
 
-    await expect(getDiceExtractors([CSV_ID])).resolves.toEqual([]);
+    await expect(getRelationSources([CSV_ID])).resolves.toEqual([]);
   });
 
   // The current code looks the dataset up with a non-null assertion
@@ -216,9 +216,9 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([dataset]);
     csvGetAllMock.mockResolvedValue([orphanSourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([CSV_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([CSV_ID]);
 
     expect(result).toEqual([
       {
@@ -250,12 +250,12 @@ describe("getDiceExtractors", () => {
     datasetGetAllMock.mockResolvedValue([csvDataset, googleSheetsDataset]);
     csvGetAllMock.mockResolvedValue([csvSourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
 
-    await expect(getDiceExtractors([CSV_ID, GOOGLE_SHEETS_ID])).rejects.toThrow(
-      "Google Sheets extraction is not supported yet",
-    );
+    await expect(
+      getRelationSources([CSV_ID, GOOGLE_SHEETS_ID]),
+    ).rejects.toThrow("Google Sheets extraction is not supported yet");
   });
 
   it("matches multiple csv_file datasets in one call by their own datasetId", async () => {
@@ -278,9 +278,9 @@ describe("getDiceExtractors", () => {
     // `datasetId` and not by position.
     csvGetAllMock.mockResolvedValue([secondSourceDataset, firstSourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([CSV_ID, XLSX_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([CSV_ID, XLSX_ID]);
 
     expect(result).toEqual([
       {
@@ -313,9 +313,9 @@ describe("getDiceExtractors", () => {
     csvGetAllMock.mockResolvedValue([]);
     virtualGetAllMock.mockResolvedValue([]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    await getDiceExtractors([CSV_ID, VIRTUAL_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    await getRelationSources([CSV_ID, VIRTUAL_ID]);
 
     expect(csvGetAllMock).toHaveBeenCalledWith({
       where: { dataset_id: { in: [CSV_ID] } },
@@ -361,14 +361,14 @@ describe("getDiceExtractors", () => {
     virtualGetAllMock.mockResolvedValue([virtualSourceDataset]);
     openDataGetAllMock.mockResolvedValue([openDataSourceDataset]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getDiceExtractors([VIRTUAL_ID, CSV_ID, OPEN_DATA_ID]);
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([VIRTUAL_ID, CSV_ID, OPEN_DATA_ID]);
 
     // Observed: groups come out in the order their source type is first
     // encountered while scanning `datasets` (virtual, then csv_file, then
     // open_data), matching the mocked getAll() return order above, not the
-    // order of the ids passed to getDiceExtractors.
+    // order of the ids passed to getRelationSources.
     expect(result).toEqual([
       {
         dataset: virtualDataset,
@@ -389,12 +389,12 @@ describe("getDiceExtractors", () => {
   });
 });
 
-describe("getMissingDice", () => {
+describe("probeRelationCache", () => {
   it("returns an empty array without calling any client for an empty request", async () => {
-    const { getMissingDice } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
 
-    const result = await getMissingDice([]);
+    const result = await probeRelationCache([]);
 
     expect(result).toEqual([]);
     expect(getTableOrViewNamesMock).not.toHaveBeenCalled();
@@ -403,9 +403,9 @@ describe("getMissingDice", () => {
   it("returns only the dependencies not already loaded as DuckDB tables", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
 
-    const { getMissingDice } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
-    const result = await getMissingDice([LOADED_ID, MISSING_ID]);
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache([LOADED_ID, MISSING_ID]);
 
     expect(result).toEqual([MISSING_ID]);
   });

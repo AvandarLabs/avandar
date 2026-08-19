@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { QueryClient } from "@tanstack/react-query";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -107,9 +107,9 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return { DuckDbClient: { dropTableViewAndFile: vi.fn() } };
 });
 
-vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
+vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
   return {
-    QetlClientFactory: {
+    QueryMediatorFactory: {
       create: () => {
         return { runQuery: innerRunQueryMock };
       },
@@ -141,11 +141,11 @@ beforeEach(() => {
   fetchWorkspacesMock.mockResolvedValue([{ id: MEMBER_WORKSPACE_ID }]);
 });
 
-describe("WorkspaceQetlClient membership authorization", () => {
+describe("WorkspaceQuerySession membership authorization", () => {
   it("rejects a non-member before running a js query", async () => {
     await expect(
       getDenialCode(
-        WorkspaceQetlClient.runQuery({
+        WorkspaceQuerySession.runQuery({
           rawSql: `SELECT * FROM "${DATASET_ID}"`,
           workspaceId: FOREIGN_WORKSPACE_ID,
         }),
@@ -158,7 +158,7 @@ describe("WorkspaceQetlClient membership authorization", () => {
   it("rejects a non-member before running a parquet query", async () => {
     await expect(
       getDenialCode(
-        WorkspaceQetlClient.runQuery({
+        WorkspaceQuerySession.runQuery({
           rawSql: `SELECT * FROM "${DATASET_ID}"`,
           workspaceId: FOREIGN_WORKSPACE_ID,
           returnType: "parquet",
@@ -174,7 +174,7 @@ describe("WorkspaceQetlClient membership authorization", () => {
 
     await expect(
       getDenialCode(
-        WorkspaceQetlClient.runQuery({
+        WorkspaceQuerySession.runQuery({
           rawSql: `SELECT * FROM "${DATASET_ID}"`,
           workspaceId: MEMBER_WORKSPACE_ID,
         }),
@@ -186,7 +186,7 @@ describe("WorkspaceQetlClient membership authorization", () => {
   });
 
   it("reads the session once per query", async () => {
-    await WorkspaceQetlClient.runQuery({
+    await WorkspaceQuerySession.runQuery({
       rawSql: `SELECT * FROM "${DATASET_ID}"`,
       workspaceId: MEMBER_WORKSPACE_ID,
     });
@@ -198,7 +198,7 @@ describe("WorkspaceQetlClient membership authorization", () => {
 
   it("runs a js query for a member", async () => {
     await expect(
-      WorkspaceQetlClient.runQuery({
+      WorkspaceQuerySession.runQuery({
         rawSql: `SELECT * FROM "${DATASET_ID}"`,
         workspaceId: MEMBER_WORKSPACE_ID,
       }),
@@ -215,7 +215,7 @@ describe("WorkspaceQetlClient membership authorization", () => {
     innerRunQueryMock.mockResolvedValue(parquetBlob);
 
     await expect(
-      WorkspaceQetlClient.runQuery({
+      WorkspaceQuerySession.runQuery({
         rawSql: `SELECT * FROM "${DATASET_ID}"`,
         workspaceId: MEMBER_WORKSPACE_ID,
         returnType: "parquet",

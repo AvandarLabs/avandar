@@ -6,6 +6,7 @@ import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer
 const DATASET_ID = "22222222-2222-4222-8222-222222222222";
 const JOINED_DATASET_ID = "33333333-3333-4333-8333-333333333333";
 const LITERAL_ID = "44444444-4444-4444-8444-444444444444";
+const CONCEPT_ID = "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1";
 
 describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
   it("extracts UUID tables while ignoring UUID string literals", () => {
@@ -297,6 +298,36 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
         `TRUNCATE "${DATASET_ID}", "${JOINED_DATASET_ID}"`,
       ),
     ).toMatchObject({ kind: "unsafe" });
+  });
+
+  it("returns a prefixed concept table as a concept relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "concept_${CONCEPT_ID}"`,
+    );
+
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+    });
+  });
+
+  it("returns a bare uuid table as a dataset relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "${DATASET_ID}"`,
+    );
+
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+    });
+  });
+
+  it("keeps concept tables out of the dataset-only entry point", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT * FROM "${DATASET_ID}" JOIN "concept_${CONCEPT_ID}" ON true`,
+      ),
+    ).toEqual([DATASET_ID]);
   });
 
   it("does not interpret strings or quoted identifiers as keywords", () => {

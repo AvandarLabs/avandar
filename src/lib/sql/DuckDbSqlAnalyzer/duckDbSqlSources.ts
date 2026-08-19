@@ -1,3 +1,4 @@
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import {
   getCopyDirectionKeywordIndexes,
   getCopyRelationSourceIndexes,
@@ -10,7 +11,7 @@ import {
   getDatasetIdFromRelationAtIndex,
   getDatasetIdFromTableName,
   getIdentifierParts,
-  UUID_REGEX,
+  isRelationTableName,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlIdentifiers";
 import { getDmlUsingKeywordIndexes } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlMutations";
 import {
@@ -60,10 +61,12 @@ const INSPECTABLE_TABLE_FUNCTIONS = new Set([
 ]);
 const INSPECTABLE_INTERNAL_TABLES = new Set(["reject_errors", "reject_scans"]);
 
-/** Builds a read-only source analysis over the given dataset IDs. */
-function _readSourceAnalysis(datasetIds: readonly string[]): SourceAnalysis {
+/** Builds a read-only source analysis over the given relation table names. */
+function _readSourceAnalysis(
+  relationTableNames: readonly string[],
+): SourceAnalysis {
   return {
-    datasetIds: [...datasetIds],
+    relationTableNames: [...relationTableNames],
     isMutating: false,
     mutatedDatasetIds: [],
   };
@@ -74,7 +77,7 @@ function _unsafeSourceAnalysis(
   unsafeReason: DuckDbUnsafeSqlReason,
 ): SourceAnalysis {
   return {
-    datasetIds: [],
+    relationTableNames: [],
     unsafeReason,
     isMutating: false,
     mutatedDatasetIds: [],
@@ -85,17 +88,23 @@ function _getSourceAnalysisFromDuckDbSqlAnalysis(
   analysis: Readonly<DuckDbSqlAnalysis>,
 ): SourceAnalysis {
   if (analysis.kind === "read") {
-    return _readSourceAnalysis(analysis.datasetIds);
+    return _readSourceAnalysis(
+      analysis.relations.map((relation) => {
+        return RelationRef.toTableName(relation);
+      }),
+    );
   }
   if (analysis.kind === "mutating") {
+    // A dataset's table name is its bare id, so the read ids of a nested
+    // mutating statement are already table names.
     return {
-      datasetIds: analysis.readDatasetIds,
+      relationTableNames: analysis.readDatasetIds,
       isMutating: true,
       mutatedDatasetIds: analysis.mutatedDatasetIds,
     };
   }
   return {
-    datasetIds: analysis.datasetIds,
+    relationTableNames: analysis.datasetIds,
     unsafeReason: analysis.reason,
     isMutating: false,
     mutatedDatasetIds: [],
@@ -178,7 +187,7 @@ function _getAnalysisFromIdentifierSource(
       tokens,
     });
   }
-  const datasetId = identifier.parts.at(-1)?.toLowerCase();
+  const tableName = identifier.parts.at(-1)?.toLowerCase();
   if (
     isSuppressedCteAlias({
       aliases,
@@ -188,13 +197,13 @@ function _getAnalysisFromIdentifierSource(
   ) {
     return _readSourceAnalysis([]);
   }
-  if (datasetId !== undefined && UUID_REGEX.test(datasetId)) {
-    return _readSourceAnalysis([datasetId]);
+  if (tableName !== undefined && isRelationTableName(tableName)) {
+    return _readSourceAnalysis([tableName]);
   }
   if (
     identifier.parts.length === 1 &&
-    datasetId !== undefined &&
-    INSPECTABLE_INTERNAL_TABLES.has(datasetId)
+    tableName !== undefined &&
+    INSPECTABLE_INTERNAL_TABLES.has(tableName)
   ) {
     return _readSourceAnalysis([]);
   }

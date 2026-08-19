@@ -120,8 +120,8 @@ vi.mock("@avandar/utils", () => {
   };
 });
 
-vi.mock("@/clients/qetl/QetlClient/QetlClient", () => {
-  return { QetlClientFactory: { create: createQetlClientMock } };
+vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
+  return { QueryMediatorFactory: { create: createQetlClientMock } };
 });
 
 vi.mock(
@@ -170,7 +170,7 @@ type SnapshotState = {
 };
 
 type QetlOptions = {
-  getDiceFromSql: (rawSql: string) => Promise<Dataset.Id[]>;
+  getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
   prepareDuckDbDatasets: (params: {
     datasetIds: readonly Dataset.Id[];
     datasetDuckDbLease: unknown;
@@ -207,7 +207,7 @@ function _configureCoordinatedQuery(
   createQetlClientMock.mockImplementation((options: QetlOptions) => {
     return {
       runQuery: async ({ rawSql }: { rawSql: string }) => {
-        const datasetIds = await options.getDiceFromSql(rawSql);
+        const datasetIds = await options.getQueryDependencies(rawSql);
         const { DatasetDuckDbCoordinator } =
           await import("@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator");
         const { runCoordinatedDatasetDuckDbOperation } =
@@ -228,12 +228,12 @@ function _configureCoordinatedQuery(
 }
 
 async function _getPublicSnapshotClients() {
-  const [{ LocalPublicDatasetRawDataClient }, { PublicQetlClient }] =
+  const [{ LocalPublicDatasetRawDataClient }, { PublicQuerySession }] =
     await Promise.all([
       import("@/clients/datasets/LocalPublicDatasetRawDataClient/LocalPublicDatasetRawDataClient"),
-      import("@/clients/qetl/PublicQetlClient/PublicQetlClient"),
+      import("@/clients/qetl/PublicQuerySession/PublicQuerySession"),
     ]);
-  return { LocalPublicDatasetRawDataClient, PublicQetlClient };
+  return { LocalPublicDatasetRawDataClient, PublicQuerySession };
 }
 
 function _loadRevision(
@@ -271,13 +271,13 @@ describe("public snapshot DuckDB coordination", () => {
       await queryMayFinish.promise;
       return { data: [{ snapshotRevision: state.loadedRevision }] };
     });
-    const { LocalPublicDatasetRawDataClient, PublicQetlClient } =
+    const { LocalPublicDatasetRawDataClient, PublicQuerySession } =
       await _getPublicSnapshotClients();
     await _loadRevision({
       client: LocalPublicDatasetRawDataClient,
       snapshotRevision: FIRST_REVISION,
     });
-    const firstRevisionQuery = PublicQetlClient.runQuery({
+    const firstRevisionQuery = PublicQuerySession.runQuery({
       rawSql: `select * from "${DATASET_ID}"`,
       dashboardId: DASHBOARD_ID,
       visibility: "public",
@@ -312,14 +312,14 @@ describe("public snapshot DuckDB coordination", () => {
     });
     _configureSnapshotStorage(state);
     _configureCoordinatedQuery(runQueryMock);
-    const { LocalPublicDatasetRawDataClient, PublicQetlClient } =
+    const { LocalPublicDatasetRawDataClient, PublicQuerySession } =
       await _getPublicSnapshotClients();
     await _loadRevision({
       client: LocalPublicDatasetRawDataClient,
       snapshotRevision: SECOND_REVISION,
     });
     await expect(
-      PublicQetlClient.runQuery({
+      PublicQuerySession.runQuery({
         rawSql: `select * from "${DATASET_ID}"`,
         dashboardId: DASHBOARD_ID,
         visibility: "public",
