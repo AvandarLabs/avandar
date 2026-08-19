@@ -21,6 +21,14 @@ type Props = {
   width?: number;
   /** Rendered scale, reported so an overlay can map clicks back to points. */
   onScaleChange?: (scale: number) => void;
+  /**
+   * The page's unscaled size in PDF points, reported alongside the scale.
+   *
+   * An overlay cannot derive this from the scale: the scale only says how
+   * many pixels one point became, so without the page's own height there is
+   * nothing to flip the y axis against.
+   */
+  onPageSizeChange?: (size: { widthPt: number; heightPt: number }) => void;
 };
 
 /**
@@ -49,6 +57,7 @@ export function PdfPagePreview({
   highlights,
   width = 320,
   onScaleChange,
+  onPageSizeChange,
 }: Readonly<Props>): ReactNode {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -125,6 +134,10 @@ export function PdfPagePreview({
           // Reported after rendering rather than before, so an overlay is
           // never told a scale for a page that has not been drawn.
           onScaleChange?.(scale);
+          onPageSizeChange?.({
+            widthPt: unscaled.width,
+            heightPt: unscaled.height,
+          });
           setStatus("ready");
         }
       } catch {
@@ -139,7 +152,7 @@ export function PdfPagePreview({
     return () => {
       isCancelled = true;
     };
-  }, [file, pageIndex, highlights, width, onScaleChange]);
+  }, [file, pageIndex, highlights, width, onScaleChange, onPageSizeChange]);
 
   return (
     <Box pos="relative" w={width}>
