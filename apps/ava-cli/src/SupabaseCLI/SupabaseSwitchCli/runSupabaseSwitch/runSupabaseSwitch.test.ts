@@ -1,7 +1,7 @@
 /**
  * CLI switch flow: default id from the branch, one switch per branch.
  */
-import { SupabaseLocalEnvironmentFakeIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+import { SupabaseLocalEnvironmentFakeIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 import { describe, expect, it, vi } from "vitest";

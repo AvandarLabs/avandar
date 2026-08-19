@@ -36,6 +36,13 @@ msgstr "Pelo menos uma consulta neste conjunto de dados usa <0>SELECT *</0> ou "
 msgid "Return online to view or make the page available offline."
 msgstr "Retorne online para visualizar ou tornar a página disponível offline."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "The columns mirror what this document printed. Regions that disagree "
+"about their columns are still split out."
+msgstr "As colunas reproduzem o que foi impresso neste documento. As regiões "
+"que apresentam divergências entre si quanto às colunas continuam "
+"separadas."
+
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Create new entity"
 msgstr "Criar nova entidade"
@@ -1237,6 +1244,14 @@ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "Recomendado se você tiver 16 GB de RAM e executar o Avandar junto com "
 "outros aplicativos."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Every value becomes its own row, stamped with the document's title, "
+"organisation and date. Two reports of the same kind then stack into one "
+"series."
+msgstr "Cada valor se torna sua própria linha, identificado pelo título, pela "
+"organização e pela data do documento. Em seguida, dois relatórios do "
+"mesmo tipo são agrupados em uma única série."
+
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "Bem-vindo ao seu primeiro espaço de trabalho"
@@ -1564,6 +1579,15 @@ msgstr "Intervalo das marcações do eixo Y"
 msgid "The assistant read nothing we could use. Kept the rule-based results."
 msgstr "O assistente não leu nada que pudéssemos usar. Os resultados baseados "
 "em regras foram mantidos."
+
+#. placeholder {0}: axis.min
+#. placeholder {1}: axis.max
+#. placeholder {2}: axis.tickCount
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
+"{residual} pt)"
+msgstr "Eixo de valores de {0} a {1}, {scaleLabel}, comporta {2} marcas (erro "
+"máximo de {residual} pt)"
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -2362,6 +2386,10 @@ msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "Não foi possível encontrar um conjunto de dados conhecido "
 "correspondente a \"{tableName}\"."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "As printed"
+msgstr "Conforme impresso"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Visualização de Dados"
@@ -2861,15 +2889,6 @@ msgstr "Adicionar Campo"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr "Camadas"
-
-#. placeholder {0}: axis.min
-#. placeholder {1}: axis.max
-#. placeholder {2}: axis.tickCount
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
-msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
-"pt)"
-msgstr "Eixo Y de {0} a {1}, {scaleLabel}, ajusta-se a {2} marcas (erro máximo "
-"{residual} pt)"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3917,6 +3936,10 @@ msgstr "Imagem"
 msgid "Hide X axis"
 msgstr "Ocultar eixo X"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "One row per measurement"
+msgstr "Uma linha por medição"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Localizações exatas"
@@ -3948,6 +3971,10 @@ msgstr "Mantivemos os resultados baseados em regras."
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "Indisponível offline"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Rows"
+msgstr "Linhas"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"

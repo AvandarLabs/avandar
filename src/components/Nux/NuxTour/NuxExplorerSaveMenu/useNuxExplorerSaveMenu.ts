@@ -1,5 +1,5 @@
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import { NuxExplorerSaveMenu } from "@/components/Nux/NuxTour/nuxExplorerSaveMenu/nuxExplorerSaveMenu";
+import { NuxExplorerSaveMenu } from "@/components/Nux/NuxTour/NuxExplorerSaveMenu/NuxExplorerSaveMenu";
 import { useNuxStepFacts } from "@/components/Nux/NuxTour/useNuxStepFacts";
 
 /**

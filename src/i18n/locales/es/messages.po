@@ -36,6 +36,12 @@ msgstr "Al menos una consulta en este conjunto de datos utiliza <0>SELECT *</0> 
 msgid "Return online to view or make the page available offline."
 msgstr "Regresa en línea para ver o hacer la página disponible sin conexión."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "The columns mirror what this document printed. Regions that disagree "
+"about their columns are still split out."
+msgstr "Las columnas reflejan lo que imprimió este documento. Las regiones que "
+"no coinciden en sus columnas se mantienen separadas."
+
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Create new entity"
 msgstr "Crear una entidad nueva"
@@ -1235,6 +1241,14 @@ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "Recomendado si tiene 16 GB de RAM y ejecuta Avandar junto con otras "
 "aplicaciones."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Every value becomes its own row, stamped with the document's title, "
+"organisation and date. Two reports of the same kind then stack into one "
+"series."
+msgstr "Cada valor se convierte en su propia fila, con el título, la "
+"organización y la fecha del documento. Luego, dos informes del mismo "
+"tipo se agrupan en una sola serie."
+
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "Bienvenido a tu primer espacio de trabajo"
@@ -1565,6 +1579,15 @@ msgstr "Intervalo de marcas del eje Y"
 msgid "The assistant read nothing we could use. Kept the rule-based results."
 msgstr "El asistente no encontró nada que pudiéramos usar. Se conservaron los "
 "resultados basados en reglas."
+
+#. placeholder {0}: axis.min
+#. placeholder {1}: axis.max
+#. placeholder {2}: axis.tickCount
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
+"{residual} pt)"
+msgstr "Eje de valores de {0} a {1}, {scaleLabel}, caben {2} marcas (error "
+"máximo de {residual} pt)"
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -2365,6 +2388,10 @@ msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "No se encontró un conjunto de datos conocido que coincida con "
 "\"{tableName}\"."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "As printed"
+msgstr "Tal como se imprimió"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Visualización de datos"
@@ -2863,15 +2890,6 @@ msgstr "Agregar campo"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr "Capas"
-
-#. placeholder {0}: axis.min
-#. placeholder {1}: axis.max
-#. placeholder {2}: axis.tickCount
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
-msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
-"pt)"
-msgstr "Eje Y de {0} a {1}, {scaleLabel}, admite {2} marcas (error máximo de "
-"{residual} pt)"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3924,6 +3942,10 @@ msgstr "Imagen"
 msgid "Hide X axis"
 msgstr "Ocultar eje X"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "One row per measurement"
+msgstr "Una fila por medición"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Ubicaciones exactas"
@@ -3955,6 +3977,10 @@ msgstr "Se conservaron los resultados basados en reglas."
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "No disponible sin conexión"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Rows"
+msgstr "Filas"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"

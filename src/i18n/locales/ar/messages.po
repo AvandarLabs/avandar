@@ -35,6 +35,12 @@ msgstr "على الأقل استعلام واحد في مجموعة البيان
 msgid "Return online to view or make the page available offline."
 msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها متاحة دون اتصال."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "The columns mirror what this document printed. Regions that disagree "
+"about their columns are still split out."
+msgstr "تعكس الأعمدة ما طُبع في هذا المستند. وتظل المناطق التي تختلف أعمدتها "
+"مفصولة."
+
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Create new entity"
 msgstr "إنشاء كيان جديد"
@@ -1215,6 +1221,13 @@ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 16 جيجابايت وتُشغّل Avandar إلى "
 "جانب تطبيقات أخرى."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Every value becomes its own row, stamped with the document's title, "
+"organisation and date. Two reports of the same kind then stack into one "
+"series."
+msgstr "تتحول كل قيمة إلى صف مستقل، مرفقة بعنوان المستند واسم المؤسسة والتاريخ. "
+"ثم تتراص تقريران من النوع نفسه في سلسلة واحدة."
+
 #: src/routes/_auth/(no-workspace)/index.tsx
 msgid "Welcome to your first workspace"
 msgstr "مرحبًا بك في مساحة العمل الأولى الخاصة بك"
@@ -1540,6 +1553,15 @@ msgstr "الفاصل بين تدريجات المحور Y"
 msgid "The assistant read nothing we could use. Kept the rule-based results."
 msgstr "لم يقرأ المساعد أي شيء يمكننا استخدامه. تم الاحتفاظ بالنتائج المستندة "
 "إلى القواعد."
+
+#. placeholder {0}: axis.min
+#. placeholder {1}: axis.max
+#. placeholder {2}: axis.tickCount
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
+"{residual} pt)"
+msgstr "محور القيم من {0} إلى {1}، {scaleLabel}، يتسع لـ {2} تدريجات (الخطأ "
+"الأقصى {residual} نقطة)"
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -2324,6 +2346,10 @@ msgstr "اكتب اسم حقل بين قوسين معقوفين لملئه من 
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "تعذّر العثور على مجموعة بيانات معروفة تطابق \"{tableName}\"."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "As printed"
+msgstr "كما طُبع"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "تصوير البيانات"
@@ -2814,15 +2840,6 @@ msgstr "إضافة حقل"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
 msgstr "الطبقات"
-
-#. placeholder {0}: axis.min
-#. placeholder {1}: axis.max
-#. placeholder {2}: axis.tickCount
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
-msgid "Y-axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error {residual} "
-"pt)"
-msgstr "المحور ص من {0} إلى {1}، {scaleLabel}، يلائم {2} تدريجات (الخطأ الأقصى "
-"{residual} نقطة)"
 
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
@@ -3858,6 +3875,10 @@ msgstr "صورة"
 msgid "Hide X axis"
 msgstr "إخفاء المحور X"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "One row per measurement"
+msgstr "صف واحد لكل قياس"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "المواقع الدقيقة"
@@ -3889,6 +3910,10 @@ msgstr "تم الإبقاء على النتائج المستندة إلى الق
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx
 msgid "Unavailable offline"
 msgstr "غير متاح دون اتصال"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls.tsx
+msgid "Rows"
+msgstr "الصفوف"
 
 #: src/components/layouts/AuthLayout/BackToLoginLink.tsx
 msgid "Back to the login page"

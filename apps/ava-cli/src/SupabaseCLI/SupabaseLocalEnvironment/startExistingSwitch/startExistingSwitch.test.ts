@@ -2,7 +2,7 @@
  * Starts this branch's existing switch without creating a second project.
  */
 import { startExistingSwitch } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/startExistingSwitch/startExistingSwitch";
-import { SupabaseLocalEnvironmentFakeIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+import { SupabaseLocalEnvironmentFakeIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
 
