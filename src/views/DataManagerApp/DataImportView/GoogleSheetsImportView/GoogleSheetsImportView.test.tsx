@@ -313,7 +313,6 @@ function _simulateGoogleSheetPick(document: GPickerDocumentObject): void {
   });
 }
 
-/** Renders the view and drives one pick through the mocked Picker. */
 /**
  * Opens the tab `Select` and returns its options.
  *
@@ -321,34 +320,33 @@ function _simulateGoogleSheetPick(document: GPickerDocumentObject): void {
  * selector is the only combobox this view renders, so the options are
  * unambiguous, and the assertion then depends on the accessible tree rather
  * than on Mantine's internal markup.
+ *
+ * The options are awaited rather than read in the same flush as the click.
+ * Mantine mounts the dropdown into a portal on a later tick, so a synchronous
+ * read passes on an idle machine and fails under a loaded full-suite run, which
+ * is exactly the flake this shape removes.
  */
-function _getTabOptions(): HTMLElement[] {
-  const combobox = screen.getByRole("combobox", { name: /^tab$/i });
-  fireEvent.click(combobox);
-  fireEvent.focus(combobox);
-  return screen.getAllByRole("option", { hidden: true });
+async function _getTabOptions(): Promise<HTMLElement[]> {
+  await act(async () => {
+    const combobox = screen.getByRole("combobox", { name: /^tab$/i });
+    fireEvent.click(combobox);
+    fireEvent.focus(combobox);
+  });
+  return await waitFor(() => {
+    return screen.getAllByRole("option", { hidden: true });
+  });
 }
 
-/**
- * Opens the tab `Select` and chooses `tabName`.
- *
- * Two `act` passes, because opening the dropdown is itself a state update: the
- * options are not in the DOM until React has flushed the click that opened
- * them.
- */
+/** Opens the tab `Select` and chooses `tabName`. */
 async function _chooseTab(tabName: string): Promise<void> {
-  await act(async () => {
-    _getTabOptions();
+  const options = await _getTabOptions();
+  const option = options.find((candidate) => {
+    return candidate.textContent === tabName;
   });
+  if (!option) {
+    throw new Error(`The tab selector does not offer "${tabName}".`);
+  }
   await act(async () => {
-    const option = screen.getAllByRole("option", { hidden: true }).find(
-      (candidate) => {
-        return candidate.textContent === tabName;
-      },
-    );
-    if (!option) {
-      throw new Error(`The tab selector does not offer "${tabName}".`);
-    }
     fireEvent.click(option);
   });
 }
@@ -509,8 +507,9 @@ describe("GoogleSheetsImportView", () => {
     // Both tabs are offered, read out of the workbook bytes rather than from a
     // hand-written list, so a selector wired to the wrong source would show the
     // wrong names here.
+    const tabOptions = await _getTabOptions();
     expect(
-      _getTabOptions().map((option) => {
+      tabOptions.map((option) => {
         return option.textContent;
       }),
     ).toEqual([FIRST_TAB, SECOND_TAB]);
