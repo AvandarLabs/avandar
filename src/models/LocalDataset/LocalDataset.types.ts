@@ -43,6 +43,8 @@ export type LocalDatasetXlsxParseOptions = {
   type: "xlsx";
   sheet?: string;
   hasHeader?: boolean;
+  /** Leading rows skipped before the header row. */
+  rowsToSkip?: number;
 };
 
 /**

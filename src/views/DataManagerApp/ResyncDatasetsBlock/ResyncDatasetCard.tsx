@@ -69,6 +69,7 @@ async function _resyncXlsxDataset(options: {
     parseOptions: {
       sheet: xlsxParseOptions.sheetName,
       hasHeader: xlsxParseOptions.hasHeader,
+      rowsToSkip: xlsxParseOptions.rowsToSkip,
     },
   });
 }

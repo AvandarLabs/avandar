@@ -5,6 +5,7 @@ import {
   getParquetBlobFromStagingFiles,
   registerXlsxFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
+import { buildXlsxReadRange } from "@/clients/DuckDbClient/buildXlsxReadRange/buildXlsxReadRange";
 import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -24,6 +25,13 @@ type BaseDuckDbLoadXlsxOptions = {
    * true so behavior matches the import UI and avoids flaky auto-detection.
    */
   hasHeader?: boolean;
+  /**
+   * Leading rows to skip before the header row. Defaults to 0. A workbook
+   * published for reading often puts a title block above its header row, and
+   * those rows have to be excluded from the read or they become the column
+   * names.
+   */
+  rowsToSkip?: number;
 };
 
 /**
@@ -70,6 +78,7 @@ async function _transcodeXlsxToParquet(
     datasetDuckDbLease: DatasetDuckDbLease;
     hasHeader: boolean;
     parquetStagingFile: string;
+    rowsToSkip: number;
     sheet: string | undefined;
     xlsxStagingFile: string;
   }>,
@@ -78,10 +87,15 @@ async function _transcodeXlsxToParquet(
     options.sheet ?
       `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
     : "";
+  const range = buildXlsxReadRange(options.rowsToSkip);
+  // Naming a range turns `stop_at_empty` off, which would pad the read out to
+  // the format's maximum row, so it is switched back on alongside the range.
+  const rangeClause =
+    range ? `, range = '${range}', stop_at_empty = true` : "";
   await options.client.runRawQuery(
     `COPY (
         SELECT * FROM read_xlsx(
-          '$xlsxFile$', header = ${options.hasHeader} ${sheetClause}
+          '$xlsxFile$', header = ${options.hasHeader} ${sheetClause}${rangeClause}
         )
       ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
     {
@@ -138,6 +152,7 @@ export async function loadXlsxIntoDuckDb(
 ): Promise<DuckDbLoadXlsxResult> {
   const { client, tableName, sheet } = options;
   const hasHeader = options.hasHeader ?? true;
+  const rowsToSkip = options.rowsToSkip ?? 0;
   const xlsxStagingFile = `${tableName}__loadXlsx_src`;
   const parquetStagingFile = `${tableName}__loadXlsx_pq`;
   const conn = await client.connect();
@@ -154,6 +169,7 @@ export async function loadXlsxIntoDuckDb(
       datasetDuckDbLease: options.datasetDuckDbLease,
       hasHeader,
       parquetStagingFile,
+      rowsToSkip,
       sheet,
       xlsxStagingFile,
     });

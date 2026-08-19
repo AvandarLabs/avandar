@@ -4,7 +4,8 @@
  * worker — SheetJS isn't a streaming parser, but the parse runs off the
  * main thread, so the UI stays responsive even for ~100 MB workbooks.
  *
- * Lifecycle: main thread sends `{ file, sheet?, hasHeader?, maxPreviewRows }`,
+ * Lifecycle: main thread sends
+ * `{ file, sheet?, hasHeader?, rowsToSkip?, maxPreviewRows }`,
  * worker replies with `{ sheets, defaultSheet, columns, previewRows }`,
  * then terminates. One worker per import.
  *
@@ -16,12 +17,19 @@
  *     is the only practical way to keep the import form responsive.
  */
 import * as XLSX from "xlsx";
+import { buildXlsxPreviewRange } from "@/workers/xlsxSniff/buildXlsxPreviewRange/buildXlsxPreviewRange";
 
 type SniffRequest = {
   type: "sniff";
   file: File;
   sheet?: string;
   hasHeader?: boolean;
+  /**
+   * Leading rows to skip before the header row, matching the range the
+   * `read_xlsx` transcode uses, so the preview shows the rows that will land
+   * in the dataset.
+   */
+  rowsToSkip?: number;
   maxPreviewRows: number;
 };
 
@@ -81,20 +89,24 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
     }
 
     const hasHeader = req.hasHeader ?? true;
-    // `sheet_to_json` with `range` constrains how many rows we materialize
-    // into JS objects. Without this we'd build a JSON copy of the entire
-    // sheet just to throw most of it away.
+    // A bounded `range` constrains how many rows we materialize into JS
+    // objects. Without this we'd build a JSON copy of the entire sheet just to
+    // throw most of it away.
     const headerRowCount = hasHeader ? 1 : 0;
     const rowsToTake = req.maxPreviewRows + headerRowCount;
-    const previewRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(
-      worksheet,
-      {
-        header: hasHeader ? undefined : "A",
-        range: rowsToTake,
-        defval: null,
-        raw: true,
-      },
-    );
+    const previewRange = buildXlsxPreviewRange({
+      sheetRef: worksheet["!ref"],
+      rowsToSkip: req.rowsToSkip ?? 0,
+      maxRows: rowsToTake,
+    });
+    const previewRows =
+      previewRange === undefined ? []
+      : XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
+          header: hasHeader ? undefined : "A",
+          range: previewRange,
+          defval: null,
+          raw: true,
+        });
 
     // Derive column order from the first row's keys. SheetJS preserves
     // insertion order, which matches the XLSX cell order in `dense` mode.
