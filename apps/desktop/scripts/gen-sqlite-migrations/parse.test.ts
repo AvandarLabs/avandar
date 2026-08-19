@@ -50,6 +50,14 @@ describe("classifyStatement", () => {
     ).toBe("drop");
   });
 
+  it("classifies ALTER DEFAULT PRIVILEGES as drop", () => {
+    expect(
+      classifyStatement(
+        "alter default privileges for role postgres in schema public grant select on tables to anon;",
+      ),
+    ).toBe("drop");
+  });
+
   it("classifies CREATE / DROP POLICY as drop", () => {
     expect(
       classifyStatement(

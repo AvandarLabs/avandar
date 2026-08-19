@@ -63,10 +63,11 @@ export default defineConfig({
 
     // Sets `prefers-reduced-motion: reduce` on every page. The codebase's
     // animation CSS (see `src/config/Theme/animationPresets.css`) collapses
-    // ooze-in/swipe-out to 120ms opacity fades with no position transforms
-    // under this media query, and Mantine transitions honor it too. This
-    // removes whole classes of geometry/timing races (panel `boundingBox`
-    // mid-morph, modal-open transitions, etc.) without changing product code.
+    // ooze-in/swipe-out/pop-in to 120ms opacity fades with no position
+    // transforms under this media query, and Mantine transitions honor it too.
+    // This removes whole classes of geometry/timing races (panel
+    // `boundingBox` mid-morph, modal-open transitions, etc.) without changing
+    // product code.
     contextOptions: { reducedMotion: "reduce" },
     ...devices["Desktop Chrome"],
   },

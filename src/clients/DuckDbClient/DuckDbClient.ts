@@ -18,6 +18,7 @@ import {
 } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import { loadXlsxIntoDuckDb } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import { makeDuckDbConnectionManager } from "@/clients/DuckDbClient/makeDuckDbConnectionManager";
+import { projectParquetBlob as projectParquetBlobWithClient } from "@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob";
 import { Logger } from "@/utils/Logger";
 import type { SniffCsvOptions } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
@@ -294,6 +295,24 @@ class DuckDbClientImpl {
           datasetDuckDbLease,
         });
       },
+    });
+  }
+
+  /**
+   * A new Parquet blob holding only `columns`, in the source file's row
+   * order. The copy is a bare `SELECT` list: no `DISTINCT`, `GROUP BY`, or
+   * `ORDER BY`.
+   */
+  async projectParquetBlob(
+    options: Readonly<{
+      columns: readonly string[];
+      datasetDuckDbLease: DatasetDuckDbLease;
+      parquetBlob: Blob;
+    }>,
+  ): Promise<Blob> {
+    return await projectParquetBlobWithClient({
+      ...options,
+      client: this.#getOperations(),
     });
   }
 

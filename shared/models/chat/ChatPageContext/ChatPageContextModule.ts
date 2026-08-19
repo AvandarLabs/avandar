@@ -57,6 +57,11 @@ export const ChatPageContextModule = {
     });
   },
 
+  /** Builds the chat context for Case Manager (ontology designer). */
+  createCaseManagerViewContext: (): ChatPageContext.T => {
+    return Model.make("ChatPageContext", { app: "case-manager" });
+  },
+
   /** Builds the chat context for any surface without dedicated tools. */
   createOtherViewContext: (): ChatPageContext.T => {
     return Model.make("ChatPageContext", { app: "other" });

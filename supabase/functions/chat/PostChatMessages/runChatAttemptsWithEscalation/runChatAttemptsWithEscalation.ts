@@ -23,20 +23,22 @@ export async function runChatAttemptsWithEscalation(
     requestBody: Record<string, unknown>;
     apiKey: string;
     referer: string;
-    isDataExplorer: boolean;
-    isDashboards: boolean;
     lastUserPrompt: string;
     priorClarifications: number;
+    datasets?: ReadonlyArray<{ id: string; name: string }>;
+    concepts?: ReadonlyArray<{ id: string; name: string }>;
+    skipSqlExtraction?: boolean;
   }>,
 ): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
   const {
     requestBody,
     apiKey,
     referer,
-    isDataExplorer,
-    isDashboards,
     lastUserPrompt,
     priorClarifications,
+    datasets,
+    concepts,
+    skipSqlExtraction,
   } = options;
 
   let attemptCount = 0;
@@ -52,10 +54,11 @@ export async function runChatAttemptsWithEscalation(
     return parseOpenRouterResponse({
       message: attempt.message,
       attemptText: attempt.text,
-      isDataExplorer,
-      isDashboards,
       lastUserPrompt,
       priorClarifications,
+      datasets,
+      concepts,
+      skipSqlExtraction,
     });
   };
 

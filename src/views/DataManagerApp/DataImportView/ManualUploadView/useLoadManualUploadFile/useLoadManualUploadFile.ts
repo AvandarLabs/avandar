@@ -7,6 +7,8 @@ import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
+import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   DuckDbColumnSchema,
@@ -22,15 +24,27 @@ import {
 } from "../../DatasetImportForm/DatasetImportForm.types";
 import {
   CsvParseOptions,
+  PdfParseOptions,
   XlsxParseOptions,
 } from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
+import type {
+  DocumentMetadata,
+  ExtractedTable,
+  PageGeometry,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 
 type FileLoadOptions = {
   file: File;
   datasetId: Dataset.Id;
 };
 
-export type ParseManualFileOptions = CsvParseOptions | XlsxParseOptions;
+export type ParseManualFileOptions =
+  | CsvParseOptions
+  | XlsxParseOptions
+  | PdfParseOptions;
 
 type LoadAndParseFileOptions = FileLoadOptions & ParseManualFileOptions;
 
@@ -40,7 +54,61 @@ export type XlsxFileLoadResult = BaseLoadResult & {
   availableSheetNames: string[];
 } & DuckDbLoadXlsxResult;
 
-type FileLoadResult = CsvFileLoadResult | XlsxFileLoadResult;
+export type PdfFileLoadResult = BaseLoadResult & {
+  /**
+   * Identifies this particular load, so re-parsing remounts the import form.
+   * The CSV and XLSX results get theirs from the DuckDB load result; a PDF
+   * never touches DuckDB during the sniff, so it is minted here.
+   */
+  id: string;
+  type: "pdf";
+  pageCount: number;
+  /** Geometry for the pages read, so the picker can render and clip them. */
+  pages: readonly PageGeometry[];
+  /**
+   * `needs_selection` means the document parsed fine and is waiting for the
+   * user to choose a region. It is NOT an error, and the form must not treat
+   * it as one.
+   */
+  status: "needs_selection" | "extracted";
+  /**
+   * The row shape the extraction actually used, which is the user's pick when
+   * they made one and the shape derived from the regions' detected kinds when
+   * they did not. Undefined until a region has been selected.
+   *
+   * Reported for the same reason `regions` is: it is what really happened, and
+   * the form seeds the control from it. Defaulting the control to a fixed mode
+   * instead is what offered "keep the printed table" for a line chart.
+   */
+  outputMode: PdfOutputMode | undefined;
+  /**
+   * The regions as they were actually read, which is the requested regions
+   * with each classified shape written back into them.
+   *
+   * Without this the picker's "Read as" control shows the shape the region was
+   * created with rather than the one the rows in front of the user came out
+   * of, and a user correcting a shape would be correcting a value that was
+   * never used.
+   */
+  regions: readonly PdfRegion[];
+  columns: DuckDbColumnSchema[];
+  /** One per selected region, for the review grid. */
+  tables: readonly ExtractedTable[];
+  classifications: Readonly<Record<string, RegionClassification>>;
+  documentMetadata: DocumentMetadata;
+  /**
+   * The combined result the dataset is actually built from. Kept alongside
+   * `tables` because the fingerprint and the CSV are computed from the
+   * combination, not from any single region.
+   */
+  combinedCells: ReadonlyArray<readonly string[]>;
+  combinedHeaderRows: number;
+};
+
+type FileLoadResult =
+  | CsvFileLoadResult
+  | XlsxFileLoadResult
+  | PdfFileLoadResult;
 
 type UseLoadManualUploadFileResult = {
   loadFile: UseMutationResultTuple<FileLoadResult, LoadAndParseFileOptions>[0];
@@ -136,6 +204,38 @@ function _buildDataSourceMetadataFromLoadResult({
         };
       },
     )
+    .with({ type: "pdf" }, (pdfLoadResult): ManualUploadDataSourceMetadata => {
+      const pdfRequest =
+        loadAndParseOptions?.type === "pdf_file" ?
+          loadAndParseOptions
+        : undefined;
+      return {
+        sourceType: "pdf_file",
+        // A PDF is retained in full, so the cloud-storage toggle is the
+        // user's only say over whether the document leaves the device.
+        // Default it on, like the other file sources.
+        onlineStorageAllowed: true,
+        sizeInBytes: file.size,
+        datasetLoadResult: pdfLoadResult,
+        parseOptions: {
+          type: "pdf_file",
+          // The load result's regions, not the request's: they are the same
+          // regions with the shape each one was actually read as written in.
+          // Taking the request's back would put the placeholder shape in front
+          // of the user again on every extraction.
+          regions: pdfLoadResult.regions,
+          pageRange: pdfRequest?.pageRange,
+          // The load result's mode, not the request's, for the same reason as
+          // the regions above: it is the mode the extraction really used, and
+          // on a first load the request has none for detection to lose to.
+          outputMode: pdfLoadResult.outputMode ?? pdfRequest?.outputMode,
+          isOutputModeUserChosen: pdfRequest?.isOutputModeUserChosen,
+          // Carried through re-parses so the model that contributed rows is
+          // still known at save time, whichever re-extraction wrote them.
+          llmModel: pdfRequest?.llmModel,
+        },
+      };
+    })
     .exhaustive();
 }
 
@@ -219,13 +319,18 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           return loadResult;
         })
         .with({ type: "xlsx_file" }, async (xlsxParseOptions) => {
-          const { datasetId, sheetName, hasHeader } = xlsxParseOptions;
+          const { datasetId, sheetName, hasHeader, numRowsToSkip } =
+            xlsxParseOptions;
           const sniff = await LocalDatasetClient.startXlsxImport({
             datasetId,
             workspaceId: workspace.id,
             userId: user!.id as UserId,
             file,
-            parseOptions: { sheet: sheetName, hasHeader },
+            parseOptions: {
+              sheet: sheetName,
+              hasHeader,
+              rowsToSkip: numRowsToSkip,
+            },
           });
           const loadResult: XlsxFileLoadResult = {
             datasetId,
@@ -240,6 +345,107 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             availableSheetNames: sniff.sheets,
           };
           pendingPreviewRowsRef.value = sniff.previewRows as UnknownRow[];
+          return loadResult;
+        })
+        .with({ type: "pdf_file" }, async (pdfParseOptions) => {
+          const {
+            datasetId,
+            pageRange,
+            regions = [],
+            outputMode,
+            isOutputModeUserChosen = false,
+          } = pdfParseOptions;
+          const sniff = await LocalDatasetClient.startPdfImport({
+            datasetId,
+            workspaceId: workspace.id,
+            userId: user!.id as UserId,
+            file,
+            parseOptions: { pageRange },
+          });
+
+          if (regions.length === 0) {
+            // No regions yet, so no rows and no columns yet. This is the
+            // expected state immediately after upload, not a failure.
+            const loadResult: PdfFileLoadResult = {
+              datasetId,
+              numRows: 0,
+              id: uuid(),
+              type: "pdf",
+              pageCount: sniff.pageCount,
+              pages: sniff.pages,
+              status: "needs_selection",
+              outputMode: undefined,
+              regions: [],
+              columns: [],
+              tables: [],
+              classifications: {},
+              documentMetadata: sniff.documentMetadata,
+              combinedCells: [],
+              combinedHeaderRows: 0,
+            };
+            pendingPreviewRowsRef.value = [];
+            return loadResult;
+          }
+
+          const extracted = await extractPdfRegions({
+            pages: sniff.pages,
+            regions,
+            documentMetadata: sniff.documentMetadata,
+            // Only a mode the user picked is sent. Sending the mode a previous
+            // extraction resolved would read as a choice, and the derived
+            // default could then never change after a region was added.
+            outputMode: isOutputModeUserChosen ? outputMode : undefined,
+          });
+
+          // What each region was read as, written back into the region. The
+          // worker decided this, weighing the user's choice against the
+          // classifier's; repeating that judgement here would be a second
+          // place for the two to disagree.
+          const readRegions = regions.map((region): PdfRegion => {
+            const shape = extracted.resolvedShapes[region.id];
+            return shape === undefined || shape === region.shape ?
+                region
+              : { ...region, shape };
+          });
+
+          // Reuse the CSV import path wholesale: the extracted table is now
+          // just a CSV, so DuckDB's sniffer types it exactly as it would a
+          // real one. The PDF stays pinned as the retained original.
+          const csv = makeCsvFromPdfTable({
+            cells: extracted.combined.cells,
+            headerRows: extracted.combined.headerRows,
+          });
+          const csvFile = new File([csv], `${datasetId}.csv`, {
+            type: MIMEType.TEXT_CSV,
+          });
+          const csvSniff = await LocalDatasetClient.transcodePdfExtraction({
+            datasetId,
+            workspaceId: workspace.id,
+            userId: user!.id as UserId,
+            csvFile,
+          });
+
+          const loadResult: PdfFileLoadResult = {
+            datasetId,
+            numRows: Math.max(
+              0,
+              extracted.combined.cells.length - extracted.combined.headerRows,
+            ),
+            id: uuid(),
+            type: "pdf",
+            pageCount: sniff.pageCount,
+            pages: sniff.pages,
+            status: "extracted",
+            outputMode: extracted.combined.outputMode,
+            regions: readRegions,
+            columns: csvSniff.columns,
+            tables: extracted.tables,
+            classifications: extracted.classifications,
+            documentMetadata: sniff.documentMetadata,
+            combinedCells: extracted.combined.cells,
+            combinedHeaderRows: extracted.combined.headerRows,
+          };
+          pendingPreviewRowsRef.value = csvSniff.previewRows;
           return loadResult;
         })
         .exhaustive();

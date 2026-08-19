@@ -7,9 +7,7 @@ import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 export type DashboardManualQueryState = {
   query: StructuredQuery.Partial;
@@ -115,13 +113,15 @@ export function useDashboardManualQueryState(
         orderByColumn: columnId,
       } as StructuredQuery.Partial);
     },
-    onSetOrderByDirection: (direction: OrderByDirection | undefined) => {
+    onSetOrderByDirection: (
+      direction: StructuredQuery.OrderByDirection | undefined,
+    ) => {
       applyQueryChange({
         ...query,
         orderByDirection: direction,
       } as StructuredQuery.Partial);
     },
-    onSetFilters: (filters: QueryFilterGroup) => {
+    onSetFilters: (filters: StructuredQuery.FilterGroup) => {
       applyQueryChange({ ...query, filters } as StructuredQuery.Partial);
     },
     onSetLimit: (limit: number | undefined) => {

@@ -1,0 +1,18 @@
+.page {
+  margin-inline: auto;
+  max-width: 56rem;
+  padding-bottom: var(--mantine-spacing-xxl);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+}
+
+.panel {
+  background-color: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+}

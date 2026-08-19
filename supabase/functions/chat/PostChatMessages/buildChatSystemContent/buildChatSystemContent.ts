@@ -1,8 +1,4 @@
-import {
-  dashboardsSystemPrefix,
-  dataExplorerSystemPrefix,
-  genericSystemPrompt,
-} from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 
 /**
  * Words that suggest the user is refining the previous turn rather than asking
@@ -72,10 +68,15 @@ export function buildChatSystemContent(
         )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
     : "";
 
-  return (
-    (isDataExplorer ?
-      `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
-    : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
-    : genericSystemPrompt) + retryContextNote
-  );
+  const prefixWithSql = `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
+  const surfaceContent = ((): string => {
+    if (isDataExplorer) {
+      return `${prefixWithSql}${refinementContext}${errorContext}${resultColumnsContext}`;
+    }
+    if (isDashboards) {
+      return prefixWithSql;
+    }
+    return unifiedSystemPrefix;
+  })();
+  return surfaceContent + retryContextNote;
 }

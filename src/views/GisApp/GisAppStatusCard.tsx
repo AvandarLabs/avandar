@@ -1,5 +1,5 @@
 import { MapStatusCard } from "@/views/GisApp/panels/MapStatusCard/MapStatusCard";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
 type Props = { app: GisAppState };

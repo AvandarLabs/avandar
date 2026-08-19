@@ -117,7 +117,7 @@ export function useChatSuggestions(
         .with("data-explorer", () => {
           return _buildDataExplorerSuggestions(sharedParameters);
         })
-        .with("data-sources", "other", () => {
+        .with("data-sources", "other", "case-manager", () => {
           return [];
         })
         .exhaustive();

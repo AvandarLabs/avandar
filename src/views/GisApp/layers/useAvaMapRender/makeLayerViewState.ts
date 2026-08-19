@@ -1,5 +1,9 @@
 import { noop, sortObjList } from "@avandar/utils";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
+import type {
+  PointAggregation,
+  PointCoordinateAudit,
+} from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type {
   DropReason,
@@ -22,6 +26,12 @@ type MakeLayerViewStateInput = {
   hasBinding: boolean;
   geometry: LayerGeometry;
   queryState: MapLayerQueryState | undefined;
+
+  /** Row counts DuckDB measured, for a lat/lng point layer. */
+  audit?: PointCoordinateAudit;
+
+  /** Set when the geometry is aggregated cells rather than source rows. */
+  aggregation?: PointAggregation;
 };
 
 /** The largest single drop reason, or `undefined` when nothing was dropped. */
@@ -39,7 +49,9 @@ function _getLargestDropReason(
 }
 
 /** Counts source rows that could not become geometry. */
-function _getDroppedRowCount(drops: readonly GeometryDropReport[]): number {
+function _getDroppedRowCount(
+  drops: ReadonlyArray<Pick<GeometryDropReport, "count">>,
+): number {
   return drops.reduce((total, drop) => {
     return total + drop.count;
   }, 0);
@@ -88,28 +100,56 @@ function _getAggregateFeatureCounts(
   return { contributorCount, noDataCount, suppressedCount };
 }
 
+/**
+ * The counts the layer reports as mapped and dropped.
+ *
+ * An aggregated layer's features are cells, not rows, so counting features
+ * would claim a few thousand rows for a dataset of millions. The counts DuckDB
+ * measured before aggregating are used instead, which is the only way the
+ * status can describe the source rather than the render.
+ */
+function _getRowCounts(options: MakeLayerViewStateInput): {
+  featureCount: number;
+  droppedRowCount: number;
+  drops: readonly GeometryDropReport[];
+} {
+  const { audit, aggregation, geometry } = options;
+  if (aggregation !== undefined && audit !== undefined) {
+    return {
+      featureCount: aggregation.aggregatedRowCount,
+      droppedRowCount: _getDroppedRowCount(audit.drops),
+      drops: audit.drops.map((drop) => {
+        return { ...drop, sampleRowIndexes: [] };
+      }),
+    };
+  }
+  return {
+    featureCount: geometry.featureCollection.features.length,
+    droppedRowCount: _getDroppedRowCount(geometry.drops),
+    drops: geometry.drops,
+  };
+}
+
 /** Builds the status consumed by the layer list and selected-layer controls. */
-export function makeLayerViewState({
-  layer,
-  hasBinding,
-  geometry,
-  queryState,
-}: MakeLayerViewStateInput): MapLayerViewState {
-  const droppedRowCount = _getDroppedRowCount(geometry.drops);
+export function makeLayerViewState(
+  input: MakeLayerViewStateInput,
+): MapLayerViewState {
+  const { layer, hasBinding, geometry, queryState } = input;
+  const { featureCount, droppedRowCount, drops } = _getRowCounts(input);
   const error = queryState?.error ?? geometry.error;
   return {
     status: _getLayerStatus({
       hasBinding,
       error,
       isLoading: queryState?.isLoading,
-      featureCount: geometry.featureCollection.features.length,
+      featureCount,
       droppedRowCount,
     }),
     error,
-    featureCount: geometry.featureCollection.features.length,
+    featureCount,
     droppedRowCount,
-    drops: geometry.drops,
-    largestDropReason: _getLargestDropReason(geometry.drops),
+    drops: [...drops],
+    largestDropReason: _getLargestDropReason(drops),
     spatialDiagnostics:
       queryState?.data?.type === "spatial" ?
         queryState.data.diagnostics

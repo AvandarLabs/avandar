@@ -7,17 +7,21 @@ import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
   createGeometryLayerFixture,
   getParsedRowsSql,
+  withAoiOverlay,
+  withEmptyOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 describe("compileMapLayerSpatialQuery geometry column", () => {
   it("wraps source SQL and emits the stable one-row envelope", () => {
     const fixture = createGeometryLayerFixture();
-    const plan = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 7,
-      simplificationReferenceLatitude: 38.9,
-    });
+    const plan = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 7,
+        simplificationReferenceLatitude: 38.9,
+      }),
+    );
 
     expect(plan.rawSql).toContain("source_rows AS (");
     expect(plan.rawSql).toContain("parsed_rows AS (");
@@ -25,6 +29,11 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
     expect(plan.rawSql).toContain("diagnostic_summary AS (");
     expect(plan.rawSql).toContain("feature_rows AS (");
     expect(plan.rawSql).toContain("ST_SimplifyPreserveTopology");
+    // A row PROJ or GEOS cannot simplify falls back to its parsed geometry
+    // rather than aborting the statement and failing the whole layer.
+    expect(plan.rawSql).toContain(
+      "coalesce(TRY(ST_Transform(ST_SimplifyPreserveTopology(",
+    );
     expect(plan.rawSql).toContain(
       'replace(CAST(ST_GeometryType("__avandar_geometry") AS VARCHAR)',
     );
@@ -42,11 +51,13 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
 
   it("quotes a hostile geometry identifier everywhere it is referenced", () => {
     const fixture = createGeometryLayerFixture();
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      zoomBand: 0,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
     const hostileName = 'shape"; DROP TABLE maps; --';
     const quotedName = '"shape""; DROP TABLE maps; --"';
 
@@ -56,18 +67,20 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
 
   it("emits a direct query-column denominator as a reserved property", () => {
     const fixture = createGeometryLayerFixture();
-    const { rawSql } = compileMapLayerSpatialQuery({
-      ...fixture,
-      metadata: {
-        ...fixture.metadata,
-        normalizationDenominator: {
-          type: "queryColumn",
-          columnName: "label",
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        ...fixture,
+        metadata: {
+          ...fixture.metadata,
+          normalizationDenominator: {
+            type: "queryColumn",
+            columnName: "label",
+          },
         },
-      },
-      zoomBand: 0,
-      simplificationReferenceLatitude: 0,
-    });
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain("'__avandar_denominator', \"label\"");
   });
@@ -86,12 +99,14 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
       } as MapLayer.T;
 
       expect(
-        compileMapLayerSpatialQuery({
-          layer,
-          metadata: fixture.metadata,
-          zoomBand: 2,
-          simplificationReferenceLatitude: 0,
-        }).family,
+        compileMapLayerSpatialQuery(
+          withEmptyOverlay({
+            layer,
+            metadata: fixture.metadata,
+            zoomBand: 2,
+            simplificationReferenceLatitude: 0,
+          }),
+        ).family,
       ).toBe(family);
     },
   );
@@ -111,12 +126,14 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
       },
     } as MapLayer.T;
 
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer,
-      metadata: fixture.metadata,
-      zoomBand: 4,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata: fixture.metadata,
+        zoomBand: 4,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).not.toContain("ST_SimplifyPreserveTopology");
   });
@@ -137,12 +154,14 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
       },
     } as MapLayer.T;
 
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer,
-      metadata: fixture.metadata,
-      zoomBand: 4,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata: fixture.metadata,
+        zoomBand: 4,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(getParsedRowsSql(rawSql)).toContain(
       "TRY(ST_Transform(TRY(ST_GeomFromText",
@@ -165,13 +184,69 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
       },
     } as MapLayer.T;
 
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer,
-      metadata: fixture.metadata,
-      zoomBand: 4,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata: fixture.metadata,
+        zoomBand: 4,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(getParsedRowsSql(rawSql)).not.toContain("ST_Transform");
+  });
+
+  it("intersects parsed geometry with the aoi before ST_AsGeoJSON", () => {
+    const fixture = createGeometryLayerFixture();
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withAoiOverlay({
+        ...fixture,
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
+
+    expect(rawSql).toContain("ST_Intersects");
+    expect(rawSql).toContain("ST_GeomFromGeoJSON");
+    expect(getParsedRowsSql(rawSql)).not.toContain("ST_Intersects");
+    expect(rawSql).toContain("ST_AsGeoJSON");
+  });
+
+  it("counts invalid geometry from typed_rows without aoi-filtering parsed_rows", () => {
+    const fixture = createGeometryLayerFixture();
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withAoiOverlay({
+        ...fixture,
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
+
+    expect(getParsedRowsSql(rawSql)).not.toContain("ST_Intersects");
+    expect(rawSql).toContain(
+      'count(*) FILTER (WHERE "__avandar_geometry" IS NULL) AS invalid_count',
+    );
+    const diagnosticSql = rawSql.slice(
+      rawSql.indexOf("diagnostic_summary AS ("),
+      rawSql.indexOf("feature_rows AS ("),
+    );
+    expect(diagnosticSql).toContain("FROM typed_rows");
+    expect(rawSql.slice(rawSql.indexOf("feature_rows AS ("))).toContain(
+      "ST_Intersects",
+    );
+  });
+
+  it("omits aoi intersects when applyAoiFilter is false", () => {
+    const fixture = createGeometryLayerFixture();
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withAoiOverlay({
+        layer: { ...fixture.layer, applyAoiFilter: false },
+        metadata: fixture.metadata,
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
+
+    expect(rawSql).not.toContain("ST_Intersects");
   });
 });

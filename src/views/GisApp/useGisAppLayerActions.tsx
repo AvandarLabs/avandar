@@ -5,7 +5,7 @@ import { modals } from "@mantine/modals";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 type GisAppLayerAction = (layerId: MapLayer.Id) => void;

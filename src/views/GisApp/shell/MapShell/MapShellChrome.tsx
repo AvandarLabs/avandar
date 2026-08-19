@@ -9,6 +9,7 @@ type Props = {
   legend: ReactNode;
   toolCluster: ReactNode;
   statusCard: ReactNode;
+  timeSlider?: ReactNode;
   firstRunCard: ReactNode;
   isChromeHidden: boolean;
   topBarRef: RefCallback<HTMLDivElement>;
@@ -26,6 +27,7 @@ export function MapShellChrome({
   legend,
   toolCluster,
   statusCard,
+  timeSlider,
   firstRunCard,
   isChromeHidden,
   topBarRef,
@@ -59,6 +61,7 @@ export function MapShellChrome({
           <div className={css.mapShellBottomLeft}>{legend}</div>
           <div className={css.mapShellBottomCenter}>
             {statusCard}
+            {timeSlider}
             {toolCluster}
           </div>
         </>

@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_WAVE_C_POINT_ROW_COUNT,
-  GIS_WAVE_C_POINTS_CSV_PATH,
+  GIS_CLUSTER_POINTS_CSV_PATH,
+  GIS_CLUSTER_POINTS_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -15,7 +15,7 @@ import {
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
-const DATASET_NAME = "gis-wave-c-points.csv";
+const DATASET_NAME = "cluster-points.csv";
 const MAP_NAME = "E2E GIS heatmap";
 
 /** Centre of the fixture's tight six-point group, where heat is densest. */
@@ -75,8 +75,8 @@ test("draws a heatmap whose paint does not open the feature inspector", async ({
     datasetId = await importDatasetViaUi({
       page,
       workspaceSlug,
-      filePath: GIS_WAVE_C_POINTS_CSV_PATH,
-      expectedRowCount: GIS_WAVE_C_POINT_ROW_COUNT,
+      filePath: GIS_CLUSTER_POINTS_CSV_PATH,
+      expectedRowCount: GIS_CLUSTER_POINTS_ROW_COUNT,
     });
     await page.getByRole("link", { name: "Maps" }).click();
     await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
@@ -133,7 +133,9 @@ test("draws a heatmap whose paint does not open the feature inspector", async ({
       canvasBounds.x + projected.x,
       canvasBounds.y + projected.y,
     );
-    await expect(page.getByRole("dialog", { name: "Feature" })).toHaveCount(0, {
+    await expect(
+      page.getByRole("region", { name: "Feature", exact: true }),
+    ).toHaveCount(0, {
       timeout: SHORT_WAIT,
     });
   } finally {

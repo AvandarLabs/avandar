@@ -1,19 +1,33 @@
 import { Model } from "@avandar/models";
 import { makeSet, prop, propEq, propNotEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
+import {
+  DEFAULT_EXPORT_LAYOUT,
+  exportLayoutUpdaters,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
+import {
+  EMPTY_ANNOTATIONS,
+  overlayConfigUpdaters,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/overlayConfigUpdaters/overlayConfigUpdaters.ts";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type {
   AvaMapConfigRead,
   MapBookmark,
   MapBookmarkId,
   MapViewState,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
 /** Opening camera position when a map has no data to fit yet. */
 const DEFAULT_MAP_VIEW_STATE: MapViewState = {
   center: [-74.006, 40.7128],
   zoom: 10,
 };
+
+/** Fallback annotation label size, in pixels. */
+const DEFAULT_ANNOTATION_TEXT_SIZE_PX = 14;
+
+/** Mean Earth radius used by geodesic measure, in meters. */
+const EARTH_RADIUS_METERS = 6_371_008.8;
 
 /** True when both id lists hold the same ids, in any order. */
 function _haveSameIds(
@@ -39,14 +53,42 @@ export const AvaMapConfigModule = {
   /** Opening camera position when a map has no data to fit yet. */
   defaultViewState: DEFAULT_MAP_VIEW_STATE,
 
+  /** Empty annotation overlay: visible, no features. */
+  emptyAnnotations: EMPTY_ANNOTATIONS,
+
+  /** Fallback annotation label size, in pixels. */
+  defaultAnnotationTextSizePx: DEFAULT_ANNOTATION_TEXT_SIZE_PX,
+
+  /**
+   * Map-level geodesic and annotation paint defaults. Layer buffer distance
+   * lives on `MapLayer`.
+   */
+  GisWaveDDefaults: {
+    /** Mean Earth radius used by geodesic measure, in meters. */
+    earthRadiusMeters: EARTH_RADIUS_METERS,
+    /** Default annotation label size, in pixels. */
+    annotationTextSizePx: DEFAULT_ANNOTATION_TEXT_SIZE_PX,
+    /** Default annotation fill and stroke color. */
+    annotationColor: "#3b82f6",
+    /** Default annotation line width, in pixels. */
+    annotationStrokeWidthPx: 2,
+    /** Default annotation area fill opacity. */
+    annotationAreaOpacity: 0.35,
+  },
+
   /** A new, empty config with the default basemap and camera and no layers. */
   makeEmpty: (): AvaMapConfigRead => {
     return Model.make("AvaMapConfig", {
-      version: 3,
+      version: 5,
       basemap: { type: "builtIn", style: "avandar" },
       view: DEFAULT_MAP_VIEW_STATE,
       bookmarks: [],
       layers: [],
+      aoi: undefined,
+      timeRange: undefined,
+      annotations: EMPTY_ANNOTATIONS,
+      annotationsZIndex: 0,
+      exportLayout: DEFAULT_EXPORT_LAYOUT,
     } as const);
   },
 
@@ -220,4 +262,7 @@ export const AvaMapConfigModule = {
         config
       : { ...config, bookmarks: nextBookmarks };
   },
+
+  ...overlayConfigUpdaters,
+  ...exportLayoutUpdaters,
 };

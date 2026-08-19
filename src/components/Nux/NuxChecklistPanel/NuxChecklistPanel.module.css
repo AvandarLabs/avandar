@@ -1,0 +1,7 @@
+.nuxChecklistPanelDock {
+  /*
+   * Match AppShell's default aside transition (200ms ease) so the checklist
+   * slides in step with the chat panel.
+   */
+  transition: right 200ms ease;
+}

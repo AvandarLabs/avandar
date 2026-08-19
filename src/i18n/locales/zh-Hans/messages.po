@@ -13,17 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Delete: {0}"
-msgstr "删除：{0}"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "您可以在您的支付方式中进行更改"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "关闭聊天面板"
 
@@ -36,15 +30,15 @@ msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法安全解析，因此所有列将被发布。"
 
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+msgid "No records yet"
+msgstr "暂无记录"
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "返回在线以查看或使页面可离线使用。"
 
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Create new entity"
-msgstr "创建新实体"
-
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "您处于离线状态。在询问数据问题前，请使用编辑框旁的云图标下载离线聊天模型。"
@@ -56,6 +50,10 @@ msgstr "未检测到该数据集的列。回退到所有列。"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 group"
 msgstr "1 个群组"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Numbers in prose"
+msgstr "正文中的数字"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
@@ -78,13 +76,30 @@ msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
 msgid "Other"
 msgstr "其他"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Avandar read your file and already figured out what each column "
+"contains. Give the dataset a name, then save."
+msgstr "Avandar 已读取您的文件，并识别出每列所包含的内容。请为数据集命名，然后保存。"
+
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu.tsx
 msgid "More actions for the layer {layerName}"
 msgstr "图层 {layerName} 的更多操作"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one tab in this spreadsheet."
+msgstr "此电子表格中只有一个标签页。"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "starts with"
+msgstr "开头是"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
 msgstr "运行查询以查看结果。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Select an Excel, CSV or PDF file from your computer to import"
+msgstr "从您的计算机中选择 Excel、CSV 或 PDF 文件以导入"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
@@ -102,10 +117,19 @@ msgstr "单元格大小（米）"
 msgid "Open dataset"
 msgstr "打开数据集"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Name this case type and say where its fields come from. Map columns from "
+"existing datasets, or add fields to fill in by hand."
+msgstr "为此案例类型命名，并说明其字段来源。您可以映射现有数据集中的列，或添加需要手动填写的字段。"
+
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "值列"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is not on"
+msgstr "不在"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "0 rows"
@@ -118,6 +142,10 @@ msgstr "每月"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Remove access for {name}."
 msgstr "移除 {name} 的访问权限。"
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
+msgid "Match case"
+msgstr "区分大小写"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -143,6 +171,10 @@ msgstr "右跨度"
 msgid "Search datasets..."
 msgstr "搜索数据集..."
 
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "\"{value}\" is not a number."
+msgstr "“{value}”不是数字。"
+
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to map tools"
 msgstr "跳转到地图工具"
@@ -152,6 +184,14 @@ msgid "The dataset failed to load. Please try again later or reach out to "
 "support."
 msgstr "数据集加载失败。请稍后再试或联系支持。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "The column matching this dataset's rows to a case"
+msgstr "将此数据集中的行与案例关联起来的列"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Name it"
+msgstr "为其命名"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle.tsx
 msgid "Drag to reorder, or hold Alt and press the up or down arrow"
 msgstr "拖动以重新排序，或按住 Alt 并按向上或向下箭头键"
@@ -159,6 +199,10 @@ msgstr "拖动以重新排序，或按住 Alt 并按向上或向下箭头键"
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 msgid "Choose chat model"
 msgstr "选择聊天模型"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard.tsx
+msgid "Skip this step"
+msgstr "跳过此步骤"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "The previous URL will become invalid and unreachable. Anyone using the "
@@ -185,11 +229,11 @@ msgstr "标题字段是必填项"
 msgid "Invite a member"
 msgstr "邀请一位成员"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Ask Avandar"
 msgstr "询问 Avandar"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
 msgstr "加载文件时发生错误"
 
@@ -213,6 +257,11 @@ msgstr "{0} GB 内存"
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "无法显示 {chartName}。"
+
+#. placeholder {0}: region.label
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Select {0}"
+msgstr "选择 {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -239,6 +288,13 @@ msgstr "在此上下文中无法使用发现功能。"
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "输入一个问题，我将生成 SQL 并在画布上运行。"
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/NewCaseTypeButton.tsx
+msgid "New case type"
+msgstr "新建案例类型"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
 "affecting any others."
@@ -253,12 +309,6 @@ msgid "A saved dataset or column reference is no longer available. Choose a "
 "replacement in the layer inspector."
 msgstr "保存的数据集或列引用已不可用。请在图层检查器中选择替代项。"
 
-#. placeholder {0}: layer.source.dataSource.name
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-"release, so pick a different source."
-msgstr "{0} 中没有包含坐标的列。边界连接将在后续版本中推出，请选择其他来源。"
-
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
 "SQL query"
@@ -272,19 +322,31 @@ msgstr "H4"
 msgid "Query"
 msgstr "查询"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Join key"
+msgstr "连接键"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "label"
+msgstr "标签"
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "行过滤器"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Description"
-msgstr "个人资料描述"
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Keep the printed columns"
+msgstr "保留打印的列"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From PDF"
+msgstr "来自 PDF"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "上传 Excel"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "Go to a coordinate or P-code"
 msgstr "转到坐标或 P-code"
 
@@ -302,9 +364,21 @@ msgstr "无法加载数据集的 SQL 查询。"
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
+msgid "Disputed values"
+msgstr "有争议的值"
+
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "请检查您的电子邮件以获取确认链接。"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is not available"
+msgstr "Google Sheet 不可用"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is not between"
+msgstr "不在范围内"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
@@ -324,6 +398,7 @@ msgid "Square"
 msgstr "正方形"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "备注"
 
@@ -333,7 +408,7 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 "actual values."
 msgstr "在 \"{sourceFileName}\" 中检测到 {changedCount} 列的列类型与导入预览不同，已被实际值覆盖。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "几何图形"
 
@@ -378,12 +453,21 @@ msgstr "侧边栏布局"
 msgid "Delete failed"
 msgstr "删除失败"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
+msgid "Dismiss"
+msgstr "关闭"
+
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr "您的套餐不允许将此仪表板分享给其他人。请升级套餐，或取消分享另一个仪表板，然后重试。"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "PDF file"
+msgstr "PDF 文件"
+
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open"
 msgstr "打开"
 
@@ -404,6 +488,10 @@ msgstr "否"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "无法从 FROM 子句中确定基础表。"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Case types"
+msgstr "案例类型"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -458,7 +546,7 @@ msgstr "添加一条显示 {datasetName} 随时间变化趋势的折线图"
 msgid "Show legend"
 msgstr "显示图例"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Pan and select"
 msgstr "平移并选择"
 
@@ -482,6 +570,14 @@ msgstr "展开抽屉"
 msgid "Export annotated PDF"
 msgstr "导出带注释的 PDF"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "+ Group"
+msgstr "+ 分组"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "The column that names each case in the UI"
+msgstr "在界面中标识每个案例名称的列"
+
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
@@ -490,6 +586,10 @@ msgstr "自定义 URL 不能超过 {0} 个字符"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Source CRS"
 msgstr "源 CRS"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "For example, County or Household"
+msgstr "例如“县”或“家庭”"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -528,13 +628,21 @@ msgstr "要更好地控制您的订阅，您可以在您的订阅中进行管理
 msgid "Extra large"
 msgstr "超大"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "log"
+msgstr "日志"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Click \"Save to dashboard\"."
+msgstr "点击“保存到仪表板”。"
+
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
 "track key metrics and insights."
 msgstr "您还没有创建任何内容，也没有人向您分享内容。创建一个仪表板，跟踪关键指标和洞察。"
 
 #. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 msgid "Save: {0}"
 msgstr "保存：{0}"
 
@@ -556,6 +664,15 @@ msgstr "关于您"
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
 msgstr "无法在线同步数据集"
+
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+#: src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx
+msgid "Disputed or undetermined boundary"
+msgstr "有争议或未确定的边界"
+
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
+msgid "Delete map?"
+msgstr "删除地图？"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
@@ -601,11 +718,11 @@ msgstr "无法显示 {chartName}"
 msgid "Dataset failed to process"
 msgstr "数据集处理失败"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " {numRejectedRows} rows were rejected"
-msgstr " {numRejectedRows} 行被拒绝"
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Portrait"
+msgstr "纵向"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
 msgstr "正在回复…"
 
@@ -621,6 +738,14 @@ msgstr "允许多个值"
 msgid "Llama 3.1 8B (offline)"
 msgstr "Llama 3.1 8B（离线）"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
+msgid "Hide the tutorial?"
+msgstr "隐藏教程？"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Picker error"
+msgstr "Google Picker 错误"
+
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
 msgstr "尚未添加数据集"
@@ -629,7 +754,7 @@ msgstr "尚未添加数据集"
 msgid "Layer name"
 msgstr "图层名称"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "正在修复查询…"
 
@@ -641,16 +766,16 @@ msgstr "只有工作区管理员可以发布到 Web。"
 msgid "Other color"
 msgstr "其他颜色"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Let your colleagues open what you just built."
+msgstr "让你的同事打开你刚刚创建的内容。"
+
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Your current plan only supports up to {0} datasets. To increase the "
 "number of datasets you can add to your workspace you can purchase more "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您当前的计划仅支持最多 {0} 个数据集。要增加可以添加到工作区的数据集数量，您可以购买更多席位。每个席位允许您添加 10 个额外的数据集！"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "Add columns to the query above to start defining filters."
-msgstr "在上面的查询中添加列以开始定义过滤器。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
@@ -660,6 +785,7 @@ msgstr "仅允许一个值"
 msgid "Pie Chart"
 msgstr "饼图"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Average"
@@ -687,6 +813,10 @@ msgstr "打开数据"
 msgid "All fields"
 msgstr "所有字段"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Resize annotation text"
+msgstr "调整注释文本大小"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
 msgstr "标准差"
@@ -706,6 +836,10 @@ msgstr "折叠于"
 #: shared/copy/vizTypeLabel.ts
 msgid "Bubble Chart"
 msgstr "气泡图"
+
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
+msgid "Restart tutorial"
+msgstr "重新开始教程"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is <0>public</0>. Anyone with the link can view it."
@@ -736,14 +870,19 @@ msgstr "视图 {0}"
 msgid "Use suggestion"
 msgstr "使用建议"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "You can choose to let everyone in your workspace see your dashboard, or "
+"only specific people, or even just for yourself. You can always change "
+"this whenever you want."
+msgstr "您可以选择让工作区中的所有人查看您的仪表板，也可以仅允许特定人员查看，甚至只供自己查看。您随时都可以更改此设置。"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
 msgstr "取消发布"
 
-#. placeholder {0}: concept.name
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
-msgid "{0} Manager"
-msgstr "{0} 管理员"
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Design case types in chat"
+msgstr "在聊天中设计案例类型"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -755,12 +894,17 @@ msgstr "地图"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Table"
 msgstr "表格"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search the data catalog to add open datasets to your workspace."
 msgstr "搜索数据目录以将开放数据集添加到您的工作区。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "First tick value"
+msgstr "第一个刻度值"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{shareClause} will lose access."
@@ -804,6 +948,11 @@ msgstr "保持 SQL 不变"
 msgid "Remove User"
 msgstr "移除用户"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
+msgid "The current SQL contains parts the form could not represent. Continuing "
+"overwrites it with SQL generated from the form."
+msgstr "当前 SQL 包含表单无法表示的部分。继续操作会使用根据表单生成的 SQL 覆盖当前内容。"
+
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
@@ -834,6 +983,10 @@ msgstr "公开发布"
 #: src/routes/update-password.tsx
 msgid "Updating password for {0}"
 msgstr "正在更新 {0} 的密码"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is after"
+msgstr "晚于"
 
 #: src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx
 msgid "No layers yet."
@@ -867,6 +1020,10 @@ msgstr "4326 - WGS 84"
 msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 "true."
 msgstr "逗号连接的表不会被映射；请将其视为 ON true 的 INNER JOIN。"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+msgid "This record failed to load"
+msgstr "此记录加载失败"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -906,7 +1063,7 @@ msgstr "分享 “{resourceName}”"
 msgid "Sign in"
 msgstr "登录"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveAsMenuItems.tsx
 msgid "Save as new dataset"
 msgstr "另存为新数据集"
 
@@ -939,6 +1096,14 @@ msgstr "这是您数据集的前 {0} 行。检查数据是否正确。如果不�
 msgid "This field cannot be empty"
 msgstr "此字段不能为空"
 
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
+msgstr "“{value}”不是日期。请使用 YYYY-MM-DD 格式。"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add a note"
+msgstr "添加备注"
+
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -948,7 +1113,7 @@ msgstr "打开地图 {0}"
 msgid "Oops!"
 msgstr "哎呀！"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 msgid "Dataset saved."
 msgstr "数据集已保存。"
 
@@ -974,6 +1139,10 @@ msgstr "容器最大宽度"
 msgid "Protocol"
 msgstr "协议"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Build your first dashboard"
+msgstr "创建你的第一个仪表板"
+
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "关闭侧边栏"
@@ -995,6 +1164,10 @@ msgstr "分类"
 msgid "Remove access for {displayName}"
 msgstr "移除 {displayName} 的访问权限"
 
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
+msgid "Run a query first."
+msgstr "请先运行查询。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Seat limit reached"
 msgstr "达到座位限制"
@@ -1006,6 +1179,10 @@ msgstr "管道"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "无法取消发布仪表板"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Where the fields come from"
+msgstr "字段来源"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1042,6 +1219,11 @@ msgstr "输入电子邮件"
 msgid "X axis minimum"
 msgstr "X 轴最小值"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "This case type failed to load"
+msgstr "此案例类型加载失败"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
 msgstr "CSV"
@@ -1053,11 +1235,6 @@ msgstr "预设"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "添加按 {groupByColumn} 分组的 {datasetName} 的条形图"
-
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Permanently delete <0>{0}</0>?"
-msgstr "永久删除 <0>{0}</0> 吗？"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
@@ -1072,11 +1249,19 @@ msgid "Pixels of detail to remove at the current zoom. Set to zero to disable "
 "simplification."
 msgstr "当前缩放级别下要移除的细节像素数。设置为零可禁用简化。"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+msgid "Regular expression"
+msgstr "正则表达式"
+
+#: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+msgid "Skip"
+msgstr "跳过"
+
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "已复制"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
 msgstr "测量距离和面积"
 
@@ -1092,6 +1277,8 @@ msgstr "工作区名称"
 msgid "Your dashboard is published at:"
 msgstr "您的仪表板已发布在："
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -1106,7 +1293,15 @@ msgstr "您的问题包含可能会影响 AI 回答的语言。"
 msgid "Vertical padding"
 msgstr "垂直内边距"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#. placeholder {0}: aggregateLayer.name
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "This map includes {0}, a layer set to Aggregate only. The export applies "
+"the same suppression as the screen: areas with fewer than {threshold} "
+"records are shown as suppressed, never as zero."
+msgstr "此地图包含 {0}，这是一个仅设置为聚合的图层。导出时应用与屏幕相同的抑制规则：记录数少于 {threshold} "
+"的区域将显示为已抑制，而不会显示为零。"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
 msgstr "无法连接云端助手。要使用已下载的设备端模型处理此消息吗？"
@@ -1139,9 +1334,22 @@ msgstr "自然"
 msgid "Public"
 msgstr "公开"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Viewer lets people look at it. Editor lets them change it. Viewer is the "
+"safe default, and you can change anyone's role later."
+msgstr "查看者可以查看内容，编辑者可以修改内容。查看者是安全的默认角色，你之后可以更改任何人的角色。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
 msgstr "删除角色组"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
+msgid "Show the subtitle on the page"
+msgstr "在页面上显示副标题"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.tsx
+msgid "Export preview"
+msgstr "导出预览"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
@@ -1151,6 +1359,10 @@ msgstr "隐藏标题"
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
 msgid "{0} data truncated"
 msgstr "{0} 数据已截断"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Share it with your workspace"
+msgstr "与工作区共享"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
@@ -1192,13 +1404,26 @@ msgid "The published copy still serves the previous audience. Use the button "
 "below to apply your change."
 msgstr "已发布的副本仍面向之前的受众。请使用下面的按钮应用您的更改。"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
+msgid "Hide tutorial"
+msgstr "隐藏教程"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field, e.g. Review notes"
+msgstr "添加字段，例如“审核备注”"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} m²"
+msgstr "{areaValue} 平方米"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Confirm"
 msgstr "确认"
 
@@ -1206,13 +1431,14 @@ msgstr "确认"
 msgid "is equal to..."
 msgstr "等于..."
 
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Profile Designer"
-msgstr "Profile Designer"
-
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} 个群组"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "A {conceptName} can include columns from different datasets. Choose "
+"which columns to add as fields."
+msgstr "一个 {conceptName} 可以包含来自不同数据集的列。请选择要添加为字段的列。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "Ask the dashboard's owner to share it with you."
@@ -1222,18 +1448,32 @@ msgstr "请让仪表板所有者与您共享该仪表板。"
 msgid "Some data should come from existing datasets"
 msgstr "某些数据应来自现有数据集"
 
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Start of time range: {startLabel}"
+msgstr "时间范围开始：{startLabel}"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Couldn't export PDF"
 msgstr "无法导出 PDF"
 
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Value to keep for {0}"
+msgstr "{0} 要保留的值"
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent.tsx
 msgid "Sized by value"
 msgstr "按值调整大小"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
 msgstr "标签"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "You are offline, so nothing can be sent. Kept the rule-based results."
+msgstr "您当前处于离线状态，因此无法发送任何内容。已保留基于规则的结果。"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
@@ -1278,9 +1518,18 @@ msgstr "纬度或经度为空时，无法映射坐标。"
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "您的会话已过期。正在将您重定向到登录页面。"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "Select a region on the page to see data. Draw a box around a table, "
+"chart or block of text, or highlight a sentence."
+msgstr "选择页面上的区域以查看数据。您可以框选表格、图表或文本块，也可以突出显示句子。"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
 msgstr "第 12 列"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
+msgid "North arrow"
+msgstr "指北针"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -1299,11 +1548,16 @@ msgstr "符号"
 msgid "Invalid name column selected"
 msgstr "选择的名称列无效"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Let's save your results now"
+msgstr "现在保存您的结果"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Custom"
 msgstr "自定义"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "时间戳"
@@ -1311,6 +1565,23 @@ msgstr "时间戳"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis tick interval"
 msgstr "Y 轴刻度间隔"
+
+#. placeholder {0}: _columnList(namedColumns)
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "{0}, and {remainingCount} more naming the page and the document"
+msgstr "{0}，以及另外 {remainingCount} 个用于命名页面和文档的项"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "The assistant read nothing we could use. Kept the rule-based results."
+msgstr "助手未读取到任何可用内容。已保留基于规则的结果。"
+
+#. placeholder {0}: axis.min
+#. placeholder {1}: axis.max
+#. placeholder {2}: axis.tickCount
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
+"{residual} pt)"
+msgstr "数值轴 {0} 至 {1}，{scaleLabel}，适合 {2} 个刻度（最大误差 {residual} pt）"
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -1332,6 +1603,10 @@ msgstr "{0} 的地图"
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "工作区 ID 必须少于 {SLUG_MAX_LENGTH} 个字符"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "Refreshed from Google Sheets"
+msgstr "已从 Google Sheets 刷新"
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
 "workspace owner to get a new invitation."
@@ -1341,10 +1616,6 @@ msgstr "您尝试接受的邀请无效。请联系工作区所有者以获取新
 msgid "Normalize by"
 msgstr "归一化依据"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a description for this profile type"
-msgstr "为此配置文件类型输入描述"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
 msgstr "(年度计费)"
@@ -1352,6 +1623,11 @@ msgstr "(年度计费)"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
 msgstr "移除成员"
+
+#. placeholder {0}: _formatProducedAt(producedAt)
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Produced {0}"
+msgstr "生成于 {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -1379,6 +1655,12 @@ msgstr "已抑制 {0} 项"
 msgid "All columns"
 msgstr "所有列"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "New connectors are being added every month. If there is a database or "
+"service you use that you need to connect to, <0>please let us know so we "
+"can prioritize it</0>."
+msgstr "我们每月都会新增连接器。如果您需要连接所使用的数据库或服务，<0>请告诉我们，以便我们优先支持</0>。"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
 msgstr "数据摘要"
@@ -1387,6 +1669,10 @@ msgstr "数据摘要"
 msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "添加成员或用户群组以授予访问权限。使用上方的“常规访问权限”可扩大分享范围。"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Keep the table's columns"
+msgstr "保留表格的列"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.tsx
 msgid "Heat radius"
@@ -1415,7 +1701,7 @@ msgstr "此图表的过滤器"
 msgid "Align"
 msgstr "对齐"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
 msgstr "图层周围的缓冲区"
 
@@ -1433,6 +1719,7 @@ msgstr "查询失败。"
 msgid "{code} - UTM south zone {0}"
 msgstr "{code} - UTM 南纬带 {0}"
 
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "按住 Alt 并按向上或向下箭头键可移动此图层。"
@@ -1440,6 +1727,10 @@ msgstr "按住 Alt 并按向上或向下箭头键可移动此图层。"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
 msgstr "Positron"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Boundary disclaimer (Always included)"
+msgstr "边界免责声明（始终包含）"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
@@ -1454,6 +1745,7 @@ msgid "Permissions saved"
 msgstr "权限已保存"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "副标题"
 
@@ -1508,6 +1800,10 @@ msgstr "在计费门户中管理席位 →"
 msgid "Show exact locations"
 msgstr "显示精确位置"
 
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not load this cluster's features."
+msgstr "无法加载此集群的功能。"
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
 msgstr "表格视图没有图表设置。"
@@ -1524,14 +1820,26 @@ msgstr "工作区 ID 必须至少包含 {SLUG_MIN_LENGTH} 个字符"
 msgid "Built-in presets"
 msgstr "内置预设"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Select a data layer to buffer."
+msgstr "选择要创建缓冲区的数据图层。"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Paper size"
+msgstr "纸张大小"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Select a {conceptName}"
+msgstr "选择一个 {conceptName}"
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 现在在您的工作区中。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "Profile fields"
-msgstr "配置文件字段"
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "There is no text in this region to send. Kept the rule-based results."
+msgstr "此区域中没有可发送的文本。已保留基于规则的结果。"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1548,6 +1856,14 @@ msgstr "{app} 中的所有人都将失去访问权限。"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
 msgstr "选择最适合您工作区的计划。"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from these blocks"
+msgstr "来自这些区块的行"
+
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Chat"
+msgstr "聊天"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
@@ -1577,7 +1893,7 @@ msgstr "小数"
 msgid "Group by"
 msgstr "按组"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "Please select a file to import"
 msgstr "请选择一个文件进行导入"
 
@@ -1592,6 +1908,10 @@ msgstr "间距"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "选择数据源"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Opacity"
+msgstr "不透明度"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -1643,6 +1963,12 @@ msgstr "为字段输入名称"
 msgid "Select Plan"
 msgstr "选择计划"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Delete case type"
+msgstr "删除案例类型"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "默认值（可选）"
@@ -1651,23 +1977,28 @@ msgstr "默认值（可选）"
 msgid "Your user profile is not loaded yet. Please retry."
 msgstr "您的用户配置文件尚未加载。请重试。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Sum"
 msgstr "总和"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Sync data!"
-msgstr "同步数据！"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Top right"
 msgstr "右上"
 
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
+msgid "Permanently delete <0>{openDatasetName}</0>?"
+msgstr "永久删除 <0>{openDatasetName}</0>？"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
 msgstr "WMS"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "No attributes yet"
+msgstr "暂无属性"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -1680,6 +2011,10 @@ msgstr "授予其他成员访问权限"
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "GeoJSON"
 msgstr "GeoJSON"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
+msgid "Scale bar"
+msgstr "比例尺"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -1703,6 +2038,8 @@ msgstr "这是您组织在 URL 中使用的唯一 ID。"
 msgid "Previewing data for {0}"
 msgstr "预览 {0} 的数据"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
@@ -1728,12 +2065,6 @@ msgstr "您确定要将此用户从工作区中移除吗？"
 msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
 msgstr "配置此过滤器：在侧边面板中设置其 ID、标签和列名。"
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
-msgid "The current SQL contains parts that the form could not represent. "
-"Continuing will overwrite that SQL with one generated from the form. "
-"This cannot be undone (unless you re-run your previous chat prompt)."
-msgstr "当前 SQL 包含表单无法表示的部分。继续将用从表单生成的 SQL 覆盖该 SQL。这无法撤销（除非您重新运行之前的聊天提示）。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
@@ -1763,6 +2094,15 @@ msgstr "发生意外错误。你可以重试，或返回首页。"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "保存 URL"
+
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
+msgid "Map deleted"
+msgstr "地图已删除"
+
+#: src/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents.ts
+msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
+"unshare another dashboard, and come back to this."
+msgstr "你的方案不允许再共享一个仪表板。你可以升级方案，或取消共享另一个仪表板，然后返回此处。"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
@@ -1808,6 +2148,11 @@ msgstr "分区"
 msgid "Scale"
 msgstr "比例尺"
 
+#: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
+msgid "You shared your first dashboard with your workspace. Anyone there can "
+"open it whenever they need it."
+msgstr "您已与工作区共享第一个仪表板。工作区中的任何人都可以在需要时打开它。"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
@@ -1822,13 +2167,13 @@ msgstr "未知组"
 msgid "Paragraph"
 msgstr "段落"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File was partially loaded"
-msgstr "文件部分加载"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "支付方式"
+
+#: src/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary.tsx
+msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
+msgstr "{applied, plural, one {已应用 # 个筛选条件} other {已应用 # 个筛选条件}}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
@@ -1868,12 +2213,9 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "显示详细信息"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and "
-"will be available very soon. If there is a database or service you use "
-"that you need to connect to, <0>please let us know so we can prioritize "
-"it</0>."
-msgstr "正在连接 Google Sheets 和其他数据源，近期将可用。如果您需要连接的数据库或服务，请<0>告诉我们，以便我们优先处理</0>。"
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+msgid "Boolean"
+msgstr "布尔值"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
@@ -1889,6 +2231,11 @@ msgstr "1 个点"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "SELECT 中不支持聚合函数“{funcName}”；已跳过。"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+msgid "Annotations"
+msgstr "注释"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
 msgstr "Cluster 和 Heat 需要完整的点生成绑定。"
@@ -1896,6 +2243,15 @@ msgstr "Cluster 和 Heat 需要完整的点生成绑定。"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "私有数据集"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Create case type"
+msgstr "创建案例类型"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Publish it"
+msgstr "发布"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -1908,6 +2264,11 @@ msgstr "尚未实现"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "在下面输入或粘贴电子邮件。您的工作区将按成员收费。"
+
+#. placeholder {0}: avaMap.name
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
+msgid "{0} was deleted."
+msgstr "已删除 {0}。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -1932,7 +2293,7 @@ msgstr "\"{sourceFileName}\" 处理完成，准备使用。"
 msgid "Manual"
 msgstr "手动"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
 msgstr "正在理解你的问题…"
 
@@ -1943,6 +2304,10 @@ msgstr "工作区 ID 不能为空"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "默认情况下，我们使用基于 UUID 的直接链接。"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Readings with source columns"
+msgstr "包含来源列的读数"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide Y axis"
@@ -1963,6 +2328,23 @@ msgstr "限制更新失败"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
 msgstr "精确"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Discard"
+msgstr "放弃"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool is available when Spatial finishes loading."
+msgstr "Spatial 完成加载后即可使用此工具。"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "A dark or satellite basemap may photocopy poorly."
+msgstr "深色或卫星底图可能无法良好复印。"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is before"
+msgstr "早于"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -1994,9 +2376,17 @@ msgstr "找不到与“{tableName}”匹配的已知数据集。"
 msgid "Data Visualization"
 msgstr "数据可视化"
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "PDF"
+msgstr "PDF"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "选择一个已保存的数据集或将新数据导入到您的工作区。"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Cannot sync this case type"
+msgstr "无法同步此案例类型"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
@@ -2011,7 +2401,7 @@ msgstr "平移、缩放并点击要素以查看详情。要编辑图层，请在
 msgid "Info"
 msgstr "信息"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "正在编写查询…"
 
@@ -2020,15 +2410,13 @@ msgid "Their contributor counts stay hidden because they are below the layer's "
 "minimum."
 msgstr "贡献者数量低于图层的最低要求，因此保持隐藏。"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "No entity selected"
-msgstr "未选择实体"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Allow new {pluralConceptName} to be created manually"
 msgstr "允许手动创建新的 {pluralConceptName}"
+
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Welcome to Avandar"
+msgstr "欢迎使用 Avandar"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Tell us which open dataset you want via feedback"
@@ -2058,6 +2446,7 @@ msgstr "有可用更新"
 msgid "Step"
 msgstr "阶梯"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -2097,20 +2486,22 @@ msgstr "未找到任何内容..."
 msgid "{keyboardShortcut} to save"
 msgstr "按 {keyboardShortcut} 保存"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
 msgstr "删除"
 
 #. placeholder {0}: error.message
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 msgid "Failed to save dataset: {0}"
 msgstr "保存数据集失败：{0}"
 
@@ -2146,6 +2537,10 @@ msgstr "{numUsers} 人"
 msgid "No classified values are available yet."
 msgstr "暂时没有可用的分类值。"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterCombinatorSelector/FilterCombinatorSelector.tsx
+msgid "Combine conditions with"
+msgstr "组合条件，使用"
+
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
 msgstr "生成查询以配置此可视化。"
@@ -2157,8 +2552,10 @@ msgstr "生成查询以配置此可视化。"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Select a column"
 msgstr "选择一列"
@@ -2187,6 +2584,14 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每个系列是绘制在 Y 轴上的数值列。值按 X 轴（\"{axisKeyValue}\"）分组。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Filled in by hand"
+msgstr "手动填写"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "Some filters were removed"
+msgstr "部分筛选条件已移除"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
 msgstr "最小值"
@@ -2196,6 +2601,7 @@ msgid "Dashboard unpublished."
 msgstr "已取消发布仪表板。"
 
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Show SQL"
 msgstr "显示 SQL"
 
@@ -2204,9 +2610,10 @@ msgstr "显示 SQL"
 msgid "Grid"
 msgstr "网格"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Cannot sync this entity"
-msgstr "无法同步此实体"
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who "
+"to share it with."
+msgstr "您的信息中心已创建，但其他人还无法打开。请选择要与哪些人共享。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2243,6 +2650,10 @@ msgstr "测量"
 msgid "HAVING clause uses a left-hand side the form cannot represent."
 msgstr "HAVING 子句使用了表单无法表示的左侧表达式。"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "has no value"
+msgstr "没有值"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
 "IS NULL / IS NOT NULL are mapped."
@@ -2251,6 +2662,11 @@ msgstr "WHERE 子句对非空右侧使用了“{operator}”；仅映射 IS NULL
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid ", and "
 msgstr "，和 "
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
+"access may have been removed. Pick the sheet again to restore access."
+msgstr "Avandar 无法打开此 Google Sheet。它可能已被删除，或者您已失去访问权限。请重新选择该表格以恢复访问权限。"
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -2263,10 +2679,6 @@ msgstr "最窄"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Graphite"
 msgstr "石墨"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "not in"
-msgstr "不在"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
@@ -2329,26 +2741,30 @@ msgstr "单色"
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2361,6 +2777,10 @@ msgstr "单色"
 msgid "Cancel"
 msgstr "取消"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "No attributes or dataset are configured."
+msgstr "未配置属性或数据集。"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
 msgstr "第 8 列"
@@ -2370,6 +2790,10 @@ msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "无法总结此列。查询可能因不支持的值或格式错误的单元格而失败。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Draw a box around a table, chart, map or block of text to extract it."
+msgstr "在表格、图表、地图或文本块周围框选，以提取其中的内容。"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "数据范围"
@@ -2377,6 +2801,10 @@ msgstr "数据范围"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "数据预览"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Your Google connection expired"
+msgstr "您的 Google 连接已过期"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -2386,9 +2814,17 @@ msgstr "需要几何数据"
 msgid "Gridline color"
 msgstr "网格线颜色"
 
-#: src/views/GisApp/GisAppFurnitureBar.tsx
+#: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre、OpenStreetMap 贡献者"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "No columns from this dataset."
+msgstr "此数据集中没有列。"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Delete annotation"
+msgstr "删除注释"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
@@ -2412,17 +2848,11 @@ msgstr "下载离线聊天模型（WebLLM）"
 msgid "Review matches"
 msgstr "审核匹配项"
 
-#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
-msgid "Create new profile type"
-msgstr "创建新的配置文件类型"
-
+#: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
+#: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Add Field"
-msgstr "添加字段"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -2449,6 +2879,10 @@ msgstr "您尚未选择 X 轴"
 msgid "and is also equal to..."
 msgstr "并且也等于..."
 
+#: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
+msgid "Apply area filter"
+msgstr "应用面积筛选器"
+
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "适用于传单、报告和二维码的简短易记 URL。"
@@ -2457,9 +2891,9 @@ msgstr "适用于传单、报告和二维码的简短易记 URL。"
 msgid "Using your custom URL."
 msgstr "使用您的自定义 URL。"
 
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "Profile failed to load"
-msgstr "配置文件加载失败"
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "You can't save to a dashboard until you've run a query."
+msgstr "运行查询后才能保存到信息中心。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
@@ -2478,13 +2912,14 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "升级到“您想支付多少”计划只能通过账单门户进行。<0/>下面的按钮将带您前往那里。"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete entity"
-msgstr "删除实体"
-
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "文本为空"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+msgid "Describe what you want to manage in plain language. Avandar builds it "
+"for you."
+msgstr "用简单的语言描述您想要管理的内容。Avandar 会为您构建。"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are outside the valid range."
@@ -2503,6 +2938,10 @@ msgstr "尚未发布。在您发布之前，没有人可以通过链接打开此
 msgid "Some latitudes or longitudes are not numbers."
 msgstr "部分纬度或经度不是数字。"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Run a query first"
+msgstr "请先运行查询"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
 "represent."
@@ -2512,7 +2951,7 @@ msgstr "HAVING 子句包含表单无法表示的“{nodeType}”节点。"
 msgid "You are about to change your subscription plan to:"
 msgstr "您即将将您的订阅计划更改为："
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Dataset deleted."
 msgstr "数据集已删除。"
@@ -2524,6 +2963,20 @@ msgstr "工作表名称"
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "{layerName} returned no rows"
 msgstr "{layerName} 未返回任何行"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is at most"
+msgstr "不超过"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is"
+msgstr "是"
+
+#. placeholder {0}: layer.source.dataSource.name
+#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+msgid "No column in {0} was recognized as a coordinate by name. Pick the "
+"latitude and longitude columns above, or bind a geometry column instead."
+msgstr "未在 {0} 中识别出名称表示坐标的列。请在上方选择纬度和经度列，或改为绑定几何列。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -2543,6 +2996,10 @@ msgstr "前往数据探索器"
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "雷达图"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistDockButton.tsx
+msgid "Get started {completedCount}/{totalMilestoneCount}"
+msgstr "开始使用 {completedCount}/{totalMilestoneCount}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Scroll up to the fields above, or use the list below."
@@ -2590,6 +3047,10 @@ msgstr "行 {rowIndexes}。"
 msgid "Using {0}"
 msgstr "使用 {0}"
 
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
+msgid "Delete: {openDatasetName}"
+msgstr "删除：{openDatasetName}"
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
 "generate SQL."
@@ -2603,9 +3064,10 @@ msgstr "收到非字符串值的文本字段"
 msgid "Failed to delete workspace"
 msgstr "删除工作区失败"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete Entity"
-msgstr "删除实体"
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Here you can see a full statistical profile of your data: ranges, "
+"distributions, and what's missing."
+msgstr "您可以在这里查看数据的完整统计概况：范围、分布以及缺失值。"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
@@ -2641,6 +3103,10 @@ msgstr "在聊天中构建图表"
 msgid "Additional seats required"
 msgstr "需要额外的席位"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
+msgid "Type a value"
+msgstr "输入值"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
 msgstr "第 11 列"
@@ -2663,6 +3129,10 @@ msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
 msgstr "为要打印的地图保持启用：否则，读者无法区分没有报告数据的区域和报告值为零的区域。"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Bind geometry on the selected layer to buffer it."
+msgstr "在选定图层上绑定几何图形以创建缓冲区。"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "显示数据点"
@@ -2676,10 +3146,14 @@ msgstr "Microsoft 的紧凑型 instruct 模型。结构可靠，适合为仪表�
 msgid "Edit"
 msgstr "编辑"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "SQL 未应用。请批准假定的筛选值以运行此查询。"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
+msgid "Could not create those case types"
+msgstr "无法创建这些案例类型"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
@@ -2690,6 +3164,10 @@ msgstr "恒等"
 msgid "Data source"
 msgstr "数据源"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Bring a spreadsheet into Avandar."
+msgstr "将电子表格导入 Avandar。"
+
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 msgid "No dataset selected"
 msgstr "未选择数据集"
@@ -2698,6 +3176,7 @@ msgstr "未选择数据集"
 msgid "description"
 msgstr "描述"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
@@ -2727,13 +3206,26 @@ msgstr "选择了无效的 X 轴"
 msgid "X axis maximum"
 msgstr "X 轴最大值"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "ends with"
+msgstr "以……结尾"
+
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Refresh from Google Sheets"
+msgstr "从 Google Sheets 刷新"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "集合 {collectionNumber}"
+
+#. placeholder {0}: sourceGroups.length
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "{0} datasets joined"
+msgstr "已连接 {0} 个数据集"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Ownership reassigned."
@@ -2742,6 +3234,10 @@ msgstr "所有权已重新分配。"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google authentication error"
 msgstr "Google 认证错误"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "does not match pattern (legacy)"
+msgstr "不匹配模式（旧版）"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -2752,10 +3248,6 @@ msgstr "派生的"
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 msgstr "{0} 列被检测到。请查看下面的列信息以确保它们正确。"
-
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
-msgid "This tool is not available."
-msgstr "此工具不可用。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -2768,10 +3260,6 @@ msgstr "审核筛选条件"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Split (+/-)"
 msgstr "拆分（+/-）"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Active"
-msgstr "活动"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
@@ -2789,17 +3277,25 @@ msgstr "数据预览"
 msgid "No dashboards to show"
 msgstr "没有可显示的仪表板"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "A type of record you manage"
+msgstr "您管理的一类记录"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from these {regionCount} regions"
+msgstr "来自这 {regionCount} 个区域的行"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
 msgstr "Y 轴最大值"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "is not null"
-msgstr "不为空"
-
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Create dashboard & save"
 msgstr "创建仪表板并保存"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Your data is summarized"
+msgstr "您的数据已汇总"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
@@ -2828,6 +3324,10 @@ msgstr "最常见的值：<0>{0}</0> ({1} 行, {2}%)。"
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
 msgstr "仪表板保存成功！"
+
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Page {pageNumber} of {total}"
+msgstr "第 {pageNumber} 页，共 {total} 页"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Method"
@@ -2875,6 +3375,14 @@ msgstr "对于已登录的用户，只有您可以打开它。您可以随时再
 msgid "about a minute"
 msgstr "大约一分钟"
 
+#. placeholder {0}: dataRows.length
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
+msgid "{flaggedRowCount} of {0} rows needs review. We matched these values to "
+"their labels by position, and these were close calls. Check them against "
+"the page."
+msgstr "{flaggedRowCount} / {0} "
+"行需要检查。我们根据位置将这些值与其标签进行匹配，但其中一些匹配结果很接近。请对照页面进行检查。"
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Y axis"
 msgstr "Y 轴"
@@ -2916,9 +3424,17 @@ msgstr "正在处理数据集…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "离线聊天模型已准备好。点击切换或重新下载。"
 
+#: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
+msgid "Congratulations"
+msgstr "恭喜"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
 msgstr "正在捕获仪表板…"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Keep the measurements as found"
+msgstr "保留原始测量值"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
@@ -2929,10 +3445,6 @@ msgstr "X 轴刻度间隔"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "请再试一次。"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Field Name"
-msgstr "字段名称"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
@@ -2962,6 +3474,11 @@ msgstr "值"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis label color"
 msgstr "Y 轴标签颜色"
+
+#. placeholder {0}: region.label
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Name of {0}"
+msgstr "{0} 的名称"
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -3001,9 +3518,18 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "WHERE 子句对“{columnName}”使用了“{operator}”，但列表不是字面量。"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Distance (meters)"
+msgstr "距离（米）"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "URL 模板"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google is rate limiting this request"
+msgstr "Google 正在限制此请求的频率"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3043,9 +3569,14 @@ msgstr "如果每个 {0} 只能有一个 {attributeName} 值，请勾选此框�
 msgid "Role"
 msgstr "角色"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "is null"
-msgstr "为空"
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "Click a second labelled tick on the y-axis."
+msgstr "在 Y 轴上点击第二个带标签的刻度。"
+
+#. placeholder {0}: columnIndex + 1
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
+msgid "column {0}"
+msgstr "第 {0} 列"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
@@ -3065,6 +3596,10 @@ msgstr "{maxAllowed, plural, one {您的套餐允许 # 个已分享或公开的�
 msgid "You are offline"
 msgstr "您处于离线状态"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Draft case type"
+msgstr "草稿案例类型"
+
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to save to dashboard: {0}"
@@ -3082,14 +3617,16 @@ msgstr "无法加载 {layerName}"
 msgid "Custom role groups"
 msgstr "自定义角色组"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput.tsx
+msgid "Add a value"
+msgstr "添加值"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
 msgstr "玫瑰"
 
-#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "您确定要删除 {0} 吗？"
 
@@ -3115,9 +3652,22 @@ msgstr "数据探索器和仪表板中已启用聊天"
 msgid "Forgot your password?"
 msgstr "忘记密码？"
 
+#. placeholder {0}: pageIndex + 1
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
+msgid "PDF page {0}"
+msgstr "PDF 第 {0} 页"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Get an answer out of the data you just added."
+msgstr "从你刚刚添加的数据中获取答案。"
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "条形图"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "No {conceptName} records yet"
+msgstr "尚无 {conceptName} 记录"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -3154,6 +3704,7 @@ msgid "Failed to update workspace name"
 msgstr "更新工作区名称失败"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
 msgid "Export"
 msgstr "导出"
@@ -3215,10 +3766,15 @@ msgstr "选择此工作区中使用的语言。右到左语言会自动翻转布
 msgid "No plans available."
 msgstr "没有可用的计划。"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is on or after"
+msgstr "不早于"
+
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
 msgstr "尝试其他查找方式"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr "轮廓宽度"
@@ -3238,6 +3794,10 @@ msgstr "在此浏览器上下载"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "按月支付"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "does not start with"
+msgstr "不以……开头"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
@@ -3288,6 +3848,14 @@ msgstr "前往账单门户"
 msgid "Clear log"
 msgstr "清除日志"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is too large"
+msgstr "Google Sheet 太大"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is any of"
+msgstr "是以下任一项"
+
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
 msgstr "新建地图"
@@ -3309,6 +3877,10 @@ msgstr "预期几何图形"
 msgid "Untitled map"
 msgstr "未命名地图"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "That region is not on a page we read. Kept the rule-based results."
+msgstr "该区域不在我们读取的页面上。已保留基于规则的结果。"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Advanced geometry settings"
 msgstr "高级几何设置"
@@ -3329,15 +3901,26 @@ msgstr "隐藏 X 轴"
 msgid "Exact locations"
 msgstr "精确位置"
 
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+msgid "New chat"
+msgstr "新聊天"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "按名称、组织、管道搜索…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "数据"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
+msgid "You can restart it anytime from Profile."
+msgstr "您可以随时从个人资料中重新开始。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Kept the rule-based results."
+msgstr "已保留基于规则的结果。"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
@@ -3361,7 +3944,7 @@ msgstr "显示在地图下方和每次导出内容中。必填。"
 msgid "Sized"
 msgstr "大小"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveAsMenuItems.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Save to dashboard"
@@ -3375,19 +3958,27 @@ msgstr "标签类型"
 msgid "Displace within"
 msgstr "在以下范围内偏移"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+msgid "Number"
+msgstr "数字"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "添加 {datasetName} 中行数的条形图"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
 msgstr "未选择文件"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs DuckDB Spatial, which is unavailable."
+msgstr "此工具需要 DuckDB Spatial，但当前不可用。"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -3407,6 +3998,7 @@ msgid "Hex"
 msgstr "六边形"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Tab"
 msgstr "选项卡"
 
@@ -3426,8 +4018,14 @@ msgstr "少于一分钟"
 msgid "Send invite"
 msgstr "发送邀请"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "record"
+msgstr "记录"
+
+#. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open {0}"
 msgstr "打开 {0}"
 
@@ -3444,17 +4042,34 @@ msgstr "数据集现在仅限离线使用"
 msgid "{0} copy"
 msgstr "{0} 个副本"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "One row per number"
+msgstr "每个数字一行"
+
+#: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
+#: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+msgid "Next"
+msgstr "下一步"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "来自数据集的字段"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Create"
-msgstr "创建"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr "描边宽度"
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
+msgid "and"
+msgstr "和"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "A4"
+msgstr "A4"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "End of time range: {endLabel}"
+msgstr "时间范围结束：{endLabel}"
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3478,6 +4093,10 @@ msgstr "此图层已启用 {filterCount} 个筛选器。它们可能会排除所
 msgid "Avandar (default)"
 msgstr "Avandar（默认）"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Add your first dataset"
+msgstr "添加你的第一个数据集"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
 msgstr "宽"
@@ -3490,6 +4109,14 @@ msgstr "边界几何列"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "在下面输入或粘贴电子邮件。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Zoom to cluster"
+msgstr "缩放至聚类"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is true"
+msgstr "为真"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
@@ -3507,6 +4134,10 @@ msgstr "设为私密"
 msgid "The form only supports SELECT queries."
 msgstr "此表单仅支持 SELECT 查询。"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+msgid "Disclaimer"
+msgstr "免责声明"
+
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
@@ -3516,6 +4147,10 @@ msgstr "重复出现：<0>{0}</0> 在 <1>{1}%</1> 的行中出现。"
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "徽标"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "matches regex"
+msgstr "匹配正则表达式"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
@@ -3529,6 +4164,8 @@ msgstr "更新失败"
 msgid "Linear"
 msgstr "线性"
 
+#: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
+#: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditorHeader.tsx
@@ -3544,15 +4181,25 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 msgstr "您当前的套餐仅允许您分享或发布 {maxAllowed, plural, one {# 个仪表板} other {# "
 "个仪表板}}。请联系我们提高您工作区的上限。"
 
+#. placeholder {0}: regions.length + 1
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Region {0}"
+msgstr "区域 {0}"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "继续进入您的工作区"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "has a value"
+msgstr "有值"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自定义 URL 不能包含空格"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
 msgstr "标注地图"
 
@@ -3594,6 +4241,12 @@ msgstr "最大返回行数"
 msgid "Password update failed"
 msgstr "密码更新失败"
 
+#. placeholder {0}: flag.rowIndex + 1
+#. placeholder {1}: flag.detail
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
+msgid "Row {0}: {1}"
+msgstr "第 {0} 行：{1}"
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "在 {app} 中的任何人"
@@ -3613,6 +4266,10 @@ msgstr "描述您的答案…"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "What is the average {averageColumn} in {datasetName}?"
 msgstr "在 {datasetName} 中，{averageColumn} 的平均值是多少？"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
+msgid "Draw a region on the page"
+msgstr "在页面上绘制区域"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -3636,10 +4293,6 @@ msgstr "大多数唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 msgid "Boundary display name"
 msgstr "边界显示名称"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
-msgid "Run an AI query first."
-msgstr "首先运行 AI 查询。"
-
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Y column"
@@ -3649,17 +4302,22 @@ msgstr "Y 列"
 msgid "Go home"
 msgstr "返回首页"
 
-#: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
-msgid "Print and PDF export arrives in a later release."
-msgstr "打印和 PDF 导出将在后续版本中提供。"
-
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
 msgstr "计算 {datasetName} 中有多少行"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#. placeholder {0}: _getRowLabel(leaf, columns)
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
+msgid "View details for {0}"
+msgstr "查看 {0} 的详细信息"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在生成 SQL…"
+
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
+msgid "Walk through building and sharing a dashboard again, from the top."
+msgstr "再次从头开始，了解如何创建和共享仪表板。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
@@ -3686,6 +4344,10 @@ msgstr "标签，例如：区域"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "选择文件"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} m"
+msgstr "{lengthValue} 米"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -3715,7 +4377,7 @@ msgstr "没有可用的频率数据。"
 msgid "We'll add this visualization to your new dashboard."
 msgstr "我们将把此可视化添加到您的新仪表板。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "正在修复查询…"
 
@@ -3754,7 +4416,11 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何拥有链接的人都可以查看此{resource}。下方的人员和群组仍可控制谁可以编辑。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
+msgid "Could not render this page."
+msgstr "无法呈现此页面。"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
 msgstr "这是基于您的工作区元数据生成的查询。"
 
@@ -3774,6 +4440,10 @@ msgstr "WKB"
 msgid "Add to your workspace"
 msgstr "添加到您的工作区"
 
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "\"{value}\" is not a valid regular expression."
+msgstr "“{value}”不是有效的正则表达式。"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
 msgstr "无法加载仪表板"
@@ -3781,6 +4451,10 @@ msgstr "无法加载仪表板"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Connectors"
 msgstr "连接器"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from this graphic"
+msgstr "来自此图形的行"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Seats purchased successfully"
@@ -3811,14 +4485,27 @@ msgstr "导入失败：{reason}"
 msgid "Timestamp format"
 msgstr "时间戳格式"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Labelled graphic (map, chart, tiles)"
+msgstr "带标签的图形（地图、图表、图块）"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
 "SQL offline."
 msgstr "高质量的 7B instruct 模型。最适合处理复杂的架构和离线运行复杂 SQL。"
 
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
+msgid "This query could not run"
+msgstr "此查询无法运行"
+
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "查看"
+
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "This condition does not apply to {typeName} columns."
+msgstr "此条件不适用于 {typeName} 列。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
@@ -3827,6 +4514,14 @@ msgstr "面积布局"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "表单不支持 CTE（WITH 子句）。"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} km²"
+msgstr "{areaValue} 平方千米"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Start with a spreadsheet"
+msgstr "从电子表格开始"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3850,10 +4545,12 @@ msgstr "{layerCount} 个图层"
 msgid "Remove failed"
 msgstr "删除失败"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} 删除成功"
 
@@ -3873,10 +4570,6 @@ msgstr "重新排序图层 {layerName}"
 msgid "From dataset"
 msgstr "来自数据集"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "A profile can consist of columns that come from different datasets."
-msgstr "一个配置文件可以由来自不同数据集的列组成。"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "结束（例如：2024-12-31）"
@@ -3884,10 +4577,6 @@ msgstr "结束（例如：2024-12-31）"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
 msgid "No datasets match your search."
 msgstr "没有数据集与您的搜索匹配。"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "in"
-msgstr "在"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -3914,6 +4603,7 @@ msgstr "要更改自定义 URL 吗？"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -3926,11 +4616,6 @@ msgstr "Y 轴标签"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Quantile"
 msgstr "分位数"
-
-#. placeholder {0}: concept.name
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Finished syncing {0} data"
-msgstr "完成同步 {0} 数据"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -3986,6 +4671,10 @@ msgstr "您可以查看此数据集，因为它已与您共享。"
 msgid "Break {0} of {1}, {value}"
 msgstr "第 {0} 个断点，共 {1} 个，{value}"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
+msgid "View records"
+msgstr "查看记录"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
 msgstr "创建新仪表板"
@@ -4004,6 +4693,10 @@ msgstr "创建工作区"
 msgid "Try again"
 msgstr "再试一次"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field filled in by hand"
+msgstr "添加手动填写的字段"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
 msgstr "升级套餐"
@@ -4021,6 +4714,11 @@ msgstr "森林"
 msgid "Aggregate-only layers require an area-producing binding."
 msgstr "仅聚合图层需要生成区域的绑定。"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Area of interest applied"
+msgstr "已应用关注区域"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
 msgstr "EPSG 代码"
@@ -4030,9 +4728,18 @@ msgstr "EPSG 代码"
 msgid "Allow manual edit"
 msgstr "允许手动编辑"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is not"
+msgstr "不是"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "嵌入"
+
+#. placeholder {0}: readout.timeWindow
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Dates: {0}"
+msgstr "日期：{0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
@@ -4046,11 +4753,9 @@ msgstr "Llama 3.2 1B（离线）"
 msgid "Series"
 msgstr "系列"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to "
-"support."
-msgstr "实体加载失败。请稍后再试或联系支持。"
+#: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
+msgid "Download PDF"
+msgstr "下载 PDF"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -4065,14 +4770,9 @@ msgstr "控制工作区其余部分的默认设置。没有应用访问权限的
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "按 {groupByColumn} 统计 {datasetName} 中的行数"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未应用 SQL。请登录以批准筛选值。"
-
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach "
-"out to support."
-msgstr "配置文件管理页面加载失败。请稍后再试或联系支持。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
@@ -4088,6 +4788,10 @@ msgstr "这将永久删除 <0>{0}</0> 及其所有数据。此操作无法撤销
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "无法打开账单门户。请稍后重试。"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
+msgid "Time column"
+msgstr "时间列"
+
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
@@ -4100,6 +4804,10 @@ msgstr "卡片"
 #: src/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleEditor.tsx
 msgid "Map name"
 msgstr "地图名称"
+
+#: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
+msgid "Hide SQL"
+msgstr "隐藏 SQL"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -4138,10 +4846,6 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 "it until you press the button below."
 msgstr "此仪表板仍在 Web 上公开。任何拥有链接的人都可以查看，直到您按下下面的按钮。"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Entity deleted"
-msgstr "实体已删除"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
 msgstr "选择列"
@@ -4162,7 +4866,7 @@ msgstr " 尚未发布。"
 msgid "Cancel URL change"
 msgstr "取消 URL 更改"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 msgid "Draw an area to filter by"
 msgstr "绘制区域以进行筛选"
 
@@ -4178,13 +4882,17 @@ msgstr "获取值的总和"
 msgid "Type your answer..."
 msgstr "输入您的答案..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns are available when Spatial finishes loading."
 msgstr "Spatial 加载完成后即可使用几何列。"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
 msgstr "导入"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
+msgid "Clear Disputed status column"
+msgstr "清除有争议状态列"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4251,13 +4959,26 @@ msgstr "日期格式"
 msgid "Share summary"
 msgstr "分享摘要"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "时间"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is false"
+msgstr "为假"
+
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
 msgstr "柱状图"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is none of"
+msgstr "不属于以下任何一项"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "That coordinate is out of range."
+msgstr "该坐标超出范围。"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureAction.tsx
 msgid "Open the record"
@@ -4309,6 +5030,10 @@ msgstr "密码不匹配"
 msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每个系列是一个绘制在径向值上的数值列。值按类别轴（\"{axisKeyValue}\"）分组。"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Sync records"
+msgstr "同步记录"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -4366,9 +5091,18 @@ msgstr "尚无澄清。日志会随着聊天提出澄清问题而填充。"
 msgid "Llama 3.1 8B"
 msgstr "Llama 3.1 8B"
 
+#. placeholder {0}: outcome.addedRowCount
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Added {0} rows from the assistant. Check them before saving."
+msgstr "已从助手添加 {0} 行。请在保存前检查。"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
 msgstr "离线聊天模型已移除"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
+msgid "Create \"{trimmedSearch}\""
+msgstr "创建“{trimmedSearch}”"
 
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Search data sources"
@@ -4393,9 +5127,17 @@ msgstr "查看者"
 msgid "Pick one"
 msgstr "选择一个"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
+msgid "Undetermined values"
+msgstr "未确定的值"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "尚未添加任何字段"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Pick one from the list to see its details."
+msgstr "从列表中选择一项以查看其详细信息。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -4415,6 +5157,11 @@ msgstr "聚类"
 msgid "Loading {layerName}"
 msgstr "正在加载 {layerName}"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "This is the data explorer. Ask a question in your own words, like \"how "
+"many people were served by our programs\"."
+msgstr "这是数据浏览器。请用自己的话提问，例如“我们的项目服务了多少人”。"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "上下文"
@@ -4424,9 +5171,17 @@ msgstr "上下文"
 msgid "Error saving dataset: {0}"
 msgstr "保存数据集时出错：{0}"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "No columns yet"
+msgstr "暂无列"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata (JSON)"
 msgstr "原始元数据（JSON）"
+
+#: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
+msgid "Erase annotations"
+msgstr "擦除注释"
 
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -4437,6 +5192,11 @@ msgstr "这是您数据集的前 {0} 行。"
 msgid "Reassign failed"
 msgstr "重新分配失败"
 
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Want a quick tour? In about 5 minutes you'll go from a spreadsheet to "
+"your first dashboard."
+msgstr "想快速了解一下吗？大约 5 分钟内，你就能从电子表格创建出第一个仪表板。"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 "one {# dashboard} other {# dashboards}}. Upgrade to our Starter or "
@@ -4444,13 +5204,17 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 msgstr "您当前的套餐仅允许您分享或发布 {maxAllowed, plural, one {# 个仪表板} other {# 个仪表板}}。升级到 "
 "Starter 或 Impact 套餐，即可随意分享任意数量的仪表板。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
 msgstr "连接到边界"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
 msgstr "您需要拥有此资源的编辑权限，才能分享或发布它。"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Orientation"
+msgstr "方向"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
@@ -4460,11 +5224,20 @@ msgstr "仪表板删除成功！"
 msgid "The name you want other team members to see."
 msgstr "您希望其他团队成员看到的名称。"
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an arrow"
+msgstr "绘制箭头"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "This tool arrives in a later release."
+msgstr "此工具将在后续版本中推出。"
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
 msgstr "询问有关您的数据..."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
 msgstr "标题"
@@ -4472,6 +5245,10 @@ msgstr "标题"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "曲线"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What does this case type represent?"
+msgstr "此案例类型代表什么？"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -4520,6 +5297,10 @@ msgstr "显示图层 {layerName}"
 msgid "Create a new account"
 msgstr "创建新账户"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Reconnect your Google account and try again."
+msgstr "重新连接您的 Google 账号，然后重试。"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "方向"
@@ -4536,6 +5317,10 @@ msgstr "助手正在输入"
 msgid "Dataset saved successfully!"
 msgstr "数据集保存成功！"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "Attributes"
+msgstr "属性"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
 msgid "Cluster radius"
 msgstr "聚类半径"
@@ -4543,6 +5328,20 @@ msgstr "聚类半径"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "未找到已保存的数据集。"
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Expand the inspector"
+msgstr "展开检查器"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/index.tsx
+msgid "Case Manager"
+msgstr "案例管理器"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The tab has a header row"
+msgstr "此标签页包含标题行"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -4557,12 +5356,6 @@ msgstr "默认情况下，我们使用基于 UUID 的直接链接。您可以在
 msgid "Make internal"
 msgstr "设为内部"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "Please select an entity from the left sidebar, or create a new one."
-msgstr "请从左侧边栏选择一个实体，或创建一个新实体。"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "已检测到"
@@ -4572,6 +5365,11 @@ msgstr "已检测到"
 msgid "Delete Dataset"
 msgstr "删除数据集"
 
+#. placeholder {0}: draft.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Created {0}"
+msgstr "创建于 {0}"
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
@@ -4579,10 +5377,12 @@ msgid "Add series"
 msgstr "添加系列"
 
 #. placeholder {0}: scale.meters / 1000
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} km"
 msgstr "{0} 千米"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "日期"
@@ -4666,6 +5466,11 @@ msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "我们检测到潜在的个人信息和可能会影响 AI 回答的语言。请在下面查看这两者。"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
+"columns."
+msgstr "缓冲区需要包含已编译几何图形的图层，而不是经纬度列。"
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
 msgstr "仅在此屏幕尺寸下查看。"
@@ -4684,6 +5489,10 @@ msgstr "第 {0} 类：{1} 个值"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "忽略所有全局过滤器：此可视化未经过滤。"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Sheet"
+msgstr "Google Sheet"
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "您写道："
@@ -4697,6 +5506,7 @@ msgid "Unable to load dashboard datasets"
 msgstr "无法加载仪表板数据集"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "尚未添加描述。"
 
@@ -4708,13 +5518,25 @@ msgstr "Qwen 2.5 3B"
 msgid "Collapse drawer"
 msgstr "收起抽屉"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add note"
+msgstr "添加备注"
+
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "分享失败"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "Measure readout"
+msgstr "测量读数"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
 msgstr "时间跨度"
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
+msgid "Upper bound"
+msgstr "上限"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -4738,7 +5560,7 @@ msgstr "所有更改已保存"
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Dashboard share settings updated."
 msgstr "仪表板共享设置已更新。"
 
@@ -4756,12 +5578,12 @@ msgstr "已映射 {mapped}/{total} 行"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "已根据列名 {0} 和 {1} 匹配纬度和经度。如果不正确，请在上方更改。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Chat request failed"
 msgstr "聊天请求失败"
 
@@ -4782,13 +5604,9 @@ msgstr "缩放至图层"
 msgid "Please fix the highlighted fields."
 msgstr "请修正高亮的字段。"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-msgid "between"
-msgstr "之间"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Inactive"
-msgstr "非活动"
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is on or before"
+msgstr "早于或等于"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4812,6 +5630,22 @@ msgstr "所有成员的 "
 msgid "Some data should be manually entered"
 msgstr "某些数据应手动输入"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+msgid "Integer"
+msgstr "整数"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The results are on the canvas to the left."
+msgstr "结果显示在左侧画布上。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Field name"
+msgstr "字段名称"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Most frequent"
+msgstr "最常见"
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
@@ -4834,13 +5668,16 @@ msgstr "请求功能"
 msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
 msgstr "对于数据集 <0>{0}</0>，选择用作 {conceptName} ID 的列"
 
+#: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low"
 msgstr "低"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Description"
 msgstr "描述"
 
@@ -4856,6 +5693,10 @@ msgstr "部分数据集尚未同步到线上，或发布失败。{errorMessage}"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Update frequency"
 msgstr "更新频率"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from this chart"
+msgstr "来自此图表的行"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" could not be parsed: {message}"
@@ -4907,17 +5748,13 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分内容无法以手动形式表示。该表单显示了最佳努力的近似值；上面的 SQL 是实际运行的内容。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
 msgstr "请再试一次。您的仪表板尚未发布。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "Encoding"
 msgstr "编码"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {conceptName}."
-msgstr "我们将使用这些列将数据集合并为一个单一的 {conceptName}。"
 
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
@@ -4944,6 +5781,10 @@ msgstr "重新处理数据"
 msgid "Export as PDF"
 msgstr "导出为 PDF"
 
+#: src/views/IndividualManagerApp/EditCaseTypeButton.tsx
+msgid "Edit case type"
+msgstr "编辑案例类型"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "Filter"
@@ -4953,13 +5794,25 @@ msgstr "过滤"
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from this table"
+msgstr "来自此表格的行"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "数据集名称必须至少包含 2 个字符。"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "US Letter"
+msgstr "US Letter"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Level"
 msgstr "级别"
+
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "\"{operator}\" is not an operator this form understands."
+msgstr "“{operator}”不是此表单支持的运算符。"
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
@@ -4969,24 +5822,28 @@ msgstr "打开侧边栏"
 msgid "Upload dataset"
 msgstr "上传数据集"
 
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No matching P-code."
+msgstr "没有匹配的 P-code。"
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
 msgstr "重置"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a name for this profile type"
-msgstr "输入此配置文件类型的名称"
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "区域"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
+msgid "Mark not done"
+msgstr "标记为未完成"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not contain"
 msgstr "不包含"
 
@@ -5001,6 +5858,10 @@ msgstr "工作区名称已更新"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "将列添加为字段"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Case type name"
+msgstr "案例类型名称"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.tsx
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
@@ -5037,9 +5898,18 @@ msgstr "私有仪表板"
 msgid "Upload"
 msgstr "上传"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove {datasetName}"
+msgstr "移除 {datasetName}"
+
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr "此地图中的比例尺各不相同"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Let's let others see your dashboard"
+msgstr "让其他人查看您的仪表板"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -5062,10 +5932,6 @@ msgstr "甜甜圈样式"
 msgid "Member"
 msgstr "成员"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " over 1000 rows were rejected"
-msgstr "超过 1000 行被拒绝"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "更新订阅"
@@ -5087,6 +5953,11 @@ msgstr "获取值的平均值"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM north zone {0}"
 msgstr "{code} - UTM 北带 {0}"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Finished syncing {0} records"
+msgstr "已完成同步 {0} 条记录"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -5137,6 +6008,10 @@ msgstr "列类型已更新"
 msgid "Partially offline"
 msgstr "部分离线"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Source attribution (Always included)"
+msgstr "来源署名（始终包含）"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
 msgid "Edit query"
@@ -5157,12 +6032,24 @@ msgstr "无底图"
 msgid "Sign in again"
 msgstr "再次登录"
 
+#: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
+msgid "The first value must not be greater than the second."
+msgstr "第一个值不得大于第二个值。"
+
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Not now"
+msgstr "暂时不要"
+
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal.tsx
 msgid "Shared dashboard limit reached"
 msgstr "已达到共享仪表板上限"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+msgid "Buffer of {sourceName}"
+msgstr "{sourceName} 的缓冲区"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
 msgstr "几何列需要 DuckDB Spatial，但当前不可用。"
 
@@ -5170,6 +6057,10 @@ msgstr "几何列需要 DuckDB Spatial，但当前不可用。"
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "每个系列是一个绘制在径向值上的数值列。请在下面选择类别轴。"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "The Google file picker could not be opened. Please try again."
+msgstr "无法打开 Google 文件选择器。请重试。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -5204,6 +6095,10 @@ msgstr "在此处输入段落内容..."
 msgid "Send message"
 msgstr "发送消息"
 
+#: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
+msgid "Clear area filter"
+msgstr "清除面积筛选器"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
 msgstr "已复制！"
@@ -5215,6 +6110,10 @@ msgstr "日期"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "This dashboard doesn't reference any datasets: nothing to publish."
 msgstr "此仪表板未引用任何数据集：没有内容可发布。"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "does not match regex"
+msgstr "不匹配正则表达式"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -5233,17 +6132,33 @@ msgstr "确认邮件已发送到您的电子邮件地址。"
 msgid "Show exact locations?"
 msgstr "显示精确位置？"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Just ask"
+msgstr "直接提问"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Expand the layer panel"
 msgstr "展开图层面板"
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Place text"
+msgstr "放置文本"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "图层"
 
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Close a valid ring that does not cross itself."
+msgstr "闭合一个有效且不自相交的环。"
+
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
 msgstr "1 个图层"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Pick what they can do"
+msgstr "选择他们可以执行的操作"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Keep Dataset"
@@ -5253,9 +6168,19 @@ msgstr "保留数据集"
 msgid "Global Viewer"
 msgstr "全球查看者"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is blank"
+msgstr "为空"
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create a new workspace. You can always edit it later."
 msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "Try again in a moment, or reach out to support if it keeps happening."
+msgstr "请稍后重试；如果问题持续存在，请联系支持团队。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -5269,6 +6194,14 @@ msgstr "中性"
 msgid "Permanently deletes this workspace and all of its data. This action "
 "cannot be undone."
 msgstr "永久删除此工作区及其所有数据。此操作无法撤销。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
+msgid "Click a point on the axis"
+msgstr "点击轴上的一个点"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Extract with the assistant"
+msgstr "使用助手提取"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -5318,6 +6251,10 @@ msgstr "WHERE 子句使用了表单不支持的运算符“{operator}”。"
 msgid "Please log in again to continue."
 msgstr "请重新登录以继续。"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Production date (Always included)"
+msgstr "生成日期（始终包含）"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
 msgstr "均值"
@@ -5334,6 +6271,10 @@ msgstr "仪表板快照"
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Signing you back in…"
 msgstr "正在重新登录…"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "No region selected yet"
+msgstr "尚未选择区域"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
@@ -5370,13 +6311,21 @@ msgstr "您的姓名"
 msgid "Downloading {0} for offline chat"
 msgstr "正在下载 {0} 以进行离线聊天"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-msgid "Open chat panel"
-msgstr "打开聊天面板"
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
+msgid "Disputed status column"
+msgstr "有争议状态列"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "移除行过滤器"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Let people create cases by hand too"
+msgstr "也允许用户手动创建案例"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Could not reach the assistant. Kept the rule-based results."
+msgstr "无法连接到助手。已保留基于规则的结果。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset deleted"
@@ -5385,6 +6334,10 @@ msgstr "数据集已删除"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Discovery clarification"
 msgstr "发现澄清"
+
+#: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
+msgid "Start tour"
+msgstr "开始导览"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -5397,6 +6350,10 @@ msgstr "只有所有者可以将此 {resource} 设为私密。"
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "该查询失败。请修复 SQL 并重试。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Repeating labelled blocks"
+msgstr "重复的带标签区块"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only me"
@@ -5445,6 +6402,10 @@ msgid "Each series is one cloud of bubbles. The size column determines bubble "
 "radius."
 msgstr "每个系列是一个气泡云。大小列决定气泡半径。"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "does not end with"
+msgstr "不以……结尾"
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "添加图层"
@@ -5472,6 +6433,10 @@ msgstr "单位"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File failed to load"
 msgstr "文件加载失败"
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
+msgid "Remove group"
+msgstr "移除组"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapWeightSelect.tsx
 msgid "Weight by"
@@ -5512,9 +6477,17 @@ msgstr "Phi 3.5 Mini（离线）"
 msgid "Data processing failed"
 msgstr "数据处理失败"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "And"
+msgstr "且"
+
 #: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "此功能尚未实现。"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Time range"
+msgstr "时间范围"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -5529,14 +6502,25 @@ msgstr "任何拥有链接的人"
 msgid "This dataset can be stored in the cloud. "
 msgstr "此数据集可以存储在云中。"
 
+#. placeholder {0}: dataRows.length
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
+msgid "{flaggedRowCount} of {0} rows need review. We matched these values to "
+"their labels by position, and these were close calls. Check them against "
+"the page."
+msgstr "{flaggedRowCount} / {0} 行需要审核。我们根据位置将这些值与其标签进行了匹配，这些匹配结果存在疑问。请对照页面进行检查。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Billing"
 msgstr "账单"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Name"
-msgstr "配置文件名称"
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "This dataset now reflects the current contents of the sheet."
+msgstr "此数据集现已反映工作表的当前内容。"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Rows from this text"
+msgstr "来自此文本的行"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -5547,7 +6531,7 @@ msgstr "可视化类型"
 msgid "Latitude and longitude must both be numbers."
 msgstr "纬度和经度必须都是数字。"
 
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -5573,9 +6557,9 @@ msgstr "开启时，只有在工作区中已拥有 {app} 访问权限的组成�
 msgid "Divider"
 msgstr "分隔线"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr "成功解析 {numSuccessRows} 行，但 {numRejectedStr}"
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
+msgid "Lower bound"
+msgstr "下限"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -5583,6 +6567,10 @@ msgid "Your current plan only supports up to {0} datasets. Upgrade to our "
 "Impact plan to increase the number of datasets you can add to your "
 "workspace."
 msgstr "您当前的计划仅支持最多 {0} 个数据集。升级到我们的 Impact 计划以增加您可以添加到工作区的数据集数量。"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
+msgid "Mark done"
+msgstr "标记为已完成"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
@@ -5600,6 +6588,10 @@ msgstr "全局过滤器"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Layout"
 msgstr "布局"
+
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Move annotation text"
+msgstr "移动注释文本"
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
@@ -5661,7 +6653,7 @@ msgstr "查询返回一些列后，图表设置才会显示。"
 msgid "{0} areas are suppressed"
 msgstr "{0} 个区域已隐藏"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
 msgstr "将点聚合到边界"
 
@@ -5713,6 +6705,10 @@ msgid "This dashboard is not published yet. Use the button below to publish it "
 "to the audience you picked."
 msgstr "此仪表板尚未发布。请使用下面的按钮，将其发布给您选择的受众。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Upload a file"
+msgstr "上传文件"
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
 msgstr "链接 URL"
@@ -5725,9 +6721,10 @@ msgstr "发送反馈"
 msgid "Loading dashboard datasets"
 msgstr "加载仪表板数据集"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Select an Excel or CSV file from your computer to import"
-msgstr "从您的计算机选择一个 Excel 或 CSV 文件进行导入"
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
+"computer. No spreadsheet handy? <0>Download our sample</0> and use that."
+msgstr "欢迎使用数据源管理器。从电脑中选择一个 CSV 或 Excel 文件。手头没有电子表格？<0>下载我们的示例</0>并使用它。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -5739,11 +6736,11 @@ msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
 "support."
 msgstr "WHERE 子句包含表单不支持的“{nodeType}”节点。"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Dashboard published!"
 msgstr "仪表板已发布！"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "离线无法生成 SQL。请尝试改写内容，或重新连接以使用云端聊天。"
@@ -5781,6 +6778,10 @@ msgstr "正在加载私有资源"
 msgid "Choose the first value we see"
 msgstr "选择我们看到的第一个值"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "ID"
+msgstr "ID"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Smallest radius"
 msgstr "最小半径"
@@ -5789,6 +6790,10 @@ msgstr "最小半径"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "访问被拒绝"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "join key"
+msgstr "连接键"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
@@ -5834,6 +6839,10 @@ msgstr "限制应用访问"
 msgid "Enter dataset name"
 msgstr "输入数据集名称"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Select an annotation on the map to edit it."
+msgstr "在地图上选择注释以进行编辑。"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
 msgstr "纬度或经度为空"
@@ -5857,6 +6866,11 @@ msgstr "未保存的更改"
 msgid "Model"
 msgstr "模型"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "I will propose case types from your dataset names and columns. Pick from "
+"the options or tell me what to create."
+msgstr "我会根据您的数据集名称和列提出案例类型建议。您可以从选项中选择，也可以告诉我需要创建什么。"
+
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
 msgstr "未保存的更改将不会出现在预览中。请先保存。"
@@ -5864,6 +6878,10 @@ msgstr "未保存的更改将不会出现在预览中。请先保存。"
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace does not have a valid subscription."
 msgstr "此工作区没有有效的订阅。"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Dataset"
+msgstr "数据集"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -5925,25 +6943,46 @@ msgstr "发送答案"
 msgid "Simplification tolerance"
 msgstr "简化容差"
 
+#. placeholder {0}: avaMap.name
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
+msgid "{0} and its layers will be removed. This cannot be undone."
+msgstr "{0} 及其图层将被移除。此操作无法撤销。"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... 还有 {remainingCount} 个"
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Collapse the inspector"
+msgstr "折叠检查器"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "仅查询的内容"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "Apply calibration"
+msgstr "应用校准"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Could not generate QR code"
 msgstr "无法生成二维码"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "No fields or dataset are configured."
-msgstr "未配置任何字段或数据集。"
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
+msgid "Remove condition"
+msgstr "移除条件"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+msgid "Open case type"
+msgstr "打开案例类型"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "百分比"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Each case type is a kind of record you manage."
+msgstr "每种案例类型都是您管理的一类记录。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "bar chart"
@@ -5967,7 +7006,7 @@ msgstr "{0} 个字段"
 msgid "User group saved"
 msgstr "用户组已保存"
 
-#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation.ts
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "无法发布仪表板"
 
@@ -5979,25 +7018,24 @@ msgstr "峡湾"
 msgid "Suggested rewrite:"
 msgstr "建议重写："
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Upload a spreadsheet"
-msgstr "上传电子表格"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
 "{SUPPORT_EMAIL}"
 msgstr "我们无法更新您的订阅。请联系 {SUPPORT_EMAIL}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under "
-"maintenance."
-msgstr "在此功能维护期间，Google Sheets 连接器已被禁用。"
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "First"
+msgstr "第一项"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "移除"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "1 dataset"
+msgstr "1 个数据集"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6008,7 +7046,20 @@ msgstr "没有数值列"
 msgid "Service"
 msgstr "服务"
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "This question is too large for the on-device model. Try a shorter "
+"question, or reconnect to use cloud chat."
+msgstr "此问题对于设备端模型来说太长。请尝试缩短问题，或重新连接以使用云端聊天。"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} km"
+msgstr "{lengthValue} 千米"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+msgid "Source line"
+msgstr "来源行"
+
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
 msgstr "没有更多内容可加载"
 
@@ -6016,9 +7067,17 @@ msgstr "没有更多内容可加载"
 msgid "Could not make private"
 msgstr "无法设为私密"
 
+#: src/views/ProfileView/TutorialSection/TutorialSection.tsx
+msgid "Tutorial"
+msgstr "教程"
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "重置应用"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Play"
+msgstr "播放"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6038,6 +7097,15 @@ msgstr "有访问权限的人"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "None of the selected regions produced any rows yet, so there are no "
+"printed columns to keep."
+msgstr "所选区域尚未生成任何行，因此没有可保留的打印列。"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Name for {columnLabel}"
+msgstr "{columnLabel} 的名称"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
@@ -6059,6 +7127,10 @@ msgstr "编辑权限"
 msgid "queried"
 msgstr "查询的"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "{conceptName} fields"
+msgstr "{conceptName} 字段"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
 msgstr "Qwen 2.5 3B（离线）"
@@ -6078,7 +7150,7 @@ msgstr "保存数据集时出错"
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 #: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 #: src/views/ProfileView/DisplayNameSection.tsx
@@ -6087,9 +7159,22 @@ msgstr "保存数据集时出错"
 msgid "Save"
 msgstr "保存"
 
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "PDF files"
+msgstr "PDF 文件"
+
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr "分享或发布此{resourceLabel}"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Dissolve"
+msgstr "融合"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
+msgid "Column bound. No values assigned; outlines render as settled."
+msgstr "列已绑定。未分配任何值；轮廓将显示为已确定。"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6120,6 +7205,10 @@ msgstr "默认值"
 msgid "{0} areas have no data"
 msgstr "{0} 个区域没有数据"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "Required"
+msgstr "必填"
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
 msgstr "没有可添加到此系列的数字列。"
@@ -6148,6 +7237,10 @@ msgstr "此工作区已不存在，或您已被撤销访问权限。如果您认
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
 msgstr "只有你可以访问此 {resource}。"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is at least"
+msgstr "至少为"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -6185,7 +7278,7 @@ msgstr "正在恢复数据集处理…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "覆盖 <0>{0}</0>，从 <1>{1}</1> 到 <2>{2}</2>。"
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Loading more..."
 msgstr "加载更多..."
 
@@ -6235,6 +7328,10 @@ msgstr "可视化"
 msgid "Alt text"
 msgstr "替代文本"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Please try again in a moment."
+msgstr "请稍后再试。"
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "切换工作区"
@@ -6258,6 +7355,11 @@ msgstr "管理员"
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
 msgid "Boundary key column"
 msgstr "边界键列"
+
+#. placeholder {0}: filterReadout.timeWindow
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "Time window: {0}"
+msgstr "时间范围：{0}"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -6290,9 +7392,24 @@ msgid "Your workspace is on the Free plan, which supports up to 5 datasets. "
 "you can add to your workspace."
 msgstr "您的工作区处于免费计划，支持最多 5 个数据集。升级到我们的入门或影响计划以增加您可以添加到工作区的数据集数量。"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Avandar turns your question into a query to show you the answers."
+msgstr "Avandar 会将您的问题转换为查询，以显示答案。"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
 msgstr "语气"
+
+#. placeholder {0}: rowIndex + 1
+#. placeholder {1}: header[columnIndex] ?? t`column ${columnIndex + 1}`
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
+msgid "Row {0}, {1}"
+msgstr "第 {0} 行，{1}"
+
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "{0} features"
+msgstr "{0} 个功能"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -6300,6 +7417,10 @@ msgstr "语气"
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
 msgstr "编辑者"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Entered manually"
+msgstr "手动输入"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -6329,7 +7450,7 @@ msgstr "正在保存"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "地图工具"
 
@@ -6358,6 +7479,10 @@ msgstr "地图"
 msgid "New user group"
 msgstr "新用户组"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Keep that chart somewhere you can come back to."
+msgstr "将此图表保存到方便你日后返回的位置。"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Left"
@@ -6366,6 +7491,10 @@ msgstr "左对齐"
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "以上均不适用"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "Isochrone from a point"
+msgstr "从点创建等时圈"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -6384,6 +7513,14 @@ msgstr "琥珀色"
 msgid "Configure how to join datasets"
 msgstr "配置如何连接数据集"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Save it"
+msgstr "保存"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
+msgid "Hide the tutorial"
+msgstr "隐藏教程"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Excel"
 msgstr "Excel"
@@ -6391,6 +7528,10 @@ msgstr "Excel"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Dataset columns"
 msgstr "数据集列"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Details"
+msgstr "详细信息"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
@@ -6401,18 +7542,30 @@ msgstr "无法准备离线聊天模型。"
 msgid "Delete the view {0}"
 msgstr "删除视图 {0}"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {conceptName}."
-msgstr "对于您添加的每个数据集，请指定哪些列应用于唯一标识 {conceptName}。"
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Features in cluster ({0})"
+msgstr "集群中的功能（{0}）"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "要将“{resourceName}”设为私密吗？"
 
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "The PDF could not be created: {detail}"
+msgstr "无法创建 PDF：{detail}"
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "此自定义 URL 已被占用"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Drive access is not configured for this deployment."
+msgstr "此部署未配置 Google Drive 访问权限。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Loading features"
+msgstr "正在加载功能"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -6438,15 +7591,27 @@ msgstr "发布日期"
 msgid "This map has no layers yet"
 msgstr "此地图尚未添加图层"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is not blank"
+msgstr "不为空"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No boundary layer on this map to look up a P-code."
+msgstr "此地图上没有可用于查询 P-code 的边界图层。"
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "工作区 ID 不能包含空格"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Enter your text here"
+msgstr "在此输入文本"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
 msgstr "请再试一次。"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "contains"
 msgstr "包含"
 
@@ -6459,6 +7624,11 @@ msgstr "如果一个 {0} 有多个 {attributeName} 值，那么..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的列表达式未命名；已跳过。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Add field"
+msgstr "添加字段"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
 msgstr "隐藏副标题"
@@ -6466,6 +7636,11 @@ msgstr "隐藏副标题"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Author"
 msgstr "作者"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "This is the last step. Publish, and anyone in your workspace can open "
+"this dashboard."
+msgstr "这是最后一步。发布后，工作区中的任何人都可以打开此仪表板。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
@@ -6478,6 +7653,10 @@ msgstr "离线模型"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
 msgstr "架构版本"
+
+#: src/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary.tsx
+msgid ", {ignored, plural, one {# not applied} other {# not applied}}"
+msgstr ", {ignored, plural, one {# 个未应用} other {# 个未应用}}"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Query editor mode"
@@ -6508,14 +7687,28 @@ msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
 "undone."
 msgstr "您确定要永久删除 <0>{0}</0> 吗？此操作无法撤销。"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset, pick the column that uniquely identifies a "
+"{conceptName}. We use those columns to merge rows into one record."
+msgstr "对于每个数据集，请选择能够唯一标识 {conceptName} 的列。我们会使用这些列将行合并为一条记录。"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
 msgstr "列大纲"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "Nothing selected yet"
+msgstr "尚未选择任何内容"
 
 #: src/components/permissions/ShareResourceModal/copy/roleSelectTooltip.ts
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "此人或组可以执行的操作。查看者 = 只读，编辑者 = 编辑内容，管理员 = 完全控制，包括共享。"
+
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Include {0}"
+msgstr "包含 {0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link label"
@@ -6533,7 +7726,7 @@ msgstr "没有可用列"
 msgid "Size by"
 msgstr "按大小"
 
-#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+#: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "调整抽屉大小"
 
@@ -6553,6 +7746,10 @@ msgstr "H2"
 msgid "Add a pull quote..."
 msgstr "添加引述…"
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw freehand"
+msgstr "手绘"
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
 msgstr "每"
@@ -6569,10 +7766,6 @@ msgstr "无法将数据集设置为仅离线使用"
 msgid "Hide details"
 msgstr "隐藏详情"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Enter comment"
-msgstr "输入评论"
-
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
 msgstr "了解原因"
@@ -6580,6 +7773,10 @@ msgstr "了解原因"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "尚无条目。聊天面板请求同意时，日志会填充。"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
+msgid "No disputed-status column. Outlines render as settled."
+msgstr "没有有争议状态列。轮廓将显示为已确定。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
@@ -6598,10 +7795,14 @@ msgstr "源列"
 msgid "Number of columns"
 msgstr "列数"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Latitude and longitude columns"
 msgstr "纬度和经度列"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "linear"
+msgstr "线性"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
@@ -6614,6 +7815,11 @@ msgstr "编辑角色组"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "配置文件"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+msgid "They referenced columns this data source does not have: "
+"{removedColumnNames}"
+msgstr "它们引用了此数据源中不存在的列：{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
@@ -6641,9 +7847,17 @@ msgstr "颜色渐变"
 msgid "number"
 msgstr "数字"
 
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Sync this case type from Case Manager to create records from your data."
+msgstr "从 Case Manager 同步此案例类型，以便根据您的数据创建记录。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
 msgstr "角色组已创建"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Choose who you want to share this with"
+msgstr "选择要与之共享的对象"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
@@ -6667,7 +7881,7 @@ msgstr "1 个字段"
 msgid "Language"
 msgstr "语言"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "关闭面板 (⌘/)"
 
@@ -6715,14 +7929,24 @@ msgstr "无法读取文件"
 msgid "Column 6"
 msgstr "第 6 列"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "An unexpected error occurred."
+msgstr "发生意外错误。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
 msgstr "随意支付"
 
 #. placeholder {0}: modelCopy.displayName
+#. placeholder {0}: region.label
 #: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Remove {0}"
 msgstr "移除 {0}"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is between"
+msgstr "介于"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -6758,6 +7982,7 @@ msgstr "提示"
 msgid "You're on the Free plan"
 msgstr "您正在使用免费计划"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Count"
@@ -6781,6 +8006,7 @@ msgid "Thank you for your interest!"
 msgstr "感谢您的关注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
 msgstr "来源"
@@ -6826,16 +8052,29 @@ msgstr "没有值"
 msgid "Shape"
 msgstr "形状"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is on"
+msgstr "日期为"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Members"
 msgstr "成员"
 
+#: src/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay.tsx
+msgid "Dock chat panel"
+msgstr "停靠聊天面板"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
 msgstr "点几何"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Let's move these results to a dashboard"
+msgstr "将这些结果移至仪表板"
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "值"
 
@@ -6855,6 +8094,10 @@ msgstr "平方根"
 msgid "Popup"
 msgstr "弹出窗口"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterOperatorSelector/FilterOperatorSelector.tsx
+msgid "Condition"
+msgstr "条件"
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "分级"
@@ -6871,19 +8114,25 @@ msgstr "正在在线同步数据集..."
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "添加一个系列以选择哪个数值列驱动图表。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "几何列"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 msgid "Column"
 msgstr "列"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Remove local filter"
 msgstr "移除本地过滤器"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Could not sync {0} records"
+msgstr "无法同步 {0} 条记录"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "This removes the user group from members and resources that use it."
@@ -6906,9 +8155,27 @@ msgstr "来自您的提示："
 msgid "Delimiter"
 msgstr "分隔符"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
+msgid "You need to be signed in to ask the assistant. Kept the rule-based "
+"results."
+msgstr "您需要登录后才能向助手提问。已保留基于规则的结果。"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File loaded successfully"
 msgstr "文件加载成功"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Keep the block fields"
+msgstr "保留区块字段"
+
+#. placeholder {0}: avaMap.name
+#: src/views/GisApp/MapListView/DeleteMapButton.tsx
+msgid "Delete the map {0}"
+msgstr "删除地图 {0}"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+msgid "Read as"
+msgstr "读取为"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try one of these"
@@ -6922,6 +8189,10 @@ msgstr "选择的值列无效"
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "第 {rowNum} 行 / 第 {colNum} 列"
 
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
+msgid "You can't go to this step until you create a new dashboard."
+msgstr "创建新仪表板后才能进入此步骤。"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "尚未添加任何列。"
@@ -6930,15 +8201,24 @@ msgstr "尚未添加任何列。"
 msgid "Advanced options"
 msgstr "高级选项"
 
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is less than"
+msgstr "小于"
+
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom right"
 msgstr "右下"
 
 #. placeholder {0}: scale.meters
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} m"
 msgstr "{0} 米"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Readings only"
+msgstr "仅读数"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -6949,7 +8229,7 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
 msgstr "选择一个工作区预设或按应用自定义。用户组控制数据集和仪表板访问交集。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "划分为网格"
 
@@ -6974,6 +8254,7 @@ msgstr "从低到高"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "文本"
@@ -7007,6 +8288,7 @@ msgstr "侧边栏位置"
 msgid "X axis tick color"
 msgstr "X 轴刻度颜色"
 
+#: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Continue"
 msgstr "继续"
@@ -7035,11 +8317,7 @@ msgstr "选定文档：{0}"
 msgid "Subtle"
 msgstr "细微"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Activity"
-msgstr "活动"
-
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "（消息未发送。）"
 
@@ -7054,6 +8332,10 @@ msgid "{0} columns were detected. Review the column info below to make sure "
 "click Upload again."
 msgstr "{0} 列已被检测到。请查看下面的列信息以确保其正确。如果不正确，请更改上面的导入选项并再次点击上传。"
 
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Click \"Save\" to open the menu."
+msgstr "点击“保存”以打开菜单。"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
 msgstr "X 轴标签颜色"
@@ -7063,10 +8345,9 @@ msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} "
 "seats."
 msgstr "您的工作区已使用全部 {currentSeatUsage} 个 {totalSeats} 座位。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {conceptName}."
-msgstr "在这里选择应添加到此 {conceptName} 的数据集中的哪些列。"
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "There's your answer"
+msgstr "这就是你的答案"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Expand the legend"
@@ -7103,6 +8384,10 @@ msgstr "探索您的数据"
 msgid "Enter your email address"
 msgstr "输入您的电子邮件地址"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "Chosen from what we detected. Switch it if that reads wrong."
+msgstr "根据检测结果选择。若显示不正确，请切换。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "删除用户组"
@@ -7110,6 +8395,10 @@ msgstr "删除用户组"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Spatial unavailable"
 msgstr "空间信息不可用"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Give the dashboard a name, then create it."
+msgstr "为仪表板命名，然后创建它。"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Collapse the layer panel"
@@ -7128,6 +8417,14 @@ msgstr "在线同步？"
 msgid "Neutral failure"
 msgstr "中性失败"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
+msgid "No fields yet"
+msgstr "暂无字段"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Landscape"
+msgstr "横向"
+
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "请重试或联系支持。"
@@ -7139,6 +8436,10 @@ msgstr "一般访问"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Media"
 msgstr "媒体"
+
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "+ Condition"
+msgstr "+ 条件"
 
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
@@ -7156,8 +8457,10 @@ msgstr "复制链接"
 msgid "100,000"
 msgstr "100,000"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Delete {0}"
 msgstr "删除 {0}"
 
@@ -7170,7 +8473,7 @@ msgstr "切片颜色"
 msgid "Save changes"
 msgstr "保存更改"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet failed to load"
 msgstr "Google 表格加载失败"
 
@@ -7178,9 +8481,18 @@ msgstr "Google 表格加载失败"
 msgid "Type the confirmation phrase"
 msgstr "输入确认短语"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
+"sheet and try again."
+msgstr "Google 每次最多只能导出电子表格中的 10 MB 数据。请拆分工作表后重试。"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "应使用哪个字段作为 {singularConceptName} 的名称？"
+
+#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
+msgid "Ask your first question"
+msgstr "提出您的第一个问题"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Change URL"
@@ -7189,6 +8501,10 @@ msgstr "更改 URL"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Ochre"
 msgstr "赭色"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Could not create that case type"
+msgstr "无法创建该案例类型"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -7226,6 +8542,11 @@ msgstr "已抑制"
 msgid "Dataset limit reached"
 msgstr "数据集限制已达到"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Case type deleted"
+msgstr "案例类型已删除"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Distinct values"
 msgstr "唯一值"
@@ -7257,6 +8578,10 @@ msgid "Please take a look at the data and make sure it is correct. Once you "
 "confirm, the dataset will be synced with this data."
 msgstr "请查看数据并确保其正确。一旦确认，数据集将与此数据同步。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "Calibrate manually"
+msgstr "手动校准"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Choose Displace or Aggregate only when the layer holds protection or "
 "health data that must not be mapped to a household."
@@ -7274,6 +8599,10 @@ msgstr "发布到工作区"
 msgid "Whole number"
 msgstr "整数"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Select a data source to add filters."
+msgstr "选择数据源以添加筛选条件。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
 msgstr "年度"
@@ -7286,6 +8615,10 @@ msgstr "任何拥有 "
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信息并可能记录请求。"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove this dataset"
+msgstr "移除此数据集"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
@@ -7348,6 +8681,10 @@ msgstr "WHERE 子句对“{columnName}”使用了 BETWEEN，但其值无法由�
 msgid "Fill opacity"
 msgstr "填充不透明度"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
+msgid "Show the title on the page"
+msgstr "在页面上显示标题"
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "要确认，请在下面输入 <0>{confirmationTarget}</0>："
@@ -7356,18 +8693,18 @@ msgstr "要确认，请在下面输入 <0>{confirmationTarget}</0>："
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
 
+#: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "高"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "Entity failed to load"
-msgstr "实体加载失败"
-
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "用于登录您的账户。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not zoom to this cluster."
+msgstr "无法缩放至此集群。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
@@ -7380,6 +8717,16 @@ msgstr "角色和用户组"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Clear all"
 msgstr "清除所有"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "is greater than"
+msgstr "大于"
+
+#: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
+#: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+msgid "Close"
+msgstr "关闭"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
@@ -7406,6 +8753,10 @@ msgstr "添加 URL 以嵌入可视化内容或外部内容。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar span"
 msgstr "侧边栏跨度"
+
+#: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
+msgid "matches pattern (legacy)"
+msgstr "匹配模式（旧版）"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Max width"
@@ -7445,6 +8796,14 @@ msgstr "分享"
 msgid "Whole dataset"
 msgstr "整个数据集"
 
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Or"
+msgstr "或"
+
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to results"
+msgstr "返回结果"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
 msgstr "热力图"
@@ -7453,6 +8812,13 @@ msgstr "热力图"
 msgid "Skip to layer settings"
 msgstr "跳转到图层设置"
 
+#. placeholder {0}: caseType.name
+#. placeholder {0}: concept.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Are you sure you want to delete {0}? This cannot be undone."
+msgstr "确定要删除 {0} 吗？此操作无法撤销。"
+
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"
 msgstr "面积图"
@@ -7460,6 +8826,10 @@ msgstr "面积图"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Invalid date"
 msgstr "无效日期"
+
+#: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
+msgid "Get started"
+msgstr "开始使用"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Frontier models"
@@ -7486,6 +8856,10 @@ msgstr "箭头"
 msgid "Column 10"
 msgstr "第 10 列"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "Click a labelled tick on the y-axis."
+msgstr "在 Y 轴上点击一个带标签的刻度。"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "值，逗号分隔"
@@ -7502,6 +8876,10 @@ msgstr "引用"
 msgid "Billing portal cannot be loaded because you do not have a subscription "
 "yet."
 msgstr "由于您尚未订阅，无法加载账单门户。"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset saved, but its original file failed to upload"
+msgstr "数据集已保存，但其原始文件上传失败"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
@@ -7530,6 +8908,18 @@ msgstr "松散"
 msgid "Suppress areas below"
 msgstr "抑制低于此值的区域"
 
+#. placeholder {0}: _columnList(regionNames)
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
+msgid "{0} print different columns, so there is no shared set of columns to "
+"keep and every number goes on its own row. Remove a region, or change "
+"what one is read as, to get the choice back."
+msgstr "{0} 个打印项使用了不同的列，因此没有可保留的共同列集，每个数字都会单独占一行。请移除一个区域，或更改其中一个区域的读取方式，以恢复此选项。"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
+msgid "Annotation text"
+msgstr "注释文本"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY 引用了不在 SELECT 列表中的列“{columnName}”。"
@@ -7550,6 +8940,10 @@ msgstr "升级计划至 {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表单不支持类型为“{exprType}”的 SELECT 表达式。"
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an annotation area"
+msgstr "绘制注释区域"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"
@@ -7605,7 +8999,11 @@ msgid "This layer's popup shows no fields. Choose some in the layer's Popup "
 msgstr "此图层的弹出窗口未显示任何字段。请在图层的“弹出窗口”部分选择字段。"
 
 #. placeholder {0}: error.message
-#: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Failed to delete dataset: {0}"
 msgstr "删除数据集失败：{0}"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
+msgid "Second tick value"
+msgstr "第二个刻度值"

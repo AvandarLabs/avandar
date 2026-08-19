@@ -2,6 +2,11 @@ import { Model } from "@avandar/models";
 import { isDefined, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import {
+  areDisputedStatusValuesDisjoint,
+  canBindDisputedStatus,
+  EMPTY_DISPUTED_STATUS_VALUES,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
+import {
   QueryColumn, // prettier-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import {
@@ -45,6 +50,9 @@ const DEFAULT_HEATMAP_RADIUS_PX = 30;
 /** Fallback grid-cell size, in meters. */
 const DEFAULT_GRID_SIZE_METERS = 10_000;
 
+/** Fallback buffer distance, in meters. */
+const DEFAULT_BUFFER_DISTANCE_METERS = 1000;
+
 /** Fallback sequential heatmap color ramp. */
 const DEFAULT_HEATMAP_RAMP = [
   "#ffd4af",
@@ -75,6 +83,7 @@ function _isAreaGeoBinding(
     binding?.type === "joinToBoundaries" ||
     binding?.type === "aggregatePointsToBoundaries" ||
     binding?.type === "binPointsToGrid" ||
+    binding?.type === "bufferOfLayer" ||
     (binding?.type === "geometryColumn" && binding.family === "polygon")
   );
 }
@@ -102,8 +111,20 @@ export const MapLayerModule = {
   /** Fallback grid-cell size, in meters. */
   defaultGridSizeMeters: DEFAULT_GRID_SIZE_METERS,
 
+  /** Fallback buffer distance, in meters. */
+  defaultBufferDistanceMeters: DEFAULT_BUFFER_DISTANCE_METERS,
+
   /** Fallback sequential heatmap color ramp. */
   defaultHeatmapRamp: DEFAULT_HEATMAP_RAMP,
+
+  /** No disputed-status values assigned: every outline renders as settled. */
+  emptyDisputedStatusValues: EMPTY_DISPUTED_STATUS_VALUES,
+
+  /** True when a layer may carry a disputed-status bind. */
+  canBindDisputedStatus,
+
+  /** True when no value appears in both the disputed and undetermined lists. */
+  areDisputedStatusValuesDisjoint,
 
   /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
@@ -125,6 +146,8 @@ export const MapLayerModule = {
         stroke: { width: 1, color: "#ffffff" },
       },
       sensitivity: { mode: "exact" },
+      timeColumn: undefined,
+      applyAoiFilter: true,
       popup: { columnIds: "all", action: undefined },
       legend: {
         title: name,
@@ -135,6 +158,8 @@ export const MapLayerModule = {
         entries: [],
         sizeStops: [],
       },
+      disputedStatusColumn: undefined,
+      disputedStatusValues: EMPTY_DISPUTED_STATUS_VALUES,
     } as const);
   },
 
@@ -244,5 +269,31 @@ export const MapLayerModule = {
           })
           .filter(isDefined)
       );
+  },
+
+  /**
+   * Column names a feature must carry: the popup's columns plus any column
+   * paint depends on. The disputed bind is here rather than in the popup so a
+   * dashed casing cannot vanish because the author trimmed the popup.
+   *
+   * @param layer The layer whose popup config, disputed bind, and query
+   * columns are read.
+   * @returns `"all"` when the popup shows everything, otherwise the popup's
+   * resolved column names plus the bound disputed-status column when it is a
+   * query column not already among them.
+   */
+  toPropertyColumnNames: (layer: MapLayerRead): string[] | "all" => {
+    const popupNames = MapLayerModule.toPopupColumnNames(layer);
+    const reference = layer.disputedStatusColumn;
+    if (popupNames === "all" || reference?.type !== "queryColumn") {
+      return popupNames;
+    }
+    const column = layer.source.queryColumns.find(
+      propEq("id", reference.column),
+    );
+    const name = column ? QueryColumn.getDerivedColumnName(column) : undefined;
+    return name && !popupNames.includes(name) ?
+        [...popupNames, name]
+      : popupNames;
   },
 };

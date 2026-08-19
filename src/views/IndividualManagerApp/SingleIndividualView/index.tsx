@@ -1,24 +1,22 @@
-import { ObjectDescriptionList, Paper } from "@avandar/ui";
+import { Paper } from "@avandar/ui";
 import {
   isNonNullish,
   makeIdLookupMap,
   makeMap,
-  makeObject,
-  omit,
   prop,
   propEq,
   unknownToString,
   where,
 } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { Container, Loader, Stack, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import { SourceBadge } from "@/components/badges/SourceBadge";
 import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
-import { StatusPill } from "@/views/IndividualManagerApp/SingleIndividualView/StatusPill";
+import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -143,12 +141,6 @@ type Props = {
   individual: Individual.T;
 };
 
-type AssertionMetadata = {
-  value: AttributeAssertion.T["value"];
-  sourceType?: DatasetSource.SourceType;
-  sourceName?: string;
-};
-
 export function SingleIndividualView({
   concept,
   individual,
@@ -160,84 +152,40 @@ export function SingleIndividualView({
       individual,
     });
 
-  const [individualMetadata, assertions] = useMemo(() => {
-    // convert the attribute values array into a record
-    const assertionsRecord: Record<string, AssertionMetadata> | undefined =
-      hydratedIndividual.assertions ?
-        makeObject(hydratedIndividual.assertions, {
-          keyFn: (assertion) => {
-            return assertion.attributeName ?? t`Loading...`;
-          },
-          valueFn: (assertion) => {
-            return {
-              value: assertion.value,
-              sourceType: assertion.sourceType,
-              sourceName: assertion.sourceName,
-            };
-          },
-        })
-      : undefined;
-
-    return [omit(hydratedIndividual, "assertions"), assertionsRecord];
-  }, [hydratedIndividual, t]);
+  const attributeRows: RecordAttributeRow[] | undefined = useMemo(() => {
+    if (!hydratedIndividual.assertions) {
+      return undefined;
+    }
+    return hydratedIndividual.assertions.map((assertion) => {
+      return {
+        name: assertion.attributeName ?? t`Loading...`,
+        value: assertion.value,
+        sourceType: assertion.sourceType,
+        sourceName: assertion.sourceName,
+      };
+    });
+  }, [hydratedIndividual.assertions, t]);
 
   return (
-    <Container pt="xxl">
-      <Stack>
-        <Group>
-          <Title order={2}>
-            {isLoadingHydratedIndividual ?
-              <Loader />
-            : unknownToString(hydratedIndividual.name)}
-          </Title>
-          <StatusPill />
-        </Group>
-        <Paper>
-          <Stack>
-            <Text>{concept.description}</Text>
-            <ObjectDescriptionList
-              data={individualMetadata}
-              dateFormat="MMMM D, YYYY"
-              excludeKeys={[
-                "id",
-                "externalId",
-                "conceptId",
-                "identifierAttribute",
-                "labelAttribute",
-                "labelValue",
-                "attributes",
-                "workspaceId",
-              ]}
-            />
-
+    <Container py="md">
+      <Stack gap="lg" maw={720}>
+        <Title order={2} fw={650}>
+          {isLoadingHydratedIndividual ?
+            <Loader size="sm" />
+          : unknownToString(hydratedIndividual.name)}
+        </Title>
+        <Paper p="lg">
+          <Stack gap="lg">
             <Title order={4}>
-              <Trans>Data</Trans>
+              <Trans>Details</Trans>
             </Title>
-            {assertions === undefined ?
+            {attributeRows === undefined ?
               <Loader />
-            : <ObjectDescriptionList
-                data={assertions}
-                dateFormat="MMMM D, YYYY"
-                renderObjectKeyLabel={(key, obj) => {
-                  const { sourceType, sourceName } = obj[key]!;
-                  return (
-                    <Group gap="xs" wrap="nowrap" align="center">
-                      <SourceBadge
-                        sourceType={sourceType}
-                        sourceName={sourceName}
-                      />
-                      <Text fw={500}>{key}</Text>
-                    </Group>
-                  );
-                }}
-                itemRenderOptions={{
-                  getRenderableValue: "value",
-                }}
-              />
-            }
-
-            <ActivityBlock />
+            : <RecordAttributesList attributes={attributeRows} />}
           </Stack>
+        </Paper>
+        <Paper p="lg">
+          <ActivityBlock />
         </Paper>
       </Stack>
     </Container>

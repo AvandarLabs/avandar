@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
+import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import type {
   DataVizFilterProps,
   useLocalFilterState,
@@ -22,6 +23,9 @@ type Props = {
   displayVizConfig: VizConfig.T;
   filterProps: DataVizFilterProps;
   localFilterState: ReturnType<typeof useLocalFilterState>;
+  /** Set when the block's query failed, so the block says so rather than
+   * rendering an empty chart that reads like "no matching rows". */
+  queryErrorMessage: string | undefined;
 };
 
 /**
@@ -40,6 +44,7 @@ export function DataVizContent({
   displayVizConfig,
   filterProps,
   localFilterState,
+  queryErrorMessage,
 }: Readonly<Props>): ReactElement {
   const emptyMessage =
     prompt.length === 0 ?
@@ -70,6 +75,7 @@ export function DataVizContent({
       }}
     >
       <Stack gap="sm">
+        <QueryResultsError message={queryErrorMessage} sql={rawSql} />
         <DataVizLocalFilters
           localFilters={filterProps.localFilters}
           state={localFilterState}

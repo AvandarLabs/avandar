@@ -1,13 +1,12 @@
 import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Box, Collapse } from "@mantine/core";
 import { useState } from "react";
+import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
 import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
-import { DrawerHeight } from "@/views/DataExplorerApp/DataExplorerDrawer/DrawerHeight/DrawerHeight";
 import { QueryTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
 import { useDrawerDisclosure } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerDisclosure";
-import { useDrawerResize } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerResize";
 import { VizTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
@@ -19,9 +18,6 @@ import type { ReactNode, RefObject } from "react";
 export type DrawerTab = "query" | "visualizations";
 
 const DRAWER_TAB_IDS = ["query", "visualizations"] as const;
-
-/** Duration of the collapse and expand animation, in milliseconds. */
-const COLLAPSE_DURATION_MS = 240;
 
 /** Ties the chevron's `aria-expanded` to the region it reveals. */
 const DRAWER_REGION_ID = "data-explorer-drawer-region";
@@ -62,26 +58,9 @@ export function DataExplorerDrawer({
   const [queryEditorMode, setQueryEditorMode] =
     useState<QueryEditorMode>("manual");
 
-  const { height, maxHeight, onResizePointerDown, onResizeKeyDown } =
-    useDrawerResize({ chartRef });
-
   return (
-    <div className={css.root}>
-      {isCollapsed ? null : (
-        <div
-          className={css.resizeHandle}
-          role="separator"
-          aria-orientation="horizontal"
-          aria-label={t`Resize drawer`}
-          aria-valuenow={height}
-          aria-valuemin={DrawerHeight.MIN_HEIGHT}
-          aria-valuemax={maxHeight}
-          tabIndex={0}
-          onPointerDown={onResizePointerDown}
-          onKeyDown={onResizeKeyDown}
-        />
-      )}
-
+    <CanvasDrawer opened={!isCollapsed} canvasRef={chartRef} keepChrome>
+      <CanvasDrawer.ResizeHandle />
       <Tabs
         size="sm"
         keepMounted={false}
@@ -105,30 +84,23 @@ export function DataExplorerDrawer({
         }
         renderTabHeader={{
           query: t`Query`,
-          visualizations: t`Visualizations`,
+          // The onboarding tutorial spotlights this label, so the anchor
+          // goes on the label itself rather than on a wrapper around the
+          // whole `Tabs`. A wrapper's bounding box is the entire drawer
+          // whenever it is expanded, which is exactly when the tutorial
+          // reaches this step, so the spotlight would cover everything
+          // instead of the one control the tooltip is talking about.
+          visualizations: (
+            <span {...NuxAnchors.props(NuxAnchors.ids.explorerVizTab)}>
+              {t`Visualizations`}
+            </span>
+          ),
         }}
         wrapPanels={(panels) => {
           return (
-            // One long-lived `Collapse` around every panel is what makes the
-            // chevron and a tab label animate alike; a per-panel one would
-            // remount on the tab change and skip its transition. The panels
-            // themselves are still swapped per tab, since `keepMounted` is off.
-            //
-            // Under `prefers-reduced-motion` Mantine drops the transition and
-            // renders the children only while expanded, so those users get a
-            // remount on each open instead. There is no animation to preserve
-            // for them, and the editors' queries are already cached.
-            <Collapse
-              id={DRAWER_REGION_ID}
-              expanded={!isCollapsed}
-              transitionDuration={COLLAPSE_DURATION_MS}
-            >
-              <Box className={css.drawerBody} style={{ height }}>
-                {/* Deferring the first mount keeps a shut drawer from running
-                    the editors' data fetching at all. */}
-                {hasOpened ? panels : null}
-              </Box>
-            </Collapse>
+            <CanvasDrawer.Body regionId={DRAWER_REGION_ID}>
+              {hasOpened ? panels : null}
+            </CanvasDrawer.Body>
           );
         }}
         renderTabPanel={{
@@ -137,16 +109,18 @@ export function DataExplorerDrawer({
           },
           visualizations: () => {
             return (
-              <VizTabPanel
-                columns={columns}
-                data={data}
-                vizConfig={vizConfig}
-                onVizConfigChange={dispatch.setVizConfig}
-              />
+              <div {...NuxAnchors.props(NuxAnchors.ids.explorerVizPanel)}>
+                <VizTabPanel
+                  columns={columns}
+                  data={data}
+                  vizConfig={vizConfig}
+                  onVizConfigChange={dispatch.setVizConfig}
+                />
+              </div>
             );
           },
         }}
       />
-    </div>
+    </CanvasDrawer>
   );
 }

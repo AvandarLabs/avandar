@@ -1,5 +1,5 @@
 import { useReducedMotion } from "@mantine/hooks";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import { FitMapBounds } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 
@@ -28,6 +28,10 @@ const BOUNDS = [
 type BoundsProps = { currentBounds: typeof BOUNDS | undefined };
 
 describe("useFitMapBounds", () => {
+  afterEach(() => {
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
   it("assigns the first defined bounds request id after an effect", async () => {
     const { result, rerender } = renderHook(
       ({ currentBounds }: BoundsProps) => {
@@ -204,6 +208,7 @@ describe("useFitMapBounds", () => {
       padding: PADDING,
       animate: true,
       duration: 800,
+      maxZoom: 14,
     });
 
     rerender({
@@ -240,7 +245,29 @@ describe("useFitMapBounds", () => {
       padding: PADDING,
       animate: false,
       duration: 0,
+      maxZoom: 14,
     });
-    vi.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
+  it("caps the fitted zoom so a coincident point does not overzoom the basemap", () => {
+    const fakeMap = { fitBounds: vi.fn() };
+    const coincidentPointBounds = [
+      [-86.9023, 32.3182],
+      [-86.9023, 32.3182],
+    ] as [[number, number], [number, number]];
+
+    renderHook(() => {
+      FitMapBounds.useFitMapBounds({
+        mapInstance: _createMapInstance(fakeMap),
+        request: { id: 1, bounds: coincidentPointBounds, padding: PADDING },
+      });
+    });
+
+    expect(fakeMap.fitBounds).toHaveBeenCalledWith(coincidentPointBounds, {
+      padding: PADDING,
+      animate: true,
+      duration: 800,
+      maxZoom: 14,
+    });
   });
 });

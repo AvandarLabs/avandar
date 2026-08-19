@@ -4,6 +4,7 @@ import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/GoogleAut
 import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types";
 import type { HealthzAPI } from "@sbfn/healthz/HealthzRoutes.types";
+import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types";
 import type { PolarPublicAPI } from "@sbfn/polar-public/PolarPublicRoutes.types";
 import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types";
 import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
@@ -26,6 +27,7 @@ type FullAPI = SupportAPI &
   GoogleAuthAPI &
   GoogleAuthCallbackAPI &
   GoogleSheetsAPI &
+  OpenDataAPI &
   PolarPublicAPI &
   SubscriptionsAPI;
 

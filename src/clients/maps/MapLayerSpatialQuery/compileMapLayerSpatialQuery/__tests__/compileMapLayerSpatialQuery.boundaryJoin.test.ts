@@ -5,7 +5,11 @@ import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
-import { createGeometryLayerFixture } from "./compileMapLayerSpatialQuery.fixtures";
+import {
+  createGeometryLayerFixture,
+  withAoiOverlay,
+  withEmptyOverlay,
+} from "./compileMapLayerSpatialQuery.fixtures";
 import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -60,12 +64,14 @@ describe("compileMapLayerSpatialQuery boundary join", () => {
     const fixture = createGeometryLayerFixture();
     const { layer, metadata } = _createBoundaryJoinLayer(fixture, matching);
 
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer,
-      metadata,
-      zoomBand: 3,
-      simplificationReferenceLatitude: 0,
-    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata,
+        zoomBand: 3,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     [
       "boundary_rows",
@@ -88,25 +94,65 @@ describe("compileMapLayerSpatialQuery boundary join", () => {
     const fixture = createGeometryLayerFixture();
     const { layer, metadata } = _createBoundaryJoinLayer(fixture, "exact");
 
-    const { rawSql } = compileMapLayerSpatialQuery({
-      layer,
-      metadata: {
-        ...metadata,
-        boundary: {
-          ...metadata.boundary!,
-          displayNameColumnName: undefined,
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata: {
+          ...metadata,
+          boundary: {
+            ...metadata.boundary!,
+            displayNameColumnName: undefined,
+          },
+          normalizationDenominator: {
+            type: "queryColumn",
+            columnName: "population",
+          },
         },
-        normalizationDenominator: {
-          type: "queryColumn",
-          columnName: "population",
-        },
-      },
-      zoomBand: 0,
-      simplificationReferenceLatitude: 0,
-    });
+        zoomBand: 0,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
 
     expect(rawSql).toContain('count(DISTINCT "population")');
     expect(rawSql).toContain('any_value("population")');
     expect(rawSql).toContain("'__avandar_denominator'");
+  });
+
+  it("puts the boundary key on each feature", () => {
+    const fixture = createGeometryLayerFixture();
+    const { layer, metadata } = _createBoundaryJoinLayer(fixture, "exact");
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withEmptyOverlay({
+        layer,
+        metadata,
+        zoomBand: 3,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
+
+    expect(rawSql).toContain("'__avandar_boundary_key', boundary.boundary_key");
+  });
+
+  it("intersects only output boundary polygons with the aoi", () => {
+    const fixture = createGeometryLayerFixture();
+    const { layer, metadata } = _createBoundaryJoinLayer(fixture, "exact");
+    const { rawSql } = compileMapLayerSpatialQuery(
+      withAoiOverlay({
+        layer,
+        metadata,
+        zoomBand: 3,
+        simplificationReferenceLatitude: 0,
+      }),
+    );
+
+    expect(rawSql.split("ST_Intersects").length - 1).toBe(1);
+    expect(rawSql).toContain('ST_Intersects("__avandar_geometry"');
+    const sourceRowsStart = rawSql.indexOf("source_rows AS (");
+    const keyedSourceStart = rawSql.indexOf("keyed_source_rows AS (");
+    expect(sourceRowsStart).toBeGreaterThanOrEqual(0);
+    expect(keyedSourceStart).toBeGreaterThan(sourceRowsStart);
+    expect(rawSql.slice(sourceRowsStart, keyedSourceStart)).not.toContain(
+      "ST_Intersects",
+    );
   });
 });

@@ -1,9 +1,12 @@
 import { areaBindingUpdates } from "./areaBindingUpdates";
+import { bufferBindingUpdates } from "./bufferBindingUpdates";
+import { disputedStatusUpdates } from "./disputedStatusUpdates";
 import { geometryBindingUpdates } from "./geometryBindingUpdates";
 import { layerMetaUpdates } from "./layerMetaUpdates";
 import { queryPopupUpdates } from "./queryPopupUpdates";
 import { symbologyPaintUpdates } from "./symbologyPaintUpdates";
 import { symbologyTypeUpdates } from "./symbologyTypeUpdates";
+import { timeColumnUpdates } from "./timeColumnUpdates";
 
 /**
  * Immutable updates to a map layer, driven by the layer inspector.
@@ -16,7 +19,10 @@ export const MapLayerUpdates = {
   ...queryPopupUpdates,
   ...geometryBindingUpdates,
   ...areaBindingUpdates,
+  ...bufferBindingUpdates,
   ...symbologyTypeUpdates,
   ...symbologyPaintUpdates,
   ...layerMetaUpdates,
+  ...timeColumnUpdates,
+  ...disputedStatusUpdates,
 };

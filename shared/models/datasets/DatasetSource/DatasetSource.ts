@@ -5,9 +5,12 @@ import type {
   DatasetSourceType,
   ImportableDatasetSourceType,
   ManuallyUploadableDatasetSourceType,
+  NonReconstructableDatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
+export { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/requiresOriginalFileRetention/requiresOriginalFileRetention.ts";
+export { getOriginalFileExtensionFromSourceType } from "$/models/datasets/DatasetSource/getOriginalFileExtensionFromSourceType/getOriginalFileExtensionFromSourceType.ts";
 
 export namespace DatasetSource {
   export type T<
@@ -19,4 +22,6 @@ export namespace DatasetSource {
   export type ImportableSourceType = ImportableDatasetSourceType;
   export type ManuallyUploadableSourceType =
     ManuallyUploadableDatasetSourceType;
+  export type NonReconstructableSourceType =
+    NonReconstructableDatasetSourceType;
 }

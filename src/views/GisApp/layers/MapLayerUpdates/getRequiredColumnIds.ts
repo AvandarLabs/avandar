@@ -27,6 +27,9 @@ function _getGeoBindingColumnIds(
     .with({ type: "aggregatePointsToBoundaries" }, () => {
       return [];
     })
+    .with({ type: "bufferOfLayer" }, () => {
+      return [];
+    })
     .exhaustive();
 }
 
@@ -46,6 +49,13 @@ function _getColorColumnIds(
       color.normalization.denominator.column
     : undefined;
   return [valueColumn, denominatorColumn];
+}
+
+/** The source column a disputed bind needs, when it reads the source query. */
+function _getDisputedStatusColumnId(
+  reference: MapLayer.DisputedStatusRef | undefined,
+): QueryColumn.Id | undefined {
+  return reference?.type === "queryColumn" ? reference.column : undefined;
 }
 
 /** Column ids the layer needs regardless of what the popup shows. */
@@ -72,6 +82,8 @@ export function getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       : undefined,
       layer.symbology.type === "heatmap" ? layer.symbology.weight : undefined,
       ..._getColorColumnIds(color),
+      layer.timeColumn,
+      _getDisputedStatusColumnId(layer.disputedStatusColumn),
     ].filter(isDefined),
   );
 }

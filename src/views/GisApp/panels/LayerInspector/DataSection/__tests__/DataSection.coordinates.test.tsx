@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createLayer,
+  createXyBoundLayer,
   fixtures,
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
@@ -36,7 +37,7 @@ describe("DataSection coordinates", () => {
     ]);
   });
 
-  it("explains which columns were matched after a binding is present", () => {
+  it("does not warn after a high-confidence latitude and longitude match", () => {
     fixtures.sourceColumns = [
       fixtures.latitudeColumn,
       fixtures.longitudeColumn,
@@ -45,10 +46,38 @@ describe("DataSection coordinates", () => {
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
     expect(
+      screen.queryByText(/matched from the column names/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("warns when the match is a low-confidence x and y pair", () => {
+    fixtures.sourceColumns = [fixtures.yColumn, fixtures.xColumn];
+
+    render(
+      <DataSection layer={createXyBoundLayer()} onLayerChange={vi.fn()} />,
+    );
+
+    expect(
       screen.getByText(
-        "Latitude and longitude were matched from the column names Lat and Long_. Change them above if that is wrong.",
+        "Latitude and longitude were matched from the column names y and x. Change them above if that is wrong.",
       ),
     ).toBeInTheDocument();
+    expect(screen.getByRole("alert").getAttribute("style")).not.toContain(
+      "#cb2717",
+    );
+  });
+
+  it("dismisses the low-confidence match warning", () => {
+    fixtures.sourceColumns = [fixtures.yColumn, fixtures.xColumn];
+
+    render(
+      <DataSection layer={createXyBoundLayer()} onLayerChange={vi.fn()} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
+
+    expect(
+      screen.queryByText(/matched from the column names/i),
+    ).not.toBeInTheDocument();
   });
 
   it("does not infer a missing axis when the other axis is already bound", () => {
@@ -71,7 +100,7 @@ describe("DataSection coordinates", () => {
     expect(onLayerChange).not.toHaveBeenCalled();
   });
 
-  it("explains when a selected source has no coordinate columns", () => {
+  it("offers a manual pick when no column name reads as a coordinate", () => {
     fixtures.sourceColumns = [fixtures.nameColumn];
     const layer = createLayer();
 
@@ -79,15 +108,15 @@ describe("DataSection coordinates", () => {
 
     expect(
       screen.getByText(
-        "No column in Cases holds coordinates. Boundary joins arrive in a later release, so pick a different source.",
+        "No column in Cases was recognized as a coordinate by name. Pick the latitude and longitude columns above, or bind a geometry column instead.",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Latitude" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Latitude" }),
+    ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Longitude" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Longitude" }),
+    ).toBeInTheDocument();
   });
 
   it("updates a coordinate binding when a coordinate column changes", () => {

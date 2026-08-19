@@ -1,0 +1,160 @@
+import { assembleLabels } from "../../assembleLabels/assembleLabels";
+import { assembleQuantities } from "../../assembleQuantities/assembleQuantities";
+import { findPlotFrame } from "../../findPlotFrame/findPlotFrame";
+import { pairByProximity } from "../../pairByProximity/pairByProximity";
+import { partitionTextByFrame } from "../../partitionTextByFrame/partitionTextByFrame";
+import { readBarChart } from "../../readBarChart/readBarChart";
+import { readCartesianChart } from "../../readCartesianChart/readCartesianChart";
+import type { AxisTick } from "../../calibrateAxis/calibrateAxis";
+import type {
+  BBox,
+  ExtractedTable,
+  PdfCellFlag,
+  PdfValueUnit,
+  RegionGeometry,
+  TextItem,
+} from "../../pdfSniff.types";
+
+function _isAxisTick(entry: unknown): entry is AxisTick {
+  return (
+    typeof entry === "object" &&
+    entry !== null &&
+    Number.isFinite((entry as AxisTick).position) &&
+    Number.isFinite((entry as AxisTick).value)
+  );
+}
+
+function _yAxisHints(raw: unknown): readonly AxisTick[] {
+  return Array.isArray(raw) ? raw.filter(_isAxisTick) : [];
+}
+
+function _itemsForPairing(region: RegionGeometry): readonly TextItem[] {
+  const frame = findPlotFrame(region);
+  if (frame === undefined) {
+    return region.textItems;
+  }
+  return partitionTextByFrame(region, frame).dataLabels;
+}
+
+/**
+ * Reads a map, chart or KPI tile whose values are text at coordinates.
+ *
+ * The PDF records no link between a figure and its caption, so the pairing has
+ * to be recovered geometrically. Everything uncertain is flagged rather than
+ * dropped or silently resolved, because the measurement behind this extractor
+ * showed that roughly one pair in eight is a near-tie and roughly one in
+ * sixteen is simply wrong.
+ *
+ * Figures are assembled before labels are, because a magnitude suffix left
+ * loose becomes a label in its own right and then wins the figure printed
+ * beside it. See `assembleQuantities`.
+ *
+ * When the region contains a Cartesian plot with a series mark, weekly values
+ * are read from that mark against the labelled y-ticks, and when it contains
+ * a family of bars, each bar's own row decides which name it belongs to.
+ * Only when the region draws neither does the pairing below run, and then
+ * only over text inside the plot: axis ticks, month names and the title are
+ * scaffolding and would otherwise be read as data.
+ */
+export function extractLabelledGraphic(
+  region: RegionGeometry,
+  options: {
+    regionId: string;
+    ambiguityThreshold?: number;
+    yAxisHints?: unknown;
+  },
+): ExtractedTable {
+  const hints = _yAxisHints(options.yAxisHints);
+  const chart =
+    readCartesianChart(region, {
+      regionId: options.regionId,
+      yAxisHints: hints,
+    }) ??
+    readBarChart(region, {
+      regionId: options.regionId,
+      valueAxisHints: hints,
+    });
+  if (chart !== undefined) {
+    return chart;
+  }
+  const { quantities, labelItems } = assembleQuantities(
+    _itemsForPairing(region),
+  );
+  const byItem = new Map(
+    quantities.map((quantity) => {
+      return [quantity.item, quantity];
+    }),
+  );
+
+  const labels = assembleLabels(labelItems);
+  const { pairs, unmatchedLabels, unmatchedValues } = pairByProximity({
+    values: quantities.map((quantity) => {
+      return quantity.item;
+    }),
+    labels,
+    ambiguityThreshold: options.ambiguityThreshold,
+  });
+
+  const cells: string[][] = [["label", "value"]];
+  const flags: PdfCellFlag[] = [];
+  const rowProvenance: Array<{ page: number; bbox: BBox }> = [];
+  const rowUnits: Array<PdfValueUnit | undefined> = [];
+
+  pairs.forEach((pair, index) => {
+    const quantity = byItem.get(pair.valueItem);
+    cells.push([pair.label, quantity?.value ?? ""]);
+    rowUnits.push(quantity?.unit);
+    rowProvenance.push({
+      page: region.pageIndex,
+      bbox: quantity?.bbox ?? region.bbox,
+    });
+
+    if (pair.isAmbiguous) {
+      flags.push({
+        rowIndex: index,
+        columnIndex: 0,
+        reason: "ambiguous_association",
+        detail:
+          `"${quantity?.text ?? pair.value}" was nearly as close to another ` +
+          `label (${pair.ambiguityRatio.toFixed(2)} of the winning ` +
+          "distance). Check it against the page.",
+      });
+    }
+  });
+
+  for (const unmatched of unmatchedLabels) {
+    const rowIndex = cells.length - 1;
+    cells.push([unmatched, ""]);
+    rowProvenance.push({ page: region.pageIndex, bbox: region.bbox });
+    // No figure, so nothing to give a unit to. `undefined` keeps the array
+    // parallel to the rows, which is the whole contract of `rowUnits`.
+    rowUnits.push(undefined);
+    flags.push({
+      rowIndex,
+      columnIndex: 1,
+      reason: "unmatched_label",
+      detail: `No value was found near "${unmatched}".`,
+    });
+  }
+
+  for (const unmatched of unmatchedValues) {
+    flags.push({
+      rowIndex: -1,
+      columnIndex: -1,
+      reason: "unmatched_value",
+      detail:
+        `"${unmatched}" had no label near it, so it was left out. If this ` +
+        "is real data, the region may include a legend or an axis.",
+    });
+  }
+
+  return {
+    regionId: options.regionId,
+    cells,
+    headerRows: 1,
+    flags,
+    extractedBy: "rules",
+    rowProvenance,
+    rowUnits,
+  };
+}

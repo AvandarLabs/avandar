@@ -12,7 +12,6 @@ import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
@@ -70,6 +69,7 @@ async function _resyncXlsxDataset(options: {
     parseOptions: {
       sheet: xlsxParseOptions.sheetName,
       hasHeader: xlsxParseOptions.hasHeader,
+      rowsToSkip: xlsxParseOptions.rowsToSkip,
     },
   });
 }
@@ -126,13 +126,11 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const [deleteDatasetLocally] = useMutation({
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (datasetId: Dataset.Id) => {
-      const localDataset = await LocalDatasetClient.getById({
-        id: datasetId,
-      });
-      if (localDataset) {
-        await LocalDatasetClient.delete({ id: localDataset.datasetId });
-      }
-      await DuckDbClient.dropTableViewAndFile({ tableOrViewName: datasetId });
+      // Go through `dropLocalDataset` rather than deleting the row directly:
+      // it is the one place that knows a retained original (e.g. a PDF) must
+      // survive a cache invalidation, since for an offline-only dataset those
+      // bytes are the only copy in existence.
+      await LocalDatasetClient.dropLocalDataset({ datasetId });
     },
   });
 

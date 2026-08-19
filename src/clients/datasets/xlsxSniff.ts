@@ -15,6 +15,7 @@ export async function sniffXlsxFile(params: {
   file: File;
   sheet?: string;
   hasHeader?: boolean;
+  rowsToSkip?: number;
   maxPreviewRows: number;
 }): Promise<XlsxSniffResult> {
   const worker = new XlsxSniffWorker();
@@ -47,6 +48,7 @@ export async function sniffXlsxFile(params: {
         file: params.file,
         sheet: params.sheet,
         hasHeader: params.hasHeader,
+        rowsToSkip: params.rowsToSkip,
         maxPreviewRows: params.maxPreviewRows,
       });
     });

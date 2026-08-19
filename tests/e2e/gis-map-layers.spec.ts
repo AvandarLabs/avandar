@@ -135,11 +135,11 @@ test.describe("GIS map layers", () => {
 
       const layerInspector = page.getByRole("region", { name: "Layer" });
       await expect(
-        layerInspector.getByText(/matched from the column names/i),
-      ).toContainText("Lat");
+        layerInspector.getByRole("button", { name: "Latitude" }),
+      ).toBeVisible();
       await expect(
-        layerInspector.getByText(/matched from the column names/i),
-      ).toContainText("Long_");
+        layerInspector.getByRole("button", { name: "Longitude" }),
+      ).toBeVisible();
 
       await expect(layerRow).toContainText("3 rows unmapped", {
         timeout: LONG_WAIT,
@@ -199,12 +199,12 @@ test.describe("GIS map layers", () => {
         .toEqual([...rowsBefore].reverse());
 
       await _clickKnownFeature(page);
-      await expect(page.getByRole("dialog", { name: "Feature" })).toContainText(
-        "Admin2",
-      );
-      await expect(page.getByRole("dialog", { name: "Feature" })).toContainText(
-        "Alameda",
-      );
+      await expect(
+        page.getByRole("region", { name: "Feature", exact: true }),
+      ).toContainText("Admin2");
+      await expect(
+        page.getByRole("region", { name: "Feature", exact: true }),
+      ).toContainText("Alameda");
     } finally {
       await deleteMapsByIds({ admin, mapIds: seededMapIds });
       if (datasetId) {

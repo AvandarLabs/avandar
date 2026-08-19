@@ -349,5 +349,25 @@ describe("SaveToDashboardModal", () => {
       ).toBeInTheDocument();
       expect(screen.getByRole("listbox")).toBeInTheDocument();
     });
+
+    it("opens in create mode with no Back link when forceCreateMode is set", () => {
+      renderModal({ forceCreateMode: true });
+
+      expect(
+        screen.getByText(/we'll add this visualization to your new dashboard/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /back to dashboards/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText(/search dashboards/i),
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector('[data-nux="explorer-save-to-dashboard-modal"]'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /create dashboard & save/i }),
+      ).toHaveAttribute("data-nux", "explorer-create-dashboard-button");
+    });
   });
 });

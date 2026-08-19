@@ -6,6 +6,7 @@ import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer
 const DATASET_ID = "22222222-2222-4222-8222-222222222222";
 const JOINED_DATASET_ID = "33333333-3333-4333-8333-333333333333";
 const LITERAL_ID = "44444444-4444-4444-8444-444444444444";
+const CONCEPT_ID = "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1";
 
 describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
   it("extracts UUID tables while ignoring UUID string literals", () => {
@@ -116,6 +117,14 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     }).toThrow(/dynamic/i);
   });
 
+  it("treats json_each like unnest when exploding a UUID table's JSON", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT * FROM "${DATASET_ID}", json_each('{"features":[]}')`,
+      ),
+    ).toEqual([DATASET_ID]);
+  });
+
   it("rejects mutating statements and uninspectable table functions", () => {
     expect(() => {
       DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
@@ -184,6 +193,23 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       readDatasetIds: [JOINED_DATASET_ID],
       mutatedDatasetIds: [JOINED_DATASET_ID],
     });
+  });
+
+  // `generateIndividuals` stages rows with CREATE TABLE AS SELECT. The
+  // read-only entry point refuses mutating SQL, so the session has to ask
+  // for the datasets the statement *reads* rather than for a SELECT list.
+  it("returns the datasets a CREATE TABLE AS SELECT reads", () => {
+    const stagingSql =
+      `DROP TABLE IF EXISTS "ava_staging_individuals_${CONCEPT_ID}";\n` +
+      `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS ` +
+      `SELECT * FROM "${DATASET_ID}"`;
+
+    expect(() => {
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(stagingSql);
+    }).toThrow(/mutating/i);
+    expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(stagingSql)).toEqual([
+      DATASET_ID,
+    ]);
   });
 
   it("tracks COPY relations according to transfer direction", () => {
@@ -291,6 +317,36 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     ).toMatchObject({ kind: "unsafe" });
   });
 
+  it("returns a prefixed concept table as a concept relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "concept_${CONCEPT_ID}"`,
+    );
+
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+    });
+  });
+
+  it("returns a bare uuid table as a dataset relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "${DATASET_ID}"`,
+    );
+
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+    });
+  });
+
+  it("keeps concept tables out of the dataset-only entry point", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
+        `SELECT * FROM "${DATASET_ID}" JOIN "concept_${CONCEPT_ID}" ON true`,
+      ),
+    ).toEqual([DATASET_ID]);
+  });
+
   it("does not interpret strings or quoted identifiers as keywords", () => {
     expect(
       DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(
@@ -305,6 +361,85 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       kind: "mutating",
       readDatasetIds: [],
       mutatedDatasetIds: [DATASET_ID],
+    });
+  });
+  // An `ava_rows_<datasetId>` view reads the dataset's own registered parquet
+  // file, so it has to be reported as a read of that dataset. Reporting it as
+  // an opaque internal table would let raw SQL reach a dataset the workspace
+  // allowlist never authorized, and reporting nothing at all (which is what
+  // happened before) refuses the statement outright, which silently disables
+  // every `first` value picker.
+  it("reads a row-numbered view as a read of the dataset it exposes", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_rows_${DATASET_ID}" dataset`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+    });
+  });
+
+  // The positive control for the case above: the prefix alone must not make a
+  // name inspectable. Only a real dataset id behind it does.
+  it("still refuses a row-numbered name that is not a dataset id", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_rows_whatever"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
+
+  // The concept spine is deliberately not a relation name, so a statement that
+  // names one cannot be analyzed. That is what forces the concept view's
+  // definition to be run as trusted internal SQL, and it is also what stops raw
+  // user SQL from reading another workspace's spine out of the shared catalog.
+  it("refuses a statement that names a concept spine table", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "concept_${CONCEPT_ID}__individuals"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
+  // Individual generation stages its rows in `ava_staging_individuals_<id>`
+  // and then reads that table back — `DESCRIBE`, `SELECT count(*)`, and a
+  // paged `SELECT` — through `runRawQuery`, which refuses any source it cannot
+  // account for. The table used to be named with the concept's bare id, which
+  // the analyzer resolved as a dataset; adding the prefix made all three reads
+  // `uninspectable-source`, so every sync threw the moment its upsert began.
+  // It reads no dataset of its own, so it contributes no relation.
+  it("reads an individuals staging table as an internal table naming no relation", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_staging_individuals_${CONCEPT_ID}" LIMIT 1000`,
+      ),
+    ).toEqual({ kind: "read", relations: [] });
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `DESCRIBE "ava_staging_individuals_${CONCEPT_ID}"`,
+      ),
+    ).toEqual({ kind: "read", relations: [] });
+  });
+
+  // The staging table is a bare local table, so a qualified name is something
+  // else entirely and must not inherit its exemption.
+  it("still refuses a qualified name ending in a staging table name", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM other."ava_staging_individuals_${CONCEPT_ID}"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
     });
   });
 });

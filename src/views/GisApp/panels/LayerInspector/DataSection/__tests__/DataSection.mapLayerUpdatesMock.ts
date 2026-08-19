@@ -1,6 +1,7 @@
 import { prop, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { disputedStatusUpdates } from "@/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
@@ -216,6 +217,14 @@ function _withAreaAggregation(options: { layer: MapLayer.T }): MapLayer.T {
   return options.layer;
 }
 
+function _withTimeColumn(options: {
+  layer: MapLayer.T;
+  column: QueryColumn.T | undefined;
+}): MapLayer.T {
+  const { layer, column } = options;
+  return { ...layer, timeColumn: column?.id };
+}
+
 /** MapLayerUpdates stand-in used by DataSection tests. */
 export function createDataSectionMapLayerUpdatesMock(): {
   MapLayerUpdates: object;
@@ -236,6 +245,26 @@ export function createDataSectionMapLayerUpdatesMock(): {
       withGridSizeMeters: _withGridSizeMeters,
       withGridType: _withGridType,
       withAreaAggregation: _withAreaAggregation,
+      withTimeColumn: _withTimeColumn,
+      withBufferDistanceMeters: (options: {
+        layer: MapLayer.T;
+        distanceMeters: number;
+      }) => {
+        return _patchGeoBinding(options.layer, {
+          distanceMeters: Math.min(
+            1_000_000,
+            Math.max(100, options.distanceMeters),
+          ),
+        });
+      },
+      withBufferDissolve: (options: {
+        layer: MapLayer.T;
+        dissolve: boolean;
+      }) => {
+        return _patchGeoBinding(options.layer, { dissolve: options.dissolve });
+      },
+      withDisputedStatusColumn: disputedStatusUpdates.withDisputedStatusColumn,
+      withDisputedStatusValues: disputedStatusUpdates.withDisputedStatusValues,
     },
   };
 }

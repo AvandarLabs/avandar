@@ -4,7 +4,12 @@ import type { UUID } from "@avandar/utils";
 type ModelType = "ChatPageContext";
 
 /** Avandar surface the user is on when sending a chat message. */
-export type ChatApp = "data-explorer" | "data-sources" | "dashboards" | "other";
+export type ChatApp =
+  | "data-explorer"
+  | "data-sources"
+  | "dashboards"
+  | "case-manager"
+  | "other";
 
 export type ChatPageContextId = UUID<ModelType>;
 

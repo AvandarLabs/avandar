@@ -13,11 +13,13 @@ import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
 import { Navbar } from "@/components/AppShell/Navbar/Navbar";
+import { ChatComposerOverlay } from "@/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
+import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { AppLink } from "@/config/AppLinks/AppLinks";
@@ -43,6 +45,7 @@ const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 const ASIDE_DEFAULT_WIDTH = 380;
+const ASIDE_COMPOSER_WIDTH = "min(64vw, 960px)";
 
 /**
  * DOM id on the AppShell's main content area. Components that need to scope
@@ -96,8 +99,11 @@ function AppShellComponent({
   const { t } = useLingui();
   const { isNavbarSidebarCollapsed } = AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
-  const { isOpen: isChatPanelOpen, isAvailable: isChatPanelAvailable } =
-    ChatPanelStateManager.useState();
+  const {
+    isOpen: isChatPanelOpen,
+    isAvailable: isChatPanelAvailable,
+    layout: chatPanelLayout,
+  } = ChatPanelStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
@@ -135,7 +141,12 @@ function AppShellComponent({
       <MantineAppShell
         layout="default"
         header={{ height: headerHeight }}
-        classNames={{ navbar: css.navbar, root: css.root, main: css.main }}
+        classNames={{
+          navbar: css.navbar,
+          root: css.root,
+          main: css.main,
+          aside: css.aside,
+        }}
         navbar={{
           width: NAVBAR_DEFAULT_WIDTH,
           breakpoint: "sm",
@@ -153,6 +164,7 @@ function AppShellComponent({
           },
         }}
         padding="md"
+        transitionDuration={ANIMATION_DURATION_MS.normal}
       >
         <MantineAppShell.Header bg="neutral" withBorder={false}>
           {isDesktopPlatform && !isMobileViewSize ?
@@ -196,9 +208,26 @@ function AppShellComponent({
           mr={-16}
           mt={isMobileViewSize ? 30 : 0}
         >
+          {isChatPanelOpen && chatPanelLayout === "composer" ?
+            <ChatComposerOverlay
+              onDismiss={chatPanelDispatch.collapseComposer}
+            />
+          : null}
           {children}
         </MantineAppShell.Main>
-        <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
+        <MantineAppShell.Aside
+          withBorder={false}
+          p={0}
+          bg="transparent"
+          style={
+            isChatPanelOpen && chatPanelLayout === "composer" ?
+              {
+                width: ASIDE_COMPOSER_WIDTH,
+                zIndex: APP_CHROME_Z_INDEX + 1,
+              }
+            : undefined
+          }
+        >
           {showChatPanel && isChatPanelAvailable ?
             <ChatPanel />
           : null}

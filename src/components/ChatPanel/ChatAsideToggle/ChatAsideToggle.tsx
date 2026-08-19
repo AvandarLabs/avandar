@@ -1,10 +1,7 @@
 import { Tooltip } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { ActionIcon } from "@mantine/core";
-import {
-  IconLayoutSidebarRightCollapse,
-  IconLayoutSidebarRightExpand,
-} from "@tabler/icons-react";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button } from "@mantine/core";
+import { IconSparkles } from "@tabler/icons-react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 
 /**
@@ -18,19 +15,17 @@ export function ChatAsideToggle(): React.ReactNode {
 
   return (
     <Tooltip label={isOpen ? t`Close chat (⌘/)` : t`Open chat (⌘/)`}>
-      <ActionIcon
-        variant="subtle"
-        size="md"
+      <Button
+        variant={isOpen ? "light" : "default"}
+        size="compact-sm"
         color="neutral"
         onClick={dispatch.toggle}
-        aria-label={isOpen ? t`Close chat panel` : t`Open chat panel`}
         aria-pressed={isOpen}
         visibleFrom="sm"
+        leftSection={<IconSparkles size={16} stroke={1.5} aria-hidden />}
       >
-        {isOpen ?
-          <IconLayoutSidebarRightCollapse size={18} />
-        : <IconLayoutSidebarRightExpand size={18} />}
-      </ActionIcon>
+        <Trans>Chat</Trans>
+      </Button>
     </Tooltip>
   );
 }

@@ -13,6 +13,7 @@ import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDat
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { SetOptional } from "type-fest";
@@ -25,6 +26,7 @@ type DatasetWithColumnsAndSource = SetOptional<
     | CsvFileDataset.T
     | GoogleSheetsDataset.T
     | OpenDataDataset.T
+    | PdfFileDataset.T
     | VirtualDataset.T
     | XlsxFileDataset.T
     | undefined;
@@ -60,6 +62,7 @@ function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWit
           csv_file: t`CSV file`,
           google_sheets: t`Google Sheets`,
           open_data: t`Open Data`,
+          pdf_file: t`PDF file`,
           virtual: t`Derived Dataset`,
           xlsx_file: t`Excel file`,
           _otherwise: value,
@@ -136,7 +139,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
           if (Model.isOfModelType(value, "DatasetColumn")) {
             const datasetColumn = value as DatasetColumn.T;
             const prevDatasetColumn = dataset.columns?.find((column) => {
-              return column.id === value.id;
+              return column.id === datasetColumn.id;
             });
             assertIsDefined(prevDatasetColumn);
 

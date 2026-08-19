@@ -20,6 +20,33 @@ const COPY = {
 } as const;
 
 describe("runOfflineChatPipeline", () => {
+  it("runs analyze then SQL and rewrites table aliases", async () => {
+    const engine = createMockOfflineChatEngine([
+      {
+        match: "offline assistant",
+        response: '{"summary":"Count sales","proceed":true,"tableName":"t0"}',
+      },
+      {
+        match: "DuckDB SQL generator",
+        response: 'Counting rows.\n```sql\nSELECT COUNT(*) FROM "t0"\n```',
+      },
+    ]);
+
+    const result = await runOfflineChatPipeline({
+      engine,
+      schema: SCHEMA,
+      pageContext: ChatPageContext.createDataExplorerViewContext({
+        openDatasetId: "ds-1",
+      }),
+      messages: [{ role: "user", content: "How many rows?" }],
+      lastUserPrompt: "How many rows?",
+      copy: COPY,
+    });
+
+    expect(result.generatedSql?.sql).toContain('FROM "ds-1"');
+    expect(result.generatedSql?.sql).not.toContain('"t0"');
+  });
+
   it("runs analyze then SQL and returns generatedSql", async () => {
     const engine = createMockOfflineChatEngine([
       {

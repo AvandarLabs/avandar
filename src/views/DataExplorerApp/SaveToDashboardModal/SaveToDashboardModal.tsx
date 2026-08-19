@@ -6,6 +6,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
@@ -26,6 +29,12 @@ type Props = {
   vizConfig: VizConfig;
   workspaceSlug: string;
   onClose: () => void;
+  /**
+   * Skip list mode even when dashboards already exist. The first-dashboard
+   * tour's last tooltip is the create button, which is not mounted in list
+   * mode.
+   */
+  forceCreateMode?: boolean;
 };
 
 type Mode = "list" | "create";
@@ -50,6 +59,7 @@ export function SaveToDashboardModal({
   vizConfig,
   workspaceSlug,
   onClose,
+  forceCreateMode = false,
 }: Props): JSX.Element {
   const { t } = useLingui();
   const defaultNewDashboardName = t`Untitled dashboard`;
@@ -80,7 +90,9 @@ export function SaveToDashboardModal({
 
   // Default mode: "create" when the user has zero dashboards (or while we
   // are still loading and assume empty), otherwise show the list first.
-  const initialMode: Mode = hasDashboards ? "list" : "create";
+  // `forceCreateMode` wins: the onboarding tour always needs create mode.
+  const initialMode: Mode =
+    forceCreateMode || !hasDashboards ? "create" : "list";
   const [mode, setMode] = useState<Mode>(initialMode);
 
   // Track whether the user navigated into create mode from the list so we
@@ -90,9 +102,14 @@ export function SaveToDashboardModal({
 
   // Auto-switch to list mode the first render after dashboards finish
   // loading, in case we initialised assuming "empty" while the query was
-  // still in-flight. Only do this if the user has not interacted yet.
+  // still in-flight. Only do this if the user has not interacted yet, and
+  // never during the tour's forced create path.
   const shouldAutoSwitchToList =
-    !isInitialLoading && hasDashboards && mode === "create" && !enteredFromList;
+    !forceCreateMode &&
+    !isInitialLoading &&
+    hasDashboards &&
+    mode === "create" &&
+    !enteredFromList;
   if (shouldAutoSwitchToList) {
     setMode("list");
   }
@@ -129,13 +146,21 @@ export function SaveToDashboardModal({
   };
 
   const [insertDashboard, isInsertingDashboard] = DashboardClient.useInsert({
-    queryToInvalidate: DashboardClient.QueryKeys.getAll(),
+    queriesToInvalidate: [
+      DashboardClient.QueryKeys.getAll(),
+      getNuxWorkspaceArtifactsQueryKey(),
+    ],
     onSuccess: (createdDashboard) => {
       showOpenDashboardToast(
         createdDashboard.id,
         createdDashboard.name,
         "created",
       );
+      // Advances the onboarding tutorial's `build_dashboard` milestone, and
+      // hands it the id `share_dashboard` needs to route to the editor. This
+      // modal deliberately does not navigate on create, so without the id the
+      // tutorial would have no way to find the dashboard the user just made.
+      NuxEvents.emit("dashboard.created", { dashboardId: createdDashboard.id });
       onClose();
     },
     onError: (error) => {
@@ -234,7 +259,10 @@ export function SaveToDashboardModal({
     : t`We'll add this visualization to your new dashboard.`;
 
   return (
-    <Stack gap="md">
+    <Stack
+      gap="md"
+      {...NuxAnchors.props(NuxAnchors.ids.explorerSaveToDashboardModal)}
+    >
       <Stack gap={2}>
         <Title order={4}>
           <Trans>Save to dashboard</Trans>
@@ -263,7 +291,7 @@ export function SaveToDashboardModal({
           isDisabled={isMutating}
           showEmptyStateBanner={!enteredFromList && !hasDashboards}
           onBack={
-            enteredFromList ?
+            !forceCreateMode && enteredFromList ?
               () => {
                 setEnteredFromList(false);
                 setMode("list");

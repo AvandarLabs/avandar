@@ -5,6 +5,7 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSection/FilterSection";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -60,6 +61,9 @@ vi.mock(
 vi.mock("@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates", () => {
   return {
     MapLayerUpdates: {
+      withApplyAoiFilter: vi.fn(({ layer, applyAoiFilter }) => {
+        return { ...layer, applyAoiFilter };
+      }),
       withFilters: vi.fn(({ layer, filters }) => {
         return { ...layer, source: { ...layer.source, filters } };
       }),
@@ -149,6 +153,65 @@ describe("FilterSection", () => {
     render(<FilterSection layer={layer} onLayerChange={vi.fn()} />);
 
     expect(screen.getByTestId("section-note")).toHaveTextContent("2 filters");
+  });
+
+  it("toggles applyAoiFilter without changing query filters", () => {
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    const layer = _makeLayerWithFilters([]);
+
+    render(<FilterSection layer={layer} onLayerChange={onLayerChange} />);
+
+    const applyAreaFilterSwitch = screen.getByRole("switch", {
+      name: /apply area filter/i,
+    });
+    expect(applyAreaFilterSwitch).toBeChecked();
+
+    fireEvent.click(applyAreaFilterSwitch);
+
+    const updatedLayer = _applyLatestUpdate({
+      onLayerChange: onLayerChange,
+      layer: layer,
+    });
+    expect(updatedLayer.applyAoiFilter).toBe(false);
+    expect(updatedLayer.source.filters.rules).toEqual([]);
+    expect(MapLayerUpdates.withApplyAoiFilter).toHaveBeenCalledWith({
+      layer,
+      applyAoiFilter: false,
+    });
+    expect(MapLayerUpdates.withFilters).not.toHaveBeenCalled();
+  });
+
+  it("hides the apply area filter switch on the annotation row", () => {
+    render(
+      <FilterSection
+        layer={_makeLayerWithFilters([])}
+        onLayerChange={vi.fn()}
+        showApplyAoiFilterSwitch={false}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("switch", { name: /apply area filter/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides the apply area filter switch on a buffer of layer", () => {
+    const source = MapLayer.makeEmpty("Cases");
+    const layer: MapLayer.T = {
+      ..._makeLayerWithFilters([]),
+      geoBinding: {
+        type: "bufferOfLayer",
+        layerId: source.id,
+        distanceMeters: 1000,
+        dissolve: false,
+      },
+    };
+
+    render(<FilterSection layer={layer} onLayerChange={vi.fn()} />);
+
+    expect(
+      screen.queryByRole("switch", { name: /apply area filter/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("writes filter changes through the layer update handler", () => {

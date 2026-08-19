@@ -20,16 +20,60 @@ describe("getGeoBindingGuessFromColumns", () => {
         _column({ name: "lat" }),
         _column({ name: "lon" }),
       ]),
-    ).toEqual({ latitudeColumnName: "lat", longitudeColumnName: "lon" });
+    ).toEqual({
+      latitudeColumnName: "lat",
+      longitudeColumnName: "lon",
+      confidence: "high",
+    });
   });
 
-  it("matches case insensitively and ignores surrounding punctuation", () => {
+  it("matches case insensitively after stripping leading and trailing punctuation", () => {
     expect(
       getGeoBindingGuessFromColumns([
-        _column({ name: "Lat" }),
+        _column({ name: "_Lat" }),
         _column({ name: "Long_" }),
       ]),
-    ).toEqual({ latitudeColumnName: "Lat", longitudeColumnName: "Long_" });
+    ).toEqual({
+      latitudeColumnName: "_Lat",
+      longitudeColumnName: "Long_",
+      confidence: "high",
+    });
+  });
+
+  it("still matches when both names are mixed case with trailing punctuation", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "LATITUDE" }),
+        _column({ name: "Longitude." }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "LATITUDE",
+      longitudeColumnName: "Longitude.",
+      confidence: "high",
+    });
+  });
+
+  it("matches a coordinate name carrying one qualifier word", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "adm1_pcode", isNumeric: false }),
+        _column({ name: "center_lat" }),
+        _column({ name: "center_lon" }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "center_lat",
+      longitudeColumnName: "center_lon",
+      confidence: "high",
+    });
+  });
+
+  it("does not read a qualifier as a coordinate for x and y", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "offset_y" }),
+        _column({ name: "offset_x" }),
+      ]),
+    ).toBeUndefined();
   });
 
   it("never matches on a substring", () => {
@@ -59,13 +103,57 @@ describe("getGeoBindingGuessFromColumns", () => {
     ).toBeUndefined();
   });
 
-  it("prefers the first match when several columns qualify", () => {
+  it("prefers high-confidence names over x and y", () => {
     expect(
       getGeoBindingGuessFromColumns([
         _column({ name: "y" }),
         _column({ name: "latitude" }),
         _column({ name: "x" }),
+        _column({ name: "longitude" }),
       ]),
-    ).toEqual({ latitudeColumnName: "y", longitudeColumnName: "x" });
+    ).toEqual({
+      latitudeColumnName: "latitude",
+      longitudeColumnName: "longitude",
+      confidence: "high",
+    });
+  });
+
+  it("matches x and y as a low-confidence pair", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "y" }),
+        _column({ name: "x" }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "y",
+      longitudeColumnName: "x",
+      confidence: "low",
+    });
+  });
+
+  it("matches coord_y and coord_x as a low-confidence pair", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "coord_y" }),
+        _column({ name: "coord_x" }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "coord_y",
+      longitudeColumnName: "coord_x",
+      confidence: "low",
+    });
+  });
+
+  it("matches coordy and coordx as a low-confidence pair", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "coordy" }),
+        _column({ name: "coordx" }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "coordy",
+      longitudeColumnName: "coordx",
+      confidence: "low",
+    });
   });
 });

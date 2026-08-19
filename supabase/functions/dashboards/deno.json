@@ -1,5 +1,6 @@
 {
   "imports": {
+    "$/": "../../../shared/",
     "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
     "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
     "@avandar/models": "../../../packages/shared/models/src/index.ts",
@@ -17,13 +18,14 @@
     "@supabase/postgrest-js": "npm:@supabase/postgrest-js@2",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@utils/": "../../../packages/shared/utils/src/",
-    "$/": "../../../shared/",
     "ts-pattern": "npm:ts-pattern@5",
     "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {
     "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "lib": ["deno.ns", "dom", "dom.iterable"],
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -32,6 +34,7 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strict": true
+    "strict": true,
+    "types": ["react", "react/jsx-runtime"]
   }
 }

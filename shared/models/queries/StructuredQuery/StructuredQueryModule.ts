@@ -1,6 +1,10 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
-import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import { makeQueryFilterNodeId } from "$/models/queries/StructuredQuery/makeQueryFilterNodeId.ts";
+import {
+  EMPTY_QUERY_FILTER,
+  isEmptyQueryFilter,
+} from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { toRawDuckDbQuery } from "$/models/queries/StructuredQuery/toRawDuckDbQuery.ts";
 import type {
   PartialStructuredQuery,
@@ -9,6 +13,15 @@ import type {
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export const StructuredQueryModule = {
+  /** An empty filter tree, for a query that filters nothing. */
+  EMPTY_FILTER: EMPTY_QUERY_FILTER,
+
+  /** True when a filter tree carries no rules at any depth. */
+  isEmptyFilter: isEmptyQueryFilter,
+
+  /** A fresh id for one filter tree node. See `makeQueryFilterNodeId`. */
+  makeFilterNodeId: makeQueryFilterNodeId,
+
   makeEmpty: (): PartialStructuredQuery => {
     return Model.make("StructuredQuery", {
       id: uuid<StructuredQueryId>(),

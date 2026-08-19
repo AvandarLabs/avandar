@@ -64,6 +64,8 @@ describe("MapCanvas attribution", () => {
       basemapRef: { current: basemap },
       interactiveLayerIdsRef: { current: [] },
       onFeatureClickRef: { current: vi.fn() },
+      onClusterClickRef: { current: vi.fn() },
+      mapToolModeRef: { current: { type: "pan" } },
     };
 
     const detach = MapInstanceHelpers.attach({
@@ -108,6 +110,8 @@ describe("MapCanvas attribution", () => {
       basemapRef: { current: basemap },
       interactiveLayerIdsRef: { current: ["ava-map-layer-clinics"] },
       onFeatureClickRef: { current: onFeatureClick },
+      onClusterClickRef: { current: vi.fn() },
+      mapToolModeRef: { current: { type: "pan" } },
     };
 
     MapInstanceHelpers.attach({
@@ -142,6 +146,8 @@ describe("MapCanvas attribution", () => {
       basemapRef: { current: basemap },
       interactiveLayerIdsRef: { current: [] },
       onFeatureClickRef: { current: vi.fn() },
+      onClusterClickRef: { current: vi.fn() },
+      mapToolModeRef: { current: { type: "pan" } },
     };
 
     const detach = MapInstanceHelpers.attach({

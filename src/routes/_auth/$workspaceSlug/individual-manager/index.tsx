@@ -1,7 +1,7 @@
-import { Callout } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { Center } from "@mantine/core";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { ReactNode } from "react";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/",
@@ -10,17 +10,11 @@ export const Route = createFileRoute(
 });
 
 /**
- * This is the default view when we load the individual-manager root.
+ * `/individual-manager` without a case type is not a destination. Send the
+ * user to Case Manager, where they pick or create one.
  */
-function IndividualManagerRootWithNoConceptSelected() {
-  const { t } = useLingui();
-  return (
-    <Center h="50%">
-      <Callout
-        title={t`No entity selected`}
-        color="info"
-        message={t`Please select an entity from the left sidebar, or create a new one.`}
-      />
-    </Center>
-  );
+function IndividualManagerRootWithNoConceptSelected(): ReactNode {
+  const workspace = useCurrentWorkspace();
+  const home = AppLinks.ontologyDesignerHome(workspace.slug);
+  return <Navigate to={home.to} params={home.params} />;
 }

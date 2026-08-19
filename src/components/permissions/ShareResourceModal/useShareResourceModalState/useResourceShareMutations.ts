@@ -1,5 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
+import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError } from "@/utils/notifications/notify";
 import type { QueryKey } from "@tanstack/react-query";
@@ -24,7 +26,10 @@ export function useResourceShareMutations(
   queriesToInvalidate: readonly QueryKey[],
 ): ResourceShareMutations {
   const { t } = useLingui();
-  const invalidateKeys = [...queriesToInvalidate];
+  const invalidateKeys = [
+    ...queriesToInvalidate,
+    getNuxWorkspaceArtifactsQueryKey(),
+  ];
 
   const [upsertShare, isUpserting] = ResourceShareClient.useUpsertResourceShare(
     {
@@ -44,6 +49,9 @@ export function useResourceShareMutations(
           notifyError({
             title: t`Shared dashboard limit reached`,
             message: t`Your plan does not allow sharing this dashboard with anyone else. Upgrade your plan, or unshare another dashboard, and try again.`,
+          });
+          NuxEvents.emit("dashboard.shareBlocked", {
+            reason: "shareable_dashboard_limit",
           });
           return;
         }

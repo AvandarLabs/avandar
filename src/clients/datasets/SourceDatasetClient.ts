@@ -6,6 +6,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { CsvFileDatasetClient } from "./source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "./source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "./source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "./source-datasets/PdfFileDatasetClient";
 import { VirtualDatasetClient } from "./source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "./source-datasets/XlsxFileDatasetClient";
 
@@ -13,6 +14,7 @@ const SourceDatasetClientRegistry = {
   csv_file: CsvFileDatasetClient,
   google_sheets: GoogleSheetsDatasetClient,
   open_data: OpenDataDatasetClient,
+  pdf_file: PdfFileDatasetClient,
   virtual: VirtualDatasetClient,
   xlsx_file: XlsxFileDatasetClient,
 } satisfies Registry<DatasetSource.SourceType>;

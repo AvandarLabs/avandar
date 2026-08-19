@@ -1,6 +1,6 @@
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
+import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
-import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
 import {
   buildOfflineAnalyzePrompt,
   buildOfflineFixSqlPrompt,
@@ -122,7 +122,7 @@ export async function runOfflineChatPipeline(
     };
   }
 
-  const resolvedDataset = resolveOfflineDataset({
+  const resolvedDataset = getOfflineDatasetFromPrompt({
     schema: args.schema,
     lastUserPrompt: args.lastUserPrompt,
     openDatasetId: args.pageContext.openDatasetId,

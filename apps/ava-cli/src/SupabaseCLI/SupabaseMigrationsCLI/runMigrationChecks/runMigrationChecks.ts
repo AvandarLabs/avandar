@@ -375,9 +375,19 @@ function _checkStorageConventions(
 ): MigrationCheckResult {
   const storageMigrations = Object.entries(snapshot.newMigrationContents)
     .filter(([filename, contents]) => {
+      // Match against executable SQL only, never comments. A migration that
+      // merely mentions storage in prose is not a storage migration, and
+      // must NOT get the marker: the marker puts a file in `sql_paths`,
+      // where it is replayed against an already-migrated database, so a
+      // non-storage file there would re-run its statements out of order.
+      //
+      // This bit us on a migration whose comment cited
+      // `storage.foldername(name)[2]` to explain a `public` function it was
+      // changing. Scanning raw contents flagged it as a storage migration.
       return (
-        STORAGE_SCHEMA_PATTERN.test(contents) ||
-        filename.includes(STORAGE_MARKER)
+        _splitStatements(contents).some((statement) => {
+          return STORAGE_SCHEMA_PATTERN.test(statement);
+        }) || filename.includes(STORAGE_MARKER)
       );
     })
     .map(([filename]) => {

@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_WAVE_C_WEB_MERCATOR_CSV_PATH,
-  GIS_WAVE_C_WEB_MERCATOR_ROW_COUNT,
+  GIS_WEB_MERCATOR_POINTS_CSV_PATH,
+  GIS_WEB_MERCATOR_POINTS_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -15,7 +15,7 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Locator, Page } from "@playwright/test";
 
-const DATASET_NAME = "gis-wave-c-web-mercator.csv";
+const DATASET_NAME = "web-mercator-points.csv";
 const MAP_NAME = "E2E GIS geometry source CRS";
 
 /** WGS 84 equivalents of the fixture's EPSG:3857 point WKT. */
@@ -88,8 +88,8 @@ test("reprojects a web-mercator geometry column and keeps the source CRS", async
     datasetId = await importDatasetViaUi({
       page,
       workspaceSlug,
-      filePath: GIS_WAVE_C_WEB_MERCATOR_CSV_PATH,
-      expectedRowCount: GIS_WAVE_C_WEB_MERCATOR_ROW_COUNT,
+      filePath: GIS_WEB_MERCATOR_POINTS_CSV_PATH,
+      expectedRowCount: GIS_WEB_MERCATOR_POINTS_ROW_COUNT,
     });
     await page.getByRole("link", { name: "Maps" }).click();
     await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();

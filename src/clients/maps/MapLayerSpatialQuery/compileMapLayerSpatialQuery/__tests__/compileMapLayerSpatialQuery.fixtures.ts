@@ -3,11 +3,53 @@ import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
+import type { CompileOptions } from "../compileMapLayerSpatialQuery.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+/** Unit square used by AOI compiler tests. */
+export const SAMPLE_AOI: AvaMapConfig.AoiPolygon = {
+  type: "Polygon",
+  coordinates: [
+    [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+      [0, 0],
+    ],
+  ],
+};
+
+/**
+ * Overlay with no AOI or time range, plus a stack of only this layer.
+ */
+export function withEmptyOverlay<T extends { layer: MapLayer.T }>(
+  options: T,
+): T & Pick<CompileOptions, "overlay" | "stack"> {
+  return {
+    ...options,
+    overlay: { aoi: undefined, timeRange: undefined },
+    stack: [options.layer],
+  };
+}
+
+/**
+ * Overlay with a unit-square AOI and a stack of only this layer.
+ */
+export function withAoiOverlay<T extends { layer: MapLayer.T }>(
+  options: T,
+): T & Pick<CompileOptions, "overlay" | "stack"> {
+  return {
+    ...options,
+    overlay: { aoi: SAMPLE_AOI, timeRange: undefined },
+    stack: [options.layer],
+  };
+}
 
 function _createDataset(): Dataset.T {
   const now = new Date().toISOString();
@@ -92,6 +134,7 @@ export function createGeometryLayerFixture(): {
     boundary: undefined,
     aggregationMeasureColumnName: undefined,
     normalizationDenominator: undefined,
+    disputedStatusColumn: undefined,
   };
   return { layer, metadata };
 }
@@ -155,6 +198,16 @@ export function getParsedRowsSql(rawSql: string): string {
   const end = rawSql.indexOf("typed_rows AS (");
   if (start < 0 || end <= start) {
     throw new Error("The compiled geometry SQL has no parser section");
+  }
+  return rawSql.slice(start, end);
+}
+
+/** Returns the point-aggregation parser CTE without later assignment SQL. */
+export function getParsedPointsSql(rawSql: string): string {
+  const start = rawSql.indexOf("parsed_points AS (");
+  const end = rawSql.indexOf("boundary_rows AS (");
+  if (start < 0 || end <= start) {
+    throw new Error("The compiled point SQL has no parser section");
   }
   return rawSql.slice(start, end);
 }
