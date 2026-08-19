@@ -10,6 +10,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DisplayNameSection } from "./DisplayNameSection";
 import { EmailSection } from "./EmailSection";
 import { PasswordSection } from "./PasswordSection";
+import { TutorialSection } from "./TutorialSection/TutorialSection";
 
 /**
  * Renders the per-user settings page (display name, email, password) scoped
@@ -74,6 +75,8 @@ export function ProfileView(): JSX.Element {
               });
             }}
           />
+
+          <TutorialSection />
         </Stack>
       </Container>
     </AppLayout>

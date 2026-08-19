@@ -4,6 +4,7 @@ import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCa
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
@@ -48,8 +49,8 @@ const CAPABILITIES = {
 
   /**
    * Stored Parquet carries no version we read. An API-backed catalog entry
-   * does produce a token, which `acquire` returns on that path; csv and xlsx
-   * still report none.
+   * does produce a token, which `acquire` returns on that path; the uploaded
+   * file types still report none.
    */
   freshnessSignal: "none",
 
@@ -132,18 +133,26 @@ async function _getDataset(datasetId: Dataset.Id): Promise<Dataset.T> {
 }
 
 /**
- * Downloads a `csv_file` or `xlsx_file` dataset's stored Parquet, resolving
- * its source record first. The source record's fields are not needed to build
- * the storage path; resolving it anyway keeps the requests, and the cache
- * entries they populate, identical to the relation extractor path this
- * replaces.
+ * Downloads an uploaded-file dataset's stored Parquet, resolving its source
+ * record first. The source record's fields are not needed to build the storage
+ * path; resolving it anyway keeps the requests, and the cache entries they
+ * populate, identical to the relation extractor path this replaces.
  */
 async function _downloadStoredParquet(
   dataset: Readonly<Dataset.T>,
-  sourceType: "csv_file" | "xlsx_file",
+  sourceType: "csv_file" | "xlsx_file" | "pdf_file",
 ): Promise<Blob> {
-  const sourceClient =
-    sourceType === "csv_file" ? CsvFileDatasetClient : XlsxFileDatasetClient;
+  const sourceClient = match(sourceType)
+    .with("csv_file", () => {
+      return CsvFileDatasetClient;
+    })
+    .with("xlsx_file", () => {
+      return XlsxFileDatasetClient;
+    })
+    .with("pdf_file", () => {
+      return PdfFileDatasetClient;
+    })
+    .exhaustive();
   await sourceClient
     .withCache(AvaQueryClient)
     .withEnsureQueryData()
@@ -265,7 +274,7 @@ async function _fetchParquetFromSource(
 ): Promise<FetchedParquet> {
   const dataset = await getDataset(ref.id);
   return match(dataset.sourceType)
-    .with("csv_file", "xlsx_file", async (sourceType) => {
+    .with("csv_file", "xlsx_file", "pdf_file", async (sourceType) => {
       return {
         parquetBlob: await _downloadStoredParquet(dataset, sourceType),
         sourceVersion: undefined,
@@ -284,8 +293,8 @@ async function _fetchParquetFromSource(
 
 /**
  * Acquires the dataset source types whose rows already exist as Parquet:
- * `csv_file`, `xlsx_file` and `open_data`. Each is downloaded whole, because
- * none of the three can be asked a question.
+ * `csv_file`, `xlsx_file`, `pdf_file` and `open_data`. Each is downloaded
+ * whole, because none of the four can be asked a question.
  *
  * `handles` narrows on the reference kind alone, which is all a `RelationRef`
  * carries; a dataset's source type is stored, not encoded in its reference, so

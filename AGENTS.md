@@ -127,11 +127,13 @@ Implement functionality using red/green TDD.
   proven otherwise: reset, regenerate, and compare before trusting it.
 - Before any database migration or schema work on a branch other than
   `develop`, create an isolated local Supabase instance with
-  `ava supabase switch <temporary-project-id>`, even when no local Supabase
-  instance is running. Derive `<temporary-project-id>` from the current branch
-  by lowercasing it, replacing each run of characters outside `a-z`, `0-9`, and
-  `_` with `-`, collapsing repeated hyphens, and trimming leading and trailing
-  hyphens. For example, `feat/analytics-p2` becomes `feat-analytics-p2`.
+  `ava supabase switch`, even when no local Supabase instance is running.
+  With no project id, the command kebab-cases the current branch: lowercase
+  it, replace each run of characters outside `a-z`, `0-9`, and `_` with `-`,
+  collapse repeated hyphens, and trim leading and trailing hyphens. For
+  example, `feat/analytics-p2` becomes `feat-analytics-p2`. A branch may have
+  only one switch. Asking for a different id offers to start the existing one
+  instead; restore first if you need a new id.
 - A switch seeds the new instance once it is up, so the branch starts with the
   usual seed users and workspace. Pass `--no-seed` to leave it empty. A failed
   seed leaves the switch in place and prints the `pnpm db:seed` retry, since

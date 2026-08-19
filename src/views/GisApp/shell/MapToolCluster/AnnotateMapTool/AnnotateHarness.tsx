@@ -7,6 +7,7 @@ import { vi } from "vitest";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { AnnotationFeatureInspector } from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
+import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
 import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
@@ -44,6 +45,9 @@ export function AnnotateHarness({
   const [selectedFeatureId, setSelectedFeatureId] = useState<
     AvaMapConfig.AnnotationFeatureId | undefined
   >();
+  const [editingTextFeatureId, setEditingTextFeatureId] = useState<
+    AvaMapConfig.AnnotationFeatureId | undefined
+  >();
   const mapRef = useRef(fakeMap.map);
   const onConfigChangeRef = useRef(onConfigChange);
   onConfigChangeRef.current = onConfigChange;
@@ -71,12 +75,31 @@ export function AnnotateHarness({
     mapToolMode,
     onMapToolModeChange: setMapToolMode,
     updateConfig,
+    onEditingTextFeatureIdChange: setEditingTextFeatureId,
   });
   const selectedFeatureIdOrCreated =
     selectedFeatureId ?? lastCreatedAnnotationId;
   const selectedFeature = config.annotations.features.find((feature) => {
     return feature.id === selectedFeatureIdOrCreated;
   });
+  const editingFeature = config.annotations.features.find((feature) => {
+    return feature.id === editingTextFeatureId && feature.kind === "text";
+  });
+  const replaceFeature = (
+    nextFeature: AvaMapConfig.AnnotationFeature,
+  ): void => {
+    setConfig((current) => {
+      return {
+        ...current,
+        annotations: {
+          ...current.annotations,
+          features: current.annotations.features.map((feature) => {
+            return feature.id === nextFeature.id ? nextFeature : feature;
+          }),
+        },
+      };
+    });
+  };
   const dataLayer = config.layers[0];
   return (
     <>
@@ -110,24 +133,40 @@ export function AnnotateHarness({
       <span data-testid="annotation-preview">
         {JSON.stringify(annotationPreviewVertices)}
       </span>
+      {editingFeature?.kind === "text" ?
+        <AnnotationTextOverlay
+          map={fakeMap.map}
+          feature={editingFeature}
+          onTextChange={(text) => {
+            replaceFeature({ ...editingFeature, text });
+          }}
+          onCommit={() => {
+            setEditingTextFeatureId(undefined);
+          }}
+        />
+      : selectedFeature?.kind === "text" ?
+        <AnnotationTextOverlay
+          map={fakeMap.map}
+          feature={selectedFeature}
+          mode="select"
+          onMove={(coordinates) => {
+            replaceFeature({
+              ...selectedFeature,
+              geometry: { type: "Point", coordinates },
+            });
+          }}
+          onResize={(sizePx) => {
+            replaceFeature({ ...selectedFeature, sizePx });
+          }}
+          onStartEdit={() => {
+            setEditingTextFeatureId(selectedFeature.id);
+          }}
+        />
+      : null}
       {selectedFeature && config.annotations.isVisible ?
         <AnnotationFeatureInspector
           feature={selectedFeature}
-          onFeatureChange={(nextFeature) => {
-            setConfig((current) => {
-              return {
-                ...current,
-                annotations: {
-                  ...current.annotations,
-                  features: current.annotations.features.map((feature) => {
-                    return feature.id === nextFeature.id ?
-                        nextFeature
-                      : feature;
-                  }),
-                },
-              };
-            });
-          }}
+          onFeatureChange={replaceFeature}
           onDelete={() => {
             setConfig((current) => {
               return AvaMapConfig.withoutAnnotationFeature({

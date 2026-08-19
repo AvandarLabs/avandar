@@ -20,6 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
@@ -172,10 +174,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // "isInCloudStorage" property
                 datasetWithColumnsAndSource.source &&
                 "isInCloudStorage" in datasetWithColumnsAndSource.source &&
-                // this toggle is currently only supported for CSV and Excel
-                // datasets
+                // this toggle is currently only supported for CSV, Excel, and
+                // PDF datasets (i.e. the manually-uploaded, parquet-backed
+                // source types)
                 (dataset.sourceType === "csv_file" ||
-                  dataset.sourceType === "xlsx_file")
+                  dataset.sourceType === "xlsx_file" ||
+                  dataset.sourceType === "pdf_file")
               ) ?
                 <Box style={{ flexShrink: 0 }}>
                   <ToggleOfflineOnlyButton
@@ -200,7 +204,16 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             tabIds={["dataset-metadata", "dataset-summary"] as const}
             renderTabHeader={{
               "dataset-metadata": t`Metadata`,
-              "dataset-summary": t`Data Summary`,
+              // The onboarding tutorial's first payoff points here. It has to
+              // be the TAB and not the panel: this view opens on Metadata, so
+              // the summary itself is not mounted when the tutorial arrives,
+              // and a tooltip anchored to the panel would wait out its timeout
+              // against an element that does not exist yet.
+              "dataset-summary": (
+                <span {...NuxAnchors.props(NuxAnchors.ids.datasetSummaryTab)}>
+                  {t`Data Summary`}
+                </span>
+              ),
             }}
             renderTabPanel={{
               "dataset-metadata": () => {
@@ -253,6 +266,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     <Loader />
                   : <DatasetSummaryView datasetId={dataset.id} />;
               },
+            }}
+            onTabChange={(tabId) => {
+              if (tabId === "dataset-summary") {
+                NuxEvents.emit("dataset.summaryOpened", {
+                  datasetId: dataset.id,
+                });
+              }
             }}
           />
 

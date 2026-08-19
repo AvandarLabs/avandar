@@ -1,6 +1,11 @@
+import {
+  getOriginalFileExtensionFromSourceType,
+  requiresOriginalFileRetention,
+} from "$/models/datasets/DatasetSource/DatasetSource";
 import { createServerApiClient } from "$/ServerApiClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import type {
   DatasetColumnInput,
@@ -116,6 +121,36 @@ function _makeInsertXlsxFileDataset(
   };
 }
 
+function _makeInsertPdfFileDataset(
+  options: Readonly<DatasetMutationConfig>,
+): DatasetMutationRecord["insertPdfFileDataset"] {
+  return async (params) => {
+    const logger = options.logger.appendName("insertPdfFileDataset");
+    logger.log("Creating pdf file dataset", params);
+    const dataset = await serverApi.rpc<DatasetDBRead>(
+      "rpc_datasets__add_pdf_file_dataset",
+      {
+        p_dataset_id: params.datasetId,
+        p_workspace_id: params.workspaceId,
+        p_dataset_name: params.datasetName,
+        p_dataset_description: params.datasetDescription,
+        p_columns: _getDatabaseColumns(params.columns),
+        p_is_in_cloud_storage: params.isInCloudStorage,
+        p_size_in_bytes: params.sizeInBytes,
+        p_has_original_file: params.hasOriginalFile,
+        p_regions: params.regions,
+        p_output_mode: params.outputMode ?? "natural",
+        p_llm_model: params.llmModel ?? null,
+        p_page_range_start: params.pageRangeStart ?? null,
+        p_page_range_end: params.pageRangeEnd ?? null,
+        p_fingerprint: params.fingerprint,
+      },
+    );
+    logger.log("Successfully added pdf file dataset", dataset);
+    return options.parsers.fromDBReadToModelRead(dataset);
+  };
+}
+
 function _makeInsertGoogleSheetsDataset(
   options: Readonly<DatasetMutationConfig>,
 ): DatasetMutationRecord["insertGoogleSheetsDataset"] {
@@ -175,6 +210,27 @@ function _makeFullDelete(
         workspaceId: dataset.workspaceId,
         datasetId: params.id,
       });
+      if (requiresOriginalFileRetention(dataset.sourceType)) {
+        // The metadata row deletion below is the point of no return for the
+        // user (the dataset disappears from their workspace either way), so
+        // a failure to remove the retained-original blob must not strand
+        // them with a dataset they can no longer delete. Unlike the parquet
+        // deletion above, which throws and aborts the delete, we log and
+        // swallow: worst case is an orphaned blob to clean up later, not a
+        // dataset stuck in limbo.
+        await DatasetOriginalFileStorageClient.deleteOriginalFile({
+          workspaceId: dataset.workspaceId,
+          datasetId: params.id,
+          fileExtension: getOriginalFileExtensionFromSourceType(
+            dataset.sourceType,
+          ),
+        }).catch((error: unknown) => {
+          logger.error(
+            "Failed to delete the dataset's retained original file; leaving the object storage blob in place",
+            { datasetId: params.id, error },
+          );
+        });
+      }
     }
     await options.client.delete(params);
     const localDataset = await LocalDatasetClient.getById(params);
@@ -196,6 +252,7 @@ export function createDatasetMutations(
     insertVirtualDataset: _makeInsertVirtualDataset(options),
     insertCsvFileDataset: _makeInsertCsvFileDataset(options),
     insertXlsxFileDataset: _makeInsertXlsxFileDataset(options),
+    insertPdfFileDataset: _makeInsertPdfFileDataset(options),
     insertGoogleSheetsDataset: _makeInsertGoogleSheetsDataset(options),
     insertOpenDataDataset: _makeInsertOpenDataDataset(options),
     fullDelete: _makeFullDelete(options),

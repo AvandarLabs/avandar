@@ -2,6 +2,7 @@ import { DatasetPreview } from "@/views/DataManagerApp/DataImportView/DatasetImp
 import { ErrorSummary } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ErrorSummary";
 import { ImportStatusCallout } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ImportStatusCallout";
 import { OnlineStorageAllowedCheckbox } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox";
+import { isPdfAwaitingSelection } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/isPdfAwaitingSelection";
 import type {
   DatasetImportFormProps,
   DataSourceMetadata,
@@ -20,6 +21,7 @@ export type DatasetImportFeedbackProps = {
   onDataSourceMetadataChange: DatasetImportFormProps["onDataSourceMetadataChange"];
   onRequestDataReparse: DatasetImportFormProps["onRequestDataReparse"];
   previewRows: UnknownObject[];
+  sourceFile?: File;
   validation: DatasetImportValidation;
 };
 
@@ -36,15 +38,24 @@ export function DatasetImportFeedback({
   onDataSourceMetadataChange,
   onRequestDataReparse,
   previewRows,
+  sourceFile,
   validation,
 }: Readonly<DatasetImportFeedbackProps>): ReactNode {
   return (
     <>
-      <ImportStatusCallout
-        numRows={dataSourceMetadata.datasetLoadResult.numRows}
-        failureMessage={copy.failureMessage}
-        failureTitle={copy.failureTitle}
-      />
+      {/*
+        `numRows === 0` normally means the parse failed. For a PDF with no
+        region picked yet it means the user has not told us what to read, so
+        the callout is withheld and `DatasetPreview` explains what to do
+        instead.
+      */}
+      {isPdfAwaitingSelection(dataSourceMetadata) ? null : (
+        <ImportStatusCallout
+          numRows={dataSourceMetadata.datasetLoadResult.numRows}
+          failureMessage={copy.failureMessage}
+          failureTitle={copy.failureTitle}
+        />
+      )}
       <DatasetPreview
         columns={columns}
         columnsMessage={copy.columnsMessage}
@@ -54,6 +65,7 @@ export function DatasetImportFeedback({
         onRequestDataReparse={onRequestDataReparse}
         previewMessage={copy.previewMessage}
         previewRows={previewRows}
+        sourceFile={sourceFile}
       />
       <OnlineStorageAllowedCheckbox
         dataSourceMetadata={dataSourceMetadata}

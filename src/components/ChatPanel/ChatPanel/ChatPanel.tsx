@@ -8,6 +8,7 @@ import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
+import { NuxOpenChatPanelEffect } from "@/components/Nux/NuxTour/useNuxOpenChatPanel/NuxOpenChatPanelEffect";
 import css from "./ChatPanel.module.css";
 
 /**
@@ -56,26 +57,29 @@ export function ChatPanel(): React.ReactNode {
     context.app === "case-manager" ? dispatch.beginCaseDesign : startNewChat;
 
   return (
-    <Box h="100%" py="xs" pr="xs">
-      <Stack
-        h="100%"
-        bdrs="md"
-        className={clsx(
-          css.shell,
-          disabled && css.chatPanelShellDisabled,
-          layout === "composer" && css.shellComposer,
-        )}
-        gap={0}
-      >
-        <ChatPanelHeader
-          onNewChatClick={onNewChatClick}
-          onClose={dispatch.close}
-        />
-        <AssistantRuntimeProvider runtime={runtime}>
-          <ChatViewTranscriptSync />
-          <ChatThread />
-        </AssistantRuntimeProvider>
-      </Stack>
-    </Box>
+    <>
+      <NuxOpenChatPanelEffect />
+      <Box h="100%" py="xs" pr="xs">
+        <Stack
+          h="100%"
+          bdrs="md"
+          className={clsx(
+            css.shell,
+            disabled && css.chatPanelShellDisabled,
+            layout === "composer" && css.shellComposer,
+          )}
+          gap={0}
+        >
+          <ChatPanelHeader
+            onNewChatClick={onNewChatClick}
+            onClose={dispatch.close}
+          />
+          <AssistantRuntimeProvider runtime={runtime}>
+            <ChatViewTranscriptSync />
+            <ChatThread />
+          </AssistantRuntimeProvider>
+        </Stack>
+      </Box>
+    </>
   );
 }

@@ -1,7 +1,8 @@
 import { Tooltip } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
-import { Button, Group } from "@mantine/core";
+import { Box, Button, Group } from "@mantine/core";
 import { IconWorld } from "@tabler/icons-react";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { PrimaryActionLabel } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel";
 import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 import type { ReactNode } from "react";
@@ -44,18 +45,20 @@ export function PublishingActions({
         </Button>
       : null}
       <Tooltip label={isBlockedReason ?? ""} disabled={!isBlockedReason}>
-        <Button
-          loading={isBusy}
-          disabled={isDisabled}
-          onClick={onPrimaryAction}
-          color={actionKind === "unpublish" ? "red" : undefined}
-          variant={actionKind === "unpublish" ? "light" : "filled"}
-          leftSection={
-            actionKind === "unpublish" ? undefined : <IconWorld size={16} />
-          }
-        >
-          <PrimaryActionLabel actionKind={actionKind} />
-        </Button>
+        <Box {...NuxAnchors.props(NuxAnchors.ids.dashboardPublishButton)}>
+          <Button
+            loading={isBusy}
+            disabled={isDisabled}
+            onClick={onPrimaryAction}
+            color={actionKind === "unpublish" ? "red" : undefined}
+            variant={actionKind === "unpublish" ? "light" : "filled"}
+            leftSection={
+              actionKind === "unpublish" ? undefined : <IconWorld size={16} />
+            }
+          >
+            <PrimaryActionLabel actionKind={actionKind} />
+          </Button>
+        </Box>
       </Tooltip>
     </Group>
   );

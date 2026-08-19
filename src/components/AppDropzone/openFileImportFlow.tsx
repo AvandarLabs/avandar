@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
+import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { ImportConfirmBody } from "./ImportConfirmBody";
 
@@ -22,6 +23,7 @@ export function openFileImportFlow(file: File): void {
         cancel: <Trans>Cancel</Trans>,
       },
       centered: true,
+      zIndex: MODAL_ABOVE_NUX_TOUR_Z_INDEX,
       children: <ImportConfirmBody fileName={file.name} />,
       onConfirm: () => {
         // Open on a macrotask so the confirm click cannot land on the

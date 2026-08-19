@@ -34,9 +34,12 @@ export function useValuesFieldState(
   const isKnownValue = [...value, ...suggestions].some((known) => {
     return _normalize(known) === normalizedSearch;
   });
+  // Membership as a set, so filtering the suggestions stays one pass over them
+  // rather than one pass per suggestion over the chosen values.
+  const chosenValues = new Set(value);
   const matchingSuggestions = suggestions.filter((suggestion) => {
     return (
-      !value.includes(suggestion) &&
+      !chosenValues.has(suggestion) &&
       _normalize(suggestion).includes(normalizedSearch)
     );
   });

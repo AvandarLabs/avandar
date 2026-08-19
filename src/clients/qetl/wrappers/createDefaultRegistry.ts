@@ -86,14 +86,14 @@ export type DefaultRegistryOptions = {
  * What every `dataset` relation can be asked, regardless of its source type.
  *
  * A `RelationRef` names a kind and an id, and the registry allows one wrapper
- * per kind, but `csv_file`, `xlsx_file`, `open_data`, `virtual` and
- * `google_sheets` are five sources behind that one kind. Their capabilities are
- * not identical, so this record states the values that hold for all five and
+ * per kind, but `csv_file`, `xlsx_file`, `pdf_file`, `open_data`, `virtual` and
+ * `google_sheets` are six sources behind that one kind. Their capabilities are
+ * not identical, so this record states the values that hold for all six and
  * the composite delegates the rest.
  *
  * Every field below is chosen to preserve today's behaviour rather than to
  * describe the most capable source, because the only decision the mediator
- * makes from this record in Phase 1 is acquire versus push down, and all five
+ * makes from this record in Phase 1 is acquire versus push down, and all six
  * sources are acquire-only. Where a source is stricter than this record says,
  * its own wrapper still enforces it: Google Sheets caps a call at 10 MB and
  * shares a project-global quota, and its wrapper declares both. Specs 4 and 5
@@ -108,7 +108,7 @@ const DATASET_CAPABILITIES = {
   acquisitionUnit: { kind: "whole-relation" },
 
   /**
-   * None of the five can be asked a question. A stored Parquet blob answers
+   * None of the six can be asked a question. A stored Parquet blob answers
    * nothing, a virtual dataset's SQL is fixed at definition time, and the
    * Sheets `values.get` range is positional rather than a predicate.
    */
@@ -201,7 +201,7 @@ function _createDatasetWrapper(
   ): Promise<SourceWrapper<DatasetRef>> => {
     const dataset = await delegates.getDataset(ref.id);
     return match(dataset.sourceType)
-      .with("csv_file", "xlsx_file", "open_data", () => {
+      .with("csv_file", "xlsx_file", "pdf_file", "open_data", () => {
         return delegates.parquet;
       })
       .with("virtual", () => {
@@ -241,7 +241,7 @@ function _createDatasetWrapper(
 /**
  * The wrappers the application runs with, one registry per query session.
  *
- * Two wrappers are registered because there are two relation kinds. The five
+ * Two wrappers are registered because there are two relation kinds. The six
  * dataset source types sit behind one composite, so the registry's
  * one-wrapper-per-kind invariant holds without collapsing their behaviour.
  */

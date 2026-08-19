@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";
 
 type Props = {
@@ -95,6 +96,7 @@ export function SaveToDashboardCreateMode({
             onClick={onCreate}
             disabled={name.trim().length === 0 || isDisabled}
             loading={isCreating}
+            {...NuxAnchors.props(NuxAnchors.ids.explorerCreateDashboardButton)}
           >
             <Trans>Create dashboard &amp; save</Trans>
           </Button>

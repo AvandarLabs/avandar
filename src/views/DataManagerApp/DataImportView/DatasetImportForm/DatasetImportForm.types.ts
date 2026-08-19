@@ -1,11 +1,13 @@
 import type {
   CsvFileLoadResult,
+  PdfFileLoadResult,
   XlsxFileLoadResult,
 } from "../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   CsvParseOptions,
   FileParseOptions,
   GoogleSheetsParseOptions,
+  PdfParseOptions,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
 import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -47,9 +49,25 @@ export type CsvDataSourceMetadata = {
   parseOptions: CsvParseOptions;
 };
 
+export type PdfDataSourceMetadata = {
+  sourceType: "pdf_file";
+  onlineStorageAllowed: boolean;
+  sizeInBytes: number;
+
+  /** Geometry we read during the sniff, plus the selection status. */
+  datasetLoadResult: PdfFileLoadResult;
+
+  /**
+   * Options used to read the PDF. Used in case we need to re-read it, and
+   * carries the regions the user has picked (none, right after upload).
+   */
+  parseOptions: PdfParseOptions;
+};
+
 export type ManualUploadDataSourceMetadata =
   | XlsxDataSourceMetadata
-  | CsvDataSourceMetadata;
+  | CsvDataSourceMetadata
+  | PdfDataSourceMetadata;
 
 export type BaseLoadResult = {
   datasetId: Dataset.Id;
@@ -85,6 +103,7 @@ export type GoogleSheetsDataSourceMetadata = {
 export type DataSourceMetadata =
   | XlsxDataSourceMetadata
   | CsvDataSourceMetadata
+  | PdfDataSourceMetadata
   | GoogleSheetsDataSourceMetadata;
 
 export type DatasetImportFormProps = {
@@ -95,6 +114,13 @@ export type DatasetImportFormProps = {
   rows: readonly UnknownObject[];
   initialDatasetName: string;
   disableSubmit?: boolean;
+
+  /**
+   * The uploaded file, when there is one. Only a PDF needs it: its parse
+   * options are chosen by drawing on the rendered page, so the parse
+   * controls have to render the document itself.
+   */
+  sourceFile?: File;
 
   /** When the user requests to parse the data again. */
   onRequestDataReparse: (parseOptions: FileParseOptions) => void;
@@ -121,8 +147,11 @@ export type DatasetImportFormProps = {
    * Optional callback fired after the dataset is saved successfully.
    * Used by the app-wide import modal to close itself before the
    * default post-save navigation runs.
+   *
+   * Receives the dataset that was just saved. Callers that do not need it can
+   * declare no parameters.
    */
-  onAfterSave?: () => void;
+  onAfterSave?: (savedDataset: Dataset.T) => void;
 
   /**
    * If set, this callback is invoked with the saved dataset instead of

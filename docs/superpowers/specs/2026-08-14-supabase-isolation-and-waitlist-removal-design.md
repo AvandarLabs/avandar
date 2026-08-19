@@ -39,9 +39,15 @@ remaining account, workspace, invite, and subscription facts.
 
 ### Command interface
 
-`ava supabase switch <new-id> [port]` creates and starts an isolated local
-Supabase stack. The optional port is the API base port. When it is omitted, the
-command chooses a base port whose complete derived Supabase port set is free.
+`ava supabase switch [new-id] [port]` creates and starts an isolated local
+Supabase stack. When `new-id` is omitted, the command kebab-cases the current
+Git branch (`feat/analytics-p2` becomes `feat-analytics-p2`). The optional
+port is the API base port. When it is omitted, the command chooses a base port
+whose complete derived Supabase port set is free.
+
+A branch may have only one switch. A second id, or an omitted id when a switch
+already exists, names the existing project and asks whether to start it. A
+no means restore first, then switch to a new id.
 
 `ava supabase restore` stops the current branch's temporary stack, restores the
 original local files, and removes only resources owned by that temporary
@@ -66,7 +72,8 @@ Each backup includes exact copies of:
 
 A manifest records the branch, worktree path, temporary project id, selected
 base port, derived ports, backed-up files, and lifecycle state. A second switch
-on the same branch in the same worktree refuses to run until restore completes.
+on the same branch in the same worktree cannot create another project until
+restore completes; the command offers to start the existing one instead.
 Backups belonging to other branches or worktrees do not block the current
 worktree.
 

@@ -1,12 +1,13 @@
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { match } from "ts-pattern";
-import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
+import { attachAreaDrawGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAreaDrawGestures";
 import {
   makeAreaAnnotationFeature,
   makeArrowAnnotationFeature,
   makeFreehandAnnotationFeature,
   makeTextAnnotationFeature,
 } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
+import { MAP_TOOL_DRAG_THRESHOLD_PX } from "@/views/GisApp/tools/MapToolGesture.constants";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
 import type { Dispatch, SetStateAction } from "react";
@@ -15,12 +16,16 @@ type Vertex = [number, number];
 
 export type AnnotateGestureCallbacks = {
   invalidRingMessage: string;
+  onEditingTextFeatureIdChange: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
   onInvalidRing: Dispatch<SetStateAction<string | undefined>>;
   onMapToolModeChange: (mode: MapToolMode) => void;
   setLastCreatedAnnotationId: Dispatch<
     SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
   >;
   setVertices: Dispatch<SetStateAction<Vertex[]>>;
+  textPlaceholder: string;
   updateConfig: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;
   verticesRef: { current: Vertex[] };
 };
@@ -40,39 +45,6 @@ function _isTypingTarget(target: EventTarget | null): boolean {
   );
 }
 
-function _closeRing(vertices: readonly Vertex[]): Vertex[] {
-  const firstVertex = vertices[0];
-  if (!firstVertex) {
-    return [];
-  }
-  const lastVertex = vertices[vertices.length - 1];
-  if (
-    lastVertex &&
-    lastVertex[0] === firstVertex[0] &&
-    lastVertex[1] === firstVertex[1]
-  ) {
-    return [...vertices];
-  }
-  return [...vertices, firstVertex];
-}
-
-function _dropDuplicateCloseVertex(vertices: readonly Vertex[]): Vertex[] {
-  if (vertices.length < 2) {
-    return [...vertices];
-  }
-  const lastVertex = vertices[vertices.length - 1];
-  const previousVertex = vertices[vertices.length - 2];
-  if (
-    lastVertex &&
-    previousVertex &&
-    lastVertex[0] === previousVertex[0] &&
-    lastVertex[1] === previousVertex[1]
-  ) {
-    return vertices.slice(0, -1);
-  }
-  return [...vertices];
-}
-
 function _clearVertices(callbacks: AnnotateGestureCallbacks): void {
   callbacks.verticesRef.current = [];
   callbacks.setVertices([]);
@@ -88,30 +60,6 @@ function _commitFeature(
   });
   callbacks.setLastCreatedAnnotationId(feature.id);
   _clearVertices(callbacks);
-}
-
-function _appendVertex(
-  event: MapMouseEvent,
-  callbacks: AnnotateGestureCallbacks,
-): Vertex[] {
-  const nextVertices = [
-    ...callbacks.verticesRef.current,
-    _lngLatToVertex(event.lngLat),
-  ];
-  callbacks.verticesRef.current = nextVertices;
-  callbacks.setVertices(nextVertices);
-  return nextVertices;
-}
-
-function _commitClosedArea(callbacks: AnnotateGestureCallbacks): void {
-  const ring = _closeRing(
-    _dropDuplicateCloseVertex(callbacks.verticesRef.current),
-  );
-  if (!isClosedRingValid(ring)) {
-    callbacks.onInvalidRing(callbacks.invalidRingMessage);
-    return;
-  }
-  _commitFeature(makeAreaAnnotationFeature(ring), callbacks);
 }
 
 function _onAnnotateEscape(callbacks: AnnotateGestureCallbacks): void {
@@ -143,10 +91,13 @@ function _attachTextGestures(
   callbacks: AnnotateGestureCallbacks,
 ): () => void {
   const onClick = (event: MapMouseEvent): void => {
-    _commitFeature(
-      makeTextAnnotationFeature(_lngLatToVertex(event.lngLat)),
-      callbacks,
+    const feature = makeTextAnnotationFeature(
+      _lngLatToVertex(event.lngLat),
+      callbacks.textPlaceholder,
     );
+    _commitFeature(feature, callbacks);
+    callbacks.onEditingTextFeatureIdChange(feature.id);
+    callbacks.onMapToolModeChange({ type: "pan" });
   };
   map.on("click", onClick);
   return _attachEscapeAndCleanup(map, callbacks, () => {
@@ -154,22 +105,118 @@ function _attachTextGestures(
   });
 }
 
+type ArrowStroke = {
+  didDrag: boolean;
+  isPointerDown: boolean;
+  start: Vertex | undefined;
+  startPx: { x: number; y: number } | undefined;
+};
+
+function _previewVertices(
+  vertices: Vertex[],
+  callbacks: AnnotateGestureCallbacks,
+): void {
+  callbacks.verticesRef.current = vertices;
+  callbacks.setVertices(vertices);
+}
+
+function _beginArrowStroke(
+  map: MapLibreMap,
+  event: PointerEvent,
+  stroke: ArrowStroke,
+  callbacks: AnnotateGestureCallbacks,
+): void {
+  if (event.button !== 0 || event.altKey) {
+    return;
+  }
+  const start = _pointerEventToVertex(map, event);
+  stroke.isPointerDown = true;
+  stroke.didDrag = false;
+  stroke.start = start;
+  stroke.startPx = { x: event.clientX, y: event.clientY };
+  _clearVertices(callbacks);
+  _previewVertices([start], callbacks);
+}
+
+function _updateArrowStroke(
+  map: MapLibreMap,
+  event: PointerEvent,
+  stroke: ArrowStroke,
+  callbacks: AnnotateGestureCallbacks,
+): void {
+  if (!stroke.isPointerDown || !stroke.start || !stroke.startPx) {
+    return;
+  }
+  const dx = event.clientX - stroke.startPx.x;
+  const dy = event.clientY - stroke.startPx.y;
+  if (!stroke.didDrag && Math.hypot(dx, dy) < MAP_TOOL_DRAG_THRESHOLD_PX) {
+    return;
+  }
+  stroke.didDrag = true;
+  const end = _pointerEventToVertex(map, event);
+  _previewVertices([stroke.start, end], callbacks);
+}
+
+function _finishArrowStroke(
+  stroke: ArrowStroke,
+  callbacks: AnnotateGestureCallbacks,
+): void {
+  if (!stroke.isPointerDown) {
+    return;
+  }
+  stroke.isPointerDown = false;
+  const start = stroke.start;
+  const end = callbacks.verticesRef.current[1];
+  if (!stroke.didDrag || !start || !end) {
+    _clearVertices(callbacks);
+    return;
+  }
+  _commitFeature(makeArrowAnnotationFeature(start, end), callbacks);
+}
+
+function _cancelArrowStroke(
+  stroke: ArrowStroke,
+  callbacks: AnnotateGestureCallbacks,
+): void {
+  if (!stroke.isPointerDown) {
+    return;
+  }
+  stroke.isPointerDown = false;
+  _clearVertices(callbacks);
+}
+
 function _attachArrowGestures(
   map: MapLibreMap,
   callbacks: AnnotateGestureCallbacks,
 ): () => void {
-  const onClick = (event: MapMouseEvent): void => {
-    const nextVertices = _appendVertex(event, callbacks);
-    const start = nextVertices[0];
-    const end = nextVertices[1];
-    if (!start || !end) {
-      return;
-    }
-    _commitFeature(makeArrowAnnotationFeature(start, end), callbacks);
+  const stroke: ArrowStroke = {
+    didDrag: false,
+    isPointerDown: false,
+    start: undefined,
+    startPx: undefined,
   };
-  map.on("click", onClick);
+  const canvas = map.getCanvas();
+  const onPointerDown = (event: PointerEvent): void => {
+    _beginArrowStroke(map, event, stroke, callbacks);
+  };
+  const onPointerMove = (event: PointerEvent): void => {
+    _updateArrowStroke(map, event, stroke, callbacks);
+  };
+  const onPointerUp = (): void => {
+    _finishArrowStroke(stroke, callbacks);
+  };
+  const onPointerCancel = (): void => {
+    _cancelArrowStroke(stroke, callbacks);
+  };
+  canvas.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("pointercancel", onPointerCancel);
   return _attachEscapeAndCleanup(map, callbacks, () => {
-    map.off("click", onClick);
+    canvas.removeEventListener("pointerdown", onPointerDown);
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+    window.removeEventListener("pointercancel", onPointerCancel);
   });
 }
 
@@ -197,7 +244,6 @@ function _appendPointerVertex(
 }
 
 function _finishFreehandStroke(
-  map: MapLibreMap,
   drawing: { isPointerDown: boolean },
   callbacks: AnnotateGestureCallbacks,
 ): void {
@@ -205,7 +251,6 @@ function _finishFreehandStroke(
     return;
   }
   drawing.isPointerDown = false;
-  map.dragPan.enable();
   const vertices = callbacks.verticesRef.current;
   if (vertices.length < 2) {
     _clearVertices(callbacks);
@@ -215,7 +260,6 @@ function _finishFreehandStroke(
 }
 
 function _cancelFreehandStroke(
-  map: MapLibreMap,
   drawing: { isPointerDown: boolean },
   callbacks: AnnotateGestureCallbacks,
 ): void {
@@ -223,7 +267,6 @@ function _cancelFreehandStroke(
     return;
   }
   drawing.isPointerDown = false;
-  map.dragPan.enable();
   _clearVertices(callbacks);
 }
 
@@ -238,7 +281,6 @@ function _attachFreehandGestures(
       return;
     }
     drawing.isPointerDown = true;
-    map.dragPan.disable();
     _clearVertices(callbacks);
     _appendPointerVertex(map, event, callbacks);
   };
@@ -249,10 +291,10 @@ function _attachFreehandGestures(
     _appendPointerVertex(map, event, callbacks);
   };
   const onPointerUp = (): void => {
-    _finishFreehandStroke(map, drawing, callbacks);
+    _finishFreehandStroke(drawing, callbacks);
   };
   const onPointerCancel = (): void => {
-    _cancelFreehandStroke(map, drawing, callbacks);
+    _cancelFreehandStroke(drawing, callbacks);
   };
   canvas.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("pointermove", onPointerMove);
@@ -263,7 +305,6 @@ function _attachFreehandGestures(
     window.removeEventListener("pointermove", onPointerMove);
     window.removeEventListener("pointerup", onPointerUp);
     window.removeEventListener("pointercancel", onPointerCancel);
-    map.dragPan.enable();
   });
 }
 
@@ -271,37 +312,16 @@ function _attachAreaGestures(
   map: MapLibreMap,
   callbacks: AnnotateGestureCallbacks,
 ): () => void {
-  map.doubleClickZoom.disable();
-  const onClick = (event: MapMouseEvent): void => {
-    callbacks.onInvalidRing(undefined);
-    _appendVertex(event, callbacks);
-  };
-  const onDoubleClick = (event: MapMouseEvent): void => {
-    event.preventDefault();
-    _commitClosedArea(callbacks);
-  };
-  const onKeyDown = (event: KeyboardEvent): void => {
-    if (_isTypingTarget(event.target)) {
-      return;
-    }
-    if (event.key === "Escape") {
-      _onAnnotateEscape(callbacks);
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      _commitClosedArea(callbacks);
-    }
-  };
-  map.on("click", onClick);
-  map.on("dblclick", onDoubleClick);
-  window.addEventListener("keydown", onKeyDown);
-  return () => {
-    map.off("click", onClick);
-    map.off("dblclick", onDoubleClick);
-    window.removeEventListener("keydown", onKeyDown);
-    map.doubleClickZoom.enable();
-  };
+  return attachAreaDrawGestures(map, {
+    invalidRingMessage: callbacks.invalidRingMessage,
+    onInvalidRing: callbacks.onInvalidRing,
+    onMapToolModeChange: callbacks.onMapToolModeChange,
+    setVertices: callbacks.setVertices,
+    verticesRef: callbacks.verticesRef,
+    commitRing: (ring) => {
+      _commitFeature(makeAreaAnnotationFeature(ring), callbacks);
+    },
+  });
 }
 
 /**

@@ -182,4 +182,26 @@ describe("DashboardEditorStateManager", () => {
     });
     expect(result.current.state.editorData?.content).toEqual([]);
   });
+
+  it("does not mark unsaved changes when Puck echoes the same editor data", () => {
+    const { result } = renderManagerHooks();
+    const editorData = createEditorData();
+
+    act(() => {
+      result.current.dispatch.setActiveDashboard({
+        dashboardId: "dashboard-id",
+        editorData,
+      });
+    });
+    expect(result.current.state.hasUnsavedChanges).toBe(false);
+
+    act(() => {
+      result.current.dispatch.updateEditorData({
+        root: { props: {} },
+        content: [],
+      } as unknown as AvaPageData);
+    });
+
+    expect(result.current.state.hasUnsavedChanges).toBe(false);
+  });
 });

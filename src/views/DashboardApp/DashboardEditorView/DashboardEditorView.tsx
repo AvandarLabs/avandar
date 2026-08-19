@@ -14,7 +14,7 @@ import {
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { ReactElement } from "react";
 
 type Props = {
@@ -47,17 +47,27 @@ function useRegisterActiveDashboard(
   }>,
 ): void {
   const { dashboardId, initialEditorData, dispatch } = options;
+  const initialEditorDataRef = useRef(initialEditorData);
+  useEffect(
+    function trackInitialEditorData() {
+      initialEditorDataRef.current = initialEditorData;
+    },
+    [initialEditorData],
+  );
   useEffect(
     function registerActiveDashboard() {
+      // Seed from a ref so a loader refetch with a new dashboard object does
+      // not remount Puck. Unsaved edits live in editorData; bumping
+      // editorRevision would reload the canvas table.
       dispatch.setActiveDashboard({
         dashboardId,
-        editorData: initialEditorData,
+        editorData: initialEditorDataRef.current,
       });
       return () => {
         return dispatch.setActiveDashboard(undefined);
       };
     },
-    [dashboardId, dispatch, initialEditorData],
+    [dashboardId, dispatch],
   );
 }
 

@@ -139,6 +139,7 @@ export type SupabaseSeedTarget = {
 export type SupabaseSeedOutcome =
   | { state: "seeded" }
   | { state: "skipped" }
+  | { state: "unchanged" }
   | { state: "failed"; message: string };
 
 /** The active project a completed switch left behind. */

@@ -92,17 +92,20 @@ in CSS modules over new animation libraries.
 
 ### Transition shortcuts (`--ava-transition-*`)
 
-| Token                                | Use                                               |
-| ------------------------------------ | ------------------------------------------------- |
-| `--ava-transition-colors`            | Text/background/border only                       |
-| `--ava-transition-interactive`       | Buttons, clickable rows (includes shadow/opacity) |
-| `--ava-transition-transform`         | Scale/slide (do not animate layout properties)    |
-| `--ava-transition-opacity`           | Fades                                             |
-| `--ava-transition-shadow`            | Elevation changes                                 |
-| `--ava-animation-duration-ooze-in`   | Ooze-in preset duration                           |
-| `--ava-animation-duration-swipe-out` | Swipe-out preset duration                         |
-| `--ava-animate-swipe-translate-x`    | Swipe-out horizontal offset (default 12px)        |
-| `--ava-animate-origin-x` / `-y`      | Per-instance transform origin for ooze-in         |
+| Token                                | Use                                                |
+| ------------------------------------ | -------------------------------------------------- |
+| `--ava-transition-colors`            | Text/background/border only                        |
+| `--ava-transition-interactive`       | Buttons, clickable rows (includes shadow/opacity)  |
+| `--ava-transition-transform`         | Scale/slide (do not animate layout properties)     |
+| `--ava-transition-opacity`           | Fades                                              |
+| `--ava-transition-shadow`            | Elevation changes                                  |
+| `--ava-animation-duration-ooze-in`   | Ooze-in preset duration                            |
+| `--ava-animation-duration-swipe-out` | Swipe-out preset duration                          |
+| `--ava-animation-duration-pop-in`    | Overlay pop-in duration (modals, dropzone, NUX)    |
+| `--ava-animation-easing-pop`         | Overshoot ease for overlay pop-in                  |
+| `--ava-animate-pop-in-from-*`        | Hidden-state transform and blur for overlay pop-in |
+| `--ava-animate-swipe-translate-x`    | Swipe-out horizontal offset (default 12px)         |
+| `--ava-animate-origin-x` / `-y`      | Per-instance transform origin for ooze-in          |
 
 **Do not** set a full `transition` shorthand on elements that use Mantine’s `FloatingIndicator` (e.g. tab pill): it overrides transform/width/height and breaks slide animation.
 
@@ -110,11 +113,12 @@ in CSS modules over new animation libraries.
 
 Global keyframes live in `animationPresets.css` (imported from `main.tsx`). Use with `ANIMATION_PRESET` from `AnimationTheme`:
 
-| Preset     | Class                   | Use                                                                   |
-| ---------- | ----------------------- | --------------------------------------------------------------------- |
-| `oozeIn`   | `ava-animate-ooze-in`   | Springy grow from a trigger; set origin via `buildAnimateOriginStyle` |
-| `swipeOut` | `ava-animate-swipe-out` | Fade + light slide right on dismiss                                   |
-| `active`   | `ava-animate-active`    | `will-change` helper while a preset animation runs                    |
+| Preset     | Class                   | Use                                                                      |
+| ---------- | ----------------------- | ------------------------------------------------------------------------ |
+| `oozeIn`   | `ava-animate-ooze-in`   | Springy grow from a trigger; set origin via `buildAnimateOriginStyle`    |
+| `swipeOut` | `ava-animate-swipe-out` | Fade + light slide right on dismiss                                      |
+| `popIn`    | `ava-animate-pop-in`    | Scale-blur overshoot used by modals, the dropzone card, and NUX tooltips |
+| `active`   | `ava-animate-active`    | `will-change` helper while a preset animation runs                       |
 
 ```tsx
 import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
@@ -125,8 +129,9 @@ import { ANIMATION_PRESET, buildAnimateOriginStyle } from "@/config/Theme";
 />;
 ```
 
-These presets currently have no callers in the app. They remain available for
-any surface that should grow from the control that opened it.
+`oozeIn` and `swipeOut` currently have no callers in the app. `popIn` is
+applied by `NuxTooltip` on mount; Modal and the dropzone card consume the same
+tokens through `MODAL_CONTENT_TRANSITION` and CSS variables.
 
 Overlay components (Menu, Combobox, Modal, etc.) get `transitionProps` from `MANTINE_TRANSITION_PROPS` in `AnimationTheme.ts`.
 

@@ -164,9 +164,7 @@ function _buildExportStrings(
     disputedLegendLabel: i18n._(msg`Disputed or undetermined boundary`),
     scaleLabel:
       scaleDescriptor === undefined ? undefined : i18n._(scaleDescriptor),
-    producedAtLabel: i18n._(
-      msg`Produced ${_formatProducedAt(producedAt)}`,
-    ),
+    producedAtLabel: i18n._(msg`Produced ${_formatProducedAt(producedAt)}`),
     filename: getExportFilename({ title: text.title ?? mapName, producedAt }),
   };
 }

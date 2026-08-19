@@ -54,6 +54,10 @@ export default [
       "apps/desktop/build/**",
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
+      // `playwright test` writes its minified HTML report and trace viewer
+      // bundles here. Gitignored, but still linted, so `pnpm lint` failed with
+      // thousands of errors on any machine that had run the e2e suite.
+      "playwright-report/**",
       "src/i18n/locales/**/messages.ts",
       // `supabase start` writes a minified edge-runtime bundle here. It is
       // gitignored but was still linted, so `pnpm lint` failed with hundreds of

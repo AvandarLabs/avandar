@@ -114,9 +114,7 @@ test("persists the export layout across a reload and matches the on-screen furni
     ).toHaveValue(DISCLAIMER_TEXT);
 
     const reloadedFurnitureBar = page.getByTestId("map-furniture-bar");
-    await expect(
-      reloadedFurnitureBar.getByText(DISCLAIMER_TEXT),
-    ).toBeVisible();
+    await expect(reloadedFurnitureBar.getByText(DISCLAIMER_TEXT)).toBeVisible();
   } finally {
     await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
   }

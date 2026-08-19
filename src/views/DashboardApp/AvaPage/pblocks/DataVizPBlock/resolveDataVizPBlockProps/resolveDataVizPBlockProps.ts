@@ -1,6 +1,7 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { ResolveDataTrigger } from "@puckeditor/core";
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 
@@ -18,14 +19,21 @@ const DEFAULT_NL_QUERY: DataVizPBlockProps["nlQuery"] = {
  * Keeps `vizType` and `vizConfig.vizType` in sync by running
  * `VizConfigs.convertVizConfig` whenever the user picks a different type from
  * the top-level select. Also fills in defaults for missing fields so older
- * saved blocks (pre-v2 schema, or freshly created via `defaultProps`) always
- * resolve to a fully-shaped `DataVizPBlockProps`.
+ * saved blocks or freshly created ones always resolve to a fully-shaped
+ * `DataVizPBlockProps`.
  */
 export function resolveDataVizPBlockProps(input: {
   props: Partial<DataVizPBlockProps>;
   changed: ChangedFlags;
+  trigger?: ResolveDataTrigger;
 }): DataVizPBlockProps {
-  const { props, changed } = input;
+  const { props, changed, trigger } = input;
+  // Puck's load pass marks every field `changed` because its resolver cache
+  // is empty. Rewriting here would look like an unsaved edit. Missing filter
+  // defaults are filled at render time instead.
+  if (trigger === "load") {
+    return props as DataVizPBlockProps;
+  }
 
   const nextProps: DataVizPBlockProps = {
     nlQuery: props.nlQuery ?? DEFAULT_NL_QUERY,

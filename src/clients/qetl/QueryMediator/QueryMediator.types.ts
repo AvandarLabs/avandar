@@ -10,6 +10,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -52,6 +53,11 @@ export type RelationSource =
       sourceType: "xlsx_file";
       dataset: Dataset.T;
       sourceDataset: XlsxFileDataset.T;
+    }
+  | {
+      sourceType: "pdf_file";
+      dataset: Dataset.T;
+      sourceDataset: PdfFileDataset.T;
     };
 
 /**

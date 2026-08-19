@@ -22,16 +22,17 @@ function _paintDefaults(): {
   };
 }
 
-/** Builds a text annotation at `coordinates` with empty text. */
+/** Builds a text annotation at `coordinates` with the given `text`. */
 export function makeTextAnnotationFeature(
   coordinates: Vertex,
+  text: string,
 ): AvaMapConfig.AnnotationFeature {
   const paint = _paintDefaults();
   return {
     id: uuid<AvaMapConfig.AnnotationFeatureId>(),
     kind: "text",
     geometry: { type: "Point", coordinates: _copyVertex(coordinates) },
-    text: "",
+    text,
     sizePx: paint.sizePx,
     color: paint.color,
   };

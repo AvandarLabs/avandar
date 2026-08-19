@@ -58,7 +58,9 @@ export type ManualUploadParse = {
   onRequestDataReparse: (parseOptions: FileParseOptions) => Promise<void>;
 };
 
-function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
+function _fileMimeTypeToSourceType(
+  file: File,
+): "csv_file" | "xlsx_file" | "pdf_file" {
   const lowerFileName = file.name.toLowerCase();
 
   if (file.type.startsWith("text/csv") || lowerFileName.endsWith(".csv")) {
@@ -71,6 +73,13 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
     lowerFileName.endsWith(".xlsx")
   ) {
     return "xlsx_file";
+  }
+
+  if (
+    file.type === MIMEType.APPLICATION_PDF ||
+    lowerFileName.endsWith(".pdf")
+  ) {
+    return "pdf_file";
   }
 
   if (lowerFileName.endsWith(".xlsx")) {

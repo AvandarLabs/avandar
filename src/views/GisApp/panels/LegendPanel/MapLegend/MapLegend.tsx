@@ -52,7 +52,9 @@ export function MapLegend({
         {shown.map((layer) => {
           return <MapLegendGroup key={layer.id} layer={layer} />;
         })}
-        {hasDrawnDisputedFeature ? <DisputedLegendRow /> : null}
+        {hasDrawnDisputedFeature ?
+          <DisputedLegendRow />
+        : null}
       </div>
     </MapChromePanel>
   );
