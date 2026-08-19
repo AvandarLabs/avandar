@@ -1,10 +1,13 @@
 import {
+  coversColumns,
   makeIdentityTokensFromIdentity,
   makePreparedRelationCacheKeyFromKey,
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import type { PreparedRelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type {
   PrincipalKey,
   RelationCacheKey,
@@ -12,6 +15,7 @@ import type {
 import type {
   RelationCacheEntry,
   RelationCachePort,
+  RelationCacheProbeResult,
   RelationCacheWrite,
 } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
@@ -24,24 +28,87 @@ function _normalizeColumns(
   return [...new Set(columns)].sort();
 }
 
-async function _lookup(
-  key: RelationCacheKey,
-): Promise<RelationCacheEntry | undefined> {
-  const prepared = await makePreparedRelationCacheKeyFromKey(key);
-  const candidates = await AvaDexie.DB.RelationCacheEntry.where("tableName")
-    .equals(prepared.tableName)
-    .toArray();
-  const hit = candidates.find((entry) => {
-    return serves(entry, prepared);
+/**
+ * The narrower cached entry a miss on `prepared` could grow instead of
+ * acquiring fresh: same principal, table and definition, live, and failing
+ * `serves()` on the column check alone. By the single-live-entry rule (only
+ * one live entry can exist per `(principalKey, tableName)`) at most one
+ * candidate can ever match, so more than one is a §6.2 violation rather than
+ * a choice to make.
+ */
+function _getGrowFromCandidate(
+  candidates: readonly RelationCacheEntry[],
+  prepared: PreparedRelationCacheKey,
+): RelationCacheEntry | undefined {
+  const growable = candidates.filter((entry) => {
+    return (
+      entry.principalKey === prepared.principalKey &&
+      entry.tableName === prepared.tableName &&
+      entry.definitionToken === prepared.definitionToken &&
+      entry.staleAt === undefined &&
+      !coversColumns(entry.columns, prepared.columns)
+    );
   });
-  if (!hit) {
-    return undefined;
+  if (growable.length > 1) {
+    const duplicateIdentityKeys = growable
+      .map((entry) => {
+        return entry.identityKey;
+      })
+      .join(", ");
+    throw new Error(
+      `RelationCache §6.2 violation: more than one live entry for ` +
+        `(${prepared.principalKey}, ${prepared.tableName}): ` +
+        `${duplicateIdentityKeys}`,
+    );
   }
-  const lastQueriedAt = Date.now();
-  await AvaDexie.DB.RelationCacheEntry.update(hit.identityKey, {
-    lastQueriedAt,
+  return growable[0];
+}
+
+async function _probe(
+  keys: readonly RelationCacheKey[],
+): Promise<RelationCacheProbeResult> {
+  const preparedKeys = await Promise.all(
+    keys.map(async (key) => {
+      return { key, prepared: await makePreparedRelationCacheKeyFromKey(key) };
+    }),
+  );
+  const tableNames = [
+    ...new Set(
+      preparedKeys.map(({ prepared }) => {
+        return prepared.tableName;
+      }),
+    ),
+  ];
+  const candidates = await AvaDexie.DB.RelationCacheEntry.where("tableName")
+    .anyOf(tableNames)
+    .toArray();
+
+  const result: RelationCacheProbeResult = { hits: [], misses: [] };
+  const now = Date.now();
+  const hitIdentityKeys: string[] = [];
+
+  preparedKeys.forEach(({ key, prepared }) => {
+    const hit = candidates.find((entry) => {
+      return serves(entry, prepared);
+    });
+    if (hit) {
+      hitIdentityKeys.push(hit.identityKey);
+      result.hits.push({ key, entry: { ...hit, lastQueriedAt: now } });
+      return;
+    }
+    result.misses.push({
+      key,
+      growFrom: _getGrowFromCandidate(candidates, prepared),
+    });
   });
-  return { ...hit, lastQueriedAt };
+
+  if (hitIdentityKeys.length > 0) {
+    await AvaDexie.DB.RelationCacheEntry.where("identityKey")
+      .anyOf(hitIdentityKeys)
+      .modify({ lastQueriedAt: now });
+  }
+
+  return result;
 }
 
 async function _readPayload(
@@ -95,6 +162,57 @@ async function _bulkDeleteEntriesAndPayloads(
   await AvaDexie.DB.RelationCachePayload.bulkDelete(mutableKeys);
 }
 
+/**
+ * Whether `error` is IndexedDB refusing a write for lack of storage space,
+ * as opposed to any other Dexie or DOM fault. Recognises the modern signal
+ * every current engine (Chromium, Firefox, WebKit) uses, and Dexie carries
+ * straight through: a `DexieError` or `DOMException` named
+ * `"QuotaExceededError"`. Also recognises the legacy numeric DOMException
+ * code (`22`) that pre-standardization engines raised instead of the name.
+ * Deliberately narrow: a message that happens to mention "quota" does not
+ * qualify, so a genuine Dexie fault (a constraint violation, a closed
+ * database) is never mistaken for exhausted storage.
+ */
+function _isQuotaExceededError(error: unknown): boolean {
+  if (error instanceof Error && error.name === "QuotaExceededError") {
+    return true;
+  }
+  return error instanceof DOMException && error.code === 22;
+}
+
+async function _writeOnce(
+  entry: RelationCacheEntry,
+  payload: Blob,
+): Promise<void> {
+  await AvaDexie.DB.transaction(
+    "rw",
+    AvaDexie.DB.RelationCacheEntry,
+    AvaDexie.DB.RelationCachePayload,
+    async () => {
+      const supersededKeys = await _getSupersededIdentityKeys(entry);
+      await _bulkDeleteEntriesAndPayloads(supersededKeys);
+      await AvaDexie.DB.RelationCacheEntry.put(entry);
+      await AvaDexie.DB.RelationCachePayload.put({
+        identityKey: entry.identityKey,
+        parquetBlob: payload,
+      });
+    },
+  );
+}
+
+/**
+ * Evicts just enough of the least-recently-queried entries to make room for
+ * `incomingBytes` more, so a retried write has somewhere to land.
+ */
+async function _evictToMakeRoomFor(incomingBytes: number): Promise<void> {
+  const entries = await AvaDexie.DB.RelationCacheEntry.toArray();
+  const storedBytes = entries.reduce((sum, entry) => {
+    return sum + entry.byteSize;
+  }, 0);
+  const targetBudget = Math.max(0, storedBytes - incomingBytes);
+  await _evictToBudget(targetBudget);
+}
+
 async function _write(write: RelationCacheWrite): Promise<void> {
   const tokens = await makeIdentityTokensFromIdentity(write.identity);
   const now = Date.now();
@@ -114,20 +232,19 @@ async function _write(write: RelationCacheWrite): Promise<void> {
     freshnessCheckedAt: undefined,
   };
 
-  await AvaDexie.DB.transaction(
-    "rw",
-    AvaDexie.DB.RelationCacheEntry,
-    AvaDexie.DB.RelationCachePayload,
-    async () => {
-      const supersededKeys = await _getSupersededIdentityKeys(entry);
-      await _bulkDeleteEntriesAndPayloads(supersededKeys);
-      await AvaDexie.DB.RelationCacheEntry.put(entry);
-      await AvaDexie.DB.RelationCachePayload.put({
-        identityKey: entry.identityKey,
-        parquetBlob: write.payload,
-      });
-    },
-  );
+  try {
+    await _writeOnce(entry, write.payload);
+  } catch (firstError) {
+    if (!_isQuotaExceededError(firstError)) {
+      throw firstError;
+    }
+    await _evictToMakeRoomFor(write.payload.size);
+    try {
+      await _writeOnce(entry, write.payload);
+    } catch {
+      throw new RelationCacheWriteFailed(firstError);
+    }
+  }
 }
 
 async function _touch(identityKey: string): Promise<void> {
@@ -175,13 +292,18 @@ async function _evict(
 }
 
 /**
- * The oldest-first prefix of `entries` (by `lastQueriedAt`) whose removal
- * brings the running total at or under `budgetBytes`. Pure so the eviction
- * order is easy to test without touching Dexie.
+ * The oldest-first prefix of `entries` (by `lastQueriedAt`), skipping every
+ * entry in `excludeIdentityKeys`, whose removal brings the running total at
+ * or under `budgetBytes`. Never removes an excluded entry, even if the
+ * budget cannot be met as a result: the reduce is a single pass over a
+ * finite array, so an all-excluded batch simply returns the empty prefix it
+ * found rather than looping. Pure so the eviction order is easy to test
+ * without touching Dexie.
  */
 function _selectEvictionVictims(
   entries: readonly RelationCacheEntry[],
   budgetBytes: number,
+  excludeIdentityKeys: ReadonlySet<string>,
 ): readonly string[] {
   const sortedByAge = [...entries].sort((a, b) => {
     return a.lastQueriedAt - b.lastQueriedAt;
@@ -197,6 +319,9 @@ function _selectEvictionVictims(
       if (acc.remainingBytes <= budgetBytes) {
         return acc;
       }
+      if (excludeIdentityKeys.has(entry.identityKey)) {
+        return acc;
+      }
       return {
         remainingBytes: acc.remainingBytes - entry.byteSize,
         victimKeys: [...acc.victimKeys, entry.identityKey],
@@ -207,7 +332,10 @@ function _selectEvictionVictims(
   return victimKeys;
 }
 
-async function _evictToBudget(budgetBytes: number): Promise<void> {
+async function _evictToBudget(
+  budgetBytes: number,
+  excludeIdentityKeys: ReadonlySet<string> = new Set(),
+): Promise<void> {
   // Same atomicity rationale as `_evict`: reading the candidates and
   // deleting them in one transaction keeps a concurrent write from landing
   // in between. A miss here is benign on its own (the byte total can
@@ -222,7 +350,11 @@ async function _evictToBudget(budgetBytes: number): Promise<void> {
       const entries = await AvaDexie.DB.RelationCacheEntry.orderBy(
         "lastQueriedAt",
       ).toArray();
-      const victimKeys = _selectEvictionVictims(entries, budgetBytes);
+      const victimKeys = _selectEvictionVictims(
+        entries,
+        budgetBytes,
+        excludeIdentityKeys,
+      );
       await _bulkDeleteEntriesAndPayloads(victimKeys);
     },
   );
@@ -234,16 +366,22 @@ async function _evictToBudget(budgetBytes: number): Promise<void> {
  * deserializes a blob and a byte-budget scan never reads one either.
  */
 export const DexieRelationCache: RelationCachePort = {
-  /** Finds the entry that serves `key`, per the reuse predicate. */
-  lookup: _lookup,
+  /**
+   * Finds, in one batch, the entry that serves each requested key. Every
+   * key resolves to exactly one hit or one miss; a miss carries a
+   * `growFrom` candidate when a narrower live entry exists to grow.
+   */
+  probe: _probe,
 
-  /** Reads a hit's payload. Never called by `lookup` itself. */
+  /** Reads a hit's payload. Never called by `probe` itself. */
   readPayload: _readPayload,
 
   /**
    * Stores one relation. Idempotent on the identity's `identityKey`, and,
    * in the same transaction, deletes every other entry sharing this row's
-   * `(principalKey, tableName)` so at most one live entry survives.
+   * `(principalKey, tableName)` so at most one live entry survives. On a
+   * quota-exceeded failure, evicts to make room and retries once; if the
+   * retry also fails, throws `RelationCacheWriteFailed`.
    */
   write: _write,
 
@@ -255,8 +393,9 @@ export const DexieRelationCache: RelationCachePort = {
 
   /**
    * Drops least-recently-queried entries, metadata and payload together,
-   * until stored bytes are at or under `budgetBytes`. Reads only the
-   * `RelationCacheEntry` table to decide what to drop.
+   * until stored bytes are at or under `budgetBytes`. Never evicts an entry
+   * named in `excludeIdentityKeys`. Reads only the `RelationCacheEntry`
+   * table to decide what to drop.
    */
   evictToBudget: _evictToBudget,
 };
