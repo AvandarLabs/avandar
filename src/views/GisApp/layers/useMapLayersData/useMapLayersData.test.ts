@@ -96,6 +96,62 @@ const { runStructuredQueryWithMetadata: realRunStructuredQueryWithMetadata } =
     typeof import("@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata")
   >("@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata");
 
+/**
+ * Answers the statements a lat/lng point layer issues through the workspace
+ * session: the coordinate audit first, then either the layer's source query or,
+ * above the aggregation threshold, a cell count and the aggregate itself.
+ *
+ * Dispatching on the result column each statement is defined by, rather than on
+ * call order, keeps these tests honest if the loader's steps are reordered.
+ */
+function _mockPointLayerQueries(options: {
+  mappableRowCount: number;
+  sourceRowCount?: number;
+  dropNullCoordinateCount?: number;
+  cellCount?: number;
+  dataRows?: UnknownRow[];
+}): { getDataSql: () => string[] } {
+  const dataSql: string[] = [];
+  const makeResult = (data: UnknownRow[]): QueryResult.T<UnknownRow> => {
+    return {
+      id: uuid<QueryResult.Id>(),
+      columns: [],
+      data,
+      numRows: data.length,
+    };
+  };
+  runSpatialQueryMock.mockImplementation(
+    async ({ rawSql }: { rawSql: string }) => {
+      if (rawSql.includes("source_row_count")) {
+        return makeResult([
+          {
+            source_row_count:
+              options.sourceRowCount ?? options.mappableRowCount,
+            mappable_row_count: options.mappableRowCount,
+            drop_null_coordinate: options.dropNullCoordinateCount ?? 0,
+            drop_non_numeric_coordinate: 0,
+            drop_out_of_range: 0,
+            drop_suspected_lat_lng_swap: 0,
+            drop_null_island: 0,
+          },
+        ]);
+      }
+      if (rawSql.includes("point_aggregate_cell_count")) {
+        return makeResult([
+          { point_aggregate_cell_count: options.cellCount ?? 1 },
+        ]);
+      }
+      dataSql.push(rawSql);
+      return makeResult(options.dataRows ?? [{ cases: 1 }]);
+    },
+  );
+  return {
+    getDataSql: () => {
+      return dataSql;
+    },
+  };
+}
+
 describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
@@ -108,17 +164,11 @@ describe("useMapLayersData", () => {
     spatialAvailability.value = "available";
   });
 
-  it("queries with a layer's source when the layer is queryable", async () => {
+  it("returns a small layer's own rows without aggregating them", async () => {
     const layer = createQueryableLayer();
-    const queryResult: QueryResult.T<UnknownRow> = {
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 1 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 1,
-    };
-    runStructuredQueryWithMetadataMock.mockResolvedValue({
-      result: queryResult,
-      didAutoLimit: false,
+    const { getDataSql } = _mockPointLayerQueries({
+      mappableRowCount: 12,
+      dataRows: [{ cases: 1 }],
     });
 
     const { result } = renderHook(
@@ -133,19 +183,81 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(layer.id)?.data).toEqual({
-        type: "rows",
-        queryResult,
-        didAutoLimit: false,
-      });
+      expect(result.current.get(layer.id)?.data?.type).toBe("rows");
     });
 
-    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
-    expect(runStructuredQueryWithMetadataMock.mock.calls[0]?.[0]).toMatchObject(
-      {
-        query: layer.source,
+    const data = result.current.get(layer.id)?.data;
+    expect(data?.type === "rows" && data.aggregation).toBeUndefined();
+    expect(data?.type === "rows" && data.queryResult.data).toEqual([
+      { cases: 1 },
+    ]);
+    expect(getDataSql()).toEqual([structuredQueryToSql(layer.source)]);
+  });
+
+  it("aggregates a layer too large to convert row by row", async () => {
+    const layer = createQueryableLayer();
+    const { getDataSql } = _mockPointLayerQueries({
+      mappableRowCount: 3_800_000,
+      cellCount: 3_228,
+      dataRows: [{ lat: 1, lon: 2, point_count: 1_200 }],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+          zoom: 6,
+        });
       },
+      { wrapper: wrapperForHook },
     );
+
+    await waitFor(() => {
+      const data = result.current.get(layer.id)?.data;
+      expect(
+        data?.type === "rows" ? data.aggregation : undefined,
+      ).toBeDefined();
+    });
+
+    const data = result.current.get(layer.id)?.data;
+    expect(data?.type === "rows" && data.aggregation?.aggregatedRowCount).toBe(
+      3_800_000,
+    );
+    expect(getDataSql()[0]).toContain("GROUP BY");
+    expect(getDataSql()[0]).not.toBe(structuredQueryToSql(layer.source));
+  });
+
+  it("reports rows a map cannot place even when it aggregated the rest", async () => {
+    const layer = createQueryableLayer();
+    _mockPointLayerQueries({
+      mappableRowCount: 3_800_000,
+      sourceRowCount: 3_800_500,
+      dropNullCoordinateCount: 500,
+      cellCount: 100,
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      const data = result.current.get(layer.id)?.data;
+      expect(data?.type === "rows" ? data.audit : undefined).toBeDefined();
+    });
+
+    const data = result.current.get(layer.id)?.data;
+    expect(data?.type === "rows" && data.audit?.drops).toEqual([
+      { reason: "nullCoordinate", count: 500 },
+    ]);
   });
 
   it("runs lat/lng time filters as raw sql without waiting for spatial", async () => {
@@ -155,16 +267,7 @@ describe("useMapLayersData", () => {
       ...layer,
       timeColumn: layer.source.queryColumns[0]?.id,
     };
-    const queryResult: QueryResult.T<UnknownRow> = {
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 1 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 1,
-    };
-    runStructuredQueryWithMetadataMock.mockResolvedValue({
-      result: queryResult,
-      didAutoLimit: false,
-    });
+    const { getDataSql } = _mockPointLayerQueries({ mappableRowCount: 5 });
 
     const { result } = renderHook(
       () => {
@@ -184,22 +287,12 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(timedLayer.id)?.data).toEqual({
-        type: "rows",
-        queryResult,
-        didAutoLimit: false,
-      });
+      expect(result.current.get(timedLayer.id)?.data?.type).toBe("rows");
     });
 
     expect(initializeDuckDbMock).not.toHaveBeenCalled();
-    expect(runSpatialQueryMock).not.toHaveBeenCalled();
-    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).toContain("BETWEEN");
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).not.toContain("ST_");
+    expect(getDataSql()[0]).toContain("BETWEEN");
+    expect(getDataSql()[0]).not.toContain("ST_");
   });
 
   it("does not query a layer with no data source", () => {
@@ -251,24 +344,10 @@ describe("useMapLayersData", () => {
   it("runs separate queries and retains rows for two queryable layers", async () => {
     const firstLayer = createQueryableLayer();
     const secondLayer = createQueryableLayer();
-    const firstQueryResult: QueryResult.T<UnknownRow> = {
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 1 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 1,
-    };
-    const secondQueryResult: QueryResult.T<UnknownRow> = {
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 2 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 1,
-    };
-    runStructuredQueryWithMetadataMock
-      .mockResolvedValueOnce({ result: firstQueryResult, didAutoLimit: false })
-      .mockResolvedValueOnce({
-        result: secondQueryResult,
-        didAutoLimit: false,
-      });
+    _mockPointLayerQueries({
+      mappableRowCount: 3,
+      dataRows: [{ cases: 1 }],
+    });
 
     const { result } = renderHook(
       () => {
@@ -282,19 +361,14 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(firstLayer.id)?.data).toEqual({
-        type: "rows",
-        queryResult: firstQueryResult,
-        didAutoLimit: false,
-      });
-      expect(result.current.get(secondLayer.id)?.data).toEqual({
-        type: "rows",
-        queryResult: secondQueryResult,
-        didAutoLimit: false,
-      });
+      expect(result.current.get(firstLayer.id)?.data?.type).toBe("rows");
+      expect(result.current.get(secondLayer.id)?.data?.type).toBe("rows");
     });
 
-    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(2);
+    // Each layer keeps its own result rather than sharing one cache entry.
+    expect(result.current.get(firstLayer.id)?.data).not.toBe(
+      result.current.get(secondLayer.id)?.data,
+    );
   });
 
   it("waits for Spatial capability before running a geometry layer", () => {
@@ -429,16 +503,7 @@ describe("useMapLayersData", () => {
   it("runs lat/lng aoi filters as raw sql with spatial functions", async () => {
     const layer = createQueryableLayer();
     const aoi = UNIT_SQUARE;
-    const queryResult: QueryResult.T<UnknownRow> = {
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 1 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 1,
-    };
-    runStructuredQueryWithMetadataMock.mockResolvedValue({
-      result: queryResult,
-      didAutoLimit: false,
-    });
+    const { getDataSql } = _mockPointLayerQueries({ mappableRowCount: 7 });
 
     const { result } = renderHook(
       () => {
@@ -452,44 +517,28 @@ describe("useMapLayersData", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.get(layer.id)?.data).toEqual({
-        type: "rows",
-        queryResult,
-        didAutoLimit: false,
-      });
+      expect(result.current.get(layer.id)?.data?.type).toBe("rows");
     });
 
-    expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).toContain("ST_Point");
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).toContain("ST_Intersects");
+    expect(getDataSql()[0]).toContain("ST_Point");
+    expect(getDataSql()[0]).toContain("ST_Intersects");
   });
 
-  it("runs a plain lat/lng layer over a large dataset with no injected LIMIT and without consulting the auto-limit resolver", async () => {
+  it("runs a plain lat/lng layer with no injected LIMIT and without consulting the auto-limit resolver", async () => {
     // Wires in the real `runStructuredQueryWithMetadata` (rather than the
     // mock every other test in this file uses) so this proves the actual
     // guarantee: `resolveManualQueryForExecution` is not merely uncalled in
     // some mock's bookkeeping, it is not consulted by the real execution
     // path, and the SQL that reaches `WorkspaceQuerySession.runQuery` is the
     // compiled overlay SQL verbatim, with no LIMIT clause appended anywhere
-    // along the way.
+    // along the way. This is the hidden 100-row cap the point loader exists
+    // to keep replaced: a large layer is aggregated, never silently truncated.
     runStructuredQueryWithMetadataMock.mockImplementation(
       realRunStructuredQueryWithMetadata,
     );
     const layer = createQueryableLayer();
     const expectedSql = structuredQueryToSql(layer.source);
-    // A dataset this large is exactly the scenario the hidden 100-row cap
-    // used to bite: no filter, and well past the 50,000-row auto-limit
-    // threshold `resolveManualQueryForExecution` would otherwise apply.
-    runSpatialQueryMock.mockResolvedValue({
-      id: uuid<QueryResult.Id>(),
-      data: [{ cases: 1 }],
-      columns: [{ name: "cases", dataType: "double" }],
-      numRows: 100_000,
-    });
+    const { getDataSql } = _mockPointLayerQueries({ mappableRowCount: 9_000 });
 
     const { result } = renderHook(
       () => {
@@ -508,9 +557,6 @@ describe("useMapLayersData", () => {
 
     expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
     expect(expectedSql).not.toMatch(/limit/i);
-    expect(runSpatialQueryMock).toHaveBeenCalledWith({
-      rawSql: expectedSql,
-      workspaceId,
-    });
+    expect(getDataSql()).toEqual([expectedSql]);
   });
 });

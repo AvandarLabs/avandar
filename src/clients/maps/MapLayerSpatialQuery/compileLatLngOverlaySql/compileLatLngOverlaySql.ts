@@ -11,6 +11,9 @@ type CompileLatLngOverlayOptions = {
   latitudeColumnName: string;
   longitudeColumnName: string;
   timeColumnName: string | undefined;
+
+  /** Declared type of the time column, which decides how it is compared. */
+  timeColumnDataType?: string;
 };
 
 /**
@@ -28,6 +31,7 @@ export function compileLatLngOverlaySql(
     sourceSql: options.sourceSql,
     timeColumnName: options.timeColumnName,
     timeRange: options.overlay.timeRange,
+    timeColumnDataType: options.timeColumnDataType,
   });
   const aoi = options.layer.applyAoiFilter ? options.overlay.aoi : undefined;
   if (!aoi) {

@@ -66,13 +66,24 @@ export type ClusterSelection = {
   layerId: string;
 };
 
-/** Returns whether a rendered feature represents a MapLibre point cluster. */
+/**
+ * Returns whether a rendered feature stands for more than one source row.
+ *
+ * A DuckDB-aggregated cell carries `point_count` even when it holds a single
+ * row, so the count is compared rather than merely looked for: treating such
+ * a cell as a group would leave its click doing nothing, since it has no
+ * cluster to expand and no group of rows to list.
+ */
 function _isClusterFeature(feature: GeoJSON.Feature): boolean {
   const properties = feature.properties;
   if (!properties) {
     return false;
   }
-  return "cluster_id" in properties || "point_count" in properties;
+  if ("cluster_id" in properties) {
+    return true;
+  }
+  const pointCount = properties.point_count;
+  return typeof pointCount === "number" && pointCount > 1;
 }
 
 /** Builds the cluster identity carried by a clicked cluster feature. */
@@ -120,6 +131,54 @@ function _zoomToCluster(
   });
 }
 
+/**
+ * How many zoom levels a click on a DuckDB-aggregated cell moves in.
+ *
+ * A cell is not a MapLibre cluster, so there is no expansion zoom to ask
+ * for: the grid is rebuilt from SQL at the new zoom, and each step of the
+ * grid is one zoom level, so two levels reliably splits the clicked cell.
+ */
+const AGGREGATED_CELL_ZOOM_STEP = 2;
+
+/**
+ * Zooms toward a DuckDB-aggregated cell so its rows separate.
+ *
+ * A cell carries a count but no `cluster_id`, so MapLibre cannot expand it
+ * and the browser does not hold its rows to list. Zooming rebuilds the grid
+ * finer at the new zoom, which is the only way to see inside the cell, and it
+ * keeps the click from doing nothing at all.
+ */
+function _zoomToAggregatedCell(
+  map: MapLibreMap,
+  coordinates: [number, number],
+): void {
+  map.easeTo({
+    center: coordinates,
+    zoom: map.getZoom() + AGGREGATED_CELL_ZOOM_STEP,
+  });
+}
+
+/**
+ * The point geometry of a clicked group that MapLibre did not cluster.
+ *
+ * Returns `undefined` for a MapLibre cluster, which has its own expansion
+ * path, and for a feature standing for a single row, which opens a popup.
+ */
+function _getAggregatedCellCoordinates(
+  feature: maplibregl.MapGeoJSONFeature,
+): [number, number] | undefined {
+  const pointCount = feature.properties?.point_count;
+  if (
+    typeof feature.properties?.cluster_id === "number" ||
+    typeof pointCount !== "number" ||
+    pointCount <= 1 ||
+    feature.geometry.type !== "Point"
+  ) {
+    return undefined;
+  }
+  return feature.geometry.coordinates as [number, number];
+}
+
 /** Creates the single map-level click handler used by every rendered layer. */
 function _createMapClickHandler(
   options: Readonly<{
@@ -144,6 +203,11 @@ function _createMapClickHandler(
       layers: layerIds,
     });
     if (!feature) {
+      return;
+    }
+    const aggregatedCellCoordinates = _getAggregatedCellCoordinates(feature);
+    if (aggregatedCellCoordinates) {
+      _zoomToAggregatedCell(map, aggregatedCellCoordinates);
       return;
     }
     if (_isClusterFeature(feature)) {

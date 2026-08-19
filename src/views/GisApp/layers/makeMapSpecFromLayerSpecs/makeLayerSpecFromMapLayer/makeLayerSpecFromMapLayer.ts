@@ -12,6 +12,7 @@ import {
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
 import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
 import type {
   CircleRadiusValue,
@@ -32,6 +33,15 @@ type MakeLayerSpecFromMapLayerInput = {
   valueColumnName?: string;
   /** Which casing ink to use. Every PDF export passes `"light"` explicitly. */
   canvas?: "light" | "dark";
+
+  /**
+   * Set when the features are DuckDB-aggregated cells rather than source rows.
+   *
+   * The features already carry their own counts, so MapLibre must not cluster
+   * them a second time: doing so would group cells and count the groups as if
+   * each cell were one point, reporting a total far below the rows on screen.
+   */
+  isAggregated?: boolean;
 };
 
 /** Applies the selected scale to a numeric span. */
@@ -203,6 +213,7 @@ function _makeMapLayerSpecs(
       return makeClusterLayerSpecsFromMapLayer({
         layer: options.layer,
         sourceId: options.sourceId,
+        countSource: options.countSource,
         paint: {
           color: symbology.color.color,
           stroke: symbology.stroke,
@@ -266,6 +277,30 @@ function _getAutoClusterPaint(
 }
 
 /**
+ * True when this layer's features should be drawn as counted bubbles.
+ *
+ * Either the author chose `cluster` symbology, or a `circle` layer crossed
+ * {@link CLUSTER_AUTO_THRESHOLD}, or the rows arrived already aggregated by
+ * DuckDB and each feature stands for many.
+ */
+function _shouldPaintAsClusters(options: {
+  symbology: MapLayer.Symbology;
+  featureCount: number;
+  isAggregated: boolean;
+}): boolean {
+  if (options.symbology.type === "cluster") {
+    return true;
+  }
+  if (options.isAggregated) {
+    return _isAutoClusterableSymbology(options.symbology);
+  }
+  return (
+    _isAutoClusterableSymbology(options.symbology) &&
+    options.featureCount > CLUSTER_AUTO_THRESHOLD
+  );
+}
+
+/**
  * Turns one layer plus its data into MapLibre sources and layers.
  *
  * Pure: the same inputs always produce the same JSON, which is what makes
@@ -273,6 +308,13 @@ function _getAutoClusterPaint(
  * feature count passes {@link CLUSTER_AUTO_THRESHOLD}, without changing the
  * persisted symbology: clustering here is a rendering decision, made fresh on
  * every call.
+ *
+ * Clustering happens in one of two places, never both. When the features are
+ * source rows, MapLibre groups them and writes its own counts. When DuckDB has
+ * already aggregated them into cells, the source is left unclustered and the
+ * paint reads the counts the cells carry, because clustering pre-aggregated
+ * cells would count each cell as a single point and report a total far below
+ * the rows actually on screen.
  *
  * @param params The layer to render and the data and statistics behind it.
  * @param params.layer The persisted layer, carrying symbology and sensitivity.
@@ -282,6 +324,7 @@ function _getAutoClusterPaint(
  * @param params.valueColumnName Result column backing data-driven point paint,
  * looked up by the caller from the symbology's column id.
  * @param params.canvas Which casing ink to use. Defaults to `"light"`.
+ * @param params.isAggregated Whether the features are DuckDB-aggregated cells.
  * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
  * it as individual symbols.
@@ -292,6 +335,7 @@ export function makeLayerSpecFromMapLayer({
   stats,
   valueColumnName,
   canvas,
+  isAggregated = false,
 }: Readonly<MakeLayerSpecFromMapLayerInput>): MapSpec {
   if (
     layer.sensitivity.mode === "aggregateOnly" &&
@@ -301,11 +345,15 @@ export function makeLayerSpecFromMapLayer({
   }
 
   const { symbology } = layer;
+  const countSource: ClusterCountSource =
+    isAggregated ? "aggregatedRows" : "maplibre";
+  const paintsAsClusters = _shouldPaintAsClusters({
+    symbology,
+    featureCount: featureCollection.features.length,
+    isAggregated,
+  });
   const autoClusterPaint =
-    (
-      _isAutoClusterableSymbology(symbology) &&
-      featureCollection.features.length > CLUSTER_AUTO_THRESHOLD
-    ) ?
+    paintsAsClusters && _isAutoClusterableSymbology(symbology) ?
       _getAutoClusterPaint(symbology)
     : undefined;
 
@@ -315,9 +363,16 @@ export function makeLayerSpecFromMapLayer({
       makeClusterLayerSpecsFromMapLayer({
         layer,
         sourceId,
+        countSource,
         paint: autoClusterPaint,
       })
-    : _makeMapLayerSpecs({ layer, stats, valueColumnName, sourceId });
+    : _makeMapLayerSpecs({
+        layer,
+        stats,
+        valueColumnName,
+        sourceId,
+        countSource,
+      });
   const casingSpecs = makeDisputedCasingLayerSpecFromMapLayer({
     layer,
     sourceId,
@@ -327,7 +382,7 @@ export function makeLayerSpecFromMapLayer({
   return {
     sources: {
       [sourceId]:
-        symbology.type === "cluster" || autoClusterPaint !== undefined ?
+        paintsAsClusters && !isAggregated ?
           {
             type: "geojson",
             data: featureCollection,
