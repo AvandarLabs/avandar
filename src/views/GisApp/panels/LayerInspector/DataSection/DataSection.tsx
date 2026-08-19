@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { DataSectionBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSectionBindingControls";
+import { DisputedStatusControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls";
 import { GeometryBindingTypeSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect";
 import { TimeColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
@@ -88,6 +89,7 @@ export function DataSection({
         onLayerChange={onLayerChange}
       />
       <TimeColumnSelect layer={layer} onLayerChange={onLayerChange} />
+      <DisputedStatusControls layer={layer} onLayerChange={onLayerChange} />
     </InspectorSection>
   );
 }

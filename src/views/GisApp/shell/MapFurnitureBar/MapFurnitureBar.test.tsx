@@ -19,6 +19,22 @@ vi.mock("@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale", () => {
   };
 });
 
+/** Renders `MapFurnitureBar` with the shared mock map instance and options. */
+function _renderFurnitureBar(
+  options: Readonly<{
+    attribution?: string;
+    disclaimer: string | undefined;
+  }>,
+): void {
+  render(
+    <MapFurnitureBar
+      mapInstance={{} as MapInstance}
+      attribution={options.attribution ?? "© OpenStreetMap contributors"}
+      disclaimer={options.disclaimer}
+    />,
+  );
+}
+
 describe("MapFurnitureBar", () => {
   it("renders coordinates, scale, attribution, and the boundary disclaimer", () => {
     vi.mocked(useMapPointerCoordinates).mockReturnValue({
@@ -31,12 +47,7 @@ describe("MapFurnitureBar", () => {
       meters: 5000,
     });
 
-    render(
-      <MapFurnitureBar
-        mapInstance={{} as MapInstance}
-        attribution="© OpenStreetMap contributors"
-      />,
-    );
+    _renderFurnitureBar({ disclaimer: undefined });
 
     expect(screen.getByText("40.748 N, 73.987 W")).toBeInTheDocument();
     expect(screen.getByText("5 km")).toBeInTheDocument();
@@ -54,12 +65,7 @@ describe("MapFurnitureBar", () => {
     vi.mocked(useMapPointerCoordinates).mockReturnValue(undefined);
     vi.mocked(MapScale.useMapScale).mockReturnValue({ kind: "varies" });
 
-    render(
-      <MapFurnitureBar
-        mapInstance={{} as MapInstance}
-        attribution="© Example"
-      />,
-    );
+    _renderFurnitureBar({ attribution: "© Example", disclaimer: undefined });
 
     expect(
       screen.getByText("Move the pointer over the map to read a coordinate"),
@@ -67,5 +73,21 @@ describe("MapFurnitureBar", () => {
     expect(
       screen.getByText("Scale varies across this map"),
     ).toBeInTheDocument();
+  });
+
+  it("shows the localized default disclaimer when none is persisted", () => {
+    _renderFurnitureBar({ disclaimer: undefined });
+
+    expect(
+      screen.getByText(
+        "The boundaries and names shown do not imply official endorsement or acceptance.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the persisted disclaimer verbatim", () => {
+    _renderFurnitureBar({ disclaimer: "Our own required wording." });
+
+    expect(screen.getByText("Our own required wording.")).toBeInTheDocument();
   });
 });

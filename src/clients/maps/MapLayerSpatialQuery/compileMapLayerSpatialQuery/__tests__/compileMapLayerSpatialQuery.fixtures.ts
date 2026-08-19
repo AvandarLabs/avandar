@@ -134,6 +134,7 @@ export function createGeometryLayerFixture(): {
     boundary: undefined,
     aggregationMeasureColumnName: undefined,
     normalizationDenominator: undefined,
+    disputedStatusColumn: undefined,
   };
   return { layer, metadata };
 }

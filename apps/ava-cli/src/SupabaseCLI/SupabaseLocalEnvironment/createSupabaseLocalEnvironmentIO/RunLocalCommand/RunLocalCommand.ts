@@ -46,9 +46,7 @@ function _createLineForwarder(
   };
 }
 
-function _createOutputForwarders(
-  transformLine?: (line: string) => string,
-): {
+function _createOutputForwarders(transformLine?: (line: string) => string): {
   stdout: ReturnType<typeof _createLineForwarder>;
   stderr: ReturnType<typeof _createLineForwarder>;
 } {

@@ -1,8 +1,5 @@
-import {
-  getLocalDatabaseConfigFromRepoRoot,
-  makeSqlRunner,
-} from "./PsqlUtils";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { getLocalDatabaseConfigFromRepoRoot, makeSqlRunner } from "./PsqlUtils";
 
 const processMocks = vi.hoisted(() => {
   return {
@@ -12,7 +9,8 @@ const processMocks = vi.hoisted(() => {
 });
 
 vi.mock("node:child_process", async (importOriginal) => {
-  const originalModule = await importOriginal<typeof import("node:child_process")>();
+  const originalModule =
+    await importOriginal<typeof import("node:child_process")>();
   const mockedModule = {
     ...originalModule,
     execFileSync: processMocks.execFileSync,

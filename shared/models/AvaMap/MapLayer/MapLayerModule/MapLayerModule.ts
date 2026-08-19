@@ -2,6 +2,11 @@ import { Model } from "@avandar/models";
 import { isDefined, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import {
+  areDisputedStatusValuesDisjoint,
+  canBindDisputedStatus,
+  EMPTY_DISPUTED_STATUS_VALUES,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
+import {
   QueryColumn, // prettier-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import {
@@ -112,6 +117,15 @@ export const MapLayerModule = {
   /** Fallback sequential heatmap color ramp. */
   defaultHeatmapRamp: DEFAULT_HEATMAP_RAMP,
 
+  /** No disputed-status values assigned: every outline renders as settled. */
+  emptyDisputedStatusValues: EMPTY_DISPUTED_STATUS_VALUES,
+
+  /** True when a layer may carry a disputed-status bind. */
+  canBindDisputedStatus,
+
+  /** True when no value appears in both the disputed and undetermined lists. */
+  areDisputedStatusValuesDisjoint,
+
   /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
    * geometry columns picked yet.
@@ -144,6 +158,8 @@ export const MapLayerModule = {
         entries: [],
         sizeStops: [],
       },
+      disputedStatusColumn: undefined,
+      disputedStatusValues: EMPTY_DISPUTED_STATUS_VALUES,
     } as const);
   },
 
@@ -253,5 +269,31 @@ export const MapLayerModule = {
           })
           .filter(isDefined)
       );
+  },
+
+  /**
+   * Column names a feature must carry: the popup's columns plus any column
+   * paint depends on. The disputed bind is here rather than in the popup so a
+   * dashed casing cannot vanish because the author trimmed the popup.
+   *
+   * @param layer The layer whose popup config, disputed bind, and query
+   * columns are read.
+   * @returns `"all"` when the popup shows everything, otherwise the popup's
+   * resolved column names plus the bound disputed-status column when it is a
+   * query column not already among them.
+   */
+  toPropertyColumnNames: (layer: MapLayerRead): string[] | "all" => {
+    const popupNames = MapLayerModule.toPopupColumnNames(layer);
+    const reference = layer.disputedStatusColumn;
+    if (popupNames === "all" || reference?.type !== "queryColumn") {
+      return popupNames;
+    }
+    const column = layer.source.queryColumns.find(
+      propEq("id", reference.column),
+    );
+    const name = column ? QueryColumn.getDerivedColumnName(column) : undefined;
+    return name && !popupNames.includes(name) ?
+        [...popupNames, name]
+      : popupNames;
   },
 };

@@ -77,14 +77,16 @@ const V4LegendSchema = LegendSchema.extend({
     .readonly(),
 }).strict();
 
-const V4LayerCommonShape = {
+/** Fields shared by every version 4 layer variant. */
+export const V4LayerCommonShape = {
   ...LayerCommonShape,
   legend: V4LegendSchema,
   timeColumn: uuidType<"QueryColumn">().optional(),
   applyAoiFilter: z.boolean(),
 } as const;
 
-const V4StandardLayerSchema = z.strictObject({
+/** A version 4 layer with full point/line/polygon symbology. */
+export const V4StandardLayerSchema = z.strictObject({
   ...V4LayerCommonShape,
   geoBinding: V4GeoBindingSchema.optional(),
   symbology: V4SymbologySchema,
@@ -93,7 +95,8 @@ const V4StandardLayerSchema = z.strictObject({
     JitterSensitivitySchema,
   ]),
 });
-const V4AggregateOnlyLayerSchema = z.strictObject({
+/** A version 4 layer restricted to aggregate-only fill paint. */
+export const V4AggregateOnlyLayerSchema = z.strictObject({
   ...V4LayerCommonShape,
   geoBinding: V4AreaGeoBindingSchema.optional(),
   symbology: FillSymbologySchema,
@@ -170,7 +173,8 @@ const AnnotationFeatureSchema = z.discriminatedUnion("kind", [
   }),
 ]);
 
-const AnnotationLayerSchema = z.strictObject({
+/** Visibility and drawn features for the map's annotation overlay. */
+export const AnnotationLayerSchema = z.strictObject({
   isVisible: z.boolean(),
   features: z.array(AnnotationFeatureSchema).readonly(),
 });

@@ -1,183 +1,19 @@
-import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it } from "vitest";
-import { getResolvedMapLayerMetadata } from "./getResolvedMapLayerMetadata";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { getResolvedMapLayerMetadata } from "../getResolvedMapLayerMetadata";
+import {
+  createColumn,
+  createDataset,
+  createGridBinLayer,
+  createResolvedFixture,
+} from "./getResolvedMapLayerMetadata.fixtures";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { User } from "$/models/User/User";
-import type { UserProfile } from "$/models/User/UserProfile";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
-function _createDataset(name = "Boundaries"): Dataset.T {
-  const now = new Date().toISOString();
-  return Model.make("Dataset", {
-    id: uuid<Dataset.Id>(),
-    createdAt: now,
-    updatedAt: now,
-    dateOfLastSync: undefined,
-    description: undefined,
-    isRestricted: false,
-    name,
-    sourceType: "csv_file",
-    ownerId: uuid<User.Id>(),
-    ownerProfileId: uuid<UserProfile.Id>(),
-    workspaceId: uuid<Workspace.Id>(),
-  });
-}
-
-function _createColumn(options: {
-  dataset: Dataset.T;
-  name: string;
-  dataType?: DatasetColumn.T["dataType"];
-}): DatasetColumn.T {
-  const now = new Date().toISOString();
-  return Model.make("DatasetColumn", {
-    id: uuid<DatasetColumn.Id>(),
-    datasetId: options.dataset.id,
-    workspaceId: options.dataset.workspaceId,
-    createdAt: now,
-    updatedAt: now,
-    name: options.name,
-    originalName: options.name,
-    originalDataType: "VARCHAR",
-    dataType: options.dataType ?? "varchar",
-    detectedDataType: "VARCHAR",
-    description: undefined,
-    columnIdx: 0,
-  });
-}
-
-function _createBoundaryLayer(options: {
-  sourceDataset: Dataset.T;
-  sourceKey: QueryColumn.T;
-  boundaryDataset: Dataset.T;
-  geometryColumn: DatasetColumn.T;
-  keyColumn: DatasetColumn.T;
-  measureColumn?: QueryColumn.T;
-}): MapLayer.T {
-  const layer = MapLayer.createArea("Cases by district");
-  const aggregation: MapLayer.AreaAggregation =
-    options.measureColumn ?
-      {
-        operation: "sum",
-        measureColumn: options.measureColumn.id,
-        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
-      }
-    : {
-        operation: "count",
-        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
-      };
-  return {
-    ...layer,
-    source: {
-      ...layer.source,
-      dataSource: options.sourceDataset,
-      queryColumns: [options.sourceKey, options.measureColumn].filter(
-        (column): column is QueryColumn.T => {
-          return column !== undefined;
-        },
-      ),
-    },
-    geoBinding: {
-      type: "joinToBoundaries",
-      dataKeyColumn: options.sourceKey.id,
-      matching: "exact",
-      aggregation,
-      boundary: {
-        datasetId: options.boundaryDataset.id,
-        geometryColumnId: options.geometryColumn.id,
-        geometryEncoding: "wkt",
-        keyColumnId: options.keyColumn.id,
-        displayNameColumnId: undefined,
-        simplification: { tolerancePixels: 0.75 },
-      },
-    },
-  };
-}
-
-/** A grid-bin layer that sums one numeric query column per cell. */
-function _createGridBinLayer(options: {
-  sourceDataset: Dataset.T;
-  points: QueryColumn.T;
-  measureColumn: QueryColumn.T;
-}): MapLayer.T {
-  const layer = MapLayer.createArea("Cases by hex");
-  return {
-    ...layer,
-    source: {
-      ...layer.source,
-      dataSource: options.sourceDataset,
-      queryColumns: [options.points, options.measureColumn],
-    },
-    geoBinding: {
-      type: "binPointsToGrid",
-      grid: "hex",
-      sizeMeters: 10_000,
-      points: {
-        type: "geometryColumn",
-        column: options.points.id,
-        encoding: "wkt",
-        family: "point",
-        simplification: undefined,
-        sourceCrs: undefined,
-      },
-      aggregation: {
-        operation: "sum",
-        measureColumn: options.measureColumn.id,
-        outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
-      },
-    },
-  };
-}
-
-function _createResolvedFixture(
-  measureDataType: DatasetColumn.T["dataType"] = "double",
-) {
-  const sourceDataset = _createDataset("Cases");
-  const sourceKeyColumn = _createColumn({
-    dataset: sourceDataset,
-    name: "district_code",
-  });
-  const measureDatasetColumn = _createColumn({
-    dataset: sourceDataset,
-    name: "case_count",
-    dataType: measureDataType,
-  });
-  const sourceKey = QueryColumn.makeFromDatasetColumn(sourceKeyColumn);
-  const measureColumn = QueryColumn.makeFromDatasetColumn(measureDatasetColumn);
-  const boundaryDataset = _createDataset();
-  const geometryColumn = _createColumn({
-    dataset: boundaryDataset,
-    name: 'renamed "geometry"',
-  });
-  const keyColumn = _createColumn({
-    dataset: boundaryDataset,
-    name: "pcode",
-  });
-  const layer = _createBoundaryLayer({
-    sourceDataset,
-    sourceKey,
-    boundaryDataset,
-    geometryColumn,
-    keyColumn,
-    measureColumn,
-  });
-  return {
-    layer,
-    sourceDataset,
-    boundaryDataset,
-    geometryColumn,
-    keyColumn,
-    sourceKeyColumn,
-    measureDatasetColumn,
-  };
-}
 
 describe("getResolvedMapLayerMetadata", () => {
   it("resolves stable boundary column ids to their current names", () => {
-    const fixture = _createResolvedFixture();
+    const fixture = createResolvedFixture();
     const result = getResolvedMapLayerMetadata({
       layer: fixture.layer,
       datasets: [fixture.sourceDataset, fixture.boundaryDataset],
@@ -202,7 +38,7 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("requires a deleted boundary dataset to be rebound", () => {
-    const fixture = _createResolvedFixture();
+    const fixture = createResolvedFixture();
     const result = getResolvedMapLayerMetadata({
       layer: fixture.layer,
       datasets: [fixture.sourceDataset],
@@ -216,7 +52,7 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("requires a deleted geometry column to be rebound", () => {
-    const fixture = _createResolvedFixture();
+    const fixture = createResolvedFixture();
     const result = getResolvedMapLayerMetadata({
       layer: fixture.layer,
       datasets: [fixture.sourceDataset, fixture.boundaryDataset],
@@ -230,7 +66,7 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("rejects a nonnumeric aggregation measure", () => {
-    const fixture = _createResolvedFixture("varchar");
+    const fixture = createResolvedFixture("varchar");
     const result = getResolvedMapLayerMetadata({
       layer: fixture.layer,
       datasets: [fixture.sourceDataset, fixture.boundaryDataset],
@@ -249,7 +85,7 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("requires a deleted boundary join key to be rebound", () => {
-    const fixture = _createResolvedFixture();
+    const fixture = createResolvedFixture();
     const binding = fixture.layer.geoBinding;
     if (binding?.type !== "joinToBoundaries") {
       throw new Error("Expected a boundary join fixture");
@@ -282,17 +118,17 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("resolves a grid bin aggregation measure without a boundary", () => {
-    const sourceDataset = _createDataset("Cases");
-    const pointsColumn = _createColumn({
+    const sourceDataset = createDataset("Cases");
+    const pointsColumn = createColumn({
       dataset: sourceDataset,
       name: "location",
     });
-    const measureDatasetColumn = _createColumn({
+    const measureDatasetColumn = createColumn({
       dataset: sourceDataset,
       name: "case_count",
       dataType: "double",
     });
-    const layer = _createGridBinLayer({
+    const layer = createGridBinLayer({
       sourceDataset,
       points: QueryColumn.makeFromDatasetColumn(pointsColumn),
       measureColumn: QueryColumn.makeFromDatasetColumn(measureDatasetColumn),
@@ -312,12 +148,12 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("requires a grid bin with a boundary denominator to be rebound", () => {
-    const sourceDataset = _createDataset("Cases");
-    const pointsColumn = _createColumn({
+    const sourceDataset = createDataset("Cases");
+    const pointsColumn = createColumn({
       dataset: sourceDataset,
       name: "location",
     });
-    const measureDatasetColumn = _createColumn({
+    const measureDatasetColumn = createColumn({
       dataset: sourceDataset,
       name: "case_count",
       dataType: "double",
@@ -325,7 +161,7 @@ describe("getResolvedMapLayerMetadata", () => {
     const denominatorColumnId = uuid<DatasetColumn.Id>();
     const measureColumn =
       QueryColumn.makeFromDatasetColumn(measureDatasetColumn);
-    const binLayer = _createGridBinLayer({
+    const binLayer = createGridBinLayer({
       sourceDataset,
       points: QueryColumn.makeFromDatasetColumn(pointsColumn),
       measureColumn,
@@ -367,7 +203,7 @@ describe("getResolvedMapLayerMetadata", () => {
   });
 
   it("requires a deleted direct geometry column to be rebound", () => {
-    const sourceDataset = _createDataset("Geometry");
+    const sourceDataset = createDataset("Geometry");
     const missingColumnId = uuid<QueryColumn.Id>();
     const areaLayer = MapLayer.createArea("Areas");
     const layer: MapLayer.T = {

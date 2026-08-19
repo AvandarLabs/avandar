@@ -14,6 +14,9 @@ type Props = {
 
   /** Attribution for the current basemap. */
   attribution: string;
+
+  /** Persisted disclaimer, or unset to show the localized default. */
+  disclaimer: string | undefined;
 };
 
 /** Returns the localized-message descriptor for one coordinate hemisphere. */
@@ -41,6 +44,7 @@ function _hemisphereMessage(
 export function MapFurnitureBar({
   mapInstance,
   attribution,
+  disclaimer,
 }: Props): ReactNode {
   const { i18n, t } = useLingui();
   const coordinates = useMapPointerCoordinates(mapInstance);
@@ -89,7 +93,8 @@ export function MapFurnitureBar({
       : null}
       <span className={css.mapFurnitureBarAttribution}>{attribution}</span>
       <span className={css.mapFurnitureBarDisclaimer}>
-        {t`The boundaries and names shown do not imply official endorsement or acceptance.`}
+        {disclaimer ??
+          t`The boundaries and names shown do not imply official endorsement or acceptance.`}
       </span>
     </div>
   );

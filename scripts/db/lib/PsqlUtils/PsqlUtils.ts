@@ -57,9 +57,10 @@ function _run(
 }
 
 /** Returns the local project id and host database port from Supabase config. */
-export function getLocalDatabaseConfigFromRepoRoot(
-  repoRoot: string,
-): { projectId: string; hostPort: string } {
+export function getLocalDatabaseConfigFromRepoRoot(repoRoot: string): {
+  projectId: string;
+  hostPort: string;
+} {
   const configContents = readFileSync(
     path.join(repoRoot, "supabase", "config.toml"),
     "utf8",
@@ -68,12 +69,16 @@ export function getLocalDatabaseConfigFromRepoRoot(
   if (projectId === undefined) {
     throw new Error("Cannot read local Supabase project id from config.toml.");
   }
-  const databaseSection = configContents.split(/\n(?=\s*\[)/u).find((section) => {
-    return /^\s*\[db\]\s*(?:#.*)?$/mu.test(section);
-  });
+  const databaseSection = configContents
+    .split(/\n(?=\s*\[)/u)
+    .find((section) => {
+      return /^\s*\[db\]\s*(?:#.*)?$/mu.test(section);
+    });
   const hostPort = /^\s*port\s*=\s*(\d+)/mu.exec(databaseSection ?? "")?.[1];
   if (hostPort === undefined) {
-    throw new Error("Cannot read local Supabase database port from config.toml.");
+    throw new Error(
+      "Cannot read local Supabase database port from config.toml.",
+    );
   }
   return { projectId, hostPort };
 }

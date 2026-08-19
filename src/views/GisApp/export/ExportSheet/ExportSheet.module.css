@@ -1,0 +1,8 @@
+.exportSheetBody {
+  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-sm);
+}
+
+.exportSheetSection {
+  border-top: 1px solid var(--mantine-color-default-border);
+  padding-top: var(--mantine-spacing-sm);
+}

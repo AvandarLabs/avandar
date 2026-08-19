@@ -8,7 +8,8 @@ const SENSITIVE_FIELD_NAMES = new Set([
   "S3_PROTOCOL_ACCESS_KEY_SECRET",
 ]);
 
-const HUMAN_READABLE_SECRET_PATTERN = /^(\s*(?:publishable[ _]key|secret[ _]key|jwt[ _]secret|anon[ _]key|service_role[ _]key|s3[ _]access[ _]key|s3[ _]secret[ _]key)\s*(?:│|:|=)\s*)\S.*$/i;
+const HUMAN_READABLE_SECRET_PATTERN =
+  /^(\s*(?:publishable[ _]key|secret[ _]key|jwt[ _]secret|anon[ _]key|service_role[ _]key|s3[ _]access[ _]key|s3[ _]secret[ _]key)\s*(?:│|:|=)\s*)\S.*$/i;
 
 function _redactJsonSecrets(line: string): string | undefined {
   try {

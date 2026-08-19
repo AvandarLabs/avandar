@@ -1,6 +1,9 @@
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
 import type { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
+import type {
+  ExportLayout, // prettier-ignore
+} from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
 /**
@@ -138,6 +141,9 @@ type AvaMapConfigBody = {
    * `0` is under every data layer; `layers.length` is on top.
    */
   annotationsZIndex: number;
+
+  /** Persisted page furniture for the PDF export. */
+  exportLayout: ExportLayout;
 };
 
 /**
@@ -148,6 +154,6 @@ type AvaMapConfigBody = {
  */
 export type AvaMapConfigRead = Model.Versioned<
   "AvaMapConfig",
-  4,
+  5,
   AvaMapConfigBody
 >;

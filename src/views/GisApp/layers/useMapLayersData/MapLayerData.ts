@@ -94,6 +94,8 @@ export const MapLayerData = {
       layer.sensitivity,
       layer.timeColumn,
       layer.applyAoiFilter,
+      layer.disputedStatusColumn,
+      layer.disputedStatusValues,
       overlay?.timeRange,
       overlay?.aoi,
       ...(spatialContext ? [spatialContext] : []),

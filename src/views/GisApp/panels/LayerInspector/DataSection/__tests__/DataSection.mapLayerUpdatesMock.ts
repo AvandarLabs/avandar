@@ -1,6 +1,7 @@
 import { prop, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { disputedStatusUpdates } from "@/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
@@ -262,6 +263,8 @@ export function createDataSectionMapLayerUpdatesMock(): {
       }) => {
         return _patchGeoBinding(options.layer, { dissolve: options.dissolve });
       },
+      withDisputedStatusColumn: disputedStatusUpdates.withDisputedStatusColumn,
+      withDisputedStatusValues: disputedStatusUpdates.withDisputedStatusValues,
     },
   };
 }
