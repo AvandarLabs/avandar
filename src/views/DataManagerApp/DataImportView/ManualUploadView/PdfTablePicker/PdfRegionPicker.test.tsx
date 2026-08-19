@@ -113,13 +113,31 @@ describe("PdfRegionPicker", () => {
     ).toBeInTheDocument();
   });
 
-  it("lets the user override the shape", () => {
+  it("lets the user override the shape, and records that they chose it", () => {
+    // The flag is the override. Without it the next extraction classifies the
+    // region again and writes its own verdict straight back over the choice,
+    // which the user sees as the dropdown snapping back.
     const props = renderPicker();
 
     pickMantineSelectOption(/read as/i, "Table");
 
     expect(props.onRegionsChange).toHaveBeenCalledWith([
-      expect.objectContaining({ id: "r1", shape: "grid_table" }),
+      expect.objectContaining({
+        id: "r1",
+        shape: "grid_table",
+        isShapeUserChosen: true,
+      }),
+    ]);
+  });
+
+  it("does not claim the user chose a shape they never touched", () => {
+    const props = renderPicker();
+
+    const nameField = screen.getByDisplayValue("Deaths by state");
+    fireEvent.change(nameField, { target: { value: "Cholera deaths" } });
+
+    expect(props.onRegionsChange).toHaveBeenCalledWith([
+      expect.not.objectContaining({ isShapeUserChosen: true }),
     ]);
   });
 

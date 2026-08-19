@@ -38,7 +38,16 @@ const NO_REGION_MESSAGE = "Select a region on the page to see data";
  */
 const OCHA_MAP_BBOX = { x0: 305, y0: 450, x1: 570, y1: 615 } as const;
 
-/** Copy from `PdfRegionCard`'s shape options. */
+/**
+ * Copy from `PdfRegionCard`'s shape options, and what the "Read as" control
+ * must show for the map region without anyone selecting it.
+ *
+ * The override itself is still a supported path and is covered where it can be
+ * asserted precisely: `PdfRegionPicker.test.tsx` for the control recording the
+ * user's choice, and `pdfSniff.worker.test.ts` for that choice surviving the
+ * next classification. What only a browser can show is the default path, so
+ * that is what this spec drives.
+ */
 const LABELLED_GRAPHIC_OPTION = "Labelled graphic (map, chart, tiles)";
 
 /**
@@ -243,7 +252,7 @@ test.describe("PDF manual upload", () => {
    * unfixed value. The last assertion here is the one that catches the second
    * of those: it reads the saved dataset's own rows.
    */
-  test("extracts a map region, reviews a row, and saves the reviewed rows", async ({
+  test("classifies a drawn map region itself, reviews a row, and saves the reviewed rows", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -292,14 +301,15 @@ test.describe("PDF manual upload", () => {
     });
     await expect(regionNameInput).toBeVisible({ timeout: SHORT_WAIT });
 
-    // A drawn region is created as "Numbers in prose", so a map has to be told
-    // what it is before anything can be read out of it. The classifier's own
-    // verdict for this region is `grid_table` (a choropleth's gridlines reach
-    // the geometry as ruling lines), which is why the override exists.
+    // Nobody tells the picker this is a map. The region is drawn and the
+    // classifier decides, and the control ends up showing the shape the rows
+    // were actually read with, not the one the region was created with. This
+    // is the assertion the whole default path hangs on: for a long time a
+    // drawn region kept its "Numbers in prose" placeholder through every
+    // extraction, so the first read of any map returned nothing at all and
+    // the user had to reach for the override before they saw a single row.
     const shapeSelect = page.getByRole("combobox", { name: "Read as" });
     await expect(shapeSelect).toBeVisible({ timeout: LONG_WAIT });
-    await shapeSelect.click();
-    await page.getByRole("option", { name: LABELLED_GRAPHIC_OPTION }).click();
     await expect(shapeSelect).toHaveValue(LABELLED_GRAPHIC_OPTION, {
       timeout: LONG_WAIT,
     });
@@ -316,11 +326,17 @@ test.describe("PDF manual upload", () => {
       .toBe(EXPECTED_MAP_ROWS.length);
 
     // The classifier reports on the region and shows its working, so a user
-    // who disagrees with the shape has something to disagree with.
+    // who disagrees with the shape has something to disagree with. On this
+    // map that includes why the ruling lines it can see were discounted: the
+    // choropleth's borders and graticule are rules, and reading them as a
+    // table's is what used to make this region come back empty.
     await expect(
-      page.getByText(/\d+ ruling lines and \d+ rows\./u),
+      page.getByText(/borders or gridlines rather than a table's rules/u),
     ).toBeVisible({ timeout: SHORT_WAIT });
-    await expect(page.getByText("high", { exact: true })).toBeVisible({
+    await expect(
+      page.getByText(/scattered rather than tabulated/u),
+    ).toBeVisible({ timeout: SHORT_WAIT });
+    await expect(page.getByText("medium", { exact: true })).toBeVisible({
       timeout: SHORT_WAIT,
     });
 

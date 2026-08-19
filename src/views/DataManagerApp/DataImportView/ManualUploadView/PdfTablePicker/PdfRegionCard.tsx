@@ -110,7 +110,12 @@ export function PdfRegionCard({
           allowDeselect={false}
           onChange={(value) => {
             if (value) {
-              onPatch({ shape: value as PdfRegionShape });
+              // The flag rides along with the shape, and is the whole reason
+              // the next extraction does not classify over the top of it.
+              onPatch({
+                shape: value as PdfRegionShape,
+                isShapeUserChosen: true,
+              });
             }
           }}
         />

@@ -44,6 +44,7 @@ function _pdfDataSourceMetadata(): PdfDataSourceMetadata {
       pageCount: 3,
       pages: [],
       status: "needs_selection",
+      regions: [],
       columns: [],
       tables: [],
       classifications: {},

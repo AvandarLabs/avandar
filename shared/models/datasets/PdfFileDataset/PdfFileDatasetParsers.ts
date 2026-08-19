@@ -64,6 +64,11 @@ const pdfRegionSchema = z.object({
     "repeating_blocks",
     "prose_measures",
   ]),
+  // Absent on every region written before the flag existed, and on any region
+  // whose shape the classifier chose, so it is optional rather than defaulted:
+  // "the user never touched this" and "the user chose false" are the same
+  // thing, and inventing a `false` would only make the stored row longer.
+  isShapeUserChosen: z.boolean().optional(),
   detectionMode: z.enum(["tagged", "lattice", "stream", "manual"]),
   fragments: z.array(pdfRegionFragmentSchema).readonly(),
   // Deliberately unvalidated beyond "is an object": each shape's extractor

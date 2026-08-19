@@ -116,8 +116,11 @@ export function PdfRegionPicker({
       {
         id,
         label: `Region ${regions.length + 1}`,
-        // The classifier decides on the next extract; this is a placeholder
-        // that the worker's result immediately replaces.
+        // A shape is required from the moment the box exists, because the
+        // "Read as" control has to show something before the first extraction
+        // comes back. Leaving `isShapeUserChosen` unset is what makes this a
+        // default rather than a decision: the worker classifies the region and
+        // the resolved shape is written back over this one.
         shape: "prose_measures",
         detectionMode: "manual",
         fragments: [{ page: pageIndex, bbox }],

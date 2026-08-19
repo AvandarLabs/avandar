@@ -67,7 +67,27 @@ export type PdfRegion = {
   id: string;
   /** User-editable. Prefixes column names when regions are combined. */
   label: string;
+  /**
+   * How this region is read.
+   *
+   * Whoever wrote it last: the classifier on every extraction, unless
+   * `isShapeUserChosen` says the user has taken it over. It is stored rather
+   * than derived so that the dropdown has something to show before the first
+   * extraction comes back, and so that a saved dataset records what it was
+   * actually read as.
+   */
   shape: PdfRegionShape;
+  /**
+   * True once the user has picked the shape themselves.
+   *
+   * This is the difference between a shape we chose and a shape we were told,
+   * and without it there is no way to tell them apart: both are just a value
+   * in `shape`. The classifier re-runs on every extraction, so a region
+   * carrying a default would be re-classified for ever, while one carrying a
+   * user's choice must never be. Persisted for the same reason it exists: on
+   * reload, a re-classification must not quietly undo what the user chose.
+   */
+  isShapeUserChosen?: boolean;
   detectionMode: PdfDetectionMode;
   fragments: readonly PdfRegionFragment[];
   /**

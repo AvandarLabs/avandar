@@ -34,6 +34,7 @@ import type {
   ExtractedTable,
   PageGeometry,
   PdfRegion,
+  PdfRegionShape,
   RegionGeometry,
 } from "./pdfSniff/types";
 
@@ -85,6 +86,16 @@ export type PdfExtractResult = {
   tables: readonly ExtractedTable[];
   /** Per-region classification, so the picker can show its reasoning. */
   classifications: Readonly<Record<string, RegionClassification>>;
+  /**
+   * The shape each region was actually read as, keyed by region id.
+   *
+   * Sent back so the main thread can write it into the region rather than
+   * working it out again. The rule for choosing between the user's shape and
+   * the classifier's belongs in one place, and this is the place that applied
+   * it; a second copy on the main thread is how the dropdown ends up showing
+   * a shape that is not the one the rows came from.
+   */
+  resolvedShapes: Readonly<Record<string, PdfRegionShape>>;
   combined: CombinedTable;
 };
 
@@ -159,6 +170,7 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     );
     const tables: ExtractedTable[] = [];
     const classifications: Record<string, RegionClassification> = {};
+    const resolvedShapes: Record<string, PdfRegionShape> = {};
 
     for (const region of request.regions) {
       // A region spanning pages is clipped per fragment and concatenated, so
@@ -185,10 +197,13 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
       const classification = classifyRegion(merged);
       classifications[region.id] = classification;
 
-      // The user's explicit shape always wins over the classifier's guess.
-      // `shape` is required on a stored region, but this message crosses a
-      // postMessage boundary, so the fallback is not dead code.
-      const shape = region.shape ?? classification.shape;
+      // The user's own choice always wins; anything else is ours to revise.
+      // A region carries a shape from the moment it is drawn, so testing
+      // `region.shape` alone can never let the classifier through: that is
+      // what made the drawn region's placeholder outlive every extraction.
+      const shape =
+        region.isShapeUserChosen === true ? region.shape : classification.shape;
+      resolvedShapes[region.id] = shape;
 
       // `regionId` is written last so a stored option cannot rename the
       // region the extracted table claims to come from.
@@ -222,6 +237,7 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
       type: "extract_result",
       tables,
       classifications,
+      resolvedShapes,
       combined: combineRegions({
         tables,
         regionLabels,

@@ -167,6 +167,34 @@ describe("PdfFileDataset region parsing", () => {
     }).toThrow();
   });
 
+  it("keeps a region's shape as the user's own choice across a reload", () => {
+    // The flag is what stops a re-extraction re-classifying over the top of
+    // an override. Dropping it at the DB boundary would lose the override on
+    // the next load, silently and only for saved datasets.
+    const parsed = PdfFileDatasetParsers.fromDBReadToModelRead({
+      ...validRow,
+      regions: [
+        {
+          id: "r1",
+          label: "Deaths by state",
+          shape: "grid_table",
+          isShapeUserChosen: true,
+          detectionMode: "manual",
+          fragments: [{ page: 0, bbox: [330, 175, 590, 465] }],
+          options: {},
+        },
+      ],
+    });
+
+    expect(parsed.regions[0]!.isShapeUserChosen).toBe(true);
+  });
+
+  it("leaves a classifier-chosen shape open to re-classification", () => {
+    const parsed = PdfFileDatasetParsers.fromDBReadToModelRead(validRow);
+
+    expect(parsed.regions[0]!.isShapeUserChosen).toBeUndefined();
+  });
+
   it("defaults a region's options to an empty object when absent", () => {
     const parsed = PdfFileDatasetParsers.fromDBReadToModelRead({
       ...validRow,

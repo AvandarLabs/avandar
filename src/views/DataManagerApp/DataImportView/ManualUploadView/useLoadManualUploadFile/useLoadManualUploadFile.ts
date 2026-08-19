@@ -32,6 +32,7 @@ import type {
   DocumentMetadata,
   ExtractedTable,
   PageGeometry,
+  PdfRegion,
 } from "@/workers/pdfSniff/types";
 
 type FileLoadOptions = {
@@ -69,6 +70,16 @@ export type PdfFileLoadResult = BaseLoadResult & {
    * it as one.
    */
   status: "needs_selection" | "extracted";
+  /**
+   * The regions as they were actually read, which is the requested regions
+   * with each classified shape written back into them.
+   *
+   * Without this the picker's "Read as" control shows the shape the region was
+   * created with rather than the one the rows in front of the user came out
+   * of, and a user correcting a shape would be correcting a value that was
+   * never used.
+   */
+  regions: readonly PdfRegion[];
   columns: DuckDbColumnSchema[];
   /** One per selected region, for the review grid. */
   tables: readonly ExtractedTable[];
@@ -197,7 +208,11 @@ function _buildDataSourceMetadataFromLoadResult({
         datasetLoadResult: pdfLoadResult,
         parseOptions: {
           type: "pdf_file",
-          regions: pdfRequest?.regions ?? [],
+          // The load result's regions, not the request's: they are the same
+          // regions with the shape each one was actually read as written in.
+          // Taking the request's back would put the placeholder shape in front
+          // of the user again on every extraction.
+          regions: pdfLoadResult.regions,
           pageRange: pdfRequest?.pageRange,
           outputMode: pdfRequest?.outputMode ?? "natural",
           // Carried through re-parses so the model that contributed rows is
@@ -338,6 +353,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
               pageCount: sniff.pageCount,
               pages: sniff.pages,
               status: "needs_selection",
+              regions: [],
               columns: [],
               tables: [],
               classifications: {},
@@ -354,6 +370,17 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             regions,
             documentMetadata: sniff.documentMetadata,
             outputMode,
+          });
+
+          // What each region was read as, written back into the region. The
+          // worker decided this, weighing the user's choice against the
+          // classifier's; repeating that judgement here would be a second
+          // place for the two to disagree.
+          const readRegions = regions.map((region): PdfRegion => {
+            const shape = extracted.resolvedShapes[region.id];
+            return shape === undefined || shape === region.shape ?
+                region
+              : { ...region, shape };
           });
 
           // Reuse the CSV import path wholesale: the extracted table is now
@@ -384,6 +411,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             pageCount: sniff.pageCount,
             pages: sniff.pages,
             status: "extracted",
+            regions: readRegions,
             columns: csvSniff.columns,
             tables: extracted.tables,
             classifications: extracted.classifications,

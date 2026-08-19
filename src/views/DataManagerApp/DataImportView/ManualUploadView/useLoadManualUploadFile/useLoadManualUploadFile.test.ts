@@ -8,6 +8,7 @@ import {
   useLoadManualUploadFile,
 } from "./useLoadManualUploadFile";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DocumentMetadata, PdfRegion } from "@/workers/pdfSniff/types";
 import type { UnknownObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -16,12 +17,18 @@ import type { ReactNode } from "react";
 const {
   startCsvImportMock,
   startXlsxImportMock,
+  startPdfImportMock,
+  transcodePdfExtractionMock,
+  extractPdfRegionsMock,
   useGetPreviewDataMock,
   notifySuccessMock,
 } = vi.hoisted(() => {
   return {
     startCsvImportMock: vi.fn(),
     startXlsxImportMock: vi.fn(),
+    startPdfImportMock: vi.fn(),
+    transcodePdfExtractionMock: vi.fn(),
+    extractPdfRegionsMock: vi.fn(),
     useGetPreviewDataMock: vi.fn(),
     notifySuccessMock: vi.fn(),
   };
@@ -32,8 +39,14 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
     LocalDatasetClient: {
       startCsvImport: startCsvImportMock,
       startXlsxImport: startXlsxImportMock,
+      startPdfImport: startPdfImportMock,
+      transcodePdfExtraction: transcodePdfExtractionMock,
     },
   };
+});
+
+vi.mock("@/clients/datasets/pdfSniff", () => {
+  return { extractPdfRegions: extractPdfRegionsMock };
 });
 
 vi.mock("@/clients/datasets/DatasetQueryClient", () => {
@@ -99,6 +112,27 @@ function _columnSchema(
     extra: null,
     key: null,
     null: "YES",
+  };
+}
+
+function _emptyDocumentMetadata(): DocumentMetadata {
+  return {
+    title: null,
+    organisation: null,
+    reportNumber: null,
+    publishedAt: null,
+  };
+}
+
+/** What `PdfRegionPicker` creates when the user drags a box. */
+function _drawnRegion(): PdfRegion {
+  return {
+    id: "r1",
+    label: "Region 1",
+    shape: "prose_measures",
+    detectionMode: "manual",
+    fragments: [{ page: 0, bbox: [305, 450, 570, 615] }],
+    options: {},
   };
 }
 
@@ -276,6 +310,67 @@ describe("useLoadManualUploadFile", () => {
           .availableSheetNames,
       ).toEqual(["Sheet1", "Sheet2"]);
     }
+  });
+
+  it("writes back the shape a pdf region was actually read as", async () => {
+    // A drawn region arrives carrying the shape it was created with, and the
+    // classifier decides what it really is. If that verdict is not written
+    // back, the "Read as" control keeps showing the created shape while the
+    // rows on screen came from a different extractor, and a user who then
+    // changes the shape is correcting a value nothing ever used.
+    useGetPreviewDataMock.mockReturnValue([[]]);
+    startPdfImportMock.mockResolvedValue({
+      type: "result",
+      pageCount: 1,
+      pages: [],
+      documentMetadata: _emptyDocumentMetadata(),
+    });
+    extractPdfRegionsMock.mockResolvedValue({
+      type: "extract_result",
+      tables: [],
+      classifications: {},
+      resolvedShapes: { r1: "labelled_graphic" },
+      combined: {
+        outputMode: "natural",
+        cells: [
+          ["label", "value"],
+          ["KHARTOUM", "408"],
+        ],
+        headerRows: 1,
+      },
+    });
+    transcodePdfExtractionMock.mockResolvedValue({
+      columns: [_columnSchema("label", "VARCHAR")],
+      previewRows: [],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useLoadManualUploadFile();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current.loadFile.async({
+        type: "pdf_file",
+        file: new File(["%PDF-1.7"], "report.pdf", {
+          type: "application/pdf",
+        }),
+        datasetId: "dataset_pdf" as Dataset.Id,
+        regions: [_drawnRegion()],
+        outputMode: "natural",
+      });
+    });
+
+    const parseOptions = result.current.dataSourceMetadata?.parseOptions;
+    if (parseOptions?.type !== "pdf_file") {
+      throw new Error("expected pdf parse options");
+    }
+    expect(parseOptions.regions?.[0]?.shape).toBe("labelled_graphic");
+    // Written back by us, so a later box move re-decides it. Claiming the
+    // user chose it would pin the region to this shape for good.
+    expect(parseOptions.regions?.[0]?.isShapeUserChosen).toBeUndefined();
   });
 });
 
