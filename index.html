@@ -11,19 +11,27 @@
     />
     <title>Avandar</title>
     <!--
-      The app is cross-origin isolated (COOP: same-origin + COEP:
-      credentialless, set in vercel.json) so the offline-chat WebLLM runtime
-      (`@mlc-ai/web-llm`) can use SharedArrayBuffer for its WASM pthread build.
-      Under COEP credentialless, cross-origin iframes (Featurebase widgets,
-      etc.) must opt into `credentialless` BEFORE they navigate; setting the
-      property after insertion is too late. This installer intercepts the `src`
-      setter on `HTMLIFrameElement` and marks any cross-origin frame
-      credentialless before its first navigation.
+      Dormant while the app is not cross-origin isolated, which is the case
+      everywhere today: COOP/COEP were dropped from vercel.json because the
+      Google Picker cannot run inside an isolated document (marked
+      credentialless it has no cookie jar and asks for cookie access; unmarked
+      COEP refuses the frame outright), and Sheets import matters more than
+      SharedArrayBuffer for the offline-chat WebLLM runtime.
+
+      It stays here because re-isolating is still on the table for WebLLM. Under
+      COEP credentialless, cross-origin iframes (Featurebase widgets, etc.) must
+      opt into `credentialless` BEFORE they navigate; setting the property after
+      insertion is too late. This installer intercepts the `src` setter on
+      `HTMLIFrameElement` and marks any cross-origin frame credentialless before
+      its first navigation. A credentialless frame is loaded with an empty
+      cookie jar, so `crossOriginIsolated` gates the whole thing: without COEP
+      nothing forces the opt-in and marking a frame only costs it its cookies.
     -->
     <script>
       (function () {
         if (typeof HTMLIFrameElement === "undefined") return;
         if (!("credentialless" in HTMLIFrameElement.prototype)) return;
+        if (!window.crossOriginIsolated) return;
         var srcDesc = Object.getOwnPropertyDescriptor(
           HTMLIFrameElement.prototype,
           "src",

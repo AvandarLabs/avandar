@@ -13,6 +13,8 @@ describe("makeChatTurnSuffixFromOptions", () => {
     expect(unifiedSystemPrefix.toLowerCase()).not.toContain(
       "currently in the data explorer",
     );
+    expect(unifiedSystemPrefix).toContain('FROM "t0"');
+    expect(unifiedSystemPrefix).not.toContain("dataset ids");
     const suffix = makeChatTurnSuffixFromOptions({
       context: ChatPageContext.createDataExplorerViewContext({
         lastSql: "select 1",

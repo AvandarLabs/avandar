@@ -1,6 +1,13 @@
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { assembleWords } from "../assembleWords/assembleWords";
-import type { PageGeometry, RuleSegment, TextItem } from "../pdfSniff.types";
+import type {
+  BBox,
+  PageGeometry,
+  PathMark,
+  PathPoint,
+  RuleSegment,
+  TextItem,
+} from "../pdfSniff.types";
 import type { PDFPageProxy } from "pdfjs-dist";
 
 /**
@@ -46,6 +53,116 @@ const DRAW_OPS = {
   closePath: 4,
 } as const;
 
+/** Stop collecting marks past this many so a vector map cannot blow memory. */
+const MAX_MARKS_PER_PAGE = 2500;
+
+/** Paths covering this much of the page are clips or backgrounds, not marks. */
+const PAGE_COVER_FRACTION = 0.8;
+
+const FILL_PAINT = new Set<number>([
+  pdfjs.OPS.fill,
+  pdfjs.OPS.eoFill,
+  pdfjs.OPS.fillStroke,
+  pdfjs.OPS.eoFillStroke,
+  pdfjs.OPS.closeFillStroke,
+  pdfjs.OPS.closeEOFillStroke,
+]);
+
+type PathGeometry = {
+  rules: RuleSegment[];
+  marks: PathMark[];
+  marksTruncated: boolean;
+};
+
+type MarkBuffer = {
+  points: PathPoint[];
+  closed: boolean;
+};
+
+function _markBBox(points: readonly PathPoint[]): BBox {
+  return [
+    Math.min(
+      ...points.map((point) => {
+        return point.x;
+      }),
+    ),
+    Math.min(
+      ...points.map((point) => {
+        return point.y;
+      }),
+    ),
+    Math.max(
+      ...points.map((point) => {
+        return point.x;
+      }),
+    ),
+    Math.max(
+      ...points.map((point) => {
+        return point.y;
+      }),
+    ),
+  ];
+}
+
+function _centerOnPage(
+  bbox: BBox,
+  pageWidth: number,
+  pageHeight: number,
+): boolean {
+  const centerX = (bbox[0] + bbox[2]) / 2;
+  const centerY = (bbox[1] + bbox[3]) / 2;
+  return (
+    centerX >= 0 &&
+    centerX <= pageWidth &&
+    centerY >= 0 &&
+    centerY <= pageHeight
+  );
+}
+
+function _coversPage(
+  bbox: BBox,
+  pageWidth: number,
+  pageHeight: number,
+): boolean {
+  const width = Math.max(0, bbox[2] - bbox[0]);
+  const height = Math.max(0, bbox[3] - bbox[1]);
+  return width * height >= PAGE_COVER_FRACTION * pageWidth * pageHeight;
+}
+
+function _flushMark(
+  geometry: PathGeometry,
+  buffer: MarkBuffer,
+  isFilled: boolean,
+  pageWidth: number,
+  pageHeight: number,
+): void {
+  if (buffer.points.length < 2) {
+    return;
+  }
+  if (geometry.marks.length >= MAX_MARKS_PER_PAGE) {
+    geometry.marksTruncated = true;
+    return;
+  }
+  const bbox = _markBBox(buffer.points);
+  if (
+    !_centerOnPage(bbox, pageWidth, pageHeight) ||
+    _coversPage(bbox, pageWidth, pageHeight)
+  ) {
+    return;
+  }
+  geometry.marks.push({
+    kind: buffer.closed ? "closed" : "polyline",
+    points: buffer.points,
+    bbox,
+    isFilled,
+    fill: null,
+  });
+}
+
+function _emptyBuffer(): MarkBuffer {
+  return { points: [], closed: false };
+}
+
 function _unmappedCharRatio(text: string): number {
   if (text.length === 0) {
     return 0;
@@ -55,7 +172,8 @@ function _unmappedCharRatio(text: string): number {
 }
 
 /**
- * Walks the page's operator list and pulls out axis-aligned line segments.
+ * Walks the page's operator list and pulls out axis-aligned rules and the
+ * vector marks that rules discard.
  *
  * This is the lattice signal's raw input, and it is why we do not need
  * computer vision: Camelot rasterizes the page and runs OpenCV morphology to
@@ -71,9 +189,14 @@ function _unmappedCharRatio(text: string): number {
  * naturally covers both stroked rules and thin filled rectangles, with no
  * separate rectangle-specific branch needed.
  */
-async function _extractRules(page: PDFPageProxy): Promise<RuleSegment[]> {
+async function _extractVectors(page: PDFPageProxy): Promise<PathGeometry> {
+  const viewport = page.getViewport({ scale: 1, rotation: page.rotate });
   const operatorList = await page.getOperatorList();
-  const rules: RuleSegment[] = [];
+  const geometry: PathGeometry = {
+    rules: [],
+    marks: [],
+    marksTruncated: false,
+  };
 
   for (let i = 0; i < operatorList.fnArray.length; i += 1) {
     if (operatorList.fnArray[i] !== pdfjs.OPS.constructPath) {
@@ -92,53 +215,83 @@ async function _extractRules(page: PDFPageProxy): Promise<RuleSegment[]> {
     if (!args) {
       continue;
     }
-    const [, [pathData]] = args;
-    let index = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let startX = 0;
-    let startY = 0;
-
-    while (index < pathData.length) {
-      const op = pathData[index];
-      index += 1;
-
-      if (op === DRAW_OPS.moveTo) {
-        currentX = pathData[index] ?? 0;
-        currentY = pathData[index + 1] ?? 0;
-        index += 2;
-        startX = currentX;
-        startY = currentY;
-      } else if (op === DRAW_OPS.lineTo) {
-        const nextX = pathData[index] ?? 0;
-        const nextY = pathData[index + 1] ?? 0;
-        index += 2;
-        _pushIfAxisAligned(rules, currentX, currentY, nextX, nextY);
-        currentX = nextX;
-        currentY = nextY;
-      } else if (op === DRAW_OPS.curveTo) {
-        // Curves cannot be axis-aligned rules; skip their six coordinates.
-        index += 6;
-        currentX = pathData[index - 2] ?? currentX;
-        currentY = pathData[index - 1] ?? currentY;
-      } else if (op === DRAW_OPS.quadraticCurveTo) {
-        index += 4;
-        currentX = pathData[index - 2] ?? currentX;
-        currentY = pathData[index - 1] ?? currentY;
-      } else if (op === DRAW_OPS.closePath) {
-        _pushIfAxisAligned(rules, currentX, currentY, startX, startY);
-        currentX = startX;
-        currentY = startY;
-      } else {
-        // An op code we don't recognise means our reading of the coordinate
-        // layout may already be off; stop walking this path rather than
-        // risk misinterpreting the remaining coordinates as op codes.
-        break;
-      }
-    }
+    const [paintOp, [pathData]] = args;
+    _walkConstructPath({
+      geometry,
+      pathData,
+      isFilled: FILL_PAINT.has(paintOp),
+      pageWidth: viewport.width,
+      pageHeight: viewport.height,
+    });
   }
 
-  return rules;
+  return geometry;
+}
+
+function _walkConstructPath(options: {
+  geometry: PathGeometry;
+  pathData: ArrayLike<number>;
+  isFilled: boolean;
+  pageWidth: number;
+  pageHeight: number;
+}): void {
+  const { geometry, pathData, isFilled, pageWidth, pageHeight } = options;
+  let index = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let startX = 0;
+  let startY = 0;
+  let buffer = _emptyBuffer();
+
+  const flush = (): void => {
+    _flushMark(geometry, buffer, isFilled, pageWidth, pageHeight);
+    buffer = _emptyBuffer();
+  };
+
+  while (index < pathData.length) {
+    const op = pathData[index];
+    index += 1;
+
+    if (op === DRAW_OPS.moveTo) {
+      flush();
+      currentX = pathData[index] ?? 0;
+      currentY = pathData[index + 1] ?? 0;
+      index += 2;
+      startX = currentX;
+      startY = currentY;
+      buffer.points.push({ x: currentX, y: currentY });
+    } else if (op === DRAW_OPS.lineTo) {
+      const nextX = pathData[index] ?? 0;
+      const nextY = pathData[index + 1] ?? 0;
+      index += 2;
+      _pushIfAxisAligned(geometry.rules, currentX, currentY, nextX, nextY);
+      currentX = nextX;
+      currentY = nextY;
+      buffer.points.push({ x: currentX, y: currentY });
+    } else if (op === DRAW_OPS.curveTo) {
+      // Keep the endpoint so a marker circle still has a bbox centre.
+      index += 6;
+      currentX = pathData[index - 2] ?? currentX;
+      currentY = pathData[index - 1] ?? currentY;
+      buffer.points.push({ x: currentX, y: currentY });
+    } else if (op === DRAW_OPS.quadraticCurveTo) {
+      index += 4;
+      currentX = pathData[index - 2] ?? currentX;
+      currentY = pathData[index - 1] ?? currentY;
+      buffer.points.push({ x: currentX, y: currentY });
+    } else if (op === DRAW_OPS.closePath) {
+      _pushIfAxisAligned(geometry.rules, currentX, currentY, startX, startY);
+      currentX = startX;
+      currentY = startY;
+      buffer.closed = true;
+    } else {
+      // An op code we don't recognise means our reading of the coordinate
+      // layout may already be off; stop walking this path rather than
+      // risk misinterpreting the remaining coordinates as op codes.
+      break;
+    }
+  }
+  flush();
 }
 
 function _pushIfAxisAligned(
@@ -221,14 +374,16 @@ export async function extractPageGeometry(options: {
       return a.x - b.x;
     });
 
-  const rules = await _extractRules(page);
+  const vectors = await _extractVectors(page);
 
   return {
     pageIndex,
     width: viewport.width,
     height: viewport.height,
     textItems: assembleWords(textItems),
-    rules,
+    rules: vectors.rules,
+    marks: vectors.marks,
+    marksTruncated: vectors.marksTruncated,
     looksScanned: textItems.length <= SCANNED_PAGE_MAX_TEXT_ITEMS,
   };
 }

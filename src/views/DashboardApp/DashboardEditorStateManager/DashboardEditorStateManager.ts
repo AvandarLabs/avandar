@@ -62,6 +62,42 @@ const INITIAL_STATE: DashboardEditorAppState = {
   pendingBlocks: [],
 };
 
+/**
+ * True when two JSON-like values have the same structure and primitive
+ * values.
+ */
+function _areJsonValuesEqual(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) {
+    return true;
+  }
+  if (left === null || right === null || typeof left !== typeof right) {
+    return false;
+  }
+  if (Array.isArray(left) && Array.isArray(right)) {
+    return (
+      left.length === right.length &&
+      left.every((item, index) => {
+        return _areJsonValuesEqual(item, right[index]);
+      })
+    );
+  }
+  if (typeof left !== "object" || typeof right !== "object") {
+    return false;
+  }
+  const leftRecord = left as Record<string, unknown>;
+  const rightRecord = right as Record<string, unknown>;
+  const leftKeys = Object.keys(leftRecord);
+  if (leftKeys.length !== Object.keys(rightRecord).length) {
+    return false;
+  }
+  return leftKeys.every((key) => {
+    return (
+      Object.prototype.hasOwnProperty.call(rightRecord, key) &&
+      _areJsonValuesEqual(leftRecord[key], rightRecord[key])
+    );
+  });
+}
+
 /** Reads the stable Puck content-item id used to de-duplicate blocks. */
 function _getBlockId(
   block: AvaPageData["content"][number],
@@ -230,7 +266,11 @@ export const DashboardEditorStateManager = createAppStateManager({
       };
     },
 
-    /** Replace the active Puck data after an editor interaction. */
+    /**
+     * Replace the active Puck data after an editor interaction. Puck also
+     * echoes data on load after `resolveData`; that echo is not an edit, so
+     * structurally equal payloads keep `hasUnsavedChanges` as-is.
+     */
     updateEditorData: (
       state: DashboardEditorAppState,
       editorData: AvaPageData,
@@ -242,6 +282,13 @@ export const DashboardEditorStateManager = createAppStateManager({
         const blockId = _getBlockId(pending.block);
         return !_contentHasBlockId(editorData.content, blockId);
       });
+      const pendingUnchanged =
+        remainingPending.length === state.pendingBlocks.length;
+      if (_areJsonValuesEqual(state.editorData, editorData)) {
+        return pendingUnchanged ? state : (
+            { ...state, pendingBlocks: remainingPending }
+          );
+      }
       return {
         ...state,
         editorData,

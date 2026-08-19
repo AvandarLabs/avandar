@@ -11,9 +11,13 @@ import type {
 import type {
   CsvDataSourceMetadata,
   DatasetImportFormValues,
+  GoogleSheetsDataSourceMetadata,
   PdfDataSourceMetadata,
 } from "../DatasetImportForm.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  DuckDbColumnSchema,
+  DuckDbLoadXlsxResult,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
@@ -74,8 +78,41 @@ const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
   },
 };
 
+/**
+ * A Google Sheets import of the second tab of a two-tab workbook. The tab is
+ * deliberately not the first one, so an insert that ignored the chosen tab
+ * could not satisfy the assertions below.
+ */
+const GOOGLE_SHEETS_PARAMS: DatasetImportFormValues &
+  GoogleSheetsDataSourceMetadata = {
+  name: "Imported Sheet",
+  description: "",
+  sourceType: "google_sheets",
+  // A Google `sub`, which is what `tokens__google.google_account_id` stores.
+  googleAccountId: "108374652910384756291",
+  googleDocumentId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
+  parseOptions: { type: "google_sheets", sheetName: "Kenya", hasHeader: true },
+  datasetLoadResult: {
+    datasetId: SAVED_DATASET.id,
+    numRows: 7,
+    spreadsheetName: "regional-population",
+    availableSheetNames: ["Colombia", "Kenya"],
+    sheetLoadMetadata: {
+      type: "xlsx",
+      id: "google-sheet-load-result" as DuckDbLoadXlsxResult["id"],
+      tableName: "import_sheet",
+      xlsxName: "regional-population.xlsx",
+      numRows: 7,
+      columns: [_duckDbColumn("county"), _duckDbColumn("residents")],
+      sheet: "Kenya",
+      parquetData: new Blob(),
+    },
+  },
+};
+
 const {
   insertCsvFileDatasetMock,
+  insertGoogleSheetsDatasetMock,
   insertPdfFileDatasetMock,
   transcodeReviewedPdfExtractionMock,
   logEventMock,
@@ -86,6 +123,7 @@ const {
 } = vi.hoisted(() => {
   return {
     insertCsvFileDatasetMock: vi.fn(),
+    insertGoogleSheetsDatasetMock: vi.fn(),
     insertPdfFileDatasetMock: vi.fn(),
     transcodeReviewedPdfExtractionMock: vi.fn(),
     logEventMock: vi.fn(),
@@ -106,7 +144,7 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       },
       useGetAll: workspaceDatasetsMock,
       insertCsvFileDataset: insertCsvFileDatasetMock,
-      insertGoogleSheetsDataset: vi.fn(),
+      insertGoogleSheetsDataset: insertGoogleSheetsDatasetMock,
       insertPdfFileDataset: insertPdfFileDatasetMock,
       insertXlsxFileDataset: vi.fn(),
     },
@@ -229,6 +267,7 @@ function _pdfLoadResult(
     pageCount: 3,
     pages: [],
     status: "extracted",
+    outputMode: "natural",
     regions: [],
     columns: [_duckDbColumn("subject"), _duckDbColumn("value")],
     tables: [],
@@ -275,6 +314,8 @@ describe("useSaveDataset", () => {
   beforeEach(() => {
     insertCsvFileDatasetMock.mockReset();
     insertCsvFileDatasetMock.mockResolvedValue(SAVED_DATASET);
+    insertGoogleSheetsDatasetMock.mockReset();
+    insertGoogleSheetsDatasetMock.mockResolvedValue(SAVED_DATASET);
     insertPdfFileDatasetMock.mockReset();
     insertPdfFileDatasetMock.mockResolvedValue(SAVED_DATASET);
     transcodeReviewedPdfExtractionMock.mockReset();
@@ -320,6 +361,113 @@ describe("useSaveDataset", () => {
       });
     });
     expect(insertCsvFileDatasetMock).toHaveBeenCalledOnce();
+  });
+
+  it("stores the chosen tab on a Google Sheets import", async () => {
+    // The tab is what makes a Sheets dataset one relation rather than
+    // "whatever is first". A stored `null` means the workbook's first tab, so a
+    // new import that failed to record its tab would silently become a
+    // first-tab dataset.
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async(GOOGLE_SHEETS_PARAMS);
+    });
+
+    expect(insertGoogleSheetsDatasetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sheetName: "Kenya",
+        googleDocumentId: GOOGLE_SHEETS_PARAMS.googleDocumentId,
+        googleAccountId: GOOGLE_SHEETS_PARAMS.googleAccountId,
+      }),
+    );
+  });
+
+  it("stores the tab that was read, not one selected but not applied", async () => {
+    // The two sources diverge when a user picks a tab and saves without
+    // pressing "Process data again": the recorded columns are still the tab
+    // that was parsed, so storing the newly selected name would leave
+    // `sheet_name` disagreeing with `dataset_columns`, and acquisition would
+    // read a tab whose schema was never validated.
+    //
+    // This is also what stops the two assertions above from passing for the
+    // wrong reason: in the fixture they share a value, so only a case where
+    // they differ can tell which one the insert reads.
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async({
+        ...GOOGLE_SHEETS_PARAMS,
+        // Selected "Colombia"; the load result still holds the parsed "Kenya".
+        parseOptions: {
+          type: "google_sheets",
+          sheetName: "Colombia",
+          hasHeader: true,
+        },
+      });
+    });
+
+    expect(insertGoogleSheetsDatasetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetName: "Kenya" }),
+    );
+  });
+
+  it("never stores an absent tab when nothing was selected", async () => {
+    // A new row must always carry a concrete tab, so `null` stays a legacy
+    // value that only pre-tab-column rows have.
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async({
+        ...GOOGLE_SHEETS_PARAMS,
+        parseOptions: { type: "google_sheets", hasHeader: true },
+      });
+    });
+
+    expect(insertGoogleSheetsDatasetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetName: "Kenya" }),
+    );
+  });
+
+  it("records the Sheets columns read from the workbook", async () => {
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async(GOOGLE_SHEETS_PARAMS);
+    });
+
+    const insertParams = insertGoogleSheetsDatasetMock.mock.calls[0]![0] as {
+      columns: Array<{ name: string }>;
+    };
+    expect(
+      insertParams.columns.map((column) => {
+        return column.name;
+      }),
+    ).toEqual(["county", "residents"]);
   });
 
   it("invalidates datasets and their columns after an import", async () => {

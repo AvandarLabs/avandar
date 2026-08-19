@@ -40,5 +40,8 @@ export function makeChatPageContextFromPathname(
   ) {
     return ChatPageContext.createDataSourcesViewContext();
   }
+  if (pathname.includes("/ontology-designer")) {
+    return ChatPageContext.createCaseManagerViewContext();
+  }
   return ChatPageContext.createOtherViewContext();
 }

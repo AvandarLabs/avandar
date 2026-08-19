@@ -21,6 +21,8 @@ function firstPage(textItems: readonly TextItem[]): PageGeometry {
     height: 842,
     looksScanned: false,
     rules: [],
+    marks: [],
+    marksTruncated: false,
     textItems,
   };
 }

@@ -49,6 +49,12 @@ fi
 # switched worktree so several worktrees can run `pnpm dev` side by side.
 VITE_PORT="$("$SCRIPT_DIR/utils/get-dev-server-port.sh")"
 
+# Advertise localhost: Google OAuth and Picker treat localhost and 127.0.0.1
+# as different origins, and Cloud Console is registered for localhost. Bind
+# IPv4 loopback so Node/Playwright (which prefer 127.0.0.1) still connect.
+VITE_HOST="127.0.0.1"
+VITE_PUBLIC_URL="http://localhost:${VITE_PORT}"
+
 # ngrok-free domains need --hostname, while paid/custom domains still use --url.
 REVERSE_PROXY_HOST="${REVERSE_PROXY_URL#http://}"
 REVERSE_PROXY_HOST="${REVERSE_PROXY_HOST#https://}"
@@ -107,7 +113,7 @@ echo ""
 
 # Step 2: Start development processes concurrently
 echo -e "${BLUE}Step 2: Starting development processes...${NC}"
-echo -e "${CYAN}  - Vite (frontend dev server) on http://127.0.0.1:${VITE_PORT}${NC}"
+echo -e "${CYAN}  - Vite (frontend dev server) on ${VITE_PUBLIC_URL}${NC}"
 echo -e "${CYAN}  - Supabase Functions (edge functions server)${NC}"
 echo -e "${CYAN}  - ngrok (reverse proxy tunnel)${NC}"
 echo -e "${CYAN}  - fastify server${NC}"
@@ -145,7 +151,7 @@ if [ "$NGROK_AVAILABLE" = true ]; then
     --prefix-colors "blue,green,yellow" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite --host 127.0.0.1 --port $VITE_PORT" \
+    "vite --host $VITE_HOST --port $VITE_PORT" \
     "pnpm fns:serve" \
     "$NGROK_COMMAND || echo \"$NGROK_FALLBACK_MESSAGE\""
 else
@@ -154,6 +160,6 @@ else
     --prefix-colors "blue,green" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite --host 127.0.0.1 --port $VITE_PORT" \
+    "vite --host $VITE_HOST --port $VITE_PORT" \
     "pnpm fns:serve"
 fi

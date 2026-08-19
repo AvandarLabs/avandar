@@ -1,0 +1,19 @@
+.grid {
+  display: grid;
+  gap: var(--mantine-spacing-lg) var(--mantine-spacing-xl);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.field {
+  min-width: 0;
+}
+
+.source {
+  color: var(--mantine-color-neutral-5);
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.value {
+  color: var(--mantine-color-neutral-8);
+  overflow-wrap: anywhere;
+}

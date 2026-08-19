@@ -25,6 +25,11 @@ vi.mock(
   },
 );
 
+if (!("PointerEvent" in window)) {
+  (window as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent =
+    MouseEvent;
+}
+
 const REGION: PdfRegion = {
   id: "r1",
   label: "Deaths by state",
@@ -40,6 +45,8 @@ const PAGE: PageGeometry = {
   height: 842,
   textItems: [],
   rules: [],
+  marks: [],
+  marksTruncated: false,
   looksScanned: false,
 };
 
@@ -253,5 +260,71 @@ describe("PdfRegionPicker", () => {
       await screen.findByText(/could not reach the assistant/i),
     ).toBeInTheDocument();
     expect(props.onAssistApplied).not.toHaveBeenCalled();
+  });
+
+  it("shows the y-axis fit on a cartesian extraction", () => {
+    renderPicker({
+      tables: [
+        {
+          regionId: "r1",
+          cells: [
+            ["week", "value"],
+            ["1", "760"],
+          ],
+          headerRows: 1,
+          flags: [],
+          extractedBy: "rules",
+          rowProvenance: [{ page: 0, bbox: REGION.fragments[0]!.bbox }],
+          chartAxis: {
+            min: 0,
+            max: 10000,
+            scale: "linear",
+            tickCount: 6,
+            maxResidual: 0.3,
+          },
+        },
+      ],
+    });
+
+    // "Value axis" rather than "y-axis": a horizontal bar chart is calibrated
+    // along x, and the same note is what reports it.
+    expect(screen.getByText(/value axis 0 to 10000/i)).toBeInTheDocument();
+    expect(screen.getByText(/fits 6 ticks/i)).toBeInTheDocument();
+    expect(screen.getByText(/max error 0.3 pt/i)).toBeInTheDocument();
+  });
+
+  it("writes two y-axis clicks onto the region as calibration hints", () => {
+    const props = renderPicker();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /calibrate manually/i }),
+    );
+
+    const overlay = screen.getByTestId("pdf-region-overlay");
+    vi.spyOn(overlay, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 210, 424),
+    );
+    fireEvent.pointerDown(overlay, { clientX: 20, clientY: 400 });
+    fireEvent.pointerUp(overlay, { clientX: 20, clientY: 400 });
+    fireEvent.pointerDown(overlay, { clientX: 20, clientY: 40 });
+    fireEvent.pointerUp(overlay, { clientX: 20, clientY: 40 });
+
+    fireEvent.change(screen.getByLabelText(/first tick value/i), {
+      target: { value: "0" },
+    });
+    fireEvent.change(screen.getByLabelText(/second tick value/i), {
+      target: { value: "10000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /apply calibration/i }));
+
+    const nextRegions = vi.mocked(props.onRegionsChange).mock.calls.at(-1)?.[0];
+    const hints = nextRegions?.[0]?.options.yAxisHints as
+      | ReadonlyArray<{ position: number; value: number }>
+      | undefined;
+    expect(hints).toHaveLength(2);
+    expect(hints?.[0]).toEqual(expect.objectContaining({ value: 0 }));
+    expect(hints?.[1]).toEqual(expect.objectContaining({ value: 10000 }));
+    expect(hints?.[0]?.position).toBeLessThan(100);
+    expect(hints?.[1]?.position).toBeGreaterThan(700);
   });
 });

@@ -23,6 +23,11 @@ describe("createDataVizBlock", () => {
     ]);
     expect(block.props.vizType).toBe("table");
     expect(block.props.vizConfig).toEqual(vizConfig);
+    expect(block.props.globalFilterSubscription).toEqual({
+      mode: "all",
+      subscribedFilterIds: [],
+    });
+    expect(block.props.localFilters).toEqual([]);
   });
 
   it("stamps a unique UUID into props.id for every call", () => {

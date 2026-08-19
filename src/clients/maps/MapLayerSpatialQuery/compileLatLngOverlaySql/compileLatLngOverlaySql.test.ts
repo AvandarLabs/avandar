@@ -37,6 +37,18 @@ const latLngLayerWithTime: MapLayer.T = {
 };
 
 describe("compileLatLngOverlaySql", () => {
+  it("returns the source sql rather than undefined with no aoi or time range", () => {
+    const sql = compileLatLngOverlaySql({
+      sourceSql: "SELECT * FROM cases",
+      layer: latLngLayerWithTime,
+      overlay: { aoi: undefined, timeRange: undefined },
+      latitudeColumnName: "latitude",
+      longitudeColumnName: "longitude",
+      timeColumnName: "observed_at",
+    });
+    expect(sql).toBe("SELECT * FROM cases");
+  });
+
   it("compiles lat/lng time-only sql without spatial functions", () => {
     const sql = compileLatLngOverlaySql({
       sourceSql: "SELECT * FROM cases",

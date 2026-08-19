@@ -1,0 +1,157 @@
+.page {
+  margin-inline: auto;
+  max-width: 72rem;
+  padding-bottom: var(--mantine-spacing-xl);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  margin-bottom: var(--mantine-spacing-lg);
+}
+
+.grid {
+  display: grid;
+  gap: var(--mantine-spacing-lg);
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 48em) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cardShell {
+  display: flex;
+  position: relative;
+}
+
+.cardDeleteButton {
+  opacity: 0;
+  position: absolute;
+  right: var(--mantine-spacing-md);
+  top: var(--mantine-spacing-md);
+  transition: opacity var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
+}
+
+/* Revealed on hover to keep the grid calm, but always present for keyboard
+   users, who never produce a hover. The focus rule is stated first so it does
+   not sit at lower specificity than the hover rule that follows. */
+.cardDeleteButton:focus-visible {
+  opacity: 1;
+}
+
+.cardShell:hover .cardDeleteButton {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .cardDeleteButton {
+    opacity: 1;
+  }
+}
+
+.card {
+  align-items: stretch;
+  background: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-sm);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: var(--mantine-spacing-md);
+  margin: 0;
+  padding: var(--mantine-spacing-lg);
+  text-align: left;
+  transition:
+    transform var(--ava-animation-duration-normal)
+      var(--ava-animation-easing-out),
+    box-shadow var(--ava-animation-duration-normal)
+      var(--ava-animation-easing-out),
+    border-color var(--ava-animation-duration-normal)
+      var(--ava-animation-easing-out);
+  width: 100%;
+}
+
+.card:hover,
+.card:focus-visible {
+  border-color: var(--mantine-color-primary-3);
+  box-shadow: var(--mantine-shadow-md);
+  transform: translateY(-2px);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+.footer {
+  border-top: 1px solid var(--ava-border-default);
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--mantine-spacing-sm);
+}
+
+.openHint {
+  color: var(--mantine-color-primary-6);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+}
+
+.createCard {
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    var(--mantine-color-primary-0),
+    var(--ava-surface-raised)
+  );
+  border: 1.5px dashed var(--mantine-color-primary-3);
+  border-radius: var(--mantine-radius-md);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+  gap: var(--mantine-spacing-sm);
+  justify-content: center;
+  margin: 0;
+  min-height: 220px;
+  padding: var(--mantine-spacing-lg);
+  text-align: center;
+  transition:
+    border-color var(--ava-animation-duration-normal)
+      var(--ava-animation-easing-out),
+    background-color var(--ava-animation-duration-normal)
+      var(--ava-animation-easing-out);
+  width: 100%;
+}
+
+.createCard:hover,
+.createCard:focus-visible {
+  background: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-6);
+}
+
+.createCard:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .createCard,
+  .cardDeleteButton {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    transform: none;
+  }
+}

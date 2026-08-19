@@ -427,16 +427,27 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // about the bar rather than the bar's own unit.
     expect(table.rowUnits).toEqual(["n", "n", "n", "n", "n", "n"]);
 
-    // Every pillar has its own figure: nothing is unmatched in either
-    // direction. Five of the six pairings are near-ties and say so, which is
-    // the truth about this chart rather than a defect: the pillar names sit
-    // in a column 90 to 180 points to the left, while the rows are only 23
-    // points apart, so a bar's amount is barely closer to its own name than
-    // to the name above it. The values are right and flagged for review.
-    for (const flag of table.flags) {
-      expect(flag.reason).toBe("ambiguous_association");
-    }
-    expect(flaggedRowIndices(table).size).toBe(5);
+    // Nothing is flagged, and that is a change of mechanism rather than a
+    // relaxed assertion. Proximity pairing used to flag five of these six as
+    // near-ties, correctly: the pillar names sit in a column 90 to 180 points
+    // to the left while the rows are only 23 points apart, so a bar's amount
+    // was barely closer to its own name than to the name above it. Reading
+    // the bars themselves removes the contest. A bar occupies a row, its name
+    // and its figure sit on that row, and no distance is being weighed.
+    expect(table.flags).toEqual([]);
+
+    // The trust signal behind that claim: every printed figure is checked
+    // against the length its own bar was drawn at, and the five bars fit one
+    // straight line through 1M, 2M and 3M to within a thousandth of a point.
+    // A mislabelled bar would not survive this, which is why the flags being
+    // empty means something.
+    expect(table.chartAxis?.scale).toBe("linear");
+    expect(table.chartAxis?.tickCount).toBe(5);
+    expect(table.chartAxis?.maxResidual).toBeLessThan(0.01);
+
+    // "Others" is printed as 0 and drawn as nothing, and it still comes out
+    // as a row. A reader that only walked the bars would silently lose it.
+    expect(dataRows(table).at(-1)).toEqual(["Others", "0"]);
   });
 
   it("reads all six response pillars, one column region at a time", async () => {
@@ -518,11 +529,11 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     expect(meta.title).toMatch(/cholera/iu);
   });
 
-  it("does NOT extract the weekly trend chart", async () => {
-    // Shape 4 is deferred. Asserting its absence keeps that a decision rather
-    // than something that quietly half-works: the chart has axis ticks and
-    // week numbers but no data labels, so any weekly figure here would be an
-    // interpolated guess at a bar's height.
+  it("reads the weekly trend chart from the area path", async () => {
+    // The chart prints no case counts. These values are the area-path
+    // vertices read against a linear fit of the six labelled y-ticks
+    // (0 to 10,000). Interpolation against that fit is arithmetic with a
+    // measured residual, not a guess at a bar's height.
     const region = clipToRegion({
       page: await pageOf(OCHA, 1),
       bbox: OCHA_TREND,
@@ -530,39 +541,42 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     const table = extractLabelledGraphic(region, { regionId: "trend" });
     const rows = dataRows(table);
 
-    // Everything the chart prints as scaffolding: the y-axis ticks and the
-    // 26 week ordinals. Nothing else is text on this chart.
-    const scaffolding = new Set([
-      "0",
-      "2000",
-      "4000",
-      "6000",
-      "8000",
-      "10000",
-      ...Array.from({ length: 26 }, (_unused, index) => {
-        return String(index + 1);
-      }),
+    expect(table.cells[0]).toEqual(["week", "value"]);
+    expect(rows).toEqual([
+      ["1", "760"],
+      ["2", "617"],
+      ["3", "685"],
+      ["4", "675"],
+      ["5", "629"],
+      ["6", "644"],
+      ["7", "1552"],
+      ["8", "2000"],
+      ["9", "668"],
+      ["10", "498"],
+      ["11", "582"],
+      ["12", "493"],
+      ["13", "631"],
+      ["14", "483"],
+      ["15", "528"],
+      ["16", "797"],
+      ["17", "1100"],
+      ["18", "967"],
+      ["19", "979"],
+      ["20", "2784"],
+      ["21", "8581"],
+      ["22", "4264"],
+      ["23", "3039"],
+      ["24", "1819"],
+      ["25", "918"],
+      ["26", "364"],
     ]);
+    expect(table.flags).toEqual([]);
+    expect(table.rowUnits).toEqual(
+      Array.from({ length: 26 }, () => {
+        return "n";
+      }),
+    );
 
-    // Not one emitted value is a reading of the series: every one is a tick
-    // label or a week number that the extractor happened to pair with a month
-    // name. Nothing between the ticks is ever invented.
-    for (const row of rows) {
-      expect(scaffolding.has(row[1] ?? "")).toBe(true);
-    }
-    // 26 weekly bars, and at most a handful of junk rows: no series comes out.
-    expect(rows.length).toBeLessThan(10);
-    // And the extractor says so, loudly, at region level.
-    const unmatched = table.flags.filter((flag) => {
-      return flag.reason === "unmatched_value";
-    });
-    expect(unmatched.length).toBeGreaterThanOrEqual(20);
-
-    // The chart's axes and gridlines reach `extractPageGeometry` as 34
-    // horizontal rules, five of them spanning 88% or more of the region, and
-    // the classifier used to read that as a grid table at high confidence.
-    // It no longer does: those rules organise no columns of text, so they are
-    // chart furniture rather than a table's rules.
     expect(classifyRegion(region).shape).toBe("labelled_graphic");
   });
 });

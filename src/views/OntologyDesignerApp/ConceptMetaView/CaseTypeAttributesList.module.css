@@ -1,0 +1,21 @@
+.list {
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+}
+
+.row {
+  border-bottom: 1px solid var(--ava-border-default);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.source {
+  color: var(--mantine-color-neutral-6);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+  max-width: 10rem;
+}

@@ -175,6 +175,7 @@ export async function runBackgroundParquetTranscoding(params: {
           file: params.source.file,
           sheet: params.source.options.sheet,
           hasHeader: params.source.options.hasHeader,
+          rowsToSkip: params.source.options.rowsToSkip,
         });
 
     const currentRow = await AvaDexie.DB.LocalDataset.get(datasetId);

@@ -12,7 +12,7 @@ export type CombinedTable = {
   headerRows: number;
 };
 
-const OBSERVATION_HEADER = [
+export const OBSERVATION_HEADER = [
   "subject",
   "metric",
   "value",
@@ -30,13 +30,45 @@ const OBSERVATION_HEADER = [
 ] as const;
 
 /**
+ * Tables that produced rows, which is the only set the union rule looks at.
+ *
+ * A region that yielded nothing but its header cannot disagree with anything,
+ * so counting it would block a union that is plainly available.
+ */
+export function getPopulatedTables(
+  tables: readonly ExtractedTable[],
+): readonly ExtractedTable[] {
+  return tables.filter((table) => {
+    return table.cells.length > 1;
+  });
+}
+
+/**
+ * Whether the selected regions share one set of printed columns to keep.
+ *
+ * Exported because the import UI has to say whether keeping them is even an
+ * option, and this is the rule that decides it. Reimplementing it there would
+ * be a second implementation of the union rule, and the two would drift: the
+ * control would offer a choice this function does not honour.
+ */
+export function canKeepPrintedColumns(params: {
+  tables: readonly ExtractedTable[];
+}): boolean {
+  const populated = getPopulatedTables(params.tables);
+  return (
+    populated.length > 0 &&
+    new Set(populated.map(getPrintedColumnKey)).size === 1
+  );
+}
+
+/**
  * Header comparison ignores case and surrounding whitespace.
  *
  * A table continuing onto a new page often repeats its header with different
  * spacing or capitalisation. Treating that as a different schema would refuse
  * to union a table that plainly is one.
  */
-function _headerKey(table: ExtractedTable): string {
+export function getPrintedColumnKey(table: ExtractedTable): string {
   const header = table.cells[0] ?? [];
   const names = header.map((name) => {
     return name.trim().toLowerCase().replace(/\s+/gu, " ");
@@ -132,17 +164,15 @@ export function combineRegions(params: {
   documentMetadata: DocumentMetadata;
   outputMode?: "natural" | "observations";
 }): CombinedTable {
-  const populated = params.tables.filter((table) => {
-    return table.cells.length > 1;
-  });
+  const populated = getPopulatedTables(params.tables);
 
   if (populated.length === 0) {
     return { outputMode: "natural", cells: [], headerRows: 0 };
   }
 
-  const headerKeys = new Set(populated.map(_headerKey));
   const shouldUnion =
-    params.outputMode !== "observations" && headerKeys.size === 1;
+    params.outputMode !== "observations" &&
+    canKeepPrintedColumns({ tables: params.tables });
 
   if (shouldUnion) {
     const [first] = populated;

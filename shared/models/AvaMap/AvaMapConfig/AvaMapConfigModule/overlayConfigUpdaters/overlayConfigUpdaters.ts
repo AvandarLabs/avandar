@@ -120,6 +120,34 @@ export const overlayConfigUpdaters = {
   },
 
   /**
+   * Replaces one annotation with `nextFeatures` at the same index.
+   */
+  withAnnotationFeaturesReplaced: (
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      featureId: AnnotationFeatureId;
+      nextFeatures: readonly AnnotationFeature[];
+    }>,
+  ): AvaMapConfigRead => {
+    const { config, featureId, nextFeatures } = options;
+    const featureIndex = config.annotations.features.findIndex(
+      propEq("id", featureId),
+    );
+    if (featureIndex < 0) {
+      return config;
+    }
+    const features = [...config.annotations.features];
+    features.splice(featureIndex, 1, ...nextFeatures);
+    if (features.length === 0) {
+      return { ...config, annotations: EMPTY_ANNOTATIONS };
+    }
+    return {
+      ...config,
+      annotations: { ...config.annotations, features },
+    };
+  },
+
+  /**
    * Removes an annotation by id. The last removal leaves an empty overlay.
    */
   withoutAnnotationFeature: (

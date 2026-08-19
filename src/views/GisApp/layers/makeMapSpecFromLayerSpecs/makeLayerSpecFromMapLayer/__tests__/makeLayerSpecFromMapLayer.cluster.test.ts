@@ -57,6 +57,11 @@ describe("makeLayerSpecFromMapLayer cluster and heatmap paint", () => {
         id: `ava-map-layer-${layer.id}-count`,
         type: "symbol",
         filter: ["has", "point_count"],
+        paint: {
+          "text-color": "#1a1a1a",
+          "text-halo-color": "#ffffff",
+          "text-halo-width": 1.5,
+        },
         layout: {
           "text-field": ["get", "point_count_abbreviated"],
           "text-font": ["Noto Sans Regular"],

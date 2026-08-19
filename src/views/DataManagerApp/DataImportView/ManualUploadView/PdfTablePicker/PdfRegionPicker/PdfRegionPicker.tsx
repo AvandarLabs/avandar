@@ -8,9 +8,11 @@ import { PdfPagePreview } from "../PdfPagePreview";
 import { PdfRegionCard } from "../PdfRegionCard";
 import { PdfRegionOverlay } from "../PdfRegionOverlay/PdfRegionOverlay";
 import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
+import { usePdfAxisCalibration } from "../usePdfAxisCalibration";
 import type { Highlight } from "../PdfPagePreview";
 import type { AssistStatus } from "../PdfRegionCard";
 import type { RegionAssistSkipReason } from "../runRegionModelAssist/runRegionModelAssist";
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
 import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
 import type {
   BBox,
@@ -94,6 +96,7 @@ export function PdfRegionPicker({
     Readonly<Record<string, AssistStatus>>
   >({});
   const isOnline = useIsOnline();
+  const calibration = usePdfAxisCalibration();
 
   const tablesByRegionId = makeMap(tables, { key: "regionId" });
 
@@ -260,7 +263,10 @@ export function PdfRegionPicker({
             height={pageSize.heightPt * scale}
             scale={scale}
             pageHeight={pageSize.heightPt}
+            interaction={calibration.regionId === null ? "draw" : "pick"}
+            markers={calibration.points}
             onRegionDrawn={addRegion}
+            onPointPicked={calibration.pick}
           />
         </Box>
         {pageCount > 1 ?
@@ -313,6 +319,20 @@ export function PdfRegionPicker({
                   void onAssist(region, table);
                 }
               }}
+              isCalibrating={calibration.regionId === region.id}
+              calibrationPoints={
+                calibration.regionId === region.id ? calibration.points : []
+              }
+              onStartCalibration={() => {
+                calibration.start(region.id);
+              }}
+              onApplyCalibration={(hints: readonly AxisTick[]) => {
+                updateRegion(region.id, {
+                  options: { ...region.options, yAxisHints: hints },
+                });
+                calibration.cancel();
+              }}
+              onCancelCalibration={calibration.cancel}
             />
           );
         })}

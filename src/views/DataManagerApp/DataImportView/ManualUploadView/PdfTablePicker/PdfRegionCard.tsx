@@ -12,15 +12,29 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
+import { PdfAxisCalibration } from "./PdfAxisCalibration/PdfAxisCalibration";
 import css from "./PdfRegionCard.module.css";
 import { getCoverageFlagFromTable } from "./runRegionModelAssist/runRegionModelAssist";
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
 import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
 import type {
+  ChartAxisFit,
   ExtractedTable,
   PdfRegion,
   PdfRegionShape,
 } from "@/workers/pdfSniff/pdfSniff.types";
 import type { ReactNode } from "react";
+
+function ChartAxisNote({ axis }: { axis: ChartAxisFit }): ReactNode {
+  const { t } = useLingui();
+  const scaleLabel = axis.scale === "log" ? t`log` : t`linear`;
+  const residual = axis.maxResidual.toFixed(1);
+  return (
+    <Text size="xs" c="dimmed">
+      {t`Value axis ${axis.min} to ${axis.max}, ${scaleLabel}, fits ${axis.tickCount} ticks (max error ${residual} pt)`}
+    </Text>
+  );
+}
 
 /** Per-region state of the assistant offer. */
 export type AssistStatus = {
@@ -41,6 +55,11 @@ type Props = {
   onPatch: (patch: Partial<PdfRegion>) => void;
   onRemove: () => void;
   onAssist: () => void;
+  isCalibrating: boolean;
+  calibrationPoints: ReadonlyArray<{ x: number; y: number }>;
+  onStartCalibration: () => void;
+  onApplyCalibration: (hints: readonly AxisTick[]) => void;
+  onCancelCalibration: () => void;
 };
 
 /**
@@ -59,6 +78,11 @@ export function PdfRegionCard({
   onPatch,
   onRemove,
   onAssist,
+  isCalibrating,
+  calibrationPoints,
+  onStartCalibration,
+  onApplyCalibration,
+  onCancelCalibration,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const coverageFlag = getCoverageFlagFromTable(table);
@@ -182,6 +206,20 @@ export function PdfRegionCard({
               </Text>
             : null}
           </Stack>
+        : null}
+
+        {region.shape === "labelled_graphic" ?
+          <PdfAxisCalibration
+            isPicking={isCalibrating}
+            points={calibrationPoints}
+            onStart={onStartCalibration}
+            onApply={onApplyCalibration}
+            onCancel={onCancelCalibration}
+          />
+        : null}
+
+        {table?.chartAxis ?
+          <ChartAxisNote axis={table.chartAxis} />
         : null}
       </Stack>
     </Paper>

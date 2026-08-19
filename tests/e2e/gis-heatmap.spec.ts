@@ -133,7 +133,9 @@ test("draws a heatmap whose paint does not open the feature inspector", async ({
       canvasBounds.x + projected.x,
       canvasBounds.y + projected.y,
     );
-    await expect(page.getByRole("dialog", { name: "Feature" })).toHaveCount(0, {
+    await expect(
+      page.getByRole("region", { name: "Feature", exact: true }),
+    ).toHaveCount(0, {
       timeout: SHORT_WAIT,
     });
   } finally {

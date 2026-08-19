@@ -168,6 +168,7 @@ function _makeInsertGoogleSheetsDataset(
         p_google_account_id: params.googleAccountId,
         p_google_document_id: params.googleDocumentId,
         p_rows_to_skip: params.rowsToSkip,
+        p_sheet_name: { value: params.sheetName ?? null },
       },
     );
     logger.log("Successfully added dataset", dataset);

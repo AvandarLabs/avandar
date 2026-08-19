@@ -1,0 +1,201 @@
+service_date,program,region,people_served,sessions
+2025-02-22,Case management,North,72,6
+2025-07-28,Events,East,36,6
+2025-11-22,Events,North,65,5
+2025-08-28,Outreach,South,63,7
+2025-06-05,Workshops,South,8,4
+2025-03-04,Workshops,North,15,5
+2025-08-07,Workshops,East,88,8
+2025-02-11,Outreach,West,32,8
+2025-02-07,Events,South,91,7
+2025-08-25,Workshops,East,12,1
+2025-05-02,Workshops,West,42,7
+2025-02-02,Events,North,42,6
+2025-08-05,Workshops,West,20,5
+2025-06-27,Outreach,West,24,6
+2025-05-23,Case management,East,42,7
+2025-08-12,Workshops,North,8,4
+2025-07-28,Events,East,6,2
+2025-04-10,Case management,North,35,5
+2025-11-17,Workshops,North,18,6
+2025-02-14,Case management,North,2,1
+2025-03-14,Events,West,5,1
+2025-02-10,Workshops,South,40,4
+2025-03-22,Case management,North,48,4
+2025-03-30,Case management,North,36,3
+2025-04-11,Case management,East,10,2
+2025-08-18,Events,East,49,7
+2025-03-01,Outreach,South,28,4
+2025-07-27,Workshops,North,6,1
+2025-08-12,Outreach,West,54,6
+2025-01-18,Events,East,60,6
+2025-07-11,Workshops,East,42,7
+2025-06-29,Workshops,North,32,4
+2025-11-18,Events,West,40,5
+2025-05-25,Workshops,North,80,8
+2025-10-10,Workshops,North,12,2
+2025-01-18,Workshops,West,48,4
+2025-08-16,Workshops,East,9,3
+2025-08-25,Events,West,96,8
+2025-06-13,Events,North,9,1
+2025-04-29,Outreach,South,24,3
+2025-05-13,Outreach,North,27,3
+2025-10-19,Case management,North,5,1
+2025-04-15,Workshops,East,66,6
+2025-08-07,Workshops,North,55,5
+2025-01-02,Workshops,East,24,3
+2025-08-18,Workshops,South,14,2
+2025-06-01,Case management,West,6,3
+2025-08-21,Workshops,North,40,8
+2025-04-20,Case management,West,35,5
+2025-09-03,Outreach,West,24,3
+2025-05-29,Case management,East,8,2
+2025-05-24,Events,South,52,4
+2025-06-19,Case management,West,64,8
+2025-09-29,Case management,North,32,8
+2025-07-21,Workshops,East,11,1
+2025-02-02,Workshops,West,6,2
+2025-01-27,Events,East,20,5
+2025-05-30,Case management,South,56,8
+2025-08-09,Workshops,South,26,2
+2025-11-29,Case management,East,30,3
+2025-08-05,Workshops,North,27,3
+2025-10-06,Outreach,West,48,4
+2025-11-12,Case management,South,16,4
+2025-11-12,Events,West,77,7
+2025-05-13,Outreach,North,21,7
+2025-06-08,Events,South,8,4
+2025-03-31,Outreach,West,16,2
+2025-01-03,Outreach,South,52,4
+2025-02-04,Case management,South,54,6
+2025-09-22,Case management,North,55,5
+2025-08-20,Case management,North,77,7
+2025-12-01,Events,East,45,5
+2025-12-19,Outreach,South,16,4
+2025-09-01,Events,South,12,2
+2025-06-10,Outreach,South,14,7
+2025-01-12,Events,North,63,7
+2025-02-18,Events,East,13,1
+2025-04-04,Workshops,West,35,5
+2025-03-27,Outreach,North,21,3
+2025-06-02,Case management,East,9,1
+2025-11-17,Case management,West,40,5
+2025-06-06,Outreach,West,40,4
+2025-07-23,Workshops,East,78,6
+2025-05-20,Case management,West,8,2
+2025-03-15,Outreach,East,21,7
+2025-06-03,Outreach,South,13,1
+2025-09-02,Workshops,North,14,2
+2025-10-27,Outreach,West,4,2
+2025-10-14,Workshops,East,5,1
+2025-11-18,Case management,North,8,2
+2025-01-01,Workshops,South,48,6
+2025-09-04,Workshops,East,12,4
+2025-05-01,Case management,West,24,2
+2025-11-22,Case management,South,56,7
+2025-07-29,Case management,West,9,3
+2025-12-14,Events,East,84,7
+2025-07-13,Events,South,30,3
+2025-06-24,Events,South,21,7
+2025-03-22,Outreach,South,49,7
+2025-03-23,Workshops,West,12,3
+2025-10-14,Workshops,East,32,8
+2025-01-14,Events,North,6,1
+2025-11-04,Events,West,20,5
+2025-08-29,Workshops,West,20,2
+2025-11-24,Events,East,35,7
+2025-09-24,Events,West,20,2
+2025-10-03,Case management,East,8,1
+2025-03-06,Events,North,48,8
+2025-07-12,Events,West,33,3
+2025-10-11,Case management,East,40,5
+2025-03-27,Workshops,West,40,5
+2025-04-14,Workshops,South,10,2
+2025-07-06,Case management,South,14,7
+2025-08-29,Case management,South,44,4
+2025-01-04,Workshops,East,36,6
+2025-12-13,Case management,East,24,2
+2025-02-09,Outreach,West,28,4
+2025-01-22,Outreach,South,32,4
+2025-01-17,Case management,South,25,5
+2025-10-31,Outreach,East,14,7
+2025-05-05,Case management,North,32,8
+2025-06-04,Outreach,North,36,4
+2025-11-01,Case management,South,49,7
+2025-12-18,Events,West,14,7
+2025-01-24,Events,West,35,5
+2025-05-19,Workshops,West,48,8
+2025-09-26,Events,North,28,7
+2025-08-27,Workshops,South,4,1
+2025-11-04,Outreach,East,42,6
+2025-08-01,Case management,South,65,5
+2025-03-01,Workshops,East,8,1
+2025-04-21,Workshops,South,78,6
+2025-06-07,Workshops,East,12,6
+2025-02-18,Events,West,49,7
+2025-10-21,Events,West,9,1
+2025-10-29,Case management,North,48,6
+2025-05-11,Case management,South,49,7
+2025-05-09,Outreach,East,18,3
+2025-01-12,Outreach,North,26,2
+2025-07-25,Workshops,South,10,5
+2025-07-15,Events,East,12,6
+2025-08-18,Outreach,South,24,4
+2025-08-19,Case management,South,36,4
+2025-12-23,Outreach,North,36,4
+2025-05-13,Case management,North,40,8
+2025-04-27,Events,North,96,8
+2025-02-20,Outreach,South,42,7
+2025-03-08,Outreach,West,40,8
+2025-06-19,Outreach,South,72,6
+2025-10-01,Case management,West,78,6
+2025-07-22,Events,North,12,4
+2025-11-28,Case management,West,15,5
+2025-06-13,Outreach,East,84,7
+2025-07-30,Events,West,11,1
+2025-07-25,Events,West,64,8
+2025-07-26,Case management,West,54,6
+2025-06-25,Outreach,North,33,3
+2025-12-16,Workshops,North,20,2
+2025-03-21,Case management,West,18,2
+2025-09-05,Case management,South,48,6
+2025-08-20,Events,North,70,7
+2025-08-15,Outreach,East,24,4
+2025-06-08,Workshops,East,48,6
+2025-01-03,Outreach,East,56,7
+2025-10-20,Case management,North,65,5
+2025-03-01,Workshops,South,48,4
+2025-02-21,Workshops,South,84,7
+2025-03-27,Workshops,South,32,4
+2025-03-16,Outreach,West,4,1
+2025-01-11,Workshops,North,11,1
+2025-05-24,Events,North,11,1
+2025-06-17,Case management,North,60,6
+2025-02-10,Workshops,West,49,7
+2025-12-31,Outreach,East,56,8
+2025-09-30,Outreach,East,26,2
+2025-09-14,Case management,North,10,1
+2025-07-05,Outreach,West,36,6
+2025-07-13,Outreach,North,40,8
+2025-07-08,Case management,East,30,5
+2025-04-14,Events,North,14,7
+2025-12-10,Events,South,48,4
+2025-09-07,Workshops,West,12,6
+2025-06-28,Case management,North,5,1
+2025-05-09,Events,North,10,5
+2025-11-11,Events,East,60,6
+2025-11-11,Case management,South,32,8
+2025-10-29,Case management,North,4,2
+2025-09-18,Events,South,30,6
+2025-12-18,Case management,East,13,1
+2025-08-01,Outreach,West,21,7
+2025-11-03,Outreach,South,12,4
+2025-07-17,Events,East,12,3
+2025-07-09,Case management,East,16,2
+2025-01-27,Workshops,South,36,4
+2025-05-22,Outreach,West,20,5
+2025-09-18,Outreach,South,64,8
+2025-09-24,Case management,North,15,5
+2025-06-01,Workshops,South,12,2
+2025-10-22,Workshops,South,12,2
+2025-10-30,Events,North,40,4

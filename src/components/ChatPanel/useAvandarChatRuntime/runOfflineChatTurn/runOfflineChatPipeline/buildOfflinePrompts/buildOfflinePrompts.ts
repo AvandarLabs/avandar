@@ -2,7 +2,6 @@
  * Offline chat prompts for the WebLLM pipeline (`runOfflineChatPipeline`).
  *
  * Deterministic SQL repair lives in `repairOfflineGeneratedSql.ts`.
- * See `docs/offline-chat-sql-hardening.md`.
  *
  * ## Dropped vs online chat (`chat.routes.ts`)
  *
@@ -17,6 +16,7 @@
  */
 
 import { isDefined, propEq } from "@avandar/utils";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type {
   OfflineChatSchema,
@@ -26,34 +26,48 @@ import type {
 const REFINEMENT_HINTS =
   /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;
 
+function aliasesFromSchema(
+  schema: OfflineChatSchema,
+): readonly SqlTableAlias.T[] {
+  return SqlTableAlias.fromSchema({
+    datasets: schema.datasets,
+    concepts: schema.concepts ?? [],
+  });
+}
+
+function aliasForDatasetId(
+  datasetId: string,
+  aliases: readonly SqlTableAlias.T[],
+): string | undefined {
+  const match = aliases.find((entry) => {
+    return entry.kind === "dataset" && entry.datasetId === datasetId;
+  });
+  return match?.alias;
+}
+
 function formatSchema(schema: OfflineChatSchema): string {
-  const datasetLines = schema.datasets
-    .map((dataset) => {
-      return `- table name: "${dataset.id}" | label: ${dataset.name}`;
-    })
-    .join("\n");
-
-  const columnLines = schema.columns
-    .map((column) => {
-      return `- "${column.name}" (${column.data_type}) in table "${column.dataset_id}"`;
-    })
-    .join("\n");
-
-  return `Available datasets (SQL FROM must use table name, never label):\n${datasetLines}\n\nSchema:\n${columnLines}`;
+  const block = SqlTableAlias.formatSchemaBlock({
+    aliases: aliasesFromSchema(schema),
+    columns: schema.columns,
+    conceptAttributes: schema.conceptAttributes ?? [],
+  });
+  return `Available datasets and concepts (SQL FROM must use the alias, never a label):\n${block}`;
 }
 
 function formatAllowedTablesList(schema: OfflineChatSchema): string {
-  return schema.datasets
-    .map((dataset) => {
-      return `- "${dataset.id}" (label: ${dataset.name})`;
+  return aliasesFromSchema(schema)
+    .map((entry) => {
+      return `- "${entry.alias}" (label: ${entry.name})`;
     })
     .join("\n");
 }
 
 function formatResolvedDatasetRequirement(
   dataset: OfflineChatSchemaDataset,
+  aliases: readonly SqlTableAlias.T[],
 ): string {
-  return `Required: use FROM "${dataset.id}" only (label: ${dataset.name}). No other table names.\n\n`;
+  const alias = aliasForDatasetId(dataset.id, aliases) ?? dataset.id;
+  return `Required: use FROM "${alias}" only (label: ${dataset.name}). No other table names.\n\n`;
 }
 
 function formatOpenDatasetHint(
@@ -68,17 +82,20 @@ function formatOpenDatasetHint(
   if (!openDataset) {
     return "";
   }
-  return `User has this dataset open. Default FROM table name: "${openDataset.id}" (label: ${openDataset.name}).\n\n`;
+  const alias =
+    aliasForDatasetId(openDatasetId, aliasesFromSchema(schema)) ??
+    openDataset.id;
+  return `User has this dataset open. Default FROM table name: "${alias}" (label: ${openDataset.name}).\n\n`;
 }
 
 function formatOfflineSqlSchemaNotes(): string {
   return `Rules:
-- SQL FROM / JOIN targets must be the quoted table name values above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "<uuid from table name>").
+- SQL FROM / JOIN targets must be the quoted aliases above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "t0" or FROM "c0").
 - Do not invent datasets or system tables (pg_database, information_schema).
-- Use only column names listed under Schema. Never invent columns.
+- Use only column names listed next to each alias. Never invent columns.
 - Do not invent WHERE literal values unless the user named them.
 - DuckDB uses LIMIT, not SELECT TOP.
-- Wrap every table id and column name in double quotes.
+- Wrap every table alias and column name in double quotes.
 - One read-only SELECT or WITH. No semicolons.`;
 }
 
@@ -124,12 +141,12 @@ ${formatSchema(args.schema)}
 User question:
 ${args.lastUserPrompt}
 
-Pick the dataset table name (UUID, not label) you will use. Set proceed false if materially ambiguous.
+Pick the dataset or concept alias (t0, t1, … / c0, c1, …; not a label) you will use. Set proceed false if materially ambiguous.
 
 Respond with ONLY valid JSON (no markdown fence):
 {
-  "summary": "one sentence with dataset table id and Schema columns",
-  "tableName": "optional exact UUID from Available datasets",
+  "summary": "one sentence with dataset alias and columns",
+  "tableName": "optional exact alias from Available datasets",
   "proceed": true or false,
   "clarifyQuestion": "optional, under 25 words",
   "clarifyOptions": ["optional", "2-6", "short strings"]
@@ -145,9 +162,10 @@ export function buildOfflineSqlPrompt(args: {
   lastSql?: string;
   lastError?: string;
 }): string {
+  const aliases = aliasesFromSchema(args.schema);
   const resolvedBlock =
     args.resolvedDataset ?
-      formatResolvedDatasetRequirement(args.resolvedDataset)
+      formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
     : "";
 
   return `You are a DuckDB SQL generator for Avandar offline chat.
@@ -175,9 +193,10 @@ export function buildOfflineFixSqlPrompt(args: {
   lastUserPrompt: string;
   resolvedDataset?: OfflineChatSchemaDataset;
 }): string {
+  const aliases = aliasesFromSchema(args.schema);
   const resolvedBlock =
     args.resolvedDataset ?
-      formatResolvedDatasetRequirement(args.resolvedDataset)
+      formatResolvedDatasetRequirement(args.resolvedDataset, aliases)
     : "";
 
   return `Fix this DuckDB SQL. Use ONLY Allowed table names and Schema columns.

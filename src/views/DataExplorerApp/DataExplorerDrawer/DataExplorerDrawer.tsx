@@ -2,6 +2,7 @@ import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
 import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
 import { QueryTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
@@ -83,7 +84,17 @@ export function DataExplorerDrawer({
         }
         renderTabHeader={{
           query: t`Query`,
-          visualizations: t`Visualizations`,
+          // The onboarding tutorial spotlights this label, so the anchor
+          // goes on the label itself rather than on a wrapper around the
+          // whole `Tabs`. A wrapper's bounding box is the entire drawer
+          // whenever it is expanded, which is exactly when the tutorial
+          // reaches this step, so the spotlight would cover everything
+          // instead of the one control the tooltip is talking about.
+          visualizations: (
+            <span {...NuxAnchors.props(NuxAnchors.ids.explorerVizTab)}>
+              {t`Visualizations`}
+            </span>
+          ),
         }}
         wrapPanels={(panels) => {
           return (
@@ -98,12 +109,14 @@ export function DataExplorerDrawer({
           },
           visualizations: () => {
             return (
-              <VizTabPanel
-                columns={columns}
-                data={data}
-                vizConfig={vizConfig}
-                onVizConfigChange={dispatch.setVizConfig}
-              />
+              <div {...NuxAnchors.props(NuxAnchors.ids.explorerVizPanel)}>
+                <VizTabPanel
+                  columns={columns}
+                  data={data}
+                  vizConfig={vizConfig}
+                  onVizConfigChange={dispatch.setVizConfig}
+                />
+              </div>
             );
           },
         }}

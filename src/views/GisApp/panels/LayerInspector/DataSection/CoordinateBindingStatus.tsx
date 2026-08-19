@@ -34,10 +34,10 @@ export function CoordinateBindingStatus({
         {t`Pick both a latitude and a longitude column. One on its own plots every point on a diagonal line, which looks like a result and is not.`}
       </Callout>
     : layer.source.dataSource ?
-      <Callout color="warning">
+      <Callout color="info">
         <Stack gap="xs">
           <span>
-            {t`No column in ${layer.source.dataSource.name} holds coordinates. Boundary joins arrive in a later release, so pick a different source.`}
+            {t`No column in ${layer.source.dataSource.name} was recognized as a coordinate by name. Pick the latitude and longitude columns above, or bind a geometry column instead.`}
           </span>
         </Stack>
       </Callout>

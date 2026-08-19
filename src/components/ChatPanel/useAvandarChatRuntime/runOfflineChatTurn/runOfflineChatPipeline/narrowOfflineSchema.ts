@@ -10,5 +10,10 @@ export function narrowOfflineSchema(
 ): OfflineChatSchema {
   const datasets = schema.datasets.filter(propEq("id", datasetId));
   const columns = schema.columns.filter(propEq("dataset_id", datasetId));
-  return { datasets, columns };
+  return {
+    datasets,
+    columns,
+    concepts: schema.concepts ?? [],
+    conceptAttributes: schema.conceptAttributes ?? [],
+  };
 }

@@ -53,6 +53,29 @@ describe("getGeoBindingGuessFromColumns", () => {
     });
   });
 
+  it("matches a coordinate name carrying one qualifier word", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "adm1_pcode", isNumeric: false }),
+        _column({ name: "center_lat" }),
+        _column({ name: "center_lon" }),
+      ]),
+    ).toEqual({
+      latitudeColumnName: "center_lat",
+      longitudeColumnName: "center_lon",
+      confidence: "high",
+    });
+  });
+
+  it("does not read a qualifier as a coordinate for x and y", () => {
+    expect(
+      getGeoBindingGuessFromColumns([
+        _column({ name: "offset_y" }),
+        _column({ name: "offset_x" }),
+      ]),
+    ).toBeUndefined();
+  });
+
   it("never matches on a substring", () => {
     expect(
       getGeoBindingGuessFromColumns([

@@ -16,6 +16,12 @@ import type {
  */
 const MIN_INSIDE_FRACTION = 0.5;
 
+function _markOverlaps(markBBox: BBox, regionBBox: BBox): boolean {
+  const [markX0, markY0, markX1, markY1] = markBBox;
+  const [x0, y0, x1, y1] = regionBBox;
+  return markX1 >= x0 && markX0 <= x1 && markY1 >= y0 && markY0 <= y1;
+}
+
 function _insideFraction(item: TextItem, bbox: BBox): number {
   const [x0, y0, x1, y1] = bbox;
   const itemRight = item.x + item.width;
@@ -58,6 +64,9 @@ export function clipToRegion(options: {
       }
       const overlapsY = rule.span[1] >= y0 && rule.span[0] <= y1;
       return overlapsY && rule.position >= x0 && rule.position <= x1;
+    }),
+    marks: (page.marks ?? []).filter((mark) => {
+      return _markOverlaps(mark.bbox, bbox);
     }),
   };
 }

@@ -15,8 +15,14 @@ export type ApplyChatTurnResponseOptions = {
     queueDashboardBlock: (
       block: NonNullable<ChatResponse.T["dashboardBlock"]>,
     ) => void;
+    applyCreatedCaseTypes: (
+      caseTypes: NonNullable<ChatResponse.T["createdCaseTypes"]>,
+    ) => void;
     setPendingClarification: (
       clarification: ChatClarifyRequestWithAudit | undefined,
+    ) => void;
+    setPendingCaseTypeDraft: (
+      draft: NonNullable<ChatResponse.T["proposedCaseType"]>,
     ) => void;
     recordClarificationShown: (
       clarification: ChatClarifyRequestWithAudit,
@@ -61,6 +67,16 @@ export async function applyChatTurnResponse(
 
   if (response.dashboardBlock) {
     handlers.queueDashboardBlock(response.dashboardBlock);
+  }
+
+  if (response.createdCaseTypes && response.createdCaseTypes.length > 0) {
+    handlers.applyCreatedCaseTypes(response.createdCaseTypes);
+  }
+
+  // A turn that proposes nothing leaves any open draft in place, so the user
+  // can keep chatting about the card without it disappearing under them.
+  if (response.proposedCaseType) {
+    handlers.setPendingCaseTypeDraft(response.proposedCaseType);
   }
 
   if (response.clarification) {

@@ -2,16 +2,20 @@ import { makeIdLookupMap, propEq } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { compileLatLngOverlaySql } from "@/clients/maps/MapLayerSpatialQuery/compileLatLngOverlaySql/compileLatLngOverlaySql";
 import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
 import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
-import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { runPointLayerQuery } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
+import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
+import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -109,7 +113,7 @@ async function _runSpatialLayer(options: {
     throw new Error(`Map geometry requires rebinding: ${metadata.reason}`);
   }
   const plan = compileMapLayerSpatialQuery({ ...options, metadata });
-  const queryResult = await WorkspaceQetlClient.runQuery({
+  const queryResult = await WorkspaceQuerySession.runQuery({
     rawSql: plan.rawSql,
     workspaceId: options.workspaceId,
     signal: options.signal,
@@ -134,6 +138,52 @@ function _getQueryColumnName(
   return column === undefined ? undefined : (
       QueryColumn.getDerivedColumnName(column)
     );
+}
+
+/** The declared type of a layer's bound column, for SQL that depends on it. */
+function _getQueryColumnDataType(
+  layer: MapLayer.T,
+  columnId: QueryColumn.Id | undefined,
+): string | undefined {
+  if (!columnId) {
+    return undefined;
+  }
+  return layer.source.queryColumns.find(propEq("id", columnId))?.baseColumn
+    .dataType;
+}
+
+/**
+ * The filtered SQL and column names a lat/lng layer aggregates over.
+ *
+ * Returns `undefined` when the layer is not a resolvable lat/lng point layer,
+ * which is the caller's signal to fall back to structured-query execution.
+ */
+function _getLatLngPointSource(options: {
+  layer: MapLayer.T;
+  overlay: MapOverlay;
+}): PointLayerSource | undefined {
+  const binding = options.layer.geoBinding;
+  if (binding?.type !== "latLngColumns") {
+    return undefined;
+  }
+  const sourceSql = _getLatLngOverlayRawSql(options);
+  const latitudeColumnName = _getQueryColumnName(
+    options.layer,
+    binding.latitude,
+  );
+  const longitudeColumnName = _getQueryColumnName(
+    options.layer,
+    binding.longitude,
+  );
+  if (!sourceSql || !latitudeColumnName || !longitudeColumnName) {
+    return undefined;
+  }
+  return {
+    sourceSql,
+    latitudeColumnName,
+    longitudeColumnName,
+    valueColumnName: getPaintValueColumnName(options.layer),
+  };
 }
 
 function _getLatLngOverlayRawSql(options: {
@@ -166,35 +216,58 @@ function _getLatLngOverlayRawSql(options: {
       options.layer,
       options.layer.timeColumn,
     ),
+    timeColumnDataType: _getQueryColumnDataType(
+      options.layer,
+      options.layer.timeColumn,
+    ),
   });
 }
 
+/**
+ * Loads a lat/lng layer, letting DuckDB aggregate it when the row count would
+ * cost the browser more heap than it has.
+ *
+ * The aggregating path needs the layer's own SQL, so it only applies when the
+ * binding resolves to one. A layer that cannot compile its own source SQL falls
+ * back to structured-query execution, which is also where the Data Explorer's
+ * large-dataset guard lives.
+ */
 async function _runLatLngLayer(options: {
   layer: MapLayer.T;
   workspaceId: Workspace.Id;
   overlay: MapOverlay;
+  zoomBand: number;
+  signal?: AbortSignal;
 }): Promise<MapLayerDataResult> {
-  const queryResult = await runStructuredQuery({
+  const pointSource = _getLatLngPointSource(options);
+  if (pointSource) {
+    const { queryResult, audit, aggregation } = await runPointLayerQuery({
+      ...pointSource,
+      zoomBand: options.zoomBand,
+      runQuery: async (rawSql) => {
+        return await WorkspaceQuerySession.runQuery({
+          rawSql,
+          workspaceId: options.workspaceId,
+          signal: options.signal,
+        });
+      },
+    });
+    return {
+      type: "rows",
+      queryResult,
+      didAutoLimit: false,
+      audit,
+      aggregation,
+    };
+  }
+
+  const { result, didAutoLimit } = await runStructuredQueryWithMetadata({
     auth: "workspace",
     workspaceId: options.workspaceId,
     query: options.layer.source,
     rawSql: _getLatLngOverlayRawSql(options),
   });
-  return { type: "rows", queryResult };
-}
-
-function useDuckDbSpatialAvailability(): string {
-  return useSyncExternalStore(
-    (listener) => {
-      return DuckDbClient.subscribeSpatialAvailability(listener);
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
-  );
+  return { type: "rows", queryResult: result, didAutoLimit };
 }
 
 function useInitializeDuckDbForSpatialLayers(
@@ -231,9 +304,18 @@ function _createLayerQuery(
   const needsSpatial = _layerNeedsSpatial(layer, context.overlay);
   const isCapabilityReady =
     !needsSpatial || context.spatialAvailability === "available";
+  const isLatLngPointLayer = layer.geoBinding?.type === "latLngColumns";
+
   return {
     enabled:
       MapLayerData.isQueryable(layer, context.layers) && isCapabilityReady,
+
+    // `context.zoomBand` is read by `_runLatLngLayer` but only enters the key
+    // for a lat/lng layer, which is the only binding that reaches it: every
+    // other queryable binding is spatial and carries the zoom in
+    // `spatialContext` instead. Keying every layer on zoom would refetch fill
+    // and line layers on every zoom step for a value they never read.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       context.workspaceId,
       ...MapLayerData.getQueryKeyFromMapLayer(
@@ -248,10 +330,13 @@ function _createLayerQuery(
         : undefined,
         context.overlay,
         context.layers,
+        isLatLngPointLayer ? { zoomBand: context.zoomBand } : undefined,
       ),
     ],
+    // A point layer re-aggregates on every zoom band, so without a placeholder
+    // the layer would blank out and refit on each step rather than repaint.
     placeholderData:
-      _isSpatialBinding(layer) ?
+      _isSpatialBinding(layer) || isLatLngPointLayer ?
         (previous: MapLayerDataResult | undefined) => {
           return previous;
         }
@@ -275,6 +360,8 @@ function _createLayerQuery(
         layer,
         workspaceId: context.workspaceId,
         overlay: context.overlay,
+        zoomBand: context.zoomBand,
+        signal,
       });
     },
   };

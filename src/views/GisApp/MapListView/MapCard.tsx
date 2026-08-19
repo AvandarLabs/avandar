@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconMap } from "@tabler/icons-react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { DeleteMapButton } from "@/views/GisApp/MapListView/DeleteMapButton";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
 
@@ -23,25 +24,30 @@ export function MapCard({ avaMap, workspaceSlug }: Props): ReactNode {
 
   return (
     <Paper p="md">
-      <Link
-        to={mapEditorLink.to}
-        params={mapEditorLink.params}
-        aria-label={t`Open the map ${avaMap.name}`}
-      >
-        <Group gap="sm" wrap="nowrap">
-          <ThemeIcon variant="light" color="neutral" size="lg">
-            <IconMap size={18} stroke={1.5} />
-          </ThemeIcon>
-          <Stack gap={2} miw={0}>
-            <Text fw={600} size="sm" truncate>
-              {avaMap.name}
-            </Text>
-            <Text c="dimmed" size="xs">
-              {t`${layerText} · ${updatedDate}`}
-            </Text>
-          </Stack>
-        </Group>
-      </Link>
+      <Group gap="xs" wrap="nowrap" align="flex-start">
+        <Link
+          to={mapEditorLink.to}
+          params={mapEditorLink.params}
+          aria-label={t`Open the map ${avaMap.name}`}
+          flex={1}
+          miw={0}
+        >
+          <Group gap="sm" wrap="nowrap">
+            <ThemeIcon variant="light" color="neutral" size="lg">
+              <IconMap size={18} stroke={1.5} />
+            </ThemeIcon>
+            <Stack gap={2} miw={0}>
+              <Text fw={600} size="sm" truncate>
+                {avaMap.name}
+              </Text>
+              <Text c="dimmed" size="xs">
+                {t`${layerText} · ${updatedDate}`}
+              </Text>
+            </Stack>
+          </Group>
+        </Link>
+        <DeleteMapButton avaMap={avaMap} />
+      </Group>
     </Paper>
   );
 }

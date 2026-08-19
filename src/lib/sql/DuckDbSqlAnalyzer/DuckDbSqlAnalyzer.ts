@@ -1,7 +1,8 @@
 import { prop, propIsDefined } from "@avandar/utils";
 import {
   getDatasetIdsAtIndexes,
-  mergeDatasetIds,
+  getRelationRefFromTableName,
+  mergeUniqueNames,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlIdentifiers";
 import { getMutationTargetAnalysis } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlMutations";
 import { getSourceAnalyses } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSources";
@@ -16,6 +17,7 @@ import type {
   SourceAnalysis,
   SqlToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 
 export type {
   DuckDbSqlAnalysis,
@@ -43,23 +45,43 @@ function _hasRecognizedReadStatement(tokens: readonly SqlToken[]): boolean {
   });
 }
 
+/** Names the relation each table name refers to, dropping unknown names. */
+function _getRelations(relationTableNames: readonly string[]): RelationRef.T[] {
+  return relationTableNames.flatMap((tableName) => {
+    const relation = getRelationRefFromTableName(tableName);
+    return relation === undefined ? [] : [relation];
+  });
+}
+
+/** Narrows relation table names to the ids of the datasets among them. */
+function _getDatasetIds(relationTableNames: readonly string[]): string[] {
+  return _getRelations(relationTableNames).flatMap((relation) => {
+    return relation.kind === "dataset" ? [relation.id] : [];
+  });
+}
+
 function _getMutationAnalysis(
   options: Readonly<{
-    datasetIds: string[];
+    relationTableNames: string[];
     sourceAnalyses: readonly SourceAnalysis[];
     tokens: readonly SqlToken[];
   }>,
 ): DuckDbSqlAnalysis {
-  const { datasetIds, sourceAnalyses, tokens } = options;
+  const { relationTableNames, sourceAnalyses, tokens } = options;
   const targetAnalysis = getMutationTargetAnalysis(tokens);
+  const readDatasetIds = _getDatasetIds(relationTableNames);
   if (!targetAnalysis.isComplete) {
-    return { kind: "unsafe", reason: "uninspectable-source", datasetIds };
+    return {
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: readDatasetIds,
+    };
   }
-  const mutatedDatasetIds = mergeDatasetIds(
+  const mutatedDatasetIds = mergeUniqueNames(
     getDatasetIdsAtIndexes({ tokens, indexes: targetAnalysis.indexes }),
     ...sourceAnalyses.map(prop("mutatedDatasetIds")),
   );
-  return { kind: "mutating", readDatasetIds: datasetIds, mutatedDatasetIds };
+  return { kind: "mutating", readDatasetIds, mutatedDatasetIds };
 }
 
 function _getDuckDbSqlAnalysisFromSql(
@@ -79,44 +101,90 @@ function _getDuckDbSqlAnalysisFromSql(
     recursionDepth,
     tokens,
   });
-  const datasetIds = mergeDatasetIds(...sourceAnalyses.map(prop("datasetIds")));
+  const relationTableNames = mergeUniqueNames(
+    ...sourceAnalyses.map(prop("relationTableNames")),
+  );
   const unsafeReason = sourceAnalyses.find(
     propIsDefined("unsafeReason"),
   )?.unsafeReason;
   if (unsafeReason !== undefined) {
-    return { kind: "unsafe", reason: unsafeReason, datasetIds };
+    return {
+      kind: "unsafe",
+      reason: unsafeReason,
+      datasetIds: _getDatasetIds(relationTableNames),
+    };
   }
   const isMutating =
     hasMutation(tokens) || sourceAnalyses.some(prop("isMutating"));
   if (isMutating) {
-    return _getMutationAnalysis({ tokens, sourceAnalyses, datasetIds });
+    return _getMutationAnalysis({ tokens, sourceAnalyses, relationTableNames });
   }
   if (!_hasRecognizedReadStatement(tokens)) {
-    return { kind: "unsafe", reason: "invalid-sql", datasetIds };
+    return {
+      kind: "unsafe",
+      reason: "invalid-sql",
+      datasetIds: _getDatasetIds(relationTableNames),
+    };
   }
-  return { kind: "read", datasetIds };
+  return { kind: "read", relations: _getRelations(relationTableNames) };
 }
 
-/** Returns the complete static dataset effect analysis for DuckDB SQL. */
+/** Returns the complete static relation effect analysis for DuckDB SQL. */
 function _getPublicDuckDbSqlAnalysisFromSql(sql: string): DuckDbSqlAnalysis {
   return _getDuckDbSqlAnalysisFromSql({ sql, recursionDepth: 0 });
 }
 
-/** Returns UUID table sources, rejecting incomplete or mutating analysis. */
-function _getDatasetIdsFromSqlTableReferences(sql: string): string[] {
+/** Returns read relation sources, rejecting incomplete or mutating analysis. */
+function _getRelationsFromSqlTableReferences(sql: string): RelationRef.T[] {
   const analysis = _getPublicDuckDbSqlAnalysisFromSql(sql);
   if (analysis.kind === "read") {
-    return analysis.datasetIds;
+    return analysis.relations;
   }
   const reason =
     analysis.kind === "mutating" ? "mutating SQL" : analysis.reason;
   throw new Error(`Cannot safely analyze DuckDB SQL: ${reason}`);
 }
 
-/** Performs fail-closed static dataset-effect analysis for DuckDB SQL. */
+/** Returns UUID table sources, rejecting incomplete or mutating analysis. */
+function _getDatasetIdsFromSqlTableReferences(sql: string): string[] {
+  return _getRelationsFromSqlTableReferences(sql).flatMap((relation) => {
+    return relation.kind === "dataset" ? [relation.id] : [];
+  });
+}
+
+/**
+ * The datasets a statement must load before it can run, including the ones a
+ * CREATE TABLE AS SELECT (or other mutation) reads.
+ *
+ * The read-only entry point refuses mutating SQL, which is correct for
+ * callers that only authorize SELECTs. Individual generation stages rows
+ * with CREATE TABLE AS SELECT from those same datasets, and that statement
+ * still has to load them.
+ */
+function _getReadDatasetIdsFromSql(sql: string): string[] {
+  const analysis = _getPublicDuckDbSqlAnalysisFromSql(sql);
+  if (analysis.kind === "read") {
+    return analysis.relations.flatMap((relation) => {
+      return relation.kind === "dataset" ? [relation.id] : [];
+    });
+  }
+  if (analysis.kind === "mutating") {
+    return analysis.readDatasetIds;
+  }
+  throw new Error(`Cannot safely analyze DuckDB SQL: ${analysis.reason}`);
+}
+
+/** Performs fail-closed static relation-effect analysis for DuckDB SQL. */
 export const DuckDbSqlAnalyzer = {
   /** Returns UUID table sources, rejecting incomplete or mutating analysis. */
   getDatasetIdsFromSqlTableReferences: _getDatasetIdsFromSqlTableReferences,
-  /** Returns the complete static dataset effect analysis for DuckDB SQL. */
+  /**
+   * Returns the datasets a statement reads, including mutating SQL whose
+   * SELECT sources are datasets.
+   */
+  getReadDatasetIdsFromSql: _getReadDatasetIdsFromSql,
+  /** Returns the complete static relation effect analysis for DuckDB SQL. */
   getDuckDbSqlAnalysisFromSql: _getPublicDuckDbSqlAnalysisFromSql,
+  /** Returns every relation read, rejecting incomplete or mutating analysis. */
+  getRelationsFromSqlTableReferences: _getRelationsFromSqlTableReferences,
 };

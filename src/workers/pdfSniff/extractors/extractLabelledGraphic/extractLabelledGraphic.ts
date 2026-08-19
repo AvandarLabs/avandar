@@ -1,13 +1,40 @@
 import { assembleLabels } from "../../assembleLabels/assembleLabels";
 import { assembleQuantities } from "../../assembleQuantities/assembleQuantities";
+import { findPlotFrame } from "../../findPlotFrame/findPlotFrame";
 import { pairByProximity } from "../../pairByProximity/pairByProximity";
+import { partitionTextByFrame } from "../../partitionTextByFrame/partitionTextByFrame";
+import { readBarChart } from "../../readBarChart/readBarChart";
+import { readCartesianChart } from "../../readCartesianChart/readCartesianChart";
+import type { AxisTick } from "../../calibrateAxis/calibrateAxis";
 import type {
   BBox,
   ExtractedTable,
   PdfCellFlag,
   PdfValueUnit,
   RegionGeometry,
+  TextItem,
 } from "../../pdfSniff.types";
+
+function _isAxisTick(entry: unknown): entry is AxisTick {
+  return (
+    typeof entry === "object" &&
+    entry !== null &&
+    Number.isFinite((entry as AxisTick).position) &&
+    Number.isFinite((entry as AxisTick).value)
+  );
+}
+
+function _yAxisHints(raw: unknown): readonly AxisTick[] {
+  return Array.isArray(raw) ? raw.filter(_isAxisTick) : [];
+}
+
+function _itemsForPairing(region: RegionGeometry): readonly TextItem[] {
+  const frame = findPlotFrame(region);
+  if (frame === undefined) {
+    return region.textItems;
+  }
+  return partitionTextByFrame(region, frame).dataLabels;
+}
 
 /**
  * Reads a map, chart or KPI tile whose values are text at coordinates.
@@ -21,12 +48,38 @@ import type {
  * Figures are assembled before labels are, because a magnitude suffix left
  * loose becomes a label in its own right and then wins the figure printed
  * beside it. See `assembleQuantities`.
+ *
+ * When the region contains a Cartesian plot with a series mark, weekly values
+ * are read from that mark against the labelled y-ticks, and when it contains
+ * a family of bars, each bar's own row decides which name it belongs to.
+ * Only when the region draws neither does the pairing below run, and then
+ * only over text inside the plot: axis ticks, month names and the title are
+ * scaffolding and would otherwise be read as data.
  */
 export function extractLabelledGraphic(
   region: RegionGeometry,
-  options: { regionId: string; ambiguityThreshold?: number },
+  options: {
+    regionId: string;
+    ambiguityThreshold?: number;
+    yAxisHints?: unknown;
+  },
 ): ExtractedTable {
-  const { quantities, labelItems } = assembleQuantities(region.textItems);
+  const hints = _yAxisHints(options.yAxisHints);
+  const chart =
+    readCartesianChart(region, {
+      regionId: options.regionId,
+      yAxisHints: hints,
+    }) ??
+    readBarChart(region, {
+      regionId: options.regionId,
+      valueAxisHints: hints,
+    });
+  if (chart !== undefined) {
+    return chart;
+  }
+  const { quantities, labelItems } = assembleQuantities(
+    _itemsForPairing(region),
+  );
   const byItem = new Map(
     quantities.map((quantity) => {
       return [quantity.item, quantity];

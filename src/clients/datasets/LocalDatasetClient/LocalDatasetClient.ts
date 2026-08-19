@@ -320,12 +320,14 @@ function _makeStartXlsxImport(
       file: params.file,
       sheet: params.parseOptions.sheet,
       hasHeader: params.parseOptions.hasHeader,
+      rowsToSkip: params.parseOptions.rowsToSkip,
       maxPreviewRows: PREVIEW_ROW_COUNT,
     });
     const parseOptions = {
       type: "xlsx" as const,
       sheet: params.parseOptions.sheet ?? sniff.defaultSheet,
       hasHeader: params.parseOptions.hasHeader,
+      rowsToSkip: params.parseOptions.rowsToSkip,
     };
     await _putParsingDataset({
       ...params,

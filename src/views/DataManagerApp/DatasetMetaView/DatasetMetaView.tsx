@@ -20,6 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
@@ -29,6 +31,7 @@ import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
+import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
@@ -50,6 +53,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
+  const [refreshGoogleSheetDataset, isRefreshPending] =
+    useRefreshGoogleSheetDataset();
   const [sourceDataset, isLoadingSourceDataset] =
     DatasetClient.useGetSourceDataset({
       datasetId: dataset.id,
@@ -199,7 +204,16 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             tabIds={["dataset-metadata", "dataset-summary"] as const}
             renderTabHeader={{
               "dataset-metadata": t`Metadata`,
-              "dataset-summary": t`Data Summary`,
+              // The onboarding tutorial's first payoff points here. It has to
+              // be the TAB and not the panel: this view opens on Metadata, so
+              // the summary itself is not mounted when the tutorial arrives,
+              // and a tooltip anchored to the panel would wait out its timeout
+              // against an element that does not exist yet.
+              "dataset-summary": (
+                <span {...NuxAnchors.props(NuxAnchors.ids.datasetSummaryTab)}>
+                  {t`Data Summary`}
+                </span>
+              ),
             }}
             renderTabPanel={{
               "dataset-metadata": () => {
@@ -253,46 +267,79 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   : <DatasetSummaryView datasetId={dataset.id} />;
               },
             }}
+            onTabChange={(tabId) => {
+              if (tabId === "dataset-summary") {
+                NuxEvents.emit("dataset.summaryOpened", {
+                  datasetId: dataset.id,
+                });
+              }
+            }}
           />
 
-          <Button
-            color="danger"
-            mt="lg"
-            onClick={() => {
-              modals.openConfirmModal({
-                title: t`Delete dataset`,
-                children: (
-                  <Text>
-                    <Trans>
-                      Are you sure you want to delete {dataset.name}?
-                    </Trans>
-                  </Text>
-                ),
-                labels: { confirm: t`Delete`, cancel: t`Cancel` },
-                confirmProps: {
-                  color: "danger",
-                  loading: isDeletePending,
-                },
-                onConfirm: () => {
-                  deleteDataset(
-                    { id: dataset.id },
-                    {
-                      onSuccess: () => {
-                        navigate(AppLinks.dataManagerHome(workspace.slug));
-                        notifications.show({
-                          title: t`Dataset deleted`,
-                          message: t`${dataset.name} deleted successfully`,
-                          color: "green",
-                        });
+          <Group mt="lg">
+            {/*
+              Google Sheets is the one source type whose rows can change under
+              the dataset without anyone re-importing it. The freshness check is
+              throttled, so this is the escape hatch for a user who has just
+              edited the sheet and does not want to wait for the window to
+              close.
+            */}
+            {(
+              dataset.sourceType === "google_sheets" &&
+              sourceDataset?.__type === "GoogleSheetsDataset"
+            ) ?
+              <Button
+                variant="default"
+                loading={isRefreshPending}
+                onClick={() => {
+                  refreshGoogleSheetDataset({
+                    datasetId: dataset.id,
+                    sourceDataset,
+                  });
+                }}
+              >
+                <Trans>Refresh from Google Sheets</Trans>
+              </Button>
+            : null}
+
+            <Button
+              color="danger"
+              onClick={() => {
+                modals.openConfirmModal({
+                  title: t`Delete dataset`,
+                  children: (
+                    <Text>
+                      <Trans>
+                        Are you sure you want to delete {dataset.name}?
+                      </Trans>
+                    </Text>
+                  ),
+                  labels: { confirm: t`Delete`, cancel: t`Cancel` },
+                  confirmProps: {
+                    color: "danger",
+                    loading: isDeletePending,
+                  },
+                  onConfirm: () => {
+                    deleteDataset(
+                      { id: dataset.id },
+                      {
+                        onSuccess: () => {
+                          navigate(AppLinks.dataManagerHome(workspace.slug));
+                          notifications.show({
+                            title: t`Dataset deleted`,
+                            message: t`${dataset.name} deleted successfully`,
+                            color: "green",
+                          });
+                        },
                       },
-                    },
-                  );
-                },
-              });
-            }}
-          >
-            <Trans>Delete Dataset</Trans>
-          </Button>
+                    );
+                  },
+                });
+              }}
+            >
+              <Trans>Delete Dataset</Trans>
+            </Button>
+          </Group>
         </Paper>
       </Stack>
     </Container>

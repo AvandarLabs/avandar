@@ -1,12 +1,13 @@
 import { prop } from "@avandar/utils";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { Parser } from "node-sql-parser";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
+import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
 import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/forceFromTableToDatasetId/forceFromTableToDatasetId";
 import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineColumnFromError";
-import { resolveOfflineDataset } from "@/components/ChatPanel/offlineChatHelpers/resolveOfflineDataset/resolveOfflineDataset";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
@@ -36,7 +37,13 @@ export type RepairOfflineGeneratedSqlResult = {
 function buildAllowedTableIdSet(
   schema: OfflineChatSchema,
 ): ReadonlySet<string> {
-  return new Set(schema.datasets.map(prop("id")));
+  const datasetIds = schema.datasets.map(prop("id"));
+  const conceptTableNames = SqlTableAlias.fromConcepts(
+    schema.concepts ?? [],
+  ).map((entry) => {
+    return entry.tableName;
+  });
+  return new Set([...datasetIds, ...conceptTableNames]);
 }
 
 function applyParseFailureHeuristics(
@@ -72,6 +79,7 @@ function remapTableInFromList(
   fromList: unknown,
   args: {
     datasets: OfflineChatSchema["datasets"];
+    concepts: OfflineChatSchema["concepts"];
     lastUserPrompt: string;
     preferredDatasetId?: string;
   },
@@ -91,6 +99,7 @@ function remapTableInFromList(
       datasets: args.datasets,
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
+      concepts: args.concepts ?? [],
     });
     if (matched && matched.id !== tableName) {
       item.table = matched.id;
@@ -112,6 +121,7 @@ function remapTablesInSelectAst(
   if (
     remapTableInFromList(ast.from, {
       datasets: args.schema.datasets,
+      concepts: args.schema.concepts,
       lastUserPrompt: args.lastUserPrompt,
       preferredDatasetId: args.preferredDatasetId,
     })
@@ -207,14 +217,14 @@ export function repairOfflineGeneratedSql(
   args: RepairOfflineGeneratedSqlArgs,
 ): RepairOfflineGeneratedSqlResult {
   const appliedSteps: string[] = [];
-  const resolved = resolveOfflineDataset({
+  const datasetFromPrompt = getOfflineDatasetFromPrompt({
     schema: args.schema,
     lastUserPrompt: args.lastUserPrompt,
     openDatasetId: args.openDatasetId,
     analyzeTableName: args.analyzeTableName,
   });
   const preferredDatasetId =
-    args.resolvedDatasetId ?? resolved?.id ?? args.openDatasetId;
+    args.resolvedDatasetId ?? datasetFromPrompt?.id ?? args.openDatasetId;
   const allowedTableIds = buildAllowedTableIdSet(args.schema);
 
   devLogOfflineChat("repairOfflineGeneratedSql:start", {
@@ -224,13 +234,23 @@ export function repairOfflineGeneratedSql(
       return { id: dataset.id, name: dataset.name };
     }),
     openDatasetId: args.openDatasetId,
-    resolvedFromPrompt: resolved?.id,
+    resolvedFromPrompt: datasetFromPrompt?.id,
     resolvedDatasetIdArg: args.resolvedDatasetId,
     preferredDatasetId,
     allowedTableIds: [...allowedTableIds],
   });
 
   let sql = args.sql.trim();
+
+  const aliases = SqlTableAlias.fromSchema({
+    datasets: args.schema.datasets,
+    concepts: args.schema.concepts ?? [],
+  });
+  const sqlWithIds = SqlTableAlias.applyToSql(sql, aliases);
+  if (sqlWithIds !== sql) {
+    appliedSteps.push("apply_sql_table_aliases");
+    sql = sqlWithIds;
+  }
 
   if (preferredDatasetId) {
     sql = applyForcedDatasetTableId({

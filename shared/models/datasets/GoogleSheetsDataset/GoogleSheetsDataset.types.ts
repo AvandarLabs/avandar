@@ -29,6 +29,16 @@ export type GoogleSheetsDatasetRead = Model.Base<
     /** Number of rows to skip before the tabular data starts. */
     rowsToSkip: number;
 
+    /**
+     * Name of the spreadsheet tab that backs this dataset.
+     *
+     * `null` means the workbook's first tab, which is what every row imported
+     * before this column existed already read. New imports always write a
+     * concrete name, so `null` is a legacy value with a shrinking blast radius
+     * rather than a permanent ambiguity.
+     */
+    sheetName: string | null;
+
     /** Timestamp of when the Google Sheets metadata was last updated. */
     updatedAt: string;
 
@@ -49,7 +59,7 @@ export type GoogleSheetsDatasetModel = SupabaseCrudModelSpec<
       Read: GoogleSheetsDatasetRead;
       Insert: SetOptional<
         GoogleSheetsDatasetRead,
-        "createdAt" | "id" | "rowsToSkip" | "updatedAt"
+        "createdAt" | "id" | "rowsToSkip" | "sheetName" | "updatedAt"
       >;
       Update: Partial<GoogleSheetsDatasetRead>;
     };

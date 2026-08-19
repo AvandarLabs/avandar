@@ -1,66 +1,59 @@
 import { NavLinkList } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
-import { ReactNode, useMemo } from "react";
+import { Box, BoxProps, Loader, ScrollArea } from "@mantine/core";
+import clsx from "clsx";
+import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import css from "@/views/OntologyDesignerApp/ConceptNavbar.module.css";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ReactNode } from "react";
 
 type Props = {
   concepts: readonly Concept.T[];
   isLoading: boolean;
 } & BoxProps;
 
+/**
+ * Case-type list pane. Matches the Data Sources dataset list: raised surface,
+ * hairline divider, visible hover on inactive rows.
+ */
 export function ConceptNavbar({
   concepts,
   isLoading,
+  className,
   ...boxProps
 }: Props): ReactNode {
-  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const theme = useMantineTheme();
-  const borderStyle = useMemo(() => {
-    return {
-      borderTopRightRadius: theme.radius.md,
-      borderBottomRightRadius: theme.radius.md,
-    };
-  }, [theme.radius]);
 
-  const individualLinks = useMemo(() => {
-    const conceptLinks = [
-      ...concepts.map((individual) => {
-        const appLink = AppLinks.ontologyDesignerConceptView({
-          workspaceSlug: workspace.slug,
-          conceptId: individual.id,
-          conceptName: individual.name,
-        });
-        return {
-          ...appLink,
-          label: appLink.label(),
-          style: borderStyle,
-        };
-      }),
-      {
-        to: AppLinks.ontologyDesignerCreatorView(workspace.slug).to,
-        label: t`Create new profile type`,
-        style: borderStyle,
-        key: "create-new",
-      },
-    ];
-    return conceptLinks;
-  }, [concepts, borderStyle, workspace.slug, t]);
+  const conceptLinks = useMemo(() => {
+    return concepts.map((concept) => {
+      const appLink = AppLinks.ontologyDesignerConceptView({
+        workspaceSlug: workspace.slug,
+        conceptId: concept.id,
+        conceptName: concept.name,
+      });
+      return {
+        ...appLink,
+        label: appLink.label(),
+      };
+    });
+  }, [concepts, workspace.slug]);
 
   return (
-    <Box bg="neutral.1" pt="0" {...boxProps}>
+    <Box className={clsx(css.pane, className)} {...boxProps}>
       {isLoading ?
-        <Loader />
-      : null}
-      <NavLinkList
-        pt="md"
-        links={individualLinks}
-        pr="md"
-        inactiveHoverColor="neutral.1"
-      />
+        <Loader m="md" size="sm" />
+      : <ScrollArea h="100%" w="100%">
+          <NavLinkList
+            pt="md"
+            links={conceptLinks}
+            pr="md"
+            pl="xs"
+            gap="xs"
+            inactiveHoverColor="neutral.1"
+          />
+        </ScrollArea>
+      }
     </Box>
   );
 }

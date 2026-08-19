@@ -100,6 +100,9 @@ export function classifyStatement(sql: string): StatementKind {
   if (/^(grant|revoke)\b/.test(t)) {
     return "drop";
   }
+  if (/^alter\s+default\s+privileges\b/.test(t)) {
+    return "drop";
+  }
   if (/^(create|alter|drop)\s+(or\s+replace\s+)?policy\b/.test(t)) {
     return "drop";
   }

@@ -6,6 +6,8 @@ import { extractPageGeometry } from "./extractPageGeometry";
 const FRONTIERS =
   "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
 const PLOS_NCD = "public/test-data/pdf/plos-one-ncd-mobile-phone-surveys.pdf";
+const OCHA =
+  "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf";
 
 async function geometryForPage(path: string, pageNumber: number) {
   const bytes = await readFile(path);
@@ -74,5 +76,23 @@ describe("extractPageGeometry", () => {
     }, 0);
 
     expect(worstItem).toBeGreaterThan(0);
+  });
+
+  it("keeps the OCHA trend chart's area path as a closed mark", async () => {
+    const geometry = await geometryForPage(OCHA, 1);
+    const area = geometry.marks.filter((mark) => {
+      return (
+        mark.kind === "closed" &&
+        mark.bbox[0] > 60 &&
+        mark.bbox[2] < 560 &&
+        mark.bbox[1] > 80 &&
+        mark.bbox[3] < 200 &&
+        mark.points.length >= 20
+      );
+    });
+
+    expect(area).toHaveLength(1);
+    expect(area[0]!.points.length).toBe(28);
+    expect(geometry.marksTruncated).toBe(false);
   });
 });

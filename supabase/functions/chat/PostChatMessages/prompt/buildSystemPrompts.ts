@@ -51,7 +51,7 @@ When to call \`clarify\`:
   the wrong dataset silently returns a wrong answer, which is worse than
   asking. Use \`fixed_options\` with \`multi: true\` listing the dataset
   names from the schema. On the answer, map the selected names back to
-  the corresponding dataset ids in the schema when building SQL.
+  the corresponding aliases in the schema when building SQL.
 - Filtering a text column by a specific value you don't know. When the
   user names or implies a specific category, label, or code (a specific
   indicator, program, status, region) and answering requires a filter on
@@ -84,8 +84,9 @@ How to clarify:
   metadata. Use \`free_text\` for open-ended or numeric answers.
 - For "which of the values in column X..." questions where you do NOT
   know the values from metadata alone, use the \`discovery\` shape:
-  emit a short \`SELECT DISTINCT "col" FROM "dataset" ORDER BY "col"
-  LIMIT 100\` query. The user will be shown a dropdown of the actual values when
+  emit a short \`SELECT DISTINCT "col" FROM "t0" ORDER BY "col"
+  LIMIT 100\` query using a schema alias. The user will be shown a dropdown of
+  the actual values when
   prompt-derived candidates do not identify one unique local match. Candidate
   generation never receives or inspects the query results.
   Only emit read-only SELECT or WITH statements; no semicolons.
@@ -143,7 +144,7 @@ Rules for \`addDashboardBlock\`:
 
 DataViz rules:
 - \`vizType\`: table, bar, line, area, scatter, pie.
-- Wrap dataset ids and column names in double quotes in \`sql\`.
+- Wrap table aliases and column names in double quotes in \`sql\`.
 - \`prompt\` is a short label for the chart ("Monthly revenue").
 
 For headings, copy, callouts, lists, etc., use the matching \`kind\` — do not

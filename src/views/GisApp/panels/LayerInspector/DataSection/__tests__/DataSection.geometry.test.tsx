@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
+  duckDbInitialize,
   resetDataSectionFixtures,
   spatialAvailability,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
@@ -67,5 +68,23 @@ describe("DataSection geometry", () => {
         "Geometry columns need DuckDB Spatial, which is unavailable.",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("starts Spatial detection while the geometry picker waits on it", async () => {
+    spatialAvailability.value = "loading";
+
+    render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
+
+    await waitFor(() => {
+      expect(duckDbInitialize).toHaveBeenCalled();
+    });
+  });
+
+  it("does not start Spatial detection once the capability is known", () => {
+    spatialAvailability.value = "available";
+
+    render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
+
+    expect(duckDbInitialize).not.toHaveBeenCalled();
   });
 });

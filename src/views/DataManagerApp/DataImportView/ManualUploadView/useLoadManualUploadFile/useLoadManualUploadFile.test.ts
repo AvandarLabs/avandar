@@ -374,6 +374,110 @@ describe("useLoadManualUploadFile", () => {
     // Written back by us, so a later box move re-decides it. Claiming the
     // user chose it would pin the region to this shape for good.
     expect(parseOptions.regions?.[0]?.isShapeUserChosen).toBeUndefined();
+    // The mode the extraction actually used, not the one requested. Seeding a
+    // fixed default here is what offered a line chart its printed table.
+    expect(parseOptions.outputMode).toBe("natural");
+  });
+
+  it("seeds the row shape the extraction resolved, not the request's", async () => {
+    startPdfImportMock.mockResolvedValue({
+      type: "result",
+      pageCount: 1,
+      pages: [],
+      documentMetadata: _emptyDocumentMetadata(),
+    });
+    extractPdfRegionsMock.mockResolvedValue({
+      type: "extract_result",
+      tables: [],
+      classifications: {},
+      resolvedShapes: { r1: "labelled_graphic" },
+      combined: {
+        outputMode: "observations",
+        cells: [["subject", "metric", "value"]],
+        headerRows: 1,
+      },
+    });
+    transcodePdfExtractionMock.mockResolvedValue({
+      columns: [_columnSchema("subject", "VARCHAR")],
+      previewRows: [],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useLoadManualUploadFile();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current.loadFile.async({
+        type: "pdf_file",
+        file: new File(["%PDF-1.7"], "report.pdf", {
+          type: "application/pdf",
+        }),
+        datasetId: "dataset_pdf" as Dataset.Id,
+        regions: [_drawnRegion()],
+      });
+    });
+
+    const parseOptions = result.current.dataSourceMetadata?.parseOptions;
+    if (parseOptions?.type !== "pdf_file") {
+      throw new Error("expected pdf parse options");
+    }
+    expect(parseOptions.outputMode).toBe("observations");
+    // A mode nobody picked must not be sent, or the derived default could
+    // never change once a first extraction had resolved one.
+    expect(extractPdfRegionsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ outputMode: undefined }),
+    );
+  });
+
+  it("forwards a row shape the user picked", async () => {
+    startPdfImportMock.mockResolvedValue({
+      type: "result",
+      pageCount: 1,
+      pages: [],
+      documentMetadata: _emptyDocumentMetadata(),
+    });
+    extractPdfRegionsMock.mockResolvedValue({
+      type: "extract_result",
+      tables: [],
+      classifications: {},
+      resolvedShapes: { r1: "labelled_graphic" },
+      combined: {
+        outputMode: "natural",
+        cells: [["label", "value"]],
+        headerRows: 1,
+      },
+    });
+    transcodePdfExtractionMock.mockResolvedValue({
+      columns: [_columnSchema("label", "VARCHAR")],
+      previewRows: [],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useLoadManualUploadFile();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current.loadFile.async({
+        type: "pdf_file",
+        file: new File(["%PDF-1.7"], "report.pdf", {
+          type: "application/pdf",
+        }),
+        datasetId: "dataset_pdf" as Dataset.Id,
+        regions: [_drawnRegion()],
+        outputMode: "natural",
+        isOutputModeUserChosen: true,
+      });
+    });
+
+    expect(extractPdfRegionsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ outputMode: "natural" }),
+    );
   });
 });
 

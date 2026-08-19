@@ -50,6 +50,28 @@ export type RuleSegment = {
   span: readonly [number, number];
 };
 
+/** One vertex of a retained vector path, in the same space as `TextItem`. */
+export type PathPoint = {
+  x: number;
+  y: number;
+};
+
+/**
+ * A painted path kept for chart reading: a polyline or a closed shape, with
+ * the points the content stream actually drew.
+ *
+ * Axis-aligned edges of the same path also appear in `rules`. Marks keep the
+ * diagonal segments and the grouping that rules throw away.
+ */
+export type PathMark = {
+  kind: "polyline" | "closed";
+  points: readonly PathPoint[];
+  bbox: BBox;
+  isFilled: boolean;
+  /** sRGB 0-255. `null` when the fill colour was not recorded. */
+  fill: readonly [number, number, number] | null;
+};
+
 /** Everything one page contributes, in a pdf.js-free form. */
 export type PageGeometry = {
   pageIndex: number;
@@ -57,6 +79,9 @@ export type PageGeometry = {
   height: number;
   textItems: readonly TextItem[];
   rules: readonly RuleSegment[];
+  marks: readonly PathMark[];
+  /** True when mark collection stopped at the per-page cap. */
+  marksTruncated: boolean;
   /** True when the page carries a full-page image and almost no text. */
   looksScanned: boolean;
 };
@@ -80,6 +105,7 @@ export type RegionGeometry = {
   bbox: BBox;
   textItems: readonly TextItem[];
   rules: readonly RuleSegment[];
+  marks: readonly PathMark[];
 };
 
 /** A label made of one or more text items, with its centroid. */
@@ -141,7 +167,11 @@ export type PdfCellFlag = {
   rowIndex: number;
   /** Column within the row, or `-1` for a region-level flag. */
   columnIndex: number;
-  reason: "ambiguous_association" | "unmatched_label" | "unmatched_value";
+  reason:
+    | "ambiguous_association"
+    | "unmatched_label"
+    | "unmatched_value"
+    | "high_residual";
   /** Free text shown next to the flagged cell in the review grid. */
   detail: string;
 };
@@ -199,4 +229,18 @@ export type ExtractedTable = {
    * column is the source of truth for its own rows.
    */
   rowUnits?: ReadonlyArray<PdfValueUnit | undefined>;
+  /**
+   * The y-axis fit used to read a Cartesian chart. Absent when this table
+   * was not read from a calibrated plot.
+   */
+  chartAxis?: ChartAxisFit;
+};
+
+/** Least-squares y-axis fit used to read a Cartesian chart. */
+export type ChartAxisFit = {
+  min: number;
+  max: number;
+  scale: "linear" | "log";
+  tickCount: number;
+  maxResidual: number;
 };

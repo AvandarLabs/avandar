@@ -47,4 +47,16 @@ describe("DashboardShareButton", () => {
       expect.objectContaining({ title: "Share “First dash”" }),
     );
   });
+
+  it("exposes a laid-out nux hook around the Share control", () => {
+    render(
+      <DashboardShareButton
+        dashboard={{ id: "dash-1", name: "First dash" } as Dashboard.T}
+        hasUnsavedChanges={false}
+      />,
+    );
+
+    const hook = screen.getByRole("button", { name: "Share" }).parentElement;
+    expect(hook).toHaveAttribute("data-nux", "dashboard-share-button");
+  });
 });

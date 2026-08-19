@@ -113,6 +113,38 @@ describe("overlay updaters", () => {
       }).annotations,
     ).toEqual({ isVisible: true, features: [] });
   });
+
+  it("replaces one annotation with zero or more features at the same index", () => {
+    const first = _makeTextAnnotation();
+    const second = _makeTextAnnotation();
+    const replacement = _makeTextAnnotation();
+    const config = AvaMapConfig.withAnnotationFeature({
+      config: AvaMapConfig.withAnnotationFeature({
+        config: AvaMapConfig.makeEmpty(),
+        feature: first,
+      }),
+      feature: second,
+    });
+    const split = AvaMapConfig.withAnnotationFeaturesReplaced({
+      config,
+      featureId: first.id,
+      nextFeatures: [replacement],
+    });
+    expect(
+      split.annotations.features.map((feature) => {
+        return feature.id;
+      }),
+    ).toEqual([replacement.id, second.id]);
+    expect(
+      AvaMapConfig.withAnnotationFeaturesReplaced({
+        config: split,
+        featureId: replacement.id,
+        nextFeatures: [],
+      }).annotations.features.map((feature) => {
+        return feature.id;
+      }),
+    ).toEqual([second.id]);
+  });
 });
 
 describe("withBufferLayerInserted", () => {

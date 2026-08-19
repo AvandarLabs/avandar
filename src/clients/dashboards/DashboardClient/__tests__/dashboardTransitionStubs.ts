@@ -62,9 +62,9 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
   return {
-    WorkspaceQetlClient: {
+    WorkspaceQuerySession: {
       runQuery: vi.fn().mockResolvedValue(new Blob(["query-parquet"])),
     },
   };

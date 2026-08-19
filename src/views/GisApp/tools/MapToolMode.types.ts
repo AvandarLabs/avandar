@@ -7,4 +7,5 @@ export type MapToolMode =
   | { type: "measure" }
   | { type: "buffer" }
   | { type: "annotate"; kind: AvaMapConfig.AnnotationKind }
+  | { type: "erase" }
   | { type: "goto" };

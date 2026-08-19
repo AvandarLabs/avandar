@@ -58,5 +58,13 @@ export function truncateSchemaForOffline(
       })
     : datasets;
 
-  return { datasets: trimmedDatasets, columns };
+  const concepts = (schema.concepts ?? []).slice(0, MAX_DATASETS);
+  const keptConceptIds = new Set(concepts.map(prop("id")));
+  const conceptAttributes = (schema.conceptAttributes ?? []).filter(
+    (attribute) => {
+      return keptConceptIds.has(attribute.concept_id);
+    },
+  );
+
+  return { datasets: trimmedDatasets, columns, concepts, conceptAttributes };
 }

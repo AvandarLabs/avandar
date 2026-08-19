@@ -128,7 +128,7 @@ describe("useGisApp annotation inspector", () => {
   });
 
   it("expands the inspector when a new annotation is created", () => {
-    const feature = makeTextAnnotationFeature([10, 10]);
+    const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { rerender } = renderHook(() => {
       return useGisApp(_createAvaMap());
     });
@@ -142,7 +142,7 @@ describe("useGisApp annotation inspector", () => {
   });
 
   it("expands the inspector when an annotation feature is clicked on the map", () => {
-    const feature = makeTextAnnotationFeature([10, 10]);
+    const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { result } = renderHook(() => {
       return useGisApp(_createAvaMap());
     });

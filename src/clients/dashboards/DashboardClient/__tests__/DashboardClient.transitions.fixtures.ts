@@ -178,7 +178,7 @@ const {
   dbFromMock,
   dbEqMock,
   dbIsMock,
-  dbLimitMock,
+  dbSelectMock,
   dbThrowOnErrorMock,
   dbUpdateMock,
   deleteDashboardMock,
@@ -198,11 +198,8 @@ const {
   const operationHistory: string[] = [];
   const visibilityState = createVisibilityState();
   const throwOnErrorMock = createThrowOnErrorMock(visibilityState);
-  const limitMock = vi.fn(() => {
-    return { throwOnError: throwOnErrorMock };
-  });
   const selectMock = vi.fn(() => {
-    return { limit: limitMock };
+    return { throwOnError: throwOnErrorMock };
   });
   const deleteThrowOnErrorMock = vi.fn();
   const deleteSingleMock = vi.fn(() => {
@@ -239,7 +236,7 @@ const {
     dbDeleteThrowOnErrorMock: deleteThrowOnErrorMock,
     dbEqMock: queryBuilder.eq,
     dbIsMock: queryBuilder.is,
-    dbLimitMock: limitMock,
+    dbSelectMock: selectMock,
     dbThrowOnErrorMock: throwOnErrorMock,
     dbUpdateMock: updateMock,
     deleteDashboardMock: vi.fn(),
@@ -365,7 +362,7 @@ export {
   dbEqMock,
   dbFromMock,
   dbIsMock,
-  dbLimitMock,
+  dbSelectMock,
   dbThrowOnErrorMock,
   dbUpdateMock,
   deleteDashboardMock,

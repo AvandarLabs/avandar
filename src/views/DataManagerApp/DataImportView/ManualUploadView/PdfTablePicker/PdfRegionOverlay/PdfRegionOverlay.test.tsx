@@ -114,4 +114,52 @@ describe("PdfRegionOverlay", () => {
 
     expect(onRegionDrawn).toHaveBeenCalledWith([20, 708, 220, 808]);
   });
+
+  it("reports a click as a PDF point in pick mode", () => {
+    const onRegionDrawn = vi.fn();
+    const onPointPicked = vi.fn();
+    render(
+      <PdfRegionOverlay
+        width={300}
+        height={424}
+        scale={0.5}
+        pageHeight={848}
+        interaction="pick"
+        onRegionDrawn={onRegionDrawn}
+        onPointPicked={onPointPicked}
+      />,
+    );
+
+    const surface = screen.getByTestId("pdf-region-overlay");
+    fireEvent.pointerDown(surface, { clientX: 10, clientY: 20 });
+    fireEvent.pointerUp(surface, { clientX: 10, clientY: 20 });
+
+    expect(onPointPicked).toHaveBeenCalledWith({ x: 20, y: 808 });
+    expect(onRegionDrawn).not.toHaveBeenCalled();
+  });
+
+  it("measures a pick against the rendered surface, not the bitmap scale", () => {
+    const onPointPicked = vi.fn();
+    render(
+      <PdfRegionOverlay
+        width={300}
+        height={424}
+        scale={0.5}
+        pageHeight={848}
+        interaction="pick"
+        onRegionDrawn={vi.fn()}
+        onPointPicked={onPointPicked}
+      />,
+    );
+
+    const surface = screen.getByTestId("pdf-region-overlay");
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 270, 381.6),
+    );
+
+    fireEvent.pointerDown(surface, { clientX: 9, clientY: 18 });
+    fireEvent.pointerUp(surface, { clientX: 9, clientY: 18 });
+
+    expect(onPointPicked).toHaveBeenCalledWith({ x: 20, y: 808 });
+  });
 });

@@ -24,10 +24,10 @@ const DBReadSchema = z.object({
   date_of_last_update: z.iso.datetime({ offset: true }).nullable(),
   coverage_start_date: z.iso.datetime({ offset: true }).nullable(),
   coverage_end_date: z.iso.datetime({ offset: true }).nullable(),
-  parquet_file_name: z.string(),
+  parquet_file_name: z.string().nullable(),
   display_name: z.string(),
-  pipeline_name: z.string(),
-  pipeline_run_id: z.string(),
+  pipeline_name: z.string().nullable(),
+  pipeline_run_id: z.string().nullable(),
   external_organization_name: z.string(),
   external_service_name: z.string().nullable(),
   external_dataset_id: z.string().nullable(),
@@ -38,6 +38,11 @@ const DBReadSchema = z.object({
   description: z.string().nullable(),
   notes: z.string().nullable(),
   metadata: supabaseJSONSchema.nullable(),
+  access_kind: z.enum(["pipeline_parquet", "api_resource"]),
+  api_service: z.enum(["ckan"]).nullable(),
+  api_base_url: z.string().nullable(),
+  api_resource_id: z.string().nullable(),
+  api_resource_format: z.string().nullable(),
 });
 
 export const OpenDataCatalogEntryParsers =

@@ -1,10 +1,13 @@
 import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 
 type Dataset = { id: string; name: string };
 type DatasetColumn = { dataset_id: string; name: string; data_type: string };
+type Concept = { id: string; name: string };
+type ConceptAttribute = { concept_id: string; name: string };
 
 /**
  * Heuristic to detect whether a prompt looks like a geospatial question. Used
@@ -36,17 +39,21 @@ type BuildSqlSystemPromptOptions = {
   prompt: string;
   datasets: readonly Dataset[];
   columns: readonly DatasetColumn[];
+  concepts?: readonly Concept[];
+  conceptAttributes?: readonly ConceptAttribute[];
   includeSpatialDocumentation?: boolean;
 };
 
 /**
  * Build the schema-aware system prompt used for natural-language → DuckDB SQL
- * generation. Shared between the `queries` edge function (used by the manual
- * "AI query" tab) and the new `chat` edge function (used by the persistent
- * chat panel) so both endpoints stay in sync.
+ * generation. Shared between the `chat` edge function surfaces so they stay
+ * in sync.
  *
- * The schema is sent as a compact listing (one line per dataset + one line
- * per column), not as JSON, to keep token cost low.
+ * The schema is a compact alias listing (one line per dataset or concept,
+ * columns or attribute names inline), not JSON, to keep the character budget
+ * low. Relation ids are rewritten after the model returns SQL. Spatial docs
+ * default on for the queries endpoint; chat omits them here and puts them in
+ * the volatile turn suffix.
  */
 export function buildSqlSystemPrompt(
   options: Readonly<BuildSqlSystemPromptOptions>,
@@ -55,8 +62,16 @@ export function buildSqlSystemPrompt(
     prompt,
     datasets,
     columns,
+    concepts = [],
+    conceptAttributes = [],
     includeSpatialDocumentation = true,
   } = options;
+  const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
+  const schemaBlock = SqlTableAlias.formatSchemaBlock({
+    aliases,
+    columns,
+    conceptAttributes,
+  });
   const spatialDocs =
     includeSpatialDocumentation ?
       makeSpatialSqlDocumentationFromPrompt(prompt)
@@ -64,26 +79,15 @@ export function buildSqlSystemPrompt(
 
   return `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.
 
-Available datasets:
-${datasets
-  .map((d) => {
-    return `- ${d.name} (table name: "${d.id}")`;
-  })
-  .join("\n")}
-
-Schema:
-${columns
-  .map((c) => {
-    return `- "${c.name}" (${c.data_type}) in table "${c.dataset_id}"`;
-  })
-  .join("\n")}
+Available datasets and concepts:
+${schemaBlock}
 
 Notes:
 
-- Dataset names are for semantic convenience only. The tables in SQL are named
-  after the dataset UUIDs, not the dataset names.
-- The SQL query should reference the dataset IDs instead of names.
-- Wrap all table IDs and column names in quotation marks, to avoid syntax errors.
+- SQL FROM / JOIN targets must be the aliases above (t0, t1, … for datasets;
+  c0, c1, … for concepts), never a label or filename. Wrap aliases and column
+  names in double quotes.
+- Do not invent datasets, concepts, or columns.
 - The query will run in DuckDB and should only use DuckDB functions supported
   by DuckDB.
 

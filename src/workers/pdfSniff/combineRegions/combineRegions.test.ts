@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { combineRegions } from "./combineRegions";
+import { canKeepPrintedColumns, combineRegions } from "./combineRegions";
 import type { ExtractedTable } from "../pdfSniff.types";
 import type { CombinedTable } from "./combineRegions";
 
@@ -421,5 +421,53 @@ describe("combineRegions", () => {
     });
 
     expect(result.cells).toEqual([]);
+  });
+});
+
+describe("canKeepPrintedColumns", () => {
+  // The control asks this to decide whether keeping the printed columns is on
+  // offer at all, so it has to agree with what `combineRegions` then does.
+  it("is true when the same table continues onto another page", () => {
+    const tables = [
+      table("r1", [
+        ["District", "Cases"],
+        ["Khartoum", "12"],
+      ]),
+      table("r2", [
+        ["district", "cases"],
+        ["Gezira", "8"],
+      ]),
+    ];
+
+    expect(canKeepPrintedColumns({ tables })).toBe(true);
+    expect(
+      combineRegions({ tables, regionLabels: {}, documentMetadata: DOC })
+        .outputMode,
+    ).toBe("natural");
+  });
+
+  it("is false when two regions print different columns", () => {
+    const tables = [
+      table("r1", [
+        ["district", "cases"],
+        ["Khartoum", "12"],
+      ]),
+      table("r2", [
+        ["label", "value"],
+        ["Week 1", "12"],
+      ]),
+    ];
+
+    expect(canKeepPrintedColumns({ tables })).toBe(false);
+    expect(
+      combineRegions({ tables, regionLabels: {}, documentMetadata: DOC })
+        .outputMode,
+    ).toBe("observations");
+  });
+
+  it("is false when nothing produced rows", () => {
+    expect(
+      canKeepPrintedColumns({ tables: [table("r1", [["district", "cases"]])] }),
+    ).toBe(false);
   });
 });

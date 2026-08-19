@@ -67,9 +67,13 @@ function _getDataVizPBlockConfig(
       localFilters: options.localFiltersField,
     } as Fields<DataVizPBlockProps>,
     defaultProps,
-    resolveData: (data, { changed }) => {
+    resolveData: (data, { changed, trigger }) => {
       return {
-        props: resolveDataVizPBlockProps({ props: data.props, changed }),
+        props: resolveDataVizPBlockProps({
+          props: data.props,
+          changed,
+          trigger,
+        }),
       };
     },
     render: DataVizPBlock,

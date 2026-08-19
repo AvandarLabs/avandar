@@ -5,6 +5,15 @@ import css from "./PdfPagePreview.module.css";
 import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
 import type { ReactNode } from "react";
 
+/**
+ * Ceiling on the device pixel ratio the page bitmap is drawn at.
+ *
+ * A phone reporting 4 would quadruple the bitmap's memory for a sharpness
+ * nobody can see, and this canvas is kept alive for as long as the picker is
+ * open.
+ */
+const MAX_PIXEL_RATIO = 3;
+
 /** One box drawn over the rendered page. */
 export type Highlight = {
   /** In PDF points. */
@@ -94,7 +103,31 @@ export function PdfPagePreview({
             rotation: page.rotate,
           });
           const scale = width / unscaled.width;
-          const viewport = page.getViewport({ scale, rotation: page.rotate });
+
+          /*
+           * The canvas is LAID OUT at `width` pixels but its bitmap is drawn
+           * at the display's own pixel density. Without this, a retina screen
+           * stretches a 420-pixel bitmap across roughly 756 physical pixels
+           * and the page reads as blurry -- which matters more here than in a
+           * normal thumbnail, because the user has to see a table rule
+           * clearly enough to drag a box around it.
+           *
+           * This changes nothing downstream. Extraction never looks at these
+           * pixels: `extractPageGeometry` takes the page at scale 1 and reads
+           * pdf.js's operator list and text items in PDF points, and the
+           * overlay measures its own rect rather than trusting a scale. The
+           * only coupling is the `scale` reported below, which stays the
+           * layout scale for that reason.
+           */
+          const pixelRatio = Math.min(
+            Math.max(globalThis.devicePixelRatio || 1, 1),
+            MAX_PIXEL_RATIO,
+          );
+          const renderScale = scale * pixelRatio;
+          const viewport = page.getViewport({
+            scale: renderScale,
+            rotation: page.rotate,
+          });
 
           const canvas = canvasRef.current;
           if (isCancelled || !canvas) {
@@ -126,11 +159,13 @@ export function PdfPagePreview({
               highlight.isActive ?
                 "rgba(34, 139, 230, 0.18)"
               : "rgba(34, 139, 230, 0.08)";
-            context.lineWidth = highlight.isActive ? 2 : 1;
-            const boxX = x0 * scale;
-            const boxY = canvas.height - y1 * scale;
-            const boxWidth = (x1 - x0) * scale;
-            const boxHeight = (y1 - y0) * scale;
+            // Multiplied by the pixel ratio so the outline keeps the same
+            // weight on screen rather than thinning to a hairline.
+            context.lineWidth = (highlight.isActive ? 2 : 1) * pixelRatio;
+            const boxX = x0 * renderScale;
+            const boxY = canvas.height - y1 * renderScale;
+            const boxWidth = (x1 - x0) * renderScale;
+            const boxHeight = (y1 - y0) * renderScale;
             context.fillRect(boxX, boxY, boxWidth, boxHeight);
             context.strokeRect(boxX, boxY, boxWidth, boxHeight);
             context.restore();
@@ -138,6 +173,8 @@ export function PdfPagePreview({
 
           await doc.destroy();
           if (!isCancelled) {
+            // The LAYOUT scale, not `renderScale`: this is what a caller
+            // sizes an overlay with, and the overlay lives in CSS pixels.
             // Reported after rendering rather than before, so an overlay is
             // never told a scale for a page that has not been drawn.
             onScaleChange?.(scale);

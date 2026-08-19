@@ -29,6 +29,11 @@ describe("compileMapLayerSpatialQuery geometry column", () => {
     expect(plan.rawSql).toContain("diagnostic_summary AS (");
     expect(plan.rawSql).toContain("feature_rows AS (");
     expect(plan.rawSql).toContain("ST_SimplifyPreserveTopology");
+    // A row PROJ or GEOS cannot simplify falls back to its parsed geometry
+    // rather than aborting the statement and failing the whole layer.
+    expect(plan.rawSql).toContain(
+      "coalesce(TRY(ST_Transform(ST_SimplifyPreserveTopology(",
+    );
     expect(plan.rawSql).toContain(
       'replace(CAST(ST_GeometryType("__avandar_geometry") AS VARCHAR)',
     );

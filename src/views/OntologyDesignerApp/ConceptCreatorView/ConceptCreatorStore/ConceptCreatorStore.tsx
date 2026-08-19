@@ -8,8 +8,8 @@ type ConceptCreatorState = {
 
 const initialState: ConceptCreatorState = {
   conceptName: "",
-  singularConceptName: "profile",
-  pluralConceptName: "profiles",
+  singularConceptName: "record",
+  pluralConceptName: "records",
 };
 
 export const ConceptCreatorStore = createAppStateManager({
@@ -20,8 +20,8 @@ export const ConceptCreatorStore = createAppStateManager({
       return {
         ...state,
         conceptName,
-        singularConceptName: conceptName.toLowerCase() || "profile",
-        pluralConceptName: `${conceptName.toLowerCase() || "profile"}s`,
+        singularConceptName: conceptName.toLowerCase() || "record",
+        pluralConceptName: `${conceptName.toLowerCase() || "record"}s`,
       };
     },
   },

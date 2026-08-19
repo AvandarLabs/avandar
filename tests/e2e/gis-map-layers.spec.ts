@@ -199,12 +199,12 @@ test.describe("GIS map layers", () => {
         .toEqual([...rowsBefore].reverse());
 
       await _clickKnownFeature(page);
-      await expect(page.getByRole("dialog", { name: "Feature" })).toContainText(
-        "Admin2",
-      );
-      await expect(page.getByRole("dialog", { name: "Feature" })).toContainText(
-        "Alameda",
-      );
+      await expect(
+        page.getByRole("region", { name: "Feature", exact: true }),
+      ).toContainText("Admin2");
+      await expect(
+        page.getByRole("region", { name: "Feature", exact: true }),
+      ).toContainText("Alameda");
     } finally {
       await deleteMapsByIds({ admin, mapIds: seededMapIds });
       if (datasetId) {

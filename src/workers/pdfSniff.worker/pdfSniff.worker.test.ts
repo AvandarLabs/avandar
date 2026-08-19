@@ -46,6 +46,8 @@ const GRAPHIC_PAGE: PageGeometry = {
     item("202", 306, 490),
   ],
   rules: [],
+  marks: [],
+  marksTruncated: false,
   looksScanned: false,
 };
 
@@ -64,6 +66,8 @@ const TABLE_PAGE: PageGeometry = {
     { orientation: "horizontal", position: 590, span: [90, 400] },
     { orientation: "horizontal", position: 570, span: [90, 400] },
   ],
+  marks: [],
+  marksTruncated: false,
   looksScanned: false,
 };
 
