@@ -24,12 +24,12 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * DuckDB from an earlier session, in which case the statement reads it. Naming
  * the offending relations and refusing is both safer and more truthful.
  *
- * Only bare-UUID table references reach here, because that is all
- * `getDatasetIdsFromSqlTableReferences` extracts: string literals and
- * UUID-shaped CTE aliases are excluded, and prefixed views such as
- * `concept_<uuid>` or `ava_rows_<uuid>` never match. So every id checked here
- * is a dataset reference by the invariant `RelationRef.fromTableName` encodes,
- * and a denial cannot be triggered by SQL that merely mentions a UUID.
+ * Only dataset ids reach here: string literals and UUID-shaped CTE aliases
+ * are excluded, and prefixed views such as `concept_<uuid>` are not dataset
+ * ids. `ava_rows_<uuid>` is reported as its dataset, which is a read of that
+ * file. So every id checked here is a dataset reference by the invariant
+ * `RelationRef.fromTableName` encodes, and a denial cannot be triggered by
+ * SQL that merely mentions a UUID.
  *
  * **Freshness.** The dataset list is read with `fetchQuery`, not
  * `ensureQueryData`. `ensureQueryData` resolves from any present cache entry

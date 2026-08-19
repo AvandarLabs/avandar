@@ -3,7 +3,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
-import { extractReferencedRelations } from "@/clients/qetl/wrappers/extractReferencedRelations/extractReferencedRelations";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { Logger } from "@/utils/Logger";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
@@ -33,17 +33,22 @@ export type ConceptRelationAllowlist = {
 
 /** The concept relations one statement names, without duplicates. */
 function _getConceptRefsFromSql(rawSql: string): ConceptRelationRef[] {
-  const referenced = extractReferencedRelations(rawSql);
-  if (referenced.outcome !== "ok") {
-    // Fail closed. An unanalyzable statement carries no relation list, and
-    // treating a missing list as "names no concept" would let a concept
-    // reference through unauthorized and unloaded.
+  const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(rawSql);
+  // Mutating SQL is fully accounted for: CREATE TABLE AS SELECT (individual
+  // generation) reads datasets, not concept views, so there is nothing to
+  // plan. Unanalyzable SQL still fails closed, because a missing list would
+  // let a concept reference through unauthorized and unloaded.
+  if (analysis.kind === "mutating") {
+    return [];
+  }
+  if (analysis.kind !== "read") {
     throw new Error(
-      `Cannot determine the concepts this query reads: ${referenced.reason}`,
+      `Cannot determine the concepts this query reads: ` +
+        `Cannot safely analyze DuckDB SQL: ${analysis.reason}`,
     );
   }
   return removeDuplicates(
-    referenced.relations.filter((relation): relation is ConceptRelationRef => {
+    analysis.relations.filter((relation): relation is ConceptRelationRef => {
       return relation.kind === "concept";
     }),
     { hashFn: prop("id") },

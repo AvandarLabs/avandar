@@ -123,7 +123,7 @@ function _createWorkspaceQetlClient(
       return await assertWorkspaceRelations({
         workspaceId: options.workspaceId,
         referencedDatasetIds:
-          DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(rawSql),
+          DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
       });
     },
     planConceptRelations: async (rawSql) => {

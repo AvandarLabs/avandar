@@ -152,10 +152,37 @@ function _getDatasetIdsFromSqlTableReferences(sql: string): string[] {
   });
 }
 
+/**
+ * The datasets a statement must load before it can run, including the ones a
+ * CREATE TABLE AS SELECT (or other mutation) reads.
+ *
+ * The read-only entry point refuses mutating SQL, which is correct for
+ * callers that only authorize SELECTs. Individual generation stages rows
+ * with CREATE TABLE AS SELECT from those same datasets, and that statement
+ * still has to load them.
+ */
+function _getReadDatasetIdsFromSql(sql: string): string[] {
+  const analysis = _getPublicDuckDbSqlAnalysisFromSql(sql);
+  if (analysis.kind === "read") {
+    return analysis.relations.flatMap((relation) => {
+      return relation.kind === "dataset" ? [relation.id] : [];
+    });
+  }
+  if (analysis.kind === "mutating") {
+    return analysis.readDatasetIds;
+  }
+  throw new Error(`Cannot safely analyze DuckDB SQL: ${analysis.reason}`);
+}
+
 /** Performs fail-closed static relation-effect analysis for DuckDB SQL. */
 export const DuckDbSqlAnalyzer = {
   /** Returns UUID table sources, rejecting incomplete or mutating analysis. */
   getDatasetIdsFromSqlTableReferences: _getDatasetIdsFromSqlTableReferences,
+  /**
+   * Returns the datasets a statement reads, including mutating SQL whose
+   * SELECT sources are datasets.
+   */
+  getReadDatasetIdsFromSql: _getReadDatasetIdsFromSql,
   /** Returns the complete static relation effect analysis for DuckDB SQL. */
   getDuckDbSqlAnalysisFromSql: _getPublicDuckDbSqlAnalysisFromSql,
   /** Returns every relation read, rejecting incomplete or mutating analysis. */

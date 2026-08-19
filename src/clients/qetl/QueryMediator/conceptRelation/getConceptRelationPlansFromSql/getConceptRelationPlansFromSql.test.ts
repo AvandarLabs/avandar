@@ -202,12 +202,29 @@ describe("getConceptRelationPlansFromSql", () => {
         allowlist: _permissiveAllowlist(),
       }),
     ).rejects.toThrow(/Cannot determine the concepts this query reads/);
-    await expect(
-      getConceptRelationPlansFromSql({
-        rawSql: `DELETE FROM "${DATASET_ID}"`,
-        allowlist: _permissiveAllowlist(),
-      }),
-    ).rejects.toThrow(/Cannot determine the concepts this query reads/);
+  });
+
+  // `generateIndividuals` stages rows with CREATE TABLE AS SELECT from the
+  // contributing datasets. That is mutating SQL, but it names no concept
+  // relation: treating it as unanalyzable made every Generate Individuals
+  // click fail before DuckDB ran.
+  it("plans nothing for CREATE TABLE AS SELECT from a dataset", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    const allowlist = _permissiveAllowlist();
+    const getAllowedConceptIds = vi.fn(allowlist.getAllowedConceptIds);
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql:
+        `DROP TABLE IF EXISTS "ava_staging_individuals_${CONCEPT_ID}";\n` +
+        `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS ` +
+        `SELECT * FROM "${DATASET_ID}"`,
+      allowlist: { ...allowlist, getAllowedConceptIds },
+    });
+
+    expect(plans).toEqual([]);
+    expect(getAllowedConceptIds).not.toHaveBeenCalled();
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
   });
 
   it("plans a concept named twice in one statement only once", async () => {

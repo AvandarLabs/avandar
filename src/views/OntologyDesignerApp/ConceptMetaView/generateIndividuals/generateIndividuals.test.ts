@@ -13,6 +13,7 @@ import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
@@ -239,5 +240,17 @@ describe("generateIndividuals", () => {
     const statements = _getRunSqlStatements();
     expect(statements).toHaveLength(2);
     expect(statements[1]).toBe(`DROP TABLE IF EXISTS "${STAGING_TABLE}";`);
+  });
+
+  // The staging statement is CREATE TABLE AS SELECT, which the read-only
+  // analyzer entry point refuses. The session has to load the datasets that
+  // SELECT reads, or Generate Individuals fails before DuckDB runs.
+  it("emits staging SQL whose contributing dataset the session can load", async () => {
+    await generateIndividuals(_makeConcept());
+
+    const createSql = _getRunSqlStatements()[0]!;
+    expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(createSql)).toEqual([
+      DATASET_ID,
+    ]);
   });
 });

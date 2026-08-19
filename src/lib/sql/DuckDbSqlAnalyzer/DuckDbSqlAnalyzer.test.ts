@@ -195,6 +195,23 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     });
   });
 
+  // `generateIndividuals` stages rows with CREATE TABLE AS SELECT. The
+  // read-only entry point refuses mutating SQL, so the session has to ask
+  // for the datasets the statement *reads* rather than for a SELECT list.
+  it("returns the datasets a CREATE TABLE AS SELECT reads", () => {
+    const stagingSql =
+      `DROP TABLE IF EXISTS "ava_staging_individuals_${CONCEPT_ID}";\n` +
+      `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS ` +
+      `SELECT * FROM "${DATASET_ID}"`;
+
+    expect(() => {
+      DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(stagingSql);
+    }).toThrow(/mutating/i);
+    expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(stagingSql)).toEqual([
+      DATASET_ID,
+    ]);
+  });
+
   it("tracks COPY relations according to transfer direction", () => {
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(

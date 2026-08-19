@@ -260,4 +260,36 @@ describe("buildConceptViewSql", () => {
 
     expect(forward).toBe(reversed);
   });
+
+  // Exit criteria 3 and 4: joins are raw SQL in Data Explorer, so the view
+  // has to survive JOIN / WHERE / GROUP BY / ORDER BY against a contributing
+  // dataset. `p2`'s region is East (most_frequent tie-break); joining to
+  // dataset B matches both of p2's rows, so East counts 2 and sorts first.
+  it("joins to a dataset, then filters, groups, and sorts", async () => {
+    const rows = await withDuckDb(async (connection) => {
+      await _seed(connection);
+      await connection.run(
+        buildConceptViewSql({
+          viewName: CONCEPT_VIEW,
+          spineTableName: SPINE,
+          attributeColumns: [AGE, REGION],
+        }),
+      );
+      const reader = await connection.runAndReadAll(`
+        SELECT c.region, COUNT(*) AS n
+        FROM "${CONCEPT_VIEW}" c
+        JOIN "${DATASET_B}" d
+          ON CAST(c.external_id AS VARCHAR) = CAST(d.hh_id AS VARCHAR)
+        WHERE c.region IS NOT NULL
+        GROUP BY c.region
+        ORDER BY n DESC, c.region
+      `);
+      return reader.getRowObjects().map(_normalize);
+    });
+
+    expect(rows).toEqual([
+      { region: "East", n: 2 },
+      { region: "North", n: 1 },
+    ]);
+  });
 });
