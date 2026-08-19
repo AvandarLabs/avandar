@@ -5,6 +5,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
+import { assertWorkspaceRelations } from "@/clients/qetl/assertWorkspaceRelations/assertWorkspaceRelations";
 import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
@@ -115,12 +116,15 @@ function _createWorkspaceQetlClient(
     return await _getAllWorkspaceDatasetIds(options.workspaceId);
   };
   return QueryMediatorFactory.create({
+    // The per-relation half of authorization. Membership is checked once per
+    // `runQuery` above; this checks what the statement actually named, and
+    // refuses rather than silently dropping a reference the workspace does not
+    // own.
     getQueryDependencies: async (rawSql) => {
-      const referencedIds = new Set(
-        DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(rawSql),
-      );
-      return (await getAllDatasetIds()).filter((datasetId) => {
-        return referencedIds.has(datasetId);
+      return await assertWorkspaceRelations({
+        workspaceId: options.workspaceId,
+        referencedDatasetIds:
+          DuckDbSqlAnalyzer.getDatasetIdsFromSqlTableReferences(rawSql),
       });
     },
     getDuckDbLeaseDatasetIds: getAllDatasetIds,

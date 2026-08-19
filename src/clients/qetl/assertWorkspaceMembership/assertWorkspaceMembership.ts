@@ -13,12 +13,12 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * This is the principal-level check: it asserts that the user may act **in the
  * named workspace**. It does not assert that every relation named by a query
  * belongs to that workspace. That per-relation check is a separate mechanism,
- * currently provided by `WorkspaceQetlClient`'s `getDiceFromSql`, which
+ * currently provided by `WorkspaceQuerySession`'s `getQueryDependencies`, which
  * intersects the SQL's table references with the dataset ids of the named
  * workspace, so a dataset owned by another workspace is never loaded. If a
  * relation cache probe is ever wired ahead of source dispatch, it would bypass
- * `getDiceFromSql`, so that probe must carry its own per-relation workspace
- * check; this assertion does not cover it.
+ * `getQueryDependencies`, so that probe must carry its own per-relation
+ * workspace check; this assertion does not cover it.
  *
  * The workspace list is session-scoped, so `userId` must always be the
  * authenticated user. Omit it to authorize whoever is signed in. Pass it when

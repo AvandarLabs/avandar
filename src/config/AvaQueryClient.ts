@@ -2,6 +2,7 @@ import { getIsOnline } from "@avandar/browser-utils";
 import { QueryClient } from "@tanstack/react-query";
 import { SessionExpiredError } from "$/ServerApiClient";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
+import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -36,9 +37,14 @@ export const AvaQueryClient = new QueryClient({
           return false;
         }
         // An authorization refusal is a decision, not a fault. Retrying it
-        // repeats the same membership read and reaches the same answer, so it
-        // only delays the error the caller is waiting on.
-        if (error instanceof WorkspaceMembershipDenied) {
+        // repeats the same membership or dataset-list read and reaches the same
+        // answer, so it only delays the error the caller is waiting on. Both
+        // halves of authorization are listed: the principal-level refusal and
+        // the per-relation one.
+        if (
+          error instanceof WorkspaceMembershipDenied ||
+          error instanceof WorkspaceRelationsDenied
+        ) {
           return false;
         }
         return getIsOnline() ? failureCount < 1 : false;

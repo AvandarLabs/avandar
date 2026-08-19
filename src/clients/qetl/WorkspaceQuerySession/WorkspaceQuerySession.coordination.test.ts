@@ -59,12 +59,20 @@ vi.mock("@/clients/WorkspaceClient", () => {
   };
 });
 
+// Both accessors are modelled because the session uses each for a different
+// purpose: `withEnsureQueryData` for the lease breadth, and `withFetchQuery`
+// for the per-relation authorization read, which must honor staleness. Both
+// answer from the same mock, so a dataset in this list is one the workspace
+// owns and is therefore authorized.
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: datasetGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetGetAllMock };
           },
         };

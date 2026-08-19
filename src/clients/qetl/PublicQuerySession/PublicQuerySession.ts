@@ -179,7 +179,7 @@ export type IPublicQetlClient = Module<
  * Executes SQL only against the immutable snapshot committed by a dashboard.
  *
  * This path deliberately has no workspace membership check, unlike
- * `WorkspaceQetlClient`. It is authorized structurally instead: the reachable
+ * `WorkspaceQuerySession`. It is authorized structurally instead: the reachable
  * dataset ids are exactly the ones `PublicDatasetParquetStorageClient` lists
  * for the requested snapshot revision, `_getReferencedPublishedDatasetIds`
  * intersects the SQL's table references with that list, and
