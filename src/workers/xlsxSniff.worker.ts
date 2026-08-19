@@ -100,7 +100,8 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
       maxRows: rowsToTake,
     });
     const previewRows =
-      previewRange === undefined ? []
+      previewRange === undefined ?
+        []
       : XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
           header: hasHeader ? undefined : "A",
           range: previewRange,

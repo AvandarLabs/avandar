@@ -1,11 +1,11 @@
 import { uuid } from "$/lib/uuid";
+import { buildXlsxReadRange } from "@/clients/DuckDbClient/buildXlsxReadRange/buildXlsxReadRange";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import {
   assertXlsxFileReadable,
   getParquetBlobFromStagingFiles,
   registerXlsxFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
-import { buildXlsxReadRange } from "@/clients/DuckDbClient/buildXlsxReadRange/buildXlsxReadRange";
 import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -90,8 +90,7 @@ async function _transcodeXlsxToParquet(
   const range = buildXlsxReadRange(options.rowsToSkip);
   // Naming a range turns `stop_at_empty` off, which would pad the read out to
   // the format's maximum row, so it is switched back on alongside the range.
-  const rangeClause =
-    range ? `, range = '${range}', stop_at_empty = true` : "";
+  const rangeClause = range ? `, range = '${range}', stop_at_empty = true` : "";
   await options.client.runRawQuery(
     `COPY (
         SELECT * FROM read_xlsx(

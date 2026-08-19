@@ -28,9 +28,10 @@ export function useDuckDbSpatialAvailability(): DuckDbSpatialAvailability {
  *
  * Prefer {@link useDuckDbSpatialAvailability} where something else already
  * guarantees initialization, so a map with no spatial layer does not pay for
- * DuckDB startup it never uses.
+ * DuckDB startup it never uses. The shorter name keeps the declaration inside
+ * the line limit; it is the detecting form of the hook above.
  */
-export function useDetectedDuckDbSpatialAvailability(): DuckDbSpatialAvailability {
+export function useDetectedSpatialAvailability(): DuckDbSpatialAvailability {
   const availability = useDuckDbSpatialAvailability();
   useEffect(
     function startSpatialDetection() {
