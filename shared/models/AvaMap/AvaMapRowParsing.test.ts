@@ -80,9 +80,12 @@ describe("AvaMapParsers", () => {
 
     const model = AvaMapParsers.fromDBReadToModelRead(row);
 
+    // `config` is checked separately below via `toEqual`, since
+    // `toMatchObject` treats a JSON-round-tripped optional field that is
+    // absent (e.g. an unset `disclaimer`) as a mismatch against a source
+    // object that still carries that key with an explicit `undefined`.
     expect(model).toMatchObject({
       __type: "AvaMap",
-      config,
       description: undefined,
       slug: undefined,
     });

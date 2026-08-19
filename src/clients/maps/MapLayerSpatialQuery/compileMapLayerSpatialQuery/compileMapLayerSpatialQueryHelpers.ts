@@ -119,24 +119,29 @@ export function makeSuppressedAreaFeatureSql(options: {
   keySql?: string;
   denominatorSql: string;
   contributorCountSql: string;
+  disputedStatusSql?: string;
 }): string {
   const properties = MapLayerSpatialFeatureProperties;
   const keyPair =
     options.keySql === undefined ?
       ""
     : `, '${properties.boundaryKey}', ${options.keySql}`;
+  const disputedStatusPair =
+    options.disputedStatusSql === undefined ?
+      ""
+    : `, '${properties.disputedStatus}', ${options.disputedStatusSql}`;
   return `json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(${options.geometrySql})),
     'properties', CASE WHEN state = 'suppressed' THEN json_object(
         '${properties.featureId}', ${options.featureIdSql}${keyPair},
         '${properties.boundaryName}', ${options.nameSql},
-        '${properties.state}', state)
+        '${properties.state}', state${disputedStatusPair})
       ELSE json_object(
         '${properties.featureId}', ${options.featureIdSql}${keyPair},
         '${properties.boundaryName}', ${options.nameSql},
         '${properties.state}', state,
         '${properties.value}', reportable_value,
         '${properties.denominator}', ${options.denominatorSql},
-        '${properties.contributorCount}', ${options.contributorCountSql})
+        '${properties.contributorCount}', ${options.contributorCountSql}${disputedStatusPair})
       END)`;
 }
 

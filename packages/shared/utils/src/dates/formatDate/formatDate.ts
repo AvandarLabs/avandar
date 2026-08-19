@@ -1,12 +1,15 @@
 import { FORMAT_TOKEN_ORDER as TOKEN_ORDER } from "@utils/dates/date-utils/formatPatternConstants.ts";
 import { parseFormatSegments } from "@utils/dates/date-utils/parseFormatSegments.ts";
+import { getDateTimeFormatter } from "@utils/dates/formatDate/getDateTimeFormatter.ts";
+import {
+  getDisplayLocale,
+  PARSE_LOCALE,
+} from "@utils/dates/formatDate/getDisplayLocale.ts";
 import { isDate } from "@utils/guards/isDate/isDate.ts";
 import type { FormatToken as Token } from "@utils/dates/date-utils/formatPatternConstants.ts";
 import type { LiteralUnion } from "type-fest";
 
 export type FormattableTimezone = LiteralUnion<"local" | "UTC", string>;
-
-const FORMAT_LOCALE = "en-US";
 
 /**
  * Parses `value` the same way `Date` does for numbers, strings, `Date`, and
@@ -72,18 +75,21 @@ function getIntlTimeZone(
 function buildZonedFieldBag(
   date: Date,
   intlTimeZone: string | undefined,
+  displayLocale: string,
 ): ZonedFieldBag {
-  const zoneOpts = intlTimeZone === undefined ? {} : { timeZone: intlTimeZone };
-
-  const wall = new Intl.DateTimeFormat(FORMAT_LOCALE, {
-    ...zoneOpts,
-    day: "numeric",
-    hour: "numeric",
-    hour12: false,
-    minute: "numeric",
-    month: "numeric",
-    second: "numeric",
-    year: "numeric",
+  const wall = getDateTimeFormatter({
+    locale: PARSE_LOCALE,
+    intlTimeZone,
+    shapeKey: "wall",
+    fields: {
+      day: "numeric",
+      hour: "numeric",
+      hour12: false,
+      minute: "numeric",
+      month: "numeric",
+      second: "numeric",
+      year: "numeric",
+    },
   }).formatToParts(date);
 
   const year = Number(_part(wall, "year"));
@@ -93,10 +99,11 @@ function buildZonedFieldBag(
   const minute = Number(_part(wall, "minute"));
   const second = Number(_part(wall, "second"));
 
-  const wall12 = new Intl.DateTimeFormat(FORMAT_LOCALE, {
-    ...zoneOpts,
-    hour: "numeric",
-    hour12: true,
+  const wall12 = getDateTimeFormatter({
+    locale: PARSE_LOCALE,
+    intlTimeZone,
+    shapeKey: "wall12",
+    fields: { hour: "numeric", hour12: true },
   }).formatToParts(date);
 
   const hour12 = Number(_part(wall12, "hour"));
@@ -105,9 +112,11 @@ function buildZonedFieldBag(
   const dayPeriodLower = dayPeriodUpper === "PM" ? "pm" : "am";
 
   const monthShort =
-    new Intl.DateTimeFormat(FORMAT_LOCALE, {
-      ...zoneOpts,
-      month: "short",
+    getDateTimeFormatter({
+      locale: displayLocale,
+      intlTimeZone,
+      shapeKey: "month-short",
+      fields: { month: "short" },
     })
       .formatToParts(date)
       .find((p) => {
@@ -115,9 +124,11 @@ function buildZonedFieldBag(
       })?.value ?? "";
 
   const monthLong =
-    new Intl.DateTimeFormat(FORMAT_LOCALE, {
-      ...zoneOpts,
-      month: "long",
+    getDateTimeFormatter({
+      locale: displayLocale,
+      intlTimeZone,
+      shapeKey: "month-long",
+      fields: { month: "long" },
     })
       .formatToParts(date)
       .find((p) => {
@@ -125,9 +136,11 @@ function buildZonedFieldBag(
       })?.value ?? "";
 
   const weekdayShort =
-    new Intl.DateTimeFormat(FORMAT_LOCALE, {
-      ...zoneOpts,
-      weekday: "short",
+    getDateTimeFormatter({
+      locale: displayLocale,
+      intlTimeZone,
+      shapeKey: "weekday-short",
+      fields: { weekday: "short" },
     })
       .formatToParts(date)
       .find((p) => {
@@ -135,9 +148,11 @@ function buildZonedFieldBag(
       })?.value ?? "";
 
   const weekdayLong =
-    new Intl.DateTimeFormat(FORMAT_LOCALE, {
-      ...zoneOpts,
-      weekday: "long",
+    getDateTimeFormatter({
+      locale: displayLocale,
+      intlTimeZone,
+      shapeKey: "weekday-long",
+      fields: { weekday: "long" },
     })
       .formatToParts(date)
       .find((p) => {
@@ -189,9 +204,11 @@ function _millisecondRemainder(date: Date): number {
 }
 
 function getOffsetIso(date: Date, intlTimeZone: string | undefined): string {
-  const formatter = new Intl.DateTimeFormat(FORMAT_LOCALE, {
-    ...(intlTimeZone === undefined ? {} : { timeZone: intlTimeZone }),
-    timeZoneName: "longOffset",
+  const formatter = getDateTimeFormatter({
+    locale: PARSE_LOCALE,
+    intlTimeZone,
+    shapeKey: "offset",
+    fields: { timeZoneName: "longOffset" },
   });
   const raw = formatter.formatToParts(date).find((p) => {
     return p.type === "timeZoneName";
@@ -325,6 +342,15 @@ function emitToken(token: Token, bag: ZonedFieldBag): string {
  * @param options.zone The timezone to use. Defaults to "local", meaning that
  * the local timezone will be used. Otherwise, any valid timezone string can be
  * passed, such as "UTC" or "America/New_York".
+ * @param options.locale The locale used for month and weekday *names* (`MMM`,
+ * `MMMM`, `ddd`, `dddd`). Defaults to the reader's own locale: the browser's
+ * `navigator.language`, or the host default in a Node process, falling back to
+ * `en-US`. Pass this only to override that deliberately; normally leaving it
+ * unset is what makes a date read correctly for whoever is looking at it.
+ *
+ * Numeric tokens are unaffected: `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss` and the
+ * `Z` offset always render in Latin digits and a fixed offset shape, so a
+ * formatted value stays machine-parseable in every locale.
  * @returns The formatted date.
  */
 export function formatDate(
@@ -332,9 +358,11 @@ export function formatDate(
   {
     zone = "local",
     format = "YYYY-MM-DDTHH:mm:ssZ",
+    locale,
   }: {
     zone?: FormattableTimezone;
     format?: string;
+    locale?: string;
   } = {},
 ): string {
   if (value === null || value === undefined) {
@@ -347,7 +375,7 @@ export function formatDate(
   }
 
   const intlTimeZone = getIntlTimeZone(zone);
-  const bag = buildZonedFieldBag(date, intlTimeZone);
+  const bag = buildZonedFieldBag(date, intlTimeZone, getDisplayLocale(locale));
   return parseFormatSegments(format)
     .map((segment) => {
       if (segment.kind === "literal") {

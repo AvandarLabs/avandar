@@ -20,6 +20,8 @@ export type AvaMapRender = {
   layerViewStates: Map<MapLayer.Id, MapLayerViewState>;
   layerBounds: Map<MapLayer.Id, MapBounds | undefined>;
   legendUpdates: Map<MapLayer.Id, LayerLegendUpdate>;
+  /** True when any visible layer draws a disputed or undetermined boundary. */
+  hasDrawnDisputedFeature: boolean;
 };
 
 /** Hit-testable annotation layer ids, empty when the overlay is hidden. */
@@ -90,6 +92,9 @@ function _makeAvaMapRender(options: {
       }),
       { key: "layerId", valueKey: "legendUpdate" },
     ) as Map<MapLayer.Id, LayerLegendUpdate>,
+    hasDrawnDisputedFeature: renderedLayers.some(
+      prop("hasDrawnDisputedFeature"),
+    ),
   };
 }
 

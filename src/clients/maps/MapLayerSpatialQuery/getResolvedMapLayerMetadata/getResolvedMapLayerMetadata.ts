@@ -2,26 +2,23 @@ import { Model } from "@avandar/models";
 import { isDefined, propEq } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { match } from "ts-pattern";
+import { getDisputedStatusColumn } from "./getDisputedStatusColumn";
+import {
+  createRebindRequired,
+  findBoundaryColumn,
+} from "./getResolvedMapLayerMetadataHelpers";
 import type {
   MapLayerMetadataResolution,
-  MapLayerRebindReason,
   MapLayerRebindRequired,
   ResolvedBoundarySource,
 } from "../MapLayerSpatialQuery.types";
+import type {
+  BoundaryBinding,
+  ResolveOptions,
+} from "./getResolvedMapLayerMetadata.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-
-type ResolveOptions = {
-  layer: MapLayer.T;
-  datasets: readonly Dataset.T[];
-  datasetColumns: readonly DatasetColumn.T[];
-};
-
-type BoundaryBinding = Extract<
-  MapLayer.GeoBinding,
-  { type: "joinToBoundaries" | "aggregatePointsToBoundaries" }
->;
 
 type AggregatingBinding = BoundaryBinding | MapLayer.GridBinBinding;
 
@@ -31,14 +28,6 @@ type ResolvedDenominator = NonNullable<
     { type: "resolved" }
   >["normalizationDenominator"]
 >;
-
-/** Creates one actionable rebind result. */
-function _createRebindRequired(
-  reason: MapLayerRebindReason,
-  referenceId: string,
-): MapLayerRebindRequired {
-  return { type: "rebindRequired", reason, referenceId };
-}
 
 /** Returns the boundary-dependent form of a layer binding. */
 function _getBoundaryBinding(layer: MapLayer.T): BoundaryBinding | undefined {
@@ -90,17 +79,6 @@ function _getRequiredSourceColumnIds(
     .exhaustive();
 }
 
-/** Finds one column only when it still belongs to the referenced dataset. */
-function _findBoundaryColumn(
-  columns: readonly DatasetColumn.T[],
-  datasetId: Dataset.Id,
-  columnId: DatasetColumn.Id,
-): DatasetColumn.T | undefined {
-  return columns
-    .filter(propEq("id", columnId))
-    .find(propEq("datasetId", datasetId));
-}
-
 /** Resolves all columns of one persisted boundary reference. */
 function _getResolvedBoundary(
   binding: BoundaryBinding,
@@ -110,15 +88,15 @@ function _getResolvedBoundary(
   const { boundary } = binding;
   const dataset = datasets.find(propEq("id", boundary.datasetId));
   if (!dataset) {
-    return _createRebindRequired("missingBoundaryDataset", boundary.datasetId);
+    return createRebindRequired("missingBoundaryDataset", boundary.datasetId);
   }
-  const geometryColumn = _findBoundaryColumn(
+  const geometryColumn = findBoundaryColumn(
     columns,
     dataset.id,
     boundary.geometryColumnId,
   );
   if (!geometryColumn) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingBoundaryGeometryColumn",
       boundary.geometryColumnId,
     );
@@ -139,27 +117,27 @@ function _getResolvedBoundaryWithGeometry(options: {
   columns: readonly DatasetColumn.T[];
 }): ResolvedBoundarySource | MapLayerMetadataResolution {
   const { boundary } = options.binding;
-  const keyColumn = _findBoundaryColumn(
+  const keyColumn = findBoundaryColumn(
     options.columns,
     options.dataset.id,
     boundary.keyColumnId,
   );
   if (!keyColumn) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingBoundaryKeyColumn",
       boundary.keyColumnId,
     );
   }
   const displayNameColumn =
     boundary.displayNameColumnId ?
-      _findBoundaryColumn(
+      findBoundaryColumn(
         options.columns,
         options.dataset.id,
         boundary.displayNameColumnId,
       )
     : undefined;
   if (boundary.displayNameColumnId && !displayNameColumn) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingBoundaryDisplayNameColumn",
       boundary.displayNameColumnId,
     );
@@ -188,13 +166,13 @@ function _getAggregationMeasure(
     propEq("id", aggregation.measureColumn),
   );
   if (!queryColumn) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingSourceColumn",
       aggregation.measureColumn,
     );
   }
   if (!QueryColumn.isNumeric(queryColumn)) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "aggregationMeasureNotNumeric",
       queryColumn.baseColumn.id,
     );
@@ -217,7 +195,7 @@ function _getNormalizationDenominator(
   const { denominator } = normalization;
   if (denominator.type === "queryColumn") {
     if (binding?.type === "aggregatePointsToBoundaries") {
-      return _createRebindRequired(
+      return createRebindRequired(
         "unsupportedNormalizationDenominator",
         denominator.column,
       );
@@ -226,10 +204,10 @@ function _getNormalizationDenominator(
       propEq("id", denominator.column),
     );
     if (!column) {
-      return _createRebindRequired("missingSourceColumn", denominator.column);
+      return createRebindRequired("missingSourceColumn", denominator.column);
     }
     if (!QueryColumn.isNumeric(column)) {
-      return _createRebindRequired(
+      return createRebindRequired(
         "normalizationDenominatorNotNumeric",
         denominator.column,
       );
@@ -242,25 +220,25 @@ function _getNormalizationDenominator(
   const boundary =
     binding && "boundary" in binding ? binding.boundary : undefined;
   if (!boundary) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "unsupportedNormalizationDenominator",
       denominator.column,
     );
   }
-  const column = _findBoundaryColumn(
+  const column = findBoundaryColumn(
     options.datasetColumns,
     boundary.datasetId,
     denominator.column,
   );
   if (!column) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingBoundaryDenominatorColumn",
       denominator.column,
     );
   }
   const queryColumn = QueryColumn.makeFromDatasetColumn(column);
   if (!QueryColumn.isNumeric(queryColumn)) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "normalizationDenominatorNotNumeric",
       denominator.column,
     );
@@ -283,19 +261,23 @@ export function getResolvedMapLayerMetadata(
     return !sourceColumnNames.has(columnId);
   });
   if (missingSourceColumnId) {
-    return _createRebindRequired("missingSourceColumn", missingSourceColumnId);
+    return createRebindRequired("missingSourceColumn", missingSourceColumnId);
   }
   const aggregatingBinding = _getAggregatingBinding(options.layer);
+  const binding = _getBoundaryBinding(options.layer);
   const normalizationDenominator = _getNormalizationDenominator(
     options,
     aggregatingBinding,
   );
   if (
     normalizationDenominator &&
-    "type" in normalizationDenominator &&
     normalizationDenominator.type === "rebindRequired"
   ) {
     return normalizationDenominator;
+  }
+  const disputedStatusColumn = getDisputedStatusColumn(options, binding);
+  if (disputedStatusColumn && disputedStatusColumn.type === "rebindRequired") {
+    return disputedStatusColumn;
   }
   const aggregationMeasure =
     aggregatingBinding ?
@@ -304,7 +286,6 @@ export function getResolvedMapLayerMetadata(
   if (typeof aggregationMeasure !== "string" && aggregationMeasure) {
     return aggregationMeasure;
   }
-  const binding = _getBoundaryBinding(options.layer);
   if (!binding) {
     return {
       type: "resolved",
@@ -312,11 +293,12 @@ export function getResolvedMapLayerMetadata(
       boundary: undefined,
       aggregationMeasureColumnName: aggregationMeasure,
       normalizationDenominator,
+      disputedStatusColumn,
     };
   }
   const source = options.layer.source.dataSource;
   if (!Model.isOfModelType(source, "Dataset")) {
-    return _createRebindRequired(
+    return createRebindRequired(
       "missingSourceDataset",
       source?.id ?? "unbound",
     );
@@ -335,5 +317,6 @@ export function getResolvedMapLayerMetadata(
     boundary,
     aggregationMeasureColumnName: aggregationMeasure,
     normalizationDenominator,
+    disputedStatusColumn,
   };
 }

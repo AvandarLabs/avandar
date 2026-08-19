@@ -176,6 +176,21 @@ export const GIS_DATED_POINTS_ROW_COUNT = 9;
 /** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
 export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
 
+/** Directory of Wave E export/disputed-boundary GIS fixtures. */
+const GIS_WAVE_E_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-e");
+
+/**
+ * Four adjacent polygons: two `status = Agreed`, one `Disputed`, one
+ * `Undetermined`, each a GeoJSON polygon string near 10E-12E, 10N-12N.
+ */
+export const GIS_DISPUTED_BOUNDARIES_CSV_PATH = path.join(
+  GIS_WAVE_E_DATA_DIR,
+  "disputed-boundaries.csv",
+);
+
+/** Parsed row count of {@link GIS_DISPUTED_BOUNDARIES_CSV_PATH}. */
+export const GIS_DISPUTED_BOUNDARIES_ROW_COUNT = 4;
+
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),

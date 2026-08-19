@@ -51,6 +51,13 @@ function _getColorColumnIds(
   return [valueColumn, denominatorColumn];
 }
 
+/** The source column a disputed bind needs, when it reads the source query. */
+function _getDisputedStatusColumnId(
+  reference: MapLayer.DisputedStatusRef | undefined,
+): QueryColumn.Id | undefined {
+  return reference?.type === "queryColumn" ? reference.column : undefined;
+}
+
 /** Column ids the layer needs regardless of what the popup shows. */
 export function getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
   const binding = layer.geoBinding;
@@ -76,6 +83,7 @@ export function getRequiredColumnIds(layer: MapLayer.T): Set<QueryColumn.Id> {
       layer.symbology.type === "heatmap" ? layer.symbology.weight : undefined,
       ..._getColorColumnIds(color),
       layer.timeColumn,
+      _getDisputedStatusColumnId(layer.disputedStatusColumn),
     ].filter(isDefined),
   );
 }

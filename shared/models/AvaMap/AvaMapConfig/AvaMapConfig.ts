@@ -14,6 +14,12 @@ import type {
   MapViewState,
   TimeRange as TimeRangeType,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
+import type {
+  ExportHeaderLine as ExportHeaderLineType,
+  ExportLayout as ExportLayoutType,
+  ExportOrientation as ExportOrientationType,
+  ExportPaper as ExportPaperType,
+} from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
 
 /** Public model namespace for a map's editable configuration. */
 // prettier-ignore
@@ -48,4 +54,12 @@ export namespace AvaMapConfig {
   export type AnnotationFeatureId = AnnotationFeatureIdType;
   /** Discriminator for a persisted annotation drawing. */
   export type AnnotationKind = AnnotationKindType;
+  /** Persisted page furniture for the PDF export. */
+  export type ExportLayout = ExportLayoutType;
+  /** A paper size the export sheet offers. */
+  export type ExportPaper = ExportPaperType;
+  /** A page orientation the export sheet offers. */
+  export type ExportOrientation = ExportOrientationType;
+  /** One optional header line: whether it prints, and the author's text. */
+  export type ExportHeaderLine = ExportHeaderLineType;
 }

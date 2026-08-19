@@ -1,5 +1,6 @@
-import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand";
+import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
 import { DockerPublishedPorts } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
+import { SupabaseCommandOutput } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import {
   constant,
@@ -201,11 +202,13 @@ export function createDockerIO(
         cwd: projectRoot,
       });
     },
-    runSupabase: async (commandArguments) => {
+    runSupabase: async (commandArguments, options) => {
       return await RunLocalCommand.run({
-        command: "supabase",
-        args: commandArguments,
+        command: "pnpm",
+        args: ["exec", "supabase", ...commandArguments],
         cwd: projectRoot,
+        outputMode: options?.outputMode,
+        transformStreamLine: SupabaseCommandOutput.redactSecretsFromLine,
       });
     },
     listPublishedHostPorts: async () => {

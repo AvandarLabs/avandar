@@ -1,3 +1,5 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
 /**
  * The MapLibre id naming scheme for data-layer sources and layers, plus the
  * persisted annotation overlay which also lives in MapSpec.
@@ -24,6 +26,11 @@ export const MapLayerIds = {
   /** The MapLibre layer id for a cluster's count label. */
   getClusterCountLayerIdFromLayerId: (layerId: string): string => {
     return `ava-map-layer-${layerId}-count`;
+  },
+
+  /** MapLibre id of a layer's dashed disputed-boundary casing. */
+  toDisputedCasingLayerId: (layerId: MapLayer.Id): string => {
+    return `${MapLayerIds.toLayerId(layerId)}-disputed-casing`;
   },
 
   /** GeoJSON source for the persisted annotation overlay. */

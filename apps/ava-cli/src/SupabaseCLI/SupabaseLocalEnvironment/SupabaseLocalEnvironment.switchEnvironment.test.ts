@@ -3,7 +3,7 @@ import {
   EDGE_ENV_PATH,
   ENV_PATH,
   SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { describe, expect, it } from "vitest";
 
 const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;

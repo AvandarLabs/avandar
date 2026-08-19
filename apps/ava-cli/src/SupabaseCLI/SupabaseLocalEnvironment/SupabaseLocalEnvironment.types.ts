@@ -59,6 +59,9 @@ export type SupabaseDockerResourceInspection =
   | { exists: false }
   | { exists: true; projectId?: string };
 
+/** Controls whether a local command remains silent or forwards its output. */
+export type CommandOutputMode = "capture" | "stream";
+
 /** Side-effect boundary used by the local Supabase workflows. */
 export type SupabaseLocalEnvironmentIO = {
   projectRoot: string;
@@ -113,7 +116,10 @@ export type SupabaseLocalEnvironmentIO = {
     resource: Readonly<SupabaseDockerResource>,
   ) => Promise<CommandResult>;
   /** Runs the Supabase CLI with the supplied command arguments. */
-  runSupabase: (commandArguments: readonly string[]) => Promise<CommandResult>;
+  runSupabase: (
+    commandArguments: readonly string[],
+    options?: Readonly<{ outputMode?: CommandOutputMode }>,
+  ) => Promise<CommandResult>;
   /** Runs the repository seed against an explicitly addressed local stack. */
   runSeed: (options: Readonly<SupabaseSeedTarget>) => Promise<CommandResult>;
 };

@@ -3,23 +3,26 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import {
   createVersion1Json,
   createVersion2Json,
+  omitExportFields,
   omitOverlayFields,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/schemaTestFixtures.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
 import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v4SchemaSuites.ts";
+import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v5SchemaSuites.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import { describe, expect, it } from "vitest";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 describe("AvaMapConfigSchema", () => {
-  it("migrates an empty version 1 config to version 4", () => {
+  it("migrates an empty version 1 config to the current version", () => {
     expect(AvaMapConfigSchema.fromJson(createVersion1Json())).toEqual({
       ...createVersion1Json(),
-      version: 4,
+      version: 5,
       aoi: undefined,
       timeRange: undefined,
       annotations: { isVisible: true, features: [] },
       annotationsZIndex: 0,
+      exportLayout: AvaMapConfig.defaultExportLayout,
     });
   });
 
@@ -33,10 +36,15 @@ describe("AvaMapConfigSchema", () => {
     } = currentLayer.legend;
     const parsed = AvaMapConfigSchema.fromJson({
       ...createVersion1Json(),
-      layers: [{ ...omitOverlayFields(currentLayer), legend: version1Legend }],
+      layers: [
+        {
+          ...omitOverlayFields(omitExportFields(currentLayer)),
+          legend: version1Legend,
+        },
+      ],
     });
 
-    expect(parsed.version).toBe(4);
+    expect(parsed.version).toBe(5);
     expect(parsed.layers[0]).toMatchObject({
       id: currentLayer.id,
       name: "Cases",
@@ -65,7 +73,7 @@ describe("AvaMapConfigSchema", () => {
       ...createVersion1Json(),
       layers: [
         {
-          ...omitOverlayFields(currentLayer),
+          ...omitOverlayFields(omitExportFields(currentLayer)),
           geoBinding: {
             type: "latLngColumns",
             latitude: queryColumnId,
@@ -91,10 +99,15 @@ describe("AvaMapConfigSchema", () => {
     const { sizeStops: _sizeStops, ...version2Legend } = currentLayer.legend;
     const parsed = AvaMapConfigSchema.fromJson({
       ...createVersion2Json(),
-      layers: [{ ...omitOverlayFields(currentLayer), legend: version2Legend }],
+      layers: [
+        {
+          ...omitOverlayFields(omitExportFields(currentLayer)),
+          legend: version2Legend,
+        },
+      ],
     });
 
-    expect(parsed.version).toBe(4);
+    expect(parsed.version).toBe(5);
     expect(parsed.layers[0]?.legend.sizeStops).toEqual([]);
     expect(parsed.layers[0]?.symbology).toEqual(currentLayer.symbology);
   });
@@ -189,7 +202,7 @@ describe("AvaMapConfigSchema", () => {
   it("rejects a config written by a future version", () => {
     const config = AvaMapConfig.makeEmpty();
     const json = AvaMapConfigSchema.toJson(config) as Record<string, unknown>;
-    const future = { ...json, version: 5 };
+    const future = { ...json, version: 6 };
     expect(() => {
       return AvaMapConfigSchema.fromJson(future);
     }).toThrow();

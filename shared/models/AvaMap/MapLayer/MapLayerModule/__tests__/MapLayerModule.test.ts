@@ -1,88 +1,23 @@
-import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import {
+  createBoundLayer,
+  createDataset,
+  createNumericColumn,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/__tests__/MapLayerModule.fixtures.ts";
 import {
   QueryColumn, // prettier-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { describe, expect, it } from "vitest";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
-import type {
-  DatasetColumn, // prettier-ignore
-} from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
-import type { User } from "$/models/User/User.ts";
-import type { UserProfile } from "$/models/User/UserProfile.ts";
-import type { Workspace } from "$/models/Workspace/Workspace.ts";
-
-/** An honest `DatasetColumn`, built through `Model.make` with no cast. */
-function _createNumericColumn(name: string): DatasetColumn.T {
-  const now = new Date().toISOString();
-  return Model.make("DatasetColumn", {
-    id: uuid<DatasetColumn.Id>(),
-    datasetId: uuid<Dataset.Id>(),
-    workspaceId: uuid<Workspace.Id>(),
-    createdAt: now,
-    updatedAt: now,
-    name,
-    originalName: name,
-    originalDataType: "DOUBLE",
-    dataType: "double",
-    detectedDataType: "DOUBLE",
-    description: undefined,
-    columnIdx: 0,
-  });
-}
-
-/** An honest `Dataset`, built through `Model.make` with no cast. */
-function _createDataset(): Dataset.T {
-  const now = new Date().toISOString();
-  return Model.make("Dataset", {
-    id: uuid<Dataset.Id>(),
-    createdAt: now,
-    updatedAt: now,
-    dateOfLastSync: undefined,
-    description: undefined,
-    isRestricted: false,
-    name: "Cases",
-    sourceType: "csv_file",
-    ownerId: uuid<User.Id>(),
-    ownerProfileId: uuid<UserProfile.Id>(),
-    workspaceId: uuid<Workspace.Id>(),
-  });
-}
-
-/** A layer with a data source and a geo binding that resolves. */
-function _createBoundLayer(): MapLayer.Standard {
-  const layer = MapLayer.makeEmpty("Cases");
-  const latitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lat"),
-  );
-  const longitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lon"),
-  );
-  return {
-    ...layer,
-    source: {
-      ...layer.source,
-      dataSource: _createDataset(),
-      queryColumns: [latitude, longitude],
-    },
-    geoBinding: {
-      type: "latLngColumns",
-      latitude: latitude.id,
-      longitude: longitude.id,
-    },
-    popup: { ...layer.popup, action: undefined },
-  };
-}
 
 /** An exact layer whose points are aggregated into fixed hexagonal cells. */
 function _makeGridBinLayer(): MapLayer.T {
   const layer = MapLayer.createArea("Cases by hex");
   const latitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lat"),
+    createNumericColumn("lat"),
   );
   const longitude = QueryColumn.makeFromDatasetColumn(
-    _createNumericColumn("lon"),
+    createNumericColumn("lon"),
   );
   return {
     ...layer,
@@ -110,7 +45,7 @@ function _makeGridBinLayer(): MapLayer.T {
 /** An exact point layer drawn with cluster paint. */
 function _makeClusterLayer(): MapLayer.T {
   return {
-    ..._createBoundLayer(),
+    ...createBoundLayer(),
     symbology: {
       type: "cluster",
       radiusPx: 50,
@@ -204,7 +139,7 @@ describe("MapLayer.withSensitivity", () => {
   });
 
   it("removes a point binding before applying aggregate-only", () => {
-    const layer = MapLayer.withSensitivity(_createBoundLayer(), {
+    const layer = MapLayer.withSensitivity(createBoundLayer(), {
       mode: "aggregateOnly",
       minCellCount: 5,
       minGeoLevel: "district",
@@ -221,7 +156,7 @@ describe("MapLayer.withSensitivity", () => {
   it("preserves an area binding while applying aggregate-only", () => {
     const areaLayer = MapLayer.createArea("Cases by district");
     const polygonColumn = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("geometry"),
+      createNumericColumn("geometry"),
     );
     const layerWithPolygon: MapLayer.T = {
       ...areaLayer,
@@ -258,10 +193,10 @@ describe("MapLayer.toGeoBinding", () => {
 
   it("maps column ids to the names rows are keyed by", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lat"),
+      createNumericColumn("lat"),
     );
     const longitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lon"),
+      createNumericColumn("lon"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -285,7 +220,7 @@ describe("MapLayer.toGeoBinding", () => {
 
   it("returns undefined when a bound column is not in the query", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lat"),
+      createNumericColumn("lat"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -300,7 +235,7 @@ describe("MapLayer.toGeoBinding", () => {
 
   it("returns undefined when only latitude is set", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lat"),
+      createNumericColumn("lat"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -319,7 +254,7 @@ describe("MapLayer.toGeoBinding", () => {
 
   it("returns undefined when only longitude is set", () => {
     const longitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lon"),
+      createNumericColumn("lon"),
     );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
@@ -338,10 +273,10 @@ describe("MapLayer.toGeoBinding", () => {
 
   it("starts resolving only once the second axis is added", () => {
     const latitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lat"),
+      createNumericColumn("lat"),
     );
     const longitude = QueryColumn.makeFromDatasetColumn(
-      _createNumericColumn("lon"),
+      createNumericColumn("lon"),
     );
     const emptyLayer = MapLayer.makeEmpty("Cases");
     const withLatitudeOnly = {
@@ -377,7 +312,7 @@ describe("MapLayer.toGeoBinding", () => {
 describe("makeFromDataSource", () => {
   it("names the layer and its legend after the caller's name", () => {
     const layer = MapLayer.fromDataSource({
-      dataSource: _createDataset(),
+      dataSource: createDataset(),
       name: "Cholera linelist",
     });
     expect(layer.name).toBe("Cholera linelist");
@@ -385,7 +320,7 @@ describe("makeFromDataSource", () => {
   });
 
   it("selects the source and no columns, so nothing is bound yet", () => {
-    const dataSource = _createDataset();
+    const dataSource = createDataset();
     const layer = MapLayer.fromDataSource({
       dataSource,
       name: "Cholera linelist",
@@ -398,12 +333,12 @@ describe("makeFromDataSource", () => {
 
 describe("toPopupColumnNames", () => {
   it("returns every non-coordinate column name when set to all", () => {
-    const layer = _createBoundLayer();
+    const layer = createBoundLayer();
     expect(MapLayer.toPopupColumnNames(layer)).toBe("all");
   });
 
   it("resolves selected column ids to the names rows are keyed by", () => {
-    const bound = _createBoundLayer();
+    const bound = createBoundLayer();
     const [firstColumn] = bound.source.queryColumns;
     const layer: MapLayer.T = {
       ...bound,
@@ -415,7 +350,7 @@ describe("toPopupColumnNames", () => {
   });
 
   it("drops a selected column that is no longer in the layer's query", () => {
-    const bound = _createBoundLayer();
+    const bound = createBoundLayer();
     const layer: MapLayer.T = {
       ...bound,
       popup: {

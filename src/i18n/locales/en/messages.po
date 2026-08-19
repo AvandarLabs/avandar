@@ -318,6 +318,10 @@ msgstr "Could not load the dataset's SQL query."
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
+msgid "Disputed values"
+msgstr "Disputed values"
+
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
 msgstr "Please check your email for a confirmation link."
@@ -587,6 +591,11 @@ msgstr "About you"
 msgid "Unable to sync dataset online"
 msgstr "Unable to sync dataset online"
 
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+#: src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx
+msgid "Disputed or undetermined boundary"
+msgstr "Disputed or undetermined boundary"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
 msgstr "Use this basemap"
@@ -637,6 +646,10 @@ msgstr "Dataset failed to process"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} rows were rejected"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Portrait"
+msgstr "Portrait"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
@@ -1153,6 +1166,15 @@ msgstr "Your question contains language that may bias the AI's answer."
 msgid "Vertical padding"
 msgstr "Vertical padding"
 
+#. placeholder {0}: aggregateLayer.name
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "This map includes {0}, a layer set to Aggregate only. The export applies "
+"the same suppression as the screen: areas with fewer than {threshold} "
+"records are shown as suppressed, never as zero."
+msgstr "This map includes {0}, a layer set to Aggregate only. The export "
+"applies the same suppression as the screen: areas with fewer than "
+"{threshold} records are shown as suppressed, never as zero."
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
@@ -1190,6 +1212,14 @@ msgstr "Public"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Delete role group"
 msgstr "Delete role group"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
+msgid "Show the subtitle on the page"
+msgstr "Show the subtitle on the page"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.tsx
+msgid "Export preview"
+msgstr "Export preview"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
@@ -1347,6 +1377,10 @@ msgstr "Select a region on the page to see data. Draw a box around a table, "
 msgid "Column 12"
 msgstr "Column 12"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
+msgid "North arrow"
+msgstr "North arrow"
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -1418,6 +1452,11 @@ msgstr "(Annual billing)"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
 msgstr "Remove member"
+
+#. placeholder {0}: _formatProducedAt(producedAt)
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Produced {0}"
+msgstr "Produced {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -1510,6 +1549,10 @@ msgstr "Hold Alt and press the up or down arrow to move this layer."
 msgid "Positron"
 msgstr "Positron"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Boundary disclaimer (Always included)"
+msgstr "Boundary disclaimer (Always included)"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
 msgstr "Undo"
@@ -1523,6 +1566,7 @@ msgid "Permissions saved"
 msgstr "Permissions saved"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "Subtitle"
 
@@ -1597,6 +1641,10 @@ msgstr "Built-in presets"
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Select a data layer to buffer."
 msgstr "Select a data layer to buffer."
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Paper size"
+msgstr "Paper size"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -1766,6 +1814,10 @@ msgstr "Give access to additional members"
 msgid "GeoJSON"
 msgstr "GeoJSON"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
+msgid "Scale bar"
+msgstr "Scale bar"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
 msgstr "avg"
@@ -1789,6 +1841,8 @@ msgstr "This is the unique ID of your organization used in URLs."
 msgid "Previewing data for {0}"
 msgstr "Previewing data for {0}"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
@@ -2072,6 +2126,10 @@ msgstr "Exact"
 msgid "This tool is available when Spatial finishes loading."
 msgstr "This tool is available when Spatial finishes loading."
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "A dark or satellite basemap may photocopy poorly."
+msgstr "A dark or satellite basemap may photocopy poorly."
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
 "and discover insights from your data."
@@ -2281,6 +2339,7 @@ msgstr "Generate a query to configure this visualization."
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
@@ -2516,7 +2575,7 @@ msgstr "Needs geometry"
 msgid "Gridline color"
 msgstr "Gridline color"
 
-#: src/views/GisApp/GisAppFurnitureBar.tsx
+#: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre, OpenStreetMap contributors"
 
@@ -2787,6 +2846,10 @@ msgstr "Build a chart in chat"
 msgid "Additional seats required"
 msgstr "Additional seats required"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
+msgid "Type a value"
+msgstr "Type a value"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
 msgstr "Column 11"
@@ -2980,6 +3043,10 @@ msgstr "Most common value: <0>{0}</0> ({1} rows, {2}%)."
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
 msgstr "Dashboard saved successfully!"
+
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Page {pageNumber} of {total}"
+msgstr "Page {pageNumber} of {total}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Method"
@@ -3315,6 +3382,7 @@ msgid "Failed to update workspace name"
 msgstr "Failed to update workspace name"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
 msgid "Export"
 msgstr "Export"
@@ -3634,6 +3702,10 @@ msgstr "Create"
 msgid "Stroke width"
 msgstr "Stroke width"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "A4"
+msgstr "A4"
+
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
 msgstr "End of time range: {endLabel}"
@@ -3690,6 +3762,10 @@ msgstr "Make private"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "The form only supports SELECT queries."
 msgstr "The form only supports SELECT queries."
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+msgid "Disclaimer"
+msgstr "Disclaimer"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -3834,10 +3910,6 @@ msgstr "Y column"
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
 msgstr "Go home"
-
-#: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
-msgid "Print and PDF export arrives in a later release."
-msgstr "Print and PDF export arrives in a later release."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -4224,6 +4296,11 @@ msgstr "Forest"
 msgid "Aggregate-only layers require an area-producing binding."
 msgstr "Aggregate-only layers require an area-producing binding."
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Area of interest applied"
+msgstr "Area of interest applied"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
 msgstr "EPSG code"
@@ -4236,6 +4313,11 @@ msgstr "Allow manual edit"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "Embed"
+
+#. placeholder {0}: readout.timeWindow
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "Dates: {0}"
+msgstr "Dates: {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
@@ -4255,6 +4337,10 @@ msgid "The entity failed to load. Please try again later or reach out to "
 "support."
 msgstr "The entity failed to load. Please try again later or reach out to "
 "support."
+
+#: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
+msgid "Download PDF"
+msgstr "Download PDF"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -4400,6 +4486,10 @@ msgstr "Geometry columns are available when Spatial finishes loading."
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
 msgstr "Import"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
+msgid "Clear Disputed status column"
+msgstr "Clear Disputed status column"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4594,6 +4684,10 @@ msgstr "Llama 3.1 8B"
 msgid "Offline chat model removed"
 msgstr "Offline chat model removed"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
+msgid "Create \"{trimmedSearch}\""
+msgstr "Create \"{trimmedSearch}\""
+
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Search data sources"
 msgstr "Search data sources"
@@ -4616,6 +4710,10 @@ msgstr "Viewer"
 #: src/components/ChatPanel/ClarificationCard/SingleOptionList.tsx
 msgid "Pick one"
 msgstr "Pick one"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
+msgid "Undetermined values"
+msgstr "Undetermined values"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -4677,6 +4775,10 @@ msgstr "Join to boundaries"
 msgid "You need edit access on this resource to share or publish it."
 msgstr "You need edit access on this resource to share or publish it."
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Orientation"
+msgstr "Orientation"
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
 msgstr "Dashboard deleted successfully!"
@@ -4698,6 +4800,7 @@ msgid "Ask about your data..."
 msgstr "Ask about your data..."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
 msgstr "Title"
@@ -4817,6 +4920,7 @@ msgid "Add series"
 msgstr "Add series"
 
 #. placeholder {0}: scale.meters / 1000
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} km"
 msgstr "{0} km"
@@ -5092,6 +5196,7 @@ msgid "For dataset <0>{0}</0>, choose the column to use as the {conceptName} ID"
 msgstr "For dataset <0>{0}</0>, choose the column to use as the {conceptName} "
 "ID"
 
+#: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low"
 msgstr "Low"
@@ -5218,6 +5323,10 @@ msgstr "This cannot be undone."
 msgid "Dataset name must be at least 2 characters."
 msgstr "Dataset name must be at least 2 characters."
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "US Letter"
+msgstr "US Letter"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Level"
 msgstr "Level"
@@ -5305,6 +5414,7 @@ msgstr "Private dashboards"
 msgid "Upload"
 msgstr "Upload"
 
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr "Scale varies across this map"
@@ -5405,6 +5515,10 @@ msgstr "Column types updated"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "Partially offline"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Source attribution (Always included)"
+msgstr "Source attribution (Always included)"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -5608,6 +5722,10 @@ msgstr "WHERE clause uses operator \"{operator}\" which the form does not "
 msgid "Please log in again to continue."
 msgstr "Please log in again to continue."
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
+msgid "Production date (Always included)"
+msgstr "Production date (Always included)"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
 msgstr "Mean"
@@ -5665,6 +5783,10 @@ msgstr "Your name"
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Downloading {0} for offline chat"
 msgstr "Downloading {0} for offline chat"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
+msgid "Disputed status column"
+msgstr "Disputed status column"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
@@ -6329,6 +6451,10 @@ msgstr "Service"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
+msgid "Source line"
+msgstr "Source line"
+
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "Nothing more to load"
@@ -6427,6 +6553,10 @@ msgstr "Share or publish this {resourceLabel}"
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Dissolve"
 msgstr "Dissolve"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
+msgid "Column bound. No values assigned; outlines render as settled."
+msgstr "Column bound. No values assigned; outlines render as settled."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6600,6 +6730,11 @@ msgstr "Admin"
 msgid "Boundary key column"
 msgstr "Boundary key column"
 
+#. placeholder {0}: filterReadout.timeWindow
+#: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
+msgid "Time window: {0}"
+msgstr "Time window: {0}"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
 msgstr "Coordinate is outside the valid range"
@@ -6758,6 +6893,10 @@ msgstr "For each dataset you've added, please specify which columns should be "
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
 msgstr "Make \"{resourceName}\" private?"
+
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+msgid "The PDF could not be created: {detail}"
+msgstr "The PDF could not be created: {detail}"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
@@ -6940,6 +7079,10 @@ msgstr "See why"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "No entries yet. The log fills in as the chat panel asks for consent."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
+msgid "No disputed-status column. Outlines render as settled."
+msgstr "No disputed-status column. Outlines render as settled."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
@@ -7302,6 +7445,7 @@ msgid "Bottom right"
 msgstr "Bottom right"
 
 #. placeholder {0}: scale.meters
+#: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} m"
 msgstr "{0} m"
@@ -7505,6 +7649,10 @@ msgstr "Sync online?"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "Neutral failure"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
+msgid "Landscape"
+msgstr "Landscape"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
@@ -7731,6 +7879,10 @@ msgstr "WHERE clause uses BETWEEN on \"{columnName}\" with a value that the "
 msgid "Fill opacity"
 msgstr "Fill opacity"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
+msgid "Show the title on the page"
+msgstr "Show the title on the page"
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -7739,6 +7891,7 @@ msgstr "To confirm, type <0>{confirmationTarget}</0> below:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} and {groupClause}"
 
+#: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
 msgstr "High"
