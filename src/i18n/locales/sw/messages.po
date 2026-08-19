@@ -331,10 +331,10 @@ msgstr "Seti ya data iliyohifadhiwa au rejeleo la safu halipatikani tena. "
 
 #. placeholder {0}: layer.source.dataSource.name
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
-msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
-"release, so pick a different source."
-msgstr "Hakuna safu katika {0} iliyo na viwianishi. Uunganishaji wa mipaka "
-"utapatikana katika toleo lijalo, kwa hivyo chagua chanzo tofauti."
+#~ msgid "No column in {0} holds coordinates. Boundary joins arrive in a later "
+#~ "release, so pick a different source."
+#~ msgstr "Hakuna safu katika {0} iliyo na viwianishi. Uunganishaji wa mipaka "
+#~ "utapatikana katika toleo lijalo, kwa hivyo chagua chanzo tofauti."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
 msgid "Enter your question or instructions in natural language to generate a "
@@ -3105,6 +3105,12 @@ msgstr "ni isiyozidi"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
 msgstr "ni"
+
+#. placeholder {0}: layer.source.dataSource.name
+#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+msgid "No column in {0} was recognized as a coordinate by name. Pick the "
+"latitude and longitude columns above, or bind a geometry column instead."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"

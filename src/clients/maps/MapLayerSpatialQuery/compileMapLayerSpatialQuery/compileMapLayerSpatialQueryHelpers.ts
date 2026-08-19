@@ -47,7 +47,16 @@ export function makeSimplifiedGeometrySql(
     tolerancePixels: simplification.tolerancePixels,
   });
   const projected = `ST_Transform(${geometrySql}, 'EPSG:4326', 'EPSG:3857', always_xy := true)`;
-  return `ST_Transform(ST_SimplifyPreserveTopology(${projected}, ${tolerance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
+  const simplified = `ST_Transform(ST_SimplifyPreserveTopology(${projected}, ${tolerance}), 'EPSG:3857', 'EPSG:4326', always_xy := true)`;
+  // Simplification is a render optimization, so no row is allowed to fail the
+  // layer over it. Both halves of the chain raise rather than return NULL on
+  // input they cannot handle: PROJ refuses coordinates that fall outside the
+  // projection, and the GEOS simplifier raises on self-intersections, which
+  // real administrative-boundary exports carry. Unguarded, one such row
+  // aborted the whole statement and the map reported only that the layer's
+  // query failed. Falling back to the parsed geometry keeps that row's real
+  // shape instead of dropping the feature.
+  return `coalesce(TRY(${simplified}), ${geometrySql})`;
 }
 
 /** Maps DuckDB single and multi geometry types to renderable families. */

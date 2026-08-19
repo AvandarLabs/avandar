@@ -100,7 +100,7 @@ describe("DataSection coordinates", () => {
     expect(onLayerChange).not.toHaveBeenCalled();
   });
 
-  it("explains when a selected source has no coordinate columns", () => {
+  it("offers a manual pick when no column name reads as a coordinate", () => {
     fixtures.sourceColumns = [fixtures.nameColumn];
     const layer = createLayer();
 
@@ -108,15 +108,15 @@ describe("DataSection coordinates", () => {
 
     expect(
       screen.getByText(
-        "No column in Cases holds coordinates. Boundary joins arrive in a later release, so pick a different source.",
+        "No column in Cases was recognized as a coordinate by name. Pick the latitude and longitude columns above, or bind a geometry column instead.",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Latitude" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Latitude" }),
+    ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Longitude" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Longitude" }),
+    ).toBeInTheDocument();
   });
 
   it("updates a coordinate binding when a coordinate column changes", () => {
