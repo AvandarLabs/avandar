@@ -1,6 +1,6 @@
 import { makeObject, prop, setValue } from "@avandar/utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
-import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
@@ -22,12 +22,7 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type {
-  OrderByDirection,
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type {
   VizConfig,
   VizType,
@@ -62,7 +57,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         dataSource,
         ...(options?.limit !== undefined ? { limit: options.limit } : {}),
-      } as PartialStructuredQuery);
+      } as StructuredQuery.Partial);
       return applyQueryChange({ state, newQuery });
     },
 
@@ -85,7 +80,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         queryColumns: columns,
         aggregations: newAggregations,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       const newVizConfig = VizConfigs.hydrateFromQuery(
         state.vizConfig,
         newQuery,
@@ -119,7 +114,7 @@ export const DataExplorerStateManager = createAppStateManager({
         ...query,
         queryColumns: newQueryColumns,
         aggregations: newAggregations,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
       const next = applyQueryChange({ state, newQuery });
       return { ...next, vizConfig: newVizConfig };
@@ -133,19 +128,19 @@ export const DataExplorerStateManager = createAppStateManager({
       const newQuery = {
         ...state.query,
         orderByColumn: columnId,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       return applyQueryChange({ state, newQuery });
     },
 
     /** Set the direction that we are ordering by. */
     setOrderByDirection: (
       state: DataExplorerAppState,
-      direction: OrderByDirection | undefined,
+      direction: StructuredQuery.OrderByDirection | undefined,
     ) => {
       const newQuery = {
         ...state.query,
         orderByDirection: direction,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       return applyQueryChange({ state, newQuery });
     },
 
@@ -154,7 +149,7 @@ export const DataExplorerStateManager = createAppStateManager({
       const newQuery = {
         ...state.query,
         limit,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       return applyQueryChange({ state, newQuery });
     },
 
@@ -162,11 +157,14 @@ export const DataExplorerStateManager = createAppStateManager({
      * Set the recursive filter tree on the structured query, which also
      * regenerates the raw SQL via knex.
      */
-    setFilters: (state: DataExplorerAppState, filters: QueryFilterGroup) => {
+    setFilters: (
+      state: DataExplorerAppState,
+      filters: StructuredQuery.FilterGroup,
+    ) => {
       const newQuery = {
         ...state.query,
         filters,
-      } as PartialStructuredQuery;
+      } as StructuredQuery.Partial;
       return applyQueryChange({ state, newQuery });
     },
 
@@ -178,7 +176,7 @@ export const DataExplorerStateManager = createAppStateManager({
     applySqlMapping: (
       state: DataExplorerAppState,
       payload: {
-        query: PartialStructuredQuery;
+        query: StructuredQuery.Partial;
         isFullyMapped: boolean;
         unmappedReasons: readonly SqlFailedMappingReason[];
       },
@@ -195,8 +193,8 @@ export const DataExplorerStateManager = createAppStateManager({
     clearFilters: (state: DataExplorerAppState): DataExplorerAppState => {
       const newQuery = {
         ...state.query,
-        filters: EMPTY_QUERY_FILTER,
-      } as PartialStructuredQuery;
+        filters: StructuredQuery.EMPTY_FILTER,
+      } as StructuredQuery.Partial;
       return applyQueryChange({ state, newQuery });
     },
 

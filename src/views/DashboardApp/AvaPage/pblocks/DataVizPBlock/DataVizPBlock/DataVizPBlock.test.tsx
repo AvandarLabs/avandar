@@ -26,6 +26,9 @@ const { useDataQueryMock } = vi.hoisted(() => {
           ],
         },
         false,
+        // Third element mirrors the real hook's react-query result, which the
+        // block reads to tell a failed query from an empty one.
+        { isError: false, error: null },
       ];
     }),
   };

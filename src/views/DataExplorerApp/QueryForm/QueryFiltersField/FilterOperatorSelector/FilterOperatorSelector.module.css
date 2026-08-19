@@ -1,0 +1,9 @@
+.filterOperatorControl {
+  flex: 1 1 8rem;
+  min-width: 7rem;
+}
+
+.filterOperatorWrappingOption {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
