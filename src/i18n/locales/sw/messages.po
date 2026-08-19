@@ -13,11 +13,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
-#~ msgid "Delete: {0}"
-#~ msgstr "Futa: {0}"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
@@ -61,7 +56,7 @@ msgstr "Kikundi 1"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Numbers in prose"
-msgstr ""
+msgstr "Nambari katika maandishi"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Sort by"
@@ -88,7 +83,8 @@ msgstr "Nyingine"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Avandar read your file and already figured out what each column "
 "contains. Give the dataset a name, then save."
-msgstr ""
+msgstr "Avandar imesoma faili yako na tayari imebaini yaliyomo katika kila "
+"safu. Ipe seti ya data jina, kisha ihifadhi."
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu.tsx
 msgid "More actions for the layer {layerName}"
@@ -96,7 +92,7 @@ msgstr "Vitendo zaidi vya safu {layerName}"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "starts with"
-msgstr ""
+msgstr "huanza na"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx
 msgid "Run a query to see results."
@@ -104,7 +100,8 @@ msgstr "Fanya swali ili kuona matokeo."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel, CSV or PDF file from your computer to import"
-msgstr ""
+msgstr "Chagua faili ya Excel, CSV au PDF kutoka kwenye kompyuta yako ili "
+"kuleta"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
@@ -129,7 +126,7 @@ msgstr "Safu ya thamani"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
-msgstr ""
+msgstr "haipo kwenye"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "0 rows"
@@ -145,7 +142,7 @@ msgstr "Ondoa ufikiaji kwa {name}."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
 msgid "Match case"
-msgstr ""
+msgstr "Linganisha herufi kubwa na ndogo"
 
 #: src/routes/forgot-password.tsx
 msgid "Check your email for a password reset link"
@@ -174,7 +171,7 @@ msgstr "Tafuta datasets..."
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
-msgstr ""
+msgstr "\"{value}\" si nambari."
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to map tools"
@@ -188,7 +185,7 @@ msgstr "Seti ya data ilishindwa kupakia. Tafadhali jaribu tena baadaye au "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it"
-msgstr ""
+msgstr "Ipe jina"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle.tsx
 msgid "Drag to reorder, or hold Alt and press the up or down arrow"
@@ -261,7 +258,7 @@ msgstr " {chartName} haiwezi kuonyeshwa."
 #. placeholder {0}: region.label
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Select {0}"
-msgstr ""
+msgstr "Chagua {0}"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -335,7 +332,7 @@ msgstr "Maelezo ya Profaili"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
-msgstr ""
+msgstr "Kutoka PDF"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -361,7 +358,7 @@ msgstr "Avandar"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Disputed values"
-msgstr ""
+msgstr "Thamani zilizopingwa"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please check your email for a confirmation link."
@@ -369,7 +366,7 @@ msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not between"
-msgstr ""
+msgstr "haipo kati ya"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand"
@@ -457,7 +454,7 @@ msgstr "Mpango wako hauruhusu kushiriki dashibodi hii na mtu mwingine. Boresha "
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "PDF file"
-msgstr ""
+msgstr "Faili ya PDF"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -540,10 +537,6 @@ msgstr "Onyesha ufafanuzi"
 msgid "Pan and select"
 msgstr "Sogeza na uchague"
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Nobody can see your dashboard yet."
-#~ msgstr ""
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "List"
 msgstr "Orodha"
@@ -566,7 +559,7 @@ msgstr "Export PDF iliyo na maelezo"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Group"
-msgstr ""
+msgstr "+ Kikundi"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
@@ -617,7 +610,7 @@ msgstr "Kubwa zaidi"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save to dashboard\"."
-msgstr ""
+msgstr "Bofya \"Hifadhi kwenye dashibodi\"."
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
@@ -641,10 +634,6 @@ msgstr "Bure"
 msgid "The table visualization has no extra settings."
 msgstr "Mwangaza wa meza haina mipangilio ya ziada."
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Save to a dashboard"
-#~ msgstr ""
-
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "Kuhusu wewe"
@@ -656,7 +645,7 @@ msgstr "Imeshindikana kusawazisha mkusanyiko wa data mtandaoni"
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx
 msgid "Disputed or undetermined boundary"
-msgstr ""
+msgstr "Mpaka unaopingwa au usioamuliwa"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 msgid "Use this basemap"
@@ -712,7 +701,7 @@ msgstr " {numRejectedRows} safu zilikataliwa"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
-msgstr ""
+msgstr "Picha wima"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
@@ -732,7 +721,7 @@ msgstr "Llama 3.1 8B (nje ya mtandao)"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
-msgstr ""
+msgstr "Ufichwe mafunzo?"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -741,10 +730,6 @@ msgstr "Hakuna datasets zilizoongezwa bado"
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Jina la safu"
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Only you can see this"
-#~ msgstr "Ni wewe pekee unayeweza kuona hili"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -770,14 +755,6 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "datasets unazoweza kuongeza kwenye eneo lako la kazi unaweza kununua "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "Add columns to the query above to start defining filters."
-#~ msgstr "Ongeza safu kwenye swali hapo juu ili kuanza kufafanua filtria."
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Open it to your workspace"
-#~ msgstr "Fungua kwenye workspace yako"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
@@ -874,7 +851,9 @@ msgstr "Tumia pendekezo"
 msgid "You can choose to let everyone in your workspace see your dashboard, or "
 "only specific people, or even just for yourself. You can always change "
 "this whenever you want."
-msgstr ""
+msgstr "Unaweza kuchagua kuruhusu kila mtu katika nafasi yako ya kazi kuona "
+"dashibodi yako, watu mahususi pekee, au wewe mwenyewe tu. Unaweza "
+"kubadilisha mipangilio hii wakati wowote."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Unpublish"
@@ -892,10 +871,6 @@ msgstr "Karatasi ina safu ya kichwa"
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Map"
 msgstr "Ramani"
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Change the chart if you like"
-#~ msgstr "Badilisha chati ukitaka"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -955,7 +930,9 @@ msgstr "Ondoa Mtumiaji"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
-msgstr ""
+msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
+"SQL hiyo itafutwa na kubadilishwa na SQL inayozalishwa kutoka kwenye "
+"fomu."
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
@@ -990,7 +967,7 @@ msgstr "Inasasisha nenosiri kwa {0}"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is after"
-msgstr ""
+msgstr "iko baada ya"
 
 #: src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx
 msgid "No layers yet."
@@ -1107,7 +1084,7 @@ msgstr "Uwanja huu hauwezi kuwa tupu"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
-msgstr ""
+msgstr "\"{value}\" si tarehe. Tumia YYYY-MM-DD."
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1237,11 +1214,6 @@ msgstr "Kuweka awali"
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "Ongeza chati ya nguzo ya {datasetName} iliyogawanywa na {groupByColumn}"
 
-#. placeholder {0}: state.openDataset.name
-#: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
-#~ msgid "Permanently delete <0>{0}</0>?"
-#~ msgstr "Futa kabisa <0>{0}</0>?"
-
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
 msgstr "Inapendekezwa ikiwa una RAM ya GB 16 na unaendesha Avandar pamoja na "
@@ -1259,7 +1231,7 @@ msgstr "Pikseli za maelezo za kuondoa katika ukuzaji wa sasa. Weka sifuri ili "
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
-msgstr ""
+msgstr "Usemi wa kawaida"
 
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Skip"
@@ -1304,7 +1276,9 @@ msgstr "Pengo la wima"
 msgid "This map includes {0}, a layer set to Aggregate only. The export applies "
 "the same suppression as the screen: areas with fewer than {threshold} "
 "records are shown as suppressed, never as zero."
-msgstr ""
+msgstr "Ramani hii inajumuisha {0}, safu iliyowekwa kuwa ya Kukusanya pekee. "
+"Uhamishaji unatumia ufichaji uleule kama skrini: maeneo yenye rekodi "
+"zisizozidi {threshold} yanaonyeshwa kama yaliyofichwa, kamwe si sifuri."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
@@ -1353,11 +1327,11 @@ msgstr "Futa kundi la jukumu"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Show the subtitle on the page"
-msgstr ""
+msgstr "Onyesha manukuu kwenye ukurasa"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.tsx
 msgid "Export preview"
-msgstr ""
+msgstr "Hakikisho la uhamishaji"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
@@ -1415,7 +1389,7 @@ msgstr "Nakala iliyochapishwa bado inahudumia hadhira ya awali. Tumia kitufe "
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide tutorial"
-msgstr ""
+msgstr "Ficha mafunzo"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
@@ -1471,7 +1445,8 @@ msgstr "Lebo"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "You are offline, so nothing can be sent. Kept the rule-based results."
-msgstr ""
+msgstr "Huna muunganisho wa intaneti, kwa hivyo hakuna kinachoweza kutumwa. "
+"Matokeo yanayotegemea kanuni yamehifadhiwa."
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
@@ -1520,7 +1495,8 @@ msgstr "Kipindi chako kimekwisha. Unapelekwa kwenye ukurasa wa kuingia."
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Select a region on the page to see data. Draw a box around a table, "
 "chart or block of text, or highlight a sentence."
-msgstr ""
+msgstr "Chagua eneo kwenye ukurasa ili kuona data. Chora kisanduku kuzunguka "
+"jedwali, chati au sehemu ya maandishi, au uangazie sentensi."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
@@ -1528,7 +1504,7 @@ msgstr "Safu wima ya 12"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
 msgid "North arrow"
-msgstr ""
+msgstr "Mshale wa kaskazini"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -1549,7 +1525,7 @@ msgstr "Safu ya jina isiyo sahihi imechaguliwa"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's save your results now"
-msgstr ""
+msgstr "Hebu tuhifadhi matokeo yako sasa"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
@@ -1567,7 +1543,8 @@ msgstr "Muda wa alama za mhimili wa Y"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "The assistant read nothing we could use. Kept the rule-based results."
-msgstr ""
+msgstr "Msaidizi hakusoma chochote tulichoweza kutumia. Matokeo yanayotegemea "
+"kanuni yamehifadhiwa."
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
@@ -1615,7 +1592,7 @@ msgstr "Ondoa mwanachama"
 #. placeholder {0}: _formatProducedAt(producedAt)
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
-msgstr ""
+msgstr "Imetolewa {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -1712,7 +1689,7 @@ msgstr "Positron"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Boundary disclaimer (Always included)"
-msgstr ""
+msgstr "Kanusho la mpaka (Hujumuishwa kila wakati)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
@@ -1808,7 +1785,7 @@ msgstr "Chagua safu ya data ya kuunda bafa."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Paper size"
-msgstr ""
+msgstr "Ukubwa wa karatasi"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -1817,7 +1794,8 @@ msgstr "\"{0}\" sasa iko katika eneo lako la kazi."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "There is no text in this region to send. Kept the rule-based results."
-msgstr ""
+msgstr "Hakuna maandishi katika eneo hili ya kutuma. Matokeo yanayotegemea "
+"kanuni yamehifadhiwa."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Profile fields"
@@ -1841,7 +1819,7 @@ msgstr "Chagua mpango unaofaa zaidi kwa eneo lako la kazi."
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
-msgstr ""
+msgstr "Gumzo"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
@@ -1969,7 +1947,7 @@ msgstr "Juu kulia"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
-msgstr ""
+msgstr "Ufute kabisa <0>{openDatasetName}</0>?"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
@@ -1989,7 +1967,7 @@ msgstr "GeoJSON"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
 msgid "Scale bar"
-msgstr ""
+msgstr "Kipimo cha ramani"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -2043,14 +2021,6 @@ msgid "Configure this filter: set its id, label, and column name in the side "
 "panel."
 msgstr "Sanidi kichujio hiki: weka id, lebo, na jina la safu katika paneli ya "
 "upande."
-
-#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
-#~ msgid "The current SQL contains parts that the form could not represent. "
-#~ "Continuing will overwrite that SQL with one generated from the form. "
-#~ "This cannot be undone (unless you re-run your previous chat prompt)."
-#~ msgstr "SQL ya sasa ina sehemu ambazo fomu haiwezi kuwakilisha. Kuendelea "
-#~ "kutafuta kutafuta SQL hiyo na moja iliyoundwa kutoka kwa fomu. Hii "
-#~ "haiwezi kufutwa (isipokuwa uirudie amri yako ya mazungumzo ya awali)."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Formal"
@@ -2136,7 +2106,8 @@ msgstr "Mizani"
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "You shared your first dashboard with your workspace. Anyone there can "
 "open it whenever they need it."
-msgstr ""
+msgstr "Umeshiriki dashibodi yako ya kwanza na nafasi yako ya kazi. Mtu yeyote "
+"huko anaweza kuifungua wakati wowote anapoihitaji."
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2162,7 +2133,8 @@ msgstr "Njia za Malipo"
 
 #: src/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary.tsx
 msgid "{applied, plural, one {# filter applied} other {# filters applied}}"
-msgstr ""
+msgstr "{applied, plural, one {# kichujio kimetumika} other {vichujio # "
+"vimetumika}}"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for 1 column in \"{sourceFileName}\" differed from "
@@ -2208,7 +2180,7 @@ msgstr "Onyesha maelezo"
 
 #: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connecting to Google Sheets and other data sources are in the works and "
@@ -2251,7 +2223,7 @@ msgstr "Seti za data za faragha"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Publish it"
-msgstr ""
+msgstr "Ichapishe"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
@@ -2314,11 +2286,6 @@ msgstr "au"
 msgid "Items"
 msgstr "Vipengee"
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "This is the data explorer. Ask a question in plain English, like \"how "
-#~ "many people were served by our programs\"."
-#~ msgstr ""
-
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "Sasisho la vizuizi limefeli"
@@ -2334,11 +2301,12 @@ msgstr "Zana hii itapatikana Spatial itakapomaliza kupakia."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
-msgstr ""
+msgstr "Ramani msingi yenye mandharinyuma meusi au ya setilaiti inaweza "
+"kunakiliwa vibaya kwa fotokopi."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
-msgstr ""
+msgstr "ni kabla ya"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2376,7 +2344,7 @@ msgstr "Uonyeshaji wa Data"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -2400,10 +2368,6 @@ msgstr "Maelezo"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "Inaandika swali…"
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Your data is already summarized for you"
-#~ msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Their contributor counts stay hidden because they are below the layer's "
@@ -2542,11 +2506,6 @@ msgid "The layer configuration is saved. Retry after connectivity or the "
 msgstr "Usanidi wa tabaka umehifadhiwa. Jaribu tena baada ya muunganisho au "
 "kiendelezi cha Spatial kupatikana."
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Open Data Summary to get a full statistical profile of your data: "
-#~ "ranges, distributions, and what's missing."
-#~ msgstr ""
-
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "Watu {numUsers}"
@@ -2557,7 +2516,7 @@ msgstr "Bado hakuna thamani zilizoainishwa."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterCombinatorSelector/FilterCombinatorSelector.tsx
 msgid "Combine conditions with"
-msgstr ""
+msgstr "Unganisha masharti kwa"
 
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "Generate a query to configure this visualization."
@@ -2605,7 +2564,7 @@ msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Some filters were removed"
-msgstr ""
+msgstr "Baadhi ya vichujio vimeondolewa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
@@ -2628,7 +2587,8 @@ msgstr "Gridi"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who "
 "to share it with."
-msgstr ""
+msgstr "Dashibodi yako ipo, lakini bado hakuna mtu mwingine anayeweza "
+"kuifungua. Hebu tuchague watu wa kushiriki nao."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Cannot sync this entity"
@@ -2672,7 +2632,7 @@ msgstr "Kifungu cha HAVING kinatumia upande wa kushoto ambao fomu haiwezi "
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has no value"
-msgstr ""
+msgstr "haina thamani"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses \"{operator}\" with a non-null right-hand side; only "
@@ -2688,12 +2648,6 @@ msgstr ", na "
 msgid "Password updated successfully"
 msgstr "Nenosiri limeboreshwa kwa mafanikio"
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Open Save and choose \"Save to dashboard\". Name the dashboard, create "
-#~ "it, and Avandar will take you there."
-#~ msgstr "Fungua Save kisha uchague \"Save to dashboard\". Ipe dashboard jina, "
-#~ "iunde, na Avandar itakupeleka huko."
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Narrowest"
 msgstr "Nyembamba zaidi"
@@ -2701,10 +2655,6 @@ msgstr "Nyembamba zaidi"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Graphite"
 msgstr "Graphite"
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "not in"
-#~ msgstr "siko ndani ya"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seat used · {remainingSeats} remaining"
@@ -2815,7 +2765,8 @@ msgstr "Haiwezekani kufupisha safu hii. Query inaweza kuwa imeshindwa kwa "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Draw a box around a table, chart, map or block of text to extract it."
-msgstr ""
+msgstr "Chora kisanduku kuzunguka jedwali, chati, ramani au kipande cha "
+"maandishi ili kukitoa."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
@@ -2922,7 +2873,7 @@ msgstr "Wasifu haujafanikiwa kupakia"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
-msgstr ""
+msgstr "Huwezi kuhifadhi kwenye dashibodi hadi utekeleze swali."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "You are currently on the <0>{currentFeaturePlanName}</0> plan."
@@ -2941,10 +2892,6 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "Kuinua mpango wa \"Lipa Kile Unachotaka\" kunaweza kufanywa tu kupitia "
 "lango la malipo.<0/>Kitufe kilichopo chini kita kupeleka huko."
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Open Save."
-#~ msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Delete entity"
@@ -2974,7 +2921,7 @@ msgstr "Baadhi ya latitudo au longitudo si nambari."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Run a query first"
-msgstr ""
+msgstr "Tekeleza swali kwanza"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING clause contains a \"{nodeType}\" node that the form cannot "
@@ -3001,11 +2948,11 @@ msgstr "{layerName} haikurejesha safu yoyote"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
-msgstr ""
+msgstr "ni isiyozidi"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
-msgstr ""
+msgstr "ni"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
@@ -3083,7 +3030,7 @@ msgstr "Ukifanya matumizi ya {0}"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
-msgstr ""
+msgstr "Futa: {openDatasetName}"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -3106,7 +3053,8 @@ msgstr "Futa Kitu"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
 "distributions, and what's missing."
-msgstr ""
+msgstr "Hapa unaweza kuona wasifu kamili wa kitakwimu wa data yako: safu za "
+"thamani, mgawanyo na data iliyokosekana."
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
@@ -3144,7 +3092,7 @@ msgstr "Viti vya ziada vinahitajika"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
 msgid "Type a value"
-msgstr ""
+msgstr "Andika thamani"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
@@ -3247,7 +3195,7 @@ msgstr "Kima cha juu cha mhimili wa X"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
-msgstr ""
+msgstr "huishia na"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
@@ -3267,7 +3215,7 @@ msgstr "Kosa la uthibitisho la Google"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not match pattern (legacy)"
-msgstr ""
+msgstr "hailingani na muundo (wa zamani)"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Derived"
@@ -3316,17 +3264,13 @@ msgstr "Hakuna dashibodi za kuonyesha"
 msgid "Y axis maximum"
 msgstr "Kima cha juu cha mhimili wa Y"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "is not null"
-#~ msgstr "si tupu"
-
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Create dashboard & save"
 msgstr "Unda dashibodi & hifadhi"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your data is summarized"
-msgstr ""
+msgstr "Data yako imefupishwa"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
@@ -3359,7 +3303,7 @@ msgstr "Dashibodi imehifadhiwa kwa mafanikio!"
 
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Page {pageNumber} of {total}"
-msgstr ""
+msgstr "Ukurasa {pageNumber} kati ya {total}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Method"
@@ -3414,7 +3358,9 @@ msgstr "takriban dakika moja"
 msgid "{flaggedRowCount} of {0} rows needs review. We matched these values to "
 "their labels by position, and these were close calls. Check them against "
 "the page."
-msgstr ""
+msgstr "Safu {flaggedRowCount} kati ya {0} zinahitaji kukaguliwa. Tulioanisha "
+"thamani hizi na lebo zake kulingana na nafasi, na hizi zilikuwa hali "
+"zenye utata. Zikague dhidi ya ukurasa."
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Y axis"
@@ -3461,7 +3407,7 @@ msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
-msgstr ""
+msgstr "Hongera"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Capturing dashboard…"
@@ -3514,7 +3460,7 @@ msgstr "Rangi ya lebo ya mhimili wa Y"
 #. placeholder {0}: region.label
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Name of {0}"
-msgstr ""
+msgstr "Jina la {0}"
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -3605,14 +3551,10 @@ msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia 
 msgid "Role"
 msgstr "Jukumu"
 
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "is null"
-#~ msgstr "ni tupu"
-
 #. placeholder {0}: columnIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
 msgid "column {0}"
-msgstr ""
+msgstr "safu wima {0}"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
 msgid "Open models"
@@ -3652,7 +3594,7 @@ msgstr "Makundi ya jukumu la kawaida"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput.tsx
 msgid "Add a value"
-msgstr ""
+msgstr "Ongeza thamani"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Rose"
@@ -3690,7 +3632,7 @@ msgstr "Umesahau nenosiri lako?"
 #. placeholder {0}: pageIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "PDF page {0}"
-msgstr ""
+msgstr "Ukurasa wa PDF {0}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Get an answer out of the data you just added."
@@ -3804,7 +3746,7 @@ msgstr "Hakuna mipango inapatikana."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or after"
-msgstr ""
+msgstr "ni baada ya au tarehe hiyo"
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
@@ -3833,7 +3775,7 @@ msgstr "Lipa kila mwezi"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
-msgstr ""
+msgstr "haianzi na"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Vertical gridlines"
@@ -3889,7 +3831,7 @@ msgstr "Futa kumbukumbu"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
-msgstr ""
+msgstr "ni mojawapo ya"
 
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
@@ -3915,7 +3857,8 @@ msgstr "Ramani isiyo na jina"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "That region is not on a page we read. Kept the rule-based results."
-msgstr ""
+msgstr "Eneo hilo halipo kwenye ukurasa tulioujumuisha katika usomaji. "
+"Tumehifadhi matokeo ya kanuni."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Advanced geometry settings"
@@ -3939,7 +3882,7 @@ msgstr "Maeneo kamili"
 
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
-msgstr ""
+msgstr "Mazungumzo mapya"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
@@ -3953,11 +3896,11 @@ msgstr "Data"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "You can restart it anytime from Profile."
-msgstr ""
+msgstr "Unaweza kuyaanzisha upya wakati wowote kutoka kwenye Wasifu."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Kept the rule-based results."
-msgstr ""
+msgstr "Tumehifadhi matokeo ya kanuni."
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 #: src/lib/hooks/browser/useOfflineGate/useOfflineGate.ts
@@ -3997,7 +3940,7 @@ msgstr "Sambaza ndani ya"
 
 #: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 msgid "Number"
-msgstr ""
+msgstr "Nambari"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4093,11 +4036,11 @@ msgstr "Upana wa mstari"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "and"
-msgstr ""
+msgstr "na"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
-msgstr ""
+msgstr "A4"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "End of time range: {endLabel}"
@@ -4146,7 +4089,7 @@ msgstr "Andika au bandika barua pepe hapa chini."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
-msgstr ""
+msgstr "ni kweli"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "URL"
@@ -4166,7 +4109,7 @@ msgstr "Fomu hii inatumia hoja za SELECT pekee."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Disclaimer"
-msgstr ""
+msgstr "Kanusho"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: (share * 100).toFixed(0)
@@ -4181,7 +4124,7 @@ msgstr "Nembo"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "matches regex"
-msgstr ""
+msgstr "inalingana na regex"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Decision"
@@ -4216,7 +4159,7 @@ msgstr "Mpango wako wa sasa unakuruhusu tu kushiriki au kuchapisha {maxAllowed, 
 #. placeholder {0}: regions.length + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Region {0}"
-msgstr ""
+msgstr "Eneo {0}"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
@@ -4224,7 +4167,7 @@ msgstr "Endelea kwenye ofisi yako"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "has a value"
-msgstr ""
+msgstr "ina thamani"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
@@ -4277,7 +4220,7 @@ msgstr "Kusasisha nenosiri kumeshindikana"
 #. placeholder {1}: flag.detail
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
 msgid "Row {0}: {1}"
-msgstr ""
+msgstr "Mstari {0}: {1}"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
@@ -4301,7 +4244,7 @@ msgstr "Ni nini wastani wa {averageColumn} katika {datasetName}?"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionOverlay/PdfRegionOverlay.tsx
 msgid "Draw a region on the page"
-msgstr ""
+msgstr "Chora eneo kwenye ukurasa"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
@@ -4333,10 +4276,6 @@ msgstr "Safu ya Y"
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Go home"
 msgstr "Nenda nyumbani"
-
-#: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
-#~ msgid "Print and PDF export arrives in a later release."
-#~ msgstr "Uchapishaji na uhamishaji wa PDF utapatikana katika toleo lijalo."
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count how many rows there are in {datasetName}"
@@ -4376,7 +4315,7 @@ msgstr "Lebele, mfano. Mkoa"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
-msgstr ""
+msgstr "Chagua faili"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
@@ -4455,7 +4394,7 @@ msgstr "Mtu yeyote aliye na kiungo anaweza kutazama {resource} hii. Watu na "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
-msgstr ""
+msgstr "Ukurasa huu haukuweza kuonyeshwa."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -4480,7 +4419,7 @@ msgstr "Ongeza kwenye eneo lako la kazi"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
-msgstr ""
+msgstr "\"{value}\" si regular expression halali."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState.tsx
 msgid "Unable to load dashboard"
@@ -4521,7 +4460,7 @@ msgstr "Muundo wa alama ya wakati"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Labelled graphic (map, chart, tiles)"
-msgstr ""
+msgstr "Picha yenye lebo (ramani, chati, vigae)"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
@@ -4531,7 +4470,7 @@ msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya 
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "This query could not run"
-msgstr ""
+msgstr "Hoja hii haikuweza kutekelezwa"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "View"
@@ -4539,7 +4478,7 @@ msgstr "Tazama"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "This condition does not apply to {typeName} columns."
-msgstr ""
+msgstr "Sharti hili halitumiki kwa safu za {typeName}."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Area layout"
@@ -4614,10 +4553,6 @@ msgstr "Mwisho (mfano. 2024-12-31)"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
 msgid "No datasets match your search."
 msgstr "Hakuna seti za data zinazolingana na utafutaji wako."
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "in"
-#~ msgstr "katika"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -4758,7 +4693,7 @@ msgstr "Safu za muhtasari pekee zinahitaji uunganishaji unaozalisha eneo."
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Area of interest applied"
-msgstr ""
+msgstr "Eneo la maslahi limetumika"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -4771,7 +4706,7 @@ msgstr "Ruhusu kuhariri kwa mkono"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not"
-msgstr ""
+msgstr "si"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
@@ -4780,7 +4715,7 @@ msgstr "Embed"
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Dates: {0}"
-msgstr ""
+msgstr "Tarehe: {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B (offline)"
@@ -4803,7 +4738,7 @@ msgstr "Kitu hakikupata kupakia. Tafadhali jaribu tena baadaye au wasiliana na "
 
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 msgid "Download PDF"
-msgstr ""
+msgstr "Pakua PDF"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -4850,10 +4785,6 @@ msgstr "Imeshindikana kufungua tovuti ya malipo. Tafadhali jaribu tena baadaye."
 msgid "Time column"
 msgstr "Safu ya muda"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Click here to upload a file"
-#~ msgstr ""
-
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
@@ -4870,7 +4801,7 @@ msgstr "Jina la ramani"
 
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide SQL"
-msgstr ""
+msgstr "Ficha SQL"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Permanently delete all consent decisions on this device? This action "
@@ -4964,7 +4895,7 @@ msgstr "Ingiza"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Clear Disputed status column"
-msgstr ""
+msgstr "Ondoa safu ya hali ya Kupingwa"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5040,7 +4971,7 @@ msgstr "Wakati"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
-msgstr ""
+msgstr "si kweli"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
@@ -5048,7 +4979,7 @@ msgstr "Chati ya pau"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is none of"
-msgstr ""
+msgstr "si yoyote kati ya"
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "That coordinate is out of range."
@@ -5169,7 +5100,7 @@ msgstr "Llama 3.1 8B"
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
-msgstr ""
+msgstr "Imeongeza mistari {0} kutoka kwa msaidizi. Ikague kabla ya kuhifadhi."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "Offline chat model removed"
@@ -5177,7 +5108,7 @@ msgstr "Mfano wa mazungumzo ya mtandaoni umeondolewa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
-msgstr ""
+msgstr "Unda \"{trimmedSearch}\""
 
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Search data sources"
@@ -5204,7 +5135,7 @@ msgstr "Chagua moja"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Undetermined values"
-msgstr ""
+msgstr "Thamani ambazo hazijaamuliwa"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -5231,7 +5162,8 @@ msgstr "Inapakia {layerName}"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the data explorer. Ask a question in your own words, like \"how "
 "many people were served by our programs\"."
-msgstr ""
+msgstr "Hiki ni kichunguzi cha data. Uliza swali kwa maneno yako mwenyewe, kama "
+"vile \"ni watu wangapi walihudumiwa na programu zetu\"."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
@@ -5280,7 +5212,7 @@ msgstr "Unahitaji ruhusa ya kuhariri rasilimali hii ili kuishiriki au "
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"
-msgstr ""
+msgstr "Mwelekeo"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Dashboard deleted successfully!"
@@ -5578,7 +5510,7 @@ msgstr "Muda"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Upper bound"
-msgstr ""
+msgstr "Kikomo cha juu"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -5649,11 +5581,7 @@ msgstr "Tafadhali rekebisha maeneo yaliyoangaziwa."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or before"
-msgstr ""
-
-#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
-#~ msgid "between"
-#~ msgstr "katika"
+msgstr "iko mnamo au kabla ya"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
 msgid "Inactive"
@@ -5683,11 +5611,11 @@ msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 
 #: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 msgid "Integer"
-msgstr ""
+msgstr "Nambari kamili"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The results are on the canvas to the left."
-msgstr ""
+msgstr "Matokeo yako kwenye turubai upande wa kushoto."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5842,7 +5770,7 @@ msgstr "Jina la dataset linapaswa kuwa na angalau herufi 2."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
-msgstr ""
+msgstr "US Letter"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Level"
@@ -5850,7 +5778,7 @@ msgstr "Kiwango"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{operator}\" is not an operator this form understands."
-msgstr ""
+msgstr "\"{operator}\" si opereta ambayo fomu hii inaweza kuelewa."
 
 #: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
@@ -5879,7 +5807,7 @@ msgstr "Eneo"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark not done"
-msgstr ""
+msgstr "Weka kuwa haijakamilika"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
@@ -5947,7 +5875,7 @@ msgstr "Mizani inatofautiana katika ramani hii"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
-msgstr ""
+msgstr "Waruhusu wengine waone dashibodi yako"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -6048,7 +5976,7 @@ msgstr "Sehemu ya mtandaoni"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
-msgstr ""
+msgstr "Maelezo ya chanzo (Hujumuishwa kila wakati)"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -6072,7 +6000,7 @@ msgstr "Ingia tena"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
-msgstr ""
+msgstr "Thamani ya kwanza haipaswi kuwa kubwa kuliko ya pili."
 
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Not now"
@@ -6149,11 +6077,7 @@ msgstr "Dashibodi hii hairejelei seti yoyote ya data: hakuna kitu cha "
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not match regex"
-msgstr ""
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Ava wrote the SQL, ran it, and picked a chart to show it in."
-#~ msgstr "Ava iliandika SQL, ikaiendesha, na ikachagua chati ya kuionyesha."
+msgstr "hailingani na regex"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -6211,7 +6135,7 @@ msgstr "Mtazamaji wa Kimataifa"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is blank"
-msgstr ""
+msgstr "iko wazi"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create a new workspace. You can always edit it later."
@@ -6233,7 +6157,7 @@ msgstr "Hufuta kabisa workspace hii na data yake yote. Hatua hii haiwezi "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Extract with the assistant"
-msgstr ""
+msgstr "Toa kwa kutumia msaidizi"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
@@ -6287,7 +6211,7 @@ msgstr "Tafadhali ingia tena ili kuendelea."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
-msgstr ""
+msgstr "Tarehe ya uzalishaji (Hujumuishwa kila wakati)"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
@@ -6308,7 +6232,7 @@ msgstr "Inakuingiza tena…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "No region selected yet"
-msgstr ""
+msgstr "Bado hakuna eneo lililochaguliwa"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
@@ -6347,13 +6271,9 @@ msgstr "Jina lako"
 msgid "Downloading {0} for offline chat"
 msgstr "Inapakua {0} kwa mazungumzo ya mtandaoni"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#~ msgid "Open chat panel"
-#~ msgstr "Fungua paneli ya mazungumzo"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
-msgstr ""
+msgstr "Safu ya hali ya Kupingwa"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
@@ -6361,7 +6281,8 @@ msgstr "Ondoa kichujio cha safu"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Could not reach the assistant. Kept the rule-based results."
-msgstr ""
+msgstr "Haikuwezekana kumfikia msaidizi. Matokeo ya kulingana na kanuni "
+"yamehifadhiwa."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset deleted"
@@ -6389,7 +6310,7 @@ msgstr "Swali hilo limefeli. Tafadhali rekebisha SQL na ujaribu tena."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
-msgstr ""
+msgstr "Vizuizi vilivyo na lebo vinavyojirudia"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only me"
@@ -6442,7 +6363,7 @@ msgstr "Kila series ni wingu moja la mipira. Safu ya ukubwa inaamua radius ya "
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not end with"
-msgstr ""
+msgstr "haiishii na"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
@@ -6475,7 +6396,7 @@ msgstr "Faili ilishindwa kupakia"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
-msgstr ""
+msgstr "Ondoa kikundi"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapWeightSelect.tsx
 msgid "Weight by"
@@ -6518,7 +6439,7 @@ msgstr "Usindikaji wa data umeshindwa"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "And"
-msgstr ""
+msgstr "Na"
 
 #: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
@@ -6547,7 +6468,9 @@ msgstr "Seti hii ya data inaweza kuhifadhiwa kwenye wingu."
 msgid "{flaggedRowCount} of {0} rows need review. We matched these values to "
 "their labels by position, and these were close calls. Check them against "
 "the page."
-msgstr ""
+msgstr "{flaggedRowCount} kati ya safu mlalo {0} zinahitaji kukaguliwa. "
+"Tuliambatanisha thamani hizi na lebo zake kulingana na nafasi, na hizi "
+"zilikuwa hali za karibu. Zikague dhidi ya ukurasa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -6598,7 +6521,7 @@ msgstr "Kitenganishi"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
-msgstr ""
+msgstr "Kikomo cha chini"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
@@ -6615,7 +6538,7 @@ msgstr "Mpango wako wa sasa unasaidia seti hadi {0} za data. Pandisha hadhi "
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark done"
-msgstr ""
+msgstr "Weka kuwa imekamilika"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is offline-only. Click to allow online syncing."
@@ -6752,7 +6675,7 @@ msgstr "Dashibodi hii bado haijachapishwa. Tumia kitufe kilicho hapa chini "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a file"
-msgstr ""
+msgstr "Pakia faili"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
@@ -6769,11 +6692,9 @@ msgstr "Inapakia seti za data za dashibodi"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
 "computer. No spreadsheet handy? <0>Download our sample</0> and use that."
-msgstr ""
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Select an Excel or CSV file from your computer to import"
-#~ msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
+msgstr "Karibu kwenye kidhibiti chako cha chanzo cha data. Chagua faili la CSV "
+"au Excel kutoka kwenye kompyuta yako. Huna lahajedwali tayari? <0>Pakua "
+"sampuli yetu</0> na uitumie."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7006,7 +6927,7 @@ msgstr "Hakuna maeneo au dataset zilizowekwa."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove condition"
-msgstr ""
+msgstr "Ondoa sharti"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
@@ -7046,10 +6967,6 @@ msgstr "Fiord"
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Upload a spreadsheet"
-#~ msgstr "Pakia karatasi ya kazi"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -7083,7 +7000,7 @@ msgstr "{lengthValue} km"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
-msgstr ""
+msgstr "Mstari wa chanzo"
 
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
@@ -7176,7 +7093,7 @@ msgstr "Hifadhi"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "PDF files"
-msgstr ""
+msgstr "Faili za PDF"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
@@ -7189,7 +7106,8 @@ msgstr "Yeyusha"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "Column bound. No values assigned; outlines render as settled."
-msgstr ""
+msgstr "Kikomo cha safu wima. Hakuna thamani zilizowekwa; mihimili huonyeshwa "
+"kuwa imethibitishwa."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -7254,7 +7172,7 @@ msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at least"
-msgstr ""
+msgstr "ni angalau"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -7370,7 +7288,7 @@ msgstr "Safu wima ya ufunguo wa mpaka"
 #. placeholder {0}: filterReadout.timeWindow
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "Time window: {0}"
-msgstr ""
+msgstr "Muda: {0}"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -7409,7 +7327,7 @@ msgstr "Eneo lako la kazi liko kwenye mpango wa Bure, ambao unasaidia hadi seti 
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Avandar turns your question into a query to show you the answers."
-msgstr ""
+msgstr "Avandar hubadilisha swali lako kuwa query ili kukuonyesha majibu."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
@@ -7419,7 +7337,7 @@ msgstr "Toni"
 #. placeholder {1}: header[columnIndex] ?? t`column ${columnIndex + 1}`
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
 msgid "Row {0}, {1}"
-msgstr ""
+msgstr "Safu mlalo {0}, {1}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -7521,11 +7439,11 @@ msgstr "Sanidi jinsi ya kuungana na seti za data"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it"
-msgstr ""
+msgstr "Ihifadhi"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial"
-msgstr ""
+msgstr "Ficha mafunzo"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Excel"
@@ -7556,7 +7474,7 @@ msgstr "Uweke \"{resourceName}\" kuwa ya faragha?"
 
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "The PDF could not be created: {detail}"
-msgstr ""
+msgstr "PDF haikuweza kuundwa: {detail}"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
@@ -7589,7 +7507,7 @@ msgstr "Ramani hii bado haina tabaka"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not blank"
-msgstr ""
+msgstr "si tupu"
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "No boundary layer on this map to look up a P-code."
@@ -7627,7 +7545,8 @@ msgstr "Mwandishi"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "This is the last step. Publish, and anyone in your workspace can open "
 "this dashboard."
-msgstr ""
+msgstr "Hii ndiyo hatua ya mwisho. Chapisha, na mtu yeyote katika nafasi yako "
+"ya kazi anaweza kufungua dashibodi hii."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
@@ -7643,7 +7562,7 @@ msgstr "Toleo la schema"
 
 #: src/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary.tsx
 msgid ", {ignored, plural, one {# not applied} other {# not applied}}"
-msgstr ""
+msgstr ", {ignored, plural, one {# haijatumika} other {# hazijatumika}}"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Query editor mode"
@@ -7683,7 +7602,7 @@ msgstr "Muonekano wa safu"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Nothing selected yet"
-msgstr ""
+msgstr "Hakuna kilichochaguliwa bado"
 
 #: src/components/permissions/ShareResourceModal/copy/roleSelectTooltip.ts
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
@@ -7710,12 +7629,6 @@ msgstr "Ukubwa kwa"
 #: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "Badilisha ukubwa wa paneli ya pembeni"
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "The Visualizations tab has the chart settings, if this isn't the shape "
-#~ "you wanted."
-#~ msgstr "Kichupo cha Visualizations kina mipangilio ya chati, ikiwa hii si aina "
-#~ "uliyotaka."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
@@ -7768,7 +7681,8 @@ msgstr "Hakuna entries bado. Kumbukumbu inajaza kadri paneli ya mazungumzo "
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "No disputed-status column. Outlines render as settled."
-msgstr ""
+msgstr "Hakuna safu wima ya hali ya mzozo. Mihimili huonyeshwa kuwa "
+"imethibitishwa."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
@@ -7807,7 +7721,8 @@ msgstr "Profaili"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "They referenced columns this data source does not have: "
 "{removedColumnNames}"
-msgstr ""
+msgstr "Zilirejelea safu wima ambazo chanzo hiki cha data hakina: "
+"{removedColumnNames}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
@@ -7841,7 +7756,7 @@ msgstr "Kundi la jukumu limeundwa"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Choose who you want to share this with"
-msgstr ""
+msgstr "Chagua mtu unayetaka kushiriki naye"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Failed to update display name"
@@ -7926,7 +7841,7 @@ msgstr "Ondoa {0}"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is between"
-msgstr ""
+msgstr "iko kati ya"
 
 #: shared/copy/appLabel.ts
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -8038,7 +7953,7 @@ msgstr "Umbo"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
-msgstr ""
+msgstr "iko kwenye"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -8051,7 +7966,7 @@ msgstr "Jiometri ya nukta"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's move these results to a dashboard"
-msgstr ""
+msgstr "Hebu tuhamishe matokeo haya kwenye dashibodi"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
@@ -8076,7 +7991,7 @@ msgstr "Dirisha ibukizi"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterOperatorSelector/FilterOperatorSelector.tsx
 msgid "Condition"
-msgstr ""
+msgstr "Sharti"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -8114,11 +8029,6 @@ msgid "This removes the user group from members and resources that use it."
 msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 "zinazotumia hiyo."
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Your dashboard exists, but nobody else can open it yet. Let's fix that."
-#~ msgstr "Dashboard yako ipo, lakini bado hakuna mtu mwingine anayeweza "
-#~ "kuifungua. Hebu turekebishe hilo."
-
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Largest radius"
 msgstr "Radi kubwa zaidi"
@@ -8139,7 +8049,8 @@ msgstr "Mkataba"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 "results."
-msgstr ""
+msgstr "Unahitaji kuwa umeingia ili kumuuliza msaidizi. Matokeo ya kulingana na "
+"kanuni yamehifadhiwa."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "File loaded successfully"
@@ -8147,7 +8058,7 @@ msgstr "Faili imepakiwa kwa mafanikio"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
-msgstr ""
+msgstr "Soma kama"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try one of these"
@@ -8163,7 +8074,7 @@ msgstr "Safu {rowNum} / Safu wima {colNum}"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
-msgstr ""
+msgstr "Huwezi kwenda kwenye hatua hii hadi uunde dashibodi mpya."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
@@ -8175,7 +8086,7 @@ msgstr "Chaguo za kina"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is less than"
-msgstr ""
+msgstr "ni chini ya"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -8187,10 +8098,6 @@ msgstr "Chini kulia"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "{0} m"
 msgstr "{0} m"
-
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Save it to a dashboard"
-#~ msgstr "Ihifadhi kwenye dashboard"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name updated"
@@ -8317,7 +8224,7 @@ msgstr "{0} safu zimegundulika. Angalia taarifa za safu hapa chini ili "
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save\" to open the menu."
-msgstr ""
+msgstr "Bofya \"Hifadhi\" ili kufungua menyu."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label color"
@@ -8388,7 +8295,7 @@ msgstr "Spatial haipatikani"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
-msgstr ""
+msgstr "Ipe dashibodi jina, kisha iunde."
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Collapse the layer panel"
@@ -8410,7 +8317,7 @@ msgstr "Kushindwa kwa kawaida"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
-msgstr ""
+msgstr "Mlalo"
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
@@ -8426,7 +8333,7 @@ msgstr "Midia"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "+ Condition"
-msgstr ""
+msgstr "+ Sharti"
 
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
@@ -8530,14 +8437,6 @@ msgstr "HAVING inatumia opereta \"{operator}\" ambaye fomu haitumii."
 msgid "Displaced"
 msgstr "Imehamishwa"
 
-#: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
-#~ msgid "Workspace means everyone in your workspace, not the public. Nothing here "
-#~ "creates a public link. And you can set it back to Private whenever you "
-#~ "like."
-#~ msgstr "Workspace inamaanisha kila mtu katika workspace yako, si umma. Hakuna "
-#~ "chochote hapa kinachounda kiungo cha umma. Na unaweza kukirudisha kuwa "
-#~ "Private wakati wowote upendao."
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
 "Your subscription will be updated accordingly."
@@ -8579,7 +8478,7 @@ msgstr "Nambari kamili"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."
-msgstr ""
+msgstr "Chagua chanzo cha data ili kuongeza vichujio."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Annual"
@@ -8660,7 +8559,7 @@ msgstr "Uwazi wa ujazaji"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Show the title on the page"
-msgstr ""
+msgstr "Onyesha kichwa kwenye ukurasa"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -8698,7 +8597,7 @@ msgstr "Futa yote"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is greater than"
-msgstr ""
+msgstr "ni kubwa kuliko"
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
@@ -8735,7 +8634,7 @@ msgstr "Upana wa upau wa pembeni"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "matches pattern (legacy)"
-msgstr ""
+msgstr "inalingana na muundo (wa zamani)"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Max width"
@@ -8777,7 +8676,7 @@ msgstr "Dataset nzima"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Or"
-msgstr ""
+msgstr "Au"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
@@ -8843,7 +8742,7 @@ msgstr "Lango la malipo haliwezi kupakiwa kwa sababu bado hujawa na usajili."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved, but its original file failed to upload"
-msgstr ""
+msgstr "Seti ya data imehifadhiwa, lakini faili yake asili imeshindwa kupakiwa"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
