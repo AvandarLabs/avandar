@@ -112,6 +112,13 @@ export function PdfReviewGrid({
         </Alert>
       )}
 
+      {/*
+       * The index here is a tiebreaker, not the identity. A flag carries no
+       * id, and one region can legitimately raise two flags with the same
+       * reason, so reason alone is not unique. These lists are derived fresh
+       * from a static extraction result and never reorder or splice, which is
+       * the case index keys are unsafe for.
+       */}
       {regionFlags.map((flag, index) => {
         return (
           <Alert key={`${flag.reason}-${index}`} variant="light" color="gray">

@@ -34,6 +34,35 @@ Read `docs/superpowers/specs/2026-08-18-pdf-region-extraction-design.md` in
 full first. This plan implements it directly, and several tasks below only make
 sense against the evidence recorded there.
 
+## Corrections to the UI tasks, found during execution
+
+Two things in Tasks 15 to 17 were wrong as written. Both are fixed in the
+shipped code; this records them so a re-read does not reintroduce them.
+
+**1. `@testing-library/user-event` is not installed in this repo.** Only
+`dom`, `jest-dom` and `react` are. Every UI test below used `userEvent`, so as
+written they would not even transform. Drive interactions with `fireEvent` from
+`@/test-utils` (the repo's `MantineProvider`-wrapped render, which these
+components require), and drive a Mantine `Select` with the existing
+`pickMantineSelectOption` helper.
+
+`fireEvent` is also the more accurate tool here: these components are fully
+controlled by props that a `vi.fn()` parent never updates, so a
+character-by-character `userEvent.type` would accumulate garbage, while
+`fireEvent.change` fires one `onChange` carrying the whole new value.
+
+**2. The picker's page-height calculation was wrong, and would have misplaced
+every drawn region.** Task 16's snippet did
+`setPageHeight(PREVIEW_WIDTH / nextScale)`, but `PREVIEW_WIDTH / scale` is the
+page **width** in points, not its height. Feeding that to `PdfRegionOverlay` as
+`pageHeight` puts every y-flip out by the difference between the two, which on
+A4 is 247 points: regions land far from where they were drawn, plausibly enough
+that it might not look like a bug.
+
+Scale alone cannot yield the page height, so `PdfPagePreview` gained an
+optional `onPageSizeChange?: ({ widthPt, heightPt })` reported from the
+unscaled viewport after render. `onScaleChange` is unchanged.
+
 ## Known gap: the observations `unit` column
 
 Found while implementing Task 12, deferred deliberately, not covered by the
