@@ -8,8 +8,8 @@ import { compileLatLngOverlaySql } from "@/clients/maps/MapLayerSpatialQuery/com
 import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
 import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
-import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
@@ -109,7 +109,7 @@ async function _runSpatialLayer(options: {
     throw new Error(`Map geometry requires rebinding: ${metadata.reason}`);
   }
   const plan = compileMapLayerSpatialQuery({ ...options, metadata });
-  const queryResult = await WorkspaceQetlClient.runQuery({
+  const queryResult = await WorkspaceQuerySession.runQuery({
     rawSql: plan.rawSql,
     workspaceId: options.workspaceId,
     signal: options.signal,
@@ -174,13 +174,13 @@ async function _runLatLngLayer(options: {
   workspaceId: Workspace.Id;
   overlay: MapOverlay;
 }): Promise<MapLayerDataResult> {
-  const queryResult = await runStructuredQuery({
+  const { result, didAutoLimit } = await runStructuredQueryWithMetadata({
     auth: "workspace",
     workspaceId: options.workspaceId,
     query: options.layer.source,
     rawSql: _getLatLngOverlayRawSql(options),
   });
-  return { type: "rows", queryResult };
+  return { type: "rows", queryResult: result, didAutoLimit };
 }
 
 function useDuckDbSpatialAvailability(): string {

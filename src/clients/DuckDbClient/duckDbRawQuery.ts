@@ -50,9 +50,14 @@ function _getRawQueryExecutionPlan(
   ) {
     throw new Error("Public DuckDB queries require an expected snapshot owner");
   }
+  // A read analysis names relations of every kind, so only the datasets among
+  // them are dataset tables this plan has to prepare.
   const readDatasetIds =
-    analysis.kind === "mutating" ?
-      analysis.readDatasetIds
+    analysis.kind === "mutating" ? analysis.readDatasetIds
+    : analysis.kind === "read" ?
+      analysis.relations.flatMap((relation) => {
+        return relation.kind === "dataset" ? [relation.id] : [];
+      })
     : analysis.datasetIds;
   const mutatedDatasetIds =
     analysis.kind === "mutating" ? analysis.mutatedDatasetIds : [];

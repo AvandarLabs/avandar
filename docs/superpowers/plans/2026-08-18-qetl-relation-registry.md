@@ -1821,7 +1821,14 @@ path. Proposal Phase 0's exit criterion is that at least one test goes red when
 a query returns wrong rows. Today none can.
 
 **Files:**
-- Create: `shared/models/queries/StructuredQuery/structuredQueryToSql/__tests__/structuredQueryToSql.executed.test.ts`
+- Create: `src/lib/sql/__tests__/structuredQueryToSql.executed.test.ts`
+
+**Corrected location.** An earlier draft put this under
+`shared/models/queries/StructuredQuery/structuredQueryToSql/__tests__/`. That
+**breaks `pnpm type-check`**: `deno check shared` type-checks every file under
+`shared/`, and a `shared/` file importing `@/` fails it. Mapping `@/` for Deno
+is not the fix, because it would let Deno-reachable code import browser code. So
+an executed suite for a `shared/` module cannot live under `shared/`.
 
 - [ ] **Step 1: Write the failing test**
 

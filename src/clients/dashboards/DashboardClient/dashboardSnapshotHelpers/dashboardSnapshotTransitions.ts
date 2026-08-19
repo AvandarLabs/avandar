@@ -110,7 +110,7 @@ async function _deleteStagedSnapshotBestEffort(
 
 /**
  * Claims a snapshot transition on a dashboard, tolerating a lost response
- * whose write in fact landed.
+ * whose write in relation landed.
  */
 export async function createTransitionClaim(
   options: Readonly<TransitionClaimOptions>,

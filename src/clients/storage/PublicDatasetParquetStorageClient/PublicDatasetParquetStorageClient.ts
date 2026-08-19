@@ -191,7 +191,8 @@ async function _listDatasetIdsForDashboard(
   });
 
   // TODO(jpsyx): we are limiting to 1000 datasets per dashboard for now, but
-  // when we switch to data cubes and dice we may need to change to something
+  // when we switch to relation caches and relation we may need to change to
+  // something
   // more dynamic
   const pageSize = 1000;
 

@@ -31,7 +31,7 @@ export const CLIENT_ANALYTICS_EVENT_NAMES = [
 ] as const;
 
 /**
- * Events emitted from edge functions. These describe facts only the server
+ * Events emitted from edge functions. These describe relations only the server
  * knows, such as the model used or how many attempts a chat turn took.
  */
 export const SERVER_ANALYTICS_EVENT_NAMES = [
@@ -42,7 +42,7 @@ export const SERVER_ANALYTICS_EVENT_NAMES = [
 
 /**
  * Events emitted by Postgres triggers via `util__log_analytics_event`. These
- * are row facts, so a trigger records them for every code path, including
+ * are row relations, so a trigger records them for every code path, including
  * seed scripts and backfills.
  */
 export const DB_ANALYTICS_EVENT_NAMES = [

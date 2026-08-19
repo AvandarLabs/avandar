@@ -61,7 +61,7 @@ export type UserQueryAnalyticsTrigger = Exclude<
 /**
  * Coarse classification of a failed query, derived from the runtime error.
  * Classifying at the emitter is what makes failures groupable in SQL without
- * storing the error text that would be needed to group them after the fact.
+ * storing the error text that would be needed to group them after the relation.
  */
 export type QueryErrorClass =
   | "offline"

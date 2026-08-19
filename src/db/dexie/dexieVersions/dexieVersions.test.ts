@@ -43,6 +43,19 @@ const v9Schemas = {
   },
 } as const;
 
+// v10 adds the relation cache's two tables and deletes nothing.
+const v10Schemas = {
+  ...v9Schemas,
+  RelationCacheEntry: {
+    primaryKey: "identityKey",
+    indexes: ["tableName", "principalKey", "lastQueriedAt"],
+  },
+  RelationCachePayload: {
+    primaryKey: "identityKey",
+    indexes: [],
+  },
+} as const;
+
 /** The store names IndexedDB physically holds, as opposed to Dexie's schema. */
 function _readStoredTableNames(): readonly string[] {
   return Array.from(db.backendDB().objectStoreNames);
@@ -130,6 +143,29 @@ async function _seedV7Database(legacyDatabase: Dexie): Promise<void> {
 }
 
 /**
+ * A populated v9 database, including a `LocalDataset` row carrying
+ * `parquetData`. `startDatasetUpload` stages resumable-upload bytes in that
+ * same column, so v10 must leave it untouched rather than treat it as a
+ * cache to clear.
+ */
+async function _seedV9DatabaseWithParquetData(
+  legacyDatabase: Dexie,
+): Promise<void> {
+  legacyDatabase.version(9).stores({
+    meta: "&key",
+    LocalDataset: "&datasetId,userId,workspaceId",
+    LocalPublicDataset: "&[dashboardId+datasetId],dashboardId",
+    ConsentAuditEntry: "&id,workspaceId,userId,timestamp,context,decision",
+    ClarificationAuditEntry: "&id,workspaceId,timestamp,outcome,turnNumber",
+  });
+  await legacyDatabase.open();
+  await legacyDatabase.table("LocalDataset").put({
+    datasetId: "staged-dataset",
+    parquetData: new Blob(["parquet-bytes"]),
+  });
+}
+
+/**
  * A store that was rebuilt has to be usable, not merely present. Writing and
  * reading back by compound key is the positive control for the emptiness
  * assertions, which would also pass against a store that does not exist.
@@ -151,8 +187,8 @@ afterAll(async () => {
   await db.delete();
 });
 
-describe("AvaDexie v9 schema", () => {
-  it("is current and removes the planning tables", async () => {
+describe("AvaDexie v10 schema", () => {
+  it("is current and keeps every earlier table", async () => {
     await db.open();
 
     expect(
@@ -161,9 +197,9 @@ describe("AvaDexie v9 schema", () => {
           return name;
         })
         .sort(),
-    ).toEqual([...Object.keys(v9Schemas), "meta"].sort());
+    ).toEqual([...Object.keys(v10Schemas), "meta"].sort());
 
-    Object.entries(v9Schemas).forEach(
+    Object.entries(v10Schemas).forEach(
       ([tableName, { primaryKey, indexes }]) => {
         const table = db.table(tableName);
 
@@ -175,6 +211,28 @@ describe("AvaDexie v9 schema", () => {
         ).toEqual(indexes);
       },
     );
+  });
+
+  it("adds the relation cache tables without deleting anything", async () => {
+    await _upgradeFromLegacyDatabase(_seedV9DatabaseWithParquetData);
+
+    const storedTableNames = _readStoredTableNames();
+    expect(storedTableNames).toContain("RelationCacheEntry");
+    expect(storedTableNames).toContain("RelationCachePayload");
+
+    await expect(db.table("RelationCacheEntry").count()).resolves.toBe(0);
+    await expect(db.table("RelationCachePayload").count()).resolves.toBe(0);
+
+    // The resumable-upload staging blob survives untouched: v10 must not
+    // treat `LocalDataset.parquetData` as a cache it is free to clear. (Not
+    // asserting `instanceof Blob`: fake-indexeddb's structured clone
+    // downgrades a Blob to a plain object, which no browser does. The key
+    // surviving, rather than being stripped by the migration, is what this
+    // covers.)
+    const stagedRow = await db.table("LocalDataset").get("staged-dataset");
+    expect(stagedRow).toBeDefined();
+    expect(Object.keys(stagedRow!)).toContain("parquetData");
+    expect(stagedRow!.parquetData).toBeDefined();
   });
 
   it("keys the public snapshot cache by dashboard and dataset together", () => {

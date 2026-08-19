@@ -6,6 +6,28 @@ export function escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
 }
 
+/**
+ * Prefix of the auxiliary view that exposes a dataset's physical row order.
+ *
+ * Deliberately not a `RelationRef` prefix: an `ava_rows_` view is an internal
+ * implementation detail of ordering, never a relation a query may name, so
+ * `RelationRef.fromTableName` must not resolve it.
+ */
+const ROW_NUMBERED_VIEW_PREFIX = "ava_rows_";
+
+/**
+ * Names the auxiliary view that carries a dataset's `file_row_number`.
+ *
+ * A dataset's public view is `SELECT * FROM read_parquet(...)` without
+ * `file_row_number = true`, which verifiably hides the column, and adding it
+ * there would leak an internal column into every `SELECT *` in the product. So
+ * ordering reads a parallel view instead. This is what gives the `first` value
+ * picker a **total** order: contributing dataset, then physical row.
+ */
+export function getRowNumberedViewName(tableName: string): string {
+  return `${ROW_NUMBERED_VIEW_PREFIX}${tableName}`;
+}
+
 /** Builds the `EXCLUDE`/replacement clauses for a parquet projection. */
 export function getParquetProjectionClauses(
   columnReplacements: DuckDbLoadParquetOptions["columnReplacements"],

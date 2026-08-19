@@ -10,9 +10,9 @@ import {
 import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getDatasetColumnAssertions";
+import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { Logger } from "@/utils/Logger";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Individual } from "$/models/ontology/Individual/Individual";
@@ -73,7 +73,7 @@ export async function generateIndividuals(
       identifierMappingsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
-  await WorkspaceQetlClient.runQuery({
+  await WorkspaceQuerySession.runQuery({
     rawSql: sqlTemplate(`
       DROP TABLE IF EXISTS "$conceptId$";
 

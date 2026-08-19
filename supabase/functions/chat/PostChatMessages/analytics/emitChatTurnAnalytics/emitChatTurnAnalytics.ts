@@ -5,7 +5,7 @@ import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpe
 import type { AnalyticsApp } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
-/** What a turn ended up being, and the facts only the server knows about it. */
+/** What a turn ended up being, and the relations only the server knows about it. */
 type ChatTurnOutcomeRecord =
   | {
       kind: "completed";

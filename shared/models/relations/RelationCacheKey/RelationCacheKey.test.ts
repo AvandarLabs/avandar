@@ -1,0 +1,267 @@
+import {
+  coversColumns,
+  makeIdentityTokensFromIdentity,
+  makePreparedRelationCacheKeyFromKey,
+  makePrincipalKeyFromPublicSession,
+  makePrincipalKeyFromWorkspaceSession,
+  serves,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey.ts";
+import { describe, expect, it } from "vitest";
+import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+
+const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
+const OTHER_DATASET_ID = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
+
+const WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
+  workspaceId: "workspace-1",
+  userId: "user-1",
+});
+
+function _makeIdentity(
+  overrides: Partial<RelationCacheIdentity> = {},
+): RelationCacheIdentity {
+  return {
+    principal: WORKSPACE_PRINCIPAL,
+    relation: { kind: "dataset", id: DATASET_ID },
+    definition: { kind: "virtual-sql", text: "select * from t" },
+    sourceVersion: undefined,
+    ...overrides,
+  };
+}
+
+describe("makePrincipalKeyFromWorkspaceSession", () => {
+  it("builds the workspace principal form", () => {
+    expect(
+      makePrincipalKeyFromWorkspaceSession({
+        workspaceId: "ws1",
+        userId: "u1",
+      }),
+    ).toBe("w:ws1:u1");
+  });
+});
+
+describe("makePrincipalKeyFromPublicSession", () => {
+  it("builds the public principal form", () => {
+    expect(
+      makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: "dash1",
+        snapshotRevision: "rev.1_2-A",
+      }),
+    ).toBe("p:published:dash1:rev.1_2-A");
+  });
+
+  it("rejects a snapshotRevision that could carry the ':' delimiter", () => {
+    expect(() => {
+      return makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: "dash1",
+        snapshotRevision: "rev:1",
+      });
+    }).toThrow();
+  });
+
+  it("rejects an empty snapshotRevision", () => {
+    expect(() => {
+      return makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: "dash1",
+        snapshotRevision: "",
+      });
+    }).toThrow();
+  });
+});
+
+describe("makeIdentityTokensFromIdentity", () => {
+  it("is deterministic for the same inputs", async () => {
+    const identity = _makeIdentity();
+    const [first, second] = await Promise.all([
+      makeIdentityTokensFromIdentity(identity),
+      makeIdentityTokensFromIdentity(identity),
+    ]);
+    expect(first.identityKey).toBe(second.identityKey);
+  });
+
+  it("changes when the principal changes", async () => {
+    const a = await makeIdentityTokensFromIdentity(_makeIdentity());
+    const b = await makeIdentityTokensFromIdentity(
+      _makeIdentity({
+        principal: makePrincipalKeyFromWorkspaceSession({
+          workspaceId: "workspace-2",
+          userId: "user-1",
+        }),
+      }),
+    );
+    expect(a.identityKey).not.toBe(b.identityKey);
+  });
+
+  it("changes when the relation changes", async () => {
+    const a = await makeIdentityTokensFromIdentity(_makeIdentity());
+    const b = await makeIdentityTokensFromIdentity(
+      _makeIdentity({ relation: { kind: "dataset", id: OTHER_DATASET_ID } }),
+    );
+    expect(a.identityKey).not.toBe(b.identityKey);
+  });
+
+  it("changes when the definition text differs only by whitespace", async () => {
+    const a = await makeIdentityTokensFromIdentity(
+      _makeIdentity({
+        definition: { kind: "virtual-sql", text: "select * from t" },
+      }),
+    );
+    const b = await makeIdentityTokensFromIdentity(
+      _makeIdentity({
+        definition: { kind: "virtual-sql", text: "select *  from t" },
+      }),
+    );
+    expect(a.identityKey).not.toBe(b.identityKey);
+    expect(a.definitionToken).not.toBe(b.definitionToken);
+  });
+
+  it("changes when the source version changes, though it is never matched at lookup", async () => {
+    const a = await makeIdentityTokensFromIdentity(
+      _makeIdentity({ sourceVersion: "v1" }),
+    );
+    const b = await makeIdentityTokensFromIdentity(
+      _makeIdentity({ sourceVersion: "v2" }),
+    );
+    expect(a.identityKey).not.toBe(b.identityKey);
+  });
+
+  it("gives a workspace and a public principal over the same relation and definition different identity keys", async () => {
+    const workspace = await makeIdentityTokensFromIdentity(_makeIdentity());
+    const publicPrincipal = await makeIdentityTokensFromIdentity(
+      _makeIdentity({
+        principal: makePrincipalKeyFromPublicSession({
+          bucket: "published",
+          dashboardId: "dash1",
+          snapshotRevision: "1",
+        }),
+      }),
+    );
+    expect(workspace.identityKey).not.toBe(publicPrincipal.identityKey);
+  });
+});
+
+describe("coversColumns", () => {
+  it("hits when the cached set equals the needed set", () => {
+    expect(coversColumns(["a", "b"], ["a", "b"])).toBe(true);
+  });
+
+  it("hits when the needed set is a subset of the cached set", () => {
+    expect(coversColumns(["a", "b", "c"], ["a"])).toBe(true);
+  });
+
+  it("misses when the needed set is a superset of the cached set", () => {
+    expect(coversColumns(["a"], ["a", "b"])).toBe(false);
+  });
+
+  it("treats cached 'all' as covering any request", () => {
+    expect(coversColumns("all", ["a", "b"])).toBe(true);
+    expect(coversColumns("all", "all")).toBe(true);
+  });
+
+  it("treats needed 'all' against a finite cached set as a miss", () => {
+    expect(coversColumns(["a", "b"], "all")).toBe(false);
+  });
+
+  it("compares column names case-sensitively", () => {
+    expect(coversColumns(["A"], ["a"])).toBe(false);
+  });
+});
+
+describe("serves", () => {
+  it("serves when principal, table, definition match and columns are covered", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d0",
+      columns: ["a", "b"],
+      staleAt: undefined,
+    };
+    expect(
+      serves(entry, {
+        principalKey: "w:ws:u",
+        tableName: DATASET_ID,
+        definitionToken: "d0",
+        columns: ["a"],
+      }),
+    ).toBe(true);
+  });
+
+  it("never serves a different principal, even over the same relation and definition", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d0",
+      columns: "all" as const,
+      staleAt: undefined,
+    };
+    expect(
+      serves(entry, {
+        principalKey: "p:published:dash1:1",
+        tableName: DATASET_ID,
+        definitionToken: "d0",
+        columns: "all",
+      }),
+    ).toBe(false);
+  });
+
+  it("does not serve once staleAt is set", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d0",
+      columns: "all" as const,
+      staleAt: Date.now(),
+    };
+    expect(
+      serves(entry, {
+        principalKey: "w:ws:u",
+        tableName: DATASET_ID,
+        definitionToken: "d0",
+        columns: "all",
+      }),
+    ).toBe(false);
+  });
+
+  it("does not serve a different definition token", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d1.aaaa",
+      columns: "all" as const,
+      staleAt: undefined,
+    };
+    expect(
+      serves(entry, {
+        principalKey: "w:ws:u",
+        tableName: DATASET_ID,
+        definitionToken: "d1.bbbb",
+        columns: "all",
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("makePreparedRelationCacheKeyFromKey", () => {
+  it("carries the relation's table name, the principal and a definition token", async () => {
+    const prepared = await makePreparedRelationCacheKeyFromKey({
+      ..._makeIdentity(),
+      columns: ["a"],
+    });
+    expect(prepared.principalKey).toBe(WORKSPACE_PRINCIPAL);
+    expect(prepared.tableName).toBe(DATASET_ID);
+    expect(prepared.columns).toEqual(["a"]);
+    expect(prepared.definitionToken).toMatch(/^d1\./);
+  });
+
+  it("produces 'd0' for an undefined definition", async () => {
+    const prepared = await makePreparedRelationCacheKeyFromKey({
+      ..._makeIdentity({ definition: undefined }),
+      columns: "all",
+    });
+    expect(prepared.definitionToken).toBe("d0");
+  });
+});
