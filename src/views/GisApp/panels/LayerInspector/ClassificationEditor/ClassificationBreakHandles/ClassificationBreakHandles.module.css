@@ -1,0 +1,15 @@
+.classificationBreakHandles {
+  display: flex;
+  justify-content: space-around;
+}
+
+.classificationBreakHandle:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .classificationBreakHandle {
+    transition: none;
+  }
+}

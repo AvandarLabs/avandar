@@ -119,6 +119,23 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
     );
   });
 
+  it("skips a Docker-published port set when choosing an automatic base", async () => {
+    const fake = createFakeIO({ publishedHostPorts: [55322] });
+    await expect(
+      SupabaseLocalEnvironment.switch({
+        io: fake.io,
+        temporaryProjectId: "analytics-p2-temp",
+      }),
+    ).resolves.toEqual({
+      basePort: 55341,
+      devServerPort: 6193,
+      projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
+    });
+    expect(fake.files.get(CONFIG_PATH)).toContain("port = 55341");
+    expect(fake.files.get(CONFIG_PATH)).toContain("port = 55342");
+  });
+
   it("ignores a backup belonging to another branch", async () => {
     const fake = createFakeIO();
     makeBackupHierarchy({ branch: "feat/other-work" }).forEach(
@@ -131,7 +148,12 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         io: fake.io,
         temporaryProjectId: "analytics-p2-temp",
       }),
-    ).resolves.toEqual({ basePort: 55321, projectId: "analytics-p2-temp" });
+    ).resolves.toEqual({
+      basePort: 55321,
+      devServerPort: 6173,
+      projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
+    });
   });
 
   it("ignores a same-branch backup belonging to another worktree", async () => {
@@ -146,7 +168,12 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
         io: fake.io,
         temporaryProjectId: "analytics-p2-temp",
       }),
-    ).resolves.toEqual({ basePort: 55321, projectId: "analytics-p2-temp" });
+    ).resolves.toEqual({
+      basePort: 55321,
+      devServerPort: 6173,
+      projectId: "analytics-p2-temp",
+      seed: { state: "seeded" },
+    });
   });
 
   it("backs up every development file before rewriting configuration", async () => {

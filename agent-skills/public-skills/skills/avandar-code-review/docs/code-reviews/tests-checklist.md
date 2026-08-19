@@ -5,6 +5,10 @@ actually protects behavior. A test that cannot fail for a real, behavioral
 reason is worse than no test: it reports coverage that does not exist. Apply
 these rules only to test lines in the diff.
 
+This file is the core of the `tests` focused review. That pack applies
+this checklist only; it does not apply comment, naming, or file-layout
+rules from other phases.
+
 ## Tautological and assertion-free tests
 
 Flag any test whose assertion can only fail if a symbol is deleted or renamed,

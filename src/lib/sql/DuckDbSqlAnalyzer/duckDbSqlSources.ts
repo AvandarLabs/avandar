@@ -56,6 +56,7 @@ const INSPECTABLE_TABLE_FUNCTIONS = new Set([
   "generate_series",
   "range",
   "unnest",
+  "json_each",
 ]);
 const INSPECTABLE_INTERNAL_TABLES = new Set(["reject_errors", "reject_scans"]);
 

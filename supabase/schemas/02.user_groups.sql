@@ -21,7 +21,8 @@ select
 ,
   insert,
 update,
-delete on table public.user_groups to authenticated;
+delete on table public.user_groups to authenticated,
+service_role;
 
 create trigger tr_user_groups__set_updated_at before
 update on public.user_groups for each row

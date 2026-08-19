@@ -18,6 +18,7 @@ type GetAvailableBasePortOptions = {
   currentApiPort: SupabaseConfigState["apiPort"];
   currentPorts: SupabaseConfigState["ports"];
   requestedBasePort?: number;
+  occupiedHostPorts?: readonly number[];
   isPortAvailable: (port: number) => Promise<boolean>;
 };
 
@@ -89,8 +90,13 @@ async function _findAutomaticBasePort(
 async function _getAvailableBasePortFromPorts(
   options: Readonly<GetAvailableBasePortOptions>,
 ): Promise<number> {
-  const { currentApiPort, currentPorts, requestedBasePort, isPortAvailable } =
-    options;
+  const occupiedHostPorts = new Set(options.occupiedHostPorts ?? []);
+  const isPortAvailable = async (port: number) => {
+    return (
+      !occupiedHostPorts.has(port) && (await options.isPortAvailable(port))
+    );
+  };
+  const { currentApiPort, currentPorts, requestedBasePort } = options;
   if (requestedBasePort !== undefined) {
     const derivedPorts = _makeDerivedPortsFromBasePort({
       currentApiPort,

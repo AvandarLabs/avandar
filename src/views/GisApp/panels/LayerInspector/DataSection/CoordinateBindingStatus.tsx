@@ -1,0 +1,46 @@
+import { Callout } from "@avandar/ui";
+import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+import { LowConfidenceMatchCallout } from "@/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout";
+import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ReactNode } from "react";
+
+type Props = {
+  layer: MapLayer.T;
+  guess: GeoBindingGuess | undefined;
+  isBound: boolean;
+  hasCoordinateCandidates: boolean;
+};
+
+/** Explains inferred, incomplete, or unavailable coordinate bindings. */
+export function CoordinateBindingStatus({
+  layer,
+  guess,
+  isBound,
+  hasCoordinateCandidates,
+}: Props): ReactNode {
+  const { t } = useLingui();
+  return (
+    isBound ?
+      guess?.confidence === "low" ?
+        <LowConfidenceMatchCallout
+          key={`${guess.latitudeColumnName}:${guess.longitudeColumnName}`}
+          guess={guess}
+        />
+      : null
+    : hasCoordinateCandidates ?
+      <Callout color="warning">
+        {t`Pick both a latitude and a longitude column. One on its own plots every point on a diagonal line, which looks like a result and is not.`}
+      </Callout>
+    : layer.source.dataSource ?
+      <Callout color="warning">
+        <Stack gap="xs">
+          <span>
+            {t`No column in ${layer.source.dataSource.name} holds coordinates. Boundary joins arrive in a later release, so pick a different source.`}
+          </span>
+        </Stack>
+      </Callout>
+    : null
+  );
+}

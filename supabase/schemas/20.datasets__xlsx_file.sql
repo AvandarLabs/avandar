@@ -38,7 +38,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets__xlsx_file to authenticated;
+delete on table public.datasets__xlsx_file to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__xlsx_file in their workspace" on public.datasets__xlsx_file for

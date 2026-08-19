@@ -33,7 +33,8 @@ select
 ,
   insert,
 update,
-delete on table public.role_groups to authenticated;
+delete on table public.role_groups to authenticated,
+service_role;
 
 create trigger tr_role_groups__set_updated_at before
 update on public.role_groups for each row

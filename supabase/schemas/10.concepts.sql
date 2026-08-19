@@ -26,7 +26,8 @@ select
 ,
   insert,
 update,
-delete on table public.concepts to authenticated;
+delete on table public.concepts to authenticated,
+service_role;
 
 -- Policies
 create policy "User can SELECT concepts" on public.concepts for

@@ -89,11 +89,18 @@ alter table public.subscriptions enable row level security;
 
 -- Data API privileges.
 --
--- Read-only: subscription rows are written by the billing backend under
--- `service_role`, never by a browser.
+-- Read-only for the Data API: subscription rows are written by the billing
+-- backend under `service_role`, never by a browser.
 grant
 select
   on table public.subscriptions to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.subscriptions to service_role;
 
 --------------------------------------------------------------------------------
 -- Policies: subscriptions

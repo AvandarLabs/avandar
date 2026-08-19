@@ -51,7 +51,7 @@ catalog:
   "@mantine/hooks": ^9.2.0
   "@mantine/modals": ^9.2.0
   "@mantine/notifications": ^9.2.0
-  "@supabase/supabase-js": ^2.98.0
+  "@supabase/supabase-js": ^2.112.3
   "@tabler/icons-react": ^3.31.0
   "@tanstack/react-query": ^5.81.5
   "@tanstack/react-router": ^1.170.0

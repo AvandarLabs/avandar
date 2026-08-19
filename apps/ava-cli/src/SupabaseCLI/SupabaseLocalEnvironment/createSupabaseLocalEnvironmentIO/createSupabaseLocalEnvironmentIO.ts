@@ -1,4 +1,5 @@
 import { createDockerIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createDockerIO";
+import { createSeedIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSeedIO";
 import { FileSystemIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/FileSystemIO";
 import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand";
 import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
@@ -44,5 +45,6 @@ export function createSupabaseLocalEnvironmentIO(
     ...FileSystemIO.createPathIO(),
     ..._createGitIO(projectRoot),
     ...createDockerIO(projectRoot),
+    ...createSeedIO(projectRoot),
   };
 }

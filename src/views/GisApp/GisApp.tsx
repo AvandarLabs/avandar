@@ -1,37 +1,20 @@
-import { Box } from "@mantine/core";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { GisMapCanvas } from "@/views/GisApp/GisMapCanvas/GisMapCanvas";
-import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector";
-import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
-import { useGisMapState } from "@/views/GisApp/useGisMapState";
-import type { Workspace } from "$/models/Workspace/Workspace";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import css from "@/views/GisApp/GisApp.module.css";
+import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
+import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
 
-type Props = { workspaceId: Workspace.Id };
+type Props = { avaMap: AvaMap.T };
 
-/**
- * The GIS app. Holds the map config in state, runs each layer's query, and
- * hands the resulting declarative spec to the canvas.
- */
-export function GisApp({ workspaceId }: Props): ReactNode {
-  const { avaMap, layer, updateLayer, updateBasemap } = useGisMapState();
-  const inspector = useFeatureInspector();
+/** Coordinates the editable map state with the GIS application shell. */
+export function GisApp({ avaMap }: Props): ReactNode {
+  const app = useGisApp(avaMap);
 
   return (
-    <Box w="100%" mih="100dvh" pos="relative">
-      <GisMapCanvas
-        avaMap={avaMap}
-        layer={layer}
-        onBasemapChange={updateBasemap}
-        onFeatureClick={inspector.onFeatureClick}
-        onLayerChange={updateLayer}
-        workspaceId={workspaceId}
-      />
-      <FeatureInspector
-        opened={inspector.isInspectorOpen}
-        onClose={inspector.closeInspector}
-        feature={inspector.selectedFeature}
-      />
-    </Box>
+    <AppLayout containerProps={{ className: css.canvas }}>
+      <GisAppMapShell app={app} />
+    </AppLayout>
   );
 }

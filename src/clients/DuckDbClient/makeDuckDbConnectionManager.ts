@@ -2,6 +2,7 @@ import * as duckdb from "@duckdb/duckdb-wasm";
 import { buildManualDuckDbBundles } from "@/clients/DuckDbClient/duckDbManualBundles";
 import { shouldLoadDuckDbNetworkExtensions } from "@/clients/DuckDbClient/shouldLoadDuckDbNetworkExtensions";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import type { DuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { ILogger } from "@avandar/logger";
 
 /** Lazily starts DuckDB-WASM and tracks the connections handed out. */
@@ -88,6 +89,7 @@ async function _loadDuckDbExtensions(
     conn: duckdb.AsyncDuckDBConnection;
     hasPthreadWorker: boolean;
     logger: ILogger;
+    spatialAvailability: DuckDbSpatialAvailabilityStore;
   }>,
 ): Promise<void> {
   const { conn, logger } = options;
@@ -105,27 +107,33 @@ async function _loadDuckDbExtensions(
   // .xlsx flows hit a runtime "unknown function/format" error instead of
   // breaking the whole client.
   // TODO(jpsyx): only load spatial when a geo query needs it.
-  const loadOptionalExtension = async (name: string): Promise<void> => {
+  const loadOptionalExtension = async (name: string): Promise<boolean> => {
     try {
       await conn.query(`LOAD ${name};`);
+      return true;
     } catch (error) {
       logger.warn(
         `DuckDB extension "${name}" failed to load (likely offline); ` +
           "queries that need it will fail.",
         { error },
       );
+      return false;
     }
   };
-  if (loadNetworkExtensions) {
-    await loadOptionalExtension("spatial");
-  }
+  const didLoadSpatial =
+    loadNetworkExtensions && (await loadOptionalExtension("spatial"));
+  options.spatialAvailability.set(didLoadSpatial ? "available" : "unavailable");
   await conn.query("LOAD parquet;");
   if (loadNetworkExtensions) {
     await loadOptionalExtension("excel");
   }
 }
 
-async function _initializeDuckDb(logger: ILogger): Promise<duckdb.AsyncDuckDB> {
+async function _initializeDuckDb(options: {
+  logger: ILogger;
+  spatialAvailability: DuckDbSpatialAvailabilityStore;
+}): Promise<duckdb.AsyncDuckDB> {
+  const { logger, spatialAvailability } = options;
   const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
 
   const worker = new Worker(bundle.mainWorker!);
@@ -146,6 +154,7 @@ async function _initializeDuckDb(logger: ILogger): Promise<duckdb.AsyncDuckDB> {
     conn,
     hasPthreadWorker: bundle.pthreadWorker != null,
     logger,
+    spatialAvailability,
   });
   await conn.close();
 
@@ -153,18 +162,23 @@ async function _initializeDuckDb(logger: ILogger): Promise<duckdb.AsyncDuckDB> {
 }
 
 /** Creates the lazily started DuckDB instance and its connection tracker. */
-export function makeDuckDbConnectionManager(
-  logger: ILogger,
-): DuckDbConnectionManager {
+export function makeDuckDbConnectionManager(options: {
+  logger: ILogger;
+  spatialAvailability: DuckDbSpatialAvailabilityStore;
+}): DuckDbConnectionManager {
+  const { logger, spatialAvailability } = options;
   const openConnections = new Set<duckdb.AsyncDuckDBConnection>();
   let dbPromise: Promise<duckdb.AsyncDuckDB> | undefined;
 
   const getDb = async (): Promise<duckdb.AsyncDuckDB> => {
     if (!dbPromise) {
-      dbPromise = _initializeDuckDb(logger).catch((error: unknown) => {
-        dbPromise = undefined;
-        throw error;
-      });
+      dbPromise = _initializeDuckDb({ logger, spatialAvailability }).catch(
+        (error: unknown) => {
+          dbPromise = undefined;
+          spatialAvailability.set("unavailable");
+          throw error;
+        },
+      );
     }
     return dbPromise;
   };

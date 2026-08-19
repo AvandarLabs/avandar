@@ -82,7 +82,10 @@ building the temporary port set.
 For an explicit base port, the command verifies the complete derived set is
 within the valid TCP port range and available before writing any file. Without
 an explicit port, it searches candidate base ports until the complete derived
-set is available. A candidate is rejected if any required port is listening.
+set is available. A candidate is rejected if any required port is listening or
+already published by a running Docker container. Node bind probes cannot see
+every Docker Desktop mapping, so switch also reads `docker ps` published host
+ports before choosing a set.
 
 ### Switch lifecycle
 

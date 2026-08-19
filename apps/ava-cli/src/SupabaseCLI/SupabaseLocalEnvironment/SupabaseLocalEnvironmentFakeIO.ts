@@ -4,6 +4,7 @@ import type {
   SupabaseDockerResource,
   SupabaseDockerResourceInspection,
   SupabaseLocalEnvironmentIO,
+  SupabaseSeedTarget,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** Canonical project root used by the local-environment fake. */
@@ -26,9 +27,18 @@ port = 54321
 port = 54322
 `;
 /** Initial browser environment contents stored by the fake. */
-export const ORIGINAL_ENV = "VITE_SUPABASE_API_URL=old\nUNRELATED=keep\n";
+export const ORIGINAL_ENV = `VITE_APP_URL=http://localhost:5173/
+VITE_SUPABASE_API_URL=old
+VITE_SUPABASE_ANON_KEY=old
+SUPABASE_SERVICE_ROLE_KEY=old
+UNRELATED=keep
+`;
 /** Initial edge-function environment contents stored by the fake. */
-export const ORIGINAL_EDGE_ENV = "SB_SECRET_KEY=old\n";
+export const ORIGINAL_EDGE_ENV = `SB_SECRET_KEY=old
+SB_PUBLISHABLE_KEY=old
+SB_JWT_ISSUER=http://127.0.0.1:54321/auth/v1
+GOOGLE_REDIRECT_URI="http://localhost:54321/functions/v1/google-auth-callback"
+`;
 /** Successful `supabase status` response returned by the fake. */
 export const STATUS_JSON = JSON.stringify({
   API_URL: "http://127.0.0.1:55321",
@@ -58,6 +68,9 @@ export type FakeOptions = {
   >;
   resourceRemovalFailures?: readonly string[];
   listResourcesError?: string;
+  publishedHostPorts?: readonly number[];
+  seedResult?: Readonly<CommandResult>;
+  seedError?: string;
 };
 
 /** Mutable state and I/O adapter exposed to local-environment tests. */
@@ -69,6 +82,7 @@ export type FakeHarness = {
   copyOperations: Array<[string, string]>;
   operations: string[];
   removedResources: SupabaseDockerResource[];
+  seedTargets: SupabaseSeedTarget[];
 };
 
 /** Mutable fake state shared by its focused I/O adapters. */
@@ -99,6 +113,7 @@ function _createFakeState(options: Readonly<FakeOptions>): FakeState {
     copyOperations: [],
     operations: [],
     removedResources: [],
+    seedTargets: [],
     commandResults: options.commandResults ?? {},
   };
 }
@@ -267,6 +282,7 @@ function _createFakeDockerIO(
   | "listSupabaseResources"
   | "inspectSupabaseResource"
   | "removeSupabaseResource"
+  | "listPublishedHostPorts"
 > {
   const { options, state } = factoryOptions;
   return {
@@ -295,6 +311,9 @@ function _createFakeDockerIO(
       state.removedResources.push(resource);
       return { ok: true, stdout: "", stderr: "" };
     },
+    listPublishedHostPorts: async () => {
+      return [...(options.publishedHostPorts ?? [])];
+    },
   };
 }
 
@@ -302,7 +321,11 @@ function _createFakeCommandIO(
   factoryOptions: Readonly<FakeFactoryOptions>,
 ): Pick<
   SupabaseLocalEnvironmentIO,
-  "readBranch" | "readWorktreePath" | "isPortAvailable" | "runSupabase"
+  | "readBranch"
+  | "readWorktreePath"
+  | "isPortAvailable"
+  | "runSupabase"
+  | "runSeed"
 > {
   const { options, state } = factoryOptions;
   return {
@@ -323,6 +346,20 @@ function _createFakeCommandIO(
         state.commandResults[command.join(" ")] ?? {
           ok: true,
           stdout: command[0] === "status" ? STATUS_JSON : "",
+          stderr: "",
+        }
+      );
+    },
+    runSeed: async (target) => {
+      state.seedTargets.push({ ...target });
+      state.operations.push(`seed:${target.supabaseUrl}`);
+      if (options.seedError) {
+        throw new Error(options.seedError);
+      }
+      return (
+        options.seedResult ?? {
+          ok: true,
+          stdout: "",
           stderr: "",
         }
       );
@@ -350,6 +387,7 @@ function _createFakeIO(options: Readonly<FakeOptions> = {}): FakeHarness {
     copyOperations: state.copyOperations,
     operations: state.operations,
     removedResources: state.removedResources,
+    seedTargets: state.seedTargets,
   };
 }
 

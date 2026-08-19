@@ -21,7 +21,8 @@ select
 ,
   insert,
 update,
-delete on table public.role_group_app_roles to authenticated;
+delete on table public.role_group_app_roles to authenticated,
+service_role;
 
 create trigger tr_role_group_app_roles__set_updated_at before
 update on public.role_group_app_roles for each row

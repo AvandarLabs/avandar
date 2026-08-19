@@ -1,15 +1,20 @@
 import { execFile } from "node:child_process";
 import * as net from "node:net";
 import { promisify } from "node:util";
+import { promiseMapSequential } from "@avandar/utils";
 import type { CommandResult } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const execFileAsync = promisify(execFile);
+
+/** Addresses a port must be free on before a local service may claim it. */
+const PROBED_HOSTS = ["127.0.0.1", "0.0.0.0"] as const;
 
 async function _runCommand(
   options: Readonly<{
     command: string;
     args: readonly string[];
     cwd: string;
+    env?: Readonly<Record<string, string>>;
   }>,
 ): Promise<CommandResult> {
   try {
@@ -17,6 +22,10 @@ async function _runCommand(
       cwd: options.cwd,
       encoding: "utf8",
       maxBuffer: 10 * 1024 * 1024,
+      // Only set `env` when there is something to override: passing it always
+      // would replace the inherited environment with a copy, which is a
+      // different call than every existing caller makes.
+      ...(options.env ? { env: { ...process.env, ...options.env } } : {}),
     });
     return {
       ok: true,
@@ -38,7 +47,9 @@ async function _runCommand(
   }
 }
 
-function _isPortAvailable(port: number): Promise<boolean> {
+function _isHostPortAvailable(
+  options: Readonly<{ port: number; host: string }>,
+): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
     server.once("error", (error: NodeJS.ErrnoException) => {
@@ -48,7 +59,7 @@ function _isPortAvailable(port: number): Promise<boolean> {
       }
       reject(error);
     });
-    server.listen(port, "127.0.0.1", () => {
+    server.listen(options.port, options.host, () => {
       server.close(() => {
         resolve(true);
       });
@@ -56,8 +67,29 @@ function _isPortAvailable(port: number): Promise<boolean> {
   });
 }
 
+async function _isPortAvailable(port: number): Promise<boolean> {
+  // Probe one host at a time: overlapping the binds would have each probe
+  // competing with the socket the other one is holding.
+  const availability = await promiseMapSequential(PROBED_HOSTS, (host) => {
+    return _isHostPortAvailable({ port, host });
+  });
+  return availability.every(Boolean);
+}
+
 /** Runs local processes and probes local TCP ports. */
 export const RunLocalCommand = {
+  /**
+   * Reports whether a port is free on every local address.
+   *
+   * Both a loopback and a wildcard bind have to succeed, because neither alone
+   * sees every holder on macOS. Docker publishes a container port on the IPv6
+   * wildcard while `127.0.0.1` stays bindable, so a loopback-only probe calls
+   * another local Supabase stack's port free and the switch that follows dies
+   * inside `supabase start`. BSD sockets then allow a wildcard bind alongside
+   * an existing loopback one, so a wildcard-only probe misses a plain local
+   * server.
+   */
   isPortAvailable: _isPortAvailable,
+
   run: _runCommand,
 };

@@ -34,6 +34,13 @@ grant
 select
   on table public.catalog_entries__dataset_column to authenticated;
 
+grant
+select
+,
+  insert,
+update,
+delete on table public.catalog_entries__dataset_column to service_role;
+
 -- Any signed-in user may read the catalog's column associations.
 --
 -- Scoped `to authenticated` rather than left unscoped. An unscoped policy

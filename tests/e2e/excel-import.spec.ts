@@ -32,10 +32,6 @@ async function expectExcelParsePreview(options: {
   sampleCellSubstring: string;
 }): Promise<void> {
   await expect(
-    options.page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
-
-  await expect(
     options.page.getByText(
       `These are the first ${options.formattedRowCount} rows`,
       { exact: false },

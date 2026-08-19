@@ -1,4 +1,5 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand";
+import { DockerPublishedPorts } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import {
   constant,
@@ -157,6 +158,18 @@ function _makeRemoveArgumentsFromResource(
   });
 }
 
+async function _listPublishedHostPorts(projectRoot: string): Promise<number[]> {
+  const result = await RunLocalCommand.run({
+    command: "docker",
+    args: ["ps", "--format", "{{.Ports}}"],
+    cwd: projectRoot,
+  });
+  if (!result.ok) {
+    throw new Error(`Cannot list Docker published ports: ${result.stderr}`);
+  }
+  return DockerPublishedPorts.fromPsOutput(result.stdout);
+}
+
 /** Creates the Docker and Supabase command adapter for a project root. */
 export function createDockerIO(
   projectRoot: string,
@@ -167,6 +180,7 @@ export function createDockerIO(
   | "inspectSupabaseResource"
   | "removeSupabaseResource"
   | "runSupabase"
+  | "listPublishedHostPorts"
 > {
   return {
     hasSupabaseResources: async (projectId) => {
@@ -193,6 +207,9 @@ export function createDockerIO(
         args: commandArguments,
         cwd: projectRoot,
       });
+    },
+    listPublishedHostPorts: async () => {
+      return await _listPublishedHostPorts(projectRoot);
     },
   };
 }

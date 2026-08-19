@@ -52,6 +52,100 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 /** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
+/** Directory of GIS geometry, boundary, and point CSV fixtures. */
+const GIS_DATA_DIR = path.join(process.cwd(), "tests/data/gis");
+
+/** Point, line, and polygon rows in WKT, WKB, and GeoJSON columns. */
+export const GIS_GEOMETRY_FORMATS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "geometry-formats.csv",
+);
+/** Adjacent square polygons with code, name, and population. */
+export const GIS_BOUNDARY_POLYGONS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "boundary-polygons.csv",
+);
+/** Lat/lng points with a numeric value column. */
+export const GIS_LAT_LNG_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "lat-lng-points.csv",
+);
+/** Pre-aggregated boundary-key summary values. */
+export const GIS_BOUNDARY_SUMMARY_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "boundary-summary.csv",
+);
+
+/** Parsed row count of {@link GIS_GEOMETRY_FORMATS_CSV_PATH}. */
+export const GIS_GEOMETRY_FORMATS_ROW_COUNT = 4;
+/** Parsed row count of {@link GIS_BOUNDARY_POLYGONS_CSV_PATH}. */
+export const GIS_BOUNDARY_POLYGONS_ROW_COUNT = 4;
+/** Parsed row count of {@link GIS_LAT_LNG_POINTS_CSV_PATH}. */
+export const GIS_LAT_LNG_POINTS_ROW_COUNT = 8;
+/** Parsed row count of {@link GIS_BOUNDARY_SUMMARY_CSV_PATH}. */
+export const GIS_BOUNDARY_SUMMARY_ROW_COUNT = 7;
+
+/**
+ * Points with two tight groups a degree apart, so a fitted map clusters each
+ * group into a single symbol. `cases` is the first numeric column, so a
+ * graduated classification defaults to it, and `population` is a second
+ * numeric column available as a normalization denominator.
+ */
+export const GIS_CLUSTER_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "cluster-points.csv",
+);
+
+/** Two valid rows plus two whose latitude only fits as a longitude. */
+export const GIS_SWAPPED_LAT_LNG_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "swapped-lat-lng-points.csv",
+);
+
+/**
+ * Four points sharing one coordinate and one point a degree away, so any
+ * fixed-meter grid puts them in exactly two cells with counts four and one.
+ */
+export const GIS_GRID_BIN_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "grid-bin-points.csv",
+);
+
+/** Point WKT in EPSG:3857 whose WGS 84 equivalents sit near 10E 10N. */
+export const GIS_WEB_MERCATOR_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "web-mercator-points.csv",
+);
+
+/** Parsed row count of {@link GIS_CLUSTER_POINTS_CSV_PATH}. */
+export const GIS_CLUSTER_POINTS_ROW_COUNT = 8;
+/** Parsed row count of {@link GIS_SWAPPED_LAT_LNG_POINTS_CSV_PATH}. */
+export const GIS_SWAPPED_LAT_LNG_POINTS_ROW_COUNT = 4;
+/** Parsed row count of {@link GIS_GRID_BIN_POINTS_CSV_PATH}. */
+export const GIS_GRID_BIN_POINTS_ROW_COUNT = 5;
+/** Parsed row count of {@link GIS_WEB_MERCATOR_POINTS_CSV_PATH}. */
+export const GIS_WEB_MERCATOR_POINTS_ROW_COUNT = 3;
+
+/**
+ * Dated points clustered near 10E 10N, plus one later-week outlier at 11E 10N.
+ * `observed_at` is the map time column; `cases` is unused numeric payload.
+ */
+export const GIS_DATED_POINTS_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "dated-points.csv",
+);
+
+/** One P-code polygon covering 10E 10N for buffer and go-to flows. */
+export const GIS_PCODE_POLYGON_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "pcode-polygon.csv",
+);
+
+/** Parsed row count of {@link GIS_DATED_POINTS_CSV_PATH}. */
+export const GIS_DATED_POINTS_ROW_COUNT = 9;
+/** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
+export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
+
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),

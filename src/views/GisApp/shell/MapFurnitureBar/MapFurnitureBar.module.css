@@ -1,0 +1,57 @@
+.mapFurnitureBar {
+  align-items: center;
+  background: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  color: var(--mantine-color-dimmed);
+  display: flex;
+  font-size: 11px;
+  gap: var(--mantine-spacing-sm);
+  height: 28px;
+  padding: 0 var(--mantine-spacing-sm);
+}
+
+.mapFurnitureBarSpacer {
+  flex: 1;
+}
+
+.mapFurnitureBarCoordinates {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mapFurnitureBarScale {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--mantine-spacing-xxs);
+  white-space: nowrap;
+}
+
+.mapFurnitureBarScaleRule {
+  border: 1px solid var(--mantine-color-dimmed);
+  border-top: 0;
+  height: 6px;
+}
+
+.mapFurnitureBarAttribution,
+.mapFurnitureBarDisclaimer {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* The strip wraps so attribution and the disclaimer are never clipped. */
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .mapFurnitureBar {
+    flex-wrap: wrap;
+    height: auto;
+    padding-bottom: var(--mantine-spacing-xxs);
+    padding-top: var(--mantine-spacing-xxs);
+    row-gap: 2px;
+  }
+
+  .mapFurnitureBarSpacer {
+    flex-basis: 100%;
+    height: 0;
+  }
+}

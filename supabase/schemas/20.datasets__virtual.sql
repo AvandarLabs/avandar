@@ -29,7 +29,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets__virtual to authenticated;
+delete on table public.datasets__virtual to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__virtual in their workspace" on public.datasets__virtual for

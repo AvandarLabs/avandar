@@ -1,0 +1,138 @@
+/*
+ * The shell fills the AppLayout canvas. The map surface takes remaining
+ * height; the feature drawer and furniture strip sit below it in flow so
+ * opening the drawer shrinks the map instead of covering chrome.
+ *
+ * The container query is on this element rather than the viewport because the
+ * workspace nav rail takes a fixed 200px off every viewport width, so the
+ * panels have to respond to the canvas. Canvas 1000px is roughly viewport lg
+ * and canvas 792px is roughly viewport md.
+ */
+.mapShell {
+  /* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+  container-name: mapShell;
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+}
+
+.mapShellSurface {
+  background: var(--ava-surface-sunken);
+  overflow: hidden;
+  position: relative;
+}
+
+/* One grid over the map keeps every panel on the same gutter. */
+.mapShellChrome {
+  display: grid;
+  gap: var(--mantine-spacing-sm);
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  inset: 0;
+  padding: var(--mantine-spacing-sm);
+  pointer-events: none;
+  position: absolute;
+}
+
+.mapShellChrome > * {
+  pointer-events: auto;
+}
+
+/* Wrap rather than clip so every action remains reachable. */
+.mapShellTopBar {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-sm);
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-content: space-between;
+}
+
+.mapShellLeftColumn {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 0;
+}
+
+.mapShellRightColumn {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  grid-column: 3;
+  grid-row: 2 / 4;
+  min-height: 0;
+}
+
+.mapShellBottomLeft {
+  align-self: end;
+  grid-column: 1;
+  grid-row: 3;
+}
+
+/* The tool cluster stays centred on the map as panels collapse. */
+.mapShellBottomCenter {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  grid-column: 1 / -1;
+  grid-row: 3;
+  place-self: end center;
+}
+
+.mapShellFirstRun {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  place-self: center;
+}
+
+.mapShellReadOnlyNotice {
+  display: none;
+}
+
+/* Below lg, both panels share the center and stack responsively. */
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .mapShellLeftColumn,
+  .mapShellRightColumn {
+    align-self: stretch;
+    grid-row: 2 / 4;
+  }
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 520px) {
+  .mapShellLeftColumn,
+  .mapShellRightColumn,
+  .mapShellBottomCenter {
+    display: none;
+  }
+
+  .mapShellReadOnlyNotice {
+    align-items: flex-start;
+    align-self: start;
+    background: var(--ava-surface-overlay);
+    border: 1px solid var(--ava-border-default);
+    border-radius: var(--mantine-radius-md);
+    box-shadow: var(--mantine-shadow-md);
+    display: flex;
+    font-size: 12px;
+    gap: var(--mantine-spacing-xs);
+    grid-column: 1 / -1;
+    grid-row: 2;
+    line-height: 1.45;
+    margin: 0 auto;
+    max-width: 420px;
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  }
+}

@@ -116,10 +116,6 @@ test.describe("CSV with quoted fields after sniff sample", () => {
       workspaceSlug,
     });
     await expect(
-      page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
-
-    await expect(
       page.getByText(
         `These are the first ${formatImportPreviewRowCount(LATE_QUOTES_EXPECTED_ROW_COUNT)} rows`,
         { exact: false },

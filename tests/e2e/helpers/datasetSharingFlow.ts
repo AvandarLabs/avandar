@@ -32,9 +32,9 @@ export async function uploadCaliforniaCsvDataset(options: {
     .getByRole("button", { name: "Upload", exact: true })
     .click();
 
-  await expect(
-    page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
+  await expect(page.getByRole("alert", { name: "Data Preview" })).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
 
   await page.getByLabel("Dataset name").fill(datasetName);
 

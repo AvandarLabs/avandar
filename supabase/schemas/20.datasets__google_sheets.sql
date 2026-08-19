@@ -30,7 +30,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets__google_sheets to authenticated;
+delete on table public.datasets__google_sheets to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__google_sheets in their workspace" on public.datasets__google_sheets for
