@@ -88,6 +88,12 @@ function _observation(params: {
     params.extractedBy,
     params.sourceText,
     params.doc.title ?? "",
+    // KNOWN GAP: `organisation` comes from the PDF's `Author` field, which is
+    // whoever last saved the file as often as it is the publisher. Measured
+    // on the gate documents, IMC SitRep #1 gives "Roger Shambuyi", a person,
+    // and the OCHA update gives null. This column therefore lands on every
+    // observation row and must not be treated as a reliable join key until
+    // the organisation is read from the page rather than the file metadata.
     params.doc.organisation ?? "",
     params.doc.publishedAt ?? "",
     params.doc.reportNumber ?? "",

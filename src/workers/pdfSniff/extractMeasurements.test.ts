@@ -29,6 +29,38 @@ describe("extractMeasurements", () => {
     ).toBe(true);
   });
 
+  it("scopes each subject to its own comma fragment", () => {
+    // The real sentence from IMC SitRep #1, page 1, and the reason this
+    // function resolves a subject per fragment rather than per sentence.
+    // Taking the first "in <Place>" clause for the whole sentence reported
+    // South Darfur's 166 cases and 13 deaths under West Darfur.
+    const found = extractMeasurements(
+      "In June, 21,563 cases and 388 deaths have been reported, including " +
+        "13 suspected cases (five confirmed) and one death in West Darfur, " +
+        "and 166 cases and 13 deaths in South Darfur.",
+    );
+    const subjectOf = (value: number) => {
+      return found.find((m) => {
+        return m.value === value;
+      })?.subject;
+    };
+
+    // The sentence never says where the June totals happened, and with two
+    // clauses on offer there is nothing to borrow, so they stay unattributed.
+    expect(subjectOf(21_563)).toBeNull();
+    expect(subjectOf(388)).toBeNull();
+
+    expect(subjectOf(13)).toBe("West Darfur");
+    expect(subjectOf(1)).toBe("West Darfur");
+
+    expect(subjectOf(166)).toBe("South Darfur");
+    expect(
+      found.filter((m) => {
+        return m.subject === "South Darfur";
+      }),
+    ).toHaveLength(2);
+  });
+
   it("reads a number written as a word", () => {
     // "one death in West Darfur" is the case that defeats a digits-only
     // regex, and it appears in the gate document.

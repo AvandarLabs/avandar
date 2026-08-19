@@ -40,6 +40,17 @@ const SCALE_WORD_SET = new Set(Object.keys(SCALE_WORDS));
 const SUBJECT_CLAUSE =
   /\bin\s+([A-Z][A-Za-z]*(?:\s+[A-Z][A-Za-z]*){0,2})\b(?=[.,;]|$)/u;
 
+/** Every subject clause in a sentence, used only to count them. */
+const SUBJECT_CLAUSE_GLOBAL = new RegExp(SUBJECT_CLAUSE, "gu");
+
+/**
+ * Comma boundary between clauses.
+ *
+ * The trailing `\s+` is what makes this safe for a thousands separator:
+ * `21,563` has no space after its comma, so a number is never cut in half.
+ */
+const FRAGMENT_SPLIT = /,\s+/gu;
+
 /**
  * A number, optionally preceded by a currency symbol and followed by a
  * percent sign, a scale word or "per cent", then the noun phrase it measures.
@@ -189,6 +200,73 @@ function _cleanMetric(phrase: string): string {
   return words.join(" ");
 }
 
+/** One comma-delimited clause of a sentence, and the subject governing it. */
+type Fragment = {
+  /** Index of the fragment's first character in the whole sentence. */
+  start: number;
+  /** Index one past its last character. */
+  end: number;
+  subject: string | null;
+};
+
+/**
+ * Splits a sentence into comma-delimited fragments and resolves who each one
+ * is about.
+ *
+ * A single sentence routinely names more than one place: "...and one death in
+ * West Darfur, and 166 cases and 13 deaths in South Darfur." Attaching the
+ * first clause to every figure, as this used to, reported South Darfur's
+ * figures under West Darfur, which is the one failure mode the whole design
+ * exists to prevent. A wrong province is worse than no province.
+ *
+ * A fragment carrying its own clause governs its own figures. A fragment with
+ * none borrows the sentence's clause only when the sentence has exactly one,
+ * which is what keeps "There were 166 cases and 13 deaths in South Darfur."
+ * attaching to both figures. Where a sentence offers several, an unclaimed
+ * figure gets `null`: we genuinely cannot tell, and null is honest where a
+ * guess is not.
+ */
+function _fragments(sentence: string): readonly Fragment[] {
+  const clauseCount = [...sentence.matchAll(SUBJECT_CLAUSE_GLOBAL)].length;
+  const fallback =
+    clauseCount === 1 ?
+      (SUBJECT_CLAUSE.exec(sentence)?.[1]?.trim() ?? null)
+    : null;
+
+  const bounds: Array<{ start: number; end: number }> = [];
+  let start = 0;
+  for (const separator of sentence.matchAll(FRAGMENT_SPLIT)) {
+    bounds.push({ start, end: separator.index });
+    start = separator.index + separator[0].length;
+  }
+  bounds.push({ start, end: sentence.length });
+
+  return bounds.map((bound) => {
+    const own = SUBJECT_CLAUSE.exec(sentence.slice(bound.start, bound.end));
+    return {
+      ...bound,
+      subject: own ? own[1]!.trim() : fallback,
+    };
+  });
+}
+
+/**
+ * The fragment a match at `position` belongs to.
+ *
+ * The first fragment ending after the position, rather than the one strictly
+ * containing it: `MEASUREMENT` opens with an optional currency symbol and
+ * `\s*`, so a match can begin on the space inside a ", " separator, which
+ * belongs to no fragment. That space introduces the figure that follows it.
+ */
+function _fragmentAt(
+  fragments: readonly Fragment[],
+  position: number,
+): Fragment | undefined {
+  return fragments.find((fragment) => {
+    return position < fragment.end;
+  });
+}
+
 /**
  * Pulls measurements out of a sentence.
  *
@@ -196,12 +274,14 @@ function _cleanMetric(phrase: string): string {
  * extracting something wrong, because a wrong number in an imported dataset
  * is far more damaging than a missing one the user can see is missing. The
  * model assist exists to raise recall without loosening these rules.
+ *
+ * Matching runs over the whole sentence rather than fragment by fragment, so
+ * that `_precedingWord` still sees the word before a figure even when a comma
+ * separates them: "In June, 2024 cases" has to keep reading `june` and
+ * rejecting 2024 as a year.
  */
 export function extractMeasurements(sentence: string): readonly Measurement[] {
-  const subjectMatch = SUBJECT_CLAUSE.exec(sentence);
-  // A subject that arrives at the end governs every figure before it, so it
-  // is attached to all of them rather than only to the nearest.
-  const subject = subjectMatch ? subjectMatch[1]!.trim() : null;
+  const fragments = _fragments(sentence);
 
   const found: Measurement[] = [];
 
@@ -222,7 +302,7 @@ export function extractMeasurements(sentence: string): readonly Measurement[] {
     ) {
       const scale = scaleWord ? SCALE_WORDS[scaleWord]! : 1;
       found.push({
-        subject,
+        subject: _fragmentAt(fragments, match.index ?? 0)?.subject ?? null,
         metric: isPercent && metric.length === 0 ? "percentage" : metric,
         value: _parseNumber(rawNumber!) * scale,
         unit:

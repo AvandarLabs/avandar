@@ -222,9 +222,22 @@ const OCHA_PILLARS_PAGE3_LEFT: BBox = [30, 690, 295, 800];
  * two items on one baseline when their edge gap is 8 points or less, and the
  * "Khartoum" capital-city annotation sits 6.8 points to the right of the
  * "NORTH KORDOFAN" state label. The VALUE is right; only the label is
- * polluted. Fixing it means tightening SAME_LINE_MAX_GAP, which is a change
- * to a shared unit with its own measured trade-off, so it is recorded here
- * rather than made under a test-writing task.
+ * polluted.
+ *
+ * Requiring a matching `fontName` for a same-line merge was tried and backed
+ * out. The premise holds: the two items really are set in different faces
+ * (4pt small caps `g_d0_f5` against the 5pt city face `g_d0_f8`). But
+ * unfusing them releases "Khartoum" as a label in its own right, and it then
+ * WINS the 408 figure from the state label on distance alone: 15.9 points to
+ * the city annotation against 20.5 to "KHARTOUM", a ratio of 0.78 that falls
+ * just under the flagging threshold. The measured result was 19 rows with
+ * "Khartoum" holding 408, "KHARTOUM" empty, and 7 flagged rows, so it traded
+ * one wrong label for another and broke the flag budget. The map's 16
+ * pairings survive only with the fusion left in place.
+ *
+ * The real fix is for pairing to know that a point annotation and an area
+ * label are different kinds of thing, which is a change to shape 2's
+ * association rule rather than to label assembly.
  */
 const OCHA_MAP_DEATHS: Readonly<Record<string, string>> = {
   "RED SEA": "25",
@@ -322,18 +335,24 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
   });
 
   it("does NOT read the funding-by-pillar bars as pillar amounts", async () => {
-    // KNOWN GAP, asserted rather than hidden. Each bar's amount is printed as
-    // three text items ("3", "M", "(15%)"). `extractLabelledGraphic` treats a
-    // bare numeral as a value and everything else as a label, so "M (15%)"
-    // assembles into a label 13 points from the figure while the pillar name
-    // it belongs to sits 172 points away. Every figure therefore pairs with
-    // its own unit, and the six pillar names come out as rows with no value.
+    // KNOWN GAP, asserted rather than hidden. This is the `unit` gap the plan
+    // already records, showing up as a pairing failure.
+    //
+    // `extractLabelledGraphic` has no notion of a unit: it treats a bare
+    // numeral as a value and every other item as a label. Each bar's amount
+    // is printed as three items ("3", "M", "(15%)"), so the magnitude suffix
+    // and the share become a label, "M (15%)", sitting 13 points from the
+    // figure while the pillar name it belongs to is 172 points away. Every
+    // figure therefore pairs with its own unit, and the six pillar names come
+    // out as rows with no value.
     //
     // That output is incomplete but not a lie: no row claims a pillar was
-    // funded at some amount. Reading "3 M" as 3,000,000 needs unit-aware
-    // value assembly in the extractor, which is a change to shape 2 rather
-    // than to this test. Until then this pins the behaviour so that a fix has
-    // to come back here and update it deliberately.
+    // funded at some amount. The tempting "fix" is to drop the annotations so
+    // the count comes out at 6, which would report WASH at 3 where the
+    // document says $3 million: a count that passes over a value wrong by a
+    // factor of a million. The real fix is unit-aware value assembly, the
+    // same gap that leaves `unit` unpopulated elsewhere. Until then this pins
+    // the behaviour so a fix has to come back here and update it.
     const region = clipToRegion(await pageOf(OCHA, 3), OCHA_BARS);
     const table = extractLabelledGraphic(region, { regionId: "bars" });
     const labels = byLabel(table);
@@ -537,36 +556,35 @@ describe("gate document: IMC Sudan Cholera SitRep #1 (committed geometry)", () =
     ).toBe(true);
   });
 
-  it("mis-attributes the South Darfur figures to West Darfur", async () => {
-    // KNOWN DEFECT, asserted rather than hidden, and the most damaging one in
-    // this file: these two rows are WRONG, not merely missing.
-    //
-    // The sentence names two subjects: "...and one death in West Darfur, and
-    // 166 cases and 13 deaths reported in South Darfur." `extractMeasurements`
-    // takes the FIRST trailing "in <Place>" clause and applies it to every
-    // figure in the sentence, which its docstring states as a deliberate rule
-    // ("a subject that arrives at the end governs every figure before it").
-    // With two such clauses the rule attributes South Darfur's 166 cases and
-    // 13 deaths to West Darfur, and nothing flags it.
-    //
-    // Fixing it means segmenting a sentence at each subject clause, which is
-    // a change to the measurement grammar rather than to this test. Until
-    // then this pins the damage so it cannot grow unnoticed.
+  it("reads the South Darfur figures with their subject", async () => {
+    // One sentence names two provinces: "...and one death in West Darfur, and
+    // 166 cases and 13 deaths reported in South Darfur." Each figure has to
+    // land on the province its own clause names, which is why
+    // `extractMeasurements` resolves a subject per comma fragment rather than
+    // per sentence.
     const { page1 } = await committedImcGeometry();
     const region = clipToRegion(page1, IMC_PROSE);
     const table = extractProseMeasures(region, { regionId: "prose" });
-    const subjects = new Set(
-      dataRows(table).map((row) => {
-        return row[0];
-      }),
-    );
+    const subjectOf = (value: string) => {
+      return dataRows(table).find((row) => {
+        return row[2] === value;
+      })?.[0];
+    };
 
-    expect(subjects.has("South Darfur")).toBe(false);
     expect(
       dataRows(table).filter((row) => {
-        return row[0] === "West Darfur";
+        return row[0] === "South Darfur";
       }),
-    ).toHaveLength(7);
+    ).toHaveLength(2);
+    expect(subjectOf("166")).toBe("South Darfur");
+    expect(subjectOf("13")).toBe("West Darfur");
+    expect(subjectOf("5")).toBe("West Darfur");
+
+    // The June totals belong to no province the sentence names, and with two
+    // clauses on offer there is nothing to borrow. Unattributed is the honest
+    // answer; a guess here is what put South Darfur's dead in West Darfur.
+    expect(subjectOf("21563")).toBe("");
+    expect(subjectOf("388")).toBe("");
   });
 
   it("reads the Ombada Hospital CTC figures", async () => {
