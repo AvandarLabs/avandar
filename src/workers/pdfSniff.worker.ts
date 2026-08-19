@@ -1,24 +1,41 @@
 /**
- * Worker that reads a PDF's page geometry without blocking the main thread.
+ * Worker that reads a PDF's page geometry, and extracts the regions a user
+ * has selected, without blocking the main thread.
  *
- * Lifecycle: main thread sends
- * `{ type: "sniff", file, pageRange?, password? }`, the worker posts zero or
- * more `progress` messages, then one `result` or `error`, then closes. One
- * worker per import, matching `xlsxSniff.worker.ts`.
+ * Lifecycle: main thread sends either
+ * `{ type: "sniff", file, pageRange?, password? }`, for which the worker posts
+ * zero or more `progress` messages then one `result` or `error`; or
+ * `{ type: "extract", pages, regions, documentMetadata, outputMode? }`, for
+ * which it posts one `extract_result`. Either way it closes afterwards. One
+ * worker per request, matching `xlsxSniff.worker.ts`.
  *
  * Why this is a worker: reading every page's text and operator list is, for a
  * 200-page statistical publication, seconds of pure JS. On the main thread
- * that freezes input and animation.
- *
- * Deliberately knows nothing about tables, regions or extraction. It answers
- * one question ("what is on these pages") so that later phases can add
- * extraction without touching the page loop or the error taxonomy.
+ * that freezes input and animation. Extraction is here for the same reason: a
+ * region on a dense page is thousands of text items, and classifying it and
+ * then reading it is real work.
  */
+import { match } from "ts-pattern";
+import { classifyRegion } from "./pdfSniff/classifyRegion";
+import { clipToRegion } from "./pdfSniff/clipToRegion";
+import { combineRegions } from "./pdfSniff/combineRegions";
 import { detectTextLayer } from "./pdfSniff/detectTextLayer";
 import { extractDocumentMetadata } from "./pdfSniff/extractDocumentMetadata";
+import { extractGridTable } from "./pdfSniff/extractors/extractGridTable";
+import { extractLabelledGraphic } from "./pdfSniff/extractors/extractLabelledGraphic";
+import { extractProseMeasures } from "./pdfSniff/extractors/extractProseMeasures";
+import { extractRepeatingBlocks } from "./pdfSniff/extractors/extractRepeatingBlocks";
 import { extractPageGeometry } from "./pdfSniff/extractPageGeometry";
 import { loadPdfDocument } from "./pdfSniff/loadPdfJs";
-import type { DocumentMetadata, PageGeometry } from "./pdfSniff/types";
+import type { RegionClassification } from "./pdfSniff/classifyRegion";
+import type { CombinedTable } from "./pdfSniff/combineRegions";
+import type {
+  DocumentMetadata,
+  ExtractedTable,
+  PageGeometry,
+  PdfRegion,
+  RegionGeometry,
+} from "./pdfSniff/types";
 
 /**
  * Hard cap on pages read when the user has not chosen a range. Beyond this we
@@ -34,6 +51,21 @@ type SniffRequest = {
   password?: string;
 };
 
+/**
+ * Re-reads nothing. The geometry the sniff already produced is sent back in,
+ * because the user re-extracts every time they nudge a box or change a
+ * shape, and re-parsing the document for that would make the UI feel broken.
+ */
+type ExtractRequest = {
+  type: "extract";
+  pages: readonly PageGeometry[];
+  regions: readonly PdfRegion[];
+  documentMetadata: DocumentMetadata;
+  outputMode?: "natural" | "observations";
+};
+
+type PdfWorkerRequest = SniffRequest | ExtractRequest;
+
 export type PdfSniffResult = {
   type: "result";
   pageCount: number;
@@ -45,6 +77,15 @@ export type PdfSniffResult = {
    * each time a box moves would be wasted work.
    */
   documentMetadata: DocumentMetadata;
+};
+
+export type PdfExtractResult = {
+  type: "extract_result";
+  /** One per region, in the order they were supplied. */
+  tables: readonly ExtractedTable[];
+  /** Per-region classification, so the picker can show its reasoning. */
+  classifications: Readonly<Record<string, RegionClassification>>;
+  combined: CombinedTable;
 };
 
 export type PdfSniffProgress = {
@@ -70,7 +111,11 @@ export type PdfSniffError = {
   detail?: Record<string, unknown>;
 };
 
-type SniffResponse = PdfSniffResult | PdfSniffProgress | PdfSniffError;
+type SniffResponse =
+  | PdfSniffResult
+  | PdfExtractResult
+  | PdfSniffProgress
+  | PdfSniffError;
 
 function _post(message: SniffResponse): void {
   (self as unknown as DedicatedWorkerGlobalScope).postMessage(message);
@@ -80,9 +125,111 @@ function _close(): void {
   (self as unknown as DedicatedWorkerGlobalScope).close();
 }
 
-self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
+/**
+ * Whether an inbound message is a request of ours.
+ *
+ * The port is shared. `loadPdfJs` imports `pdf.worker.mjs`, which installs
+ * pdf.js's own handler on this same global scope and puts its internal
+ * protocol traffic (`{ sourceName: "worker", ... }`) through this listener
+ * too. Those messages are not requests and must be ignored silently rather
+ * than interpreted; treating one as an `extract` would be far worse than the
+ * no-op it looks like, because extraction has no `file` to fail on and would
+ * post a nonsense result. The main-thread driver ignores pdf.js's replies the
+ * same way, in `_isPdfSniffResponse`.
+ */
+function _isPdfWorkerRequest(data: unknown): data is PdfWorkerRequest {
+  if (typeof data !== "object" || data === null || !("type" in data)) {
+    return false;
+  }
+  const { type } = data as { type: unknown };
+  return type === "sniff" || type === "extract";
+}
+
+self.addEventListener("message", async (event: MessageEvent<unknown>) => {
   const request = event.data;
-  if (request.type !== "sniff") {
+  if (!_isPdfWorkerRequest(request)) {
+    return;
+  }
+
+  if (request.type === "extract") {
+    const pagesByIndex = new Map(
+      request.pages.map((page) => {
+        return [page.pageIndex, page];
+      }),
+    );
+    const tables: ExtractedTable[] = [];
+    const classifications: Record<string, RegionClassification> = {};
+
+    for (const region of request.regions) {
+      // A region spanning pages is clipped per fragment and concatenated, so
+      // a table continuing across a page break arrives as one table.
+      const clipped = region.fragments.flatMap((fragment) => {
+        const page = pagesByIndex.get(fragment.page);
+        return page ? [clipToRegion(page, fragment.bbox)] : [];
+      });
+      const firstClip = clipped[0];
+      if (!firstClip) {
+        continue;
+      }
+      const merged: RegionGeometry = {
+        pageIndex: firstClip.pageIndex,
+        bbox: firstClip.bbox,
+        textItems: clipped.flatMap((clip) => {
+          return clip.textItems;
+        }),
+        rules: clipped.flatMap((clip) => {
+          return clip.rules;
+        }),
+      };
+
+      const classification = classifyRegion(merged);
+      classifications[region.id] = classification;
+
+      // The user's explicit shape always wins over the classifier's guess.
+      // `shape` is required on a stored region, but this message crosses a
+      // postMessage boundary, so the fallback is not dead code.
+      const shape = region.shape ?? classification.shape;
+
+      // `regionId` is written last so a stored option cannot rename the
+      // region the extracted table claims to come from.
+      const options = { ...region.options, regionId: region.id };
+
+      tables.push(
+        match(shape)
+          .with("grid_table", () => {
+            return extractGridTable(merged, options);
+          })
+          .with("labelled_graphic", () => {
+            return extractLabelledGraphic(merged, options);
+          })
+          .with("repeating_blocks", () => {
+            return extractRepeatingBlocks(merged, options);
+          })
+          .with("prose_measures", () => {
+            return extractProseMeasures(merged, options);
+          })
+          .exhaustive(),
+      );
+    }
+
+    const regionLabels = Object.fromEntries(
+      request.regions.map((region) => {
+        return [region.id, region.label];
+      }),
+    );
+
+    _post({
+      type: "extract_result",
+      tables,
+      classifications,
+      combined: combineRegions({
+        tables,
+        regionLabels,
+        documentMetadata: request.documentMetadata,
+        outputMode: request.outputMode,
+      }),
+    });
+    _close();
     return;
   }
 

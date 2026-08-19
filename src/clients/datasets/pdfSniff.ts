@@ -1,10 +1,16 @@
 // eslint-disable-next-line import-x/extensions
 import PdfSniffWorker from "@/workers/pdfSniff.worker.ts?worker";
 import type {
+  PdfExtractResult,
   PdfSniffError,
   PdfSniffProgress,
   PdfSniffResult,
 } from "@/workers/pdfSniff.worker";
+import type {
+  DocumentMetadata,
+  PageGeometry,
+  PdfRegion,
+} from "@/workers/pdfSniff/types";
 
 /**
  * Thrown when the worker rejects a document for a specific, explainable
@@ -23,7 +29,11 @@ export class PdfSniffRejection extends Error {
   }
 }
 
-type PdfSniffResponse = PdfSniffResult | PdfSniffProgress | PdfSniffError;
+type PdfSniffResponse =
+  | PdfSniffResult
+  | PdfExtractResult
+  | PdfSniffProgress
+  | PdfSniffError;
 
 /**
  * Whether a message on the worker port is one of ours.
@@ -41,7 +51,12 @@ function _isPdfSniffResponse(data: unknown): data is PdfSniffResponse {
     return false;
   }
   const { type } = data as { type: unknown };
-  return type === "progress" || type === "result" || type === "error";
+  return (
+    type === "progress" ||
+    type === "result" ||
+    type === "extract_result" ||
+    type === "error"
+  );
 }
 
 /**
@@ -78,7 +93,9 @@ export async function sniffPdfFile(params: {
           resolve(data);
           return;
         }
-        reject(new PdfSniffRejection(data));
+        if (data.type === "error") {
+          reject(new PdfSniffRejection(data));
+        }
       });
       worker.addEventListener(
         "error",
@@ -92,6 +109,61 @@ export async function sniffPdfFile(params: {
         file: params.file,
         pageRange: params.pageRange,
         password: params.password,
+      });
+    });
+  } finally {
+    worker.terminate();
+  }
+}
+
+/**
+ * Extracts the selected regions.
+ *
+ * Separate from `sniffPdfFile` because the user re-extracts every time they
+ * adjust a box or change a shape, and re-reading the whole document for that
+ * would make the UI feel broken. The geometry the sniff already produced is
+ * sent back to the worker instead.
+ */
+export async function extractPdfRegions(params: {
+  pages: readonly PageGeometry[];
+  regions: readonly PdfRegion[];
+  documentMetadata: DocumentMetadata;
+  outputMode?: "natural" | "observations";
+}): Promise<PdfExtractResult> {
+  const worker = new PdfSniffWorker();
+  try {
+    return await new Promise<PdfExtractResult>((resolve, reject) => {
+      worker.addEventListener("message", (event: MessageEvent<unknown>) => {
+        const data = event.data;
+
+        // Same shared-port discipline as `sniffPdfFile`: pdf.js posts its own
+        // protocol traffic here, and rejecting on it would fail every
+        // extraction in a real browser while every unit test still passed.
+        if (!_isPdfSniffResponse(data)) {
+          return;
+        }
+
+        if (data.type === "extract_result") {
+          resolve(data);
+          return;
+        }
+        if (data.type === "error") {
+          reject(new PdfSniffRejection(data));
+        }
+      });
+      worker.addEventListener(
+        "error",
+        (event) => {
+          reject(new Error(event.message || "PDF extract worker errored"));
+        },
+        { once: true },
+      );
+      worker.postMessage({
+        type: "extract",
+        pages: params.pages,
+        regions: params.regions,
+        documentMetadata: params.documentMetadata,
+        outputMode: params.outputMode,
       });
     });
   } finally {
