@@ -15,6 +15,20 @@ import type { SourceVersion } from "$/models/relations/RelationCapabilities/Rela
  */
 const SNAPSHOT_REVISION_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
+/**
+ * The only two snapshot bucket names a public principal may embed, mirrored
+ * from `SnapshotStorageUtils.PUBLIC_BUCKET_NAME` / `PRIVATE_BUCKET_NAME`
+ * (`src/clients/storage/PublicDatasetParquetStorageClient/
+ * SnapshotStorageUtils/`). Duplicated rather than imported because that
+ * module is browser-only `src/` code, and this file is Deno-reachable:
+ * `deno check shared` cannot resolve the `@/` alias. Keep these two
+ * literals in sync with that module by hand.
+ */
+const PUBLIC_SNAPSHOT_BUCKET_NAMES: readonly string[] = [
+  "published",
+  "published-private",
+];
+
 /** The exact identity, resolved into the tokens `serves` compares by. */
 export type RelationCacheIdentityTokens = {
   principalKey: PrincipalKey;
@@ -96,14 +110,29 @@ export function makePrincipalKeyFromWorkspaceSession(params: {
  * `p:<bucket>:<dashboardId>:<snapshotRevision>`. A published snapshot is its
  * own authorization boundary, so this form carries no user.
  *
- * @throws if `snapshotRevision` does not match `[A-Za-z0-9_.-]+`, which is
- *   what guarantees it never introduces a stray `:` delimiter into the key.
+ * `dashboardId` is a compile-time-only brand over `string` with no runtime
+ * validation elsewhere, and `bucket` is likewise plain `string` at this
+ * boundary, so without these checks a value containing `:` in either could
+ * make two different principals collide on one key, the same defect class
+ * fixed for `makePrincipalKeyFromWorkspaceSession`.
+ *
+ * @throws if `bucket` is not one of the known snapshot bucket names, if
+ *   `dashboardId` is not a bare UUID, or if `snapshotRevision` does not
+ *   match `[A-Za-z0-9_.-]+`.
  */
 export function makePrincipalKeyFromPublicSession(params: {
   bucket: string;
   dashboardId: string;
   snapshotRevision: string;
 }): PrincipalKey {
+  assert(
+    PUBLIC_SNAPSHOT_BUCKET_NAMES.includes(params.bucket),
+    `bucket "${params.bucket}" must be one of ${PUBLIC_SNAPSHOT_BUCKET_NAMES.join(", ")}`,
+  );
+  assert(
+    RelationRef.isUuid(params.dashboardId),
+    `dashboardId "${params.dashboardId}" must be a UUID`,
+  );
   assert(
     SNAPSHOT_REVISION_PATTERN.test(params.snapshotRevision),
     `snapshotRevision "${params.snapshotRevision}" must match ${SNAPSHOT_REVISION_PATTERN}`,

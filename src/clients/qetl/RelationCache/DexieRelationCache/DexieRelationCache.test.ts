@@ -25,6 +25,7 @@ const WORKSPACE_ID = "44444444-4444-4444-8444-444444444444";
 const OTHER_WORKSPACE_ID = "55555555-5555-4555-8555-555555555555";
 const USER_ID = "66666666-6666-4666-8666-666666666666";
 const OTHER_USER_ID = "77777777-7777-4777-8777-777777777777";
+const DASHBOARD_ID = "88888888-8888-4888-8888-888888888888";
 
 const WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
   workspaceId: WORKSPACE_ID,
@@ -36,7 +37,7 @@ const OTHER_WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
 });
 const PUBLIC_PRINCIPAL = makePrincipalKeyFromPublicSession({
   bucket: "published",
-  dashboardId: "dashboard-1",
+  dashboardId: DASHBOARD_ID,
   snapshotRevision: "1",
 });
 

@@ -6,6 +6,7 @@ import {
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import type { PreparedRelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type {
@@ -175,29 +176,6 @@ async function _bulkDeleteEntriesAndPayloads(
   await AvaDexie.DB.RelationCachePayload.bulkDelete(mutableKeys);
 }
 
-/**
- * Whether `error` is IndexedDB refusing a write for lack of storage space,
- * as opposed to any other Dexie or DOM fault. Recognises the modern signal
- * every current engine (Chromium, Firefox, WebKit) uses, and Dexie carries
- * straight through: a `DexieError` or `DOMException` named
- * `"QuotaExceededError"`. Also recognises the legacy numeric DOMException
- * code (`22`) that pre-standardization engines raised instead of the name.
- * Deliberately narrow: a message that happens to mention "quota" does not
- * qualify, so a genuine Dexie fault (a constraint violation, a closed
- * database) is never mistaken for exhausted storage.
- */
-function _isQuotaExceededError(error: unknown): boolean {
-  if (error instanceof Error && error.name === "QuotaExceededError") {
-    return true;
-  }
-  // `DOMException.code` is deprecated in favor of `.name`, but this is the
-  // deliberate legacy fallback for engines that predate the standardized
-  // `"QuotaExceededError"` name and only ever set the numeric code: `22` is
-  // the legacy `DOMException.QUOTA_EXCEEDED_ERR` constant. Read
-  // intentionally, not accidentally, so keep it rather than remove it.
-  return error instanceof DOMException && error.code === 22;
-}
-
 async function _writeOnce(
   entry: RelationCacheEntry,
   payload: Blob,
@@ -253,7 +231,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
   try {
     await _writeOnce(entry, write.payload);
   } catch (firstError) {
-    if (!_isQuotaExceededError(firstError)) {
+    if (!isQuotaExceededError(firstError)) {
       throw firstError;
     }
     await _evictToMakeRoomFor(write.payload.size);

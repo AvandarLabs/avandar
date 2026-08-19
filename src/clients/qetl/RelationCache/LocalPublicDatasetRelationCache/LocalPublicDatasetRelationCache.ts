@@ -1,7 +1,12 @@
 import { assert } from "@avandar/utils";
-import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import {
+  makePreparedRelationCacheKeyFromKey,
+  makePrincipalKeyFromPublicSession,
+  serves,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
@@ -10,6 +15,7 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   PrincipalKey,
+  RelationCacheEntryFields,
   RelationCacheKey,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type {
@@ -109,8 +115,8 @@ function _parseIdentityKey(
  * Rebuilds a row's own principal key from its `bucket` and
  * `snapshotRevision`, or `undefined` if either is missing (a row can predate
  * the columns being populated). Reusing the same builder that produces a
- * request's principal is what makes the comparison in `_getServingRow`
- * exact equality rather than a hand-rolled field-by-field check.
+ * request's principal is what makes `_rowServesKey`'s comparison exact
+ * string equality rather than a hand-rolled field-by-field check.
  */
 function _getPrincipalKeyFromRow(
   row: LocalPublicDataset.Read,
@@ -156,10 +162,48 @@ function _makeEntryFromRow(row: LocalPublicDataset.Read): RelationCacheEntry {
 }
 
 /**
+ * Whether `row` may serve `key`, decided by the shared `serves()` predicate
+ * rather than a second, hand-rolled equality check: if `serves()` ever
+ * learns to compare a new field (a revocation flag, say), this port picks
+ * that up automatically instead of silently carrying a stale copy of the
+ * old rule.
+ *
+ * Two fields are given values chosen for this port rather than derived from
+ * `row`: `columns` is always `"all"`, because the row is the complete
+ * snapshot file and so covers any column request; `definitionToken` is
+ * copied from `key`'s own prepared token rather than the row's, because a
+ * published snapshot has no logical definition to distinguish and copying
+ * the request's token makes that comparison a deliberate no-op instead of a
+ * false constraint that would reject every request. `staleAt` is always
+ * `undefined`: this port has no staleness concept of its own, a
+ * superseding write is what retires an old row.
+ */
+async function _rowServesKey(
+  row: LocalPublicDataset.Read,
+  key: RelationCacheKey,
+): Promise<boolean> {
+  const principalKey = _getPrincipalKeyFromRow(row);
+  if (principalKey === undefined) {
+    return false;
+  }
+  const prepared = await makePreparedRelationCacheKeyFromKey(key);
+  const entryFields: RelationCacheEntryFields = {
+    principalKey,
+    tableName: RelationRef.toTableName({ kind: "dataset", id: row.datasetId }),
+    definitionToken: prepared.definitionToken,
+    columns: "all",
+    staleAt: undefined,
+  };
+  return serves(entryFields, prepared);
+}
+
+/**
  * Finds the one row, if any, that serves `key`. Only a `"dataset"` relation
- * can ever match (this port never stores a concept), and the principal must
- * decode as a public-session principal naming the exact bucket and
- * snapshotRevision the row was written under.
+ * can ever match (this port never stores a concept). `_parsePublicPrincipalKey`
+ * is used here only to pick which row to fetch efficiently by primary key;
+ * the actual serve decision is `_rowServesKey`, so a principal that fails to
+ * parse simply has no candidate to fetch rather than being rejected by a
+ * security-critical branch of its own.
  */
 async function _getServingRow(
   key: RelationCacheKey,
@@ -175,11 +219,7 @@ async function _getServingRow(
     parts.dashboardId,
     key.relation.id,
   ]);
-  if (
-    row === undefined ||
-    row.bucket !== parts.bucket ||
-    row.snapshotRevision !== parts.snapshotRevision
-  ) {
+  if (row === undefined || !(await _rowServesKey(row, key))) {
     return undefined;
   }
   return row;
@@ -233,19 +273,6 @@ async function _readPayload(
  * than omitted, only because `RelationCachePort` requires one.
  */
 async function _touch(): Promise<void> {}
-
-/**
- * Whether `error` is IndexedDB refusing a write for lack of storage space.
- * Mirrors `DexieRelationCache`'s identical check; duplicated here rather
- * than shared because extracting a helper for two call sites is out of
- * this port's scope.
- */
-function _isQuotaExceededError(error: unknown): boolean {
-  if (error instanceof Error && error.name === "QuotaExceededError") {
-    return true;
-  }
-  return error instanceof DOMException && error.code === 22;
-}
 
 async function _putRow(row: LocalPublicDataset.Read): Promise<void> {
   await AvaDexie.DB.LocalPublicDataset.put(row);
@@ -337,6 +364,24 @@ async function _evictToMakeRoomFor(incomingBytes: number): Promise<void> {
 }
 
 /**
+ * Describes a rejected principal's shape without embedding its content: a
+ * principal string can carry a real `workspaceId` and `userId` (the
+ * workspace form) or a real `dashboardId` (the public form), and an error
+ * message is exactly the kind of place that content leaks into a console
+ * or an error tracker. Only the leading `p:`/`w:` discriminator, which
+ * identifies no one, is safe to surface.
+ */
+function _describePrincipalShape(principal: PrincipalKey): string {
+  if (principal.startsWith("w:")) {
+    return "a workspace-session (w:…) principal";
+  }
+  if (principal.startsWith("p:")) {
+    return "a malformed public-session (p:…) principal";
+  }
+  return "a principal in neither the public nor workspace form";
+}
+
+/**
  * Stores one downloaded snapshot. This port only ever holds a `"dataset"`
  * relation under a public-session principal, so both are validated before
  * anything is written: a concept relation or a workspace-session principal
@@ -360,7 +405,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
   if (parts === undefined) {
     throw new Error(
       `LocalPublicDatasetRelationCache only accepts a public-session ` +
-        `principal, got "${write.identity.principal}"`,
+        `principal, got ${_describePrincipalShape(write.identity.principal)}`,
     );
   }
   const row: LocalPublicDataset.Read = {
@@ -375,7 +420,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
   try {
     await _putRow(row);
   } catch (firstError) {
-    if (!_isQuotaExceededError(firstError)) {
+    if (!isQuotaExceededError(firstError)) {
       throw firstError;
     }
     await _evictToMakeRoomFor(write.payload.size);

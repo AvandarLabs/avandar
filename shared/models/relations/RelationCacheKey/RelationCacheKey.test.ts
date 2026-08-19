@@ -7,8 +7,8 @@ import {
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.ts";
 import { describe, expect, it } from "vitest";
-import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const OTHER_DATASET_ID = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
@@ -16,6 +16,7 @@ const OTHER_DATASET_ID = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_WORKSPACE_ID = "22222222-2222-4222-8222-222222222222";
 const USER_ID = "33333333-3333-4333-8333-333333333333";
+const DASHBOARD_ID = "44444444-4444-4444-8444-444444444444";
 
 const WORKSPACE_PRINCIPAL = makePrincipalKeyFromWorkspaceSession({
   workspaceId: WORKSPACE_ID,
@@ -89,17 +90,17 @@ describe("makePrincipalKeyFromPublicSession", () => {
     expect(
       makePrincipalKeyFromPublicSession({
         bucket: "published",
-        dashboardId: "dash1",
+        dashboardId: DASHBOARD_ID,
         snapshotRevision: "rev.1_2-A",
       }),
-    ).toBe("p:published:dash1:rev.1_2-A");
+    ).toBe(`p:published:${DASHBOARD_ID}:rev.1_2-A`);
   });
 
   it("rejects a snapshotRevision that could carry the ':' delimiter", () => {
     expect(() => {
       return makePrincipalKeyFromPublicSession({
         bucket: "published",
-        dashboardId: "dash1",
+        dashboardId: DASHBOARD_ID,
         snapshotRevision: "rev:1",
       });
     }).toThrow();
@@ -109,8 +110,35 @@ describe("makePrincipalKeyFromPublicSession", () => {
     expect(() => {
       return makePrincipalKeyFromPublicSession({
         bucket: "published",
-        dashboardId: "dash1",
+        dashboardId: DASHBOARD_ID,
         snapshotRevision: "",
+      });
+    }).toThrow();
+  });
+
+  it("rejects a bucket outside the known snapshot bucket names", () => {
+    expect(() => {
+      return makePrincipalKeyFromPublicSession({
+        bucket: "not-a-real-bucket",
+        dashboardId: DASHBOARD_ID,
+        snapshotRevision: "1",
+      });
+    }).toThrow();
+  });
+
+  it("rejects a dashboardId that is not a UUID, including one that could carry the ':' delimiter", () => {
+    expect(() => {
+      return makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: "dash1",
+        snapshotRevision: "1",
+      });
+    }).toThrow();
+    expect(() => {
+      return makePrincipalKeyFromPublicSession({
+        bucket: "published",
+        dashboardId: "a:b",
+        snapshotRevision: "1",
       });
     }).toThrow();
   });
@@ -178,7 +206,7 @@ describe("makeIdentityTokensFromIdentity", () => {
       _makeIdentity({
         principal: makePrincipalKeyFromPublicSession({
           bucket: "published",
-          dashboardId: "dash1",
+          dashboardId: DASHBOARD_ID,
           snapshotRevision: "1",
         }),
       }),

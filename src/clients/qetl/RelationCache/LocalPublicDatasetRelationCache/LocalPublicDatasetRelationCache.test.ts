@@ -313,6 +313,25 @@ describe("LocalPublicDatasetRelationCache.write", () => {
     ).rejects.toThrow(/public-session principal/);
   });
 
+  it("throws when the principal's snapshotRevision fails the pattern the round trip enforces, even though the prefix, segment count and bucket are otherwise valid", async () => {
+    // Isolates the round-trip check inside _parsePublicPrincipalKey: the
+    // segment count, "p" prefix and bucket membership all pass here, so
+    // only the round trip's re-validation of snapshotRevision (via
+    // makePrincipalKeyFromPublicSession's own assert) can reject this.
+    const invalidSnapshotRevisionPrincipal = `p:${BUCKET}:${DASHBOARD_ID}:abc!def`;
+
+    await expect(
+      LocalPublicDatasetRelationCache.write(
+        _makeWrite({
+          identity: { principal: invalidSnapshotRevisionPrincipal },
+        }),
+      ),
+    ).rejects.toThrow(/public-session principal/);
+
+    const rows = await db.LocalPublicDataset.toArray();
+    expect(rows).toHaveLength(0);
+  });
+
   it("retries once after a quota-exceeded failure and succeeds", async () => {
     let putCalls = 0;
     const originalPut = db.LocalPublicDataset.put.bind(db.LocalPublicDataset);
