@@ -19,12 +19,18 @@ import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChart
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { ReactNode } from "react";
 
 const mantineBarChartMock = vi.fn();
 const mantineLineChartMock = vi.fn();
 const mantineRadarChartMock = vi.fn();
 const mantineCompositeChartMock = vi.fn();
-const mantineScatterChartMock = vi.fn();
+
+const rechartsXAxisMock = vi.fn();
+const rechartsYAxisMock = vi.fn();
+const rechartsScatterMock = vi.fn();
+const rechartsLegendMock = vi.fn();
 
 vi.mock("@mantine/charts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/charts")>();
@@ -46,9 +52,42 @@ vi.mock("@mantine/charts", async (importOriginal) => {
       mantineCompositeChartMock(props);
       return <div data-testid="mantine-composite" />;
     },
-    ScatterChart: (props: unknown) => {
-      mantineScatterChartMock(props);
-      return <div data-testid="mantine-scatter" />;
+  };
+});
+
+// ScatterChart renders Recharts primitives directly (not Mantine's
+// ScatterChart), so intercept the Recharts elements it emits.
+vi.mock("recharts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("recharts")>();
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }: { children?: ReactNode }) => {
+      return <div>{children}</div>;
+    },
+    ScatterChart: ({ children }: { children?: ReactNode }) => {
+      return <div data-testid="recharts-scatter">{children}</div>;
+    },
+    CartesianGrid: () => {
+      return null;
+    },
+    Tooltip: () => {
+      return null;
+    },
+    XAxis: (props: unknown) => {
+      rechartsXAxisMock(props);
+      return null;
+    },
+    YAxis: (props: unknown) => {
+      rechartsYAxisMock(props);
+      return null;
+    },
+    Legend: (props: unknown) => {
+      rechartsLegendMock(props);
+      return null;
+    },
+    Scatter: (props: unknown) => {
+      rechartsScatterMock(props);
+      return null;
     },
   };
 });
@@ -72,7 +111,10 @@ beforeEach(() => {
   mantineLineChartMock.mockClear();
   mantineRadarChartMock.mockClear();
   mantineCompositeChartMock.mockClear();
-  mantineScatterChartMock.mockClear();
+  rechartsXAxisMock.mockClear();
+  rechartsYAxisMock.mockClear();
+  rechartsScatterMock.mockClear();
+  rechartsLegendMock.mockClear();
 });
 
 function renderBar(config: BarChartVizConfig): void {
@@ -535,86 +577,110 @@ describe("LineChart: axis scale and rotation", () => {
   });
 });
 
-function _renderScatter(chartStyle?: ChartStyle): void {
+function _renderScatter(
+  chartStyle?: ChartStyle,
+  series: ScatterSeries[] = [{ key: "w", xKey: "v" }],
+): void {
   render(
     <AvandarAppProvider>
-      <ScatterChart
-        data={DATA}
-        series={[{ key: "w", xKey: "v" }]}
-        chartStyle={chartStyle}
-      />
+      <ScatterChart data={DATA} series={series} chartStyle={chartStyle} />
     </AvandarAppProvider>,
   );
 }
 
+// ScatterChart is rendered with Recharts primitives, so these assert the
+// props on the intercepted <XAxis> / <YAxis> / <Scatter> / <Legend> rather
+// than on a Mantine wrapper.
 describe("ScatterChart: both axes are value axes", () => {
   it("bounds the X axis", () => {
     _renderScatter({ xAxis: { min: 0, max: 4, tickInterval: 1 } });
-    const props = lastProps<{
-      xAxisProps?: { domain?: unknown; ticks?: number[] };
-    }>(mantineScatterChartMock);
-    expect(props.xAxisProps?.domain).toEqual([0, 4]);
-    expect(props.xAxisProps?.ticks).toEqual([0, 1, 2, 3, 4]);
+    const props = lastProps<{ domain?: unknown; ticks?: number[] }>(
+      rechartsXAxisMock,
+    );
+    expect(props.domain).toEqual([0, 4]);
+    expect(props.ticks).toEqual([0, 1, 2, 3, 4]);
   });
 
   it("bounds the Y axis", () => {
     _renderScatter({ yAxis: { min: 0, max: 40, tickInterval: 20 } });
-    const props = lastProps<{ yAxisProps?: { ticks?: number[] } }>(
-      mantineScatterChartMock,
-    );
-    expect(props.yAxisProps?.ticks).toEqual([0, 20, 40]);
+    const props = lastProps<{ ticks?: number[] }>(rechartsYAxisMock);
+    expect(props.ticks).toEqual([0, 20, 40]);
   });
 
   it("derives the X extent from the xKey column, not the Y column", () => {
     _renderScatter({ xAxis: { tickInterval: 1 } });
-    const props = lastProps<{ xAxisProps?: { domain?: unknown } }>(
-      mantineScatterChartMock,
-    );
+    const props = lastProps<{ domain?: unknown }>(rechartsXAxisMock);
     // `v` runs 1 to 3, so the derived domain is 0 to 3. Reading `w`
     // instead would give 0 to 5, which is what this case rules out.
-    expect(props.xAxisProps?.domain).toEqual([0, 3]);
+    expect(props.domain).toEqual([0, 3]);
   });
 
   it("prefers a configured axis label over the derived column name", () => {
     _renderScatter({ xAxis: { label: "Spend" } });
-    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
-    expect(props.xAxisLabel).toBe("Spend");
+    const props = lastProps<{ label?: { value?: string } }>(rechartsXAxisMock);
+    expect(props.label?.value).toBe("Spend");
   });
 
   it("derives the axis label from the column when unset", () => {
     _renderScatter(undefined);
-    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
-    expect(props.xAxisLabel).toBe("v");
+    const props = lastProps<{ label?: { value?: string } }>(rechartsXAxisMock);
+    expect(props.label?.value).toBe("v");
   });
 
-  it("labels each axis exactly once", () => {
-    _renderScatter({ xAxis: { label: "Spend" } });
-    const props = lastProps<{
-      xAxisLabel?: string;
-      xAxisProps?: { label?: unknown };
-    }>(mantineScatterChartMock);
-    // Recharts renders both an axis `label` prop and any `<Label>`
-    // child, so exactly one of these two may be set.
-    expect(props.xAxisLabel).toBe("Spend");
-    expect(props.xAxisProps?.label).toBeUndefined();
+  it("gives each axis label its own color", () => {
+    _renderScatter({
+      xAxis: { label: "Spend", labelColor: "#ff0000" },
+      yAxis: { label: "Revenue", labelColor: "#0000ff" },
+    });
+    const x = lastProps<{ label?: { value?: string; fill?: string } }>(
+      rechartsXAxisMock,
+    );
+    const y = lastProps<{ label?: { value?: string; fill?: string } }>(
+      rechartsYAxisMock,
+    );
+    // X and Y label colors must stay independent; the old Mantine path
+    // collapsed both into a single shared styles.axisLabel fill.
+    expect(x.label?.value).toBe("Spend");
+    expect(x.label?.fill).toBe("#ff0000");
+    expect(y.label?.value).toBe("Revenue");
+    expect(y.label?.fill).toBe("#0000ff");
+  });
+
+  it("renders each series with its own color and label", () => {
+    _renderScatter(undefined, [
+      { key: "w", xKey: "v", label: "Alpha", color: "#123456" },
+      { key: "v", xKey: "w", label: "Beta", color: "#abcdef" },
+    ]);
+    expect(rechartsScatterMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Alpha", fill: "#123456" }),
+    );
+    expect(rechartsScatterMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Beta", fill: "#abcdef" }),
+    );
+  });
+
+  it("renders the legend even for a single series", () => {
+    _renderScatter(undefined, [{ key: "w", xKey: "v" }]);
+    expect(rechartsLegendMock).toHaveBeenCalled();
   });
 
   it("rotates X tick labels", () => {
     _renderScatter({ xAxis: { tickAngle: -90 } });
     const props = lastProps<{
-      xAxisProps?: { tick?: { angle?: number }; interval?: number };
-    }>(mantineScatterChartMock);
-    expect(props.xAxisProps?.tick?.angle).toBe(-90);
-    expect(props.xAxisProps?.interval).toBe(0);
+      tick?: { angle?: number };
+      interval?: number;
+    }>(rechartsXAxisMock);
+    expect(props.tick?.angle).toBe(-90);
+    expect(props.interval).toBe(0);
   });
 
   it("adds no domain or ticks when nothing is configured", () => {
     _renderScatter(undefined);
-    const props = lastProps<{
-      xAxisProps?: { domain?: unknown; ticks?: unknown };
-    }>(mantineScatterChartMock);
-    expect(props.xAxisProps?.domain).toBeUndefined();
-    expect(props.xAxisProps?.ticks).toBeUndefined();
+    const props = lastProps<{ domain?: unknown; ticks?: unknown }>(
+      rechartsXAxisMock,
+    );
+    expect(props.domain).toBeUndefined();
+    expect(props.ticks).toBeUndefined();
   });
 });
 
