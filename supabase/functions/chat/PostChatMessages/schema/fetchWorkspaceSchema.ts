@@ -6,9 +6,21 @@ export type DatasetColumn = {
   name: string;
   data_type: string;
 };
+export type Concept = { id: string; name: string };
+export type ConceptAttribute = {
+  concept_id: string;
+  name: string;
+};
 
-/** Loads the datasets and columns available to a workspace chat request. */
-export async function fetchWorkspaceSchema(options: {
+/** Datasets, concepts, and field names a workspace chat turn may name. */
+export type WorkspaceChatSchema = {
+  datasets: Dataset[];
+  columns: DatasetColumn[];
+  concepts: Concept[];
+  conceptAttributes: ConceptAttribute[];
+};
+
+async function _fetchDatasets(options: {
   supabaseClient: AvaSupabaseClient;
   workspaceId: string;
 }): Promise<{ datasets: Dataset[]; columns: DatasetColumn[] }> {
@@ -35,4 +47,51 @@ export async function fetchWorkspaceSchema(options: {
     .throwOnError();
 
   return { datasets: datasets ?? [], columns: columns ?? [] };
+}
+
+async function _fetchConcepts(options: {
+  supabaseClient: AvaSupabaseClient;
+  workspaceId: string;
+}): Promise<{ concepts: Concept[]; conceptAttributes: ConceptAttribute[] }> {
+  const { data: concepts } = await options.supabaseClient
+    .from("concepts")
+    .select("id, name")
+    .eq("workspace_id", options.workspaceId)
+    .throwOnError();
+
+  if (!concepts || concepts.length === 0) {
+    return { concepts: [], conceptAttributes: [] };
+  }
+
+  const { data: conceptAttributes } = await options.supabaseClient
+    .from("concept_attributes")
+    .select("concept_id, name")
+    .eq("workspace_id", options.workspaceId)
+    .in(
+      "concept_id",
+      concepts.map((concept: Concept) => {
+        return concept.id;
+      }),
+    )
+    .throwOnError();
+
+  return {
+    concepts: concepts ?? [],
+    conceptAttributes: conceptAttributes ?? [],
+  };
+}
+
+/**
+ * Loads the datasets, concepts, and names available to a workspace chat
+ * request.
+ */
+export async function fetchWorkspaceSchema(options: {
+  supabaseClient: AvaSupabaseClient;
+  workspaceId: string;
+}): Promise<WorkspaceChatSchema> {
+  const [datasetSchema, conceptSchema] = await Promise.all([
+    _fetchDatasets(options),
+    _fetchConcepts(options),
+  ]);
+  return { ...datasetSchema, ...conceptSchema };
 }

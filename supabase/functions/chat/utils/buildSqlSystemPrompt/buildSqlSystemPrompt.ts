@@ -6,6 +6,8 @@ const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 
 type Dataset = { id: string; name: string };
 type DatasetColumn = { dataset_id: string; name: string; data_type: string };
+type Concept = { id: string; name: string };
+type ConceptAttribute = { concept_id: string; name: string };
 
 /**
  * Heuristic to detect whether a prompt looks like a geospatial question. Used
@@ -37,6 +39,8 @@ type BuildSqlSystemPromptOptions = {
   prompt: string;
   datasets: readonly Dataset[];
   columns: readonly DatasetColumn[];
+  concepts?: readonly Concept[];
+  conceptAttributes?: readonly ConceptAttribute[];
   includeSpatialDocumentation?: boolean;
 };
 
@@ -45,10 +49,11 @@ type BuildSqlSystemPromptOptions = {
  * generation. Shared between the `chat` edge function surfaces so they stay
  * in sync.
  *
- * The schema is a compact alias listing (one line per dataset, columns inline),
- * not JSON, to keep the character budget low. Dataset UUIDs are rewritten
- * after the model returns SQL. Spatial docs default on for the queries
- * endpoint; chat omits them here and puts them in the volatile turn suffix.
+ * The schema is a compact alias listing (one line per dataset or concept,
+ * columns or attribute names inline), not JSON, to keep the character budget
+ * low. Relation ids are rewritten after the model returns SQL. Spatial docs
+ * default on for the queries endpoint; chat omits them here and puts them in
+ * the volatile turn suffix.
  */
 export function buildSqlSystemPrompt(
   options: Readonly<BuildSqlSystemPromptOptions>,
@@ -57,10 +62,16 @@ export function buildSqlSystemPrompt(
     prompt,
     datasets,
     columns,
+    concepts = [],
+    conceptAttributes = [],
     includeSpatialDocumentation = true,
   } = options;
-  const aliases = SqlTableAlias.fromDatasets(datasets);
-  const schemaBlock = SqlTableAlias.formatSchemaBlock({ aliases, columns });
+  const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
+  const schemaBlock = SqlTableAlias.formatSchemaBlock({
+    aliases,
+    columns,
+    conceptAttributes,
+  });
   const spatialDocs =
     includeSpatialDocumentation ?
       makeSpatialSqlDocumentationFromPrompt(prompt)
@@ -68,14 +79,15 @@ export function buildSqlSystemPrompt(
 
   return `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.
 
-Available datasets:
+Available datasets and concepts:
 ${schemaBlock}
 
 Notes:
 
-- SQL FROM / JOIN targets must be the aliases above (t0, t1, …), never a label
-  or filename. Wrap aliases and column names in double quotes.
-- Do not invent datasets or columns.
+- SQL FROM / JOIN targets must be the aliases above (t0, t1, … for datasets;
+  c0, c1, … for concepts), never a label or filename. Wrap aliases and column
+  names in double quotes.
+- Do not invent datasets, concepts, or columns.
 - The query will run in DuckDB and should only use DuckDB functions supported
   by DuckDB.
 

@@ -11,6 +11,7 @@ import {
 } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/buildOfflinePrompts/buildOfflinePrompts";
 
 const DEATHS_TABLE_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+const CONCEPT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
 const SCHEMA = {
   datasets: [{ id: DEATHS_TABLE_ID, name: "LONG_us_deaths.csv" }],
@@ -21,6 +22,12 @@ const SCHEMA = {
       data_type: "string",
     },
   ],
+} as const;
+
+const SCHEMA_WITH_CONCEPT = {
+  ...SCHEMA,
+  concepts: [{ id: CONCEPT_ID, name: "Case" }],
+  conceptAttributes: [{ concept_id: CONCEPT_ID, name: "status" }],
 } as const;
 
 describe("buildOfflineSqlPrompt", () => {
@@ -43,6 +50,18 @@ describe("buildOfflineSqlPrompt", () => {
     expect(prompt).not.toContain(DEATHS_TABLE_ID);
     expect(prompt).toContain("Output ONLY");
     expect(prompt).toContain("LIMIT, not SELECT TOP");
+  });
+
+  it("lists concept aliases and attribute names without concept UUIDs", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: SCHEMA_WITH_CONCEPT,
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Count cases",
+      lastUserPrompt: "how many cases",
+    });
+
+    expect(prompt).toContain("- c0: Case (status)");
+    expect(prompt).not.toContain(CONCEPT_ID);
   });
 });
 

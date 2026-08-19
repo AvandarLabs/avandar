@@ -111,6 +111,8 @@ export const PostChatMessages = POST({
         prompt: lastUserPrompt,
         datasets: schema.datasets,
         columns: schema.columns,
+        concepts: schema.concepts,
+        conceptAttributes: schema.conceptAttributes,
         includeSpatialDocumentation: false,
       });
       const systemContent = `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
@@ -148,6 +150,7 @@ export const PostChatMessages = POST({
           lastUserPrompt,
           priorClarifications,
           datasets: schema.datasets,
+          concepts: schema.concepts,
         }));
       } catch (error) {
         await emitChatTurnAnalytics({

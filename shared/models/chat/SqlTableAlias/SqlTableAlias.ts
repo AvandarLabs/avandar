@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
+  SqlTableAliasConcept,
+  SqlTableAliasConceptAttribute,
   SqlTableAliasDataset,
   SqlTableAliasT,
 } from "$/models/chat/SqlTableAlias/SqlTableAlias.types.ts";
@@ -9,4 +11,6 @@ export { SqlTableAliasModule as SqlTableAlias } from "$/models/chat/SqlTableAlia
 export namespace SqlTableAlias {
   export type T = SqlTableAliasT;
   export type Dataset = SqlTableAliasDataset;
+  export type Concept = SqlTableAliasConcept;
+  export type ConceptAttribute = SqlTableAliasConceptAttribute;
 }

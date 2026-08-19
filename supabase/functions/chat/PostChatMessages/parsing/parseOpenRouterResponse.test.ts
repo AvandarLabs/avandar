@@ -64,4 +64,29 @@ describe("parseOpenRouterResponse", () => {
       query: `SELECT DISTINCT "region" FROM "${CHOLERA_ID}" LIMIT 20`,
     });
   });
+
+  it("rewrites generateSql concept aliases to concept table names", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const parsed = parseOpenRouterResponse({
+      message: {
+        tool_calls: [
+          {
+            function: {
+              name: "generateSql",
+              arguments: JSON.stringify({
+                sql: 'SELECT "status" FROM "c0" LIMIT 10',
+              }),
+            },
+          },
+        ],
+      },
+      attemptText: "",
+      lastUserPrompt: "preview cases",
+      priorClarifications: 0,
+      concepts: [{ id: conceptId, name: "Case" }],
+    });
+
+    expect(parsed.generatedSql?.sql).toContain(`FROM "concept_${conceptId}"`);
+    expect(parsed.generatedSql?.sql).not.toContain('"c0"');
+  });
 });

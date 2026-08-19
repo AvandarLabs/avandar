@@ -74,4 +74,19 @@ describe("buildSqlSystemPrompt", () => {
     expect(prompt).not.toContain("Reference documentation");
     expect(prompt).toContain("- t0: Cholera cases (case_id)");
   });
+
+  it("lists concept aliases and attribute names without concept UUIDs", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const prompt = buildSqlSystemPrompt({
+      prompt: "count cases",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: conceptId, name: "Case" }],
+      conceptAttributes: [{ concept_id: conceptId, name: "status" }],
+    });
+
+    expect(prompt).toContain("- c0: Case (status)");
+    expect(prompt).toContain("c0, c1");
+    expect(prompt).not.toContain(conceptId);
+  });
 });

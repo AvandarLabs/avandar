@@ -15,9 +15,21 @@ export type OfflineChatSchemaColumn = {
   data_type: string;
 };
 
+export type OfflineChatSchemaConcept = {
+  id: string;
+  name: string;
+};
+
+export type OfflineChatSchemaConceptAttribute = {
+  concept_id: string;
+  name: string;
+};
+
 export type OfflineChatSchema = {
   datasets: readonly OfflineChatSchemaDataset[];
   columns: readonly OfflineChatSchemaColumn[];
+  concepts?: readonly OfflineChatSchemaConcept[];
+  conceptAttributes?: readonly OfflineChatSchemaConceptAttribute[];
 };
 
 export type OfflineChatMessage = {

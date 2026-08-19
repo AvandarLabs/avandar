@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { fuzzyMatchOfflineDatasetByName } from "./fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
 import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
@@ -19,6 +20,18 @@ const MIN_TABLE_REF_HEURISTIC_SCORE = 2;
 
 function stripTableQuotes(tableRef: string): string {
   return tableRef.replace(/^"+|"+$/g, "").trim();
+}
+
+function _isConceptTableRef(
+  ref: string,
+  concepts: ReadonlyArray<{ id: string; name: string }>,
+): boolean {
+  if (RelationRef.fromTableName(ref)?.kind === "concept") {
+    return true;
+  }
+  return SqlTableAlias.fromConcepts(concepts).some((entry) => {
+    return entry.alias === ref || entry.tableName === ref;
+  });
 }
 
 function exactDatasetMatch(
@@ -43,9 +56,13 @@ export function matchOfflineDatasetTable(args: {
   datasets: readonly OfflineChatSchemaDataset[];
   lastUserPrompt: string;
   preferredDatasetId?: string;
+  concepts?: ReadonlyArray<{ id: string; name: string }>;
 }): OfflineChatSchemaDataset | undefined {
   const ref = stripTableQuotes(args.tableRef);
   if (!ref || FORBIDDEN_TABLE_NAMES.has(ref.toLowerCase())) {
+    return undefined;
+  }
+  if (_isConceptTableRef(ref, args.concepts ?? [])) {
     return undefined;
   }
 
