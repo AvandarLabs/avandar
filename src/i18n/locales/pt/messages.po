@@ -814,6 +814,10 @@ msgstr "Dados abertos"
 msgid "All fields"
 msgstr "Todos os campos"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Resize annotation text"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
 msgstr "desvio padrão"
@@ -5247,6 +5251,10 @@ msgstr "Erro ao salvar o conjunto de dados: {0}"
 msgid "Raw metadata (JSON)"
 msgstr "Metadados brutos (JSON)"
 
+#: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
+msgid "Erase annotations"
+msgstr ""
+
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "These are the first {0} rows of your dataset."
@@ -6637,6 +6645,10 @@ msgstr "Filtros globais"
 msgid "Layout"
 msgstr "Layout"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Move annotation text"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "Função para {displayName}"
@@ -7608,6 +7620,10 @@ msgstr "Não há uma camada de limites neste mapa para consultar um código P."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "O ID do workspace não pode conter espaços"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Enter your text here"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8888,6 +8904,7 @@ msgid "Suppress areas below"
 msgstr "Suprimir áreas abaixo de"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
 msgid "Annotation text"
 msgstr "Texto da anotação"
 

@@ -1,15 +1,18 @@
+import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
+import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
 import {
-  attachAoiGestures,
-  attachMeasureGestures,
+    attachAoiGestures,
+    attachMeasureGestures,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
+import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
 import type {
-  AoiGestureCallbacks,
-  MeasureGestureCallbacks,
+    AoiGestureCallbacks,
+    MeasureGestureCallbacks,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Map as MapLibreMap } from "maplibre-gl";
@@ -22,6 +25,9 @@ type Options = {
   mapToolMode: MapToolMode;
   onMapToolModeChange: (mode: MapToolMode) => void;
   updateConfig: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;
+  onEditingTextFeatureIdChange?: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
 };
 
 type AnnotateIdSetter = Dispatch<
@@ -33,7 +39,13 @@ function _attachGesturesForMode(
   mapToolMode: MapToolMode,
   aoiCallbacks: AoiGestureCallbacks,
   measureCallbacks: MeasureGestureCallbacks,
-  setLastCreatedAnnotationId: AnnotateIdSetter,
+  annotate: {
+    setLastCreatedAnnotationId: AnnotateIdSetter;
+    onEditingTextFeatureIdChange: (
+      featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+    ) => void;
+    textPlaceholder: string;
+  },
 ): (() => void) | undefined {
   return match(mapToolMode)
     .with({ type: "aoi" }, () => {
@@ -45,7 +57,7 @@ function _attachGesturesForMode(
     .with({ type: "annotate" }, (mode) => {
       return attachAnnotateGestures(map, mode.kind, {
         ...aoiCallbacks,
-        setLastCreatedAnnotationId,
+        ...annotate,
       });
     })
     .with({ type: "pan" }, () => {
@@ -56,6 +68,12 @@ function _attachGesturesForMode(
     })
     .with({ type: "goto" }, () => {
       return undefined;
+    })
+    .with({ type: "erase" }, () => {
+      return attachEraseGestures(map, {
+        onMapToolModeChange: aoiCallbacks.onMapToolModeChange,
+        updateConfig: aoiCallbacks.updateConfig,
+      });
     })
     .exhaustive();
 }
@@ -95,6 +113,10 @@ type RegisterToolGesturesOptions = {
   setLastCreatedAnnotationId: AnnotateIdSetter;
   setVertices: Dispatch<SetStateAction<Vertex[]>>;
   verticesRef: { current: Vertex[] };
+  textPlaceholder: string;
+  onEditingTextFeatureIdChange: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
 };
 
 function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
@@ -108,6 +130,8 @@ function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
     setLastCreatedAnnotationId,
     setVertices,
     verticesRef,
+    textPlaceholder,
+    onEditingTextFeatureIdChange,
   } = options;
   useEffect(
     function registerToolGestures() {
@@ -127,17 +151,23 @@ function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
           verticesRef,
         },
         { onMapToolModeChange, setVertices, verticesRef },
-        setLastCreatedAnnotationId,
+        {
+          setLastCreatedAnnotationId,
+          onEditingTextFeatureIdChange,
+          textPlaceholder,
+        },
       );
     },
     [
       invalidRingMessage,
       mapRef,
       mapToolMode,
+      onEditingTextFeatureIdChange,
       onMapToolModeChange,
       setInvalidRingStatus,
       setLastCreatedAnnotationId,
       setVertices,
+      textPlaceholder,
       updateConfig,
       verticesRef,
     ],
@@ -161,7 +191,11 @@ function _annotationPreviewVerticesForMode(
   if (mapToolMode.type !== "annotate") {
     return [];
   }
-  if (mapToolMode.kind === "area" || mapToolMode.kind === "freehand") {
+  if (
+    mapToolMode.kind === "area" ||
+    mapToolMode.kind === "freehand" ||
+    mapToolMode.kind === "arrow"
+  ) {
     return vertices;
   }
   return [];
@@ -183,6 +217,7 @@ export function useMapToolGestures({
   mapToolMode,
   onMapToolModeChange,
   updateConfig,
+  onEditingTextFeatureIdChange = noop,
 }: Options): GestureResult {
   const { t } = useLingui();
   const [vertices, setVertices] = useState<Vertex[]>([]);
@@ -195,6 +230,8 @@ export function useMapToolGestures({
   >();
   const verticesRef = useRef<Vertex[]>([]);
   const invalidRingMessage = t`Close a valid ring that does not cross itself.`;
+  const textPlaceholder = t`Enter your text here`;
+  useMapPanPolicy({ mapRef, mapToolMode });
   _resetVerticesForToolChange({
     toolKey: _toolKey(mapToolMode),
     vertexToolKey,
@@ -213,6 +250,8 @@ export function useMapToolGestures({
     setLastCreatedAnnotationId,
     setVertices,
     verticesRef,
+    textPlaceholder,
+    onEditingTextFeatureIdChange,
   });
   return {
     inProgressVertices: _inProgressVerticesForMode(mapToolMode, vertices),

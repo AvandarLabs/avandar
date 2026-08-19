@@ -10,6 +10,7 @@ import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor"
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 import type { GisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** Collects already-loaded spatial FeatureCollections, keyed by layer. */
@@ -36,6 +37,7 @@ export function useGisAppRendering(
     avaMap: AvaMap.T;
     chrome: GisAppChrome;
     editor: ReturnType<typeof useAvaMapEditor>;
+    hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
   }>,
 ): GisAppRendering {
   const [datasets = []] = DatasetClient.useGetAll(
@@ -68,6 +70,7 @@ export function useGisAppRendering(
   const rendering = useAvaMapRender({
     layerQueryStates,
     mapConfig: options.editor.mapConfig,
+    hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
   });
   PersistedLayerLegends.usePersistedLayerLegends({
     mapConfig: options.editor.mapConfig,

@@ -1,11 +1,11 @@
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
-  Button,
-  ColorInput,
-  NumberInput,
-  Stack,
-  TextInput,
+    Button,
+    ColorInput,
+    NumberInput,
+    Stack,
+    TextInput,
 } from "@mantine/core";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
@@ -140,7 +140,6 @@ function AnnotationFeatureFields({
           key={feature.id}
           label={t`Annotation text`}
           value={feature.text}
-          autoFocus={feature.text === ""}
           onChange={(event) => {
             onFeatureChange({ ...feature, text: event.currentTarget.value });
           }}

@@ -799,6 +799,10 @@ msgstr "فتح البيانات"
 msgid "All fields"
 msgstr "جميع الحقول"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Resize annotation text"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
 msgstr "الانحراف المعياري"
@@ -5168,6 +5172,10 @@ msgstr "خطأ في حفظ مجموعة البيانات: {0}"
 msgid "Raw metadata (JSON)"
 msgstr "البيانات الوصفية الخام (JSON)"
 
+#: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
+msgid "Erase annotations"
+msgstr ""
+
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "These are the first {0} rows of your dataset."
@@ -6536,6 +6544,10 @@ msgstr "الفلاتر العالمية"
 msgid "Layout"
 msgstr "التخطيط"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Move annotation text"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "الدور لـ {displayName}"
@@ -7494,6 +7506,10 @@ msgstr "لا توجد طبقة حدود على هذه الخريطة للبحث 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على مسافات"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Enter your text here"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8759,6 +8775,7 @@ msgid "Suppress areas below"
 msgstr "استبعاد المناطق الأقل من"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
 msgid "Annotation text"
 msgstr "نص التعليق التوضيحي"
 

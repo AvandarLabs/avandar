@@ -777,6 +777,10 @@ msgstr "開放數據"
 msgid "All fields"
 msgstr "所有欄位"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Resize annotation text"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
 msgstr "標準差"
@@ -5039,6 +5043,10 @@ msgstr "保存資料集時出錯：{0}"
 msgid "Raw metadata (JSON)"
 msgstr "原始元數據（JSON）"
 
+#: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
+msgid "Erase annotations"
+msgstr ""
+
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "These are the first {0} rows of your dataset."
@@ -6383,6 +6391,10 @@ msgstr "全域篩選"
 msgid "Layout"
 msgstr "版面配置"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Move annotation text"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "{displayName} 的角色"
@@ -7321,6 +7333,10 @@ msgstr "此地圖上沒有可用來查詢 P-code 的邊界圖層。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "工作區 ID 不得包含空格"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Enter your text here"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8558,6 +8574,7 @@ msgid "Suppress areas below"
 msgstr "抑制低於以下值的區域"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
 msgid "Annotation text"
 msgstr "註記文字"
 

@@ -6,11 +6,16 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@/test-utils";
 import { AnnotateHarness } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateHarness";
 import {
-  createFakeMap,
-  emitWindowPointer,
-  openAnnotateSubCluster,
+    createFakeMap,
+    emitTargetPointer,
+    emitWindowPointer,
+    openAnnotateSubCluster,
 } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
+import {
+    makeFreehandAnnotationFeature,
+    makeTextAnnotationFeature,
+} from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 
 const spatialAvailability = vi.hoisted(() => {
   return {
@@ -56,13 +61,48 @@ describe("AnnotateMapTool", () => {
       screen.getByRole("button", { name: "Draw an annotation area" }),
     ).toBeVisible();
     expect(
-      screen.getByRole("button", {
+      screen.queryByRole("button", {
         name: "Isochrone from a point. This tool arrives in a later release.",
       }),
-    ).toHaveAttribute("aria-disabled", "true");
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Erase annotations" }),
+    ).toBeVisible();
   });
 
-  it("places a text feature with empty text and focuses the input", async () => {
+  it("places placeholder text, focuses the overlay, and returns to Select", async () => {
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.makeEmpty();
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    await openAnnotateSubCluster();
+    fireEvent.click(screen.getByRole("button", { name: "Place text" }));
+    act(() => {
+      fakeMap.emitClick(29.2, -1.7);
+    });
+
+    const overlay = screen.getByTestId("annotation-text-overlay");
+    expect(overlay).toHaveValue("Enter your text here");
+    expect(overlay).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Pan and select" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(config.annotations.features).toEqual([
+      expect.objectContaining({
+        kind: "text",
+        text: "Enter your text here",
+      }),
+    ]);
+  });
+
+  it("focuses the overlay after placing a second text feature", async () => {
     const fakeMap = createFakeMap();
     render(<AnnotateHarness fakeMap={fakeMap} />);
 
@@ -71,25 +111,10 @@ describe("AnnotateMapTool", () => {
     act(() => {
       fakeMap.emitClick(29.2, -1.7);
     });
-
-    const textInput = screen.getByRole("textbox", { name: "Annotation text" });
-    expect(textInput).toHaveValue("");
-    expect(textInput).toHaveFocus();
-  });
-
-  it("focuses the text input after placing a second text feature", async () => {
-    const fakeMap = createFakeMap();
-    render(<AnnotateHarness fakeMap={fakeMap} />);
-
-    await openAnnotateSubCluster();
-    fireEvent.click(screen.getByRole("button", { name: "Place text" }));
+    const firstOverlay = screen.getByTestId("annotation-text-overlay");
+    expect(firstOverlay).toHaveFocus();
     act(() => {
-      fakeMap.emitClick(29.2, -1.7);
-    });
-    const firstInput = screen.getByRole("textbox", { name: "Annotation text" });
-    expect(firstInput).toHaveFocus();
-    act(() => {
-      firstInput.blur();
+      firstOverlay.blur();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Place text" }));
@@ -97,11 +122,45 @@ describe("AnnotateMapTool", () => {
       fakeMap.emitClick(30.2, -2.7);
     });
 
-    const secondInput = screen.getByRole("textbox", {
-      name: "Annotation text",
+    const secondOverlay = screen.getByTestId("annotation-text-overlay");
+    expect(secondOverlay).toHaveValue("Enter your text here");
+    expect(secondOverlay).toHaveFocus();
+  });
+
+  it("moves selected text in Select after the overlay commits", async () => {
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.makeEmpty();
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    await openAnnotateSubCluster();
+    fireEvent.click(screen.getByRole("button", { name: "Place text" }));
+    act(() => {
+      fakeMap.emitClick(29.2, -1.7);
     });
-    expect(secondInput).toHaveValue("");
-    expect(secondInput).toHaveFocus();
+    act(() => {
+      screen.getByTestId("annotation-text-overlay").blur();
+    });
+
+    const frame = screen.getByTestId("annotation-text-selection");
+    act(() => {
+      emitTargetPointer(frame, "pointerdown", 29.2, -1.7);
+      emitWindowPointer("pointermove", 40, 10);
+      emitWindowPointer("pointerup", 40, 10);
+    });
+
+    expect(config.annotations.features[0]).toEqual(
+      expect.objectContaining({
+        kind: "text",
+        geometry: { type: "Point", coordinates: [40, 10] },
+      }),
+    );
   });
 
   it("shows an Annotations row after the first feature is added", async () => {
@@ -130,7 +189,7 @@ describe("AnnotateMapTool", () => {
       screen.getByRole("button", { name: "Draw an annotation area" }),
     );
     act(() => {
-      fakeMap.emitClick(0, 0);
+      fakeMap.emitDblClick(0, 0);
       fakeMap.emitClick(1, 0);
       fakeMap.emitClick(1, 1);
     });
@@ -147,6 +206,7 @@ describe("AnnotateMapTool", () => {
 
     await openAnnotateSubCluster();
     fireEvent.click(screen.getByRole("button", { name: "Draw freehand" }));
+    fakeMap.dragPan.enable.mockClear();
     act(() => {
       fakeMap.emitPointerDown(0, 0);
       emitWindowPointer("pointerup");
@@ -155,7 +215,7 @@ describe("AnnotateMapTool", () => {
     expect(
       screen.queryByRole("button", { name: "Annotations" }),
     ).not.toBeInTheDocument();
-    expect(fakeMap.dragPan.enable).toHaveBeenCalled();
+    expect(fakeMap.dragPan.enable).not.toHaveBeenCalled();
   });
 
   it("shows a live annotation stroke while the freehand pointer is down", async () => {
@@ -184,6 +244,7 @@ describe("AnnotateMapTool", () => {
 
     await openAnnotateSubCluster();
     fireEvent.click(screen.getByRole("button", { name: "Draw freehand" }));
+    fakeMap.dragPan.enable.mockClear();
     act(() => {
       fakeMap.emitPointerDown(0, 0);
       emitWindowPointer("pointermove", 1, 1);
@@ -191,7 +252,7 @@ describe("AnnotateMapTool", () => {
     });
 
     expect(screen.getByRole("button", { name: "Annotations" })).toBeVisible();
-    expect(fakeMap.dragPan.enable).toHaveBeenCalled();
+    expect(fakeMap.dragPan.enable).not.toHaveBeenCalled();
   });
 
   it("cancels an in-progress freehand stroke on pointercancel", async () => {
@@ -200,6 +261,7 @@ describe("AnnotateMapTool", () => {
 
     await openAnnotateSubCluster();
     fireEvent.click(screen.getByRole("button", { name: "Draw freehand" }));
+    fakeMap.dragPan.enable.mockClear();
     act(() => {
       fakeMap.emitPointerDown(4, 4);
       emitWindowPointer("pointermove", 5, 5);
@@ -210,10 +272,65 @@ describe("AnnotateMapTool", () => {
       screen.queryByRole("button", { name: "Annotations" }),
     ).not.toBeInTheDocument();
     expect(screen.getByTestId("annotation-preview")).toHaveTextContent("[]");
-    expect(fakeMap.dragPan.enable).toHaveBeenCalled();
+    expect(fakeMap.dragPan.enable).not.toHaveBeenCalled();
   });
 
-  it("commits an arrow from two clicks with default paint", async () => {
+  it("shows a live arrow preview while the pointer is down", async () => {
+    const fakeMap = createFakeMap();
+    render(<AnnotateHarness fakeMap={fakeMap} />);
+
+    await openAnnotateSubCluster();
+    fireEvent.click(screen.getByRole("button", { name: "Draw an arrow" }));
+    act(() => {
+      fakeMap.emitPointerDown(0, 0);
+      emitWindowPointer("pointermove", 10, 10);
+    });
+
+    expect(screen.getByTestId("annotation-preview")).toHaveTextContent(
+      "[[0,0],[10,10]]",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Annotations" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("commits an arrow from a press-drag-release with default paint", async () => {
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.makeEmpty();
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    await openAnnotateSubCluster();
+    fireEvent.click(screen.getByRole("button", { name: "Draw an arrow" }));
+    act(() => {
+      fakeMap.emitPointerDown(0, 0);
+      emitWindowPointer("pointermove", 10, 10);
+      emitWindowPointer("pointerup", 10, 10);
+    });
+
+    expect(config.annotations.features).toEqual([
+      expect.objectContaining({
+        kind: "arrow",
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [0, 0],
+            [10, 10],
+          ],
+        },
+        color: "#3b82f6",
+        strokeWidthPx: 2,
+      }),
+    ]);
+  });
+
+  it("does not commit an arrow from two clicks without a drag", async () => {
     const fakeMap = createFakeMap();
     let config = AvaMapConfig.makeEmpty();
     render(
@@ -229,23 +346,10 @@ describe("AnnotateMapTool", () => {
     fireEvent.click(screen.getByRole("button", { name: "Draw an arrow" }));
     act(() => {
       fakeMap.emitClick(0, 0);
-      fakeMap.emitClick(1, 1);
+      fakeMap.emitClick(10, 10);
     });
 
-    expect(config.annotations.features).toEqual([
-      expect.objectContaining({
-        kind: "arrow",
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [0, 0],
-            [1, 1],
-          ],
-        },
-        color: "#3b82f6",
-        strokeWidthPx: 2,
-      }),
-    ]);
+    expect(config.annotations.features).toEqual([]);
   });
 
   it("writes an annotation area without setting aoi", async () => {
@@ -265,12 +369,10 @@ describe("AnnotateMapTool", () => {
       screen.getByRole("button", { name: "Draw an annotation area" }),
     );
     act(() => {
-      fakeMap.emitClick(0, 0);
-      fakeMap.emitClick(1, 0);
-      fakeMap.emitClick(1, 1);
-      fakeMap.emitClick(0, 1);
+      fakeMap.emitPointerDown(0, 0);
+      emitWindowPointer("pointermove", 10, 10);
+      emitWindowPointer("pointerup", 10, 10);
     });
-    fireEvent.keyDown(window, { key: "Enter" });
 
     expect(config.aoi).toBeUndefined();
     expect(config.annotations.features).toEqual([
@@ -281,9 +383,9 @@ describe("AnnotateMapTool", () => {
           coordinates: [
             [
               [0, 0],
-              [1, 0],
-              [1, 1],
-              [0, 1],
+              [10, 0],
+              [10, 10],
+              [0, 10],
               [0, 0],
             ],
           ],
@@ -292,5 +394,95 @@ describe("AnnotateMapTool", () => {
         opacity: 0.35,
       }),
     ]);
+  });
+
+  it("deletes a text annotation when the eraser hits it", () => {
+    const feature = makeTextAnnotationFeature([10, 10], "Hello");
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.withAnnotationFeature({
+      config: AvaMapConfig.makeEmpty(),
+      feature,
+    });
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        initialConfig={config}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Erase annotations" }));
+    act(() => {
+      fakeMap.emitPointerDown(10, 10);
+      emitWindowPointer("pointermove", 10, 10);
+      emitWindowPointer("pointerup", 10, 10);
+    });
+
+    expect(config.annotations.features).toEqual([]);
+  });
+
+  it("splits a freehand stroke where the eraser crosses it", () => {
+    const stroke = makeFreehandAnnotationFeature([
+      [0, 0],
+      [40, 0],
+      [80, 0],
+    ]);
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.withAnnotationFeature({
+      config: AvaMapConfig.makeEmpty(),
+      feature: stroke,
+    });
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        initialConfig={config}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Erase annotations" }));
+    act(() => {
+      fakeMap.emitPointerDown(40, 0);
+      emitWindowPointer("pointerup", 40, 0);
+    });
+
+    expect(config.annotations.features).toHaveLength(2);
+    expect(
+      config.annotations.features.every((feature) => feature.kind === "freehand"),
+    ).toBe(true);
+    expect(config.annotations.features.map((feature) => feature.id)).not.toContain(
+      stroke.id,
+    );
+  });
+
+  it("does not erase while Alt is held", () => {
+    const feature = makeTextAnnotationFeature([10, 10], "Hello");
+    const fakeMap = createFakeMap();
+    let config = AvaMapConfig.withAnnotationFeature({
+      config: AvaMapConfig.makeEmpty(),
+      feature,
+    });
+    render(
+      <AnnotateHarness
+        fakeMap={fakeMap}
+        initialConfig={config}
+        onConfigChange={(nextConfig) => {
+          config = nextConfig;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Erase annotations" }));
+    act(() => {
+      fakeMap.emitPointerDown(10, 10, { altKey: true });
+      emitWindowPointer("pointermove", 10, 10, { altKey: true });
+      emitWindowPointer("pointerup", 10, 10, { altKey: true });
+    });
+
+    expect(config.annotations.features).toEqual([feature]);
   });
 });

@@ -45,6 +45,11 @@ export type MapCanvasOptions = {
 
   /** Writes a closed Area ring into map config. */
   updateConfig?: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;
+
+  /** Opens the in-place text overlay for a newly placed annotation. */
+  onEditingTextFeatureIdChange?: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
 };
 
 /** References owned by the live map canvas controller. */
@@ -63,6 +68,9 @@ type CanvasToolOverlayOptions = {
   mapToolMode: MapToolMode;
   onMapToolModeChange: (mode: MapToolMode) => void;
   updateConfig: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;
+  onEditingTextFeatureIdChange: (
+    featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+  ) => void;
 };
 
 function useMapCanvasToolOverlays(options: CanvasToolOverlayOptions): {
@@ -81,6 +89,7 @@ function useMapCanvasToolOverlays(options: CanvasToolOverlayOptions): {
     mapToolMode: options.mapToolMode,
     onMapToolModeChange: options.onMapToolModeChange,
     updateConfig: options.updateConfig,
+    onEditingTextFeatureIdChange: options.onEditingTextFeatureIdChange,
   });
   useMapChromeOverlays({
     mapInstance: options.mapInstance,
@@ -106,6 +115,7 @@ export function useMapCanvas({
   onMapToolModeChange = noop,
   aoi,
   updateConfig = noop,
+  onEditingTextFeatureIdChange = noop,
 }: Readonly<MapCanvasOptions>): MapCanvasController {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useMapInstance({
@@ -124,6 +134,7 @@ export function useMapCanvas({
       mapToolMode,
       onMapToolModeChange,
       updateConfig,
+      onEditingTextFeatureIdChange,
     });
   useMapStyleSync({ mapInstance, basemap });
   useMapSpecSync({ mapInstance, spec });

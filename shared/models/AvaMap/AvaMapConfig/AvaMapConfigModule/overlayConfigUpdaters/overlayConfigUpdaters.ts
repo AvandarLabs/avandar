@@ -1,12 +1,12 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type {
-  AnnotationFeature,
-  AnnotationFeatureId,
-  AnnotationLayer,
-  AoiPolygon,
-  AvaMapConfigRead,
-  TimeRange,
+    AnnotationFeature,
+    AnnotationFeatureId,
+    AnnotationLayer,
+    AoiPolygon,
+    AvaMapConfigRead,
+    TimeRange,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 
 /** Empty annotation overlay: visible, no features. */
@@ -116,6 +116,34 @@ export const overlayConfigUpdaters = {
         ...config.annotations,
         features: [...config.annotations.features, feature],
       },
+    };
+  },
+
+  /**
+   * Replaces one annotation with `nextFeatures` at the same index.
+   */
+  withAnnotationFeaturesReplaced: (
+    options: Readonly<{
+      config: AvaMapConfigRead;
+      featureId: AnnotationFeatureId;
+      nextFeatures: readonly AnnotationFeature[];
+    }>,
+  ): AvaMapConfigRead => {
+    const { config, featureId, nextFeatures } = options;
+    const featureIndex = config.annotations.features.findIndex(
+      propEq("id", featureId),
+    );
+    if (featureIndex < 0) {
+      return config;
+    }
+    const features = [...config.annotations.features];
+    features.splice(featureIndex, 1, ...nextFeatures);
+    if (features.length === 0) {
+      return { ...config, annotations: EMPTY_ANNOTATIONS };
+    }
+    return {
+      ...config,
+      annotations: { ...config.annotations, features },
     };
   },
 

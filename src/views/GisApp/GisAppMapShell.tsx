@@ -1,3 +1,4 @@
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useRef, useState } from "react";
@@ -14,6 +15,7 @@ import { GisAppStatusCard } from "@/views/GisApp/GisAppStatusCard";
 import { GisAppTopBar } from "@/views/GisApp/GisAppTopBar";
 import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
+import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
 import { MapTimeSlider } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider";
 import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
@@ -22,6 +24,65 @@ import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
 type Props = { app: GisAppState };
+
+function _replaceAnnotationFeature(
+  app: GisAppState,
+  nextFeature: AvaMapConfig.AnnotationFeature,
+): void {
+  app.updateConfig((current) => {
+    return {
+      ...current,
+      annotations: {
+        ...current.annotations,
+        features: current.annotations.features.map((item) => {
+          return item.id === nextFeature.id ? nextFeature : item;
+        }),
+      },
+    };
+  });
+}
+
+function GisAppAnnotationTextOverlay({ app }: Readonly<Props>): ReactNode {
+  const map = app.mapInstance.mapRef.current;
+  const target = app.annotationTextOverlayTarget;
+  if (!map || !target) {
+    return null;
+  }
+  const feature = target.feature;
+  if (target.mode === "edit") {
+    return (
+      <AnnotationTextOverlay
+        map={map}
+        feature={feature}
+        onTextChange={(text) => {
+          _replaceAnnotationFeature(app, { ...feature, text });
+        }}
+        onCommit={() => {
+          app.setEditingTextFeatureId(undefined);
+        }}
+      />
+    );
+  }
+  return (
+    <AnnotationTextOverlay
+      map={map}
+      feature={feature}
+      mode="select"
+      onMove={(coordinates) => {
+        _replaceAnnotationFeature(app, {
+          ...feature,
+          geometry: { type: "Point", coordinates },
+        });
+      }}
+      onResize={(sizePx) => {
+        _replaceAnnotationFeature(app, { ...feature, sizePx });
+      }}
+      onStartEdit={() => {
+        app.setEditingTextFeatureId(feature.id);
+      }}
+    />
+  );
+}
 
 /** Composes the application shell from independently focused GIS surfaces. */
 export function GisAppMapShell({ app }: Props): ReactNode {
@@ -40,7 +101,12 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       leftColumnRef={app.leftColumnRef}
       rightColumnRef={app.rightColumnRef}
       canvasSurfaceRef={mapSurfaceRef}
-      canvas={<MapCanvasSurface containerRef={app.containerRef} />}
+      canvas={
+        <>
+          <MapCanvasSurface containerRef={app.containerRef} />
+          <GisAppAnnotationTextOverlay app={app} />
+        </>
+      }
       topBar={
         <GisAppTopBar
           app={app}

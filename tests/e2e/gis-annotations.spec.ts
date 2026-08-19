@@ -3,8 +3,8 @@ import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
 import { seedAvaMap } from "./helpers/seedAvaMap";
 import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
+    createSupabaseAdminClient,
+    getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
@@ -54,7 +54,33 @@ async function _selectAnnotateKind(page: Page, name: string): Promise<void> {
   });
 }
 
-/** Draws a triangle in the upper canvas so the empty-map card is missed. */
+async function _dragCanvasFraction(
+  page: Page,
+  startXFraction: number,
+  startYFraction: number,
+  endXFraction: number,
+  endYFraction: number,
+): Promise<void> {
+  const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
+  const mapCanvas = mapRegion.locator(".maplibregl-canvas");
+  const canvasBox = await mapCanvas.boundingBox();
+  if (!canvasBox) {
+    throw new Error("MapLibre canvas was not visible for the annotation drag.");
+  }
+  await page.mouse.move(
+    canvasBox.x + canvasBox.width * startXFraction,
+    canvasBox.y + canvasBox.height * startYFraction,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    canvasBox.x + canvasBox.width * endXFraction,
+    canvasBox.y + canvasBox.height * endYFraction,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+}
+
+/** Draws a rectangle in the upper canvas so the empty-map card is missed. */
 async function _drawAnnotationArea(page: Page): Promise<void> {
   await page.getByRole("heading", { name: "Layers", exact: true }).click();
   await page.keyboard.press("Escape");
@@ -66,11 +92,7 @@ async function _drawAnnotationArea(page: Page): Promise<void> {
     await annotate.click();
   }
   await _selectAnnotateKind(page, "Draw an annotation area");
-  await _clickCanvasFraction(page, 0.35, 0.18);
-  await _clickCanvasFraction(page, 0.55, 0.18);
-  await _clickCanvasFraction(page, 0.45, 0.28);
-  await page.getByRole("heading", { name: "Layers", exact: true }).click();
-  await page.keyboard.press("Enter");
+  await _dragCanvasFraction(page, 0.35, 0.18, 0.55, 0.32);
 }
 
 async function _readAnnotationSnapshot(
@@ -138,7 +160,7 @@ test("persists text and area annotations and hides them from the row", async ({
       .click();
     await _selectAnnotateKind(page, "Place text");
     await _clickCanvasFraction(page, 0.4, 0.18);
-    const textField = page.getByRole("textbox", { name: "Annotation text" });
+    const textField = page.getByTestId("annotation-text-overlay");
     await expect(textField).toBeVisible({ timeout: SHORT_WAIT });
     await textField.fill(ANNOTATION_TEXT);
     await expect(textField).toHaveValue(ANNOTATION_TEXT);

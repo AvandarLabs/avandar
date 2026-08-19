@@ -807,6 +807,10 @@ msgstr "Fungua data"
 msgid "All fields"
 msgstr "Sehemu zote"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Resize annotation text"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "stddev"
 msgstr "stddev"
@@ -5240,6 +5244,10 @@ msgstr "Kosa la kuhifadhi dataset: {0}"
 msgid "Raw metadata (JSON)"
 msgstr "Metadata ya ghafi (JSON)"
 
+#: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
+msgid "Erase annotations"
+msgstr ""
+
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 msgid "These are the first {0} rows of your dataset."
@@ -6624,6 +6632,10 @@ msgstr "Vichujio vya kimataifa"
 msgid "Layout"
 msgstr "Mpangilio"
 
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
+msgid "Move annotation text"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "Jukumu la {displayName}"
@@ -7591,6 +7603,10 @@ msgstr "Hakuna safu ya mipaka kwenye ramani hii ya kutafuta P-code."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Enter your text here"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8864,6 +8880,7 @@ msgid "Suppress areas below"
 msgstr "Kandamiza maeneo yaliyo chini ya"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+#: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.tsx
 msgid "Annotation text"
 msgstr "Maandishi ya dokezo"
 
