@@ -1,14 +1,36 @@
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
-import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ComponentProps } from "react";
+
+vi.mock(
+  "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable",
+  () => {
+    return {
+      ClusterFeatureTable: () => {
+        return <div data-testid="cluster-feature-table" />;
+      },
+    };
+  },
+);
+
+const { FeatureInspector } =
+  await import("@/views/GisApp/panels/FeatureInspector/FeatureInspector");
 
 const FEATURE: GeoJSON.Feature = {
   type: "Feature",
   properties: { case_id: "case-123" },
   geometry: { type: "Point", coordinates: [0, 0] },
+};
+
+const CLUSTER: ClusterSelection = {
+  sourceId: "ava-map-source-clinics",
+  clusterId: 42,
+  pointCount: 120,
+  coordinates: [-73.9, 40.7],
+  layerId: "ava-map-layer-clinics",
 };
 
 function _makePopup(urlTemplate: string): MapLayer.Popup {
@@ -28,8 +50,12 @@ function _renderInspector(
         return;
       }}
       feature={FEATURE}
+      cluster={undefined}
       popup={undefined}
       canvasRef={createRef<HTMLDivElement>()}
+      mapRef={{ current: undefined }}
+      onRowClick={vi.fn()}
+      onBackToTable={vi.fn()}
       {...props}
     />,
   );
@@ -72,5 +98,37 @@ describe("FeatureInspector", () => {
     expect(
       screen.queryByRole("link", { name: "Open case" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("shows the cluster's feature table, titled with the cluster, when a cluster is selected and no feature was drilled into", () => {
+    _renderInspector({ feature: undefined, cluster: CLUSTER });
+
+    expect(screen.getByTestId("cluster-feature-table")).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: /features in cluster/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/case-123/)).not.toBeInTheDocument();
+  });
+
+  it("shows a back-to-table control for a feature drilled into from the cluster table, and invokes it", () => {
+    const onBackToTable = vi.fn();
+    _renderInspector({ feature: FEATURE, cluster: CLUSTER, onBackToTable });
+
+    const backButton = screen.getByRole("button", { name: /back/i });
+    fireEvent.click(backButton);
+
+    expect(onBackToTable).toHaveBeenCalledOnce();
+    expect(
+      screen.queryByTestId("cluster-feature-table"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not show a back-to-table control for a feature reached directly, unchanged from before clusters existed", () => {
+    _renderInspector({ feature: FEATURE, cluster: undefined });
+
+    expect(
+      screen.queryByRole("button", { name: /back/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Feature" })).toBeInTheDocument();
   });
 });

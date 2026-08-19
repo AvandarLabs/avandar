@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
@@ -23,6 +24,7 @@ export type GisAppMapCallbacks = {
     feature: GeoJSON.Feature,
     renderedLayerId: string,
   ) => void;
+  onMapClusterClick: (cluster: ClusterSelection) => void;
   onMapViewChange: (view: AvaMapConfig.ViewState) => void;
 };
 
@@ -67,6 +69,22 @@ function _selectLayerFromClick(
   options.featureInspector.onFeatureClick(feature);
 }
 
+function _selectLayerFromCluster(
+  options: MapCallbackOptions,
+  cluster: ClusterSelection,
+): void {
+  const layer = options.mapConfig.layers.find((candidate) => {
+    return MapLayerIds.toLayerId(candidate.id) === cluster.layerId;
+  });
+  if (!layer) {
+    return;
+  }
+  options.setIsAnnotationRowSelected(false);
+  options.setSelectedAnnotationFeatureId(undefined);
+  options.setSelectedLayerId(layer.id);
+  options.featureInspector.onClusterClick(cluster);
+}
+
 /** Updates the model and selection in response to map canvas interactions. */
 export function useGisAppMapCallbacks(
   options: MapCallbackOptions,
@@ -89,6 +107,12 @@ export function useGisAppMapCallbacks(
     },
     [options],
   );
+  const onMapClusterClick = useCallback(
+    (cluster: ClusterSelection) => {
+      _selectLayerFromCluster(options, cluster);
+    },
+    [options],
+  );
 
-  return { onMapFeatureClick, onMapViewChange };
+  return { onMapFeatureClick, onMapClusterClick, onMapViewChange };
 }

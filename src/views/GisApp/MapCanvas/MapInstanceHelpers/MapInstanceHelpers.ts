@@ -57,6 +57,15 @@ function _createMapLibreInstance({
   return map;
 }
 
+/** Identifies the cluster and source a table-opening click came from. */
+export type ClusterSelection = {
+  sourceId: string;
+  clusterId: number;
+  pointCount: number;
+  coordinates: [number, number];
+  layerId: string;
+};
+
 /** Returns whether a rendered feature represents a MapLibre point cluster. */
 function _isClusterFeature(feature: GeoJSON.Feature): boolean {
   const properties = feature.properties;
@@ -66,28 +75,41 @@ function _isClusterFeature(feature: GeoJSON.Feature): boolean {
   return "cluster_id" in properties || "point_count" in properties;
 }
 
-/** Zooms the map into one cluster instead of opening the feature inspector. */
-function _expandClusterOnClick(
-  map: MapLibreMap,
+/** Builds the cluster identity carried by a clicked cluster feature. */
+function _makeClusterSelectionFromFeature(
   feature: maplibregl.MapGeoJSONFeature,
-): void {
+): ClusterSelection | undefined {
   const clusterId = feature.properties?.cluster_id;
-  if (typeof clusterId !== "number") {
-    return;
+  const pointCount = feature.properties?.point_count;
+  if (typeof clusterId !== "number" || typeof pointCount !== "number") {
+    return undefined;
   }
-  const source = map.getSource<maplibregl.GeoJSONSource>(feature.source);
+  const { geometry } = feature;
+  if (geometry.type !== "Point") {
+    return undefined;
+  }
+  return {
+    sourceId: feature.source,
+    clusterId,
+    pointCount,
+    coordinates: geometry.coordinates as [number, number],
+    layerId: feature.layer.id,
+  };
+}
+
+/** Eases the camera to the zoom level where a cluster's points expand. */
+function _zoomToCluster(
+  map: MapLibreMap,
+  cluster: Readonly<
+    Pick<ClusterSelection, "clusterId" | "coordinates" | "sourceId">
+  >,
+): void {
+  const source = map.getSource<maplibregl.GeoJSONSource>(cluster.sourceId);
   if (!source || !("getClusterExpansionZoom" in source)) {
     return;
   }
-  void source.getClusterExpansionZoom(clusterId).then((zoom) => {
-    const { geometry } = feature;
-    if (geometry.type !== "Point") {
-      return;
-    }
-    map.easeTo({
-      center: geometry.coordinates as [number, number],
-      zoom,
-    });
+  void source.getClusterExpansionZoom(cluster.clusterId).then((zoom) => {
+    map.easeTo({ center: cluster.coordinates, zoom });
   });
 }
 
@@ -118,7 +140,10 @@ function _createMapClickHandler(
       return;
     }
     if (_isClusterFeature(feature)) {
-      _expandClusterOnClick(map, feature);
+      const cluster = _makeClusterSelectionFromFeature(feature);
+      if (cluster) {
+        latestValues.onClusterClickRef.current(cluster);
+      }
       return;
     }
     latestValues.onFeatureClickRef.current(
@@ -203,4 +228,10 @@ function _attachMapInstance({
 export const MapInstanceHelpers = {
   /** Creates, wires, and returns cleanup for one MapLibre instance. */
   attach: _attachMapInstance,
+
+  /**
+   * Eases the camera to a cluster's expansion zoom. Shared by the map's
+   * click handling and the "Zoom to cluster" action in the feature table.
+   */
+  zoomToCluster: _zoomToCluster,
 };

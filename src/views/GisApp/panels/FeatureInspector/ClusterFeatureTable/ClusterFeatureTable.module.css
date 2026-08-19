@@ -1,0 +1,17 @@
+.clusterFeatureTableToolbar {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}
+
+.clusterFeatureTableScrollArea {
+  overflow-x: auto;
+}
+
+.clusterFeatureTableRow {
+  cursor: pointer;
+}
+
+.clusterFeatureTablePagination {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  display: flex;
+  justify-content: center;
+}

@@ -82,6 +82,7 @@ function useGisAppCanvas(
     fitBoundsRequest: options.chrome.fitBoundsRequest,
     interactiveLayerIds: options.rendering.interactiveLayerIds,
     onFeatureClick: options.callbacks.onMapFeatureClick,
+    onClusterClick: options.callbacks.onMapClusterClick,
     onViewChange: options.callbacks.onMapViewChange,
     spec: options.rendering.spec,
     view: options.editor.mapConfig.view,

@@ -1,10 +1,15 @@
-import { Stack } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
+import { Button, Stack } from "@mantine/core";
+import { IconArrowLeft } from "@tabler/icons-react";
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
+import { ClusterFeatureTable } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable";
 import { FeatureAction } from "@/views/GisApp/panels/FeatureInspector/FeatureAction";
 import { FeatureFields } from "@/views/GisApp/panels/FeatureInspector/FeatureFields";
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspector.module.css";
 import { FeatureInspectorHeader } from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Map as MapLibreMap } from "maplibre-gl";
 import type { ReactNode, RefObject } from "react";
 
 const FEATURE_DRAWER_REGION_ID = "gis-feature-drawer-region";
@@ -14,21 +19,41 @@ type Props = {
   opened: boolean;
   onClose: () => void;
   feature: GeoJSON.Feature | undefined;
+  cluster: ClusterSelection | undefined;
   canvasRef: RefObject<HTMLElement | null>;
+  mapRef: RefObject<MapLibreMap | undefined>;
 
-  /** The popup config of the layer the feature came from. */
+  /** Opens the single-feature view for one row of the cluster table. */
+  onRowClick: (feature: GeoJSON.Feature) => void;
+
+  /** Returns from a drilled-into feature to its originating cluster table. */
+  onBackToTable: () => void;
+
+  /** The popup config of the layer the feature or cluster came from. */
   popup: MapLayer.Popup | undefined;
 };
 
-/** Lists the clicked feature's fields, and its record link when it has one. */
+/**
+ * Shows a cluster's member features as a table, or one selected feature's
+ * fields. A feature reached by drilling into the table can return to it.
+ */
 export function FeatureInspector({
   opened,
   onClose,
   feature,
+  cluster,
   popup,
   canvasRef,
+  mapRef,
+  onRowClick,
+  onBackToTable,
 }: Props): ReactNode {
+  const { t } = useLingui();
   const properties: Record<string, unknown> = feature?.properties ?? {};
+  const showTable = cluster !== undefined && feature === undefined;
+  const showBackToTable = cluster !== undefined && feature !== undefined;
+  const title =
+    showTable ? t`Features in cluster (${cluster.pointCount})` : t`Feature`;
 
   return (
     <CanvasDrawer opened={opened} canvasRef={canvasRef}>
@@ -38,11 +63,30 @@ export function FeatureInspector({
           <FeatureInspectorHeader
             onClose={onClose}
             titleId={FEATURE_DRAWER_TITLE_ID}
+            title={title}
           />
-          <Stack className={css.featureInspectorBody} gap="sm">
-            <FeatureFields properties={properties} />
-            <FeatureAction action={popup?.action} properties={properties} />
-          </Stack>
+          {showTable && cluster ?
+            <ClusterFeatureTable
+              cluster={cluster}
+              mapRef={mapRef}
+              onRowClick={onRowClick}
+            />
+          : <Stack className={css.featureInspectorBody} gap="sm">
+              {showBackToTable ?
+                <Button
+                  variant="subtle"
+                  size="xs"
+                  leftSection={<IconArrowLeft size={14} />}
+                  onClick={onBackToTable}
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  {t`Back to results`}
+                </Button>
+              : null}
+              <FeatureFields properties={properties} />
+              <FeatureAction action={popup?.action} properties={properties} />
+            </Stack>
+          }
         </div>
       </CanvasDrawer.Body>
     </CanvasDrawer>
