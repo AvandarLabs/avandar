@@ -15,9 +15,10 @@
  * extraction without touching the page loop or the error taxonomy.
  */
 import { detectTextLayer } from "./pdfSniff/detectTextLayer";
+import { extractDocumentMetadata } from "./pdfSniff/extractDocumentMetadata";
 import { extractPageGeometry } from "./pdfSniff/extractPageGeometry";
 import { loadPdfDocument } from "./pdfSniff/loadPdfJs";
-import type { PageGeometry } from "./pdfSniff/types";
+import type { DocumentMetadata, PageGeometry } from "./pdfSniff/types";
 
 /**
  * Hard cap on pages read when the user has not chosen a range. Beyond this we
@@ -38,6 +39,12 @@ export type PdfSniffResult = {
   pageCount: number;
   /** Geometry for the pages actually read, in page order. */
   pages: readonly PageGeometry[];
+  /**
+   * The document's identity, read once here rather than on every extract. It
+   * depends on the document rather than on any region, so re-reading page one
+   * each time a box moves would be wasted work.
+   */
+  documentMetadata: DocumentMetadata;
 };
 
 export type PdfSniffProgress = {
@@ -154,7 +161,26 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
       return;
     }
 
-    _post({ type: "result", pageCount: doc.numPages, pages });
+    // `pages[0]` is the first page actually read, which is the cover only
+    // when the user did not narrow the range. Reading the range's first
+    // page is still the right guess: it is the page whose typography the
+    // user is looking at.
+    const { info } = await doc.getMetadata();
+    const firstReadPage = pages[0];
+    const documentMetadata =
+      firstReadPage ?
+        extractDocumentMetadata({
+          page: firstReadPage,
+          info: (info ?? {}) as Record<string, unknown>,
+        })
+      : {
+          title: null,
+          organisation: null,
+          reportNumber: null,
+          publishedAt: null,
+        };
+
+    _post({ type: "result", pageCount: doc.numPages, pages, documentMetadata });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     const isPasswordError = /password/i.test(message);
