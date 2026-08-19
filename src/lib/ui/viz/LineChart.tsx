@@ -1,11 +1,11 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { Label } from "recharts";
 import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import { Label } from "recharts";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
 import type { LineSeries } from "$/models/vizs/SeriesConfig";
