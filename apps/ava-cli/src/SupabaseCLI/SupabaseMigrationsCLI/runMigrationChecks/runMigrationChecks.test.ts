@@ -207,6 +207,34 @@ describe("runMigrationChecks", () => {
       expect(check.details.join("\n")).toContain("_STORAGE-");
     });
 
+    it("passes a public-schema migration that only mentions storage in a comment", () => {
+      // A migration is a storage migration because of what it EXECUTES, not
+      // what it talks about. Marking this one would be actively wrong: the
+      // marker puts a file in `sql_paths`, where it is replayed against an
+      // already-migrated database, so a `public` function would be
+      // redefined out of order.
+      //
+      // Regression test. Scanning raw file contents flagged a migration
+      // whose comment cited `storage.foldername(name)[2]` while explaining
+      // a `public` function it was changing.
+      const results = runMigrationChecks(
+        makeSnapshot({
+          workingTreeMigrations: ["20260817181537_widen_object_name.sql"],
+          newMigrationContents: {
+            "20260817181537_widen_object_name.sql": [
+              "-- Enforced at the policy level by the separate",
+              "-- `storage.foldername(name)[2] = 'datasets'` check.",
+              "create or replace function public.util__thing () returns uuid",
+              "language sql immutable as $$ select null::uuid; $$;",
+            ].join("\n"),
+          },
+        }),
+      );
+
+      const check = findCheck(results, "Storage migrations");
+      expect(check.status).toBe("pass");
+    });
+
     it("fails a marked migration missing from the seed sql_paths", () => {
       const results = runMigrationChecks(
         makeSnapshot({

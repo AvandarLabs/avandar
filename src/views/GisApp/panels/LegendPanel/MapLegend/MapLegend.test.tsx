@@ -73,6 +73,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={layers}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -95,6 +96,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[layer]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={onToggleCollapsed}
       />,
@@ -115,6 +117,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[layerWithEmptyLegendTitle]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -146,6 +149,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[classifiedLayer]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -210,6 +214,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[sizedLayer]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -237,6 +242,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[clusterLayer]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -266,6 +272,7 @@ describe("MapLegend", () => {
     render(
       <MapLegend
         layers={[heatmapLayer]}
+        hasDrawnDisputedFeature={false}
         isCollapsed={false}
         onToggleCollapsed={vi.fn()}
       />,
@@ -275,5 +282,68 @@ describe("MapLegend", () => {
       screen.getByRole("img", { name: "Low to High" }),
     ).toBeInTheDocument();
     expect(screen.queryByText("Not reported")).not.toBeInTheDocument();
+  });
+});
+
+function _visibleFillLayer(): MapLayer.T {
+  return MapLayer.makeEmpty("Fill layer");
+}
+
+describe("MapLegend disputed row", () => {
+  const DISPUTED_LABEL = "Disputed or undetermined boundary";
+
+  it("shows the locked row when a disputed segment is drawn", () => {
+    render(
+      <MapLegend
+        layers={[_visibleFillLayer()]}
+        hasDrawnDisputedFeature
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(DISPUTED_LABEL)).toBeInTheDocument();
+  });
+
+  it("omits the locked row when no disputed segment is drawn", () => {
+    render(
+      <MapLegend
+        layers={[_visibleFillLayer()]}
+        hasDrawnDisputedFeature={false}
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(DISPUTED_LABEL)).toBeNull();
+  });
+
+  it("offers no control to hide the locked row", () => {
+    render(
+      <MapLegend
+        layers={[_visibleFillLayer()]}
+        hasDrawnDisputedFeature
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+    const row = screen.getByText(DISPUTED_LABEL).closest("div")!;
+
+    expect(within(row).queryByRole("button")).toBeNull();
+    expect(within(row).queryByRole("checkbox")).toBeNull();
+  });
+
+  it("shows the locked row even when every layer legend is hidden", () => {
+    const layer = _visibleFillLayer();
+    render(
+      <MapLegend
+        layers={[{ ...layer, legend: { ...layer.legend, position: "hidden" } }]}
+        hasDrawnDisputedFeature
+        isCollapsed={false}
+        onToggleCollapsed={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(DISPUTED_LABEL)).toBeInTheDocument();
   });
 });

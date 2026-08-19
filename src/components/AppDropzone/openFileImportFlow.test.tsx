@@ -99,6 +99,10 @@ describe("openFileImportFlow", () => {
     fireEvent.click(screen.getByText("open"));
     fireEvent.click(await screen.findByRole("button", { name: /^import$/i }));
 
+    expect(
+      screen.queryByTestId("manual-upload-view-mock"),
+    ).not.toBeInTheDocument();
+
     const manualUploadMock = await screen.findByTestId(
       "manual-upload-view-mock",
     );

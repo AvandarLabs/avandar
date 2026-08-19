@@ -54,7 +54,10 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
-import { getProjectIdFromConfig, makeSqlRunner } from "../lib/psql";
+import {
+  getLocalDatabaseConfigFromRepoRoot,
+  makeSqlRunner,
+} from "../lib/PsqlUtils/PsqlUtils";
 import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
   CreateViewStatement,
@@ -277,7 +280,7 @@ function main(): void {
   const migrationFile = _getMigrationFilePath({ repoRoot, explicitFile });
   const original = readFileSync(migrationFile, "utf8");
   const statements = NoopViewRecreations.getStatementsFromSql(original);
-  const runSql = makeSqlRunner(getProjectIdFromConfig(repoRoot));
+  const runSql = makeSqlRunner(getLocalDatabaseConfigFromRepoRoot(repoRoot));
 
   console.log(`Migration: ${path.basename(migrationFile)}`);
   if (

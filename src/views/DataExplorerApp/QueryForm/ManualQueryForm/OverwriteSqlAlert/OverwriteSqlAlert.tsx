@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Alert, Stack, Text } from "@mantine/core";
+import { Alert, Group, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import css from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.module.css";
 import type { ReactNode } from "react";
@@ -28,15 +28,19 @@ export function OverwriteSqlAlert({
       withCloseButton
       onClose={onDismiss}
       data-testid="overwrite-sql-warning"
+      py="xs"
     >
-      <Text size="xs" mb="xs">
-        <Trans>
-          The current SQL contains parts that the form could not represent.
-          Continuing will overwrite that SQL with one generated from the form.
-          This cannot be undone (unless you re-run your previous chat prompt).
-        </Trans>
-      </Text>
-      <Stack gap="xs">
+      {/*
+       * Kept to one line with the actions inline: this sits inside the query
+       * drawer, where a tall banner pushes the form's own controls out of view.
+       */}
+      <Group gap="sm" wrap="wrap" align="baseline">
+        <Text size="xs">
+          <Trans>
+            The current SQL contains parts the form could not represent.
+            Continuing overwrites it with SQL generated from the form.
+          </Trans>
+        </Text>
         <Text
           component="button"
           type="button"
@@ -60,7 +64,7 @@ export function OverwriteSqlAlert({
         >
           <Trans>Keep SQL as-is</Trans>
         </Text>
-      </Stack>
+      </Group>
     </Alert>
   );
 }

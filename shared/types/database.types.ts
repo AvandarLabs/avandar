@@ -730,6 +730,72 @@ export type Database = {
           },
         ]
       }
+      datasets__pdf_file: {
+        Row: {
+          created_at: string
+          dataset_id: string
+          fingerprint: Json
+          has_original_file: boolean
+          id: string
+          is_in_cloud_storage: boolean
+          llm_model: string | null
+          output_mode: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end: number | null
+          page_range_start: number | null
+          regions: Json
+          size_in_bytes: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id: string
+          fingerprint: Json
+          has_original_file?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end?: number | null
+          page_range_start?: number | null
+          regions: Json
+          size_in_bytes: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string
+          fingerprint?: Json
+          has_original_file?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end?: number | null
+          page_range_start?: number | null
+          regions?: Json
+          size_in_bytes?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__pdf_file_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__pdf_file_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets__virtual: {
         Row: {
           created_at: string
@@ -1649,6 +1715,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_pdf_file_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_fingerprint: Json
+          p_has_original_file: boolean
+          p_is_in_cloud_storage: boolean
+          p_llm_model?: string
+          p_output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          p_page_range_end: number
+          p_page_range_start: number
+          p_regions: Json
+          p_size_in_bytes: number
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_datasets__add_virtual_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -2010,12 +2113,20 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
+      datasets__pdf_detection_mode: "tagged" | "lattice" | "stream" | "manual"
+      datasets__pdf_output_mode: "natural" | "observations"
+      datasets__pdf_region_shape:
+        | "grid_table"
+        | "labelled_graphic"
+        | "repeating_blocks"
+        | "prose_measures"
       datasets__source_type:
         | "csv_file"
         | "google_sheets"
         | "virtual"
         | "open_data"
         | "xlsx_file"
+        | "pdf_file"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
@@ -2250,12 +2361,21 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
+      datasets__pdf_detection_mode: ["tagged", "lattice", "stream", "manual"],
+      datasets__pdf_output_mode: ["natural", "observations"],
+      datasets__pdf_region_shape: [
+        "grid_table",
+        "labelled_graphic",
+        "repeating_blocks",
+        "prose_measures",
+      ],
       datasets__source_type: [
         "csv_file",
         "google_sheets",
         "virtual",
         "open_data",
         "xlsx_file",
+        "pdf_file",
       ],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],

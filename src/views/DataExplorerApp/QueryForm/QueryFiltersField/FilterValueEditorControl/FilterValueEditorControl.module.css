@@ -1,0 +1,16 @@
+.filterValueControlSlot {
+  align-items: center;
+  display: flex;
+  flex: 3 1 12rem;
+  gap: var(--mantine-spacing-xs);
+  min-width: 10rem;
+}
+
+.filterValueControlNotApplied {
+  opacity: 0.65;
+}
+
+.filterValueControlMessage {
+  flex: 1 1 100%;
+  padding-left: var(--mantine-spacing-xs);
+}

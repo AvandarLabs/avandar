@@ -1,13 +1,12 @@
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { mantineColorVar, Tooltip } from "@avandar/ui";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
-import { IconSparkles, IconX } from "@tabler/icons-react";
+import { Box, Stack } from "@mantine/core";
 import clsx from "clsx";
+import { ChatPanelHeader } from "@/components/ChatPanel/ChatPanelHeader/ChatPanelHeader";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
-import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
+import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
 import css from "./ChatPanel.module.css";
 
 /**
@@ -19,9 +18,8 @@ import css from "./ChatPanel.module.css";
  */
 export function ChatPanel(): React.ReactNode {
   const dispatch = ChatPanelStateManager.useDispatch();
-  const runtime = useAvandarChatRuntime();
+  const { runtime, startNewChat } = useAvandarChatRuntime();
   const context = useChatPageContext();
-  const { t } = useLingui();
   const disabled =
     context.app !== "data-explorer" && context.app !== "dashboards";
 
@@ -33,26 +31,12 @@ export function ChatPanel(): React.ReactNode {
         className={clsx(css.shell, disabled && css.chatPanelShellDisabled)}
         gap={0}
       >
-        <Group px="md" py="sm" justify="space-between" className={css.header}>
-          <Group gap="xs">
-            <IconSparkles size={16} color={mantineColorVar("primary.6")} />
-            <Text size="sm" fw={600} c="neutral.9">
-              <Trans>Ask Avandar</Trans>
-            </Text>
-          </Group>
-          <Tooltip label={t`Close panel (⌘/)`}>
-            <ActionIcon
-              variant="subtle"
-              size="sm"
-              color="neutral"
-              onClick={dispatch.close}
-              aria-label={t`Close chat panel`}
-            >
-              <IconX size={16} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
+        <ChatPanelHeader
+          onNewChatClick={startNewChat}
+          onClose={dispatch.close}
+        />
         <AssistantRuntimeProvider runtime={runtime}>
+          <ChatViewTranscriptSync />
           <ChatThread />
         </AssistantRuntimeProvider>
       </Stack>

@@ -20,7 +20,10 @@ type RawClarifyArgs = {
   };
 };
 
-/** Counts answered clarification turns in the visible chat history. */
+/**
+ * Counts answered clarification turns in the visible chat history. View-change
+ * lines are not counted because they lack the `[Clarification answer:` marker.
+ */
 export function countClarificationsInHistory(
   messages: ReadonlyArray<{ role: string; content: string }>,
 ): number {

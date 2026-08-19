@@ -36,6 +36,7 @@ import { downloadRowsAsCsv } from "@/views/DataExplorerApp/downloadRowsAsCsv";
 import { formatOfflineQueryError } from "@/views/DataExplorerApp/formatOfflineQueryError/formatOfflineQueryError";
 import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
+import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplorerResultsChrome";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
@@ -381,6 +382,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           </Button>
         </Group>
         <GeneratedPromptBanner />
+        <QueryExplorerResultsChrome
+          lastQueryError={state.lastQueryError}
+          sql={state.rawSql}
+          filters={state.query.filters}
+        />
         <Box ref={chartRef} flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer

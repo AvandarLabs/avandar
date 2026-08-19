@@ -10,6 +10,7 @@ import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -74,6 +75,21 @@ async function _getXlsxExtractors(
   });
 }
 
+async function _getPdfExtractors(
+  options: Readonly<SourceExtractorOptions>,
+): Promise<DiceExtractor[]> {
+  const sources = await PdfFileDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", options.ids));
+  return sources.map((sourceDataset) => {
+    return {
+      dataset: options.datasetsById[sourceDataset.datasetId]!,
+      sourceType: "pdf_file",
+      sourceDataset,
+    };
+  });
+}
+
 async function _getVirtualExtractors(
   options: Readonly<SourceExtractorOptions>,
 ): Promise<DiceExtractor[]> {
@@ -121,6 +137,9 @@ async function _getExtractorsForSourceType(
     })
     .with("xlsx_file", () => {
       return _getXlsxExtractors(extractorOptions);
+    })
+    .with("pdf_file", () => {
+      return _getPdfExtractors(extractorOptions);
     })
     .with("virtual", () => {
       return _getVirtualExtractors(extractorOptions);

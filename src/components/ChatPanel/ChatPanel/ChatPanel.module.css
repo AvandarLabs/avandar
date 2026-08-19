@@ -18,7 +18,3 @@
    */
   background-color: var(--mantine-color-neutral-0);
 }
-
-.header {
-  border-bottom: 1px solid var(--ava-border-default);
-}

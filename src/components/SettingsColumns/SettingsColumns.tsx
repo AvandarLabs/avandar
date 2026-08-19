@@ -14,6 +14,15 @@ export type SettingsColumnGroup = {
 
   /** The controls belonging to this group. */
   content: ReactNode;
+
+  /**
+   * How many grid tracks the group occupies in the `columns` layout. Defaults
+   * to 1. Use it for a group whose content is materially more complex than its
+   * neighbours, such as the filter tree, which otherwise gets the same width as
+   * a column of single selects. Clamped by the grid, so a host with fewer
+   * tracks than the span is unaffected.
+   */
+  span?: number;
 };
 
 /**
@@ -86,7 +95,15 @@ export function SettingsColumns({
         >
           {groups.map((group) => {
             return (
-              <div key={group.id} className={css.settingsColumnsColumn}>
+              <div
+                key={group.id}
+                className={css.settingsColumnsColumn}
+                style={
+                  group.span !== undefined && group.span > 1 ?
+                    { gridColumn: `span ${group.span}` }
+                  : undefined
+                }
+              >
                 <Fieldset
                   variant="unstyled"
                   legend={group.title}

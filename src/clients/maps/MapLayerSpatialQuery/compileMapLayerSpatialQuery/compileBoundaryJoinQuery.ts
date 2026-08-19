@@ -44,6 +44,7 @@ type BoundaryJoinSqlParts = {
   boundaryDataset: string;
   boundaryDenominator: string;
   aggregatedDenominator: string;
+  disputedStatus: string;
   areaValue: string;
   contributorCount: string;
   valueAlias: string;
@@ -128,6 +129,20 @@ function _buildAggregatedDenominatorSql(
   return joinedDenominator ? `, ${joinedDenominator} AS ${alias}` : "";
 }
 
+/** Selects the boundary's disputed-status column when the layer binds one. */
+function _buildBoundaryDisputedStatusSql(
+  metadata: ResolvedMapLayerMetadata,
+): string {
+  const reference = metadata.disputedStatusColumn;
+  if (reference?.type !== "boundaryColumn") {
+    return "";
+  }
+  const alias = quoteSqlIdentifier(
+    MapLayerSpatialFeatureProperties.disputedStatus,
+  );
+  return `, ${quoteSqlIdentifier(reference.columnName)} AS ${alias}`;
+}
+
 function _getBoundaryJoinSqlParts(
   options: Readonly<CompileOptions>,
 ): BoundaryJoinSqlParts {
@@ -157,6 +172,7 @@ function _getBoundaryJoinSqlParts(
     boundaryDataset: quoteSqlIdentifier(boundary.datasetId),
     boundaryDenominator: _buildBoundaryDenominatorSql(options.metadata),
     aggregatedDenominator: _buildAggregatedDenominatorSql(options.metadata),
+    disputedStatus: _buildBoundaryDisputedStatusSql(options.metadata),
     areaValue: _buildAreaValueExpression({
       binding,
       metadata: options.metadata,
@@ -206,7 +222,7 @@ keyed_source_rows AS (
 boundary_rows AS (
   SELECT row_number() OVER () AS boundary_feature_id,
     ${parts.boundaryKey} AS boundary_key, ${parts.displayName} AS boundary_name,
-    ${parts.geometryParser} AS ${parts.geometryColumn}${parts.boundaryDenominator}
+    ${parts.geometryParser} AS ${parts.geometryColumn}${parts.boundaryDenominator}${parts.disputedStatus}
   FROM ${parts.boundaryDataset}
 ),
 typed_boundaries AS (
@@ -255,6 +271,7 @@ function _buildMatchDiagnostics(isAggregateOnly: boolean): string {
 function _buildBoundaryFeatureRowsCte(options: {
   geometry: string;
   denominator: string;
+  disputedStatus: string;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const properties = MapLayerSpatialFeatureProperties;
@@ -271,7 +288,8 @@ function _buildBoundaryFeatureRowsCte(options: {
       '${properties.state}', CASE WHEN area_values.boundary_feature_id IS NULL THEN 'noData' ELSE 'value' END,
       '${properties.value}', ${quoteSqlIdentifier(properties.value)},
       '${properties.denominator}', ${options.denominator},
-      '${properties.contributorCount}', ${quoteSqlIdentifier(properties.contributorCount)}
+      '${properties.contributorCount}', ${quoteSqlIdentifier(properties.contributorCount)},
+      '${properties.disputedStatus}', ${options.disputedStatus}
     )) AS feature
   FROM unambiguous_boundaries boundary
   LEFT JOIN area_values USING (boundary_feature_id)${outputAoiWhere}
@@ -304,13 +322,24 @@ function _getJoinDenominatorSql(
   );
 }
 
+/** Reads the boundary's disputed-status column when the layer binds one. */
+function _getJoinDisputedStatusSql(
+  disputedStatusType: "queryColumn" | "boundaryColumn" | undefined,
+): string {
+  const alias = quoteSqlIdentifier(
+    MapLayerSpatialFeatureProperties.disputedStatus,
+  );
+  return disputedStatusType === "boundaryColumn" ? `boundary.${alias}` : "NULL";
+}
+
 /** Builds GeoJSON features and the stable join diagnostic envelope. */
 function _buildBoundaryJoinOutput(options: {
   isAggregateOnly: boolean;
   denominatorType: "queryColumn" | "boundaryColumn" | undefined;
+  disputedStatusType: "queryColumn" | "boundaryColumn" | undefined;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
-  const { isAggregateOnly, denominatorType, aoi } = options;
+  const { isAggregateOnly, denominatorType, disputedStatusType, aoi } = options;
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
   const featureAlias = quoteSqlIdentifier(
     MapLayerSpatialQueryColumns.featureCollection,
@@ -324,6 +353,7 @@ function _buildBoundaryJoinOutput(options: {
 ${_buildBoundaryFeatureRowsCte({
   geometry,
   denominator: _getJoinDenominatorSql(denominatorType),
+  disputedStatus: _getJoinDisputedStatusSql(disputedStatusType),
   aoi,
 })},
 ${_buildBoundaryDiagnosticSummaryCte(geometry)}
@@ -353,6 +383,7 @@ export function compileBoundaryJoinQuery(
 ${_buildBoundaryJoinOutput({
   isAggregateOnly,
   denominatorType: options.metadata.normalizationDenominator?.type,
+  disputedStatusType: options.metadata.disputedStatusColumn?.type,
   aoi: getAppliedAoiFromCompileOptions(options),
 })}`;
   return makeSpatialQueryPlan({

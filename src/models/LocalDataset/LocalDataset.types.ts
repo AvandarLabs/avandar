@@ -21,7 +21,7 @@ export type LocalDatasetParseStatus = "ready" | "parsing" | "failed";
  * transcoding is in progress, so we can resume it after a tab refresh
  * without asking the user to re-pick the file.
  */
-export type LocalDatasetSourceFileType = "csv" | "xlsx";
+export type LocalDatasetSourceFileType = "csv" | "xlsx" | "pdf";
 
 /**
  * Parse options needed to resume the background parquet transcoding for a
@@ -45,9 +45,26 @@ export type LocalDatasetXlsxParseOptions = {
   hasHeader?: boolean;
 };
 
+/**
+ * Parse options recorded for a PDF import. Unlike the CSV and XLSX shapes,
+ * these do not redrive a background transcode: a PDF has no rows until the
+ * user picks a region, so there is nothing to transcode. They record only how
+ * much of the document was read, so a reload can read the same pages again.
+ *
+ * The user's chosen regions are deliberately not here yet. Nothing can select
+ * one until the region picker exists, so persisting an always-empty list would
+ * be committing to a storage shape ahead of the feature that fills it.
+ */
+export type LocalDatasetPdfParseOptions = {
+  type: "pdf";
+  /** Inclusive, one-based page range the user limited reading to. */
+  pageRange?: readonly [number, number];
+};
+
 export type LocalDatasetParseOptions =
   | LocalDatasetCsvParseOptions
-  | LocalDatasetXlsxParseOptions;
+  | LocalDatasetXlsxParseOptions
+  | LocalDatasetPdfParseOptions;
 
 /**
  * This model tracks a locally-loaded dataset as a Parquet data blob.
@@ -88,11 +105,12 @@ type LocalDatasetDBRead = {
   parseFailedReason: string | undefined;
 
   /**
-   * Cached bytes of the original source file (CSV or XLSX). Only retained
-   * for files below the per-file cache threshold so we can resume the
-   * background parquet transcoding after a tab refresh without asking the
-   * user to re-pick the file. Always cleared once `parseStatus` transitions
-   * to `"ready"`.
+   * Cached bytes of the original source file (CSV, XLSX, or PDF). Only
+   * retained for files below the per-file cache threshold so we can resume
+   * the background parquet transcoding after a tab refresh without asking
+   * the user to re-pick the file. Cleared once `parseStatus` transitions to
+   * `"ready"`, unless `isSourcePinned` is set, in which case these bytes are
+   * the retained original and are kept indefinitely.
    */
   sourceBytes: Blob | undefined;
 
@@ -111,6 +129,18 @@ type LocalDatasetDBRead = {
    * entries when the cumulative cache exceeds its size budget.
    */
   lastSourceAccessedAt: number | undefined;
+
+  /**
+   * When true, `sourceBytes` is the retained original file rather than a
+   * resume cache, and must survive both LRU eviction and the post-transcode
+   * cleanup.
+   *
+   * Set for source types where the original cannot be reconstructed from the
+   * parquet plus metadata; see `requiresOriginalFileRetention`. For an
+   * offline-only PDF these bytes are the only copy in existence, so dropping
+   * them is unrecoverable data loss rather than a cache miss.
+   */
+  isSourcePinned: boolean | undefined;
 
   /**
    * Parse options needed to redrive the background parquet transcoding

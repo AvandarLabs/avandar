@@ -67,7 +67,10 @@ async function _getCachedFact(
 
 async function _downloadStoredDatasetFact(
   extractor: Readonly<
-    Extract<DiceExtractor, { sourceType: "csv_file" | "xlsx_file" }>
+    Extract<
+      DiceExtractor,
+      { sourceType: "csv_file" | "xlsx_file" | "pdf_file" }
+    >
   >,
 ): Promise<ExtractedFact> {
   const parquetBlob = await DatasetParquetStorageClient.downloadDataset({
@@ -118,6 +121,7 @@ async function _fetchExtractor(
   return match(options.extractor)
     .with({ sourceType: "csv_file" }, _downloadStoredDatasetFact)
     .with({ sourceType: "xlsx_file" }, _downloadStoredDatasetFact)
+    .with({ sourceType: "pdf_file" }, _downloadStoredDatasetFact)
     .with({ sourceType: "open_data" }, _downloadOpenDataFact)
     .with({ sourceType: "virtual" }, async (extractor) => {
       return {

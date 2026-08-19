@@ -44,7 +44,7 @@ function _getPropertyColumnNames(options: {
     layer.popup.columnIds === "all" ?
       layer.source.queryColumns.map(prop("id"))
     : layer.popup.columnIds;
-  return selectedIds
+  const columnNames = selectedIds
     .filter((columnId) => {
       return columnId !== geometryColumnId;
     })
@@ -52,15 +52,31 @@ function _getPropertyColumnNames(options: {
       return metadata.sourceColumnNames.get(columnId);
     })
     .filter(isDefined);
+  const disputedStatusColumnName =
+    metadata.disputedStatusColumn?.type === "queryColumn" ?
+      metadata.disputedStatusColumn.columnName
+    : undefined;
+  return (
+      disputedStatusColumnName &&
+        !columnNames.includes(disputedStatusColumnName)
+    ) ?
+      [...columnNames, disputedStatusColumnName]
+    : columnNames;
 }
 
 /** Builds a DuckDB JSON object expression for selected source properties. */
 function _buildPropertiesExpression(options: {
   columnNames: readonly string[];
   denominatorColumnName?: string;
+  disputedStatusColumnName?: string;
 }): string {
-  const { columnNames, denominatorColumnName } = options;
-  if (columnNames.length === 0 && !denominatorColumnName) {
+  const { columnNames, denominatorColumnName, disputedStatusColumnName } =
+    options;
+  if (
+    columnNames.length === 0 &&
+    !denominatorColumnName &&
+    !disputedStatusColumnName
+  ) {
     return "json_object()";
   }
   const columnEntries = columnNames.flatMap((columnName) => {
@@ -73,7 +89,14 @@ function _buildPropertiesExpression(options: {
         quoteSqlIdentifier(denominatorColumnName),
       ]
     : [];
-  return `json_object(${[...columnEntries, ...denominatorEntries].join(", ")})`;
+  const disputedStatusEntries =
+    disputedStatusColumnName ?
+      [
+        quoteSqlLiteral(MapLayerSpatialFeatureProperties.disputedStatus),
+        quoteSqlIdentifier(disputedStatusColumnName),
+      ]
+    : [];
+  return `json_object(${[...columnEntries, ...denominatorEntries, ...disputedStatusEntries].join(", ")})`;
 }
 
 /** Builds diagnostic counts and observed-family metadata. */
@@ -169,6 +192,7 @@ function _buildGeometryColumnSql(options: {
   familyLiteral: string;
   properties: readonly string[];
   denominatorColumnName: string | undefined;
+  disputedStatusColumnName: string | undefined;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
@@ -176,6 +200,7 @@ function _buildGeometryColumnSql(options: {
   const propertiesSql = _buildPropertiesExpression({
     columnNames: options.properties,
     denominatorColumnName: options.denominatorColumnName,
+    disputedStatusColumnName: options.disputedStatusColumnName,
   });
   const sourceAoiWhere =
     options.aoi ?
@@ -221,6 +246,10 @@ export function compileGeometryColumnQuery(
     options.metadata.normalizationDenominator?.type === "queryColumn" ?
       options.metadata.normalizationDenominator.columnName
     : undefined;
+  const disputedStatusColumnName =
+    options.metadata.disputedStatusColumn?.type === "queryColumn" ?
+      options.metadata.disputedStatusColumn.columnName
+    : undefined;
   return makeSpatialQueryPlan({
     compile: options,
     rawSql: _buildGeometryColumnSql({
@@ -233,6 +262,7 @@ export function compileGeometryColumnQuery(
       familyLiteral: binding.family,
       properties,
       denominatorColumnName,
+      disputedStatusColumnName,
       aoi: getAppliedAoiFromCompileOptions(options),
     }),
     family: binding.family,

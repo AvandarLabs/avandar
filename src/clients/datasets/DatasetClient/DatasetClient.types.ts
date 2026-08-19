@@ -3,6 +3,11 @@ import type { ExcludeNullsIn, FiltersByColumn } from "@avandar/utils";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
+import type {
+  PdfOutputMode,
+  PdfRegion,
+  PdfTableFingerprint,
+} from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { CompositeTypes } from "$/types/database.types";
@@ -59,6 +64,22 @@ export type XlsxDatasetInsertParams = BaseDatasetInsertParams & {
   timestampFormat?: string;
 };
 
+/** Parameters for creating a PDF-backed dataset. */
+export type PdfDatasetInsertParams = BaseDatasetInsertParams & {
+  isInCloudStorage: boolean;
+  sizeInBytes: number;
+  hasOriginalFile: boolean;
+  /** One entry per extracted region, each with its own shape and options. */
+  regions: readonly PdfRegion[];
+  /** Defaults to `natural` in the RPC when omitted. */
+  outputMode?: PdfOutputMode;
+  /** Omitted when the rows came from rules alone. */
+  llmModel?: string;
+  pageRangeStart?: number;
+  pageRangeEnd?: number;
+  fingerprint: PdfTableFingerprint;
+};
+
 /** Parameters for creating a Google Sheets-backed dataset. */
 export type GoogleSheetsDatasetInsertParams = BaseDatasetInsertParams & {
   rowsToSkip: number;
@@ -92,6 +113,9 @@ export type DatasetMutationRecord = {
   ) => Promise<Dataset.T>;
   insertXlsxFileDataset: (
     params: Readonly<XlsxDatasetInsertParams>,
+  ) => Promise<Dataset.T>;
+  insertPdfFileDataset: (
+    params: Readonly<PdfDatasetInsertParams>,
   ) => Promise<Dataset.T>;
   insertGoogleSheetsDataset: (
     params: Readonly<GoogleSheetsDatasetInsertParams>,

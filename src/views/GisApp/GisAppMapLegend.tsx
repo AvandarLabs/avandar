@@ -10,6 +10,7 @@ export function GisAppMapLegend({ app }: Props): ReactNode {
   return (
     <MapLegend
       layers={app.rows.filter(prop("isVisible"))}
+      hasDrawnDisputedFeature={app.hasDrawnDisputedFeature}
       isCollapsed={app.panelState.legend}
       onToggleCollapsed={() => {
         app.togglePanel("legend");

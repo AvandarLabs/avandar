@@ -9,13 +9,19 @@ import type {
 
 function _canBeOfflineOnly(
   sourceType: DatasetSourceType,
-): sourceType is "csv_file" | "xlsx_file";
+): sourceType is "csv_file" | "xlsx_file" | "pdf_file";
 function _canBeOfflineOnly(sourceType: {
   sourceType: DatasetSourceType;
-}): sourceType is { sourceType: "csv_file" } | { sourceType: "xlsx_file" };
+}): sourceType is
+  | { sourceType: "csv_file" }
+  | { sourceType: "xlsx_file" }
+  | { sourceType: "pdf_file" };
 function _canBeOfflineOnly(sourceType: {
   type: DatasetSourceType;
-}): sourceType is { type: "csv_file" } | { type: "xlsx_file" };
+}): sourceType is
+  | { type: "csv_file" }
+  | { type: "xlsx_file" }
+  | { type: "pdf_file" };
 function _canBeOfflineOnly(
   datasetSource: DatasetSourceModel,
 ): datasetSource is CanBeOfflineOnlyDatasetSourceModel;
@@ -32,7 +38,7 @@ function _canBeOfflineOnly(
     : "sourceType" in sourceType ? sourceType.sourceType
     : sourceType.type;
   return match(type)
-    .with("csv_file", "xlsx_file", () => {
+    .with("csv_file", "xlsx_file", "pdf_file", () => {
       return true;
     })
     .with("google_sheets", "open_data", "virtual", () => {
@@ -46,6 +52,7 @@ export const DatasetSourceModule = {
     "csv_file",
     "google_sheets",
     "open_data",
+    "pdf_file",
     "virtual",
     "xlsx_file",
   ),
@@ -63,6 +70,7 @@ export const DatasetSourceModule = {
       CsvFileDataset: "csv_file",
       OpenDataDataset: "open_data",
       GoogleSheetsDataset: "google_sheets",
+      PdfFileDataset: "pdf_file",
       VirtualDataset: "virtual",
       XlsxFileDataset: "xlsx_file",
     } as const);

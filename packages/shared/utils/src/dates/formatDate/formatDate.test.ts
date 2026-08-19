@@ -228,6 +228,80 @@ describe("formatDate", () => {
   });
 });
 
+describe("formatDate locale resolution", () => {
+  /** Mid-June so the month name differs plainly across locales. */
+  const june = "2024-06-15T14:05:07.123Z";
+
+  beforeEach(() => {
+    vi.stubEnv("TZ", "UTC");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("renders month and weekday names in an explicit locale", () => {
+    expect(
+      formatDate(june, { zone: "UTC", format: "MMMM", locale: "fr-FR" }),
+    ).toBe("juin");
+    expect(
+      formatDate(june, { zone: "UTC", format: "dddd", locale: "fr-FR" }),
+    ).toBe("samedi");
+  });
+
+  it("renders short month and weekday names in an explicit locale", () => {
+    expect(
+      formatDate(june, { zone: "UTC", format: "MMM", locale: "es-ES" }),
+    ).toBe("jun");
+    expect(
+      formatDate(june, { zone: "UTC", format: "ddd", locale: "es-ES" }),
+    ).toBe("sáb");
+  });
+
+  it("keeps numeric tokens in Latin digits under a non-Latin-digit locale", () => {
+    expect(
+      formatDate(june, {
+        zone: "UTC",
+        format: "YYYY-MM-DD HH:mm:ss",
+        locale: "ar-EG",
+      }),
+    ).toBe("2024-06-15 14:05:07");
+  });
+
+  it("keeps the Z offset parseable under a locale with its own offset label", () => {
+    expect(
+      formatDate(june, {
+        zone: "America/New_York",
+        format: "Z",
+        locale: "fr-FR",
+      }),
+    ).toBe("-04:00");
+  });
+
+  it("falls back to the runtime locale when none is passed", () => {
+    vi.stubGlobal("navigator", { language: "fr-FR" });
+
+    expect(formatDate(june, { zone: "UTC", format: "MMMM" })).toBe("juin");
+  });
+
+  it("prefers an explicit locale over the runtime locale", () => {
+    vi.stubGlobal("navigator", { language: "fr-FR" });
+
+    expect(
+      formatDate(june, { zone: "UTC", format: "MMMM", locale: "en-US" }),
+    ).toBe("June");
+  });
+
+  it("still formats when the runtime exposes no language", () => {
+    vi.stubGlobal("navigator", {});
+
+    expect(formatDate(june, { zone: "UTC", format: "YYYY-MM-DD" })).toBe(
+      "2024-06-15",
+    );
+  });
+});
+
 describe("parseDate integration with formatDate tokens", () => {
   /** No sub-second field in default `formatDate` output for round-trip. */
   const roundTripInstant = "2024-06-15T14:05:07.000Z";

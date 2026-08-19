@@ -12,6 +12,7 @@
 import { Model } from "@avandar/models";
 import {
   makeIdLookupMap,
+  makeObject,
   objectEntries,
   objectValues,
   prop,
@@ -24,11 +25,12 @@ import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/Q
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
-import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts";
+import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import { match } from "ts-pattern";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 import type { Knex } from "knex";
@@ -37,7 +39,10 @@ export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQue
 
 export function structuredQueryToSql(
   query: PartialStructuredQuery,
-  { castTimestampsToISO = false }: StructuredQueryToSqlOptions = {},
+  {
+    castTimestampsToISO = false,
+    columnTypes,
+  }: StructuredQueryToSqlOptions = {},
 ): string {
   if (query.dataSource === undefined && query.nestedSubquery === undefined) {
     return "";
@@ -67,6 +72,16 @@ export function structuredQueryToSql(
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+
+  // Column types the filter renderer uses for typed literals. Built from the
+  // query's own columns and overlaid with any caller-supplied types.
+  const effectiveColumnTypes: QueryFilterColumnTypes = {
+    ...makeObject(queryColumns, {
+      keyFn: prop("baseColumn.name"),
+      valueFn: prop("baseColumn.dataType"),
+    }),
+    ...(columnTypes ?? {}),
+  };
   const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
     key: "id",
   });
@@ -140,7 +155,9 @@ export function structuredQueryToSql(
 
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
-    sqlQuery = applyFilters(sqlQuery, filters);
+    sqlQuery = applyFilters(sqlQuery, filters, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (groupByColumnNames.length > 0) {
@@ -150,7 +167,9 @@ export function structuredQueryToSql(
 
   // apply HAVING clause (after GROUP BY, before ORDER BY)
   if (!isEmptyQueryFilter(having)) {
-    sqlQuery = applyHaving(sqlQuery, having);
+    sqlQuery = applyHaving(sqlQuery, having, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (orderByColumnName && orderByDirection) {

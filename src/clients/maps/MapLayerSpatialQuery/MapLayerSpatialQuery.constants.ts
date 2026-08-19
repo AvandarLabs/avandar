@@ -11,6 +11,7 @@ export const MapLayerSpatialFeatureProperties = {
   classIndex: "__avandar_class_index",
   contributorCount: "__avandar_contributor_count",
   denominator: "__avandar_denominator",
+  disputedStatus: "__avandar_disputed_status",
   featureId: "__avandar_feature_id",
   state: "__avandar_state",
   value: "__avandar_value",

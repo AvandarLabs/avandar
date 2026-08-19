@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
 import { makeSelectOptions } from "@avandar/ui";
-import { isNonNullish, makeIdLookupMap, prop, where } from "@avandar/utils";
+import { isNonNullish, makeIdLookupMap, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
   defaultOptionsFilter,
@@ -8,13 +8,11 @@ import {
   MultiSelect,
 } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
+import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
 import type {
   ComboboxItem,
   ComboboxParsedItem,
@@ -70,43 +68,21 @@ export function QueryColumnMultiSelect({
     finalValue: [],
   });
 
-  const [datasetColumns, isLoadingDatasetColumns] =
-    DatasetColumnClient.useGetAll({
-      ...where("dataset_id", "eq", dataSourceId?.id),
-      useQueryOptions: {
-        enabled: Model.isOfModelType(dataSourceId, "Dataset"),
-      },
-    });
+  // Column loading lives in a shared hook so this multi-select (what the query
+  // selects) and the filter panel (what the query can filter on) always agree
+  // about which columns exist.
+  const { columns: queryColumns, isLoading } =
+    useQueryColumnsForDataSource(dataSourceId);
 
-  const [conceptAttributes, isLoadingConceptAttributes] =
-    ConceptAttributeClient.useGetAll({
-      ...where("concept_id", "eq", dataSourceId?.id),
-      useQueryOptions: {
-        enabled: Model.isOfModelType(dataSourceId, "Concept"),
-      },
-    });
-
-  const isLoading = isLoadingDatasetColumns || isLoadingConceptAttributes;
-
-  const { queryColumns, selectableOptions, queryColumnLookup } = useMemo(() => {
-    const columns = [
-      ...(datasetColumns ?? []).map((col) => {
-        return QueryColumnFns.makeFromDatasetColumn(col);
-      }),
-      ...(conceptAttributes ?? []).map((col) => {
-        return QueryColumnFns.makeFromConceptAttribute(col);
-      }),
-    ];
-
+  const { selectableOptions, queryColumnLookup } = useMemo(() => {
     return {
-      queryColumns: columns,
-      selectableOptions: makeSelectOptions(columns, {
+      selectableOptions: makeSelectOptions(queryColumns, {
         valueKey: "id",
         labelFn: prop("baseColumn.name"),
       }),
-      queryColumnLookup: makeIdLookupMap(columns),
+      queryColumnLookup: makeIdLookupMap(queryColumns),
     };
-  }, [datasetColumns, conceptAttributes]);
+  }, [queryColumns]);
 
   const matchColumnFilter = useMemo((): OptionsFilter => {
     const filter: OptionsFilter = ({ options, search, limit }) => {
