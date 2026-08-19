@@ -70,6 +70,7 @@ function useDatasetImportFormState(
       onDataSourceMetadataChange: options.onDataSourceMetadataChange,
       onRequestDataReparse: options.onRequestDataReparse,
       previewRows,
+      sourceFile: options.sourceFile,
       validation,
     },
     onSubmit: validation.form.onSubmit(
@@ -109,6 +110,7 @@ export function DatasetImportForm({
   dataSourceMetadata,
   onAfterSave,
   onSaveSuccess,
+  sourceFile,
 }: Readonly<DatasetImportFormProps>): ReactNode {
   const state = useDatasetImportFormState({
     rows,
@@ -120,6 +122,7 @@ export function DatasetImportForm({
     dataSourceMetadata,
     onAfterSave,
     onSaveSuccess,
+    sourceFile,
   });
 
   return (

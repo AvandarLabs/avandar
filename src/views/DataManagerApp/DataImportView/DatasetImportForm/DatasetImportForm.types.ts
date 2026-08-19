@@ -108,6 +108,13 @@ export type DatasetImportFormProps = {
   initialDatasetName: string;
   disableSubmit?: boolean;
 
+  /**
+   * The uploaded file, when there is one. Only a PDF needs it: its parse
+   * options are chosen by drawing on the rendered page, so the parse
+   * controls have to render the document itself.
+   */
+  sourceFile?: File;
+
   /** When the user requests to parse the data again. */
   onRequestDataReparse: (parseOptions: FileParseOptions) => void;
   isProcessing?: boolean;

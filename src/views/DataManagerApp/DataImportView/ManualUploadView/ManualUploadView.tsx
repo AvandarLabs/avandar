@@ -152,6 +152,7 @@ export function ManualUploadView({
         <DatasetImportForm
           key={id}
           initialDatasetName={uploadedFile.name}
+          sourceFile={uploadedFile}
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}

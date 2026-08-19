@@ -7,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { computePdfTableFingerprint } from "@/clients/datasets/pdfTableFingerprint";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -50,6 +51,13 @@ export type PdfParseOptions = {
   /** Inclusive, one-based page range the user limited reading to. */
   pageRange?: readonly [number, number];
   outputMode?: "natural" | "observations";
+  /**
+   * Which model contributed rows, or undefined when the rows came from rules
+   * alone. Set by the picker's assist and written to `llm_model` on save,
+   * because the workspace privacy log has to be able to answer "did a model
+   * see this document" from the dataset row by itself.
+   */
+  llmModel?: string;
 };
 
 export type GoogleSheetsParseOptions = {
@@ -225,14 +233,51 @@ async function _saveXlsxDataset(
   });
 }
 
-/**
- * Placeholder for the PDF save, which Phase B2 replaces once region
- * extraction exists. Until then a PDF only ever reaches the form in the
- * `needs_selection` state, which the save button is disabled for, so this
- * throws rather than writing a dataset with no columns and no rows.
- */
-function _savePdfDataset(): Promise<Dataset.T> {
-  return Promise.reject(new Error("Select a region before saving"));
+async function _savePdfDataset(
+  options: Readonly<{
+    context: DatasetInsertContext;
+    payload: Extract<DataSourceMetadata, { sourceType: "pdf_file" }>;
+  }>,
+): Promise<Dataset.T> {
+  const { datasetLoadResult, onlineStorageAllowed, parseOptions, sizeInBytes } =
+    options.payload;
+
+  if (datasetLoadResult.status !== "extracted") {
+    // The submit button is disabled while a PDF is awaiting a selection, so
+    // getting here means something bypassed the form. Saving anyway would
+    // write a dataset with no columns and no rows.
+    throw new Error("Select a region before saving.");
+  }
+
+  return DatasetClient.insertPdfFileDataset({
+    datasetId: datasetLoadResult.datasetId,
+    workspaceId: options.context.workspaceId,
+    datasetName: options.context.datasetName,
+    datasetDescription: options.context.datasetDescription,
+    columns: _duckDbColumnsToImportedColumns(datasetLoadResult.columns).map(
+      snakeCaseKeysShallow,
+    ),
+    isInCloudStorage: onlineStorageAllowed,
+    sizeInBytes,
+    // A PDF is pinned in local storage from the moment it is read, so the
+    // original exists whether or not the user allowed the cloud upload.
+    hasOriginalFile: true,
+    regions: parseOptions.regions ?? [],
+    outputMode: parseOptions.outputMode ?? "natural",
+    llmModel: parseOptions.llmModel,
+    // The form's range is inclusive and one-based; the stored one is
+    // inclusive and zero-based, matching `PageGeometry.pageIndex`.
+    pageRangeStart:
+      parseOptions.pageRange ? parseOptions.pageRange[0] - 1 : undefined,
+    pageRangeEnd:
+      parseOptions.pageRange ? parseOptions.pageRange[1] - 1 : undefined,
+    // Fingerprinted from the combination rather than any single region,
+    // because the combination is what the dataset's rows actually are.
+    fingerprint: await computePdfTableFingerprint({
+      cells: datasetLoadResult.combinedCells,
+      headerRows: datasetLoadResult.combinedHeaderRows,
+    }),
+  });
 }
 
 function _saveDatasetFromValues(
@@ -257,8 +302,8 @@ function _saveDatasetFromValues(
     .with({ sourceType: "xlsx_file" }, (payload) => {
       return _saveXlsxDataset({ context, payload });
     })
-    .with({ sourceType: "pdf_file" }, () => {
-      return _savePdfDataset();
+    .with({ sourceType: "pdf_file" }, (payload) => {
+      return _savePdfDataset({ context, payload });
     })
     .exhaustive();
 }

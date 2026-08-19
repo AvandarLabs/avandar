@@ -7,6 +7,8 @@ import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
+import { pdfTableToCsv } from "@/clients/datasets/pdfTableToColumns";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   DuckDbColumnSchema,
@@ -25,7 +27,12 @@ import {
   PdfParseOptions,
   XlsxParseOptions,
 } from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { PageGeometry } from "@/workers/pdfSniff/types";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion";
+import type {
+  DocumentMetadata,
+  ExtractedTable,
+  PageGeometry,
+} from "@/workers/pdfSniff/types";
 
 type FileLoadOptions = {
   file: File;
@@ -63,6 +70,17 @@ export type PdfFileLoadResult = BaseLoadResult & {
    */
   status: "needs_selection" | "extracted";
   columns: DuckDbColumnSchema[];
+  /** One per selected region, for the review grid. */
+  tables: readonly ExtractedTable[];
+  classifications: Readonly<Record<string, RegionClassification>>;
+  documentMetadata: DocumentMetadata;
+  /**
+   * The combined result the dataset is actually built from. Kept alongside
+   * `tables` because the fingerprint and the CSV are computed from the
+   * combination, not from any single region.
+   */
+  combinedCells: ReadonlyArray<readonly string[]>;
+  combinedHeaderRows: number;
 };
 
 type FileLoadResult =
@@ -182,6 +200,9 @@ function _buildDataSourceMetadataFromLoadResult({
           regions: pdfRequest?.regions ?? [],
           pageRange: pdfRequest?.pageRange,
           outputMode: pdfRequest?.outputMode ?? "natural",
+          // Carried through re-parses so the model that contributed rows is
+          // still known at save time, whichever re-extraction wrote them.
+          llmModel: pdfRequest?.llmModel,
         },
       };
     })
@@ -292,7 +313,12 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           return loadResult;
         })
         .with({ type: "pdf_file" }, async (pdfParseOptions) => {
-          const { datasetId, pageRange } = pdfParseOptions;
+          const {
+            datasetId,
+            pageRange,
+            regions = [],
+            outputMode,
+          } = pdfParseOptions;
           const sniff = await LocalDatasetClient.startPdfImport({
             datasetId,
             workspaceId: workspace.id,
@@ -301,19 +327,71 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             parseOptions: { pageRange },
           });
 
-          // No regions yet, so no rows and no columns yet. This is the
-          // expected state immediately after upload, not a failure.
+          if (regions.length === 0) {
+            // No regions yet, so no rows and no columns yet. This is the
+            // expected state immediately after upload, not a failure.
+            const loadResult: PdfFileLoadResult = {
+              datasetId,
+              numRows: 0,
+              id: uuid(),
+              type: "pdf",
+              pageCount: sniff.pageCount,
+              pages: sniff.pages,
+              status: "needs_selection",
+              columns: [],
+              tables: [],
+              classifications: {},
+              documentMetadata: sniff.documentMetadata,
+              combinedCells: [],
+              combinedHeaderRows: 0,
+            };
+            pendingPreviewRowsRef.value = [];
+            return loadResult;
+          }
+
+          const extracted = await extractPdfRegions({
+            pages: sniff.pages,
+            regions,
+            documentMetadata: sniff.documentMetadata,
+            outputMode,
+          });
+
+          // Reuse the CSV import path wholesale: the extracted table is now
+          // just a CSV, so DuckDB's sniffer types it exactly as it would a
+          // real one. The PDF stays pinned as the retained original.
+          const csv = pdfTableToCsv({
+            cells: extracted.combined.cells,
+            headerRows: extracted.combined.headerRows,
+          });
+          const csvFile = new File([csv], `${datasetId}.csv`, {
+            type: MIMEType.TEXT_CSV,
+          });
+          const csvSniff = await LocalDatasetClient.transcodePdfExtraction({
+            datasetId,
+            workspaceId: workspace.id,
+            userId: user!.id as UserId,
+            csvFile,
+          });
+
           const loadResult: PdfFileLoadResult = {
             datasetId,
-            numRows: 0,
+            numRows: Math.max(
+              0,
+              extracted.combined.cells.length - extracted.combined.headerRows,
+            ),
             id: uuid(),
             type: "pdf",
             pageCount: sniff.pageCount,
             pages: sniff.pages,
-            status: "needs_selection",
-            columns: [],
+            status: "extracted",
+            columns: csvSniff.columns,
+            tables: extracted.tables,
+            classifications: extracted.classifications,
+            documentMetadata: sniff.documentMetadata,
+            combinedCells: extracted.combined.cells,
+            combinedHeaderRows: extracted.combined.headerRows,
           };
-          pendingPreviewRowsRef.value = [];
+          pendingPreviewRowsRef.value = csvSniff.previewRows;
           return loadResult;
         })
         .exhaustive();

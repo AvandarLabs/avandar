@@ -1,5 +1,5 @@
 import { Alert, Box, Group, Pagination, Stack, Text } from "@mantine/core";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { PdfPagePreview } from "./PdfPagePreview";
 import { PdfRegionCard } from "./PdfRegionCard";
@@ -35,6 +35,11 @@ type Props = {
   tables: readonly ExtractedTable[];
   classifications: Readonly<Record<string, RegionClassification>>;
   activeRegionId: string | null;
+  /**
+   * A row's origin, highlighted on top of the regions so clicking a row in
+   * the review grid shows where its value came from.
+   */
+  focusedProvenance?: { page: number; bbox: BBox } | undefined;
   workspaceId: Workspace.Id;
   /** Undefined while the session is still loading; the assist needs it. */
   userId: string | undefined;
@@ -62,6 +67,7 @@ export function PdfRegionPicker({
   tables,
   classifications,
   activeRegionId,
+  focusedProvenance,
   workspaceId,
   userId,
   onRegionsChange,
@@ -173,7 +179,7 @@ export function PdfRegionPicker({
    * two callbacks below are memoised for that reason, not for render cost.
    */
   const highlights = useMemo((): readonly Highlight[] => {
-    return regions.flatMap((region) => {
+    const regionHighlights = regions.flatMap((region) => {
       return region.fragments
         .filter((fragment) => {
           return fragment.page === pageIndex;
@@ -185,7 +191,23 @@ export function PdfRegionPicker({
           };
         });
     });
-  }, [regions, pageIndex, activeRegionId]);
+    return (
+        focusedProvenance !== undefined && focusedProvenance.page === pageIndex
+      ) ?
+        [...regionHighlights, { bbox: focusedProvenance.bbox, isActive: true }]
+      : regionHighlights;
+  }, [regions, pageIndex, activeRegionId, focusedProvenance]);
+
+  // A row's origin can be on a page the user is not looking at, and pointing
+  // at an off-screen highlight would be no answer at all.
+  useEffect(
+    function followFocusedProvenanceToItsPage() {
+      if (focusedProvenance !== undefined) {
+        setPageIndex(focusedProvenance.page);
+      }
+    },
+    [focusedProvenance],
+  );
 
   const handleScaleChange = useCallback((nextScale: number): void => {
     setScale(nextScale);

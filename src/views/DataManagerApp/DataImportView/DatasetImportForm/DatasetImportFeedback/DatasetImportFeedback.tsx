@@ -21,6 +21,7 @@ export type DatasetImportFeedbackProps = {
   onDataSourceMetadataChange: DatasetImportFormProps["onDataSourceMetadataChange"];
   onRequestDataReparse: DatasetImportFormProps["onRequestDataReparse"];
   previewRows: UnknownObject[];
+  sourceFile?: File;
   validation: DatasetImportValidation;
 };
 
@@ -37,6 +38,7 @@ export function DatasetImportFeedback({
   onDataSourceMetadataChange,
   onRequestDataReparse,
   previewRows,
+  sourceFile,
   validation,
 }: Readonly<DatasetImportFeedbackProps>): ReactNode {
   return (
@@ -63,6 +65,7 @@ export function DatasetImportFeedback({
         onRequestDataReparse={onRequestDataReparse}
         previewMessage={copy.previewMessage}
         previewRows={previewRows}
+        sourceFile={sourceFile}
       />
       <OnlineStorageAllowedCheckbox
         dataSourceMetadata={dataSourceMetadata}

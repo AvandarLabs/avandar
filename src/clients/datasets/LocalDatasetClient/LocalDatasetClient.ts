@@ -35,6 +35,9 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * get their original bytes cached; if the user closes the tab while the
  * background parquet transcoding is still running we'll prompt for a
  * re-upload instead.
+ *
+ * Sources that require original-file retention are exempt. See
+ * {@link _maybeCacheSourceBytes}.
  */
 const SOURCE_CACHE_PER_FILE_MAX_BYTES = 200 * 1024 * 1024;
 
@@ -98,9 +101,23 @@ export async function evictSourceCache(reservedBytes: number): Promise<void> {
 /**
  * Returns the source File / Blob iff caching is permitted for this size
  * (and after evicting older entries to make room).
+ *
+ * `mustRetain` exempts the file from the per-file ceiling, and it is the
+ * same condition that pins the row. For CSV and XLSX the cached bytes are a
+ * convenience for resuming a parse, so refusing an enormous one costs the
+ * user a re-upload at worst and the ceiling is right. For a source that
+ * requires retention the bytes are the retained original, the only copy of
+ * what extraction is lossy against, and large PDFs are ordinary in this
+ * corpus. Applying the ceiling there produced the worst of both: a row
+ * pinned as "the original lives here" with nothing in it, whose only symptom
+ * was `startOriginalFileUploadIfNeeded` throwing "no original file is cached
+ * locally" much later, at save time.
  */
-async function _maybeCacheSourceBytes(file: File): Promise<Blob | undefined> {
-  if (file.size > SOURCE_CACHE_PER_FILE_MAX_BYTES) {
+async function _maybeCacheSourceBytes(
+  file: File,
+  options: Readonly<{ mustRetain: boolean }>,
+): Promise<Blob | undefined> {
+  if (!options.mustRetain && file.size > SOURCE_CACHE_PER_FILE_MAX_BYTES) {
     return undefined;
   }
   await evictSourceCache(file.size);
@@ -153,6 +170,18 @@ type LocalDatasetMutationRecord = {
       LocalImportParams<Omit<LocalDatasetPdfParseOptions, "type">>
     >,
   ) => Promise<PdfSniffResult>;
+  transcodePdfExtraction: (
+    params: Readonly<{
+      datasetId: DatasetId;
+      workspaceId: Workspace.Id;
+      userId: UserId;
+      /** The extracted regions, serialised so DuckDB can type them. */
+      csvFile: File;
+    }>,
+  ) => Promise<{
+    columns: DuckDbColumnSchema[];
+    previewRows: UnknownRow[];
+  }>;
   resumeImport: (
     params: Readonly<{ datasetId: DatasetId }>,
   ) => Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult | undefined>;
@@ -171,7 +200,21 @@ type LocalDatasetMutationRecord = {
 async function _putParsingDataset(
   options: Readonly<PutParsingDatasetOptions>,
 ): Promise<void> {
-  const cachedBytes = await _maybeCacheSourceBytes(options.file);
+  // Derived, never hardcoded: the pin means "these bytes are the retained
+  // original", which is a property of the source type alone. CSV and XLSX
+  // are reconstructable from parquet + parse options so they come out false
+  // here, but a future import path that starts putting rows of a
+  // non-reconstructable kind through this function gets the pin for free
+  // instead of having to remember it. See `requiresOriginalFileRetention`.
+  //
+  // The same value decides whether the per-file cache ceiling applies, so a
+  // row can never be pinned without the bytes the pin claims to protect.
+  const isSourcePinned = requiresOriginalFileRetention(
+    getDatasetSourceTypeFromSourceFileType(options.sourceFileType),
+  );
+  const cachedBytes = await _maybeCacheSourceBytes(options.file, {
+    mustRetain: isSourcePinned,
+  });
   await AvaDexie.DB.LocalDataset.put({
     datasetId: options.datasetId,
     workspaceId: options.workspaceId,
@@ -185,16 +228,7 @@ async function _putParsingDataset(
     sourceFileType: options.sourceFileType,
     sourceFileSize: options.file.size,
     lastSourceAccessedAt: cachedBytes ? Date.now() : undefined,
-    // Derived, never hardcoded: the pin means "these bytes are the retained
-    // original", which is a property of the source type alone. CSV and XLSX
-    // are reconstructable from parquet + parse options so they come out
-    // false here, but a future import path that starts putting rows of a
-    // non-reconstructable kind through this function gets the pin for free
-    // instead of having to remember it. See
-    // `requiresOriginalFileRetention`.
-    isSourcePinned: requiresOriginalFileRetention(
-      getDatasetSourceTypeFromSourceFileType(options.sourceFileType),
-    ),
+    isSourcePinned,
     parseOptions: options.parseOptions,
   });
 }
@@ -333,6 +367,48 @@ function _makeStartPdfImport(
       parseOptions: { type: "pdf", pageRange: params.parseOptions.pageRange },
     });
     return sniff;
+  };
+}
+
+/**
+ * Types and transcodes the rows extracted from a PDF's regions.
+ *
+ * The extracted table is serialised to CSV first, so DuckDB's sniffer types
+ * it exactly as it would a real one and no second type-inference path has to
+ * exist for PDFs.
+ *
+ * Unlike `startCsvImport` this does not call `_putParsingDataset`. That
+ * function `put`s a whole row, which would replace the PDF's `sourceBytes`
+ * with the throwaway CSV and rewrite `sourceFileType` to `"csv"`, destroying
+ * the retained original. The row already exists from `startPdfImport`, and
+ * `runBackgroundParquetTranscoding` only ever `update`s it, so the pinned
+ * bytes survive both the transcode and the post-transcode clear (which
+ * `buildTranscodeCompletionUpdate` skips for pinned rows).
+ */
+function _makeTranscodePdfExtraction(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["transcodePdfExtraction"] {
+  return async (params) => {
+    const logger = context.logger.appendName("transcodePdfExtraction");
+    logger.log("Typing extracted PDF rows", {
+      datasetId: params.datasetId,
+      size: params.csvFile.size,
+    });
+    const sniff = await DuckDbClient.sniffCsv({
+      file: params.csvFile,
+      maxPreviewRows: PREVIEW_ROW_COUNT,
+    });
+    void runBackgroundParquetTranscoding({
+      datasetId: params.datasetId,
+      workspaceId: params.workspaceId,
+      userId: params.userId,
+      source: {
+        kind: "csv",
+        file: params.csvFile,
+        options: { type: "csv" },
+      },
+    });
+    return { columns: sniff.columns, previewRows: sniff.previewRows };
   };
 }
 
@@ -492,6 +568,7 @@ function _createLocalDatasetMutations(
     startCsvImport: _makeStartCsvImport(context),
     startXlsxImport: _makeStartXlsxImport(context),
     startPdfImport: _makeStartPdfImport(context),
+    transcodePdfExtraction: _makeTranscodePdfExtraction(context),
     resumeImport: _makeResumeImport(context),
     dropLocalDataset: _makeDropLocalDataset(context),
     fetchCloudDatasetToLocalStorage:
