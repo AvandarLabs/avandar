@@ -115,6 +115,16 @@ export type ScoredTable = {
   mergedCellCount: number;
 };
 
+/**
+ * What a numeric value counts.
+ *
+ * `n` is a bare count, and is the honest answer only when the document
+ * printed no unit at all. A percentage recorded as `n` is indistinguishable
+ * from a count, which is exactly the confusion observations mode exists to
+ * prevent when two reports are stacked.
+ */
+export type PdfValueUnit = "n" | "percent" | "usd";
+
 /** Why a single extracted value might be wrong, and how sure we are. */
 export type PdfCellFlag = {
   /**
@@ -172,4 +182,21 @@ export type ExtractedTable = {
    * Powers "click a row, highlight it on the page".
    */
   rowProvenance: ReadonlyArray<{ page: number; bbox: BBox }>;
+  /**
+   * What each row's value counts, parallel to `cells` minus the header rows,
+   * exactly like `rowProvenance`.
+   *
+   * Carried beside the cells rather than as a column on purpose. The natural
+   * schema mirrors what the document printed, and a map region is
+   * `[label, value]`, so a `unit` column there would be noise no reader would
+   * recognise. Observations mode reads this instead, which is the one place a
+   * percentage sharing a unit with a count does real damage.
+   *
+   * Omitted entirely by an extractor that reads no unit, and `undefined` at
+   * the index of a row that carries no numeric value. `combineRegions` falls
+   * back to `n` for both. An extractor whose own schema already has a `unit`
+   * column, as `extractProseMeasures` does, does not repeat it here: that
+   * column is the source of truth for its own rows.
+   */
+  rowUnits?: ReadonlyArray<PdfValueUnit | undefined>;
 };

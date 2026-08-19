@@ -63,26 +63,41 @@ Scale alone cannot yield the page height, so `PdfPagePreview` gained an
 optional `onPageSizeChange?: ({ widthPt, heightPt })` reported from the
 unscaled viewport after render. `onScaleChange` is unchanged.
 
-## Known gap: the observations `unit` column
+## Closed: the observations `unit` column, and the funding bars with it
 
-Found while implementing Task 12, deferred deliberately, not covered by the
-Task 20 gate assertions.
+Found while implementing Task 12, deferred at the time, fixed afterwards. Both
+halves are now asserted by the Task 20 gate.
 
-In observations mode the numeric path emits `unit: "n"` for every value, so the
-OCHA KPI tile `2.6%` becomes value `2.6` with unit `n`, and the funding bars'
-`3M` loses its currency. The spec's observations schema promises `value` is
-numeric "with `unit` absorbing the `$`, `%` or `M` suffix".
+The gap was that every extractor calls `normalizeCellValue` on the way in, so
+the suffix was already gone by the time `combineRegions` saw the cell and it
+emitted `unit: "n"` for everything: the OCHA KPI tile `2.6%` became value `2.6`
+with unit `n`, indistinguishable from a count. A percentage and a count sharing
+a unit compare as equal across stacked reports, which is the entire reason
+observations mode exists.
 
-The root cause is that each extractor calls `normalizeCellValue` on the way in,
-so the suffix is already gone by the time `combineRegions` sees the cell. A
-local patch there cannot recover it. The real fix is for the extractors, at
-least `extractLabelledGraphic`, to carry the unit alongside the value, which is
-a change to what an extractor emits and is worth deciding deliberately rather
-than bolting on.
+The same missing notion of a unit was also a pairing failure. Each funding bar
+prints its amount as three text items (`"3"`, `"M"`, `"(15%)"`), and with only
+"numeral or not" to go on, `M (15%)` assembled into a label 13 points from the
+figure while the pillar name it belongs to sat 172 points away. Every bar
+paired with its own unit, unflagged, and all six pillars came back empty.
 
-It matters because a percentage and a count sharing `unit: "n"` compare as
-equal across stacked reports, and cross-document comparison is the entire
-reason observations mode exists.
+The fix is in two parts:
+
+- `assembleQuantities` decides what is a figure before anything is classified
+  as a label, merging a numeral with a magnitude suffix, a percent sign, a
+  currency or a parenthesised share beside it. Adjacency reuses
+  `assembleLabels`' own same-line test rather than a second set of thresholds.
+  A quantity is anchored on its numeral for pairing, because a suffix extends
+  the run rightwards without moving the figure.
+- `ExtractedTable.rowUnits` carries the unit parallel to the cells, the way
+  `rowProvenance` already does, so natural mode is untouched (a map table stays
+  `[label, value]`) and `combineRegions` reads the real unit. A region whose
+  own schema has a `unit` column, as `extractProseMeasures` does, still wins.
+
+The bars now read `WASH 3000000`, `Health 2000000`, `RCCE 1000000`,
+`Log and Supply 1000000`, `Coordination 1000000`, `Others 0`. Five of the six
+are flagged as near-ties, which is honest: the pillar names are a long way
+left of the amounts and the rows are 23 points apart.
 
 ## Two defects inherited from Phase B1, to fix in this phase
 
@@ -180,6 +195,7 @@ generation caveats" section first. The three that matter here:
 |---|---|---|
 | `clipToRegion.ts` | Page geometry to region geometry | 2 |
 | `assembleLabels.ts` | Same-line and stacked-line label merging | 3 |
+| `assembleQuantities.ts` | A numeral plus its suffix, read as one figure | 5 |
 | `pairByProximity.ts` | Value to label association, plus ambiguity ratio | 4 |
 | `extractors/extractLabelledGraphic.ts` | Shape: labelled graphic | 5 |
 | `parseRunInLabels.ts` | Run-in label blocks | 6 |

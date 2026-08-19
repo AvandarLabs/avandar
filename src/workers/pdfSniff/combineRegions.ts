@@ -213,7 +213,14 @@ export function combineRegions(params: {
             subject,
             metric: metricIndex >= 0 ? (row[metricIndex] ?? "") : label,
             value: candidateValue,
-            unit: unitIndex >= 0 ? (row[unitIndex] ?? "") : "n",
+            // A region whose own schema names a unit is the authority on its
+            // own rows. Everything else reads the unit the extractor carried
+            // beside the cells, and only a region that read none at all
+            // falls back to a bare count.
+            unit:
+              unitIndex >= 0 ?
+                (row[unitIndex] ?? "")
+              : (table.rowUnits?.[rowIndex] ?? "n"),
             sourceText: sourceIndex >= 0 ? (row[sourceIndex] ?? "") : "",
           }),
         );

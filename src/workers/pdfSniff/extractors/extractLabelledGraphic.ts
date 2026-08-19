@@ -1,24 +1,13 @@
 import { assembleLabels } from "../assembleLabels";
-import { normalizeCellValue } from "../normalizeCellValue";
+import { assembleQuantities } from "../assembleQuantities";
 import { pairByProximity } from "../pairByProximity";
 import type {
   BBox,
   ExtractedTable,
   PdfCellFlag,
+  PdfValueUnit,
   RegionGeometry,
-  TextItem,
 } from "../types";
-
-/** A text item that is entirely numeric is a value; anything else a label. */
-const VALUE_PATTERN = /^[$€£¥]?\s*-?[\d][\d,. ]*\s*%?$/u;
-
-function _isValue(item: TextItem): boolean {
-  return VALUE_PATTERN.test(item.text.trim());
-}
-
-function _bboxOf(item: TextItem): BBox {
-  return [item.x, item.y, item.x + item.width, item.y + item.height];
-}
 
 /**
  * Reads a map, chart or KPI tile whose values are text at coordinates.
@@ -28,19 +17,27 @@ function _bboxOf(item: TextItem): BBox {
  * dropped or silently resolved, because the measurement behind this extractor
  * showed that roughly one pair in eight is a near-tie and roughly one in
  * sixteen is simply wrong.
+ *
+ * Figures are assembled before labels are, because a magnitude suffix left
+ * loose becomes a label in its own right and then wins the figure printed
+ * beside it. See `assembleQuantities`.
  */
 export function extractLabelledGraphic(
   region: RegionGeometry,
   options: { regionId: string; ambiguityThreshold?: number },
 ): ExtractedTable {
-  const values = region.textItems.filter(_isValue);
-  const labelItems = region.textItems.filter((item) => {
-    return !_isValue(item) && item.text.trim().length > 0;
-  });
+  const { quantities, labelItems } = assembleQuantities(region.textItems);
+  const byItem = new Map(
+    quantities.map((quantity) => {
+      return [quantity.item, quantity];
+    }),
+  );
 
   const labels = assembleLabels(labelItems);
   const { pairs, unmatchedLabels, unmatchedValues } = pairByProximity({
-    values,
+    values: quantities.map((quantity) => {
+      return quantity.item;
+    }),
     labels,
     ambiguityThreshold: options.ambiguityThreshold,
   });
@@ -48,12 +45,15 @@ export function extractLabelledGraphic(
   const cells: string[][] = [["label", "value"]];
   const flags: PdfCellFlag[] = [];
   const rowProvenance: Array<{ page: number; bbox: BBox }> = [];
+  const rowUnits: Array<PdfValueUnit | undefined> = [];
 
   pairs.forEach((pair, index) => {
-    cells.push([pair.label, normalizeCellValue(pair.value)]);
+    const quantity = byItem.get(pair.valueItem);
+    cells.push([pair.label, quantity?.value ?? ""]);
+    rowUnits.push(quantity?.unit);
     rowProvenance.push({
       page: region.pageIndex,
-      bbox: _bboxOf(pair.valueItem),
+      bbox: quantity?.bbox ?? region.bbox,
     });
 
     if (pair.isAmbiguous) {
@@ -62,9 +62,9 @@ export function extractLabelledGraphic(
         columnIndex: 0,
         reason: "ambiguous_association",
         detail:
-          `"${pair.value}" was nearly as close to another label ` +
-          `(${pair.ambiguityRatio.toFixed(2)} of the winning distance). ` +
-          "Check it against the page.",
+          `"${quantity?.text ?? pair.value}" was nearly as close to another ` +
+          `label (${pair.ambiguityRatio.toFixed(2)} of the winning ` +
+          "distance). Check it against the page.",
       });
     }
   });
@@ -73,6 +73,9 @@ export function extractLabelledGraphic(
     const rowIndex = cells.length - 1;
     cells.push([unmatched, ""]);
     rowProvenance.push({ page: region.pageIndex, bbox: region.bbox });
+    // No figure, so nothing to give a unit to. `undefined` keeps the array
+    // parallel to the rows, which is the whole contract of `rowUnits`.
+    rowUnits.push(undefined);
     flags.push({
       rowIndex,
       columnIndex: 1,
@@ -99,5 +102,6 @@ export function extractLabelledGraphic(
     flags,
     extractedBy: "rules",
     rowProvenance,
+    rowUnits,
   };
 }

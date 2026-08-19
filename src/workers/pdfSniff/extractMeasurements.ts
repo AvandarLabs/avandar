@@ -1,9 +1,11 @@
+import type { PdfValueUnit } from "./types";
+
 /** One figure read out of a sentence, with what it counts and of what. */
 export type Measurement = {
   subject: string | null;
   metric: string;
   value: number;
-  unit: "n" | "percent" | "usd";
+  unit: PdfValueUnit;
   sourceText: string;
 };
 

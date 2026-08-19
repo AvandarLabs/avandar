@@ -26,6 +26,39 @@ const STACKED_MAX_CENTRE_DELTA = 12;
 const STACKED_MAX_LINE_GAP = 11;
 
 /**
+ * The horizontal extent of an item or a run of items, with its baseline.
+ * Enough to answer "do these sit side by side on one line", and nothing more.
+ */
+export type LineSpan = {
+  /** Left edge, in PDF points. */
+  x0: number;
+  /** Right edge, in PDF points. */
+  x1: number;
+  /** Baseline y. */
+  y: number;
+};
+
+export function lineSpanOf(item: TextItem): LineSpan {
+  return { x0: item.x, x1: item.x + item.width, y: item.y };
+}
+
+/**
+ * Whether two spans sit on one baseline, close enough to be one run of text.
+ *
+ * Exported because `assembleQuantities` has to ask the same question of a
+ * number and the `M` beside it that this asks of `RED` and `SEA`. It is the
+ * same measurement of the same page, so it must use the same tolerances: a
+ * second set of thresholds would drift from these and quietly disagree about
+ * what "adjacent" means.
+ */
+export function isSameLineRun(a: LineSpan, b: LineSpan): boolean {
+  if (Math.abs(a.y - b.y) >= SAME_LINE_TOLERANCE) {
+    return false;
+  }
+  return Math.max(b.x0 - a.x1, a.x0 - b.x1) <= SAME_LINE_MAX_GAP;
+}
+
+/**
  * A group of text items being assembled into one label, tracked by its own
  * bounding box and mean baseline.
  *
@@ -56,12 +89,15 @@ function _clusterOf(item: TextItem): Cluster {
   };
 }
 
+function _spanOf(cluster: Cluster): LineSpan {
+  return { x0: cluster.x0, x1: cluster.x1, y: cluster.meanY };
+}
+
 function _shouldMerge(a: Cluster, b: Cluster): boolean {
   const dy = Math.abs(a.meanY - b.meanY);
 
   if (dy < SAME_LINE_TOLERANCE) {
-    const gap = Math.max(b.x0 - a.x1, a.x0 - b.x1);
-    return gap <= SAME_LINE_MAX_GAP;
+    return isSameLineRun(_spanOf(a), _spanOf(b));
   }
 
   if (dy <= STACKED_MAX_LINE_GAP) {

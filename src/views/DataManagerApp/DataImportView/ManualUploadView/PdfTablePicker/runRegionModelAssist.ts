@@ -154,6 +154,10 @@ export function mergeModelRows(
       return !(flag.rowIndex < 0 && flag.detail.includes(COVERAGE_FLAG_MARKER));
     }),
     rowProvenance: [...ruleTable.rowProvenance, ...modelTable.rowProvenance],
+    // The rule rows keep their index, so their units stay aligned without
+    // padding. The model's rows name their unit in a column of their own and
+    // never need this array.
+    rowUnits: hasRuleRows ? ruleTable.rowUnits : modelTable.rowUnits,
   };
 }
 

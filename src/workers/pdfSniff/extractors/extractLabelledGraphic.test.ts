@@ -114,6 +114,60 @@ describe("extractLabelledGraphic", () => {
     ).toHaveLength(3);
   });
 
+  it("reads a figure printed as a number, a suffix and a share", () => {
+    // The OCHA funding bar, item for item. Before unit-aware assembly the
+    // "M (15%)" became a label, took the 3 for itself, and left WASH empty.
+    const result = extractLabelledGraphic(
+      region([
+        item("WASH", 334.34, 426.04, 16.44),
+        item("3", 513.06, 425.9, 3.63),
+        item("M", 516.7, 425.9, 5.42),
+        item(" ", 522.11, 425.9, 0.23),
+        item("(15%)", 523.77, 425.9, 15.78),
+      ]),
+      { regionId: "r1" },
+    );
+
+    expect(result.cells.slice(1)).toEqual([["WASH", "3000000"]]);
+    expect(result.rowUnits).toEqual(["n"]);
+  });
+
+  it("reports each row's unit beside the cells, never as a column", () => {
+    // A map table is [label, value]. A unit column there is noise; the unit
+    // still has to reach observations mode, which is what `rowUnits` is for.
+    const result = extractLabelledGraphic(
+      region([
+        item("CFR", 100, 300, 20),
+        item("2.6%", 100, 290, 20),
+        item("CASES", 300, 300, 30),
+        item("83,000", 300, 290, 30),
+      ]),
+      { regionId: "r1" },
+    );
+
+    expect(result.cells[0]).toEqual(["label", "value"]);
+    expect(Object.fromEntries(result.cells.slice(1))).toEqual({
+      CFR: "2.6",
+      CASES: "83000",
+    });
+    expect(result.rowUnits).toEqual(["percent", "n"]);
+  });
+
+  it("has no unit for a label it found no figure for", () => {
+    const result = extractLabelledGraphic(
+      region([
+        item("KHARTOUM", 480, 302, 45),
+        item("408", 490, 292, 15),
+        item("ABYEI", 100, 100, 25),
+      ]),
+      { regionId: "r1" },
+    );
+
+    // Parallel to the data rows, exactly like `rowProvenance`.
+    expect(result.rowUnits).toHaveLength(result.cells.length - 1);
+    expect(result.rowUnits).toEqual(["n", undefined]);
+  });
+
   it("records row provenance for the page overlay", () => {
     const result = extractLabelledGraphic(
       region([item("KHARTOUM", 480, 302, 45), item("408", 490, 292, 15)]),

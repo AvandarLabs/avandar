@@ -314,6 +314,105 @@ describe("combineRegions", () => {
     expect(result.cells[2]![columnOf(result, "unit")]).toBe("percent");
   });
 
+  it("reads a row's unit from the table's parallel metadata", () => {
+    // A labelled graphic's natural schema is [label, value]: a `unit` column
+    // there would be noise the document never printed. Observations mode
+    // still has to tell 2.6% from a count of 2.6, so the unit rides beside
+    // the cells instead.
+    const tiles: ExtractedTable = {
+      ...table("tiles", [
+        ["label", "value"],
+        ["Cases", "83000"],
+        ["Case fatality rate", "2.6"],
+      ]),
+      rowUnits: ["n", "percent"],
+    };
+
+    const result = combineRegions({
+      tables: [
+        tiles,
+        table("x", [
+          ["a", "b", "c"],
+          ["1", "2", "3"],
+        ]),
+      ],
+      regionLabels: { tiles: "Headline figures", x: "Other" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.cells[1]![columnOf(result, "value")]).toBe("83000");
+    expect(result.cells[1]![columnOf(result, "unit")]).toBe("n");
+    expect(result.cells[2]![columnOf(result, "value")]).toBe("2.6");
+    expect(result.cells[2]![columnOf(result, "unit")]).toBe("percent");
+  });
+
+  it("keeps units out of natural mode entirely", () => {
+    const map: ExtractedTable = {
+      ...table("a", [
+        ["label", "value"],
+        ["Khartoum", "408"],
+      ]),
+      rowUnits: ["n"],
+    };
+
+    const result = combineRegions({
+      tables: [map],
+      regionLabels: { a: "Deaths by state" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.outputMode).toBe("natural");
+    expect(result.cells).toEqual([
+      ["label", "value"],
+      ["Khartoum", "408"],
+    ]);
+  });
+
+  it("still falls back to a bare count where no unit was read", () => {
+    const result = combineRegions({
+      tables: [
+        table("map", [
+          ["label", "value"],
+          ["Khartoum", "408"],
+        ]),
+        table("x", [
+          ["a", "b", "c"],
+          ["1", "2", "3"],
+        ]),
+      ],
+      regionLabels: { map: "Deaths by state", x: "Other" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.cells[1]![columnOf(result, "unit")]).toBe("n");
+  });
+
+  it("lets a region's own unit column win over the parallel metadata", () => {
+    // `extractProseMeasures` names a unit per row in its own schema. Nothing
+    // should be able to overrule the extractor that read the sentence.
+    const prose: ExtractedTable = {
+      ...table("prose", [
+        ["subject", "metric", "value", "unit", "source_text"],
+        ["Sudan", "case fatality rate", "2.6", "percent", "..."],
+      ]),
+      rowUnits: ["n"],
+    };
+
+    const result = combineRegions({
+      tables: [
+        prose,
+        table("x", [
+          ["a", "b", "c"],
+          ["1", "2", "3"],
+        ]),
+      ],
+      regionLabels: { prose: "Situation update", x: "Other" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.cells[1]![columnOf(result, "unit")]).toBe("percent");
+  });
+
   it("returns an empty result for no tables", () => {
     const result = combineRegions({
       tables: [],

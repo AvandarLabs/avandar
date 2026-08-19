@@ -332,53 +332,76 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     });
     // Nothing here is a near-tie: three tiles, well separated.
     expect(table.flags).toHaveLength(0);
+
+    // The natural schema stays two columns, because that is what the tiles
+    // print. The unit rides beside the cells instead, so 2.6% reaches
+    // observations mode as a percentage rather than as a count of 2.6. Two
+    // situation reports stacking on `metric` and `unit` is the whole reason
+    // observations mode exists, and a percentage filed as `n` is the error
+    // that would survive into the comparison unnoticed.
+    expect(table.cells[0]).toEqual(["label", "value"]);
+    const observations = combineRegions({
+      tables: [table],
+      regionLabels: { tiles: "Headline figures" },
+      documentMetadata: {
+        title: null,
+        organisation: null,
+        reportNumber: null,
+        publishedAt: null,
+      },
+      outputMode: "observations",
+    });
+    const unitIndex = observations.cells[0]!.indexOf("unit");
+    const valueIndex = observations.cells[0]!.indexOf("value");
+    const unitOf = (value: string) => {
+      return observations.cells.slice(1).find((row) => {
+        return row[valueIndex] === value;
+      })?.[unitIndex];
+    };
+
+    expect(unitOf("2.6")).toBe("percent");
+    expect(unitOf("83000")).toBe("n");
+    expect(unitOf("2100")).toBe("n");
   });
 
-  it("does NOT read the funding-by-pillar bars as pillar amounts", async () => {
-    // KNOWN GAP, asserted rather than hidden. This is the `unit` gap the plan
-    // already records, showing up as a pairing failure.
+  it("reads the funding-by-pillar bars at their printed magnitude", async () => {
+    // Each bar's amount is printed as three text items ("3", "M", "(15%)").
+    // `assembleQuantities` reads them as one figure before anything is
+    // classified as a label, so the magnitude suffix can no longer assemble
+    // into a label of its own and take the figure printed beside it.
     //
-    // `extractLabelledGraphic` has no notion of a unit: it treats a bare
-    // numeral as a value and every other item as a label. Each bar's amount
-    // is printed as three items ("3", "M", "(15%)"), so the magnitude suffix
-    // and the share become a label, "M (15%)", sitting 13 points from the
-    // figure while the pillar name it belongs to is 172 points away. Every
-    // figure therefore pairs with its own unit, and the six pillar names come
-    // out as rows with no value.
-    //
-    // That output is incomplete but not a lie: no row claims a pillar was
-    // funded at some amount. The tempting "fix" is to drop the annotations so
-    // the count comes out at 6, which would report WASH at 3 where the
-    // document says $3 million: a count that passes over a value wrong by a
-    // factor of a million. The real fix is unit-aware value assembly, the
-    // same gap that leaves `unit` unpopulated elsewhere. Until then this pins
-    // the behaviour so a fix has to come back here and update it.
+    // The values are the document's, scaled: $3M is 3000000, not 3. A count
+    // of 6 rows reached by dropping the suffix would report WASH at 3, which
+    // is wrong by a factor of a million and would look right.
     const region = clipToRegion(await pageOf(OCHA, 3), OCHA_BARS);
     const table = extractLabelledGraphic(region, { regionId: "bars" });
-    const labels = byLabel(table);
-    const pillars = [
-      "WASH",
-      "Health",
-      "RCCE",
-      "Log and Supply",
-      "Coordination",
-      "Others",
-    ];
 
-    // All six pillars are found, and every one of them reports no figure.
-    for (const pillar of pillars) {
-      expect(labels[pillar]).toBe("");
-    }
-    expect(table.flags).toHaveLength(6);
+    expect(dataRows(table)).toHaveLength(6);
+    expect(byLabel(table)).toEqual({
+      WASH: "3000000",
+      Health: "2000000",
+      RCCE: "1000000",
+      "Log and Supply": "1000000",
+      Coordination: "1000000",
+      Others: "0",
+    });
+
+    // The chart prints no currency inside this region: its "US$" is in the
+    // title above the box. A bare count is the honest unit for what the
+    // region actually contains, and the parenthesised share is an annotation
+    // about the bar rather than the bar's own unit.
+    expect(table.rowUnits).toEqual(["n", "n", "n", "n", "n", "n"]);
+
+    // Every pillar has its own figure: nothing is unmatched in either
+    // direction. Five of the six pairings are near-ties and say so, which is
+    // the truth about this chart rather than a defect: the pillar names sit
+    // in a column 90 to 180 points to the left, while the rows are only 23
+    // points apart, so a bar's amount is barely closer to its own name than
+    // to the name above it. The values are right and flagged for review.
     for (const flag of table.flags) {
-      expect(flag.reason).toBe("unmatched_label");
+      expect(flag.reason).toBe("ambiguous_association");
     }
-
-    // The six figures are present, attached to their own units. Asserted so
-    // that the day the extractor learns to read them, this fails loudly.
-    expect(labels["M (15%)"]).toBe("3");
-    expect(labels["M (13%)"]).toBe("2");
-    expect(dataRows(table)).toHaveLength(12);
+    expect(flaggedRowIndices(table).size).toBe(5);
   });
 
   it("reads all six response pillars, one column region at a time", async () => {
