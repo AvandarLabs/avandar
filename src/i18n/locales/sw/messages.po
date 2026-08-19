@@ -33,7 +33,7 @@ msgstr "Angalau swali moja kwenye dataset hii linatumia <0>SELECT *</0> au "
 
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "No records yet"
-msgstr ""
+msgstr "Bado hakuna rekodi"
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
@@ -98,7 +98,7 @@ msgstr "Vitendo zaidi vya safu {layerName}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "There is only one tab in this spreadsheet."
-msgstr ""
+msgstr "Kuna kichupo kimoja tu katika lahajedwali hili."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "starts with"
@@ -132,7 +132,8 @@ msgstr "Fungua dataset"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
 "existing datasets, or add fields to fill in by hand."
-msgstr ""
+msgstr "Ipe aina hii ya kesi jina na eleza sehemu zinakotoka. Panga safu kutoka "
+"kwenye seti za data zilizopo, au ongeza sehemu za kujaza kwa mkono."
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -200,7 +201,8 @@ msgstr "Seti ya data ilishindwa kupakia. Tafadhali jaribu tena baadaye au "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "The column matching this dataset's rows to a case"
-msgstr ""
+msgstr "Safu inayolinganishwa na safu za seti hii ya data ili kuhusishwa na "
+"kesi"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it"
@@ -309,7 +311,7 @@ msgstr "Andika swali na nitaunda SQL na kuikimbia kwenye canvas."
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/NewCaseTypeButton.tsx
 msgid "New case type"
-msgstr ""
+msgstr "Aina mpya ya kesi"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -350,11 +352,11 @@ msgstr "Swali"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Join key"
-msgstr ""
+msgstr "Ufunguo wa kuunganisha"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "label"
-msgstr ""
+msgstr "lebo"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
@@ -396,7 +398,7 @@ msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is not available"
-msgstr ""
+msgstr "Google Sheet haipatikani"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not between"
@@ -517,7 +519,7 @@ msgstr "Haikuweza kubaini jedwali msingi kutoka kwenye kifungu cha FROM."
 
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
 msgid "Case types"
-msgstr ""
+msgstr "Aina za kesi"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -603,7 +605,7 @@ msgstr "+ Kikundi"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "The column that names each case in the UI"
-msgstr ""
+msgstr "Safu inayotaja kila kesi kwenye kiolesura"
 
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
@@ -616,7 +618,7 @@ msgstr "CRS ya chanzo"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "For example, County or Household"
-msgstr ""
+msgstr "Kwa mfano, Kaunti au Kaya"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -777,7 +779,7 @@ msgstr "Ufichwe mafunzo?"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Picker error"
-msgstr ""
+msgstr "Hitilafu ya Google Picker"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -922,7 +924,7 @@ msgstr "Acha kuchapisha"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Design case types in chat"
-msgstr ""
+msgstr "Buni aina za kesi kwenye mazungumzo"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1072,7 +1074,7 @@ msgstr "Majedwali yaliyounganishwa kwa koma hayajawekwa; yashughulikie kama "
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 msgid "This record failed to load"
-msgstr ""
+msgstr "Rekodi hii imeshindwa kupakiwa"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -1156,7 +1158,7 @@ msgstr "\"{value}\" si tarehe. Tumia YYYY-MM-DD."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Add a note"
-msgstr ""
+msgstr "Ongeza dokezo"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1237,7 +1239,7 @@ msgstr "Imeshindikana kuacha kuchapisha dashibodi"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Where the fields come from"
-msgstr ""
+msgstr "Sehemu zinakotoka"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
@@ -1281,7 +1283,7 @@ msgstr "Kima cha chini cha mhimili wa X"
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "This case type failed to load"
-msgstr ""
+msgstr "Aina hii ya kesi imeshindwa kupakiwa"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1487,7 +1489,7 @@ msgstr "Jina la safu katika SQL"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
-msgstr ""
+msgstr "Ongeza sehemu, kwa mfano Maelezo ya ukaguzi"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} m²"
@@ -1511,7 +1513,8 @@ msgstr "Vikundi {numGroups}"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "A {conceptName} can include columns from different datasets. Choose "
 "which columns to add as fields."
-msgstr ""
+msgstr "{conceptName} inaweza kujumuisha safu kutoka kwenye seti tofauti za "
+"data. Chagua safu za kuongeza kama sehemu."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "Ask the dashboard's owner to share it with you."
@@ -1533,7 +1536,7 @@ msgstr "Haiwezi kusafirisha PDF"
 #. placeholder {0}: attribute.name
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Value to keep for {0}"
-msgstr ""
+msgstr "Thamani ya kuhifadhi kwa {0}"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent.tsx
 msgid "Sized by value"
@@ -1679,7 +1682,7 @@ msgstr "Kitambulisho cha nafasi ya kazi lazima kiwe na urefu wa chini ya herufi 
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
-msgstr ""
+msgstr "Imesasishwa kutoka Google Sheets"
 
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
@@ -1734,7 +1737,9 @@ msgstr "Safu zote"
 msgid "New connectors are being added every month. If there is a database or "
 "service you use that you need to connect to, <0>please let us know so we "
 "can prioritize it</0>."
-msgstr ""
+msgstr "Viunganishi vipya vinaongezwa kila mwezi. Ikiwa kuna hifadhidata au "
+"huduma unayotumia ambayo unahitaji kuunganisha, <0>tafadhali tujulishe "
+"ili tuweze kuipa kipaumbele</0>."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
@@ -1880,7 +1885,7 @@ msgstr "Onyesha maeneo kamili"
 
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "Could not load this cluster's features."
-msgstr ""
+msgstr "Imeshindwa kupakia vipengele vya kundi hili."
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
@@ -1909,7 +1914,7 @@ msgstr "Ukubwa wa karatasi"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Select a {conceptName}"
-msgstr ""
+msgstr "Chagua {conceptName}"
 
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
@@ -2047,7 +2052,7 @@ msgstr "Chagua Mpango"
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Delete case type"
-msgstr ""
+msgstr "Futa aina ya kesi"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2078,7 +2083,7 @@ msgstr "WMS"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "No attributes yet"
-msgstr ""
+msgstr "Bado hakuna sifa"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -2341,7 +2346,7 @@ msgstr "Seti za data za faragha"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create case type"
-msgstr ""
+msgstr "Unda aina ya kesi"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Publish it"
@@ -2423,7 +2428,7 @@ msgstr "Kamili"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
-msgstr ""
+msgstr "Tupa"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
@@ -2488,7 +2493,7 @@ msgstr "Chagua dataset iliyohifadhiwa au uagize data mpya kwenye eneo lako la "
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Cannot sync this case type"
-msgstr ""
+msgstr "Haiwezi kusawazisha aina hii ya kesi"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
@@ -2700,7 +2705,7 @@ msgstr "Kila mfululizo ni safu ya nambari iliyopangwa kwenye mhimili wa Y. "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Filled in by hand"
-msgstr ""
+msgstr "Imejazwa kwa mkono"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Some filters were removed"
@@ -2783,7 +2788,8 @@ msgstr ", na "
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
 "access may have been removed. Pick the sheet again to restore access."
-msgstr ""
+msgstr "Avandar haiwezi kufungua Google Sheet hii. Huenda imefutwa, au huenda "
+"ufikiaji wake umeondolewa. Chagua sheet tena ili kurejesha ufikiaji."
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -2899,7 +2905,7 @@ msgstr "Ghairi"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "No attributes or dataset are configured."
-msgstr ""
+msgstr "Hakuna sifa au seti ya data iliyosanidiwa."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -2926,7 +2932,7 @@ msgstr "Mapitio ya data"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
-msgstr ""
+msgstr "Muunganisho wako wa Google umeisha muda"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
@@ -2942,7 +2948,7 @@ msgstr "MapLibre, wachangiaji wa OpenStreetMap"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "No columns from this dataset."
-msgstr ""
+msgstr "Hakuna safu kutoka kwenye seti hii ya data."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -3044,7 +3050,8 @@ msgstr "Maandishi tupu"
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 msgid "Describe what you want to manage in plain language. Avandar builds it "
 "for you."
-msgstr ""
+msgstr "Eleza kwa lugha rahisi unachotaka kudhibiti. Avandar itakijenga kwa "
+"ajili yako."
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are outside the valid range."
@@ -3286,7 +3293,7 @@ msgstr "SQL haikutekelezwa. Kubali thamani za vichujio zilizokadiriwa ili "
 
 #: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
 msgid "Could not create those case types"
-msgstr ""
+msgstr "Imeshindwa kuunda aina hizo za kesi"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
@@ -3349,7 +3356,7 @@ msgstr "mfano. cholera-outbreak-2024"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Refresh from Google Sheets"
-msgstr ""
+msgstr "Onyesha upya kutoka Google Sheets"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
@@ -3358,7 +3365,7 @@ msgstr "Kukusanya {collectionNumber}"
 #. placeholder {0}: sourceGroups.length
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "{0} datasets joined"
-msgstr ""
+msgstr "Seti za data {0} zimeunganishwa"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Ownership reassigned."
@@ -3413,7 +3420,7 @@ msgstr "Hakuna dashibodi za kuonyesha"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "A type of record you manage"
-msgstr ""
+msgstr "Aina ya rekodi unayodhibiti"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3664,7 +3671,7 @@ msgstr "Kiolezo cha URL"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google is rate limiting this request"
-msgstr ""
+msgstr "Google inapunguza kasi ya maombi haya"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
@@ -3736,7 +3743,7 @@ msgstr "Uko bila mtandao"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
-msgstr ""
+msgstr "Rasimu ya aina ya kesi"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -3805,7 +3812,7 @@ msgstr "Bar"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "No {conceptName} records yet"
-msgstr ""
+msgstr "Bado hakuna rekodi za {conceptName}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -3996,7 +4003,7 @@ msgstr "Futa kumbukumbu"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is too large"
-msgstr ""
+msgstr "Google Sheet ni kubwa sana"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -4177,7 +4184,7 @@ msgstr "Tuma mwaliko"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "record"
-msgstr ""
+msgstr "rekodi"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
@@ -4267,7 +4274,7 @@ msgstr "Andika au bandika barua pepe hapa chini."
 
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "Zoom to cluster"
-msgstr ""
+msgstr "Kuza hadi kwenye kundi"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4466,7 +4473,7 @@ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
-msgstr ""
+msgstr "Tazama maelezo ya {0}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
@@ -4837,7 +4844,7 @@ msgstr "Sehemu {0} kati ya {1}, {value}"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
-msgstr ""
+msgstr "Tazama rekodi"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
@@ -4860,7 +4867,7 @@ msgstr "Jaribu tena"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field filled in by hand"
-msgstr ""
+msgstr "Ongeza sehemu inayojazwa kwa mkono"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
@@ -5211,7 +5218,7 @@ msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Sync records"
-msgstr ""
+msgstr "Sawazisha rekodi"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5319,7 +5326,7 @@ msgstr "Hakuna maeneo yaliyoongezwa"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
-msgstr ""
+msgstr "Chagua moja kwenye orodha ili kuona maelezo yake."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5430,7 +5437,7 @@ msgstr "Mviringo"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
-msgstr ""
+msgstr "Aina hii ya kesi inawakilisha nini?"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -5481,7 +5488,7 @@ msgstr "Unda akaunti mpya"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Reconnect your Google account and try again."
-msgstr ""
+msgstr "Unganisha tena akaunti yako ya Google kisha ujaribu tena."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
@@ -5501,7 +5508,7 @@ msgstr "Dataset imehifadhiwa kwa mafanikio!"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Attributes"
-msgstr ""
+msgstr "Sifa"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
 msgid "Cluster radius"
@@ -5519,11 +5526,11 @@ msgstr "Panua kikaguzi"
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/index.tsx
 msgid "Case Manager"
-msgstr ""
+msgstr "Msimamizi wa Kesi"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The tab has a header row"
-msgstr ""
+msgstr "Kichupo kina safu ya vichwa"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5551,7 +5558,7 @@ msgstr "Futa Dataset"
 #. placeholder {0}: draft.name
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Created {0}"
-msgstr ""
+msgstr "Imeundwa {0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5679,7 +5686,7 @@ msgstr "Puuza vichujio vyote vya kimataifa: uonyeshaji huu haujafichwa."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Google Sheet"
-msgstr ""
+msgstr "Google Sheet"
 
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
@@ -5708,7 +5715,7 @@ msgstr "Kunja paneli ya pembeni"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Add note"
-msgstr ""
+msgstr "Ongeza dokezo"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -5829,11 +5836,11 @@ msgstr "Matokeo yako kwenye turubai lililo upande wa kushoto."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
-msgstr ""
+msgstr "Jina la sehemu"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Most frequent"
-msgstr ""
+msgstr "Inayotokea mara nyingi zaidi"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5973,7 +5980,7 @@ msgstr "Export as PDF"
 
 #: src/views/IndividualManagerApp/EditCaseTypeButton.tsx
 msgid "Edit case type"
-msgstr ""
+msgstr "Hariri aina ya kesi"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
@@ -6047,7 +6054,7 @@ msgstr "Ongeza safu kama uwanja"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Case type name"
-msgstr ""
+msgstr "Jina la aina ya kesi"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.tsx
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
@@ -6090,7 +6097,7 @@ msgstr "Pakia"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove {datasetName}"
-msgstr ""
+msgstr "Ondoa {datasetName}"
 
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
@@ -6148,7 +6155,7 @@ msgstr "{code} - ukanda wa kaskazini wa UTM {0}"
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Finished syncing {0} records"
-msgstr ""
+msgstr "Imemaliza kusawazisha rekodi {0}"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -6252,7 +6259,8 @@ msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "The Google file picker could not be opened. Please try again."
-msgstr ""
+msgstr "Kiteuzi cha faili cha Google hakikuweza kufunguliwa. Tafadhali jaribu "
+"tena."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -6374,7 +6382,8 @@ msgstr "Unda eneo jipya la kazi. Unaweza kila wakati kulihariri baadaye."
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
-msgstr ""
+msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
+"litaendelea."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -6520,7 +6529,7 @@ msgstr "Ondoa kichujio cha safu"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Let people create cases by hand too"
-msgstr ""
+msgstr "Pia waruhusu watu kuunda kesi kwa mkono"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Could not reach the assistant. Kept the rule-based results."
@@ -6722,7 +6731,7 @@ msgstr "Malipo"
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "This dataset now reflects the current contents of the sheet."
-msgstr ""
+msgstr "Seti hii ya data sasa inaakisi maudhui ya sasa ya laha."
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6997,7 +7006,7 @@ msgstr "Chagua thamani ya kwanza tunayoona"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Smallest radius"
@@ -7010,7 +7019,7 @@ msgstr "Upatikanaji umekataliwa"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
-msgstr ""
+msgstr "ufunguo wa kuunganisha"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
@@ -7089,7 +7098,9 @@ msgstr "Mfano"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "I will propose case types from your dataset names and columns. Pick from "
 "the options or tell me what to create."
-msgstr ""
+msgstr "Nitapendekeza aina za kesi kulingana na majina ya seti zako za data na "
+"safu wima zake. Chagua mojawapo ya chaguo au niambie unachotaka "
+"kiundwe."
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
@@ -7102,7 +7113,7 @@ msgstr "Workspace hii haina usajili halali."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
-msgstr ""
+msgstr "Seti ya data"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -7196,7 +7207,7 @@ msgstr "Ondoa sharti"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
 msgid "Open case type"
-msgstr ""
+msgstr "Fungua aina ya kesi"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
@@ -7204,7 +7215,7 @@ msgstr "Asilimia"
 
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
 msgid "Each case type is a kind of record you manage."
-msgstr ""
+msgstr "Kila aina ya kesi ni aina ya rekodi unayosimamia."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "bar chart"
@@ -7249,7 +7260,7 @@ msgstr "Hatukuweza kuboresha usajili wako. Tafadhali wasiliana na "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "First"
-msgstr ""
+msgstr "Kwanza"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -7258,7 +7269,7 @@ msgstr "Ondoa"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "1 dataset"
-msgstr ""
+msgstr "Seti 1 ya data"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -7272,7 +7283,8 @@ msgstr "Huduma"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too large for the on-device model. Try a shorter "
 "question, or reconnect to use cloud chat."
-msgstr ""
+msgstr "Swali hili ni kubwa sana kwa modeli iliyo kwenye kifaa. Jaribu swali "
+"fupi zaidi, au unganisha tena ili kutumia gumzo la wingu."
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
@@ -7323,7 +7335,7 @@ msgstr "Google Sheets"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Name for {columnLabel}"
-msgstr ""
+msgstr "Jina la {columnLabel}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
@@ -7349,7 +7361,7 @@ msgstr "iliyoulizwa"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
-msgstr ""
+msgstr "Sehemu za {conceptName}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
@@ -7429,7 +7441,7 @@ msgstr "Maeneo {0} hayana data"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
-msgstr ""
+msgstr "Lazima"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
@@ -7555,7 +7567,7 @@ msgstr "Maandishi mbadala"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Please try again in a moment."
-msgstr ""
+msgstr "Tafadhali jaribu tena baada ya muda mfupi."
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -7638,7 +7650,7 @@ msgstr "Safu mlalo {0}, {1}"
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "{0} features"
-msgstr ""
+msgstr "Vipengele {0}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -7649,7 +7661,7 @@ msgstr "Mhariri"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Entered manually"
-msgstr ""
+msgstr "Imeingizwa mwenyewe"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -7760,7 +7772,7 @@ msgstr "Safu za seti za data"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
-msgstr ""
+msgstr "Maelezo"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
@@ -7774,7 +7786,7 @@ msgstr "Futa mwonekano {0}"
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
-msgstr ""
+msgstr "Vipengele katika kundi ({0})"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -7790,11 +7802,11 @@ msgstr "URL hii maalum tayari inatumika"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Drive access is not configured for this deployment."
-msgstr ""
+msgstr "Ufikiaji wa Google Drive haujasanidiwa kwa uwekaji huu."
 
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "Loading features"
-msgstr ""
+msgstr "Inapakia vipengele"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -7857,7 +7869,7 @@ msgstr "Usemi wa safu usio na jina katika SELECT; umerukwa."
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add field"
-msgstr ""
+msgstr "Ongeza sehemu"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
@@ -7924,7 +7936,9 @@ msgstr "Je, una uhakika unataka kufuta <0>{0}</0> milele? Hii haiwezi "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "For each dataset, pick the column that uniquely identifies a "
 "{conceptName}. We use those columns to merge rows into one record."
-msgstr ""
+msgstr "Kwa kila mkusanyiko wa data, chagua safu inayotambulisha kwa njia ya "
+"kipekee {conceptName}. Tunatumia safu hizo kuunganisha mistari kuwa "
+"rekodi moja."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
@@ -7943,7 +7957,7 @@ msgstr "Kile mtu huyu au kundi linaweza kufanya. Mtazamaji = kusoma tu, Mhariri 
 #. placeholder {0}: attribute.name
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "Include {0}"
-msgstr ""
+msgstr "Jumuisha {0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link label"
@@ -8087,7 +8101,8 @@ msgstr "nambari"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
-msgstr ""
+msgstr "Sawazisha aina hii ya kesi kutoka Case Manager ili kuunda rekodi kutoka "
+"kwenye data yako."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -8169,7 +8184,7 @@ msgstr "Safu wima ya 6"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "An unexpected error occurred."
-msgstr ""
+msgstr "Hitilafu isiyotarajiwa imetokea."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
@@ -8306,7 +8321,7 @@ msgstr "Wajumbe"
 
 #: src/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay.tsx
 msgid "Dock chat panel"
-msgstr ""
+msgstr "Bandika kidirisha cha mazungumzo"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
@@ -8375,7 +8390,7 @@ msgstr "Ondoa chujio cha ndani"
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Could not sync {0} records"
-msgstr ""
+msgstr "Imeshindwa kusawazisha rekodi {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "This removes the user group from members and resources that use it."
@@ -8665,7 +8680,7 @@ msgstr "Kushindwa kwa kawaida"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
 msgid "No fields yet"
-msgstr ""
+msgstr "Bado hakuna sehemu"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
@@ -8730,7 +8745,8 @@ msgstr "Andika kifungu cha uthibitisho"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
 "sheet and try again."
-msgstr ""
+msgstr "Google inaweza kuhamisha hadi MB 10 za lahajedwali kwa wakati mmoja. "
+"Gawanya laha kisha ujaribu tena."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
@@ -8750,7 +8766,7 @@ msgstr "Ocheri"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
-msgstr ""
+msgstr "Imeshindwa kuunda aina hiyo ya kesi"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -8791,7 +8807,7 @@ msgstr "Kikomo cha dataset kimefikiwa"
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Case type deleted"
-msgstr ""
+msgstr "Aina ya kesi imefutwa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Distinct values"
@@ -8868,7 +8884,7 @@ msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
-msgstr ""
+msgstr "Ondoa mkusanyiko huu wa data"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
@@ -8956,7 +8972,7 @@ msgstr "Inatumika kuingia kwenye akaunti yako."
 
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
 msgid "Could not zoom to this cluster."
-msgstr ""
+msgstr "Imeshindwa kukuza hadi kwenye kundi hili."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
@@ -9055,7 +9071,7 @@ msgstr "Au"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to results"
-msgstr ""
+msgstr "Rudi kwenye matokeo"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
@@ -9070,7 +9086,7 @@ msgstr "Ruka hadi mipangilio ya tabaka"
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "Are you sure you want to delete {0}? This cannot be undone."
-msgstr ""
+msgstr "Je, una uhakika unataka kufuta {0}? Kitendo hiki hakiwezi kutenduliwa."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"
