@@ -22,8 +22,7 @@ msgstr "刪除：{0}"
 msgid "Changes to your payment method can be made in your"
 msgstr "您可以在您的付款方式中進行更改"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "關閉聊天面板"
 
@@ -44,7 +43,7 @@ msgstr "返回線上以查看或使頁面可離線使用。"
 msgid "Create new entity"
 msgstr "建立新實體"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下載離線聊天模型，再詢問資料相關問題。"
@@ -189,7 +188,7 @@ msgstr "標題欄位為必填"
 msgid "Invite a member"
 msgstr "邀請一位成員"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Ask Avandar"
 msgstr "詢問 Avandar"
 
@@ -292,7 +291,7 @@ msgstr "來自 PDF"
 msgid "Upload Excel"
 msgstr "上傳 Excel"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "Go to a coordinate or P-code"
 msgstr "前往座標或 P-code"
 
@@ -341,7 +340,7 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 "actual values."
 msgstr "在 \"{sourceFileName}\" 中檢測到 {changedCount} 列的類型與匯入預覽不同，已被實際值覆蓋。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "幾何圖形"
 
@@ -385,6 +384,10 @@ msgstr "側邊欄版面配置"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete failed"
 msgstr "刪除失敗"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
+msgid "Dismiss"
+msgstr "關閉"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
@@ -470,7 +473,7 @@ msgstr "新增一個顯示 {datasetName} 隨時間變化的趨勢的折線圖"
 msgid "Show legend"
 msgstr "顯示圖例"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Pan and select"
 msgstr "平移並選取"
 
@@ -617,7 +620,7 @@ msgstr "數據集處理失敗"
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} 行被拒絕"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
 msgstr "回覆中…"
 
@@ -641,7 +644,7 @@ msgstr "尚未添加任何資料集"
 msgid "Layer name"
 msgstr "圖層名稱"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "修正查詢中…"
 
@@ -1088,7 +1091,7 @@ msgstr "目前縮放程度下要移除的細節像素數。設為零即可停用
 msgid "Copied"
 msgstr "已複製"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
 msgstr "測量距離和面積"
 
@@ -1118,7 +1121,7 @@ msgstr "您的問題包含可能會影響 AI 回答的語言。"
 msgid "Vertical padding"
 msgstr "垂直內距"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
 msgstr "無法連線至雲端助理。要使用您下載到裝置上的模型處理此訊息嗎？"
@@ -1208,9 +1211,14 @@ msgstr "已發布的版本仍會提供給先前的受眾。請使用下方按鈕
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} m²"
+msgstr "{areaValue} m²"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Confirm"
 msgstr "確認"
 
@@ -1233,6 +1241,10 @@ msgstr "請要求儀表板擁有者與您分享。"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "某些數據應來自現有數據集"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Start of time range: {startLabel}"
+msgstr "時間範圍開始：{startLabel}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -1432,7 +1444,7 @@ msgstr "此圖表的篩選器"
 msgid "Align"
 msgstr "對齊"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
 msgstr "圖層周圍的緩衝區"
 
@@ -1450,6 +1462,7 @@ msgstr "查詢失敗。"
 msgid "{code} - UTM south zone {0}"
 msgstr "{code} - UTM 南部區域 {0}"
 
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "按住 Alt 並按向上或向下箭頭鍵即可移動此圖層。"
@@ -1541,6 +1554,10 @@ msgstr "工作區 ID 至少必須有 {SLUG_MIN_LENGTH} 個字元"
 msgid "Built-in presets"
 msgstr "內建預設"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Select a data layer to buffer."
+msgstr "選取要建立緩衝區的資料圖層。"
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
@@ -1565,6 +1582,10 @@ msgstr "{app} 中的所有人都將失去存取權限。"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
 msgstr "選擇最適合您工作區的計劃。"
+
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Chat"
+msgstr "聊天"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
@@ -1595,7 +1616,7 @@ msgstr "小數"
 msgid "Group by"
 msgstr "按群組"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "Please select a file to import"
 msgstr "請選擇一個檔案以導入"
 
@@ -1610,6 +1631,10 @@ msgstr "間距"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "選擇數據來源"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Opacity"
+msgstr "不透明度"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -1908,6 +1933,11 @@ msgstr "1 個點"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "SELECT 中不支援彙總函式「{funcName}」；已略過。"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+msgid "Annotations"
+msgstr "註記"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
 msgstr "叢集和熱點需要完整的點產生繫結。"
@@ -1951,7 +1981,7 @@ msgstr "\"{sourceFileName}\" 處理完成，準備使用。"
 msgid "Manual"
 msgstr "手動"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
 msgstr "正在了解您的問題…"
 
@@ -1982,6 +2012,11 @@ msgstr "限制更新失敗"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
 msgstr "確切"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool is available when Spatial finishes loading."
+msgstr "Spatial 完成載入後即可使用此工具。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -2034,7 +2069,7 @@ msgstr "平移、縮放並點選圖徵以閱讀內容。若要編輯圖層，請
 msgid "Info"
 msgstr "資訊"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "正在撰寫查詢…"
 
@@ -2182,6 +2217,7 @@ msgstr "生成查詢以配置此可視化。"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Select a column"
 msgstr "選擇一個欄位"
@@ -2413,6 +2449,10 @@ msgstr "網格線顏色"
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre、OpenStreetMap 貢獻者"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Delete annotation"
+msgstr "刪除註記"
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
 msgstr "請在上方選擇圖表類型以進行設定。"
@@ -2471,6 +2511,10 @@ msgstr "您尚未選擇 X 軸"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "並且也等於..."
+
+#: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
+msgid "Apply area filter"
+msgstr "套用區域篩選條件"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
@@ -2672,7 +2716,7 @@ msgstr "第 11 欄"
 msgid "Column 7"
 msgstr "第 7 欄"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Feature"
 msgstr "圖徵"
 
@@ -2685,6 +2729,10 @@ msgstr "選擇要擁有此成員私人儀表板和資料集的人員。您將無
 msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
 msgstr "針對要列印的地圖保持開啟：否則讀者無法區分未回報資料的區域和回報為零的區域。"
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Bind geometry on the selected layer to buffer it."
+msgstr "繫結所選圖層中的幾何資料，以建立緩衝區。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2699,7 +2747,7 @@ msgstr "Microsoft 的精簡指令模型。具備穩固的結構和指令遵循�
 msgid "Edit"
 msgstr "編輯"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "尚未套用 SQL。請核准假設的篩選值，以執行此查詢。"
@@ -2775,10 +2823,6 @@ msgstr "衍生"
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 msgstr "{0} 列被檢測到。請檢查下面的列信息以確保它們正確。"
-
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
-msgid "This tool is not available."
-msgstr "此工具無法使用。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -3024,6 +3068,11 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "WHERE 子句對「{columnName}」使用「{operator}」，但右側為非字面值清單。"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Distance (meters)"
+msgstr "距離（公尺）"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "URL 範本"
@@ -3242,6 +3291,7 @@ msgstr "沒有可用的計劃。"
 msgid "Try a different lookup"
 msgstr "嘗試其他查詢"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr "外框寬度"
@@ -3352,6 +3402,10 @@ msgstr "隱藏 X 軸"
 msgid "Exact locations"
 msgstr "精確位置"
 
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+msgid "New chat"
+msgstr "新聊天"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "按名稱、組織、管道等搜索…"
@@ -3402,7 +3456,7 @@ msgstr "在範圍內位移"
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
 msgstr "未選擇任何檔案"
 
@@ -3411,6 +3465,11 @@ msgstr "未選擇任何檔案"
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs DuckDB Spatial, which is unavailable."
+msgstr "此工具需要 DuckDB Spatial，但目前無法使用。"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -3478,6 +3537,10 @@ msgstr "創建"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
 msgstr "筆畫寬度"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "End of time range: {endLabel}"
+msgstr "時間範圍結束：{endLabel}"
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3575,7 +3638,8 @@ msgstr "繼續進入您的工作區"
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
 msgstr "註記地圖"
 
@@ -3680,7 +3744,7 @@ msgstr "列印和 PDF 匯出功能將於後續版本推出。"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "計算 {datasetName} 中有多少行"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
 
@@ -3710,6 +3774,10 @@ msgstr "標籤，例如：區域"
 msgid "Select file"
 msgstr "選擇檔案"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} m"
+msgstr "{lengthValue} m"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
 msgstr "刪除此工作區"
@@ -3738,7 +3806,7 @@ msgstr "沒有可用的頻率數據。"
 msgid "We'll add this visualization to your new dashboard."
 msgstr "我們將把這個視覺化添加到您的新儀表板。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "正在修復查詢…"
 
@@ -3777,7 +3845,7 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何取得連結的人都能查看此{resource}。下方的人員和群組仍可控制誰能編輯。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
 msgstr "以下是根據您工作區中繼資料建立的查詢。"
 
@@ -3850,6 +3918,10 @@ msgstr "區域圖配置"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "表單不支援 CTE（WITH 子句）。"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} km²"
+msgstr "{areaValue} km²"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
@@ -3937,6 +4009,7 @@ msgstr "要變更自訂 URL 嗎？"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -4088,7 +4161,7 @@ msgstr "控制工作區其餘部分的預設設定。沒有應用程式存取權
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未套用 SQL。請登入以核准篩選值。"
 
@@ -4110,6 +4183,10 @@ msgstr "這將永久刪除 <0>{0}</0> 及其所有資料。此動作無法復原
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "無法開啟帳單入口網站。請稍後再試。"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
+msgid "Time column"
+msgstr "時間欄"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
@@ -4185,7 +4262,7 @@ msgstr " 尚未發布。"
 msgid "Cancel URL change"
 msgstr "取消網址變更"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 msgid "Draw an area to filter by"
 msgstr "繪製要篩選的區域"
 
@@ -4201,7 +4278,7 @@ msgstr "獲取數值總和"
 msgid "Type your answer..."
 msgstr "輸入您的答案..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns are available when Spatial finishes loading."
 msgstr "Spatial 完成載入後即可使用幾何欄位。"
 
@@ -4281,6 +4358,10 @@ msgstr "時間"
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
 msgstr "長條圖"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "That coordinate is out of range."
+msgstr "該座標超出範圍。"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureAction.tsx
 msgid "Open the record"
@@ -4467,7 +4548,7 @@ msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
 msgstr "您目前的方案只能分享或發布 {maxAllowed, plural, one {# 個儀表板} other {# 個儀表板}}。升級至 "
 "Starter 或 Impact 方案，即可隨意分享任意數量的儀表板。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
 msgstr "加入邊界"
 
@@ -4482,6 +4563,14 @@ msgstr "儀表板已成功刪除！"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "您希望其他團隊成員看到的名稱。"
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an arrow"
+msgstr "繪製箭頭"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "This tool arrives in a later release."
+msgstr "此工具將於後續版本推出。"
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -4566,6 +4655,10 @@ msgstr "叢集半徑"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "未找到已保存的資料集。"
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Expand the inspector"
+msgstr "展開檢查器"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -4689,6 +4782,11 @@ msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "我們檢測到潛在的個人信息和可能會影響 AI 回答的語言。請在下方查看兩者。"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
+"columns."
+msgstr "緩衝區需要包含已編譯幾何資料的圖層，不能使用緯度和經度欄。"
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
 msgstr "僅在此螢幕尺寸下檢視。"
@@ -4735,6 +4833,10 @@ msgstr "收合抽屜"
 msgid "Share failed"
 msgstr "分享失敗"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "Measure readout"
+msgstr "測量讀值"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
 msgstr "時間範圍"
@@ -4779,12 +4881,12 @@ msgstr "已對應 {mapped} / {total} 筆資料列"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "已根據欄名稱 {0} 和 {1} 比對緯度與經度。如果不正確，請在上方變更。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Chat request failed"
 msgstr "聊天請求失敗"
 
@@ -4834,6 +4936,10 @@ msgstr "所有成員的 "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The results are on the canvas to the left."
+msgstr "結果位於左側畫布上。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -4991,6 +5097,10 @@ msgstr "打開側邊欄"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
 msgstr "上傳數據集"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No matching P-code."
+msgstr "沒有相符的 P-code。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -5185,7 +5295,11 @@ msgstr "再次登入"
 msgid "Shared dashboard limit reached"
 msgstr "已達分享儀表板上限"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+msgid "Buffer of {sourceName}"
+msgstr "{sourceName} 的緩衝區"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
 msgstr "幾何欄位需要 DuckDB Spatial，但目前無法使用。"
 
@@ -5227,6 +5341,10 @@ msgstr "在此輸入您的段落…"
 msgid "Send message"
 msgstr "發送消息"
 
+#: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
+msgid "Clear area filter"
+msgstr "清除區域篩選條件"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
 msgstr "已複製！"
@@ -5260,9 +5378,17 @@ msgstr "顯示精確位置？"
 msgid "Expand the layer panel"
 msgstr "展開圖層面板"
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Place text"
+msgstr "放置文字"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "圖層"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Close a valid ring that does not cross itself."
+msgstr "閉合有效且不自我交叉的環。"
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
@@ -5396,10 +5522,6 @@ msgstr "您的名字"
 #: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
 msgid "Downloading {0} for offline chat"
 msgstr "正在下載 {0} 以進行離線聊天"
-
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-msgid "Open chat panel"
-msgstr "打開聊天面板"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
@@ -5542,6 +5664,10 @@ msgstr "資料處理失敗"
 #: src/utils/notifications/notifyNotImplemented.ts
 msgid "This feature is not implemented yet."
 msgstr "此功能尚未實現。"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Time range"
+msgstr "時間範圍"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
@@ -5689,7 +5815,7 @@ msgstr "查詢傳回欄位後，圖表設定才會顯示。"
 msgid "{0} areas are suppressed"
 msgstr "已隱藏 {0} 個區域"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
 msgstr "將點聚合至邊界"
 
@@ -5771,7 +5897,7 @@ msgstr "WHERE 子句包含表單不支援的「{nodeType}」節點。"
 msgid "Dashboard published!"
 msgstr "儀表板已發佈！"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
@@ -5861,6 +5987,10 @@ msgstr "限制應用訪問"
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "輸入數據集名稱"
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Select an annotation on the map to edit it."
+msgstr "在地圖上選取註記以進行編輯。"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
@@ -5957,6 +6087,10 @@ msgstr "簡化容差"
 msgid "... and {remainingCount} more"
 msgstr "... 和 {remainingCount} 個更多"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Collapse the inspector"
+msgstr "收合檢查器"
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "僅查詢的內容"
@@ -6032,6 +6166,10 @@ msgstr "沒有數值欄"
 msgid "Service"
 msgstr "服務"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} km"
+msgstr "{lengthValue} km"
+
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "沒有更多內容可加載"
@@ -6043,6 +6181,10 @@ msgstr "無法設為私人"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "重設應用程式"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Play"
+msgstr "播放"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6118,6 +6260,11 @@ msgstr "PDF 檔案"
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr "分享或發布此{resourceLabel}"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Dissolve"
+msgstr "融合"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6357,7 +6504,7 @@ msgstr "儲存中"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "地圖工具"
 
@@ -6394,6 +6541,10 @@ msgstr "靠左"
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "以上皆非"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "Isochrone from a point"
+msgstr "從點建立等時圈"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -6465,6 +6616,10 @@ msgstr "發布日期"
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "This map has no layers yet"
 msgstr "此地圖尚未有圖層"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No boundary layer on this map to look up a P-code."
+msgstr "此地圖上沒有可用來查詢 P-code 的邊界圖層。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
@@ -6561,7 +6716,7 @@ msgstr "沒有可用的欄位"
 msgid "Size by"
 msgstr "大小依據"
 
-#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+#: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "調整抽屜大小"
 
@@ -6580,6 +6735,10 @@ msgstr "H2"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
 msgstr "新增引文…"
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw freehand"
+msgstr "徒手繪製"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
@@ -6626,7 +6785,7 @@ msgstr "來源欄位"
 msgid "Number of columns"
 msgstr "欄位數量"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Latitude and longitude columns"
 msgstr "緯度與經度欄"
@@ -6695,7 +6854,7 @@ msgstr "1 個欄位"
 msgid "Language"
 msgstr "語言"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "關閉面板 (⌘/)"
 
@@ -6809,6 +6968,7 @@ msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
 msgstr "來源"
@@ -6899,7 +7059,7 @@ msgstr "正在將資料集同步至線上..."
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "添加一個系列以選擇哪個數字列驅動圖表。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "幾何欄"
@@ -6977,7 +7137,7 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
 msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據集和儀表板的訪問交集。"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "分箱至網格"
 
@@ -7067,7 +7227,7 @@ msgstr "細微"
 msgid "Activity"
 msgstr "活動"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "（訊息未傳送。）"
 
@@ -7409,6 +7569,10 @@ msgstr "角色與用戶群組"
 msgid "Clear all"
 msgstr "清除所有"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+msgid "Close"
+msgstr "關閉"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
@@ -7562,6 +7726,10 @@ msgstr "鬆散"
 msgid "Suppress areas below"
 msgstr "抑制低於以下值的區域"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Annotation text"
+msgstr "註記文字"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "ORDER BY 參照的欄位「{columnName}」不在 SELECT 清單中。"
@@ -7582,6 +7750,10 @@ msgstr "升級計劃至 {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an annotation area"
+msgstr "繪製註記區域"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

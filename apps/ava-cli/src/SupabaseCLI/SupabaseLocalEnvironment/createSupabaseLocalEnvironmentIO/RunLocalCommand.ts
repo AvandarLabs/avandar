@@ -14,6 +14,7 @@ async function _runCommand(
     command: string;
     args: readonly string[];
     cwd: string;
+    env?: Readonly<Record<string, string>>;
   }>,
 ): Promise<CommandResult> {
   try {
@@ -21,6 +22,10 @@ async function _runCommand(
       cwd: options.cwd,
       encoding: "utf8",
       maxBuffer: 10 * 1024 * 1024,
+      // Only set `env` when there is something to override: passing it always
+      // would replace the inherited environment with a copy, which is a
+      // different call than every existing caller makes.
+      ...(options.env ? { env: { ...process.env, ...options.env } } : {}),
     });
     return {
       ok: true,

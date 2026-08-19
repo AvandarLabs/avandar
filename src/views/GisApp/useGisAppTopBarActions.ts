@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 
 type GisAppBookmark = AvaMapConfig.T["bookmarks"][number];
 

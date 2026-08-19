@@ -56,6 +56,12 @@ export type FitBoundsRequest = {
 /** Camera flight duration when motion is not reduced, in milliseconds. */
 const FIT_BOUNDS_DURATION_MS = 800;
 
+/**
+ * Highest zoom an automatic camera fit may use. Past this, typical vector
+ * basemaps overzoom into a featureless background that looks like an error.
+ */
+const FIT_BOUNDS_MAX_ZOOM = 14;
+
 type LegacyFitBoundsRequestStore = {
   getServerSnapshot: () => FitBoundsRequest | undefined;
   getSnapshot: () => FitBoundsRequest | undefined;
@@ -212,6 +218,7 @@ export const FitMapBounds = {
                 padding: MapChromeInsets;
                 animate: boolean;
                 duration: number;
+                maxZoom: number;
               },
             ) => unknown;
           }
@@ -238,6 +245,7 @@ export const FitMapBounds = {
           padding: request.padding,
           animate: !prefersReducedMotion,
           duration: prefersReducedMotion ? 0 : FIT_BOUNDS_DURATION_MS,
+          maxZoom: FIT_BOUNDS_MAX_ZOOM,
         });
       },
       [mapRef, prefersReducedMotion, request],

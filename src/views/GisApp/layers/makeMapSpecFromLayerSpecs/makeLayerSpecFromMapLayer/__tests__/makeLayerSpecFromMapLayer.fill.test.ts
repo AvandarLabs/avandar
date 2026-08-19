@@ -59,6 +59,35 @@ describe("makeLayerSpecFromMapLayer fill and line paint", () => {
     });
   });
 
+  it("does not emit circle layers for aggregate-only fill with aoi filter", () => {
+    const layer = MapLayer.withSensitivity(MapLayer.createArea("Cases"), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "admin2",
+    });
+    const withAoiFilter = { ...layer, applyAoiFilter: true };
+    const spec = makeLayerSpecFromMapLayer({
+      layer: withAoiFilter,
+      featureCollection,
+      stats: { valueDomain: undefined },
+    });
+
+    expect(
+      spec.layers.some((layerSpec) => {
+        return (
+          layerSpec.type === "circle" ||
+          layerSpec.type === "symbol" ||
+          layerSpec.type === "heatmap"
+        );
+      }),
+    ).toBe(false);
+    expect(
+      spec.layers.map((layerSpec) => {
+        return layerSpec.type;
+      }),
+    ).toEqual(["fill", "line"]);
+  });
+
   it("paints graduated classes after suppressed and no-data states", () => {
     const base = MapLayer.createArea("Districts");
     const layer = {

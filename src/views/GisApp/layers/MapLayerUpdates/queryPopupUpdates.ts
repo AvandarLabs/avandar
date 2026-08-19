@@ -32,6 +32,7 @@ function withDataSource(
     layer.source.dataSource === dataSource &&
     layer.source.queryColumns.length === 0 &&
     layer.geoBinding === undefined &&
+    layer.timeColumn === undefined &&
     layer.popup.columnIds === "all" &&
     layer.popup.action === undefined;
   if (isUnchanged) {
@@ -41,6 +42,7 @@ function withDataSource(
     ...layer,
     source: { ...layer.source, dataSource, queryColumns: [] },
     geoBinding: undefined,
+    timeColumn: undefined,
     popup: { columnIds: "all", action: undefined },
   };
 }

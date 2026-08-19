@@ -13,7 +13,7 @@ import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
 
-vi.mock("@/views/GisApp/useGisApp", () => {
+vi.mock("@/views/GisApp/useGisApp/useGisApp", () => {
   return {
     useGisApp: () => {
       return {};

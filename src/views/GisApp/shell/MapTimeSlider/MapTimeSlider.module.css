@@ -1,0 +1,16 @@
+.mapTimeSlider {
+  align-items: center;
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-lg);
+  box-shadow: var(--mantine-shadow-md);
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  min-width: 240px;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  width: min(420px, 100%);
+}
+
+.mapTimeSliderTrack {
+  flex: 1;
+}

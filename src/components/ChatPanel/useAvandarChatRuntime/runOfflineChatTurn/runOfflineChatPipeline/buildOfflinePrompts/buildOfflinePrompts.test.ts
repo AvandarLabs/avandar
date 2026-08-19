@@ -60,6 +60,34 @@ describe("buildOfflineFixSqlPrompt", () => {
 });
 
 describe("buildOfflineAnalyzePrompt", () => {
+  it("does not lock the offline analyze prompt to a single app", () => {
+    const sharedArgs = {
+      schema: SCHEMA,
+      lastUserPrompt: "deaths",
+    } as const;
+
+    const dashboardsPrompt = buildOfflineAnalyzePrompt({
+      ...sharedArgs,
+      pageContext: ChatPageContext.createDashboardsViewContext({
+        dashboardId: "11111111-1111-4111-8111-111111111111",
+      }),
+    });
+
+    const dataExplorerPrompt = buildOfflineAnalyzePrompt({
+      ...sharedArgs,
+      pageContext: ChatPageContext.createDataExplorerViewContext({
+        openDatasetId: DEATHS_TABLE_ID,
+      }),
+    });
+
+    expect(dashboardsPrompt).toBe(dataExplorerPrompt);
+    expect(dashboardsPrompt).toContain("[View changed]");
+    expect(dashboardsPrompt.toLowerCase()).not.toContain("currently");
+    expect(dashboardsPrompt).not.toContain("editing a dashboard");
+    expect(dashboardsPrompt).not.toContain("Data Explorer");
+    expect(dashboardsPrompt).toContain("offline assistant");
+  });
+
   it("includes optional tableName in JSON shape", () => {
     const prompt = buildOfflineAnalyzePrompt({
       schema: SCHEMA,

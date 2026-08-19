@@ -1,0 +1,9 @@
+.annotationFeatureInspector {
+  padding: var(--mantine-spacing-sm);
+}
+
+.annotationFeatureInspector :global(input:focus-visible),
+.annotationFeatureInspector :global(button:focus-visible) {
+  outline: 2px solid var(--mantine-color-primary-6);
+  outline-offset: 2px;
+}

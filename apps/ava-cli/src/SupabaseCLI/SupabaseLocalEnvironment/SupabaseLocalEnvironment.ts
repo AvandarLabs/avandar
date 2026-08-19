@@ -9,6 +9,9 @@ import type {
   RestorePreparation,
   SupabaseBackupManifest,
   SupabaseLocalEnvironmentIO,
+  SupabaseLocalStatus,
+  SupabaseSeedOutcome,
+  SupabaseSwitchResult,
   SwitchPreparation,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
@@ -32,11 +35,11 @@ async function _rewriteDevelopmentEnvironments(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIO;
     envFiles: readonly string[];
-    statusJson: string;
+    status: SupabaseLocalStatus;
     devServerPort: number;
   }>,
 ): Promise<void> {
-  const status = SupabaseConfig.makeLocalStatusFromJson(options.statusJson);
+  const { status } = options;
   const [envPath, ...remainingEnvFiles] = options.envFiles;
   if (!envPath) {
     return;
@@ -131,7 +134,12 @@ async function _activateSwitch(
     preparation: SwitchPreparation;
     temporaryProjectId: string;
   }>,
-): Promise<{ basePort: number; devServerPort: number; projectId: string }> {
+): Promise<{
+  basePort: number;
+  devServerPort: number;
+  projectId: string;
+  status: SupabaseLocalStatus;
+}> {
   const { io, preparation, temporaryProjectId } = options;
   await io.writeTextFile({
     filePath: preparation.configPath,
@@ -147,10 +155,11 @@ async function _activateSwitch(
   });
   const statusResult = await io.runSupabase(["status", "-o", "json"]);
   _requireCommandSuccess({ result: statusResult, stage: "Supabase status" });
+  const status = SupabaseConfig.makeLocalStatusFromJson(statusResult.stdout);
   await _rewriteDevelopmentEnvironments({
     io,
     envFiles: preparation.envFiles,
-    statusJson: statusResult.stdout,
+    status,
     devServerPort: preparation.devServerPort,
   });
   await SupabaseBackupStore.writeManifest({
@@ -162,7 +171,50 @@ async function _activateSwitch(
     basePort: preparation.manifest.basePort,
     devServerPort: preparation.devServerPort,
     projectId: temporaryProjectId,
+    status,
   };
+}
+
+/**
+ * Seeds the stack a switch just activated.
+ *
+ * The connection comes from the `supabase status` the switch already read, not
+ * from the environment file it wrote, so the seed cannot reach a stale stack
+ * even if writing that file left it inconsistent. Migrations already ran inside
+ * `supabase start`, so only the repository's own seed data is missing.
+ *
+ * A failure returns rather than throws. The switch has completed by this point
+ * and the project is running; tearing it down over a seed the user can rerun
+ * would lose far more than it protects.
+ */
+async function _seedSwitchedProject(
+  options: Readonly<{
+    io: SupabaseLocalEnvironmentIO;
+    status: SupabaseLocalStatus;
+    skipSeed: boolean;
+  }>,
+): Promise<SupabaseSeedOutcome> {
+  if (options.skipSeed) {
+    return { state: "skipped" };
+  }
+  try {
+    const result = await options.io.runSeed({
+      supabaseUrl: options.status.apiUrl,
+      serviceRoleKey: options.status.secretKey,
+    });
+    if (result.ok) {
+      return { state: "seeded" };
+    }
+    return {
+      state: "failed",
+      message: result.stderr || result.stdout || "unknown error",
+    };
+  } catch (error) {
+    return {
+      state: "failed",
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 async function _switch(
@@ -170,23 +222,35 @@ async function _switch(
     io: SupabaseLocalEnvironmentIO;
     temporaryProjectId: string;
     requestedBasePort?: number;
+    skipSeed?: boolean;
   }>,
-): Promise<{ basePort: number; devServerPort: number; projectId: string }> {
+): Promise<SupabaseSwitchResult> {
   const preparation = await SupabaseSwitchPreparation.prepareSwitch(options);
-  try {
-    return await _activateSwitch({
+  const activation = await (async () => {
+    try {
+      return await _activateSwitch({
+        io: options.io,
+        preparation,
+        temporaryProjectId: options.temporaryProjectId,
+      });
+    } catch (error) {
+      return await _rollbackSwitch({
+        io: options.io,
+        backupDirectory: preparation.backupDirectory,
+        manifest: preparation.manifest,
+        switchError: error,
+      });
+    }
+  })();
+  const { status, ...switchResult } = activation;
+  return {
+    ...switchResult,
+    seed: await _seedSwitchedProject({
       io: options.io,
-      preparation,
-      temporaryProjectId: options.temporaryProjectId,
-    });
-  } catch (error) {
-    return await _rollbackSwitch({
-      io: options.io,
-      backupDirectory: preparation.backupDirectory,
-      manifest: preparation.manifest,
-      switchError: error,
-    });
-  }
+      status,
+      skipSeed: options.skipSeed ?? false,
+    }),
+  };
 }
 
 async function _removeRestoredBackup(
@@ -264,7 +328,10 @@ async function _restore(
 
 /** Manages branch-isolated local Supabase configuration and resources. */
 export const SupabaseLocalEnvironment = {
-  /** Starts an isolated local Supabase project for the current branch. */
+  /**
+   * Starts an isolated local Supabase project for the current branch and
+   * seeds it, unless `skipSeed` is set.
+   */
   switch: _switch,
 
   /** Stops the current branch's temporary project and restores local files. */

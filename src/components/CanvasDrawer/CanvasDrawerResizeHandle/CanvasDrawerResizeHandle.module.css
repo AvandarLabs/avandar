@@ -1,0 +1,35 @@
+/*
+ * Sits over the top border so the whole hairline is grabbable. The visible
+ * pill only appears on hover or keyboard focus, so the resting state stays a
+ * plain edge rather than yet another piece of chrome.
+ */
+.canvasDrawerResizeHandle {
+  cursor: ns-resize;
+  flex: 0 0 auto;
+  height: 7px;
+  margin-top: -4px;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+  z-index: 1;
+}
+
+.canvasDrawerResizeHandle::after {
+  background: var(--mantine-color-neutral-4);
+  border-radius: 2px;
+  content: "";
+  height: 3px;
+  left: 50%;
+  opacity: 0;
+  position: absolute;
+  top: 2px;
+  transform: translateX(-50%);
+  transition: opacity var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+  width: 48px;
+}
+
+.canvasDrawerResizeHandle:hover::after,
+.canvasDrawerResizeHandle:focus-visible::after {
+  opacity: 1;
+}

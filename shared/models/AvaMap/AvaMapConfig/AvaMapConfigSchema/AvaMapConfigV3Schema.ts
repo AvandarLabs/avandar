@@ -56,7 +56,8 @@ export const V3GeoBindingSchema = z.discriminatedUnion("type", [
 const V3PolygonGeometryBindingSchema = V3GeometryColumnBindingSchema.extend({
   family: z.literal("polygon"),
 }).strict();
-const V3AreaGeoBindingSchema = z.discriminatedUnion("type", [
+/** Version 3 area geo binding, including optional source CRS and grid bins. */
+export const V3AreaGeoBindingSchema = z.discriminatedUnion("type", [
   V3PolygonGeometryBindingSchema,
   BoundaryJoinBindingSchema,
   V3PointAggregationBindingSchema,

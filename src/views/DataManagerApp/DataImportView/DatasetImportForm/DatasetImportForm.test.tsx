@@ -193,6 +193,7 @@ describe("DatasetImportForm", () => {
       numRowsToSkip: 1,
       delimiter: ",",
     });
+    expect(saveDatasetMock).not.toHaveBeenCalled();
   });
 
   it("renders CSV parse controls and updates metadata", () => {

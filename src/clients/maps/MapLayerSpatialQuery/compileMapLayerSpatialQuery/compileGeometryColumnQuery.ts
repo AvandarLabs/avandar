@@ -1,5 +1,9 @@
 import { isDefined, prop } from "@avandar/utils";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
+import {
+  makeOutputAoiPredicateSql,
+  makeSourceAoiPredicateSql,
+} from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
 import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql/makeSourceCrsTransformFromGeometrySql";
 import {
@@ -11,12 +15,14 @@ import {
   GEOMETRY_COLUMN,
 } from "./compileMapLayerSpatialQuery.constants";
 import {
+  getAppliedAoiFromCompileOptions,
   makeFamilyExpressionFromGeometrySql,
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
 } from "./compileMapLayerSpatialQueryHelpers";
 import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
 import type { CompileSourceOptions } from "./compileMapLayerSpatialQuery.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type GeometryColumnBinding = Extract<
@@ -148,12 +154,22 @@ function _buildGeometryColumnParser(options: {
   });
 }
 
+function _buildParsedRowsCte(options: {
+  parser: string;
+  geometry: string;
+}): string {
+  return `parsed_rows AS (
+  SELECT source_rows.*, ${options.parser} AS ${options.geometry} FROM source_rows
+)`;
+}
+
 function _buildGeometryColumnSql(options: {
   sourceSql: string;
   parser: string;
   familyLiteral: string;
   properties: readonly string[];
   denominatorColumnName: string | undefined;
+  aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
   const family = quoteSqlIdentifier(FAMILY_COLUMN);
@@ -161,10 +177,19 @@ function _buildGeometryColumnSql(options: {
     columnNames: options.properties,
     denominatorColumnName: options.denominatorColumnName,
   });
+  const sourceAoiWhere =
+    options.aoi ?
+      `\n    AND ${makeSourceAoiPredicateSql(geometry, options.aoi)}`
+    : "";
+  const outputAoiWhere =
+    options.aoi ?
+      `\n    AND ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
+    : "";
   return `WITH source_rows AS (${options.sourceSql}),
-parsed_rows AS (
-  SELECT source_rows.*, ${options.parser} AS ${geometry} FROM source_rows
-),
+${_buildParsedRowsCte({
+  parser: options.parser,
+  geometry,
+})},
 typed_rows AS (
   SELECT parsed_rows.*, ${makeFamilyExpressionFromGeometrySql(geometry)} AS ${family} FROM parsed_rows
 ),
@@ -174,7 +199,7 @@ feature_rows AS (
     'properties', ${propertiesSql}) AS feature
   FROM typed_rows
   WHERE ${family} = ${quoteSqlLiteral(options.familyLiteral)}
-    AND (SELECT has_mixed_families FROM diagnostic_summary) = false
+    AND (SELECT has_mixed_families FROM diagnostic_summary) = false${sourceAoiWhere}${outputAoiWhere}
 )
 ${_buildFinalSelect()}`;
 }
@@ -208,6 +233,7 @@ export function compileGeometryColumnQuery(
       familyLiteral: binding.family,
       properties,
       denominatorColumnName,
+      aoi: getAppliedAoiFromCompileOptions(options),
     }),
     family: binding.family,
     sourcePropertyColumnNames: properties,

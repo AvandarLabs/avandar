@@ -1,6 +1,10 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { UtmEpsg } from "@/views/GisApp/layers/UtmEpsg/UtmEpsg";
+import {
+  makeOutputAoiPredicateSql,
+  makeSourceAoiPredicateSql,
+} from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { makeGridCellExpressionsFromGrid } from "../makeGridCellExpressionsFromGrid/makeGridCellExpressionsFromGrid";
+import { makeMetersCrsSql } from "../makeMetersCrsSql";
 import {
   MapLayerSpatialFeatureProperties,
   MapLayerSpatialQueryColumns,
@@ -11,6 +15,7 @@ import {
   GRID_CELL_SIMPLIFICATION,
 } from "./compileMapLayerSpatialQuery.constants";
 import {
+  getAppliedAoiFromCompileOptions,
   makeFamilyExpressionFromGeometrySql,
   makePointAggregateValueSql,
   makePointExpressionFromBinding,
@@ -23,21 +28,8 @@ import type {
   CompileOptions,
   CompileSourceOptions,
 } from "./compileMapLayerSpatialQuery.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
-/**
- * Derives the analysis CRS for a grid from the point set's centroid.
- *
- * `sizeMeters` cannot be applied in EPSG:4326, and Web Mercator meters shrink
- * toward the poles, so cells there would not share one ground size. The CASE
- * mirrors `UtmEpsg.fromLongitudeLatitude`, whose constants it reuses.
- */
-function _buildMetersCrsExpression(): string {
-  const zone =
-    "least(60, greatest(1, CAST(floor((centroid_longitude + 180) / 6) AS BIGINT) + 1))";
-  const epsg = `CASE WHEN centroid_latitude >= 84 THEN ${UtmEpsg.polar.north} WHEN centroid_latitude <= -80 THEN ${UtmEpsg.polar.south} WHEN centroid_latitude >= 0 THEN ${UtmEpsg.base.north} + ${zone} ELSE ${UtmEpsg.base.south} + ${zone} END`;
-  return `concat('EPSG:', CAST(${epsg} AS BIGINT))`;
-}
 
 function _buildGridDenominatorSelect(
   metadata: CompileOptions["metadata"],
@@ -58,8 +50,11 @@ function _buildGridPointCtes(options: {
   sourceSql: string;
   pointParser: string;
   family: string;
+  aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
-  const { sourceSql, pointParser, family } = options;
+  const { sourceSql, pointParser, family, aoi } = options;
+  const sourceAoiWhere =
+    aoi ? ` AND ${makeSourceAoiPredicateSql("point_geometry", aoi)}` : "";
   return `source_rows AS (${sourceSql}),
 parsed_points AS (
   SELECT source_rows.*, ${pointParser} AS point_geometry FROM source_rows
@@ -70,13 +65,13 @@ typed_points AS (
 ),
 point_rows AS (
   SELECT * FROM typed_points
-  WHERE point_geometry IS NOT NULL AND ${family} = 'point'
+  WHERE point_geometry IS NOT NULL AND ${family} = 'point'${sourceAoiWhere}
 )`;
 }
 
 function _buildGridProjectionCtes(): string {
   return `grid_crs AS (
-  SELECT ${_buildMetersCrsExpression()} AS meters_crs
+  SELECT ${makeMetersCrsSql()} AS meters_crs
   FROM (
     SELECT avg(ST_X(point_geometry)) AS centroid_longitude,
       avg(ST_Y(point_geometry)) AS centroid_latitude
@@ -134,6 +129,7 @@ function _buildGridCellCtes(
       metadata: options.metadata,
     }),
     family,
+    aoi: getAppliedAoiFromCompileOptions(options),
   })},
 ${_buildGridProjectionCtes()},
 ${_buildGridBinningCtes({
@@ -182,8 +178,13 @@ function _buildClassifiedCellsCte(options: {
 function _buildGridFeatureRowsCte(options: {
   hasDenominator: boolean;
   denominatorAlias: string;
+  aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
+  const outputAoiWhere =
+    options.aoi ?
+      `\n  WHERE ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
+    : "";
   return `feature_rows AS (
   SELECT ${makeSuppressedAreaFeatureSql({
     geometrySql: geometry,
@@ -192,7 +193,7 @@ function _buildGridFeatureRowsCte(options: {
     denominatorSql: options.hasDenominator ? options.denominatorAlias : "NULL",
     contributorCountSql: "contributor_count",
   })} AS feature
-  FROM classified_cells
+  FROM classified_cells${outputAoiWhere}
 )`;
 }
 
@@ -239,7 +240,11 @@ function _buildGridBinOutput(options: Readonly<CompileOptions>): string {
     hasDenominator,
     denominatorAlias,
   })},
-${_buildGridFeatureRowsCte({ hasDenominator, denominatorAlias })},
+${_buildGridFeatureRowsCte({
+  hasDenominator,
+  denominatorAlias,
+  aoi: getAppliedAoiFromCompileOptions(options),
+})},
 ${_buildGridDiagnosticSummaryCte()}
 ${_buildGridBinSelect()}`;
 }

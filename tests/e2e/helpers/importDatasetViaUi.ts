@@ -5,6 +5,7 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./manualUploadCloudSyncFlow";
+import { MEDIUM_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /** Imports one CSV through the product UI and returns its saved dataset id. */
@@ -24,14 +25,17 @@ export async function importDatasetViaUi(
   await uploadPanel
     .locator('input[type="file"]')
     .setInputFiles(options.filePath);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
   const rowCount = formatNumber(options.expectedRowCount, { locale: "en-US" });
+  const parsedRowCount = page.getByText(new RegExp(`of ${rowCount}\\. Page`));
+  const uploadButton = uploadPanel.getByRole("button", {
+    name: "Upload",
+    exact: true,
+  });
+  if (!(await parsedRowCount.isVisible()) && (await uploadButton.isEnabled())) {
+    await uploadButton.click();
+  }
   await expect(page.getByRole("alert", { name: "Data Preview" })).toBeVisible();
-  await expect(
-    page.getByText(new RegExp(`of ${rowCount}\\. Page`)),
-  ).toBeVisible();
+  await expect(parsedRowCount).toBeVisible({ timeout: MEDIUM_WAIT });
   await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
   const datasetId = parseDatasetIdFromDataManagerUrl({
     url: page.url(),

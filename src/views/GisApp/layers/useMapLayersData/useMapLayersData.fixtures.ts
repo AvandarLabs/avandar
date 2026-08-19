@@ -4,6 +4,8 @@ import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { createElement } from "react";
+import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { User } from "$/models/User/User";
@@ -14,6 +16,26 @@ import type { ReactElement, ReactNode } from "react";
 /**
  * Layer, dataset, and QueryClient fixtures for `useMapLayersData` tests.
  */
+
+/** Map overlay with no AOI or time range applied. */
+export const EMPTY_MAP_OVERLAY: MapOverlay = {
+  aoi: undefined,
+  timeRange: undefined,
+};
+
+/** Unit square used as an AOI overlay in query-key tests. */
+export const UNIT_SQUARE: AvaMapConfig.AoiPolygon = {
+  type: "Polygon",
+  coordinates: [
+    [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+      [0, 0],
+    ],
+  ],
+};
 
 /**
  * An honest `DatasetColumn`, built through `Model.make` with no cast.

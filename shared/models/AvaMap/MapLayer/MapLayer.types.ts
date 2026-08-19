@@ -58,6 +58,12 @@ type MapLayerCommon = {
 
   popup: PopupConfig;
   legend: LegendConfig;
+
+  /** Query column used to filter features by time, when set. */
+  timeColumn: QueryColumn.Id | undefined;
+
+  /** Whether features outside the map's AOI are excluded. */
+  applyAoiFilter: boolean;
 };
 
 type LayerProtectionAndRendering =

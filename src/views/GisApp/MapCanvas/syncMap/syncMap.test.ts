@@ -313,4 +313,30 @@ describe("syncMap", () => {
     });
     expect(map.on).not.toHaveBeenCalled();
   });
+
+  it("raises chrome overlays after the spec, preview line last", () => {
+    const map = createFakeMap();
+    map.addLayer({ id: "ava-map-aoi-outline-line", type: "line" });
+    map.addLayer({ id: "ava-map-measure-fill", type: "fill" });
+    map.addLayer({ id: "ava-map-measure-line", type: "line" });
+    map.addLayer({ id: "ava-map-annotation-preview-line", type: "line" });
+    map.calls.length = 0;
+
+    syncMap({
+      map: asMapLibreMap(map),
+      previousSpec: emptySpec,
+      nextSpec: createSpec(["a"]),
+    });
+
+    expect(
+      map.calls.filter((call) => {
+        return call.startsWith("moveLayer:");
+      }),
+    ).toEqual([
+      "moveLayer:ava-map-aoi-outline-line",
+      "moveLayer:ava-map-measure-fill",
+      "moveLayer:ava-map-measure-line",
+      "moveLayer:ava-map-annotation-preview-line",
+    ]);
+  });
 });

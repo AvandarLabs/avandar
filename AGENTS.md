@@ -132,6 +132,10 @@ Implement functionality using red/green TDD.
   by lowercasing it, replacing each run of characters outside `a-z`, `0-9`, and
   `_` with `-`, collapsing repeated hyphens, and trimming leading and trailing
   hyphens. For example, `feat/analytics-p2` becomes `feat-analytics-p2`.
+- A switch seeds the new instance once it is up, so the branch starts with the
+  usual seed users and workspace. Pass `--no-seed` to leave it empty. A failed
+  seed leaves the switch in place and prints the `pnpm db:seed` retry, since
+  the instance itself is running and correct.
 - A switch also moves this worktree's Vite dev-server port, pinning
   `AVA_VITE_DEV_PORT` in `.env.development` and repointing `VITE_APP_URL` at it
   so `pnpm dev` can run here and in another worktree at the same time. A

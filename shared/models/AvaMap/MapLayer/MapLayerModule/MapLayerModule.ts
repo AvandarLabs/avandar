@@ -45,6 +45,9 @@ const DEFAULT_HEATMAP_RADIUS_PX = 30;
 /** Fallback grid-cell size, in meters. */
 const DEFAULT_GRID_SIZE_METERS = 10_000;
 
+/** Fallback buffer distance, in meters. */
+const DEFAULT_BUFFER_DISTANCE_METERS = 1000;
+
 /** Fallback sequential heatmap color ramp. */
 const DEFAULT_HEATMAP_RAMP = [
   "#ffd4af",
@@ -75,6 +78,7 @@ function _isAreaGeoBinding(
     binding?.type === "joinToBoundaries" ||
     binding?.type === "aggregatePointsToBoundaries" ||
     binding?.type === "binPointsToGrid" ||
+    binding?.type === "bufferOfLayer" ||
     (binding?.type === "geometryColumn" && binding.family === "polygon")
   );
 }
@@ -102,6 +106,9 @@ export const MapLayerModule = {
   /** Fallback grid-cell size, in meters. */
   defaultGridSizeMeters: DEFAULT_GRID_SIZE_METERS,
 
+  /** Fallback buffer distance, in meters. */
+  defaultBufferDistanceMeters: DEFAULT_BUFFER_DISTANCE_METERS,
+
   /** Fallback sequential heatmap color ramp. */
   defaultHeatmapRamp: DEFAULT_HEATMAP_RAMP,
 
@@ -125,6 +132,8 @@ export const MapLayerModule = {
         stroke: { width: 1, color: "#ffffff" },
       },
       sensitivity: { mode: "exact" },
+      timeColumn: undefined,
+      applyAoiFilter: true,
       popup: { columnIds: "all", action: undefined },
       legend: {
         title: name,

@@ -51,6 +51,7 @@ afterEach(async () => {
     await rm(directoryPath, { recursive: true, force: true });
   });
   commandMocks.execFile.mockReset();
+  vi.unstubAllEnvs();
 });
 
 function _setCommandFailure(
@@ -146,6 +147,35 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
         encoding: "utf8",
         maxBuffer: 10 * 1024 * 1024,
       },
+      expect.any(Function),
+    );
+  });
+
+  it("overrides the inherited connection when seeding", async () => {
+    _setCommandSuccess([{ stderr: "", stdout: "seeded" }]);
+    const projectRoot = path.resolve(process.cwd());
+    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    // The pre-switch connection `ava` loaded at startup, which the seed must
+    // not inherit.
+    vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "stale-key");
+
+    await expect(
+      io.runSeed({
+        supabaseUrl: "http://127.0.0.1:55321",
+        serviceRoleKey: "fresh-key",
+      }),
+    ).resolves.toEqual({ ok: true, stdout: "seeded", stderr: "" });
+    expect(commandMocks.execFile).toHaveBeenCalledWith(
+      "pnpm",
+      ["vite-script", "scripts/seedDatabaseScript.ts"],
+      expect.objectContaining({
+        cwd: projectRoot,
+        env: expect.objectContaining({
+          SUPABASE_URL: "http://127.0.0.1:55321",
+          SUPABASE_SERVICE_ROLE_KEY: "fresh-key",
+        }),
+      }),
       expect.any(Function),
     );
   });

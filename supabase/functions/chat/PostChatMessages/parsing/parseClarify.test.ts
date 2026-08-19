@@ -1,4 +1,7 @@
-import { parseClarify } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
+import {
+  countClarificationsInHistory,
+  parseClarify,
+} from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { describe, expect, it } from "vitest";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
@@ -79,5 +82,19 @@ describe("parseClarify", () => {
     expect(
       parseClarify(JSON.stringify(DISCOVERY_CLARIFICATION_ARGUMENTS), 0),
     ).toEqual(EXPECTED_DISCOVERY_REQUEST);
+  });
+
+  it("does not count view-change lines as clarification answers", () => {
+    // View-change lines lack the `[Clarification answer:` marker.
+    expect(
+      countClarificationsInHistory([
+        {
+          role: "user",
+          content:
+            "[View changed: app=data-explorer; route=/x; dataset=none; dashboard=none]",
+        },
+        { role: "user", content: "count rows" },
+      ]),
+    ).toBe(0);
   });
 });

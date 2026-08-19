@@ -117,12 +117,7 @@ export function buildOfflineAnalyzePrompt(args: {
   pageContext: ChatPageContext.T;
   lastUserPrompt: string;
 }): string {
-  const surface =
-    args.pageContext.app === "dashboards" ?
-      "The user is editing a dashboard and may want chart SQL. Non-SQL blocks are not available offline."
-    : "The user is in the Data Explorer asking about their data.";
-
-  return `You are Avandar's offline assistant. ${surface}
+  return `You are Avandar's offline assistant. [View changed] client messages in the thread tell you the active app, route, open dataset, and dashboard. SQL generation tools are available.
 
 ${formatSchema(args.schema)}
 

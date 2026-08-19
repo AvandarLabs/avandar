@@ -1,5 +1,5 @@
 import { MapFirstRunCard } from "@/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard";
-import type { GisAppState } from "@/views/GisApp/useGisApp";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { GisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
 import type { ReactNode } from "react";
 

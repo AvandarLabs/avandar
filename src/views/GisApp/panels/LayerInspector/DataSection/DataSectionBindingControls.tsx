@@ -1,4 +1,6 @@
+import { match } from "ts-pattern";
 import { BoundaryJoinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinControls";
+import { BufferOfLayerFields } from "@/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields";
 import { CoordinateBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingControls";
 import { GeometryColumnControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryColumnControls";
 import { GridBinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls";
@@ -13,6 +15,7 @@ type Props = {
   layer: MapLayer.T;
   sourceColumns: readonly QueryColumn.T[];
   boundaryOptions: readonly BoundarySourceOption[];
+  sourceName?: string;
   onLayerChange: LayerChangeHandler;
 };
 
@@ -21,42 +24,59 @@ export function DataSectionBindingControls({
   layer,
   sourceColumns,
   boundaryOptions,
+  sourceName = "",
   onLayerChange,
 }: Props): ReactNode {
-  if (layer.geoBinding?.type === "geometryColumn") {
-    return (
-      <GeometryColumnControls layer={layer} onLayerChange={onLayerChange} />
-    );
-  }
-  if (layer.geoBinding?.type === "joinToBoundaries") {
-    return (
-      <BoundaryJoinControls
-        layer={layer}
-        options={boundaryOptions}
-        onLayerChange={onLayerChange}
-      />
-    );
-  }
-  if (layer.geoBinding?.type === "aggregatePointsToBoundaries") {
-    return (
-      <PointAggregationControls
-        layer={layer}
-        options={boundaryOptions}
-        sourceColumns={sourceColumns}
-        onLayerChange={onLayerChange}
-      />
-    );
-  }
-  if (layer.geoBinding?.type === "binPointsToGrid") {
-    return (
-      <GridBinControls
-        layer={layer}
-        sourceColumns={sourceColumns}
-        onLayerChange={onLayerChange}
-      />
-    );
-  }
-  return (
-    <CoordinateBindingControls layer={layer} onLayerChange={onLayerChange} />
-  );
+  return match(layer.geoBinding)
+    .with({ type: "bufferOfLayer" }, () => {
+      return (
+        <BufferOfLayerFields
+          layer={layer}
+          sourceName={sourceName}
+          onLayerChange={onLayerChange}
+        />
+      );
+    })
+    .with({ type: "geometryColumn" }, () => {
+      return (
+        <GeometryColumnControls layer={layer} onLayerChange={onLayerChange} />
+      );
+    })
+    .with({ type: "joinToBoundaries" }, () => {
+      return (
+        <BoundaryJoinControls
+          layer={layer}
+          options={boundaryOptions}
+          onLayerChange={onLayerChange}
+        />
+      );
+    })
+    .with({ type: "aggregatePointsToBoundaries" }, () => {
+      return (
+        <PointAggregationControls
+          layer={layer}
+          options={boundaryOptions}
+          sourceColumns={sourceColumns}
+          onLayerChange={onLayerChange}
+        />
+      );
+    })
+    .with({ type: "binPointsToGrid" }, () => {
+      return (
+        <GridBinControls
+          layer={layer}
+          sourceColumns={sourceColumns}
+          onLayerChange={onLayerChange}
+        />
+      );
+    })
+    .with({ type: "latLngColumns" }, undefined, () => {
+      return (
+        <CoordinateBindingControls
+          layer={layer}
+          onLayerChange={onLayerChange}
+        />
+      );
+    })
+    .exhaustive();
 }

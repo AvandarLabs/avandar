@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_WAVE_B_GEOMETRY_CSV_PATH,
-  GIS_WAVE_B_GEOMETRY_ROW_COUNT,
+  GIS_GEOMETRY_FORMATS_CSV_PATH,
+  GIS_GEOMETRY_FORMATS_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -15,7 +15,7 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Locator, Page } from "@playwright/test";
 
-const DATASET_NAME = "gis-wave-b-geometry.csv";
+const DATASET_NAME = "geometry-formats.csv";
 const MAP_NAME = "E2E GIS geometry columns";
 
 /** Selects one Mantine option by its visible label. */
@@ -56,8 +56,8 @@ test("renders WKT, hexadecimal WKB, and GeoJSON geometry columns", async ({
     datasetId = await importDatasetViaUi({
       page,
       workspaceSlug,
-      filePath: GIS_WAVE_B_GEOMETRY_CSV_PATH,
-      expectedRowCount: GIS_WAVE_B_GEOMETRY_ROW_COUNT,
+      filePath: GIS_GEOMETRY_FORMATS_CSV_PATH,
+      expectedRowCount: GIS_GEOMETRY_FORMATS_ROW_COUNT,
     });
     await page.getByRole("link", { name: "Maps" }).click();
     await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
