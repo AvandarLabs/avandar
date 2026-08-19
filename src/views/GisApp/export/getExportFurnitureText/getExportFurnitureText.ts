@@ -22,7 +22,7 @@ function _topVisibleLayer(
  */
 function _visibleDataSourceNames(layers: readonly MapLayer.T[]): string[] {
   return layers
-.filter(prop("isVisible"))
+    .filter(prop("isVisible"))
     .map((layer) => {
       return layer.source.dataSource?.name;
     })
@@ -66,8 +66,7 @@ export function getExportFurnitureText(
 
   const subtitle =
     !exportLayout.subtitle.isVisible ? undefined
-    : exportLayout.subtitle.text !== "" ?
-      exportLayout.subtitle.text
+    : exportLayout.subtitle.text !== "" ? exportLayout.subtitle.text
     : _topVisibleLayer(config.layers)?.legend.title;
 
   const sourceLine =

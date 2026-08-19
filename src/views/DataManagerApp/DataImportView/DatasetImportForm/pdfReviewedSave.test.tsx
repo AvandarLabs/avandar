@@ -4,14 +4,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
-import { PdfParseControls } from "./PdfParseControls";
+import { PdfParseControls } from "./PdfParseControls/PdfParseControls";
 import { useSaveDataset } from "./useSaveDataset/useSaveDataset";
 import type { PdfFileLoadResult } from "../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   DataSourceMetadata,
   PdfDataSourceMetadata,
 } from "./DatasetImportForm.types";
-import type { ExtractedTable, PdfRegion } from "@/workers/pdfSniff/types";
+import type {
+  ExtractedTable,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -163,7 +166,7 @@ const MERGED_TABLE: ExtractedTable = {
 };
 
 vi.mock(
-  "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker",
+  "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker",
   () => {
     return {
       PdfRegionPicker: function PdfRegionPickerMock(props: {

@@ -16,7 +16,7 @@ export type PdfOutputMode = "natural" | "observations";
 
 /*
  * The region types below live here, rather than beside the extraction code in
- * `src/workers/pdfSniff/types.ts`, for two reasons:
+ * `src/workers/pdfSniff/pdfSniff.types.ts`, for two reasons:
  *
  * 1. They are the persisted contract. They describe exactly what is stored in
  *    the `datasets__pdf_file.regions` jsonb column, so they belong next to
@@ -26,10 +26,10 @@ export type PdfOutputMode = "natural" | "observations";
  *    `deno check shared`, and the Deno import map (`/deno.json`) maps `$/` to
  *    `shared/` but has no `@/` entry at all, so nothing here can import from
  *    `src/`. Defining them in `src/` and importing them back would not
- *    type-check, and would also be a cycle: `pdfSniff/types.ts` already
+ *    type-check, and would also be a cycle: `pdfSniff/pdfSniff.types.ts` already
  *    imports `PdfDetectionMode` from this file.
  *
- * `src/workers/pdfSniff/types.ts` re-exports these, so worker-side code can
+ * `src/workers/pdfSniff/pdfSniff.types.ts` re-exports these, so worker-side code can
  * keep importing them from there. Please do not move them back.
  */
 

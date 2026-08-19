@@ -8,7 +8,10 @@ import {
   useLoadManualUploadFile,
 } from "./useLoadManualUploadFile";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DocumentMetadata, PdfRegion } from "@/workers/pdfSniff/types";
+import type {
+  DocumentMetadata,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
 import type { UnknownObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";

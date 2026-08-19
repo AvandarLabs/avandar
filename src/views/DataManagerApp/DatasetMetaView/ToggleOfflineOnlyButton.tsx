@@ -7,7 +7,7 @@ import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
-import { deleteRetainedOriginalFromCloud } from "@/clients/storage/DatasetOriginalFileStorageClient/deleteRetainedOriginalFromCloud";
+import { deleteRetainedOriginalFromCloud } from "@/clients/storage/DatasetOriginalFileStorageClient/deleteRetainedOriginalFromCloud/deleteRetainedOriginalFromCloud";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";

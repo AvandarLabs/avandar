@@ -1,5 +1,5 @@
 import {
-  getOriginalFileExtension,
+  getOriginalFileExtensionFromSourceType,
   requiresOriginalFileRetention,
 } from "$/models/datasets/DatasetSource/DatasetSource";
 import { createServerApiClient } from "$/ServerApiClient";
@@ -220,11 +220,12 @@ function _makeFullDelete(
         await DatasetOriginalFileStorageClient.deleteOriginalFile({
           workspaceId: dataset.workspaceId,
           datasetId: params.id,
-          fileExtension: getOriginalFileExtension(dataset.sourceType),
+          fileExtension: getOriginalFileExtensionFromSourceType(
+            dataset.sourceType,
+          ),
         }).catch((error: unknown) => {
           logger.error(
-            "Failed to delete the dataset's retained original file; " +
-              "leaving the object storage blob in place",
+            "Failed to delete the dataset's retained original file; leaving the object storage blob in place",
             { datasetId: params.id, error },
           );
         });

@@ -1,16 +1,16 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { classifyRegion } from "./classifyRegion";
-import { clipToRegion } from "./clipToRegion";
-import { combineRegions } from "./combineRegions";
-import { extractDocumentMetadata } from "./extractDocumentMetadata";
-import { extractLabelledGraphic } from "./extractors/extractLabelledGraphic";
-import { extractProseMeasures } from "./extractors/extractProseMeasures";
-import { extractRepeatingBlocks } from "./extractors/extractRepeatingBlocks";
-import { extractPageGeometry } from "./extractPageGeometry";
-import { loadPdfDocument } from "./loadPdfJs";
-import type { BBox, ExtractedTable, PageGeometry } from "./types";
+import { classifyRegion } from "./classifyRegion/classifyRegion";
+import { clipToRegion } from "./clipToRegion/clipToRegion";
+import { combineRegions } from "./combineRegions/combineRegions";
+import { extractDocumentMetadata } from "./extractDocumentMetadata/extractDocumentMetadata";
+import { extractLabelledGraphic } from "./extractors/extractLabelledGraphic/extractLabelledGraphic";
+import { extractProseMeasures } from "./extractors/extractProseMeasures/extractProseMeasures";
+import { extractRepeatingBlocks } from "./extractors/extractRepeatingBlocks/extractRepeatingBlocks";
+import { extractPageGeometry } from "./extractPageGeometry/extractPageGeometry";
+import { loadPdfDocument } from "./loadPdfDocument/loadPdfDocument";
+import type { BBox, ExtractedTable, PageGeometry } from "./pdfSniff.types";
 
 /*
  * The executable merge gate.
@@ -75,7 +75,10 @@ async function pageOf(path: string, pageNumber: number): Promise<PageGeometry> {
   const bytes = await readFile(path);
   const doc = await loadPdfDocument(new Uint8Array(bytes));
   const page = await doc.getPage(pageNumber);
-  const geometry = await extractPageGeometry(page, pageNumber - 1);
+  const geometry = await extractPageGeometry({
+    page: page,
+    pageIndex: pageNumber - 1,
+  });
   await doc.destroy();
   return geometry;
 }
@@ -260,7 +263,10 @@ const OCHA_MAP_DEATHS: Readonly<Record<string, string>> = {
 
 describe("gate document: OCHA Sudan Cholera Operational Update", () => {
   it("reads 16 state death counts from the map", async () => {
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
     const table = extractLabelledGraphic(region, { regionId: "map" });
     const rows = dataRows(table);
 
@@ -287,7 +293,10 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // Exact equality, not containment. A near-tie on a choropleth resolves
     // silently, so the only assertion worth making is that all 16 landed on
     // the state they are printed inside.
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
     const table = extractLabelledGraphic(region, { regionId: "map" });
     const valued = Object.fromEntries(
       Object.entries(byLabel(table)).filter(([, value]) => {
@@ -299,7 +308,10 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
   });
 
   it("reads the headline state figures exactly", async () => {
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
     const table = extractLabelledGraphic(region, { regionId: "map" });
     const labels = byLabel(table);
 
@@ -315,7 +327,10 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // `extractLabelledGraphic` is not what runs otherwise: a region the
     // classifier calls a grid table is read by `extractGridTable`, which
     // returns no rows at all for a choropleth.
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
 
     expect(classifyRegion(region).shape).toBe("labelled_graphic");
   });
@@ -325,14 +340,20 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // tuning without letting the flag rate quietly become meaningless.
     // Currently 6: four near-tie pairings (Sennar, White Nile, East Darfur,
     // River Nile) plus the two states with no figure.
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
     const table = extractLabelledGraphic(region, { regionId: "map" });
 
     expect(flaggedRowIndices(table).size).toBeLessThanOrEqual(6);
   });
 
   it("reads the three KPI tiles", async () => {
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_TILES);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_TILES,
+    });
     const table = extractLabelledGraphic(region, { regionId: "tiles" });
 
     expect(dataRows(table)).toHaveLength(3);
@@ -384,7 +405,10 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // The values are the document's, scaled: $3M is 3000000, not 3. A count
     // of 6 rows reached by dropping the suffix would report WASH at 3, which
     // is wrong by a factor of a million and would look right.
-    const region = clipToRegion(await pageOf(OCHA, 3), OCHA_BARS);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 3),
+      bbox: OCHA_BARS,
+    });
     const table = extractLabelledGraphic(region, { regionId: "bars" });
 
     expect(dataRows(table)).toHaveLength(6);
@@ -419,15 +443,15 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     const page2 = await pageOf(OCHA, 2);
     const page3 = await pageOf(OCHA, 3);
     const left = extractRepeatingBlocks(
-      clipToRegion(page2, OCHA_PILLARS_PAGE2_LEFT),
+      clipToRegion({ page: page2, bbox: OCHA_PILLARS_PAGE2_LEFT }),
       { regionId: "pillars-2l" },
     );
     const right = extractRepeatingBlocks(
-      clipToRegion(page2, OCHA_PILLARS_PAGE2_RIGHT),
+      clipToRegion({ page: page2, bbox: OCHA_PILLARS_PAGE2_RIGHT }),
       { regionId: "pillars-2r" },
     );
     const sixth = extractRepeatingBlocks(
-      clipToRegion(page3, OCHA_PILLARS_PAGE3_LEFT),
+      clipToRegion({ page: page3, bbox: OCHA_PILLARS_PAGE3_LEFT }),
       { regionId: "pillars-3l" },
     );
 
@@ -499,7 +523,10 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // than something that quietly half-works: the chart has axis ticks and
     // week numbers but no data labels, so any weekly figure here would be an
     // interpolated guess at a bar's height.
-    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_TREND);
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_TREND,
+    });
     const table = extractLabelledGraphic(region, { regionId: "trend" });
     const rows = dataRows(table);
 
@@ -567,7 +594,7 @@ const IMC_RESPONSE: BBox = [30, 44, 580, 220];
 describe("gate document: IMC Sudan Cholera SitRep #1 (committed geometry)", () => {
   it("reads the June case and death figures", async () => {
     const { page1 } = await committedImcGeometry();
-    const region = clipToRegion(page1, IMC_PROSE);
+    const region = clipToRegion({ page: page1, bbox: IMC_PROSE });
     const table = extractProseMeasures(region, { regionId: "prose" });
     const flat = JSON.stringify(table.cells);
 
@@ -579,7 +606,7 @@ describe("gate document: IMC Sudan Cholera SitRep #1 (committed geometry)", () =
     // "and one death in West Darfur" is the specific construction that
     // defeats a digits-only extractor, and it is why this document is a gate.
     const { page1 } = await committedImcGeometry();
-    const region = clipToRegion(page1, IMC_PROSE);
+    const region = clipToRegion({ page: page1, bbox: IMC_PROSE });
     const table = extractProseMeasures(region, { regionId: "prose" });
 
     expect(
@@ -596,7 +623,7 @@ describe("gate document: IMC Sudan Cholera SitRep #1 (committed geometry)", () =
     // `extractMeasurements` resolves a subject per comma fragment rather than
     // per sentence.
     const { page1 } = await committedImcGeometry();
-    const region = clipToRegion(page1, IMC_PROSE);
+    const region = clipToRegion({ page: page1, bbox: IMC_PROSE });
     const table = extractProseMeasures(region, { regionId: "prose" });
     const subjectOf = (value: string) => {
       return dataRows(table).find((row) => {
@@ -622,7 +649,7 @@ describe("gate document: IMC Sudan Cholera SitRep #1 (committed geometry)", () =
 
   it("reads the Ombada Hospital CTC figures", async () => {
     const { page1 } = await committedImcGeometry();
-    const region = clipToRegion(page1, IMC_RESPONSE);
+    const region = clipToRegion({ page: page1, bbox: IMC_RESPONSE });
     const table = extractProseMeasures(region, { regionId: "response" });
     const admitted = dataRows(table).find((row) => {
       return row[1] === "patients";
@@ -665,7 +692,7 @@ describe.skipIf(!IMC_PDF_PRESENT)(
 
     it("reads the same figures straight from the PDF", async () => {
       const table = extractProseMeasures(
-        clipToRegion(await pageOf(IMC, 1), IMC_PROSE),
+        clipToRegion({ page: await pageOf(IMC, 1), bbox: IMC_PROSE }),
         { regionId: "prose" },
       );
       const flat = JSON.stringify(table.cells);

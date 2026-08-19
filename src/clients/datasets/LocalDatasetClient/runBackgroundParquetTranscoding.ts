@@ -108,7 +108,7 @@ async function _reconcileColumns(params: {
  * bytes we're supposed to protect. For an unpinned row `sourceBytes` was
  * only ever a resume cache, so it's cleared now that the parquet has landed.
  */
-export function buildTranscodeCompletionUpdate(params: {
+export function makeTranscodeCompletionUpdateFromParquet(params: {
   parquetData: Blob;
   isSourcePinned: boolean | undefined;
 }): Partial<LocalDataset> {
@@ -180,7 +180,7 @@ export async function runBackgroundParquetTranscoding(params: {
     const currentRow = await AvaDexie.DB.LocalDataset.get(datasetId);
     await AvaDexie.DB.LocalDataset.update(
       datasetId,
-      buildTranscodeCompletionUpdate({
+      makeTranscodeCompletionUpdateFromParquet({
         parquetData: result.parquetData,
         isSourcePinned: currentRow?.isSourcePinned,
       }),

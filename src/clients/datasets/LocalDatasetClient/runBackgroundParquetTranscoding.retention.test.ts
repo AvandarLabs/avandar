@@ -1,6 +1,6 @@
 import "fake-indexeddb/auto";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import { buildTranscodeCompletionUpdate } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
+import { makeTranscodeCompletionUpdateFromParquet } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
@@ -24,10 +24,10 @@ afterAll(async () => {
   await db.delete();
 });
 
-describe("buildTranscodeCompletionUpdate", () => {
+describe("makeTranscodeCompletionUpdateFromParquet", () => {
   it("clears sourceBytes for an unpinned row", () => {
     const parquetData = new Blob(["parquet"]);
-    const update = buildTranscodeCompletionUpdate({
+    const update = makeTranscodeCompletionUpdateFromParquet({
       parquetData,
       isSourcePinned: false,
     });
@@ -42,7 +42,7 @@ describe("buildTranscodeCompletionUpdate", () => {
 
   it("omits the sourceBytes key entirely for a pinned row", () => {
     const parquetData = new Blob(["parquet"]);
-    const update = buildTranscodeCompletionUpdate({
+    const update = makeTranscodeCompletionUpdateFromParquet({
       parquetData,
       isSourcePinned: true,
     });
@@ -85,7 +85,7 @@ describe("buildTranscodeCompletionUpdate", () => {
     });
 
     const parquetData = new Blob(["parquet-bytes"]);
-    const update = buildTranscodeCompletionUpdate({
+    const update = makeTranscodeCompletionUpdateFromParquet({
       parquetData,
       isSourcePinned: true,
     });

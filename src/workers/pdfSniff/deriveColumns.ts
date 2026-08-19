@@ -1,4 +1,4 @@
-import type { TextLine } from "./types";
+import type { TextLine } from "./pdfSniff.types";
 
 /** Left edges within this many points belong to the same column. */
 export const COLUMN_TOLERANCE = 6;

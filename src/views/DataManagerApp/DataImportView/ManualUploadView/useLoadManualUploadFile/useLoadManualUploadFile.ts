@@ -7,8 +7,8 @@ import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
 import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
-import { pdfTableToCsv } from "@/clients/datasets/pdfTableToColumns";
 import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import {
   DuckDbColumnSchema,
@@ -27,13 +27,13 @@ import {
   PdfParseOptions,
   XlsxParseOptions,
 } from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
 import type {
   DocumentMetadata,
   ExtractedTable,
   PageGeometry,
   PdfRegion,
-} from "@/workers/pdfSniff/types";
+} from "@/workers/pdfSniff/pdfSniff.types";
 
 type FileLoadOptions = {
   file: File;
@@ -386,7 +386,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           // Reuse the CSV import path wholesale: the extracted table is now
           // just a CSV, so DuckDB's sniffer types it exactly as it would a
           // real one. The PDF stays pinned as the retained original.
-          const csv = pdfTableToCsv({
+          const csv = makeCsvFromPdfTable({
             cells: extracted.combined.cells,
             headerRows: extracted.combined.headerRows,
           });

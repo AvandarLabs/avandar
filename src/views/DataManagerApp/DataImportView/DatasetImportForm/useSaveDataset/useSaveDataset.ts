@@ -8,8 +8,8 @@ import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { computePdfTableFingerprint } from "@/clients/datasets/pdfTableFingerprint";
-import { pdfTableToCsv } from "@/clients/datasets/pdfTableToColumns";
+import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
+import { makePdfTableFingerprintFromTable } from "@/clients/datasets/pdfTableFingerprint/pdfTableFingerprint";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -17,13 +17,13 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
-import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded";
+import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
 import type {
   DatasetImportFormValues,
   DataSourceMetadata,
 } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { PdfRegion } from "@/workers/pdfSniff/types";
+import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -263,7 +263,7 @@ async function _savePdfDataset(
   // This runs once, on save, rather than on every edit: typing each
   // keystroke through DuckDB would be wasteful and would make the grid feel
   // broken.
-  const reviewedCsv = pdfTableToCsv({
+  const reviewedCsv = makeCsvFromPdfTable({
     cells: datasetLoadResult.combinedCells,
     headerRows: datasetLoadResult.combinedHeaderRows,
   });
@@ -301,7 +301,7 @@ async function _savePdfDataset(
       parseOptions.pageRange ? parseOptions.pageRange[1] - 1 : undefined,
     // Fingerprinted from the combination rather than any single region,
     // because the combination is what the dataset's rows actually are.
-    fingerprint: await computePdfTableFingerprint({
+    fingerprint: await makePdfTableFingerprintFromTable({
       cells: datasetLoadResult.combinedCells,
       headerRows: datasetLoadResult.combinedHeaderRows,
     }),

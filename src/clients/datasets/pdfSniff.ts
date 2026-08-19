@@ -1,16 +1,16 @@
 // eslint-disable-next-line import-x/extensions
-import PdfSniffWorker from "@/workers/pdfSniff.worker.ts?worker";
+import PdfSniffWorker from "@/workers/pdfSniff.worker/pdfSniff.worker.ts?worker";
 import type {
   PdfExtractResult,
   PdfSniffError,
   PdfSniffProgress,
   PdfSniffResult,
-} from "@/workers/pdfSniff.worker";
+} from "@/workers/pdfSniff.worker/pdfSniff.worker";
 import type {
   DocumentMetadata,
   PageGeometry,
   PdfRegion,
-} from "@/workers/pdfSniff/types";
+} from "@/workers/pdfSniff/pdfSniff.types";
 
 /**
  * Thrown when the worker rejects a document for a specific, explainable
@@ -38,7 +38,7 @@ type PdfSniffResponse =
 /**
  * Whether a message on the worker port is one of ours.
  *
- * The port is shared. `loadPdfJs.ts` imports `pdf.worker.mjs` inside the
+ * The port is shared. `loadPdfDocument.ts` imports `pdf.worker.mjs` inside the
  * sniff worker, which makes pdf.js install its own handler on the same
  * global scope and post its internal protocol traffic (starting with
  * `{ action: "ready" }`) back to this listener. Those messages are not

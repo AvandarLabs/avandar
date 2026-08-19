@@ -2,7 +2,7 @@ import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { getDatasetOriginalFileStoragePath } from "@/clients/storage/DatasetOriginalFileStorageClient/utils";
+import { makeDatasetOriginalFileStoragePathFromIds } from "@/clients/storage/DatasetOriginalFileStorageClient/makeDatasetOriginalFileStoragePathFromIds/makeDatasetOriginalFileStoragePathFromIds";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
   WORKSPACES_BUCKET_NAME,
@@ -117,7 +117,7 @@ async function _oneShotOriginalFileUpload(options: {
  * @param options.file The original file to upload.
  * @param options.fileExtension The extension to store the original under,
  * with or without a leading dot. Comes from
- * `getOriginalFileExtension(sourceType)`, never from the file name: the
+ * `getOriginalFileExtensionFromSourceType(sourceType)`, never from the file name: the
  * storage path is addressed by source type, so deriving it from the file name
  * here would let a file called `contract.pdf.bak` upload to `.bak` while
  * `downloadOriginalFile` / `deleteOriginalFile` look for `.pdf`.
@@ -130,7 +130,7 @@ async function uploadOriginalFile(options: {
 }): Promise<void> {
   const { workspaceId, datasetId, file, fileExtension } = options;
 
-  const objectPath = getDatasetOriginalFileStoragePath({
+  const objectPath = makeDatasetOriginalFileStoragePathFromIds({
     workspaceId,
     datasetId,
     fileExtension,
@@ -170,7 +170,7 @@ async function downloadOriginalFile(options: {
 }): Promise<Blob | undefined> {
   const { workspaceId, datasetId, fileExtension } = options;
 
-  const objectPath = getDatasetOriginalFileStoragePath({
+  const objectPath = makeDatasetOriginalFileStoragePathFromIds({
     workspaceId,
     datasetId,
     fileExtension,
@@ -204,7 +204,7 @@ async function deleteOriginalFile(options: {
 }): Promise<void> {
   const { workspaceId, datasetId, fileExtension } = options;
 
-  const objectPath = getDatasetOriginalFileStoragePath({
+  const objectPath = makeDatasetOriginalFileStoragePathFromIds({
     workspaceId,
     datasetId,
     fileExtension,

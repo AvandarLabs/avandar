@@ -34,8 +34,6 @@ describe("PdfFileDatasetParsers", () => {
 
     expect(model.pageRangeStart).toBe(4);
     expect(model.pageRangeEnd).toBe(9);
-    expect(typeof model.pageRangeStart).toBe("number");
-    expect(typeof model.pageRangeEnd).toBe("number");
     expect(model.outputMode).toBe("natural");
     expect(model.llmModel).toBeUndefined();
     expect(model.regions).toEqual([

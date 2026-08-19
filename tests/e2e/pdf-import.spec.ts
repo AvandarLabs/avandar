@@ -256,10 +256,6 @@ test.describe("PDF manual upload", () => {
     page,
     e2eWorkerDb,
   }) => {
-    // Three pages of geometry are sniffed once on upload and again on each
-    // region change, and the save transcodes the reviewed rows through DuckDB.
-    test.slow();
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug } = e2eWorkerDb;
 
@@ -390,12 +386,16 @@ test.describe("PDF manual upload", () => {
     if (!datasetId) {
       throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
     }
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
 
+    let workspaceId:
+      | Awaited<ReturnType<typeof getWorkspaceIdBySlug>>
+      | undefined;
     try {
+      workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+
       const { data: savedDataset, error: datasetError } = await admin
         .from("datasets")
         .select("id, name, source_type")
@@ -465,13 +465,15 @@ test.describe("PDF manual upload", () => {
 
       expect(pageErrors).toEqual([]);
     } finally {
-      await deleteDatasetViaDataManagerUiAndVerify({
-        admin,
-        datasetId,
-        page,
-        workspaceId,
-        workspaceSlug,
-      });
+      if (workspaceId !== undefined) {
+        await deleteDatasetViaDataManagerUiAndVerify({
+          admin,
+          datasetId,
+          page,
+          workspaceId,
+          workspaceSlug,
+        });
+      }
     }
   });
 });

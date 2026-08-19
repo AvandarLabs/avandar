@@ -7,8 +7,8 @@ import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/cre
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/getDatasetSourceTypeFromSourceFileType/getDatasetSourceTypeFromSourceFileType";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
-import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/localDatasetSourceFileType";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
@@ -24,7 +24,7 @@ import type {
   LocalDatasetSourceFileType,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
-import type { PdfSniffResult } from "@/workers/pdfSniff.worker";
+import type { PdfSniffResult } from "@/workers/pdfSniff.worker/pdfSniff.worker";
 import type { ILogger } from "@avandar/logger";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
@@ -391,7 +391,7 @@ function _makeStartPdfImport(
  * the retained original. The row already exists from `startPdfImport`, and
  * `runBackgroundParquetTranscoding` only ever `update`s it, so the pinned
  * bytes survive both the transcode and the post-transcode clear (which
- * `buildTranscodeCompletionUpdate` skips for pinned rows).
+ * `makeTranscodeCompletionUpdateFromParquet` skips for pinned rows).
  */
 function _makeTranscodePdfExtraction(
   context: Readonly<LocalDatasetMutationContext>,
