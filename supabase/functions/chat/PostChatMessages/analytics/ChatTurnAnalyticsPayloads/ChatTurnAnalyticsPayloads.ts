@@ -22,6 +22,7 @@ function _classifyOutcome(parsed: ParsedAttempt): ChatTurnOutcome {
     parsed.generatedSql ? "sql"
     : parsed.clarification ? "clarification"
     : parsed.dashboardBlock ? "dashboard_block"
+    : parsed.createdCaseTypes && parsed.createdCaseTypes.length > 0 ? "text"
     : parsed.text ? "text"
     : "empty"
   );

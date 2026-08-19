@@ -14,4 +14,17 @@ describe("makeChatPageContextFromPathname", () => {
       }).app,
     ).toBe("data-sources");
   });
+
+  it("classifies ontology-designer routes as case-manager", () => {
+    expect(
+      makeChatPageContextFromPathname({
+        pathname: "/acme/ontology-designer",
+      }).app,
+    ).toBe("case-manager");
+    expect(
+      makeChatPageContextFromPathname({
+        pathname: "/acme/ontology-designer/concept-creator",
+      }).app,
+    ).toBe("case-manager");
+  });
 });

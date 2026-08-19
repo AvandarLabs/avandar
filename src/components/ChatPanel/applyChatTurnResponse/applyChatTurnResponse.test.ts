@@ -9,7 +9,9 @@ const SQL_RESULTS_ON_CANVAS = "The results are on the canvas to the left.";
 function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
   return {
     queueDashboardBlock: vi.fn(),
+    applyCreatedCaseTypes: vi.fn(),
     setPendingClarification: vi.fn(),
+    setPendingCaseTypeDraft: vi.fn(),
     recordClarificationShown: vi.fn().mockResolvedValue("audit-id"),
   };
 }
@@ -185,6 +187,83 @@ describe("applyChatTurnResponse", () => {
     expect(result.content).toEqual([
       { type: "text", text: SQL_RESULTS_ON_CANVAS },
     ]);
+  });
+
+  it("persists chat-created case types", async () => {
+    const handlers = _createHandlers();
+    const createdCaseTypes = [
+      {
+        name: "COVID case",
+        allowManualCreation: false,
+        identities: [
+          {
+            datasetId: "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff",
+            primaryKeyColumnId: "1f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff",
+          },
+        ],
+        attributes: [{ name: "Notes", kind: "manual_entry" as const }],
+      },
+    ];
+    const response = Model.make("ChatResponse", {
+      assistantText: "Created COVID case.",
+      createdCaseTypes,
+    });
+
+    await _applyChatTurnResponse({
+      response,
+      sqlApplied: false,
+      handlers,
+    });
+
+    expect(handlers.applyCreatedCaseTypes).toHaveBeenCalledWith(
+      createdCaseTypes,
+    );
+  });
+
+  it("hands a proposed case type to the draft card instead of persisting it", async () => {
+    const handlers = _createHandlers();
+    const proposedCaseType = {
+      name: "COVID death record",
+      allowManualCreation: false,
+      sourceDatasets: [
+        {
+          datasetId: "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff",
+          primaryKeyColumnId: "1f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff",
+        },
+      ],
+      attributes: [],
+      manualEntryAttributes: [],
+    };
+    const response = Model.make("ChatResponse", {
+      assistantText: "Here is a draft.",
+      proposedCaseType,
+    });
+
+    await _applyChatTurnResponse({
+      response,
+      sqlApplied: false,
+      handlers,
+    });
+
+    expect(handlers.setPendingCaseTypeDraft).toHaveBeenCalledWith(
+      proposedCaseType,
+    );
+    expect(handlers.applyCreatedCaseTypes).not.toHaveBeenCalled();
+  });
+
+  it("leaves an existing draft alone on a turn that proposes nothing", async () => {
+    const handlers = _createHandlers();
+    const response = Model.make("ChatResponse", {
+      assistantText: "Sure, what else would you like to change?",
+    });
+
+    await _applyChatTurnResponse({
+      response,
+      sqlApplied: false,
+      handlers,
+    });
+
+    expect(handlers.setPendingCaseTypeDraft).not.toHaveBeenCalled();
   });
 
   it("keeps prose and drops fenced SQL from the assistant text", async () => {

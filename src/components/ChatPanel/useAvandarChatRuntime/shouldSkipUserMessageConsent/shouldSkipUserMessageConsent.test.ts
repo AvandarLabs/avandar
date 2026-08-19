@@ -16,6 +16,7 @@ describe("shouldSkipUserMessageConsent", () => {
     expect(
       shouldSkipUserMessageConsent("[Clarification answer: California]"),
     ).toBe(true);
+    expect(shouldSkipUserMessageConsent("[Begin case type design]")).toBe(true);
     expect(shouldSkipUserMessageConsent("count rows")).toBe(false);
   });
 });

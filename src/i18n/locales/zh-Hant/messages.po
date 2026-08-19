@@ -30,6 +30,10 @@ msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 "parsed safely, so all columns will be published."
 msgstr "此資料集中的至少一個查詢使用了 <0>SELECT *</0> 或無法安全解析，因此所有欄位將被發布。"
 
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+msgid "No records yet"
+msgstr "尚無記錄"
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "返回線上以查看或使頁面可離線使用。"
@@ -38,10 +42,6 @@ msgstr "返回線上以查看或使頁面可離線使用。"
 msgid "The columns mirror what this document printed. Regions that disagree "
 "about their columns are still split out."
 msgstr "欄位會如實反映此文件的列印內容。欄位不一致的區域仍會分開呈現。"
-
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Create new entity"
-msgstr "建立新實體"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -90,6 +90,10 @@ msgstr "Avandar 已讀取您的檔案，並判斷出每個欄位的內容。請�
 msgid "More actions for the layer {layerName}"
 msgstr "圖層 {layerName} 的更多動作"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one tab in this spreadsheet."
+msgstr "此試算表中只有一個分頁。"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "starts with"
 msgstr "開頭為"
@@ -117,6 +121,11 @@ msgstr "儲存格大小（公尺）"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "打開資料集"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Name this case type and say where its fields come from. Map columns from "
+"existing datasets, or add fields to fill in by hand."
+msgstr "為此個案類型命名，並說明其欄位來源。您可以從現有資料集對應欄位，或新增要手動填寫的欄位。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -180,6 +189,10 @@ msgid "The dataset failed to load. Please try again later or reach out to "
 "support."
 msgstr "數據集加載失敗。請稍後再試或聯繫支持。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "The column matching this dataset's rows to a case"
+msgstr "將此資料集的資料列與個案相互對應的欄位"
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it"
 msgstr "為它命名"
@@ -225,7 +238,7 @@ msgstr "邀請一位成員"
 msgid "Ask Avandar"
 msgstr "詢問 Avandar"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
 msgstr "載入檔案時發生錯誤"
 
@@ -280,6 +293,13 @@ msgstr "在此上下文中無法使用發現功能。"
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "輸入問題，我將生成 SQL 並在畫布上運行它。"
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/NewCaseTypeButton.tsx
+msgid "New case type"
+msgstr "新增個案類型"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
 "affecting any others."
@@ -313,13 +333,17 @@ msgstr "H4"
 msgid "Query"
 msgstr "查詢"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Join key"
+msgstr "連接鍵"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "label"
+msgstr "標籤"
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "行過濾器"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Description"
-msgstr "個人資料描述"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
@@ -355,6 +379,10 @@ msgstr "有爭議的值"
 msgid "Please check your email for a confirmation link."
 msgstr "請檢查您的電子郵件以獲取確認連結。"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is not available"
+msgstr "Google Sheet 無法使用"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not between"
 msgstr "不介於"
@@ -377,6 +405,7 @@ msgid "Square"
 msgstr "正方形"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "備註"
 
@@ -445,6 +474,7 @@ msgid "PDF file"
 msgstr "PDF 檔案"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open"
 msgstr "打開"
 
@@ -465,6 +495,10 @@ msgstr "否"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "無法從 FROM 子句判定基礎資料表。"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Case types"
+msgstr "個案類型"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -547,6 +581,10 @@ msgstr "導出註解 PDF"
 msgid "+ Group"
 msgstr "+ 群組"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "The column that names each case in the UI"
+msgstr "在 UI 中標示每個個案名稱的欄位"
+
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
@@ -555,6 +593,10 @@ msgstr "自訂 URL 不得超過 {0} 個字元"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Source CRS"
 msgstr "來源 CRS"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "For example, County or Household"
+msgstr "例如：郡或家戶"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -683,10 +725,6 @@ msgstr "無法顯示 {chartName}"
 msgid "Dataset failed to process"
 msgstr "數據集處理失敗"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " {numRejectedRows} rows were rejected"
-msgstr " {numRejectedRows} 行被拒絕"
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
 msgstr "直向"
@@ -710,6 +748,10 @@ msgstr "Llama 3.1 8B（離線）"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
 msgstr "要隱藏教學嗎？"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Picker error"
+msgstr "Google Picker 錯誤"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -750,6 +792,7 @@ msgstr "僅允許一個值"
 msgid "Pie Chart"
 msgstr "圓餅圖"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Average"
@@ -844,10 +887,9 @@ msgstr "您可以選擇讓工作區中的所有人查看您的儀表板、僅限
 msgid "Unpublish"
 msgstr "取消發布"
 
-#. placeholder {0}: concept.name
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
-msgid "{0} Manager"
-msgstr "{0} 管理員"
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Design case types in chat"
+msgstr "在聊天中設計個案類型"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -986,6 +1028,10 @@ msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 "true."
 msgstr "逗號連接的資料表無法對應；請將其視為 ON true 的 INNER JOIN。"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+msgid "This record failed to load"
+msgstr "此記錄載入失敗"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
@@ -1060,6 +1106,10 @@ msgstr "此欄位不能為空"
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "「{value}」不是日期。請使用 YYYY-MM-DD。"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add a note"
+msgstr "新增備註"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1137,6 +1187,10 @@ msgstr "管道"
 msgid "Could not unpublish dashboard"
 msgstr "無法取消發布儀表板"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Where the fields come from"
+msgstr "欄位來源"
+
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "離線"
@@ -1171,6 +1225,11 @@ msgstr "輸入電子郵件"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
 msgstr "X 軸最小值"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "This case type failed to load"
+msgstr "此個案類型載入失敗"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1231,6 +1290,8 @@ msgstr "工作區名稱"
 msgid "Your dashboard is published at:"
 msgstr "您的儀表板已發布於："
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -1250,8 +1311,8 @@ msgstr "垂直內距"
 msgid "This map includes {0}, a layer set to Aggregate only. The export applies "
 "the same suppression as the screen: areas with fewer than {threshold} "
 "records are shown as suppressed, never as zero."
-msgstr "此地圖包含 {0}，這是一個僅設為彙總的圖層。匯出時會套用與畫面相同的抑制規則：少於 {threshold} "
-"筆記錄的區域會顯示為已抑制，而不會顯示為零。"
+msgstr "此地圖包含 {0}，這是一個僅設為彙總的圖層。匯出內容套用與畫面相同的抑制規則：少於 {threshold} "
+"筆記錄的區域會顯示為已抑制，不會顯示為零。"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
@@ -1364,6 +1425,10 @@ msgstr "隱藏教學"
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field, e.g. Review notes"
+msgstr "新增欄位，例如「審核備註」"
+
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} m²"
 msgstr "{areaValue} m²"
@@ -1379,13 +1444,14 @@ msgstr "確認"
 msgid "is equal to..."
 msgstr "等於..."
 
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Profile Designer"
-msgstr "設定檔設計器"
-
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} 個群組"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "A {conceptName} can include columns from different datasets. Choose "
+"which columns to add as fields."
+msgstr "一個 {conceptName} 可以包含來自不同資料集的欄位。選擇要新增為欄位的欄。"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "Ask the dashboard's owner to share it with you."
@@ -1404,10 +1470,16 @@ msgstr "時間範圍開始：{startLabel}"
 msgid "Couldn't export PDF"
 msgstr "無法導出 PDF"
 
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Value to keep for {0}"
+msgstr "保留 {0} 的值"
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent.tsx
 msgid "Sized by value"
 msgstr "依值調整大小"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
 msgstr "標籤"
@@ -1539,6 +1611,10 @@ msgstr "{0} 的地圖"
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "工作區 ID 必須少於 {SLUG_MAX_LENGTH} 個字元"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "Refreshed from Google Sheets"
+msgstr "已從 Google Sheets 重新整理"
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
 "workspace owner to get a new invitation."
@@ -1547,10 +1623,6 @@ msgstr "您嘗試接受的邀請無效。請聯繫工作區擁有者以獲取新
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "Normalize by"
 msgstr "正規化依據"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a description for this profile type"
-msgstr "為此配置文件類型輸入描述"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
@@ -1563,7 +1635,7 @@ msgstr "移除成員"
 #. placeholder {0}: _formatProducedAt(producedAt)
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
-msgstr "已產生 {0}"
+msgstr "產製於 {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -1590,6 +1662,12 @@ msgstr "已隱藏 {0} 筆"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "所有列"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "New connectors are being added every month. If there is a database or "
+"service you use that you need to connect to, <0>please let us know so we "
+"can prioritize it</0>."
+msgstr "我們每月都會新增連接器。如果您使用的資料庫或服務尚未提供連接功能，<0>請告訴我們，以便我們排定優先順序</0>。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
@@ -1656,7 +1734,7 @@ msgstr "Positron"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Boundary disclaimer (Always included)"
-msgstr "邊界免責聲明（永遠包含）"
+msgstr "邊界免責聲明（一定包含）"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
@@ -1726,6 +1804,10 @@ msgstr "在計費入口網站中管理座位 →"
 msgid "Show exact locations"
 msgstr "顯示確切位置"
 
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not load this cluster's features."
+msgstr "無法載入此叢集的功能。"
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
 msgstr "資料表檢視沒有圖表設定。"
@@ -1750,6 +1832,10 @@ msgstr "選取要建立緩衝區的資料圖層。"
 msgid "Paper size"
 msgstr "紙張大小"
 
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Select a {conceptName}"
+msgstr "選取一個 {conceptName}"
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
@@ -1758,10 +1844,6 @@ msgstr "\"{0}\" 現在在您的工作區中。"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "There is no text in this region to send. Kept the rule-based results."
 msgstr "此區域沒有可傳送的文字。已保留規則式結果。"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "Profile fields"
-msgstr "配置文件欄位"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1882,6 +1964,12 @@ msgstr "為該欄位輸入名稱"
 msgid "Select Plan"
 msgstr "選擇計劃"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Delete case type"
+msgstr "刪除個案類型"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "預設值（可選）"
@@ -1890,14 +1978,11 @@ msgstr "預設值（可選）"
 msgid "Your user profile is not loaded yet. Please retry."
 msgstr "您的用戶檔案尚未加載。請重試。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Sum"
 msgstr "總和"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Sync data!"
-msgstr "同步數據！"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -1911,6 +1996,10 @@ msgstr "要永久刪除 <0>{openDatasetName}</0> 嗎？"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
 msgstr "WMS"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "No attributes yet"
+msgstr "尚無屬性"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -2079,10 +2168,6 @@ msgstr "未知群組"
 msgid "Paragraph"
 msgstr "段落"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File was partially loaded"
-msgstr "檔案部分加載"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "付款方式"
@@ -2133,14 +2218,6 @@ msgstr "顯示詳細資料"
 msgid "Boolean"
 msgstr "布林值"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and "
-"will be available very soon. If there is a database or service you use "
-"that you need to connect to, <0>please let us know so we can prioritize "
-"it</0>."
-msgstr "正在開發連接 Google Sheets "
-"和其他數據來源的功能，將很快提供。如果您需要連接的數據庫或服務，<0>請告訴我們，以便我們優先處理</0>。"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
 "an AI provider in this workspace. Last 90 days, stored on this device "
@@ -2167,6 +2244,11 @@ msgstr "叢集和熱點需要完整的點產生繫結。"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "私人資料集"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Create case type"
+msgstr "建立個案類型"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Publish it"
@@ -2244,6 +2326,10 @@ msgstr "限制更新失敗"
 msgid "Exact"
 msgstr "確切"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Discard"
+msgstr "捨棄"
+
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool is available when Spatial finishes loading."
@@ -2251,7 +2337,7 @@ msgstr "Spatial 完成載入後即可使用此工具。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
-msgstr "深色或衛星底圖可能無法清晰影印。"
+msgstr "深色或衛星底圖可能不適合影印。"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
@@ -2299,6 +2385,10 @@ msgstr "PDF"
 msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "選擇已保存的資料集或將新數據匯入您的工作區。"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Cannot sync this case type"
+msgstr "無法同步此個案類型"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "回報錯誤"
@@ -2320,12 +2410,6 @@ msgstr "正在撰寫查詢…"
 msgid "Their contributor counts stay hidden because they are below the layer's "
 "minimum."
 msgstr "其貢獻者數量因低於圖層的最低門檻而保持隱藏。"
-
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "No entity selected"
-msgstr "未選擇任何實體"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Allow new {pluralConceptName} to be created manually"
@@ -2363,6 +2447,7 @@ msgstr "有可用的更新"
 msgid "Step"
 msgstr "步階"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -2402,6 +2487,7 @@ msgstr "未找到任何內容..."
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} 以保存"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -2409,7 +2495,7 @@ msgstr "{keyboardShortcut} 以保存"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -2499,6 +2585,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是繪製在 Y 軸上的數值列。值按 X 軸（\"{axisKeyValue}\"）分組。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Filled in by hand"
+msgstr "手動填寫"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Some filters were removed"
 msgstr "部分篩選條件已移除"
@@ -2525,10 +2615,6 @@ msgstr "網格"
 msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who "
 "to share it with."
 msgstr "您的儀表板已建立，但其他人目前還無法開啟。請選擇要與哪些人分享。"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Cannot sync this entity"
-msgstr "無法同步此實體"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2577,6 +2663,11 @@ msgstr "WHERE 子句對非 NULL 的右側值使用「{operator}」；目前僅�
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid ", and "
 msgstr "，和"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
+"access may have been removed. Pick the sheet again to restore access."
+msgstr "Avandar 無法開啟此 Google Sheet。它可能已被刪除，或您可能已失去存取權限。請重新選取試算表以恢復存取權限。"
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -2655,6 +2746,7 @@ msgstr "單色"
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -2673,7 +2765,7 @@ msgstr "單色"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2685,6 +2777,10 @@ msgstr "單色"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Cancel"
 msgstr "取消"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "No attributes or dataset are configured."
+msgstr "尚未設定屬性或資料集。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -2707,6 +2803,10 @@ msgstr "數據範圍"
 msgid "Data preview"
 msgstr "數據預覽"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Your Google connection expired"
+msgstr "您的 Google 連線已過期"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "需要幾何資料"
@@ -2718,6 +2818,10 @@ msgstr "網格線顏色"
 #: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre、OpenStreetMap 貢獻者"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "No columns from this dataset."
+msgstr "此資料集沒有欄。"
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -2745,19 +2849,11 @@ msgstr "下載離線聊天模型 (WebLLM)"
 msgid "Review matches"
 msgstr "檢閱相符項目"
 
-#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
-msgid "Create new profile type"
-msgstr "創建新的配置文件類型"
-
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Add Field"
-msgstr "添加欄位"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -2796,10 +2892,6 @@ msgstr "適合傳單、報告和 QR Code 的簡短易記網址。"
 msgid "Using your custom URL."
 msgstr "使用您的自訂網址。"
 
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "Profile failed to load"
-msgstr "配置文件加載失敗"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "執行查詢後才能儲存至儀表板。"
@@ -2821,13 +2913,14 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "升級到「隨您所願付費」計劃只能通過計費入口網站進行。<0/>下面的按鈕將帶您前往那裡。"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete entity"
-msgstr "刪除實體"
-
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "空文本"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+msgid "Describe what you want to manage in plain language. Avandar builds it "
+"for you."
+msgstr "用白話描述您想管理的內容。Avandar 會為您建立。"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are outside the valid range."
@@ -2966,10 +3059,6 @@ msgstr "收到非字串值的文本欄位"
 msgid "Failed to delete workspace"
 msgstr "刪除工作區失敗"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete Entity"
-msgstr "刪除實體"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
 "distributions, and what's missing."
@@ -3021,7 +3110,7 @@ msgstr "第 11 欄"
 msgid "Column 7"
 msgstr "第 7 欄"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Feature"
 msgstr "圖徵"
 
@@ -3057,6 +3146,10 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "尚未套用 SQL。請核准假設的篩選值，以執行此查詢。"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
+msgid "Could not create those case types"
+msgstr "無法建立這些個案類型"
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
 msgstr "識別"
@@ -3078,6 +3171,7 @@ msgstr "未選擇數據集"
 msgid "description"
 msgstr "描述"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
@@ -3115,9 +3209,18 @@ msgstr "結尾為"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Refresh from Google Sheets"
+msgstr "從 Google Sheets 重新整理"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "集合 {collectionNumber}"
+
+#. placeholder {0}: sourceGroups.length
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "{0} datasets joined"
+msgstr "已連接 {0} 個資料集"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Ownership reassigned."
@@ -3153,10 +3256,6 @@ msgstr "檢閱篩選條件"
 msgid "Split (+/-)"
 msgstr "分割（+/-）"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Active"
-msgstr "活躍"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "預設值，以逗號分隔或 JSON 陣列"
@@ -3172,6 +3271,10 @@ msgstr "數據預覽"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "沒有可顯示的儀表板"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "A type of record you manage"
+msgstr "您管理的一種記錄"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3329,10 +3432,6 @@ msgstr "X 軸刻度間隔"
 msgid "Please try again."
 msgstr "請再試一次。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Field Name"
-msgstr "字段名稱"
-
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ 添加行過濾器"
@@ -3414,6 +3513,10 @@ msgstr "距離（公尺）"
 msgid "URL template"
 msgstr "URL 範本"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google is rate limiting this request"
+msgstr "Google 正在限制此要求的頻率"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
 msgstr "計劃功能："
@@ -3479,6 +3582,10 @@ msgstr "{maxAllowed, plural, one {您的方案允許 # 個已分享或公開的�
 msgid "You are offline"
 msgstr "您目前處於離線狀態"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Draft case type"
+msgstr "草稿案件類型"
+
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to save to dashboard: {0}"
@@ -3504,10 +3611,8 @@ msgstr "新增值"
 msgid "Rose"
 msgstr "玫瑰"
 
-#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "您確定要刪除 {0} 嗎？"
 
@@ -3545,6 +3650,10 @@ msgstr "從您剛新增的資料中取得答案。"
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "條"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "No {conceptName} records yet"
+msgstr "尚無 {conceptName} 記錄"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -3725,6 +3834,10 @@ msgstr "前往計費入口"
 msgid "Clear log"
 msgstr "清除日誌"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is too large"
+msgstr "Google Sheet 太大"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
 msgstr "為以下任一項"
@@ -3788,7 +3901,6 @@ msgstr "按名稱、組織、管道等搜索…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "數據"
 
@@ -3854,7 +3966,6 @@ msgstr "未選擇任何檔案"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "提交"
 
@@ -3881,6 +3992,7 @@ msgid "Hex"
 msgstr "六邊形"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Tab"
 msgstr "索引標籤"
 
@@ -3900,8 +4012,14 @@ msgstr "少於一分鐘"
 msgid "Send invite"
 msgstr "發送邀請"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "record"
+msgstr "筆記錄"
+
+#. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open {0}"
 msgstr "打開 {0}"
 
@@ -3926,10 +4044,6 @@ msgstr "下一步"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "來自數據集的欄位"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Create"
-msgstr "創建"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -3985,6 +4099,10 @@ msgstr "邊界幾何圖形欄"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "在下面輸入或粘貼電子郵件。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Zoom to cluster"
+msgstr "縮放至群組"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4178,6 +4296,11 @@ msgstr "返回首頁"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "計算 {datasetName} 中有多少行"
 
+#. placeholder {0}: _getRowLabel(leaf, columns)
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
+msgid "View details for {0}"
+msgstr "查看 {0} 的詳細資料"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
@@ -4210,7 +4333,7 @@ msgstr "標籤，例如：區域"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
-msgstr "選取檔案"
+msgstr "選擇檔案"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
@@ -4362,6 +4485,7 @@ msgid "This query could not run"
 msgstr "此查詢無法執行"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "查看"
 
@@ -4407,10 +4531,12 @@ msgstr "{layerCount} 個圖層"
 msgid "Remove failed"
 msgstr "移除失敗"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} 刪除成功"
 
@@ -4429,10 +4555,6 @@ msgstr "重新排序圖層 {layerName}"
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
 msgstr "來自數據集"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "A profile can consist of columns that come from different datasets."
-msgstr "一個配置文件可以由來自不同數據集的列組成。"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
@@ -4480,11 +4602,6 @@ msgstr "Y 軸標籤"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Quantile"
 msgstr "分位數"
-
-#. placeholder {0}: concept.name
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Finished syncing {0} data"
-msgstr "完成同步 {0} 數據"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -4540,6 +4657,10 @@ msgstr "您可以查看此資料集，因為它已與您共享。"
 msgid "Break {0} of {1}, {value}"
 msgstr "第 {0} 個斷點，共 {1} 個，{value}"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
+msgid "View records"
+msgstr "查看記錄"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
 msgstr "創建新儀表板"
@@ -4557,6 +4678,10 @@ msgstr "創建工作區"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "再試一次"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field filled in by hand"
+msgstr "新增手動填寫的欄位"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
@@ -4578,7 +4703,7 @@ msgstr "僅彙總圖層需要產生區域的繫結。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Area of interest applied"
-msgstr "已套用關注區域"
+msgstr "已套用感興趣區域"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -4614,12 +4739,6 @@ msgstr "Llama 3.2 1B（離線）"
 msgid "Series"
 msgstr "系列"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to "
-"support."
-msgstr "實體加載失敗。請稍後再試或聯繫支持。"
-
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 msgid "Download PDF"
 msgstr "下載 PDF"
@@ -4640,11 +4759,6 @@ msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未套用 SQL。請登入以核准篩選值。"
-
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach "
-"out to support."
-msgstr "配置文件管理頁面加載失敗。請稍後再試或聯繫支持。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
@@ -4718,10 +4832,6 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 "it until you press the button below."
 msgstr "此儀表板仍公開於網路上。任何取得連結的人都能檢視，直到您按下下方按鈕為止。"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Entity deleted"
-msgstr "實體已刪除"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
 msgstr "選擇列"
@@ -4768,7 +4878,7 @@ msgstr "匯入"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Clear Disputed status column"
-msgstr "清除爭議狀態欄"
+msgstr "清除有爭議狀態欄"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -4907,6 +5017,10 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。值按類別軸（\"{axisKeyValue}\"）分組。"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Sync records"
+msgstr "同步記錄"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
 msgstr "資料集成功加載"
@@ -5006,6 +5120,10 @@ msgstr "未確定的值"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "尚未添加任何欄位"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Pick one from the list to see its details."
+msgstr "從清單中選取一項以查看詳細資料。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5110,6 +5228,10 @@ msgstr "標題"
 msgid "Curve"
 msgstr "曲線"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What does this case type represent?"
+msgstr "此案件類型代表什麼？"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "第 4 欄"
@@ -5157,6 +5279,10 @@ msgstr "顯示圖層 {layerName}"
 msgid "Create a new account"
 msgstr "創建新帳戶"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Reconnect your Google account and try again."
+msgstr "重新連結您的 Google 帳戶，然後再試一次。"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "方向"
@@ -5173,6 +5299,10 @@ msgstr "助手正在輸入"
 msgid "Dataset saved successfully!"
 msgstr "資料集已成功保存！"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "Attributes"
+msgstr "屬性"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
 msgid "Cluster radius"
 msgstr "叢集半徑"
@@ -5184,6 +5314,16 @@ msgstr "未找到已保存的資料集。"
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
 msgstr "展開檢查器"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/index.tsx
+msgid "Case Manager"
+msgstr "案件管理員"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The tab has a header row"
+msgstr "此分頁包含標題列"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5198,12 +5338,6 @@ msgstr "根據預設，我們會使用直接的 UUID 連結。請在下方新增
 msgid "Make internal"
 msgstr "設為內部"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "Please select an entity from the left sidebar, or create a new one."
-msgstr "請從左側邊欄選擇一個實體，或創建一個新實體。"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "已檢測到"
@@ -5212,6 +5346,11 @@ msgstr "已檢測到"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "刪除資料集"
+
+#. placeholder {0}: draft.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Created {0}"
+msgstr "建立於 {0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5332,6 +5471,10 @@ msgstr "類別 {0}：{1} 個值"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "忽略所有全局篩選器：此可視化未經篩選。"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Sheet"
+msgstr "Google Sheet"
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "您寫道："
@@ -5345,6 +5488,7 @@ msgid "Unable to load dashboard datasets"
 msgstr "無法加載儀表板資料集"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "尚未添加描述。"
 
@@ -5355,6 +5499,10 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "收合抽屜"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add note"
+msgstr "新增備註"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -5442,10 +5590,6 @@ msgstr "請修正標示的欄位。"
 msgid "is on or before"
 msgstr "早於或等於"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Inactive"
-msgstr "不活躍"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
@@ -5474,7 +5618,15 @@ msgstr "整數"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The results are on the canvas to the left."
-msgstr "結果位於左側的畫布上。"
+msgstr "結果位於左側畫布上。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Field name"
+msgstr "欄位名稱"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Most frequent"
+msgstr "最常見"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5503,9 +5655,11 @@ msgstr "對於數據集 <0>{0}</0>，選擇用作 {conceptName} ID 的欄位"
 msgid "Low"
 msgstr "低"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Description"
 msgstr "描述"
 
@@ -5580,10 +5734,6 @@ msgstr "請再試一次。您的儀表板尚未發布。"
 msgid "Encoding"
 msgstr "編碼"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {conceptName}."
-msgstr "我們將使用這些欄位將數據集合併為單一 {conceptName}。"
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -5608,6 +5758,10 @@ msgstr "重新處理數據"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Export as PDF"
 msgstr "匯出為 PDF"
+
+#: src/views/IndividualManagerApp/EditCaseTypeButton.tsx
+msgid "Edit case type"
+msgstr "編輯案件類型"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
@@ -5651,10 +5805,6 @@ msgstr "沒有相符的 P-code。"
 msgid "Reset"
 msgstr "重置"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a name for this profile type"
-msgstr "為此配置文件類型輸入名稱"
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "區域"
@@ -5682,6 +5832,10 @@ msgstr "工作區名稱已更新"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "將列添加為字段"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Case type name"
+msgstr "案件類型名稱"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.tsx
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
@@ -5718,6 +5872,10 @@ msgstr "私人儀表板"
 msgid "Upload"
 msgstr "上傳"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove {datasetName}"
+msgstr "移除 {datasetName}"
+
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
@@ -5748,10 +5906,6 @@ msgstr "甜甜圈樣式"
 msgid "Member"
 msgstr "成員"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " over 1000 rows were rejected"
-msgstr "超過 1000 行被拒絕"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "更新訂閱"
@@ -5773,6 +5927,11 @@ msgstr "獲取值的平均值"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM north zone {0}"
 msgstr "{code} - UTM 北帶 {0}"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Finished syncing {0} records"
+msgstr "已完成同步 {0} 筆記錄"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -5825,7 +5984,7 @@ msgstr "部分離線"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
-msgstr "來源註記（永遠包含）"
+msgstr "來源標註（一定包含）"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -5872,6 +6031,10 @@ msgstr "幾何欄位需要 DuckDB Spatial，但目前無法使用。"
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "每個系列都是一個繪製在徑向值上的數值欄。請選擇下面的類別軸。"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "The Google file picker could not be opened. Please try again."
+msgstr "無法開啟 Google 檔案選擇器。請再試一次。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -5987,6 +6150,12 @@ msgstr "空白"
 msgid "Create a new workspace. You can always edit it later."
 msgstr "創建一個新的工作區。您可以隨時稍後編輯它。"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "Try again in a moment, or reach out to support if it keeps happening."
+msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
 msgstr "Qwen 2.5 7B"
@@ -6058,7 +6227,7 @@ msgstr "請重新登錄以繼續。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
-msgstr "製作日期（永遠包含）"
+msgstr "產製日期（一定包含）"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
@@ -6118,11 +6287,15 @@ msgstr "正在下載 {0} 以進行離線聊天"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
-msgstr "爭議狀態欄"
+msgstr "有爭議狀態欄"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "移除行篩選"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Let people create cases by hand too"
+msgstr "也允許使用者手動建立案件"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Could not reach the assistant. Kept the rule-based results."
@@ -6315,9 +6488,9 @@ msgstr "{flaggedRowCount}／{0} 列需要檢查。我們依位置將這些值與
 msgid "Billing"
 msgstr "計費"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Name"
-msgstr "配置文件名稱"
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "This dataset now reflects the current contents of the sheet."
+msgstr "此資料集現在反映工作表的目前內容。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6358,10 +6531,6 @@ msgstr "分隔線"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "下限"
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr "成功解析 {numSuccessRows} 行，但 {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -6580,6 +6749,10 @@ msgstr "正在載入私人資源"
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "ID"
+msgstr "ID"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Smallest radius"
 msgstr "最小半徑"
@@ -6588,6 +6761,10 @@ msgstr "最小半徑"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "訪問被拒"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "join key"
+msgstr "連接鍵"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
@@ -6660,6 +6837,11 @@ msgstr "未儲存的變更"
 msgid "Model"
 msgstr "模型"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "I will propose case types from your dataset names and columns. Pick from "
+"the options or tell me what to create."
+msgstr "我會根據您的資料集名稱和欄位建議案件類型。請從選項中選取，或告訴我您想建立的類型。"
+
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
 msgstr "未保存的更改將不會出現在預覽中。請先保存。"
@@ -6667,6 +6849,10 @@ msgstr "未保存的更改將不會出現在預覽中。請先保存。"
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace does not have a valid subscription."
 msgstr "此工作區沒有有效的訂閱。"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Dataset"
+msgstr "資料集"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -6753,17 +6939,21 @@ msgstr "套用校準"
 msgid "Could not generate QR code"
 msgstr "無法生成 QR 碼"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "No fields or dataset are configured."
-msgstr "未配置任何字段或數據集。"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove condition"
 msgstr "移除條件"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+msgid "Open case type"
+msgstr "開啟案件類型"
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "百分比"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Each case type is a kind of record you manage."
+msgstr "每個案件類型都是您管理的一種記錄。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "bar chart"
@@ -6805,15 +6995,18 @@ msgid "We were unable to update your subscription. Please contact "
 "{SUPPORT_EMAIL}"
 msgstr "我們無法更新您的訂閱。請聯絡 {SUPPORT_EMAIL}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under "
-"maintenance."
-msgstr "在此功能維護期間，Google Sheets 連接器已被禁用。"
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "First"
+msgstr "第一個"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "移除"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "1 dataset"
+msgstr "1 個資料集"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6824,15 +7017,20 @@ msgstr "沒有數值欄"
 msgid "Service"
 msgstr "服務"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "This question is too large for the on-device model. Try a shorter "
+"question, or reconnect to use cloud chat."
+msgstr "此問題對裝置上的模型來說太長。請嘗試縮短問題，或重新連線以使用雲端聊天。"
+
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
-msgstr "來源列"
+msgstr "來源行"
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
 msgstr "沒有更多內容可加載"
 
@@ -6871,6 +7069,10 @@ msgstr "有訪問權限的人"
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Name for {columnLabel}"
+msgstr "{columnLabel} 的名稱"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
@@ -6890,6 +7092,10 @@ msgstr "編輯權限"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "查詢的"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "{conceptName} fields"
+msgstr "{conceptName} 欄位"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
@@ -6934,7 +7140,7 @@ msgstr "融合"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "Column bound. No values assigned; outlines render as settled."
-msgstr "欄位界限。未指派任何值；外框會呈現為已確認。"
+msgstr "欄位已繫結。未指派任何值；外框會以已確定狀態呈現。"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6964,6 +7170,10 @@ msgstr "默認值"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
 msgstr "{0} 個區域沒有資料"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "Required"
+msgstr "必填"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
@@ -7034,7 +7244,7 @@ msgstr "恢復數據集處理中…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "涵蓋 <0>{0}</0>，從 <1>{1}</1> 到 <2>{2}</2>。"
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Loading more..."
 msgstr "加載更多中..."
 
@@ -7083,6 +7293,10 @@ msgstr "視覺化"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Alt text"
 msgstr "替代文字"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Please try again in a moment."
+msgstr "請稍後再試一次。"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -7158,12 +7372,21 @@ msgstr "語氣"
 msgid "Row {0}, {1}"
 msgstr "第 {0} 列，{1}"
 
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "{0} features"
+msgstr "{0} 項功能"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
 msgstr "編輯者"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Entered manually"
+msgstr "手動輸入"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -7272,6 +7495,10 @@ msgstr "Excel"
 msgid "Dataset columns"
 msgstr "數據集欄位"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Details"
+msgstr "詳細資料"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "無法準備離線聊天模型。"
@@ -7281,10 +7508,10 @@ msgstr "無法準備離線聊天模型。"
 msgid "Delete the view {0}"
 msgstr "刪除檢視 {0}"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {conceptName}."
-msgstr "對於您添加的每個數據集，請指定哪些欄位應用於唯一識別 {conceptName}。"
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Features in cluster ({0})"
+msgstr "叢集中的功能（{0}）"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -7297,6 +7524,14 @@ msgstr "無法建立 PDF：{detail}"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "此自訂 URL 已被使用"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Drive access is not configured for this deployment."
+msgstr "此部署尚未設定 Google Drive 存取權限。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Loading features"
+msgstr "正在載入功能"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -7354,6 +7589,11 @@ msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的未命名欄位運算式；已略過。"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Add field"
+msgstr "新增欄位"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
@@ -7413,6 +7653,11 @@ msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
 "undone."
 msgstr "您確定要永久刪除 <0>{0}</0> 嗎？此操作無法撤銷。"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset, pick the column that uniquely identifies a "
+"{conceptName}. We use those columns to merge rows into one record."
+msgstr "針對每個資料集，選取可唯一識別 {conceptName} 的欄位。我們會使用這些欄位，將資料列合併為一筆記錄。"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
 msgstr "欄位大綱"
@@ -7425,6 +7670,11 @@ msgstr "尚未選取任何項目"
 msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "此人或群組可以做什麼。查看者 = 只讀，編輯者 = 編輯內容，管理員 = 完全控制，包括共享。"
+
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Include {0}"
+msgstr "包含 {0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link label"
@@ -7482,10 +7732,6 @@ msgstr "無法將資料集設為僅限離線使用"
 msgid "Hide details"
 msgstr "隱藏詳細資料"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Enter comment"
-msgstr "輸入評論"
-
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
 msgstr "了解原因"
@@ -7496,7 +7742,7 @@ msgstr "尚無條目。當聊天面板要求同意時，日誌會填寫。"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "No disputed-status column. Outlines render as settled."
-msgstr "沒有爭議狀態欄位。外框會呈現為已確認。"
+msgstr "沒有有爭議狀態欄。外框會以已確定狀態呈現。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
@@ -7566,6 +7812,10 @@ msgstr "色階"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
 msgstr "數字"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Sync this case type from Case Manager to create records from your data."
+msgstr "從 Case Manager 同步此案件類型，以便從您的資料建立記錄。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -7645,6 +7895,10 @@ msgstr "無法讀取檔案"
 msgid "Column 6"
 msgstr "第 6 欄"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "An unexpected error occurred."
+msgstr "發生未預期的錯誤。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
 msgstr "隨意支付"
@@ -7694,6 +7948,7 @@ msgstr "提示"
 msgid "You're on the Free plan"
 msgstr "您目前使用的是免費方案"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Count"
@@ -7772,6 +8027,10 @@ msgstr "為"
 msgid "Members"
 msgstr "成員"
 
+#: src/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay.tsx
+msgid "Dock chat panel"
+msgstr "停駐聊天面板"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
 msgstr "點幾何"
@@ -7835,6 +8094,11 @@ msgstr "欄位"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Remove local filter"
 msgstr "移除本地篩選器"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Could not sync {0} records"
+msgstr "無法同步 {0} 筆記錄"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "This removes the user group from members and resources that use it."
@@ -8011,10 +8275,6 @@ msgstr "選定的文件：{0}"
 msgid "Subtle"
 msgstr "細微"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Activity"
-msgstr "活動"
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "（訊息未傳送。）"
@@ -8046,11 +8306,6 @@ msgstr "您的工作區已使用所有 {currentSeatUsage} 的 {totalSeats} 座�
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "There's your answer"
 msgstr "這就是您的答案"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {conceptName}."
-msgstr "這是您選擇應該添加到此 {conceptName} 的數據集中的哪些列的地方。"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Expand the legend"
@@ -8116,6 +8371,10 @@ msgstr "同步到線上？"
 msgid "Neutral failure"
 msgstr "中立失敗"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
+msgid "No fields yet"
+msgstr "尚無欄位"
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
 msgstr "橫向"
@@ -8152,8 +8411,10 @@ msgstr "複製連結"
 msgid "100,000"
 msgstr "100,000"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Delete {0}"
 msgstr "刪除 {0}"
 
@@ -8166,13 +8427,18 @@ msgstr "切片顏色"
 msgid "Save changes"
 msgstr "保存更改"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet failed to load"
 msgstr "Google 表單載入失敗"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
+"sheet and try again."
+msgstr "Google 每次最多只能匯出試算表的 10 MB。請分割工作表後再試一次。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
@@ -8189,6 +8455,10 @@ msgstr "變更網址"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Ochre"
 msgstr "赭色"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Could not create that case type"
+msgstr "無法建立該案件類型"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -8225,6 +8495,11 @@ msgstr "已抑制"
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Dataset limit reached"
 msgstr "數據集限制已達"
+
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Case type deleted"
+msgstr "案件類型已刪除"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Distinct values"
@@ -8294,6 +8569,10 @@ msgstr "任何擁有 "
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove this dataset"
+msgstr "移除此資料集"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
@@ -8373,14 +8652,13 @@ msgstr "{peopleClause} 和 {groupClause}"
 msgid "High"
 msgstr "高"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "Entity failed to load"
-msgstr "實體加載失敗"
-
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "用於登錄您的帳戶。"
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not zoom to this cluster."
+msgstr "無法縮放至此叢集。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
@@ -8476,6 +8754,10 @@ msgstr "整個數據集"
 msgid "Or"
 msgstr "或"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to results"
+msgstr "返回結果"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
 msgstr "熱度"
@@ -8483,6 +8765,13 @@ msgstr "熱度"
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to layer settings"
 msgstr "跳至圖層設定"
+
+#. placeholder {0}: caseType.name
+#. placeholder {0}: concept.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Are you sure you want to delete {0}? This cannot be undone."
+msgstr "確定要刪除 {0} 嗎？此操作無法復原。"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"

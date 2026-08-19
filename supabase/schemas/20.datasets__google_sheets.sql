@@ -18,7 +18,12 @@ create table public.datasets__google_sheets (
   -- The google sheet id
   google_document_id text not null,
   -- Number of rows to skip at the start of the file
-  rows_to_skip integer not null default 0
+  rows_to_skip integer not null default 0,
+  -- Name of the spreadsheet tab that backs this relation. Nullable when the
+  -- default tab was used (e.g. the first tab in the workbook). Rows imported
+  -- before this column existed carry null, which is what they already read:
+  -- the import path took the first GRID tab.
+  sheet_name text
 );
 
 -- Enable row level security

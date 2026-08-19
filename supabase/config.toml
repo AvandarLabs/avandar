@@ -402,6 +402,12 @@ entrypoint = "./functions/queries/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/queries/*.html" ]
 
+[functions.open-data]
+enabled = true
+verify_jwt = false
+import_map = "./functions/open-data/deno.json"
+entrypoint = "./functions/open-data/index.ts"
+
 [functions.healthz]
 enabled = true
 verify_jwt = false

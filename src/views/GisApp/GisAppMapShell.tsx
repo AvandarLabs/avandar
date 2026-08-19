@@ -146,8 +146,12 @@ export function GisAppMapShell({ app }: Props): ReactNode {
             opened={app.isInspectorOpen}
             onClose={app.closeInspector}
             feature={app.selectedFeature}
-            popup={app.selectedLayer?.popup}
+            cluster={app.selectedCluster}
+            layer={app.selectedLayer}
             canvasRef={mapSurfaceRef}
+            mapRef={app.mapInstance.mapRef}
+            onRowClick={app.onRowClick}
+            onBackToTable={app.onBackToTable}
           />
           <ExportSheet
             opened={isExportOpen}

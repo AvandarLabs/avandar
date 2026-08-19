@@ -15,6 +15,7 @@ import {
 import { createGenerationAwareExecuteSql } from "@/components/ChatPanel/useAvandarChatRuntime/createGenerationAwareExecuteSql/createGenerationAwareExecuteSql";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
+import { offlineChatOverflowAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/offlineChatOverflow";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
 import { runOfflineChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatTurn";
 import { shouldSkipUserMessageConsent } from "@/components/ChatPanel/useAvandarChatRuntime/shouldSkipUserMessageConsent/shouldSkipUserMessageConsent";
@@ -274,32 +275,45 @@ export function createChatModelAdapter(
             ],
           });
         }
-        const offlineResult = await runOfflineChatTurn({
-          workspace: workspaceRef.current,
-          pageContext: currentPageContext,
-          messages: apiMessages,
-          navigatorOnLine: navigator.onLine,
-          localChatModelId,
-          copy: copyRef.current,
-          executeSql:
-            currentPageContext.app === "data-explorer" ?
-              createGenerationAwareExecuteSql(
-                tryExecuteOfflineSql,
-                isGenerationStale,
-              )
-            : undefined,
-        });
-        return applyResponseIfCurrent(
-          Model.make("ChatResponse", {
-            assistantText: offlineResult.assistantText,
-            ...(offlineResult.generatedSql ?
-              { generatedSql: offlineResult.generatedSql }
-            : {}),
-            ...(offlineResult.clarification ?
-              { clarification: offlineResult.clarification }
-            : {}),
-          }),
-        );
+        try {
+          const offlineResult = await runOfflineChatTurn({
+            workspace: workspaceRef.current,
+            pageContext: currentPageContext,
+            messages: apiMessages,
+            navigatorOnLine: navigator.onLine,
+            localChatModelId,
+            copy: copyRef.current,
+            executeSql:
+              currentPageContext.app === "data-explorer" ?
+                createGenerationAwareExecuteSql(
+                  tryExecuteOfflineSql,
+                  isGenerationStale,
+                )
+              : undefined,
+          });
+          return applyResponseIfCurrent(
+            Model.make("ChatResponse", {
+              assistantText: offlineResult.assistantText,
+              ...(offlineResult.generatedSql ?
+                { generatedSql: offlineResult.generatedSql }
+              : {}),
+              ...(offlineResult.clarification ?
+                { clarification: offlineResult.clarification }
+              : {}),
+            }),
+          );
+        } catch (error) {
+          const overflowText = offlineChatOverflowAssistantText(
+            error,
+            copyRef.current.contextWindowExceeded,
+          );
+          if (overflowText) {
+            return finishIfCurrent({
+              content: [{ type: "text" as const, text: overflowText }],
+            });
+          }
+          throw error;
+        }
       };
 
       if (initialRuntimeMode.kind === "local") {

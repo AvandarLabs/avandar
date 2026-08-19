@@ -6,6 +6,8 @@ export function isEmptyParsedAttempt(parsedAttempt: ParsedAttempt): boolean {
     !parsedAttempt.generatedSql &&
     !parsedAttempt.clarification &&
     !parsedAttempt.dashboardBlock &&
+    !parsedAttempt.createdCaseTypes &&
+    !parsedAttempt.proposedCaseType &&
     parsedAttempt.text.length === 0
   );
 }

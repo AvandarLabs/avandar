@@ -1,8 +1,4 @@
-import {
-  Callout,
-  makeSegmentedControlItems,
-  SegmentedControl,
-} from "@avandar/ui";
+import { makeSegmentedControlItems, SegmentedControl } from "@avandar/ui";
 import { identity, makeObject, prop, propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -15,12 +11,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconCircleNumber1Filled,
-  IconCircleNumber2Filled,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -193,26 +184,20 @@ export function DatasetColumnAttributesBlock({
   return (
     <Fieldset legend={t`Fields that come from datasets`}>
       <Stack>
-        <Callout.Info
-          title={t`Select the columns you want in this ${conceptName}`}
-          icon={<IconCircleNumber1Filled />}
-        >
-          <Text>
+        <Stack gap="xs">
+          <Text fw={500}>
+            <Trans>Select the columns you want in this {conceptName}</Trans>
+          </Text>
+          <Text c="dimmed" size="sm">
             <Trans>
-              A profile can consist of columns that come from different
-              datasets.
+              A {conceptName} can include columns from different datasets.
+              Choose which columns to add as fields.
             </Trans>
           </Text>
-          <Text>
-            <Trans>
-              This is where you select which columns from which datasets should
-              be added into this {conceptName}.
-            </Trans>
-          </Text>
-        </Callout.Info>
+        </Stack>
         <Group align="flex-start">
           <Stack gap="xs">
-            <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
+            <Text size="xs" c="neutral.7" tt="uppercase" lts="0.1em">
               <Trans>Dataset columns</Trans>
             </Text>
             <Divider />
@@ -229,7 +214,6 @@ export function DatasetColumnAttributesBlock({
               variant="subtle"
               color="neutral"
               aria-label={t`Add column as a field`}
-              className={`data-[disabled]:bg-transparent`}
               disabled={!selectedDatasetColumnId}
               onClick={addDatasetColumnAsAttribute}
             >
@@ -239,7 +223,6 @@ export function DatasetColumnAttributesBlock({
               variant="subtle"
               color="neutral"
               aria-label={t`Remove field`}
-              className={`data-[disabled]:bg-transparent`}
               disabled={addedAttributes.length === 0}
               onClick={removeAttribute}
             >
@@ -247,8 +230,8 @@ export function DatasetColumnAttributesBlock({
             </ActionIcon>
           </Stack>
           <Stack gap="xs">
-            <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
-              <Trans>Profile fields</Trans>
+            <Text size="xs" c="neutral.7" tt="uppercase" lts="0.1em">
+              <Trans>{conceptName} fields</Trans>
             </Text>
             <Divider />
             {addedAttributes.length === 0 ?
@@ -282,23 +265,18 @@ export function DatasetColumnAttributesBlock({
 
         <Divider my="xs" />
         {sourceDatasets.length > 1 ?
-          <Callout.Info
-            title={t`Configure how to join datasets`}
-            icon={<IconCircleNumber2Filled />}
-          >
-            <Text>
+          <Stack gap="xs">
+            <Text fw={500}>
+              <Trans>Configure how to join datasets</Trans>
+            </Text>
+            <Text c="dimmed" size="sm">
               <Trans>
-                For each dataset you've added, please specify which columns
-                should be used to uniquely identify a {conceptName}.
+                For each dataset, pick the column that uniquely identifies a{" "}
+                {conceptName}. We use those columns to merge rows into one
+                record.
               </Trans>
             </Text>
-            <Text>
-              <Trans>
-                We will use those columns to merge datasets into a single{" "}
-                {conceptName}.
-              </Trans>
-            </Text>
-          </Callout.Info>
+          </Stack>
         : null}
         {addedAttributes.length > 0 ?
           <IdentifierBlock

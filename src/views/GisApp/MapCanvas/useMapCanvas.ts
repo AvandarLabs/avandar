@@ -9,7 +9,10 @@ import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/
 import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { FitBoundsRequest } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
-import type { MapFeatureClickHandler } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import type {
+  MapClusterClickHandler,
+  MapFeatureClickHandler,
+} from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -30,6 +33,7 @@ export type MapCanvasOptions = {
   /** Ids of layers whose features respond to clicks. */
   interactiveLayerIds: readonly string[];
   onFeatureClick: MapFeatureClickHandler;
+  onClusterClick?: MapClusterClickHandler;
 
   /** Persists camera changes caused outside config synchronization. */
   onViewChange?: (view: AvaMapConfig.ViewState) => void;
@@ -110,6 +114,7 @@ export function useMapCanvas({
   fitBoundsRequest,
   interactiveLayerIds,
   onFeatureClick,
+  onClusterClick = noop,
   onViewChange = noop,
   mapToolMode = { type: "pan" },
   onMapToolModeChange = noop,
@@ -124,6 +129,7 @@ export function useMapCanvas({
     view,
     interactiveLayerIds,
     onFeatureClick,
+    onClusterClick,
     mapToolMode,
   });
   const { invalidRingStatus, measureVertices, lastCreatedAnnotationId } =

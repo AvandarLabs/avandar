@@ -29,5 +29,7 @@ export function ensureOfflineChatSchema(args: {
       { id: openDatasetId, name: openDatasetId },
     ],
     columns,
+    concepts: args.schema.concepts ?? [],
+    conceptAttributes: args.schema.conceptAttributes ?? [],
   };
 }

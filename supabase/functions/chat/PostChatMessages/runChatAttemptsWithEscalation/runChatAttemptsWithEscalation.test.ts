@@ -39,13 +39,19 @@ const EMPTY = {
 
 const USABLE = { ...EMPTY, text: "here you go" };
 
-function _run(requestBody: Record<string, unknown>) {
+function _run(
+  requestBody: Record<string, unknown>,
+  datasets?: ReadonlyArray<{ id: string; name: string }>,
+  concepts?: ReadonlyArray<{ id: string; name: string }>,
+) {
   return runChatAttemptsWithEscalation({
     requestBody,
     apiKey: "key",
     referer: "https://example.test",
     lastUserPrompt: "show revenue",
     priorClarifications: 0,
+    datasets,
+    concepts,
   });
 }
 
@@ -114,5 +120,31 @@ describe("runChatAttemptsWithEscalation", () => {
     sendOpenRouterRequestMock.mockRejectedValue(failure);
 
     await expect(_run({ model: "m" })).rejects.toBe(failure);
+  });
+
+  it("forwards datasets so generated aliases can be rewritten to ids", async () => {
+    parseOpenRouterResponseMock.mockReturnValue(USABLE);
+    const datasets = [
+      { id: "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff", name: "Cholera cases" },
+    ];
+
+    await _run({ model: "m" }, datasets);
+
+    expect(parseOpenRouterResponseMock.mock.calls[0]?.[0].datasets).toBe(
+      datasets,
+    );
+  });
+
+  it("forwards concepts so generated aliases can be rewritten to table names", async () => {
+    parseOpenRouterResponseMock.mockReturnValue(USABLE);
+    const concepts = [
+      { id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", name: "Case" },
+    ];
+
+    await _run({ model: "m" }, undefined, concepts);
+
+    expect(parseOpenRouterResponseMock.mock.calls[0]?.[0].concepts).toBe(
+      concepts,
+    );
   });
 });

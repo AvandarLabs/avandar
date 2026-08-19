@@ -183,6 +183,50 @@ function _enqueueDatasetOperation(datasetIds: readonly string[]): {
 }
 
 /**
+ * Namespaces the Web Lock names so they cannot collide with a lock taken
+ * anywhere else in the app, or by another product on the same origin.
+ */
+function _toDatasetLockName(datasetId: string): string {
+  return `avandar:dataset-duckdb:${datasetId}`;
+}
+
+/**
+ * Runs `operation` while holding one exclusive Web Lock per name, which makes
+ * the surrounding lease hold across tabs rather than only within this one.
+ * The in-memory queue above it is per-document, so without this two tabs can
+ * interleave writes to the same dataset's persisted bytes.
+ *
+ * `lockNames` MUST already be sorted. Acquiring in one global order is what
+ * stops two tabs taking the same pair of locks in opposite orders and
+ * deadlocking. `navigator.locks` takes a single name per request, so several
+ * are acquired by folding the requests into a nest.
+ *
+ * Falls back to running the operation directly where the Web Locks API is
+ * absent, which is the case in a non-secure context and under jsdom. That
+ * degrades to the existing intra-tab serialization rather than failing.
+ */
+async function _withDatasetCrossTabLocks<Result>(
+  lockNames: readonly string[],
+  operation: () => Promise<Result>,
+): Promise<Result> {
+  const locks = globalThis.navigator?.locks;
+  if (!locks) {
+    return await operation();
+  }
+  const runWithinLocks = lockNames.reduceRight<() => Promise<Result>>(
+    (runInner, lockName) => {
+      return async () => {
+        return await locks.request(lockName, async () => {
+          return await runInner();
+        });
+      };
+    },
+    operation,
+  );
+  return await runWithinLocks();
+}
+
+/**
  * Runs an operation after prior work on the same dataset IDs has settled.
  * Unrelated dataset IDs use independent queues.
  */
@@ -193,6 +237,9 @@ async function _runCoordinatedDatasetDuckDbOperation<Result>(
     operation: (lease: DatasetDuckDbLease) => Promise<Result>;
   }>,
 ): Promise<Result> {
+  // The sort is load-bearing rather than tidy: it is the global lock ordering
+  // that keeps two tabs from acquiring the same pair of dataset locks in
+  // opposite orders and deadlocking. Do not drop it.
   const datasetIds = Array.from(new Set(options.datasetIds)).sort();
   if (options.lease) {
     if (
@@ -212,7 +259,16 @@ async function _runCoordinatedDatasetDuckDbOperation<Result>(
     _enqueueDatasetOperation(datasetIds);
   await Promise.all(priorOperations);
   try {
-    return await options.operation(_createLease(datasetIds));
+    // Only a fresh lease takes the cross-tab locks. A caller that already
+    // holds a lease returned above without reaching here, which matters
+    // because Web Locks are not reentrant: re-requesting a name this stack
+    // already holds would deadlock against itself.
+    return await _withDatasetCrossTabLocks(
+      datasetIds.map(_toDatasetLockName),
+      async () => {
+        return await options.operation(_createLease(datasetIds));
+      },
+    );
   } finally {
     releaseQueueSlots();
   }

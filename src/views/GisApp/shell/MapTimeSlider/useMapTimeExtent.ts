@@ -2,7 +2,7 @@ import { useQuery } from "@avandar/query-hooks";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { getMapTimeExtentSql } from "@/clients/maps/MapLayerTimeExtent/getMapTimeExtentSql/getMapTimeExtentSql";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { getIsoInstantFromValue } from "@/views/GisApp/shell/MapTimeSlider/getIsoInstantFromValue/getIsoInstantFromValue";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -69,7 +69,7 @@ export function useMapTimeExtent(options: {
       if (rawSql === undefined) {
         throw new Error("Map time extent SQL is missing");
       }
-      return await WorkspaceQetlClient.runQuery<{
+      return await WorkspaceQuerySession.runQuery<{
         extent_start: unknown;
         extent_end: unknown;
       }>({

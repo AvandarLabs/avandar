@@ -31,6 +31,10 @@ msgid "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 msgstr "على الأقل استعلام واحد في مجموعة البيانات هذه يستخدم <0>SELECT *</0> أو "
 "لم يتمكن من التحليل بشكل آمن، لذا سيتم نشر جميع الأعمدة."
 
+#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+msgid "No records yet"
+msgstr "لا توجد سجلات بعد"
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها متاحة دون اتصال."
@@ -40,10 +44,6 @@ msgid "The columns mirror what this document printed. Regions that disagree "
 "about their columns are still split out."
 msgstr "تعكس الأعمدة ما طُبع في هذا المستند. وتظل المناطق التي تختلف أعمدتها "
 "مفصولة."
-
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Create new entity"
-msgstr "إنشاء كيان جديد"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -96,6 +96,10 @@ msgstr "قرأ Avandar ملفك وحدد بالفعل ما يحتويه كل ع�
 msgid "More actions for the layer {layerName}"
 msgstr "المزيد من الإجراءات للطبقة {layerName}"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "There is only one tab in this spreadsheet."
+msgstr "يوجد تبويب واحد فقط في جدول البيانات هذا."
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "starts with"
 msgstr "يبدأ بـ"
@@ -123,6 +127,12 @@ msgstr "حجم الخلية (بالمتر)"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "فتح مجموعة البيانات"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Name this case type and say where its fields come from. Map columns from "
+"existing datasets, or add fields to fill in by hand."
+msgstr "سمِّ نوع الحالة هذا، واذكر مصدر حقوله. طابِق الأعمدة من مجموعات "
+"البيانات الحالية، أو أضف حقولًا لتعبئتها يدويًا."
 
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
@@ -187,6 +197,10 @@ msgid "The dataset failed to load. Please try again later or reach out to "
 msgstr "فشل تحميل مجموعة البيانات. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع "
 "الدعم."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "The column matching this dataset's rows to a case"
+msgstr "العمود الذي يطابق صفوف مجموعة البيانات هذه بحالة"
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Name it"
 msgstr "تسميته"
@@ -234,7 +248,7 @@ msgstr "دعوة عضو"
 msgid "Ask Avandar"
 msgstr "اسأل أفاندار"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "An error occurred while loading the file"
 msgstr "حدث خطأ أثناء تحميل الملف"
 
@@ -289,6 +303,13 @@ msgstr "الاكتشاف غير متاح في هذا السياق."
 msgid "Type a question and I will generate the SQL and run it on the canvas."
 msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله على اللوحة."
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+#: src/views/OntologyDesignerApp/NewCaseTypeButton.tsx
+msgid "New case type"
+msgstr "نوع حالة جديد"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
 "affecting any others."
@@ -325,13 +346,17 @@ msgstr "H4"
 msgid "Query"
 msgstr "استعلام"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Join key"
+msgstr "مفتاح الربط"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "label"
+msgstr "التسمية"
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "Row filters"
 msgstr "فلاتر الصفوف"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Description"
-msgstr "وصف الملف الشخصي"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
@@ -367,6 +392,10 @@ msgstr "القيم المتنازع عليها"
 msgid "Please check your email for a confirmation link."
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is not available"
+msgstr "Google Sheet غير متاح"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not between"
 msgstr "ليس بين"
@@ -389,6 +418,7 @@ msgid "Square"
 msgstr "مربع"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "ملاحظات"
 
@@ -459,6 +489,7 @@ msgid "PDF file"
 msgstr "ملف PDF"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open"
 msgstr "فتح"
 
@@ -480,6 +511,10 @@ msgstr "لا"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not determine a base table from FROM clause."
 msgstr "تعذّر تحديد جدول أساسي من عبارة FROM."
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Case types"
+msgstr "أنواع الحالات"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -562,6 +597,10 @@ msgstr "تصدير PDF معلق"
 msgid "+ Group"
 msgstr "+ مجموعة"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "The column that names each case in the UI"
+msgstr "العمود الذي يحدد اسم كل حالة في واجهة المستخدم"
+
 #. placeholder {0}: options.failure.limit ?? 64
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot exceed {0} characters"
@@ -570,6 +609,10 @@ msgstr "لا يمكن أن يتجاوز عنوان URL المخصص {0} حرفً
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Source CRS"
 msgstr "نظام إحداثيات المصدر"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "For example, County or Household"
+msgstr "على سبيل المثال، المقاطعة أو الأسرة"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model"
@@ -649,7 +692,7 @@ msgstr "تعذّر مزامنة مجموعة البيانات عبر الإنت�
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx
 msgid "Disputed or undetermined boundary"
-msgstr "حدّ فاصل متنازع عليه أو غير محدد"
+msgstr "حدود متنازع عليها أو غير محددة"
 
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "Delete map?"
@@ -702,10 +745,6 @@ msgstr "لا يمكن عرض {chartName}"
 msgid "Dataset failed to process"
 msgstr "فشل معالجة مجموعة البيانات"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " {numRejectedRows} rows were rejected"
-msgstr "تم رفض {numRejectedRows} صفوف"
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
 msgstr "عمودي"
@@ -729,6 +768,10 @@ msgstr "Llama 3.1 8B (دون اتصال)"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
 msgstr "هل تريد إخفاء البرنامج التعليمي؟"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Picker error"
+msgstr "خطأ في Google Picker"
 
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "No datasets added yet"
@@ -771,6 +814,7 @@ msgstr "السماح بقيمة واحدة فقط"
 msgid "Pie Chart"
 msgstr "مخطط دائري"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Average"
@@ -867,10 +911,9 @@ msgstr "يمكنك اختيار السماح للجميع في مساحة عمل
 msgid "Unpublish"
 msgstr "إلغاء النشر"
 
-#. placeholder {0}: concept.name
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
-msgid "{0} Manager"
-msgstr "{0} مدير"
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Design case types in chat"
+msgstr "صمِّم أنواع الحالات في الدردشة"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "The sheet has a header row"
@@ -1016,6 +1059,10 @@ msgid "Comma-joined tables are not mapped; treat them as INNER JOIN with ON "
 msgstr "لا تتم مطابقة الجداول المرتبطة بفواصل؛ تعامل معها كـ INNER JOIN مع ON "
 "true."
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+msgid "This record failed to load"
+msgstr "تعذّر تحميل هذا السجل"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Saved datasets"
@@ -1094,6 +1141,10 @@ msgstr "لا يمكن أن يكون هذا الحقل فارغًا"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "\"{value}\" ليس تاريخًا. استخدم YYYY-MM-DD."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add a note"
+msgstr "إضافة ملاحظة"
+
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -1170,6 +1221,10 @@ msgstr "خط الأنابيب"
 msgid "Could not unpublish dashboard"
 msgstr "تعذّر إلغاء نشر لوحة المعلومات"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Where the fields come from"
+msgstr "مصدر الحقول"
+
 #: src/views/DataManagerApp/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "دون اتصال"
@@ -1206,6 +1261,11 @@ msgstr "أدخل البريد الإلكتروني"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
 msgstr "الحد الأدنى للمحور X"
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "This case type failed to load"
+msgstr "تعذّر تحميل نوع الحالة هذا"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "CSV"
@@ -1270,6 +1330,8 @@ msgstr "اسم مساحة العمل"
 msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -1289,9 +1351,9 @@ msgstr "المسافة الداخلية الرأسية"
 msgid "This map includes {0}, a layer set to Aggregate only. The export applies "
 "the same suppression as the screen: areas with fewer than {threshold} "
 "records are shown as suppressed, never as zero."
-msgstr "تتضمن هذه الخريطة {0}، وهي طبقة مضبوطة على التجميع فقط. يطبّق التصدير "
-"الإخفاء نفسه المطبق على الشاشة: تُعرض المناطق التي تحتوي على أقل من "
-"{threshold} سجلًا على أنها محجوبة، وليس أبدًا على أنها صفر."
+msgstr "تتضمن هذه الخريطة {0}، وهي طبقة مضبوطة على Aggregate فقط. يطبّق التصدير "
+"نفس الإخفاء المستخدم على الشاشة: تظهر المناطق التي تحتوي على أقل من "
+"{threshold} سجلًا على أنها محجوبة، وليس أبدًا كقيمة صفر."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
@@ -1339,7 +1401,7 @@ msgstr "حذف مجموعة الأدوار"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Show the subtitle on the page"
-msgstr "إظهار العنوان الفرعي في الصفحة"
+msgstr "إظهار العنوان الفرعي على الصفحة"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.tsx
 msgid "Export preview"
@@ -1407,6 +1469,10 @@ msgstr "إخفاء البرنامج التعليمي"
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field, e.g. Review notes"
+msgstr "إضافة حقل، مثل ملاحظات المراجعة"
+
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{areaValue} m²"
 msgstr "{areaValue} م²"
@@ -1422,13 +1488,15 @@ msgstr "تأكيد"
 msgid "is equal to..."
 msgstr "يساوي..."
 
-#: src/config/AppLinks/AppLinks.tsx
-msgid "Profile Designer"
-msgstr "مصمم الملف الشخصي"
-
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
 msgstr "{numGroups} مجموعات"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "A {conceptName} can include columns from different datasets. Choose "
+"which columns to add as fields."
+msgstr "يمكن أن يتضمن {conceptName} أعمدة من مجموعات بيانات مختلفة. اختر "
+"الأعمدة التي تريد إضافتها كحقول."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "Ask the dashboard's owner to share it with you."
@@ -1447,10 +1515,16 @@ msgstr "بداية النطاق الزمني: {startLabel}"
 msgid "Couldn't export PDF"
 msgstr "لم يتمكن من تصدير PDF"
 
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Value to keep for {0}"
+msgstr "القيمة التي يجب الاحتفاظ بها لـ {0}"
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/StandardLegendContent.tsx
 msgid "Sized by value"
 msgstr "الحجم حسب القيمة"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Label"
 msgstr "التسمية"
@@ -1587,6 +1661,10 @@ msgstr "خريطة {0}"
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "يجب أن يكون معرّف مساحة العمل أقصر من {SLUG_MAX_LENGTH} حرفًا"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "Refreshed from Google Sheets"
+msgstr "تم التحديث من Google Sheets"
+
 #: src/routes/_auth/(no-workspace)/invites/$inviteId.tsx
 msgid "The invitation you are trying to accept is not valid. Please contact the "
 "workspace owner to get a new invitation."
@@ -1596,10 +1674,6 @@ msgstr "الدعوة التي تحاول قبولها غير صالحة. يرج�
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "Normalize by"
 msgstr "التطبيع حسب"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a description for this profile type"
-msgstr "أدخل وصفًا لهذا النوع من الملف الشخصي"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "(Annual billing)"
@@ -1612,7 +1686,7 @@ msgstr "إزالة عضو"
 #. placeholder {0}: _formatProducedAt(producedAt)
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
-msgstr "تم إنتاج {0}"
+msgstr "تاريخ الإنتاج: {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -1639,6 +1713,13 @@ msgstr "تم حجب {0}"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "All columns"
 msgstr "جميع الأعمدة"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "New connectors are being added every month. If there is a database or "
+"service you use that you need to connect to, <0>please let us know so we "
+"can prioritize it</0>."
+msgstr "تُضاف موصلات جديدة كل شهر. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها "
+"وتحتاج إلى الاتصال بها، <0>فأخبرنا لنتمكن من إعطائها الأولوية</0>."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
@@ -1706,7 +1787,7 @@ msgstr "Positron"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Boundary disclaimer (Always included)"
-msgstr "إخلاء مسؤولية بشأن الحدود (مُضمّن دائمًا)"
+msgstr "إخلاء مسؤولية الحدود (مضمّن دائمًا)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 msgid "Undo"
@@ -1778,6 +1859,10 @@ msgstr "إدارة المقاعد في بوابة الفوترة →"
 msgid "Show exact locations"
 msgstr "إظهار المواقع الدقيقة"
 
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not load this cluster's features."
+msgstr "تعذّر تحميل ميزات هذه المجموعة."
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Table view has no chart settings."
 msgstr "لا يحتوي عرض الجدول على إعدادات للمخطط."
@@ -1802,6 +1887,10 @@ msgstr "حدّد طبقة بيانات لإنشاء نطاق حولها."
 msgid "Paper size"
 msgstr "حجم الورق"
 
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Select a {conceptName}"
+msgstr "حدّد {conceptName}"
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
@@ -1811,10 +1900,6 @@ msgstr "\"{0}\" الآن في مساحة العمل الخاصة بك."
 msgid "There is no text in this region to send. Kept the rule-based results."
 msgstr "لا يوجد نص في هذه المنطقة لإرساله. تم الاحتفاظ بالنتائج المستندة إلى "
 "القواعد."
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "Profile fields"
-msgstr "حقول الملف الشخصي"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Select a dataset from the list to view its metadata."
@@ -1937,6 +2022,12 @@ msgstr "أدخل اسمًا للحقل"
 msgid "Select Plan"
 msgstr "اختر خطة"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Delete case type"
+msgstr "حذف نوع الحالة"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "القيمة الافتراضية (اختياري)"
@@ -1945,14 +2036,11 @@ msgstr "القيمة الافتراضية (اختياري)"
 msgid "Your user profile is not loaded yet. Please retry."
 msgstr "لم يتم تحميل ملف تعريف المستخدم الخاص بك بعد. يرجى المحاولة مرة أخرى."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Sum"
 msgstr "مجموع"
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Sync data!"
-msgstr "مزامنة البيانات!"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -1966,6 +2054,10 @@ msgstr "هل تريد حذف <0>{openDatasetName}</0> نهائيًا؟"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
 msgstr "WMS"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "No attributes yet"
+msgstr "لا توجد سمات بعد"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -1981,7 +2073,7 @@ msgstr "GeoJSON"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
 msgid "Scale bar"
-msgstr "مقياس الرسم"
+msgstr "شريط المقياس"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "avg"
@@ -2138,10 +2230,6 @@ msgstr "مجموعة غير معروفة"
 msgid "Paragraph"
 msgstr "فقرة"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File was partially loaded"
-msgstr "تم تحميل الملف جزئيًا"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Payment Methods"
 msgstr "طرق الدفع"
@@ -2195,15 +2283,6 @@ msgstr "عرض التفاصيل"
 msgid "Boolean"
 msgstr "منطقي"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connecting to Google Sheets and other data sources are in the works and "
-"will be available very soon. If there is a database or service you use "
-"that you need to connect to, <0>please let us know so we can prioritize "
-"it</0>."
-msgstr "الاتصال بـ Google Sheets ومصادر البيانات الأخرى قيد العمل وسيكون متاحًا "
-"قريبًا جدًا. إذا كانت هناك قاعدة بيانات أو خدمة تستخدمها وتحتاج إلى "
-"الاتصال بها، <0>يرجى إخبارنا حتى نتمكن من إعطائها الأولوية</0>."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "A local record of every time you approved (or cancelled) sending data to "
 "an AI provider in this workspace. Last 90 days, stored on this device "
@@ -2231,6 +2310,11 @@ msgstr "يتطلب التجميع والتدرج الحراري ربطًا كا�
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private datasets"
 msgstr "مجموعات البيانات الخاصة"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Create case type"
+msgstr "إنشاء نوع حالة"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Publish it"
@@ -2309,6 +2393,10 @@ msgstr "فشل تحديث القيود"
 msgid "Exact"
 msgstr "دقيق"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Discard"
+msgstr "تجاهل"
+
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool is available when Spatial finishes loading."
@@ -2316,7 +2404,7 @@ msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
-msgstr "قد تُنسخ خريطة الأساس الداكنة أو خريطة الأقمار الصناعية بشكل غير واضح."
+msgstr "قد لا تُنسخ الخريطة الأساسية الداكنة أو خريطة الأقمار الصناعية جيدًا."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
@@ -2367,6 +2455,10 @@ msgid "Choose a saved dataset or import new data into your workspace."
 msgstr "اختر مجموعة بيانات محفوظة أو استورد بيانات جديدة إلى مساحة العمل الخاصة "
 "بك."
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Cannot sync this case type"
+msgstr "لا يمكن مزامنة نوع الحالة هذا"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "الإبلاغ عن خطأ"
@@ -2389,12 +2481,6 @@ msgstr "جارٍ كتابة الاستعلام…"
 msgid "Their contributor counts stay hidden because they are below the layer's "
 "minimum."
 msgstr "تبقى أعداد المساهمين فيها مخفية لأنها أقل من الحد الأدنى للطبقة."
-
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "No entity selected"
-msgstr "لم يتم اختيار أي كيان"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Allow new {pluralConceptName} to be created manually"
@@ -2434,6 +2520,7 @@ msgstr "يتوفر تحديث"
 msgid "Step"
 msgstr "خطوة"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Max"
@@ -2474,6 +2561,7 @@ msgstr "لم يتم العثور على شيء..."
 msgid "{keyboardShortcut} to save"
 msgstr "{keyboardShortcut} للحفظ"
 
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -2481,7 +2569,7 @@ msgstr "{keyboardShortcut} للحفظ"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete"
@@ -2575,6 +2663,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور "
 "X (\"{axisKeyValue}\")."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Filled in by hand"
+msgstr "تعبئة يدويًا"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
 msgid "Some filters were removed"
 msgstr "تمت إزالة بعض عوامل التصفية"
@@ -2602,10 +2694,6 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 "to share it with."
 msgstr "لوحة المعلومات متاحة، لكن لا يمكن لأي شخص آخر فتحها بعد. لنختر الأشخاص "
 "الذين تريد مشاركتها معهم."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Cannot sync this entity"
-msgstr "لا يمكن مزامنة هذا الكيان"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2655,6 +2743,12 @@ msgstr "تستخدم عبارة WHERE العامل \"{operator}\" مع قيمة 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid ", and "
 msgstr ", و"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Avandar cannot open this Google Sheet. It may have been deleted, or its "
+"access may have been removed. Pick the sheet again to restore access."
+msgstr "لا يستطيع Avandar فتح Google Sheet هذا. ربما تم حذفه أو أُزيلت صلاحية "
+"الوصول إليه. اختر الجدول مرة أخرى لاستعادة الوصول."
 
 #: src/routes/update-password.tsx
 msgid "Password updated successfully"
@@ -2735,6 +2829,7 @@ msgstr "لون واحد"
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
@@ -2753,7 +2848,7 @@ msgstr "لون واحد"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
@@ -2765,6 +2860,10 @@ msgstr "لون واحد"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Cancel"
 msgstr "إلغاء"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "No attributes or dataset are configured."
+msgstr "لم يتم إعداد أي سمات أو مجموعة بيانات."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 8"
@@ -2788,6 +2887,10 @@ msgstr "نطاق البيانات"
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Your Google connection expired"
+msgstr "انتهت صلاحية اتصالك بـ Google"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "يتطلب هندسة مكانية"
@@ -2799,6 +2902,10 @@ msgstr "لون خطوط الشبكة"
 #: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre، مساهمو OpenStreetMap"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "No columns from this dataset."
+msgstr "لا توجد أعمدة من مجموعة البيانات هذه."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -2827,19 +2934,11 @@ msgstr "تحميل نموذج الدردشة غير المتصل (WebLLM)"
 msgid "Review matches"
 msgstr "مراجعة التطابقات"
 
-#: src/views/OntologyDesignerApp/ConceptNavbar.tsx
-msgid "Create new profile type"
-msgstr "إنشاء نوع ملف تعريف جديد"
-
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "تم"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Add Field"
-msgstr "إضافة حقل"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -2878,10 +2977,6 @@ msgstr "عنوان URL قصير وسهل التذكر للمنشورات وال�
 msgid "Using your custom URL."
 msgstr "استخدام عنوان URL المخصص."
 
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "Profile failed to load"
-msgstr "فشل تحميل الملف الشخصي"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "لا يمكنك الحفظ في لوحة المعلومات حتى تُجري استعلامًا."
@@ -2904,13 +2999,14 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط من خلال بوابة "
 "الفوترة.<0/>سيأخذك الزر أدناه إلى هناك."
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete entity"
-msgstr "حذف الكيان"
-
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
 msgstr "نص فارغ"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
+msgid "Describe what you want to manage in plain language. Avandar builds it "
+"for you."
+msgstr "صِف ما تريد إدارته بلغة واضحة. سيبنيه Avandar نيابةً عنك."
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are outside the valid range."
@@ -3056,10 +3152,6 @@ msgstr "تم استلام قيمة غير نصية لحقل نصي"
 msgid "Failed to delete workspace"
 msgstr "تعذّر حذف مساحة العمل"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Delete Entity"
-msgstr "حذف الكيان"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Here you can see a full statistical profile of your data: ranges, "
 "distributions, and what's missing."
@@ -3112,7 +3204,7 @@ msgstr "العمود 11"
 msgid "Column 7"
 msgstr "العمود 7"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Feature"
 msgstr "ميزة"
 
@@ -3152,6 +3244,10 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 msgstr "لم يتم تطبيق SQL. وافق على قيم عوامل التصفية المفترضة لتشغيل هذا "
 "الاستعلام."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
+msgid "Could not create those case types"
+msgstr "تعذّر إنشاء أنواع الحالات هذه"
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Identity"
 msgstr "الهوية"
@@ -3173,6 +3269,7 @@ msgstr "لم يتم اختيار مجموعة بيانات"
 msgid "description"
 msgstr "الوصف"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Min"
@@ -3210,9 +3307,18 @@ msgstr "ينتهي بـ"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "مثل: cholera-outbreak-2024"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Refresh from Google Sheets"
+msgstr "التحديث من Google Sheets"
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Collection {collectionNumber}"
 msgstr "المجموعة {collectionNumber}"
+
+#. placeholder {0}: sourceGroups.length
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "{0} datasets joined"
+msgstr "تم ربط مجموعات البيانات {0}"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Ownership reassigned."
@@ -3248,10 +3354,6 @@ msgstr "مراجعة عامل التصفية"
 msgid "Split (+/-)"
 msgstr "تقسيم (+/-)"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Active"
-msgstr "نشط"
-
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "القيم الافتراضية، مفصولة بفواصل أو مصفوفة JSON"
@@ -3267,6 +3369,10 @@ msgstr "معاينة البيانات"
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
 msgstr "لا توجد لوحات معلومات لعرضها"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "A type of record you manage"
+msgstr "نوع من السجلات التي تديرها"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Y axis maximum"
@@ -3428,10 +3534,6 @@ msgstr "الفاصل بين تدريجات المحور X"
 msgid "Please try again."
 msgstr "يرجى المحاولة مرة أخرى."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
-msgid "Field Name"
-msgstr "اسم الحقل"
-
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
 msgstr "+ إضافة فلتر صف"
@@ -3514,6 +3616,10 @@ msgstr "المسافة (بالمتر)"
 msgid "URL template"
 msgstr "قالب URL"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google is rate limiting this request"
+msgstr "يُقيّد Google معدل هذا الطلب"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Plan Features:"
 msgstr "ميزات الخطة:"
@@ -3581,6 +3687,10 @@ msgstr "{maxAllowed, plural, one {تسمح خطتك بمشاركة لوحة مع
 msgid "You are offline"
 msgstr "أنت غير متصل"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Draft case type"
+msgstr "نوع حالة مسودة"
+
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to save to dashboard: {0}"
@@ -3606,10 +3716,8 @@ msgstr "إضافة قيمة"
 msgid "Rose"
 msgstr "وردة"
 
-#. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "هل أنت متأكد أنك تريد حذف {0}؟"
 
@@ -3647,6 +3755,10 @@ msgstr "استخرج إجابة من البيانات التي أضفتها لل
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Bar"
 msgstr "شريط"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "No {conceptName} records yet"
+msgstr "لا توجد سجلات {conceptName} حتى الآن"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
@@ -3832,6 +3944,10 @@ msgstr "اذهب إلى بوابة الفوترة"
 msgid "Clear log"
 msgstr "مسح السجل"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Sheet is too large"
+msgstr "جدول Google كبير جدًا"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
 msgstr "أيٌّ من"
@@ -3897,7 +4013,6 @@ msgstr "البحث بالاسم، المنظمة، خط الأنابيب…"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Data"
 msgstr "البيانات"
 
@@ -3963,7 +4078,6 @@ msgstr "لا يوجد ملف محدد"
 
 #: src/components/forms/AvaForm/AvaForm.tsx
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Submit"
 msgstr "إرسال"
 
@@ -3990,6 +4104,7 @@ msgid "Hex"
 msgstr "سداسي"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Tab"
 msgstr "علامة تبويب"
 
@@ -4010,8 +4125,14 @@ msgstr "أقل من دقيقة"
 msgid "Send invite"
 msgstr "إرسال الدعوة"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "record"
+msgstr "سجل"
+
+#. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Open {0}"
 msgstr "فتح {0}"
 
@@ -4036,10 +4157,6 @@ msgstr "التالي"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "الحقول التي تأتي من مجموعات البيانات"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Create"
-msgstr "إنشاء"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4097,6 +4214,10 @@ msgstr "عمود الشكل الهندسي للحدود"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below."
 msgstr "اكتب أو الصق بريدًا إلكترونيًا أدناه."
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Zoom to cluster"
+msgstr "تكبير المجموعة"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is true"
@@ -4291,6 +4412,11 @@ msgstr "الانتقال إلى الصفحة الرئيسية"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
+#. placeholder {0}: _getRowLabel(leaf, columns)
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
+msgid "View details for {0}"
+msgstr "عرض تفاصيل {0}"
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "جارٍ إنشاء SQL…"
@@ -4324,7 +4450,7 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
-msgstr "اختيار ملف"
+msgstr "اختر ملف"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
@@ -4479,6 +4605,7 @@ msgid "This query could not run"
 msgstr "تعذّر تشغيل هذا الاستعلام"
 
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "عرض"
 
@@ -4525,10 +4652,12 @@ msgstr "{layerCount} طبقات"
 msgid "Remove failed"
 msgstr "إزالة فاشلة"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} تم حذفه بنجاح"
 
@@ -4547,10 +4676,6 @@ msgstr "إعادة ترتيب الطبقة {layerName}"
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
 msgstr "من مجموعة البيانات"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "A profile can consist of columns that come from different datasets."
-msgstr "يمكن أن يتكون الملف الشخصي من أعمدة تأتي من مجموعات بيانات مختلفة."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
@@ -4599,11 +4724,6 @@ msgstr "تسمية المحور Y"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Quantile"
 msgstr "كمّي"
-
-#. placeholder {0}: concept.name
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Finished syncing {0} data"
-msgstr "تم الانتهاء من مزامنة {0} بيانات"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -4659,6 +4779,10 @@ msgstr "يمكنك عرض مجموعة البيانات هذه لأنها تمت
 msgid "Break {0} of {1}, {value}"
 msgstr "التقسيم {0} من {1}، {value}"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
+msgid "View records"
+msgstr "عرض السجلات"
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Create new dashboard"
 msgstr "إنشاء لوحة تحكم جديدة"
@@ -4676,6 +4800,10 @@ msgstr "إنشاء مساحة عمل"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 msgid "Try again"
 msgstr "حاول مرة أخرى"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+msgid "Add a field filled in by hand"
+msgstr "إضافة حقل مُعبّأ يدويًا"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
@@ -4697,7 +4825,7 @@ msgstr "تتطلب الطبقات المجمّعة فقط رابطًا ينتج 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Area of interest applied"
-msgstr "تم تطبيق المنطقة محل الاهتمام"
+msgstr "تم تطبيق منطقة الاهتمام"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "EPSG code"
@@ -4733,12 +4861,6 @@ msgstr "Llama 3.2 1B (دون اتصال بالإنترنت)"
 msgid "Series"
 msgstr "سلسلة"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "The entity failed to load. Please try again later or reach out to "
-"support."
-msgstr "فشل تحميل الكيان. يرجى المحاولة مرة أخرى لاحقًا أو التواصل مع الدعم."
-
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 msgid "Download PDF"
 msgstr "تنزيل PDF"
@@ -4760,12 +4882,6 @@ msgstr "عدّ الصفوف في {datasetName} حسب {groupByColumn}"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "لم يتم تطبيق SQL. سجّل الدخول للموافقة على قيم عامل التصفية."
-
-#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
-msgid "The profile manager page failed to load. Please try again later or reach "
-"out to support."
-msgstr "فشل تحميل صفحة إدارة الملف الشخصي. يرجى المحاولة مرة أخرى لاحقًا أو "
-"التواصل مع الدعم."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID can only contain letters, numbers, and hyphens"
@@ -4843,10 +4959,6 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 msgstr "لا تزال لوحة المعلومات هذه عامة على الويب. يمكن لأي شخص لديه الرابط "
 "عرضها حتى تضغط على الزر أدناه."
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "Entity deleted"
-msgstr "تم حذف الكيان"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields.tsx
 msgid "Select columns"
 msgstr "اختر الأعمدة"
@@ -4893,7 +5005,7 @@ msgstr "استيراد"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Clear Disputed status column"
-msgstr "مسح عمود حالة النزاع"
+msgstr "مسح عمود الحالة المتنازع عليها"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -5034,6 +5146,10 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Sync records"
+msgstr "مزامنة السجلات"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
 msgstr "تم تحميل مجموعة البيانات بنجاح"
@@ -5129,11 +5245,15 @@ msgstr "اختر واحدًا"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Undetermined values"
-msgstr "قيم غير محددة"
+msgstr "القيم غير المحددة"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
 msgstr "لم تتم إضافة أي حقول"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Pick one from the list to see its details."
+msgstr "اختر عنصرًا من القائمة لعرض تفاصيله."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5241,6 +5361,10 @@ msgstr "العنوان"
 msgid "Curve"
 msgstr "منحنى"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "What does this case type represent?"
+msgstr "ماذا يمثّل نوع الحالة هذا؟"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
 msgstr "العمود 4"
@@ -5288,6 +5412,10 @@ msgstr "إظهار الطبقة {layerName}"
 msgid "Create a new account"
 msgstr "إنشاء حساب جديد"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Reconnect your Google account and try again."
+msgstr "أعِد ربط حسابك على Google وحاول مرة أخرى."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "الاتجاه"
@@ -5304,6 +5432,10 @@ msgstr "المساعد يكتب"
 msgid "Dataset saved successfully!"
 msgstr "تم حفظ مجموعة البيانات بنجاح!"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
+msgid "Attributes"
+msgstr "السمات"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ClusterControls.tsx
 msgid "Cluster radius"
 msgstr "نصف قطر التجميع"
@@ -5315,6 +5447,16 @@ msgstr "لم يتم العثور على مجموعات بيانات محفوظة
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Expand the inspector"
 msgstr "توسيع المفتش"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/OntologyDesignerApp/index.tsx
+msgid "Case Manager"
+msgstr "مدير الحالات"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+msgid "The tab has a header row"
+msgstr "تحتوي علامة التبويب على صف عناوين"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5330,12 +5472,6 @@ msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إ�
 msgid "Make internal"
 msgstr "جعله داخليًا"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
-#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-msgid "Please select an entity from the left sidebar, or create a new one."
-msgstr "يرجى اختيار كيان من الشريط الجانبي الأيسر، أو إنشاء واحد جديد."
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
 msgstr "تم الكشف"
@@ -5344,6 +5480,11 @@ msgstr "تم الكشف"
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "حذف مجموعة البيانات"
+
+#. placeholder {0}: draft.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Created {0}"
+msgstr "تم الإنشاء {0}"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5467,6 +5608,10 @@ msgstr "الفئة {0}: {1} من القيم"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "تجاهل جميع عوامل التصفية العالمية: هذه التصور غير مصفاة."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Google Sheet"
+msgstr "جدول Google"
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "لقد كتبت:"
@@ -5480,6 +5625,7 @@ msgid "Unable to load dashboard datasets"
 msgstr "غير قادر على تحميل مجموعات بيانات لوحة التحكم"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "لم يتم إضافة أي وصف بعد."
 
@@ -5490,6 +5636,10 @@ msgstr "Qwen 2.5 3B"
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
 msgstr "طي لوحة السحب"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
+msgid "Add note"
+msgstr "إضافة ملاحظة"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
@@ -5578,10 +5728,6 @@ msgstr "يرجى إصلاح الحقول المميزة."
 msgid "is on or before"
 msgstr "في أو قبل"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/StatusPill.tsx
-msgid "Inactive"
-msgstr "غير نشط"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right"
@@ -5610,7 +5756,15 @@ msgstr "عدد صحيح"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The results are on the canvas to the left."
-msgstr "تظهر النتائج على اللوحة إلى اليسار."
+msgstr "النتائج على اللوحة إلى اليسار."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Field name"
+msgstr "اسم الحقل"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Most frequent"
+msgstr "الأكثر تكرارًا"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5640,9 +5794,11 @@ msgstr "بالنسبة لمجموعة البيانات <0>{0}</0>، اختر ا�
 msgid "Low"
 msgstr "منخفض"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Description"
 msgstr "الوصف"
 
@@ -5719,10 +5875,6 @@ msgstr "يرجى المحاولة مرة أخرى. لم يتم نشر لوحة �
 msgid "Encoding"
 msgstr "الترميز"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "We will use those columns to merge datasets into a single {conceptName}."
-msgstr "سنستخدم تلك الأعمدة لدمج مجموعات البيانات في {conceptName} واحدة."
-
 #: src/routes/forgot-password.tsx
 #: src/routes/signin.tsx
 #: src/views/ProfileView/EmailSection.tsx
@@ -5747,6 +5899,10 @@ msgstr "معالجة البيانات مرة أخرى"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions.tsx
 msgid "Export as PDF"
 msgstr "تصدير كملف PDF"
+
+#: src/views/IndividualManagerApp/EditCaseTypeButton.tsx
+msgid "Edit case type"
+msgstr "تحرير نوع الحالة"
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
@@ -5790,10 +5946,6 @@ msgstr "لا يوجد رمز P مطابق."
 msgid "Reset"
 msgstr "إعادة تعيين"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Enter a name for this profile type"
-msgstr "أدخل اسمًا لهذا النوع من الملف الشخصي"
-
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "Area"
 msgstr "المنطقة"
@@ -5821,6 +5973,10 @@ msgstr "تم تحديث اسم مساحة العمل"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
 msgstr "إضافة عمود كحقل"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Case type name"
+msgstr "اسم نوع الحالة"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.tsx
 msgid "Natural breaks used an evenly ranked sample of 5,000 values."
@@ -5859,6 +6015,10 @@ msgstr "لوحات المعلومات الخاصة"
 msgid "Upload"
 msgstr "رفع"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove {datasetName}"
+msgstr "إزالة {datasetName}"
+
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
@@ -5889,10 +6049,6 @@ msgstr "أسلوب الدونات"
 msgid "Member"
 msgstr "العضو"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid " over 1000 rows were rejected"
-msgstr "تم رفض أكثر من 1000 صف"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "تحديث الاشتراك"
@@ -5915,6 +6071,11 @@ msgstr "احصل على متوسط القيم"
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "{code} - UTM north zone {0}"
 msgstr "{code} - المنطقة الشمالية لـ UTM ‏{0}"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Finished syncing {0} records"
+msgstr "اكتملت مزامنة {0} سجلًا"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "No dashboards match “{searchQuery}”."
@@ -5967,7 +6128,7 @@ msgstr "غير متصل جزئيًا"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
-msgstr "إسناد المصدر (مضمّن دائمًا)"
+msgstr "نَسب المصدر (مضمّن دائمًا)"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock.tsx
@@ -6014,6 +6175,10 @@ msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، �
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. اختر محور الفئة أدناه."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "The Google file picker could not be opened. Please try again."
+msgstr "تعذّر فتح أداة اختيار ملفات Google. يُرجى المحاولة مرة أخرى."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
@@ -6129,6 +6294,12 @@ msgstr "فارغ"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Create a new workspace. You can always edit it later."
 msgstr "إنشاء مساحة عمل جديدة. يمكنك دائمًا تعديلها لاحقًا."
+
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
+#: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+msgid "Try again in a moment, or reach out to support if it keeps happening."
+msgstr "حاول مرة أخرى بعد قليل، أو تواصل مع الدعم إذا استمرت المشكلة."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -6264,11 +6435,15 @@ msgstr "تحميل {0} للدردشة غير المتصلة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
-msgstr "عمود حالة النزاع"
+msgstr "عمود الحالة المتنازع عليها"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "إزالة فلتر الصف"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "Let people create cases by hand too"
+msgstr "السماح للأشخاص بإنشاء الحالات يدويًا أيضًا"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Could not reach the assistant. Kept the rule-based results."
@@ -6464,9 +6639,9 @@ msgstr "يحتاج {flaggedRowCount} من أصل {0} صفًا إلى المرا�
 msgid "Billing"
 msgstr "الفوترة"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
-msgid "Profile Name"
-msgstr "اسم الملف الشخصي"
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
+msgid "This dataset now reflects the current contents of the sheet."
+msgstr "تعكس مجموعة البيانات هذه الآن المحتوى الحالي للجدول."
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
@@ -6508,10 +6683,6 @@ msgstr "فاصل"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "الحد الأدنى"
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {numSuccessRows} rows successfully, but {numRejectedStr}"
-msgstr "تم تحليل {numSuccessRows} صفوف بنجاح، ولكن {numRejectedStr}"
 
 #. placeholder {0}: subscription.maxDatasetsAllowed
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
@@ -6739,6 +6910,10 @@ msgstr "جارٍ تحميل الموارد الخاصة"
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "ID"
+msgstr "المعرّف"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls.tsx
 msgid "Smallest radius"
 msgstr "أصغر نصف قطر"
@@ -6747,6 +6922,10 @@ msgstr "أصغر نصف قطر"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "تم رفض الوصول"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "join key"
+msgstr "مفتاح الربط"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Created \"{dashboardName}\""
@@ -6822,6 +7001,12 @@ msgstr "تغييرات غير محفوظة"
 msgid "Model"
 msgstr "نموذج"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "I will propose case types from your dataset names and columns. Pick from "
+"the options or tell me what to create."
+msgstr "سأقترح أنواع الحالات استنادًا إلى أسماء مجموعات البيانات والأعمدة فيها. "
+"اختر من الخيارات أو أخبرني بما تريد إنشاءه."
+
 #: src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx
 msgid "Unsaved changes will not appear in preview. Save first."
 msgstr "لن تظهر التغييرات غير المحفوظة في المعاينة. احفظ أولاً."
@@ -6829,6 +7014,10 @@ msgstr "لن تظهر التغييرات غير المحفوظة في المعا
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "This workspace does not have a valid subscription."
 msgstr "لا تحتوي هذه المساحة على اشتراك صالح."
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Dataset"
+msgstr "مجموعة البيانات"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -6916,17 +7105,21 @@ msgstr "تطبيق المعايرة"
 msgid "Could not generate QR code"
 msgstr "تعذر إنشاء رمز الاستجابة السريعة"
 
-#: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
-msgid "No fields or dataset are configured."
-msgstr "لا توجد حقول أو مجموعة بيانات مكونة."
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove condition"
 msgstr "إزالة الشرط"
 
+#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/index.tsx
+msgid "Open case type"
+msgstr "فتح نوع الحالة"
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "نسبة مئوية"
+
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.tsx
+msgid "Each case type is a kind of record you manage."
+msgstr "كل نوع حالة هو نوع من السجلات التي تديرها."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "bar chart"
@@ -6968,15 +7161,18 @@ msgid "We were unable to update your subscription. Please contact "
 "{SUPPORT_EMAIL}"
 msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال بـ {SUPPORT_EMAIL}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Google sheets connector is disabled while this feature is under "
-"maintenance."
-msgstr "تم تعطيل موصل جداول بيانات Google أثناء صيانة هذه الميزة."
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "First"
+msgstr "الأول"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "إزالة"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "1 dataset"
+msgstr "مجموعة بيانات واحدة"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6987,6 +7183,12 @@ msgstr "لا توجد أعمدة رقمية"
 msgid "Service"
 msgstr "الخدمة"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "This question is too large for the on-device model. Try a shorter "
+"question, or reconnect to use cloud chat."
+msgstr "هذا السؤال كبير جدًا بالنسبة إلى النموذج الموجود على الجهاز. جرّب "
+"سؤالًا أقصر، أو أعِد الاتصال لاستخدام الدردشة السحابية."
+
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
 msgstr "{lengthValue} كم"
@@ -6995,7 +7197,7 @@ msgstr "{lengthValue} كم"
 msgid "Source line"
 msgstr "سطر المصدر"
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Nothing more to load"
 msgstr "لا يوجد المزيد لتحميله"
 
@@ -7034,6 +7236,10 @@ msgstr "الأشخاص الذين لديهم وصول"
 msgid "Google Sheets"
 msgstr "جداول بيانات Google"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Name for {columnLabel}"
+msgstr "اسم {columnLabel}"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
@@ -7055,6 +7261,10 @@ msgstr "تحرير الأذونات"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox.tsx
 msgid "queried"
 msgstr "تم الاستعلام"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "{conceptName} fields"
+msgstr "حقول {conceptName}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 3B (offline)"
@@ -7099,7 +7309,8 @@ msgstr "إذابة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "Column bound. No values assigned; outlines render as settled."
-msgstr "حدود العمود. لم يتم تعيين أي قيم؛ وتظهر المخططات كأنها مستقرة."
+msgstr "تم تحديد نطاق العمود. لم يتم تعيين أي قيم؛ ستظهر الحدود على أنها "
+"مستقرة."
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -7130,6 +7341,10 @@ msgstr "القيمة الافتراضية"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
 msgstr "لا تحتوي {0} مناطق على بيانات"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+msgid "Required"
+msgstr "مطلوب"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
 msgid "No numeric columns available to add to this series."
@@ -7202,7 +7417,7 @@ msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "يغطي <0>{0}</0>، من <1>{1}</1> إلى <2>{2}</2>."
 
-#: src/views/IndividualManagerApp/IndividualNavbar.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.ts
 msgid "Loading more..."
 msgstr "تحميل المزيد..."
 
@@ -7252,6 +7467,10 @@ msgstr "التصورات"
 msgid "Alt text"
 msgstr "النص البديل"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Please try again in a moment."
+msgstr "يرجى المحاولة مرة أخرى بعد قليل."
+
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "تبديل مساحة العمل"
@@ -7279,7 +7498,7 @@ msgstr "عمود مفتاح الحدود"
 #. placeholder {0}: filterReadout.timeWindow
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "Time window: {0}"
-msgstr "النافذة الزمنية: {0}"
+msgstr "الفترة الزمنية: {0}"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is outside the valid range"
@@ -7329,12 +7548,21 @@ msgstr "النبرة"
 msgid "Row {0}, {1}"
 msgstr "الصف {0}، {1}"
 
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "{0} features"
+msgstr "‏{0} من الميزات"
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Editor"
 msgstr "محرر"
+
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Entered manually"
+msgstr "تم الإدخال يدويًا"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
@@ -7443,6 +7671,10 @@ msgstr "إكسل"
 msgid "Dataset columns"
 msgstr "أعمدة مجموعة البيانات"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
+msgid "Details"
+msgstr "التفاصيل"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Could not prepare the offline chat model."
 msgstr "لم يتمكن من إعداد نموذج الدردشة غير المتصل."
@@ -7452,11 +7684,10 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 msgid "Delete the view {0}"
 msgstr "حذف العرض {0}"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "For each dataset you've added, please specify which columns should be "
-"used to uniquely identify a {conceptName}."
-msgstr "لكل مجموعة بيانات قمت بإضافتها، يرجى تحديد الأعمدة التي يجب استخدامها "
-"لتحديد {conceptName} بشكل فريد."
+#. placeholder {0}: cluster.pointCount
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Features in cluster ({0})"
+msgstr "الميزات في المجموعة ({0})"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make \"{resourceName}\" private?"
@@ -7469,6 +7700,14 @@ msgstr "تعذّر إنشاء ملف PDF: {detail}"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google Drive access is not configured for this deployment."
+msgstr "لم يتم إعداد الوصول إلى Google Drive لهذا النشر."
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Loading features"
+msgstr "جارٍ تحميل الميزات"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "This dataset will be offline-only"
@@ -7527,6 +7766,11 @@ msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لوا
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
+msgid "Add field"
+msgstr "إضافة حقل"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide subtitle"
@@ -7589,6 +7833,12 @@ msgid "Are you sure you want to permanently delete <0>{0}</0>? This cannot be "
 "undone."
 msgstr "هل أنت متأكد أنك تريد حذف <0>{0}</0> بشكل دائم؟ لا يمكن التراجع عن ذلك."
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
+msgid "For each dataset, pick the column that uniquely identifies a "
+"{conceptName}. We use those columns to merge rows into one record."
+msgstr "لكل مجموعة بيانات، اختر العمود الذي يعرّف {conceptName} بشكل فريد. "
+"نستخدم هذه الأعمدة لدمج الصفوف في سجل واحد."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
 msgid "Column outline"
 msgstr "مخطط العمود"
@@ -7602,6 +7852,11 @@ msgid "What this person or group can do. Viewer = read only, Editor = edit "
 "content, Admin = full control including sharing."
 msgstr "ما يمكن أن يفعله هذا الشخص أو المجموعة. المشاهد = قراءة فقط، المحرر = "
 "تعديل المحتوى، المسؤول = التحكم الكامل بما في ذلك المشاركة."
+
+#. placeholder {0}: attribute.name
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+msgid "Include {0}"
+msgstr "تضمين {0}"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link label"
@@ -7659,10 +7914,6 @@ msgstr "غير قادر على جعل مجموعة البيانات متاحة �
 msgid "Hide details"
 msgstr "إخفاء التفاصيل"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Enter comment"
-msgstr "أدخل تعليق"
-
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "See why"
 msgstr "معرفة السبب"
@@ -7673,7 +7924,7 @@ msgstr "لا توجد إدخالات حتى الآن. يتم ملء السجل �
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx
 msgid "No disputed-status column. Outlines render as settled."
-msgstr "لا يوجد عمود لحالة النزاع. وتظهر المخططات كأنها مستقرة."
+msgstr "لا يوجد عمود لحالة التنازع. ستظهر الحدود على أنها مستقرة."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
@@ -7744,6 +7995,10 @@ msgstr "تدرج الألوان"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "number"
 msgstr "رقم"
+
+#: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
+msgid "Sync this case type from Case Manager to create records from your data."
+msgstr "زامن نوع الحالة هذا من Case Manager لإنشاء سجلات من بياناتك."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group created"
@@ -7823,6 +8078,10 @@ msgstr "تعذر قراءة الملف"
 msgid "Column 6"
 msgstr "العمود 6"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "An unexpected error occurred."
+msgstr "حدث خطأ غير متوقع."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay what you want"
 msgstr "ادفع ما تريد"
@@ -7874,6 +8133,7 @@ msgstr "المطالبة"
 msgid "You're on the Free plan"
 msgstr "أنت على الخطة المجانية"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Count"
@@ -7955,6 +8215,10 @@ msgstr "يقع في"
 msgid "Members"
 msgstr "الأعضاء"
 
+#: src/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay.tsx
+msgid "Dock chat panel"
+msgstr "إرساء لوحة الدردشة"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
 msgstr "هندسة النقطة"
@@ -8018,6 +8282,11 @@ msgstr "عمود"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Remove local filter"
 msgstr "إزالة الفلتر المحلي"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Could not sync {0} records"
+msgstr "تعذّرت مزامنة سجلات {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "This removes the user group from members and resources that use it."
@@ -8199,10 +8468,6 @@ msgstr "المستند المحدد: {0}"
 msgid "Subtle"
 msgstr "دقيق"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
-msgid "Activity"
-msgstr "النشاط"
-
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "(لم تُرسل الرسالة.)"
@@ -8236,12 +8501,6 @@ msgstr "لقد استخدمت مساحتك جميع {currentSeatUsage} من مق
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "There's your answer"
 msgstr "ها هي إجابتك"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
-msgid "This is where you select which columns from which datasets should be "
-"added into this {conceptName}."
-msgstr "هنا تختار الأعمدة من مجموعات البيانات التي يجب إضافتها إلى هذا "
-"{conceptName}."
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Expand the legend"
@@ -8311,6 +8570,10 @@ msgstr "مزامنة عبر الإنترنت؟"
 msgid "Neutral failure"
 msgstr "فشل محايد"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.tsx
+msgid "No fields yet"
+msgstr "لا توجد حقول بعد"
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Landscape"
 msgstr "أفقي"
@@ -8347,8 +8610,10 @@ msgstr "نسخ الرابط"
 msgid "100,000"
 msgstr "100,000"
 
+#. placeholder {0}: caseType.name
 #. placeholder {0}: dataset.name
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "Delete {0}"
 msgstr "حذف {0}"
 
@@ -8361,13 +8626,19 @@ msgstr "قطع الألوان"
 msgid "Save changes"
 msgstr "احفظ التغييرات"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet failed to load"
 msgstr "فشل تحميل ورقة Google"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "اكتب عبارة التأكيد"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
+"sheet and try again."
+msgstr "يمكن لـ Google تصدير 10 ميغابايت كحد أقصى من جدول البيانات في كل مرة. "
+"قسّم الورقة وحاول مرة أخرى."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
@@ -8384,6 +8655,10 @@ msgstr "تغيير عنوان URL"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Ochre"
 msgstr "مغرة"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
+msgid "Could not create that case type"
+msgstr "تعذّر إنشاء نوع الحالة هذا"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -8420,6 +8695,11 @@ msgstr "مُستبعد"
 #: src/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal.tsx
 msgid "Dataset limit reached"
 msgstr "تم الوصول إلى حد مجموعة البيانات"
+
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Case type deleted"
+msgstr "تم حذف نوع الحالة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Distinct values"
@@ -8493,6 +8773,10 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "قد تحتوي القيم التي اخترتها على معلومات شخصية. سيتلقاها مزود الذكاء "
 "الاصطناعي وقد يسجل الطلب."
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Remove this dataset"
+msgstr "إزالة مجموعة البيانات هذه"
 
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
@@ -8573,14 +8857,13 @@ msgstr "{peopleClause} و{groupClause}"
 msgid "High"
 msgstr "مرتفع"
 
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
-#: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
-msgid "Entity failed to load"
-msgstr "فشل تحميل الكيان"
-
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
 msgstr "يستخدم لتسجيل الدخول إلى حسابك."
+
+#: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.tsx
+msgid "Could not zoom to this cluster."
+msgstr "تعذّر التكبير إلى هذه المجموعة."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add an image URL to render a figure."
@@ -8677,6 +8960,10 @@ msgstr "مجموعة البيانات الكاملة"
 msgid "Or"
 msgstr "أو"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to results"
+msgstr "العودة إلى النتائج"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
 msgstr "حراري"
@@ -8684,6 +8971,13 @@ msgstr "حراري"
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to layer settings"
 msgstr "الانتقال إلى إعدادات الطبقة"
+
+#. placeholder {0}: caseType.name
+#. placeholder {0}: concept.name
+#: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Are you sure you want to delete {0}? This cannot be undone."
+msgstr "هل أنت متأكد من رغبتك في حذف {0}؟ لا يمكن التراجع عن هذا الإجراء."
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Area Chart"

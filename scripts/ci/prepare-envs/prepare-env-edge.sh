@@ -19,7 +19,7 @@ declare -A _edge_env=(
   [SB_SECRET_KEY]="$(get_supabase_env_var SECRET_KEY)"
   [SB_JWT_ISSUER]="http://127.0.0.1:54321/auth/v1"
   [MODE]="development"
-  [VITE_APP_URL]="http://127.0.0.1:5173/"
+  [VITE_APP_URL]="http://localhost:5173/"
 
   # Google environment variables
   [GOOGLE_CLIENT_ID]="$GOOGLE_CLIENT_ID"

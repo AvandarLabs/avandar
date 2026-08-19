@@ -11,7 +11,7 @@ const PDF_DATASET_ID = "33333333-3333-3333-3333-333333333333" as Dataset.Id;
 // file has nothing to say about; what matters here is that they are reachable
 // at all in the state that only they can end.
 vi.mock(
-  "@/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls",
+  "@/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/PdfParseControls",
   async () => {
     const { createElement } = await import("react");
     return {

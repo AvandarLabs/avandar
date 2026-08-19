@@ -12,7 +12,8 @@ type Props = {
 /**
  * The alert stating what the PERSISTED visibility means for who can read the
  * dashboard today. One arm per visibility, because "nobody can open it", "only
- * people you gave access" and "the whole internet" are three different facts
+ * people you gave access" and "the whole internet" are three different
+ * relations
  * and each earns its own colour.
  */
 export function VisibilityAlert({ visibility }: Readonly<Props>): ReactNode {

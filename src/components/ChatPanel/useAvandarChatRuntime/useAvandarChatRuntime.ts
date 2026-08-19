@@ -2,6 +2,7 @@ import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter";
@@ -79,6 +80,7 @@ export function useAvandarChatRuntime(): {
     fixingQuery: t`Fixing query…`,
     noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
     metadataQuery: t`Here is a query based on your workspace metadata.`,
+    contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
   });
   const [initialMessages] = useState(() => {
     return user && workspace.id ?
@@ -112,6 +114,7 @@ export function useAvandarChatRuntime(): {
         fixingQuery: t`Fixing query…`,
         noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
         metadataQuery: t`Here is a query based on your workspace metadata.`,
+        contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
       };
     },
     [dashboardEditorState, pageContext, pathname, parseSql, t, user, workspace],
@@ -226,6 +229,13 @@ export function useAvandarChatRuntime(): {
       });
     }
     chatPanelDispatch.setPendingClarification(undefined);
+    if (pageContextRef.current.app === "case-manager") {
+      runtime.thread.append({
+        role: "user",
+        content: [{ type: "text", text: CaseDesignKickoff.CONTENT }],
+        metadata: CaseDesignKickoff.metadata,
+      });
+    }
   }, [runtime, chatPanelDispatch]);
 
   return { runtime, startNewChat };

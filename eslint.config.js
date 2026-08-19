@@ -59,6 +59,11 @@ export default [
       // thousands of errors on any machine that had run the e2e suite.
       "playwright-report/**",
       "src/i18n/locales/**/messages.ts",
+      // The repo's scratch directory (AGENTS.md sends screenshots and one-off
+      // scripts here, per branch). Gitignored, but still linted, so `pnpm lint`
+      // failed on whatever throwaway script the last debugging session left
+      // behind.
+      ".temp/**",
       // `supabase start` writes a minified edge-runtime bundle here. It is
       // gitignored but was still linted, so `pnpm lint` failed with hundreds of
       // errors on any machine where the local stack had been started, and

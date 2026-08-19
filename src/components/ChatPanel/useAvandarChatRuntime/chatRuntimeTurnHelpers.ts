@@ -15,6 +15,7 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   sqlResultsOnCanvas: string;
   fallbackTitle: string;
   fallbackMessage: string;
+  contextWindowExceeded: string;
 };
 
 /**

@@ -363,6 +363,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.31.1
         version: 2.31.1(@types/node@22.19.19)
+      '@duckdb/node-api':
+        specifier: 1.5.5-r.4
+        version: 1.5.5-r.4
       '@eslint/js':
         specifier: ^9.21.0
         version: 9.39.3
@@ -1907,6 +1910,56 @@ packages:
 
   '@duckdb/duckdb-wasm@1.33.1-dev20.0':
     resolution: {integrity: sha512-ual3d/WDZnyZHNZ3tGdFvTZY22IDdg63Bh0icSBA6JPOy1u89rNfVH/3wQhtoJPv3Xn7eWVJ/4gpT3wprrisoA==}
+
+  '@duckdb/node-api@1.5.5-r.4':
+    resolution: {integrity: sha512-8v0CZNo7aM6GQCNUHERGTrZWIfss8xKzZPF3ACNhPdMMrt7UjkNI5nRQ9FTFO7Yx8ghxYxVpdotmBBMQ5vXUOA==}
+
+  '@duckdb/node-bindings-darwin-arm64@1.5.5-r.4':
+    resolution: {integrity: sha512-4OdO3pkoJzAZDnZ2iyehi67XL4+WqHPCGYWbyAsYyhGJS+WscGrAnFhMhHudMM2XF8pIEM2tuOKMmwWnTNN2wQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@duckdb/node-bindings-darwin-x64@1.5.5-r.4':
+    resolution: {integrity: sha512-WHg3E+TupdujG31LGujMMcmtPIdW6rqRHeihlKgJR8EMetHycoYkwYxRud0niitJvS+uV0du/6pdemzs3HG9GQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@duckdb/node-bindings-linux-arm64-musl@1.5.5-r.4':
+    resolution: {integrity: sha512-Tswnf+/XWpOcFJNUUu1fkFIX/su4tMcnNz0ZV0Nru3/CkJKIMwBh+VL4SM9YV4zPK90GC4Lm8gzafjc1qDmfyQ==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@duckdb/node-bindings-linux-arm64@1.5.5-r.4':
+    resolution: {integrity: sha512-VIeHMpYAKpGiWZ4QYsOhODAHDEcXcn089aKty0MFsMEKaEfRJWixKwnwXy/ba2/wwFmnPiSFhKNqygj2BrQbqw==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@duckdb/node-bindings-linux-x64-musl@1.5.5-r.4':
+    resolution: {integrity: sha512-h0ixrgGHtHh+C/Fu1eAL9hX4iCf8yuyJN6Y24Gh8axXXP8UuSh0rQRAQUQTYarQ8pm2qSG/67ZYjyYYydD+J/w==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@duckdb/node-bindings-linux-x64@1.5.5-r.4':
+    resolution: {integrity: sha512-EY+CL/4h8MQZd9MxTBq+98m3U9osmvHBwhE9b5fMWQGt2I6p1j8fvX0SXiwy9KBfQIbjVUOf5XvGdXncI54KSg==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@duckdb/node-bindings-win32-arm64@1.5.5-r.4':
+    resolution: {integrity: sha512-uorAnySIMwWkRDuUhM1yTDxWIislnX8mndhFIw6r4VKhVW61HEOOMX5oAgkSQFII4RNWpC5PCcUAEhSATgNvVQ==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@duckdb/node-bindings-win32-x64@1.5.5-r.4':
+    resolution: {integrity: sha512-X9XGcWQ10P3mvUIaMXXk2bi94Cow7b/ziTPMKxJ0U8U3wQPxsLzEUP7D7C/KrBWINl5am2k+5SkDVyA/THUgPg==}
+    cpu: [x64]
+    os: [win32]
+
+  '@duckdb/node-bindings@1.5.5-r.4':
+    resolution: {integrity: sha512-n+4hEfjp4vny3BuWn5p1Gh5CzHaPRxoI8TzTytxL1GMlIKKrXcg/o6sSAjrsROUXGAM4WQCiWPLKnPsjJJSggg==}
 
   '@ecies/ciphers@0.2.6':
     resolution: {integrity: sha512-patgsRPKGkhhoBjETV4XxD0En4ui5fbX0hzayqI3M8tvNMGUoUvmyYAIWwlxBc1KX5cturfqByYdj5bYGRpN9g==}
@@ -13762,6 +13815,47 @@ snapshots:
     dependencies:
       apache-arrow: 17.0.0
       qs: 6.15.0
+
+  '@duckdb/node-api@1.5.5-r.4':
+    dependencies:
+      '@duckdb/node-bindings': 1.5.5-r.4
+
+  '@duckdb/node-bindings-darwin-arm64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-darwin-x64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-linux-arm64-musl@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-linux-arm64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-linux-x64-musl@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-linux-x64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-win32-arm64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings-win32-x64@1.5.5-r.4':
+    optional: true
+
+  '@duckdb/node-bindings@1.5.5-r.4':
+    dependencies:
+      detect-libc: 2.1.2
+    optionalDependencies:
+      '@duckdb/node-bindings-darwin-arm64': 1.5.5-r.4
+      '@duckdb/node-bindings-darwin-x64': 1.5.5-r.4
+      '@duckdb/node-bindings-linux-arm64': 1.5.5-r.4
+      '@duckdb/node-bindings-linux-arm64-musl': 1.5.5-r.4
+      '@duckdb/node-bindings-linux-x64': 1.5.5-r.4
+      '@duckdb/node-bindings-linux-x64-musl': 1.5.5-r.4
+      '@duckdb/node-bindings-win32-arm64': 1.5.5-r.4
+      '@duckdb/node-bindings-win32-x64': 1.5.5-r.4
 
   '@ecies/ciphers@0.2.6(@noble/ciphers@1.3.0)':
     dependencies:
