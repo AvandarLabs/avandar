@@ -77,6 +77,7 @@ const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
 const {
   insertCsvFileDatasetMock,
   insertPdfFileDatasetMock,
+  transcodeReviewedPdfExtractionMock,
   logEventMock,
   workspaceDatasetsMock,
   notifyErrorMock,
@@ -86,6 +87,7 @@ const {
   return {
     insertCsvFileDatasetMock: vi.fn(),
     insertPdfFileDatasetMock: vi.fn(),
+    transcodeReviewedPdfExtractionMock: vi.fn(),
     logEventMock: vi.fn(),
     workspaceDatasetsMock: vi.fn(),
     notifyErrorMock: vi.fn(),
@@ -107,6 +109,14 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       insertGoogleSheetsDataset: vi.fn(),
       insertPdfFileDataset: insertPdfFileDatasetMock,
       insertXlsxFileDataset: vi.fn(),
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+  return {
+    LocalDatasetClient: {
+      transcodeReviewedPdfExtraction: transcodeReviewedPdfExtractionMock,
     },
   };
 });
@@ -266,6 +276,10 @@ describe("useSaveDataset", () => {
     insertCsvFileDatasetMock.mockResolvedValue(SAVED_DATASET);
     insertPdfFileDatasetMock.mockReset();
     insertPdfFileDatasetMock.mockResolvedValue(SAVED_DATASET);
+    transcodeReviewedPdfExtractionMock.mockReset();
+    transcodeReviewedPdfExtractionMock.mockResolvedValue({
+      columns: [_duckDbColumn("subject"), _duckDbColumn("value")],
+    });
     logEventMock.mockReset();
     navigateMock.mockReset();
     notifyErrorMock.mockReset();

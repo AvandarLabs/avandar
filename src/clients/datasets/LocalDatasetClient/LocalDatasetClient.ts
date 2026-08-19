@@ -182,6 +182,14 @@ type LocalDatasetMutationRecord = {
     columns: DuckDbColumnSchema[];
     previewRows: UnknownRow[];
   }>;
+  transcodeReviewedPdfExtraction: (
+    params: Readonly<{
+      datasetId: DatasetId;
+      workspaceId: Workspace.Id;
+      /** The rows the user approved, serialised so DuckDB can type them. */
+      csvFile: File;
+    }>,
+  ) => Promise<{ columns: DuckDbColumnSchema[] }>;
   resumeImport: (
     params: Readonly<{ datasetId: DatasetId }>,
   ) => Promise<DuckDbLoadCsvResult | DuckDbLoadXlsxResult | undefined>;
@@ -412,6 +420,52 @@ function _makeTranscodePdfExtraction(
   };
 }
 
+/**
+ * Re-types and re-transcodes a PDF dataset from the rows the user approved.
+ *
+ * Called once, at save time. The import-time transcode ran against the raw
+ * extraction, so after any review correction or model-assisted row the
+ * DuckDB table and the parquet still hold the pre-review data. Saving
+ * without this would write a dataset whose column metadata described rows
+ * the user fixed while its actual rows stayed wrong, which is worse than
+ * offering no review at all.
+ *
+ * Unlike `transcodePdfExtraction` this awaits the transcode instead of
+ * firing it off. Two reasons: the caller is about to insert the dataset and
+ * wants the authoritative column types the transcode produces, not the
+ * sniffer's guess; and `startDatasetUpload` runs moments later and decides
+ * what to upload from `parseStatus` plus the import job, so returning before
+ * the job is even registered would race it into uploading the stale parquet.
+ *
+ * `userId` is read from the existing row rather than taken as a parameter.
+ * The row was created by `startPdfImport` and already records whose import
+ * this is, so there is nothing for a caller to get wrong.
+ */
+function _makeTranscodeReviewedPdfExtraction(
+  context: Readonly<LocalDatasetMutationContext>,
+): LocalDatasetMutationRecord["transcodeReviewedPdfExtraction"] {
+  return async (params) => {
+    const logger = context.logger.appendName("transcodeReviewedPdfExtraction");
+    logger.log("Re-typing reviewed PDF rows", {
+      datasetId: params.datasetId,
+      size: params.csvFile.size,
+    });
+    const row = await AvaDexie.DB.LocalDataset.get(params.datasetId);
+    if (!row) {
+      throw new Error(
+        `Cannot re-transcode ${params.datasetId}: it is no longer in local storage.`,
+      );
+    }
+    const result = await runBackgroundParquetTranscoding({
+      datasetId: params.datasetId,
+      workspaceId: params.workspaceId,
+      userId: row.userId,
+      source: { kind: "csv", file: params.csvFile, options: { type: "csv" } },
+    });
+    return { columns: result.columns };
+  };
+}
+
 function _makeResumeImport(
   context: Readonly<LocalDatasetMutationContext>,
 ): LocalDatasetMutationRecord["resumeImport"] {
@@ -569,6 +623,8 @@ function _createLocalDatasetMutations(
     startXlsxImport: _makeStartXlsxImport(context),
     startPdfImport: _makeStartPdfImport(context),
     transcodePdfExtraction: _makeTranscodePdfExtraction(context),
+    transcodeReviewedPdfExtraction:
+      _makeTranscodeReviewedPdfExtraction(context),
     resumeImport: _makeResumeImport(context),
     dropLocalDataset: _makeDropLocalDataset(context),
     fetchCloudDatasetToLocalStorage:

@@ -45,10 +45,19 @@ type Props = {
   userId: string | undefined;
   onRegionsChange: (regions: readonly PdfRegion[]) => void;
   onActiveRegionChange: (regionId: string) => void;
-  /** Called with a region's table once model rows have been merged in. */
-  onTableChange: (table: ExtractedTable) => void;
-  /** Records which model contributed, so the save can write `llm_model`. */
-  onLlmModelUsed: (llmModel: string) => void;
+  /**
+   * Called once when the assistant contributed rows.
+   *
+   * The merged table and the model that produced it arrive together on
+   * purpose. Two callbacks would be two state updates derived from the same
+   * metadata, and whichever landed second would silently discard the other,
+   * leaving a dataset that records a model in `llm_model` without the rows
+   * that model wrote.
+   */
+  onAssistApplied: (result: {
+    table: ExtractedTable;
+    llmModel: string;
+  }) => void;
 };
 
 /**
@@ -72,8 +81,7 @@ export function PdfRegionPicker({
   userId,
   onRegionsChange,
   onActiveRegionChange,
-  onTableChange,
-  onLlmModelUsed,
+  onAssistApplied,
 }: Readonly<Props>): ReactNode {
   const [pageIndex, setPageIndex] = useState(0);
   const [scale, setScale] = useState(
@@ -159,8 +167,7 @@ export function PdfRegionPicker({
         });
         return;
       }
-      onTableChange(outcome.table);
-      onLlmModelUsed(outcome.llmModel);
+      onAssistApplied({ table: outcome.table, llmModel: outcome.llmModel });
       setAssistStatus(region.id, {
         isRunning: false,
         message: `Added ${outcome.addedRowCount} rows from the assistant. Check them before saving.`,

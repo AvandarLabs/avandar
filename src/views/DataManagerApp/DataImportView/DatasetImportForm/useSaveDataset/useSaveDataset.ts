@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { snakeCaseKeysShallow, where } from "@avandar/utils";
+import { MIMEType, snakeCaseKeysShallow, where } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
@@ -7,7 +7,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { computePdfTableFingerprint } from "@/clients/datasets/pdfTableFingerprint";
+import { pdfTableToCsv } from "@/clients/datasets/pdfTableToColumns";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -249,12 +251,38 @@ async function _savePdfDataset(
     throw new Error("Select a region before saving.");
   }
 
+  // The dataset is rebuilt from `combinedCells`, which is what the review
+  // grid has been writing to: corrected values and any model-assisted rows
+  // are already in it. The import-time transcode ran against the raw
+  // extraction, so without this the saved rows would be the ones the user
+  // just finished fixing, in their unfixed form. The review grid exists
+  // because association-by-position was measured getting roughly one figure
+  // in sixteen silently wrong, so a review that does not reach the data is
+  // worse than no review: it manufactures confidence in the same bad rows.
+  //
+  // This runs once, on save, rather than on every edit: typing each
+  // keystroke through DuckDB would be wasteful and would make the grid feel
+  // broken.
+  const reviewedCsv = pdfTableToCsv({
+    cells: datasetLoadResult.combinedCells,
+    headerRows: datasetLoadResult.combinedHeaderRows,
+  });
+  const transcode = await LocalDatasetClient.transcodeReviewedPdfExtraction({
+    datasetId: datasetLoadResult.datasetId,
+    workspaceId: options.context.workspaceId,
+    csvFile: new File([reviewedCsv], `${datasetLoadResult.datasetId}.csv`, {
+      type: MIMEType.TEXT_CSV,
+    }),
+  });
+
   return DatasetClient.insertPdfFileDataset({
     datasetId: datasetLoadResult.datasetId,
     workspaceId: options.context.workspaceId,
     datasetName: options.context.datasetName,
     datasetDescription: options.context.datasetDescription,
-    columns: _duckDbColumnsToImportedColumns(datasetLoadResult.columns).map(
+    // The transcode's schema, not the sniff's: it is the authoritative
+    // typing of the rows that were actually written.
+    columns: _duckDbColumnsToImportedColumns(transcode.columns).map(
       snakeCaseKeysShallow,
     ),
     isInCloudStorage: onlineStorageAllowed,

@@ -70,8 +70,10 @@ type PickerProps = {
   userId: string | undefined;
   onRegionsChange: (regions: readonly PdfRegion[]) => void;
   onActiveRegionChange: (regionId: string) => void;
-  onTableChange: (table: ExtractedTable) => void;
-  onLlmModelUsed: (llmModel: string) => void;
+  onAssistApplied: (result: {
+    table: ExtractedTable;
+    llmModel: string;
+  }) => void;
 };
 
 function renderPicker(overrides: Partial<PickerProps> = {}): PickerProps {
@@ -93,8 +95,7 @@ function renderPicker(overrides: Partial<PickerProps> = {}): PickerProps {
     userId: "user-1",
     onRegionsChange: vi.fn(),
     onActiveRegionChange: vi.fn(),
-    onTableChange: vi.fn(),
-    onLlmModelUsed: vi.fn(),
+    onAssistApplied: vi.fn(),
     ...overrides,
   };
   render(<PdfRegionPicker {...props} />);
@@ -182,11 +183,12 @@ describe("PdfRegionPicker", () => {
     expect(
       await screen.findByText(/kept the rule-based results/i),
     ).toBeInTheDocument();
-    expect(props.onTableChange).not.toHaveBeenCalled();
-    expect(props.onLlmModelUsed).not.toHaveBeenCalled();
+    expect(props.onAssistApplied).not.toHaveBeenCalled();
   });
 
-  it("records the model that contributed rows", async () => {
+  it("reports the merged rows and the model that wrote them together", async () => {
+    // One call, not two. Two would be two state updates derived from the
+    // same metadata, and the loser would take the model's rows with it.
     const merged: ExtractedTable = {
       ...TABLE_WITH_COVERAGE_FLAG,
       extractedBy: "model",
@@ -205,11 +207,12 @@ describe("PdfRegionPicker", () => {
     );
 
     await waitFor(() => {
-      expect(props.onTableChange).toHaveBeenCalledWith(merged);
+      expect(props.onAssistApplied).toHaveBeenCalledWith({
+        table: merged,
+        llmModel: "anthropic/claude-sonnet-5",
+      });
     });
-    expect(props.onLlmModelUsed).toHaveBeenCalledWith(
-      "anthropic/claude-sonnet-5",
-    );
+    expect(props.onAssistApplied).toHaveBeenCalledTimes(1);
     expect(screen.getByText(/added 2 rows from the assistant/i)).toBeVisible();
   });
 
@@ -225,6 +228,6 @@ describe("PdfRegionPicker", () => {
     expect(
       await screen.findByText(/could not reach the assistant/i),
     ).toBeInTheDocument();
-    expect(props.onTableChange).not.toHaveBeenCalled();
+    expect(props.onAssistApplied).not.toHaveBeenCalled();
   });
 });
