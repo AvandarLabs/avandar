@@ -1,0 +1,11 @@
+.card {
+  cursor: pointer;
+}
+
+.cardActive {
+  border-color: var(--mantine-color-blue-5);
+}
+
+.nameInput {
+  flex: 1;
+}

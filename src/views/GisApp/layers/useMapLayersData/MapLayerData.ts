@@ -74,7 +74,14 @@ export const MapLayerData = {
     return MapLayer.toGeoBinding(layer) !== undefined;
   },
 
-  /** Cache key for a layer's rows, excluding display-only layer settings. */
+  /**
+   * Cache key for a layer's rows, excluding display-only layer settings.
+   *
+   * `pointContext` carries the zoom for a lat/lng point layer, which belongs
+   * in the key because a large point layer is aggregated into a zoom-sized
+   * grid in SQL: without it, zooming in would keep redrawing the grid built
+   * for the zoom the layer first loaded at.
+   */
   getQueryKeyFromMapLayer: (
     layer: MapLayer.T,
     spatialContext?: {
@@ -84,6 +91,7 @@ export const MapLayerData = {
     },
     overlay?: MapOverlay,
     stack: readonly MapLayer.T[] = [],
+    pointContext?: { zoomBand: number },
   ): unknown[] => {
     const sourceKey = _getBufferSourceQueryKey(layer, stack);
     return [
@@ -94,9 +102,12 @@ export const MapLayerData = {
       layer.sensitivity,
       layer.timeColumn,
       layer.applyAoiFilter,
+      layer.disputedStatusColumn,
+      layer.disputedStatusValues,
       overlay?.timeRange,
       overlay?.aoi,
       ...(spatialContext ? [spatialContext] : []),
+      ...(pointContext ? [pointContext] : []),
       ...(sourceKey ? [sourceKey] : []),
     ];
   },

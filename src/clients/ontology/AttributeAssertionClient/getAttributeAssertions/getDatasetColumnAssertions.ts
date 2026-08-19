@@ -11,11 +11,11 @@ import {
   where,
 } from "@avandar/utils";
 import { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
-import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { DatasetColumnMappingClient } from "@/clients/ontology/DatasetColumnMappingClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -28,120 +28,6 @@ type AttributeWithDatasetMapping = {
   attribute: ConceptAttribute.T;
   mapping: DatasetColumnMapping;
 };
-
-/**
- * Generate the nested SQL 'SELECT' statement to extract values using
- * a dataset column mapping's `ruleType`.
- *
- * The output SQL of this function will only work if it is included as a
- * subquery of a larger query that has a table called `external_ids` with
- * a column called `external_id`. The names of these identifiers can be
- * changed in `externalIdsTable` and `externalIdsColumn`, but it is still
- * a requirement that the outer query be a table of external IDs.
- */
-export function getSQLSelectOfMapping({
-  selectColumnName,
-  primaryKeyColumnName,
-  datasetId,
-  ruleType,
-  outputColumnName,
-  externalIdsTable = "external_ids",
-  externalIdColumn = "external_id",
-}: {
-  selectColumnName: string;
-  primaryKeyColumnName: string;
-  datasetId: string;
-  ruleType: DatasetColumnMapping["valuePickerRuleType"];
-  outputColumnName: string;
-  externalIdsTable?: string;
-  externalIdColumn?: string;
-}): string {
-  return match(ruleType)
-    .with("first", () => {
-      return `
-        -- Get the first value
-        (
-          SELECT "${selectColumnName}",
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-          LIMIT 1
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("most_frequent", () => {
-      return `
-        -- Get the most frequent value
-        (
-          SELECT "${selectColumnName}"
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-          GROUP BY "${selectColumnName}"
-          ORDER BY COUNT(*) DESC, "${selectColumnName}"
-          LIMIT 1
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("sum", () => {
-      return `
-        -- Get the sum of the values
-        (
-          SELECT CAST(SUM("${selectColumnName}") AS DOUBLE)
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("avg", () => {
-      return `
-        -- Get the average of the values
-        (
-          SELECT CAST(AVG("${selectColumnName}") AS DOUBLE)
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("count", () => {
-      return `
-        -- Get the count of the values
-        (
-          SELECT CAST(COUNT("${selectColumnName}") AS DOUBLE)
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("max", () => {
-      return `
-        -- Get the maximum value
-        (
-          SELECT CAST(MAX("${selectColumnName}") AS DOUBLE)
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .with("min", () => {
-      return `
-        -- Get the minimum value
-        (
-          SELECT CAST(MIN("${selectColumnName}") AS DOUBLE)
-          FROM "${datasetId}" dataset
-          WHERE
-            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
-        ) AS "${outputColumnName}"
-      `;
-    })
-    .exhaustive(() => {
-      throw new Error(`Invalid rule type: "${ruleType}"`);
-    });
-}
 
 async function _extractAssertionsFromDataset({
   datasetId,
@@ -165,7 +51,7 @@ async function _extractAssertionsFromDataset({
   const primaryKeyColumnName = identifierAttribute.datasetColumn.name;
 
   // returns rows where each column is a concept attribute ID
-  const queryResult = await WorkspaceQetlClient.runQuery<
+  const queryResult = await WorkspaceQuerySession.runQuery<
     Record<ConceptAttributeId, unknown>
   >({
     workspaceId,

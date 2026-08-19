@@ -140,7 +140,6 @@ function AnnotationFeatureFields({
           key={feature.id}
           label={t`Annotation text`}
           value={feature.text}
-          autoFocus={feature.text === ""}
           onChange={(event) => {
             onFeatureChange({ ...feature, text: event.currentTarget.value });
           }}

@@ -4,7 +4,7 @@ import {
   apiPostMock,
   dbEqMock,
   dbIsMock,
-  dbLimitMock,
+  dbSelectMock,
   dbUpdateMock,
   deleteSnapshotGenerationMock,
   deleteSnapshotsMock,
@@ -68,7 +68,10 @@ export function assertPublishTransition(
   );
   expect(dbEqMock).toHaveBeenCalledWith("updated_at", DASHBOARD.updatedAt);
   expect(dbIsMock).toHaveBeenCalledWith("snapshot_revision", null);
-  expect(dbLimitMock).toHaveBeenCalledWith(1);
+  // `select("*")` with no `limit`: PostgREST rejects a limited UPDATE that
+  // carries no explicit `order`, and the primary-key filter already bounds
+  // the write to one row.
+  expect(dbSelectMock).toHaveBeenCalledWith("*");
   expect(operationLog).toEqual([
     "validate",
     "update:undefined",

@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
+  DisputedStatusRef as DisputedStatusRefType,
+  DisputedStatus as DisputedStatusType,
+  DisputedStatusValues as DisputedStatusValuesType,
+} from "$/models/AvaMap/MapLayer/DisputedStatus.types.ts";
+import type {
   AreaAggregationOutputId as AreaAggregationOutputIdType,
   AreaAggregation as AreaAggregationType,
   AreaGeoBinding as AreaGeoBindingType,
@@ -93,4 +98,10 @@ export namespace MapLayer {
   export type Popup = PopupConfig;
   /** A configured action link shown in a map layer popup. */
   export type PopupAction = PopupLinkAction;
+  /** Where a layer's disputed-status values come from. */
+  export type DisputedStatusRef = DisputedStatusRefType;
+  /** Which source values mean disputed and which mean undetermined. */
+  export type DisputedStatusValues = DisputedStatusValuesType;
+  /** How one feature's boundary line is drawn. */
+  export type DisputedStatus = DisputedStatusType;
 }

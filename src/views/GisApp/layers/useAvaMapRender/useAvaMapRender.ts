@@ -20,6 +20,8 @@ export type AvaMapRender = {
   layerViewStates: Map<MapLayer.Id, MapLayerViewState>;
   layerBounds: Map<MapLayer.Id, MapBounds | undefined>;
   legendUpdates: Map<MapLayer.Id, LayerLegendUpdate>;
+  /** True when any visible layer draws a disputed or undetermined boundary. */
+  hasDrawnDisputedFeature: boolean;
 };
 
 /** Hit-testable annotation layer ids, empty when the overlay is hidden. */
@@ -54,8 +56,14 @@ function _makeAvaMapRender(options: {
   mapConfig: AvaMapConfig.T;
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
+  hiddenAnnotationFeatureIds: readonly AvaMapConfig.AnnotationFeatureId[];
 }): AvaMapRender {
-  const { mapConfig, layerQueryStates, geometryCache } = options;
+  const {
+    mapConfig,
+    layerQueryStates,
+    geometryCache,
+    hiddenAnnotationFeatureIds,
+  } = options;
   geometryCache.prune(makeSet(mapConfig.layers, { key: "id" }));
   const renderedLayers = mapConfig.layers.map((layer) => {
     return makeLayerRender({
@@ -69,6 +77,7 @@ function _makeAvaMapRender(options: {
       layerSpecs: renderedLayers.map(prop("layerSpec")),
       annotationSpec: makeMapSpecFromAnnotations({
         annotations: mapConfig.annotations,
+        hiddenAnnotationFeatureIds,
       }),
       annotationsZIndex: mapConfig.annotationsZIndex,
     }),
@@ -90,6 +99,9 @@ function _makeAvaMapRender(options: {
       }),
       { key: "layerId", valueKey: "legendUpdate" },
     ) as Map<MapLayer.Id, LayerLegendUpdate>,
+    hasDrawnDisputedFeature: renderedLayers.some(
+      prop("hasDrawnDisputedFeature"),
+    ),
   };
 }
 
@@ -97,9 +109,11 @@ function _makeAvaMapRender(options: {
 export function useAvaMapRender({
   mapConfig,
   layerQueryStates,
+  hiddenAnnotationFeatureIds = [],
 }: Readonly<{
   mapConfig: AvaMapConfig.T;
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
+  hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
 }>): AvaMapRender {
   const [geometryCache] = useState(createLayerGeometryCache);
 
@@ -108,6 +122,7 @@ export function useAvaMapRender({
       mapConfig,
       layerQueryStates,
       geometryCache,
+      hiddenAnnotationFeatureIds,
     });
-  }, [geometryCache, layerQueryStates, mapConfig]);
+  }, [geometryCache, hiddenAnnotationFeatureIds, layerQueryStates, mapConfig]);
 }

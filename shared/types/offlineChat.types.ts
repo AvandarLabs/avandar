@@ -15,9 +15,21 @@ export type OfflineChatSchemaColumn = {
   data_type: string;
 };
 
+export type OfflineChatSchemaConcept = {
+  id: string;
+  name: string;
+};
+
+export type OfflineChatSchemaConceptAttribute = {
+  concept_id: string;
+  name: string;
+};
+
 export type OfflineChatSchema = {
   datasets: readonly OfflineChatSchemaDataset[];
   columns: readonly OfflineChatSchemaColumn[];
+  concepts?: readonly OfflineChatSchemaConcept[];
+  conceptAttributes?: readonly OfflineChatSchemaConceptAttribute[];
 };
 
 export type OfflineChatMessage = {
@@ -53,7 +65,10 @@ export type OfflineChatEngine = {
 export type OfflineAnalyzeResult = {
   summary: string;
   proceed: boolean;
-  /** Valid workspace dataset UUID from analyze JSON when the model obeys. */
+  /**
+   * Valid workspace dataset alias or id from analyze JSON when the model
+   * obeys.
+   */
   tableName?: string;
   clarifyQuestion?: string;
   clarifyOptions?: string[];

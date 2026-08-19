@@ -213,6 +213,7 @@ export default defineConfig(({ mode }) => {
         ".claude/**",
         "apps/**",
         "packages/**",
+        "**/*.executed.test.ts",
       ],
     },
   };

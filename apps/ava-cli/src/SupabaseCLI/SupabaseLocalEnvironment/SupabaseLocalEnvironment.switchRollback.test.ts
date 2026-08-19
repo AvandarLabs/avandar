@@ -6,7 +6,7 @@ import {
   ORIGINAL_CONFIG,
   ORIGINAL_ENV,
   SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
 
@@ -27,6 +27,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
     expect(fake.operations.indexOf("command:status -o json")).toBeLessThan(
       fake.operations.indexOf(`write:${ENV_PATH}`),
     );
+    expect(fake.commandOutputModes).toEqual(["stream", undefined]);
   });
 
   it("rolls back files without invoking project-wide stop when startup fails", async () => {

@@ -115,7 +115,12 @@ with
       'dashboard.pdf_export_opened',
       'dashboard.pdf_exported',
       'chat.message_sent',
-      'chat.sql_generated'
+      'chat.sql_generated',
+      'nux.started',
+      'nux.milestone_completed',
+      'nux.dismissed',
+      'nux.completed',
+      'nux.restarted'
     ) and
     (
       workspace_id is null or
@@ -173,6 +178,15 @@ create or replace function public.util__analytics_event_category (p_event_name t
       when 'dataset.imported' then 'activation'
       when 'query.ran' then 'activation'
       when 'dashboard.published' then 'activation'
+      -- Every nux event is an activation-funnel signal, including the two
+      -- negative ones: a dismissal is a drop-off inside activation, and a
+      -- restart is a re-entry into it. Filing them elsewhere would split one
+      -- funnel across two categories.
+      when 'nux.started' then 'activation'
+      when 'nux.milestone_completed' then 'activation'
+      when 'nux.dismissed' then 'activation'
+      when 'nux.completed' then 'activation'
+      when 'nux.restarted' then 'activation'
       -- engagement
       when 'user.signed_in' then 'engagement'
       when 'chat.message_sent' then 'engagement'

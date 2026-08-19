@@ -30,11 +30,11 @@ const {
   };
 });
 
-vi.mock("@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient", () => {
-  return { WorkspaceQetlClient: { runQuery: runQueryMock } };
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
+  return { WorkspaceQuerySession: { runQuery: runQueryMock } };
 });
-vi.mock("@/clients/qetl/PublicQetlClient/PublicQetlClient", () => {
-  return { PublicQetlClient: { runQuery: publicRunQueryMock } };
+vi.mock("@/clients/qetl/PublicQuerySession/PublicQuerySession", () => {
+  return { PublicQuerySession: { runQuery: publicRunQueryMock } };
 });
 vi.mock(
   "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
@@ -316,7 +316,7 @@ describe("runStructuredQueryWithMetadata", () => {
 
     // rawSql is undefined and the query has no dataSource, so execution falls
     // through to the empty-result path in `_runSourceQuery` rather than
-    // reaching `WorkspaceQetlClient.runQuery`. `didAutoLimit` still comes
+    // reaching `WorkspaceQuerySession.runQuery`. `didAutoLimit` still comes
     // from the resolver, which is what this test pins.
     const { didAutoLimit } = await runStructuredQueryWithMetadata({
       auth: "workspace",

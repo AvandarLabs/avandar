@@ -49,6 +49,8 @@ import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+import type { RelationCacheEntryModel } from "@/models/RelationCacheEntry/RelationCacheEntry.types";
+import type { RelationCachePayloadModel } from "@/models/RelationCachePayload/RelationCachePayload.types";
 
 const db = new Dexie("AvandarDB");
 
@@ -90,6 +92,17 @@ type Schemas = {
       LocalPublicDatasetModel,
       ConsentAuditEntry.Model,
       ClarificationAuditEntry.Model,
+    ];
+  };
+  v10: {
+    version: 10;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+      RelationCacheEntryModel,
+      RelationCachePayloadModel,
     ];
   };
 };
@@ -316,9 +329,55 @@ const DBDefinitions = [
       },
     },
   }),
+
+  // Adds the relation cache: a metadata table and a payload table, split so
+  // a byte-budget scan sums `RelationCacheEntry.byteSize` without ever
+  // reading a `RelationCachePayload` blob. Deletes nothing: `LocalDataset`
+  // keeps `parquetData`, because that column is also the resumable-upload
+  // staging slot for `startDatasetUpload`, and there is no persisted
+  // "uploaded" flag to tell a staged blob apart from a cached one.
+  AvaDexieVersionManager.defineVersion<10>({
+    db,
+    version: 10,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: ["dashboardId", "datasetId"],
+        columnsToIndex: ["dashboardId"],
+      },
+      ConsentAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: [
+          "workspaceId",
+          "userId",
+          "timestamp",
+          "context",
+          "decision",
+        ],
+      },
+      ClarificationAuditEntry: {
+        primaryKey: "id",
+        columnsToIndex: ["workspaceId", "timestamp", "outcome", "turnNumber"],
+      },
+      RelationCacheEntry: {
+        primaryKey: "identityKey",
+        // `columnsToIndex` cannot express Dexie's `[a+b]` compound-index
+        // syntax (it is typed `Array<keyof DBRead>`), so the lookup filters
+        // the handful of `tableName` candidates in JS instead of indexing a
+        // compound (principalKey, tableName) key.
+        columnsToIndex: ["tableName", "principalKey", "lastQueriedAt"],
+      },
+      RelationCachePayload: {
+        primaryKey: "identityKey",
+      },
+    },
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
 /** Registry key for the current AvaDexie schema version. */
-export const CURRENT_AVA_DEXIE_VERSION = "v9" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v10" as const satisfies keyof Schemas;

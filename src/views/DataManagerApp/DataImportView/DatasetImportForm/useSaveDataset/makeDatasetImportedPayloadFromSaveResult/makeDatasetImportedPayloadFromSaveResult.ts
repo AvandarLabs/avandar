@@ -1,7 +1,7 @@
 import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 
 type FileImportAnalyticsSource = {
-  sourceType: "csv_file" | "xlsx_file";
+  sourceType: "csv_file" | "xlsx_file" | "pdf_file";
   datasetLoadResult: {
     numRows: number;
     columns: readonly unknown[];

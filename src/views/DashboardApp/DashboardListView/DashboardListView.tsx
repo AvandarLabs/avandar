@@ -9,7 +9,9 @@ import { useMemo } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
@@ -99,8 +101,14 @@ function useDashboardListViewState(
   // destination a click on its card would reach.
   const [insertDashboard, isInsertDashboardPending] = DashboardClient.useInsert(
     {
-      queryToInvalidate: DashboardClient.QueryKeys.getAll(),
+      queriesToInvalidate: [
+        DashboardClient.QueryKeys.getAll(),
+        getNuxWorkspaceArtifactsQueryKey(),
+      ],
       onSuccess: (createdDashboard) => {
+        NuxEvents.emit("dashboard.created", {
+          dashboardId: createdDashboard.id,
+        });
         onOpenDashboard(createdDashboard.id);
       },
     },

@@ -42,6 +42,8 @@ type DataVizQueryState = {
   data: UnknownDataFrame;
   emptyStructuredQuery: ReturnType<typeof StructuredQuery.makeEmpty>;
   isLoading: boolean;
+  /** Set when the block's query failed, so the block can say so. */
+  queryErrorMessage: string | undefined;
 };
 
 function _getDataVizQueryAuth(
@@ -82,12 +84,16 @@ function useDataVizQuery(
     return StructuredQuery.makeEmpty();
   }, []);
   const queryAuth = _getDataVizQueryAuth(metadata);
-  const [queryResults, isLoading] = useDataQuery({
+  const [queryResults, isLoading, dataQuery] = useDataQuery({
     query: emptyStructuredQuery,
     rawSql: options.filteredSql,
     analyticsSurface: "dashboard_block",
     ...queryAuth,
   });
+  // A failed query would otherwise render as an empty visualization, which
+  // reads the same as a filter that legitimately matches nothing.
+  const queryErrorMessage =
+    dataQuery?.isError === true ? dataQuery.error.message : undefined;
   // Memoized separately rather than returned as fresh literals: both are
   // dependencies of the `displayVizConfig` memo and props of
   // `VisualizationContainer`, so a new `[]` on every render would defeat both.
@@ -97,7 +103,7 @@ function useDataVizQuery(
   const data = useMemo(() => {
     return queryResults?.data ?? [];
   }, [queryResults?.data]);
-  return { columns, data, emptyStructuredQuery, isLoading };
+  return { columns, data, emptyStructuredQuery, isLoading, queryErrorMessage };
 }
 
 type DataVizDisplayState = DataVizQueryState & {
@@ -188,13 +194,19 @@ export function DataVizPBlock({
     localFilterState,
   });
 
-  const { columns, data, dateColumns, displayVizConfig, isLoading } =
-    useDataVizDisplayState({
-      filteredSql,
-      puck,
-      vizConfig,
-      rawSql,
-    });
+  const {
+    columns,
+    data,
+    dateColumns,
+    displayVizConfig,
+    isLoading,
+    queryErrorMessage,
+  } = useDataVizDisplayState({
+    filteredSql,
+    puck,
+    vizConfig,
+    rawSql,
+  });
 
   return (
     <DataVizContent
@@ -207,6 +219,7 @@ export function DataVizPBlock({
       displayVizConfig={displayVizConfig}
       filterProps={filterProps}
       localFilterState={localFilterState}
+      queryErrorMessage={queryErrorMessage}
     />
   );
 }

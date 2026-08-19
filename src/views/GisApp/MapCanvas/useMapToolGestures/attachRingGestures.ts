@@ -1,5 +1,8 @@
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { attachAreaDrawGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAreaDrawGestures";
 import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
+import { isPointerNearVertex } from "@/views/GisApp/tools/isPointerNearVertex/isPointerNearVertex";
+import { MAP_TOOL_SNAP_RADIUS_PX } from "@/views/GisApp/tools/MapToolGesture.constants";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
 import type { Dispatch, SetStateAction } from "react";
@@ -60,28 +63,13 @@ function _dropDuplicateCloseVertex(vertices: readonly Vertex[]): Vertex[] {
   return [...vertices];
 }
 
-function _clearInProgressVertices(callbacks: AoiGestureCallbacks): void {
-  callbacks.verticesRef.current = [];
-  callbacks.setVertices([]);
-  callbacks.onInvalidRing(undefined);
-}
-
-function _commitClosedRing(
-  vertices: readonly Vertex[],
-  callbacks: AoiGestureCallbacks,
-): void {
-  const ring = _closeRing(vertices);
-  if (!isClosedRingValid(ring)) {
-    callbacks.onInvalidRing(callbacks.invalidRingMessage);
-    return;
-  }
+function _commitAoiRing(ring: Vertex[], callbacks: AoiGestureCallbacks): void {
   callbacks.updateConfig((current) => {
     return AvaMapConfig.withAoi({
       config: current,
       aoi: { type: "Polygon", coordinates: [ring] },
     });
   });
-  _clearInProgressVertices(callbacks);
 }
 
 function _closeMeasureRing(callbacks: MeasureGestureCallbacks): void {
@@ -106,71 +94,67 @@ function _isTypingTarget(target: EventTarget | null): boolean {
   );
 }
 
+function _shouldSnapCloseMeasure(
+  map: MapLibreMap,
+  event: MapMouseEvent,
+  vertices: readonly Vertex[],
+): boolean {
+  const firstVertex = vertices[0];
+  if (!firstVertex || vertices.length < 3) {
+    return false;
+  }
+  return isPointerNearVertex({
+    pointer: { x: event.point.x, y: event.point.y },
+    vertex: firstVertex,
+    project: (vertex) => {
+      return map.project({ lng: vertex[0], lat: vertex[1] });
+    },
+    radiusPx: MAP_TOOL_SNAP_RADIUS_PX,
+  });
+}
+
 function _appendVertexFromClick(
+  map: MapLibreMap,
   event: MapMouseEvent,
   callbacks: MeasureGestureCallbacks,
 ): void {
   if (isClosedRingValid(callbacks.verticesRef.current)) {
     return;
   }
-  callbacks.setVertices((current) => {
-    const nextVertices = [...current, _lngLatToVertex(event.lngLat)];
-    callbacks.verticesRef.current = nextVertices;
-    return nextVertices;
-  });
+  if (_shouldSnapCloseMeasure(map, event, callbacks.verticesRef.current)) {
+    _closeMeasureRing(callbacks);
+    return;
+  }
+  const nextVertices = [
+    ...callbacks.verticesRef.current,
+    _lngLatToVertex(event.lngLat),
+  ];
+  callbacks.verticesRef.current = nextVertices;
+  callbacks.setVertices(nextVertices);
 }
 
 /**
- * Registers AOI polygon drawing: click to add vertices, Enter or double-click
- * to close.
+ * Registers AOI drawing: rectangle drag, Shift-lasso, or vertex polygon.
  */
 export function attachAoiGestures(
   map: MapLibreMap,
   callbacks: AoiGestureCallbacks,
 ): () => void {
-  map.doubleClickZoom.disable();
-  const onClick = (event: MapMouseEvent): void => {
-    callbacks.onInvalidRing(undefined);
-    callbacks.setVertices((current) => {
-      const nextVertices = [...current, _lngLatToVertex(event.lngLat)];
-      callbacks.verticesRef.current = nextVertices;
-      return nextVertices;
-    });
-  };
-  const onDoubleClick = (event: MapMouseEvent): void => {
-    event.preventDefault();
-    _commitClosedRing(
-      _dropDuplicateCloseVertex(callbacks.verticesRef.current),
-      callbacks,
-    );
-  };
-  const onKeyDown = (event: KeyboardEvent): void => {
-    if (_isTypingTarget(event.target)) {
-      return;
-    }
-    if (event.key === "Escape") {
-      callbacks.onMapToolModeChange({ type: "pan" });
-      return;
-    }
-    if (event.key === "Enter") {
-      event.preventDefault();
-      _commitClosedRing(callbacks.verticesRef.current, callbacks);
-    }
-  };
-  map.on("click", onClick);
-  map.on("dblclick", onDoubleClick);
-  window.addEventListener("keydown", onKeyDown);
-  return () => {
-    map.off("click", onClick);
-    map.off("dblclick", onDoubleClick);
-    window.removeEventListener("keydown", onKeyDown);
-    map.doubleClickZoom.enable();
-  };
+  return attachAreaDrawGestures(map, {
+    invalidRingMessage: callbacks.invalidRingMessage,
+    onInvalidRing: callbacks.onInvalidRing,
+    onMapToolModeChange: callbacks.onMapToolModeChange,
+    setVertices: callbacks.setVertices,
+    verticesRef: callbacks.verticesRef,
+    commitRing: (ring) => {
+      _commitAoiRing(ring, callbacks);
+    },
+  });
 }
 
 /**
- * Registers geodesic measure drawing: click to add vertices, Enter or
- * double-click to close a ring.
+ * Registers geodesic measure drawing: click to add vertices, snap-to-first
+ * or Enter to close a ring.
  */
 export function attachMeasureGestures(
   map: MapLibreMap,
@@ -178,11 +162,7 @@ export function attachMeasureGestures(
 ): () => void {
   map.doubleClickZoom.disable();
   const onClick = (event: MapMouseEvent): void => {
-    _appendVertexFromClick(event, callbacks);
-  };
-  const onDoubleClick = (event: MapMouseEvent): void => {
-    event.preventDefault();
-    _closeMeasureRing(callbacks);
+    _appendVertexFromClick(map, event, callbacks);
   };
   const onKeyDown = (event: KeyboardEvent): void => {
     if (_isTypingTarget(event.target)) {
@@ -198,11 +178,9 @@ export function attachMeasureGestures(
     }
   };
   map.on("click", onClick);
-  map.on("dblclick", onDoubleClick);
   window.addEventListener("keydown", onKeyDown);
   return () => {
     map.off("click", onClick);
-    map.off("dblclick", onDoubleClick);
     window.removeEventListener("keydown", onKeyDown);
     map.doubleClickZoom.enable();
   };

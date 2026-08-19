@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
 describe("AvaMapConfigSchema v4 overlays", () => {
   it("migrates a version 3 config to version 4 without changing wave c layers", () => {
     const parsed = AvaMapConfigSchema.fromJson(createVersion3Json());
-    expect(parsed.version).toBe(4);
+    expect(parsed.version).toBe(5);
     expect(parsed.aoi).toBeUndefined();
     expect(parsed.timeRange).toBeUndefined();
     expect(parsed.annotations.features).toEqual([]);

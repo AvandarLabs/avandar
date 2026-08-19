@@ -91,12 +91,15 @@ the product into something that truly serves your mission.
    pnpm dev
    ```
 
-   This serves the app on `http://127.0.0.1:5173`, or on the port
+   This serves the app on `http://localhost:5173`, or on the port
    `AVA_VITE_DEV_PORT` names in `.env.development`. `ava supabase switch` sets
    that variable so a switched worktree gets a dev-server port of its own and
    several worktrees can run `pnpm dev` at the same time; `ava supabase
-   restore` puts it back. Run `ava supabase status` to see which local Supabase
-   project, ports, and keys the current worktree is pointed at.
+restore` puts it back. Run `ava supabase status` to see which local Supabase
+   project, ports, and keys the current worktree is pointed at. Vite still
+   binds `127.0.0.1` so Node and Playwright keep a stable IPv4 loopback;
+   open the `localhost` URL in the browser (Google treats the two as different
+   origins).
 
 ### End-to-end tests (Playwright)
 
@@ -128,7 +131,7 @@ routes; they do not stub Supabase APIs.
 
 | Command                | What it does                                                                      |
 | ---------------------- | --------------------------------------------------------------------------------- |
-| `pnpm test`            | Full suite (unit + integration + e2e). Use `pnpm test -- --quick` to skip e2e. |
+| `pnpm test`            | Full suite (unit + integration + e2e). Use `pnpm test -- --quick` to skip e2e.    |
 | `pnpm test:e2e`        | **Headless** run: no browser window, best for CI and quick passes.                |
 | `pnpm test:e2e:headed` | Same tests with a **visible** browser; useful to watch flows and failures.        |
 | `pnpm test:e2e:ui`     | **Playwright UI mode**: pick tests, debug with time travel, live DOM, and traces. |

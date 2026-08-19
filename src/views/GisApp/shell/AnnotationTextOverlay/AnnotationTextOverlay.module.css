@@ -1,0 +1,42 @@
+.annotationTextOverlay {
+  pointer-events: auto;
+  position: absolute;
+  z-index: 1;
+}
+
+.annotationTextOverlayEditor {
+  background: transparent;
+  border: none;
+  caret-color: currentcolor;
+  color: inherit;
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.2;
+  min-width: 8ch;
+  outline: 1px solid color-mix(in srgb, currentcolor 35%, transparent);
+  overflow: hidden;
+  padding: 2px 4px;
+  resize: none;
+}
+
+.annotationTextSelection {
+  cursor: move;
+  min-height: 1em;
+  min-width: 1em;
+  outline: 1px dashed color-mix(in srgb, currentcolor 55%, transparent);
+  padding: 2px 4px;
+  position: relative;
+  white-space: pre;
+}
+
+.annotationTextResizeHandle {
+  background: var(--ava-surface-raised, #fff);
+  border: 1px solid currentcolor;
+  bottom: -4px;
+  cursor: nwse-resize;
+  height: 8px;
+  position: absolute;
+  right: -4px;
+  width: 8px;
+}

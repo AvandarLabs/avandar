@@ -1,9 +1,11 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconPointer } from "@tabler/icons-react";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { AnnotateMapTool } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool";
 import { AreaMapTool } from "@/views/GisApp/shell/MapToolCluster/AreaMapTool";
 import { BufferMapTool } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool";
+import { EraseMapTool } from "@/views/GisApp/shell/MapToolCluster/EraseMapTool";
 import { GoToMapTool } from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool";
 import { IsochroneMapTool } from "@/views/GisApp/shell/MapToolCluster/IsochroneMapTool";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
@@ -68,8 +70,14 @@ export function MapToolClusterToolbar({
         selectedLayer={selectedLayer}
         onBufferConfirm={onBufferConfirm}
       />
-      <IsochroneMapTool />
+      {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ?
+        <IsochroneMapTool />
+      : null}
       <AnnotateMapTool
+        mapToolMode={mapToolMode}
+        onMapToolModeChange={onMapToolModeChange}
+      />
+      <EraseMapTool
         mapToolMode={mapToolMode}
         onMapToolModeChange={onMapToolModeChange}
       />

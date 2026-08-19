@@ -1,8 +1,12 @@
-import { isDefined, matchLiteral } from "@avandar/utils";
+import { Model } from "@avandar/models";
+import { isDefined, matchLiteral, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack } from "@mantine/core";
-import { useState } from "react";
+import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns/pruneFilterColumns";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { notifyWarning } from "@/utils/notifications/notify";
+import { AppliedFilterSummary } from "@/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { AggregationFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields";
 import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields";
@@ -11,6 +15,7 @@ import { SortFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/So
 import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SourceFields";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
+import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
 import classes from "./ManualQueryForm.module.css";
 import type {
   SettingsColumnGroup,
@@ -23,11 +28,7 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type {
-  OrderByDirection,
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
 
 /**
@@ -52,9 +53,11 @@ export type ManualQueryFormHandlers = {
     aggregation: QueryAggregationType.T;
   }) => void;
   onSetOrderByColumn: (columnId: QueryColumnId | undefined) => void;
-  onSetOrderByDirection: (direction: OrderByDirection | undefined) => void;
+  onSetOrderByDirection: (
+    direction: StructuredQuery.OrderByDirection | undefined,
+  ) => void;
   onSetLimit: (limit: number | undefined) => void;
-  onSetFilters: (filters: QueryFilterGroup) => void;
+  onSetFilters: (filters: StructuredQuery.FilterGroup) => void;
 };
 
 type ControlledProps = {
@@ -62,7 +65,7 @@ type ControlledProps = {
    * Controlled mode: when omitted, the form reads from the global
    * `DataExplorerStateManager` (legacy Data Explorer wiring).
    */
-  query: PartialStructuredQuery;
+  query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
   handlers: ManualQueryFormHandlers;
   withinPortal?: boolean;
@@ -80,7 +83,7 @@ type LegacyProps = {
 type Props = ControlledProps | LegacyProps;
 
 type PendingChange =
-  | { kind: "filter"; nextFilter: QueryFilterGroup }
+  | { kind: "filter"; nextFilter: StructuredQuery.FilterGroup }
   | undefined;
 
 export function ManualQueryForm(props: Props): ReactNode {
@@ -140,7 +143,7 @@ function DataExplorerManualQueryForm({
 }
 
 type ViewProps = {
-  query: PartialStructuredQuery;
+  query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
   handlers: ManualQueryFormHandlers;
   withinPortal: boolean;
@@ -171,7 +174,67 @@ function ManualQueryFormView({
     dismissLargeDatasetLimitHint,
   } = useManualQueryDataSourceChange({ query, handlers });
 
-  const onFiltersChange = (nextFilters: QueryFilterGroup): void => {
+  // Filters address any column of the data source, not only the ones the query
+  // displays: what you filter on and what you select are separate choices.
+  const { columns: dataSourceColumns } = useQueryColumnsForDataSource(
+    dataSource ? Model.getTypedId(dataSource) : undefined,
+  );
+
+  const dataSourceColumnNames = useMemo(() => {
+    return dataSourceColumns.map(prop("baseColumn.name"));
+  }, [dataSourceColumns]);
+
+  // Held in a ref so the prune effect can depend on the columns it actually
+  // watches. `handlers` is a fresh object literal on every render in both
+  // hosts, so listing it in the dependency array would re-run the effect on
+  // every render.
+  const onSetFiltersRef = useRef(handlers.onSetFilters);
+  useEffect(function trackLatestSetFilters() {
+    onSetFiltersRef.current = handlers.onSetFilters;
+  });
+
+  // The set of columns the last prune reported, so a host that does not apply
+  // `onSetFilters` is not warned about the same removal twice.
+  const prunedColumnsRef = useRef<string | undefined>(undefined);
+
+  useEffect(
+    function pruneFiltersWhenColumnsChange() {
+      // Nothing to prune against until the data source's columns have loaded.
+      // Pruning is also skipped while the SQL is out of sync: the structured
+      // query is not what runs then, and applying a prune regenerates the SQL
+      // from it, which would discard hand-written SQL the form cannot
+      // represent. That is the same overwrite `onFiltersChange` stops to
+      // confirm, so it must not happen automatically.
+      const result =
+        dataSourceColumnNames.length > 0 && isStructuredQueryInSync ?
+          pruneFilterColumns({
+            filters,
+            availableColumnNames: dataSourceColumnNames,
+          })
+        : undefined;
+      const removedColumnNames = result?.removedColumnNames.join(", ") ?? "";
+      if (
+        result !== undefined &&
+        removedColumnNames !== "" &&
+        removedColumnNames !== prunedColumnsRef.current
+      ) {
+        prunedColumnsRef.current = removedColumnNames;
+        // Reported as a notification rather than held in local state: the
+        // removal is a one-off event, and a toast outlives the render that
+        // triggered it without duplicating the filter tree's state here.
+        // Running these rules would fail the whole query with a binder error,
+        // since the new data source has no such columns.
+        onSetFiltersRef.current(result.filters);
+        notifyWarning({
+          title: t`Some filters were removed`,
+          message: t`They referenced columns this data source does not have: ${removedColumnNames}`,
+        });
+      }
+    },
+    [dataSourceColumnNames, filters, isStructuredQueryInSync, t],
+  );
+
+  const onFiltersChange = (nextFilters: StructuredQuery.FilterGroup): void => {
     if (isStructuredQueryInSync) {
       handlers.onSetFilters(nextFilters);
     } else {
@@ -216,11 +279,14 @@ function ManualQueryFormView({
   );
 
   const filterFields = (
-    <QueryFiltersField
-      columns={queryColumns}
-      value={filters}
-      onChange={onFiltersChange}
-    />
+    <Stack gap="xs">
+      <AppliedFilterSummary filters={filters} />
+      <QueryFiltersField
+        columns={dataSourceColumns}
+        value={filters}
+        onChange={onFiltersChange}
+      />
+    </Stack>
   );
 
   const sortFields = (
@@ -252,7 +318,12 @@ function ManualQueryFormView({
         content: aggregationFields,
       }
     : undefined,
-    { id: "filters", title: t`Filters (Where)`, content: filterFields },
+    {
+      id: "filters",
+      title: t`Filters (Where)`,
+      content: filterFields,
+      span: 2,
+    },
     {
       id: "sort-limit",
       title: t`Sort & limit`,

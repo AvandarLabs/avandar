@@ -15,9 +15,13 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   dataset_id: z.uuid(),
   google_document_id: z.string(),
-  google_account_id: z.uuid(),
+  // A Google account id, not a UUID. `google-auth-callback` sets
+  // `tokens__google.google_account_id` from the id token's `sub`, which is a
+  // numeric string, and this column is a `text` foreign key onto it.
+  google_account_id: z.string(),
   id: z.uuid(),
   rows_to_skip: z.number(),
+  sheet_name: z.string().nullable(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
 });

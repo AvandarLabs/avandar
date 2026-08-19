@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import { ShareGeneralAccess } from "@/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess";
 import { render, screen } from "@/test-utils";
 
@@ -13,6 +14,9 @@ function findComboboxByAriaLabel(label: string): HTMLElement | undefined {
 // in `GeneralAccess.test.ts` (the pure module) and end to end in a real
 // browser instead.
 describe("ShareGeneralAccess", () => {
+  afterEach(() => {
+    NuxStepFactsStore.setGeneralAccessIsWorkspace(false);
+  });
   it("hides the workspace-role picker when restricted", () => {
     render(
       <ShareGeneralAccess
@@ -94,6 +98,23 @@ describe("ShareGeneralAccess", () => {
     const generalCombobox = findComboboxByAriaLabel("General access");
     expect(generalCombobox).toBeDefined();
     expect(generalCombobox).toHaveValue("Anyone in Dashboards");
+  });
+
+  it("tells the tutorial when a dashboard is already shared with the workspace", () => {
+    render(
+      <ShareGeneralAccess
+        resourceType="dashboard"
+        value="workspace"
+        isOwner
+        isBusy={false}
+        workspaceShareRole="viewer"
+        isPublicOptionAvailable={false}
+        publicOptionDisabledReason={undefined}
+        onChange={vi.fn()}
+        onWorkspaceRoleChange={vi.fn()}
+      />,
+    );
+    expect(NuxStepFactsStore.getGeneralAccessIsWorkspace()).toBe(true);
   });
 
   it("selects Only me when the value is private", () => {

@@ -5,7 +5,10 @@ import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues"
 import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";
 import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize/useMapWindowResize";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapFeatureClickHandler } from "@/views/GisApp/MapCanvas/useLatestMapValues";
+import type {
+  MapClusterClickHandler,
+  MapFeatureClickHandler,
+} from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Map as MapLibreMap } from "maplibre-gl";
@@ -38,6 +41,7 @@ type UseMapInstanceInput = {
   view: AvaMapConfig.ViewState;
   interactiveLayerIds: readonly string[];
   onFeatureClick: MapFeatureClickHandler;
+  onClusterClick: MapClusterClickHandler;
   mapToolMode: MapToolMode;
 };
 
@@ -71,6 +75,7 @@ export function useMapInstance({
   view,
   interactiveLayerIds,
   onFeatureClick,
+  onClusterClick,
   mapToolMode,
 }: UseMapInstanceInput): MapInstance {
   const instanceRefs = useMapInstanceRefs();
@@ -82,6 +87,7 @@ export function useMapInstance({
     basemap,
     interactiveLayerIds,
     onFeatureClick,
+    onClusterClick,
     mapToolMode,
   });
   useAttachMapInstance({

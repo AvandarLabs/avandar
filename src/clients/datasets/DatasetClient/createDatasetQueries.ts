@@ -3,6 +3,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import type { DatasetQueryConfig } from "@/clients/datasets/DatasetClient/DatasetClient.types";
@@ -44,6 +45,11 @@ function _makeGetSourceDataset(config: Readonly<DatasetQueryConfig>): (
       },
       xlsx_file: () => {
         return XlsxFileDatasetClient.getOne(
+          where("dataset_id", "eq", datasetId),
+        );
+      },
+      pdf_file: () => {
+        return PdfFileDatasetClient.getOne(
           where("dataset_id", "eq", datasetId),
         );
       },

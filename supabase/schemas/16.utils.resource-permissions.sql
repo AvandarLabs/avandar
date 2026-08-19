@@ -966,26 +966,60 @@ execute on function public.maps__auth_user_may_select (uuid) to authenticated;
 /**
  * Dataset id encoded in a `workspaces` storage bucket object name, or null.
  *
- * Object names are `<workspaceId>/datasets/<datasetId>.parquet` (see
- * getDatasetParquetStoragePath in
- * src/clients/storage/DatasetParquetStorageClient/utils.ts). The dataset id
- * lives in the FILENAME, not a folder segment, so storage.foldername() cannot
- * reach it and split_part is used instead.
+ * Exactly two object shapes are recognised, both directly under
+ * `<workspaceId>/datasets/`:
  *
- * Returns null rather than raising when the name does not match that shape, so
- * a storage policy referencing this can never error on an unexpected object
+ *   <datasetId>.parquet         the transcoded data
+ *   <datasetId>.original.<ext>  the retained source file
+ *
+ * The original is kept because some source formats, PDF above all, cannot be
+ * reconstructed from the parquet extracted out of them. The parquet path is
+ * built by getDatasetParquetStoragePath in
+ * src/clients/storage/DatasetParquetStorageClient/utils.ts.
+ *
+ * The dataset id lives in the FILENAME, not a folder segment, so
+ * storage.foldername() cannot reach it and the name is matched whole instead.
+ *
+ * Returns null rather than raising when the name does not match those shapes,
+ * so a storage policy referencing this can never error on an unexpected object
  * name. Callers MUST treat null as "deny": an object whose dataset cannot be
  * identified is not one we can prove the caller may read.
  *
- * @returns The dataset id, or null when the name is not a dataset parquet path.
+ * SECURITY. Every policy on the `workspaces` bucket gates on this function, so
+ * whatever it accepts is granted the named dataset's permissions. Three
+ * properties carry that weight, and each is pinned by
+ * supabase/tests/database/permissions/storage_original_file_object_names.test.sql:
+ *
+ *   1. The suffix is an allow-list, not a prefix match. Accepting any name
+ *      that merely BEGINS with a uuid would let an arbitrary object claim a
+ *      dataset's permissions.
+ *   2. The whole name is matched, so the path depth is exactly three segments.
+ *      A `split_part(p_object_name, '/', 4) = ''` depth guard would NOT be
+ *      sufficient: split_part returns '' both for a trailing slash
+ *      (`ws/datasets/x.parquet/`) and for an empty segment followed by more
+ *      (`ws/datasets/x.parquet//extra`).
+ *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line
+ *      anchors under newline-sensitive matching, which is off here, so
+ *      neither a trailing newline nor a valid line smuggled after a newline
+ *      matches. That differs from PCRE, where `$` matches before a trailing
+ *      newline by default, and object names are arbitrary text.
+ *
+ * The extension is capped at ten characters so an over-long tail reads as
+ * smuggled content rather than a file type, and is case-insensitive because
+ * clients are inconsistent about extension case and the extension is not
+ * itself a boundary: the dataset id in front of it is.
+ *
+ * @returns The dataset id, or null when the name is not a dataset object path.
  */
 create or replace function public.util__storage_object_dataset_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
-    when split_part(p_object_name, '/', 3) ~
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
-    then replace(split_part(p_object_name, '/', 3), '.parquet', '')::uuid
+    when p_object_name ~
+      '^[^/]+/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\.parquet|\.original\.[A-Za-z0-9]{1,10})$'
+    -- Safe: the regex above has already proven segment 3 begins with a uuid,
+    -- and a uuid contains no dot, so field 1 of the dot-split is exactly it.
+    then split_part(split_part(p_object_name, '/', 3), '.', 1)::uuid
     else null
   end;
 $$;

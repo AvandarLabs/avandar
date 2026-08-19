@@ -1,3 +1,4 @@
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   IdentifierParts,
   SqlToken,
@@ -6,6 +7,27 @@ import type {
 /** Matches the dataset IDs that name bare DuckDB tables. */
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Returns the relation a DuckDB table name refers to, or undefined when the
+ * name refers to none. `RelationRef.fromTableName` decides which prefix means
+ * which kind, so that encoding stays in one place; the extra `UUID_REGEX` test
+ * re-applies this analyzer's stricter UUID shape, which is what separates an
+ * inspectable relation table from an arbitrary workspace alias.
+ */
+export function getRelationRefFromTableName(
+  tableName: string,
+): RelationRef.T | undefined {
+  const relation = RelationRef.fromTableName(tableName.toLowerCase());
+  return relation !== undefined && UUID_REGEX.test(relation.id) ?
+      relation
+    : undefined;
+}
+
+/** Reports whether a DuckDB table name names a relation the analyzer knows. */
+export function isRelationTableName(tableName: string): boolean {
+  return getRelationRefFromTableName(tableName) !== undefined;
+}
 
 function _getRemainingIdentifierParts(
   options: Readonly<{
@@ -94,9 +116,7 @@ export function getDatasetIdsAtIndexes(
   });
 }
 
-/** Flattens dataset ID groups into one list without duplicates. */
-export function mergeDatasetIds(
-  ...datasetIdGroups: readonly string[][]
-): string[] {
-  return Array.from(new Set(datasetIdGroups.flat()));
+/** Flattens name groups into one list, in first-seen order, without dupes. */
+export function mergeUniqueNames(...nameGroups: readonly string[][]): string[] {
+  return Array.from(new Set(nameGroups.flat()));
 }

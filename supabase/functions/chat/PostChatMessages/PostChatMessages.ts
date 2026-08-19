@@ -1,9 +1,7 @@
 import { Model } from "@avandar/models";
-import { propEq } from "@avandar/utils";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { emitChatTurnAnalytics } from "@sbfn/chat/PostChatMessages/analytics/emitChatTurnAnalytics/emitChatTurnAnalytics.ts";
-import { buildChatSystemContent } from "@sbfn/chat/PostChatMessages/buildChatSystemContent/buildChatSystemContent.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 import {
@@ -11,8 +9,12 @@ import {
   MAX_CLARIFICATIONS_PER_QUESTION,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import { buildRetryContextNote } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { caseTypeDraftIntro } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
+import { buildCaseManagerSystemPrompt } from "@sbfn/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts";
+import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
+import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";
 import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
@@ -45,7 +47,13 @@ export const PostChatMessages = POST({
     context: AvaModelSchema({
       type: "ChatPageContext",
       props: {
-        app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
+        app: z.enum([
+          "data-explorer",
+          "data-sources",
+          "dashboards",
+          "case-manager",
+          "other",
+        ]),
         openDatasetId: z.string().optional(),
         lastSql: z.string().optional(),
         lastResultColumns: z
@@ -102,59 +110,57 @@ export const PostChatMessages = POST({
         userId: user.id,
       });
 
-      const isDataExplorer = context.app === "data-explorer";
-      const isDashboards = context.app === "dashboards";
-      const needsSchema = isDataExplorer || isDashboards;
-
-      // Only fetch the schema when we'll actually use it.
-      const schema =
-        needsSchema ?
-          await fetchWorkspaceSchema({ supabaseClient, workspaceId })
-        : { datasets: [], columns: [] };
-
-      const lastUserPrompt =
-        [...messages].reverse().find(propEq("role", "user"))?.content ?? "";
-
-      const sqlSystemPrompt =
-        needsSchema ?
-          buildSqlSystemPrompt({
-            prompt: lastUserPrompt,
+      const schema = await fetchWorkspaceSchema({
+        supabaseClient,
+        workspaceId,
+      });
+      const lastUserPrompt = getLastUserPromptFromMessages(messages);
+      const sqlSystemPrompt = buildSqlSystemPrompt({
+        prompt: lastUserPrompt,
+        datasets: schema.datasets,
+        columns: schema.columns,
+        concepts: schema.concepts,
+        conceptAttributes: schema.conceptAttributes,
+        includeSpatialDocumentation: false,
+      });
+      const systemContent =
+        context.app === "case-manager" ?
+          buildCaseManagerSystemPrompt({
             datasets: schema.datasets,
             columns: schema.columns,
+            concepts: schema.concepts,
           })
-        : "";
-
-      const systemContent = buildChatSystemContent({
-        isDataExplorer,
-        isDashboards,
-        sqlSystemPrompt,
-        lastSql: context.lastSql,
-        lastError: context.lastError,
-        lastResultColumns: context.lastResultColumns,
-        lastUserPrompt,
-        retryContextNote: buildRetryContextNote(retryContext),
-      });
-
-      const requestBody: Record<string, unknown> = {
-        model,
-        messages: [{ role: "system", content: systemContent }, ...messages],
-        temperature: 0.3,
-      };
+        : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
+      const turnSuffix =
+        context.app === "case-manager" ?
+          ""
+        : makeChatTurnSuffixFromOptions({
+            context,
+            retryContext,
+            lastUserPrompt,
+          });
 
       const priorClarifications = countClarificationsInHistory(messages);
       const clarificationCapReached =
         priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
+      const requestBody: Record<string, unknown> = {
+        model,
+        messages: [
+          { role: "system", content: systemContent },
+          ...messages,
+          ...(turnSuffix ? [{ role: "user", content: turnSuffix }] : []),
+        ],
+        temperature: 0.3,
+      };
       Object.assign(
         requestBody,
         makeChatToolConfigFromOptions({
-          isDataExplorer,
-          isDashboards,
           clarificationCapReached,
+          app: context.app,
         }),
       );
 
       const turnStartedAt = performance.now();
-
       let parsed: ParsedAttempt;
       let attemptCount: number;
       try {
@@ -162,10 +168,11 @@ export const PostChatMessages = POST({
           requestBody,
           apiKey: openRouterApiKey,
           referer: openRouterReferer,
-          isDataExplorer,
-          isDashboards,
           lastUserPrompt,
           priorClarifications,
+          datasets: schema.datasets,
+          concepts: schema.concepts,
+          skipSqlExtraction: context.app === "case-manager",
         }));
       } catch (error) {
         await emitChatTurnAnalytics({
@@ -183,21 +190,49 @@ export const PostChatMessages = POST({
         throw error;
       }
 
-      const { text, generatedSql, clarification, dashboardBlock } = parsed;
-
-      const assistantText =
-        text ||
-        (generatedSql ?
-          "Here is the SQL I ran. Results are on the canvas to the left."
-        : clarification ? clarification.question
-        : dashboardBlock ? dashboardBlockSummary(dashboardBlock)
-        : "I could not generate a query for that. Try rephrasing.");
+      const {
+        text,
+        generatedSql,
+        clarification,
+        dashboardBlock,
+        createdCaseTypes,
+        proposedCaseType,
+      } = parsed;
+      const assistantText = ((): string => {
+        if (text) {
+          return text;
+        }
+        if (generatedSql) {
+          return "";
+        }
+        if (clarification) {
+          return clarification.question;
+        }
+        if (dashboardBlock) {
+          return dashboardBlockSummary(dashboardBlock);
+        }
+        if (createdCaseTypes && createdCaseTypes.length > 0) {
+          return createdCaseTypes
+            .map((caseType) => {
+              return caseType.name;
+            })
+            .join(", ");
+        }
+        if (proposedCaseType) {
+          return caseTypeDraftIntro(proposedCaseType.name);
+        }
+        return context.app === "case-manager" ?
+            "I could not create those case types. Try choosing again or describing what you want."
+          : "I could not generate a query for that. Try rephrasing.";
+      })();
 
       const result: ChatResponse.T = Model.make("ChatResponse", {
         assistantText,
         ...(generatedSql ? { generatedSql: generatedSql } : {}),
         ...(clarification ? { clarification } : {}),
         ...(dashboardBlock ? { dashboardBlock } : {}),
+        ...(createdCaseTypes ? { createdCaseTypes } : {}),
+        ...(proposedCaseType ? { proposedCaseType } : {}),
       });
 
       await emitChatTurnAnalytics({

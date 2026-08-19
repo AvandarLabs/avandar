@@ -32,10 +32,24 @@ describe("AnimationTheme presets", () => {
   });
 
   it("uses spring scale-blur pop for modals", () => {
-    expect(MODAL_CONTENT_TRANSITION.duration).toBe(380);
-    expect(MODAL_CONTENT_TRANSITION.transition.out.transform).toContain(
-      "scale(0.72)",
+    expect(MODAL_CONTENT_TRANSITION.duration).toBe(
+      ANIMATION_PRESET.popIn.durationMs,
     );
+    expect(MODAL_CONTENT_TRANSITION.timingFunction).toBe(
+      AnimationTheme.easing.pop,
+    );
+    expect(MODAL_CONTENT_TRANSITION.transition.out.transform).toBe(
+      ANIMATION_PRESET.popIn.from.transform,
+    );
+    expect(MODAL_CONTENT_TRANSITION.transition.out.filter).toBe(
+      ANIMATION_PRESET.popIn.from.filter,
+    );
+  });
+
+  it("exposes the overlay pop-in entrance as a reusable preset", () => {
+    expect(ANIMATION_PRESET.popIn.className).toBe("ava-animate-pop-in");
+    expect(AnimationTheme.easing.pop).toBe("cubic-bezier(0.34, 1.56, 0.64, 1)");
+    expect(ANIMATION_PRESET.popIn.from.transform).toContain("scale(0.72)");
   });
 
   it("uses distinct durations for enter and exit presets", () => {

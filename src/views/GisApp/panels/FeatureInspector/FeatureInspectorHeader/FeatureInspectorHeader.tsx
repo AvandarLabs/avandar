@@ -8,10 +8,17 @@ import type { ReactNode } from "react";
 type Props = {
   onClose: () => void;
   titleId: string;
+
+  /** Reflects which view (single feature or cluster table) is showing. */
+  title: ReactNode;
 };
 
-/** Title and close control for the selected-feature drawer. */
-export function FeatureInspectorHeader({ onClose, titleId }: Props): ReactNode {
+/** Title and close control for the feature drawer. */
+export function FeatureInspectorHeader({
+  onClose,
+  titleId,
+  title,
+}: Props): ReactNode {
   const { t } = useLingui();
   return (
     <Group
@@ -20,7 +27,7 @@ export function FeatureInspectorHeader({ onClose, titleId }: Props): ReactNode {
       wrap="nowrap"
     >
       <Text id={titleId} fw={600} size="sm">
-        {t`Feature`}
+        {title}
       </Text>
       <ActionIcon
         variant="subtle"

@@ -139,6 +139,16 @@ describe("makeMapSpecFromAnnotations", () => {
     });
   });
 
+  it("omits a text feature that is open in the editor overlay", () => {
+    const feature = _makeTextFeature();
+    const spec = makeMapSpecFromAnnotations({
+      annotations: { isVisible: true, features: [feature] },
+      hiddenAnnotationFeatureIds: [feature.id],
+    });
+
+    expect(spec.sources["ava-map-annotations"]?.data.features).toEqual([]);
+  });
+
   it("still returns a spec when there are no annotation features", () => {
     const spec = makeMapSpecFromAnnotations({
       annotations: { isVisible: true, features: [] },

@@ -1,6 +1,7 @@
 import { useHotkeys } from "@mantine/hooks";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
+import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
 import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
@@ -8,6 +9,7 @@ import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayer
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
 import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -75,6 +77,9 @@ function useGisAppCanvas(
     rendering: ReturnType<typeof useGisAppRendering>;
     mapToolMode: MapToolMode;
     onMapToolModeChange: (mode: MapToolMode) => void;
+    onEditingTextFeatureIdChange: (
+      featureId: AvaMapConfig.AnnotationFeatureId | undefined,
+    ) => void;
   }>,
 ): ReturnType<typeof useMapCanvas> {
   return useMapCanvas({
@@ -82,6 +87,7 @@ function useGisAppCanvas(
     fitBoundsRequest: options.chrome.fitBoundsRequest,
     interactiveLayerIds: options.rendering.interactiveLayerIds,
     onFeatureClick: options.callbacks.onMapFeatureClick,
+    onClusterClick: options.callbacks.onMapClusterClick,
     onViewChange: options.callbacks.onMapViewChange,
     spec: options.rendering.spec,
     view: options.editor.mapConfig.view,
@@ -89,6 +95,7 @@ function useGisAppCanvas(
     onMapToolModeChange: options.onMapToolModeChange,
     aoi: options.editor.mapConfig.aoi,
     updateConfig: options.editor.updateConfig,
+    onEditingTextFeatureIdChange: options.onEditingTextFeatureIdChange,
   });
 }
 
@@ -150,9 +157,9 @@ function useSelectCreatedAnnotation(options: {
 }
 
 /** Collects the map state, data rendering, and interaction callbacks. */
-export function useGisAppState(
-  avaMap: AvaMap.T,
-): ReturnType<typeof useGisAppMapCallbacks> &
+export function useGisAppState(avaMap: AvaMap.T): ReturnType<
+  typeof useGisAppMapCallbacks
+> &
   ReturnType<typeof useGisAppCanvas> &
   ReturnType<typeof useGisAppChrome> &
   ReturnType<typeof useAvaMapEditor> &
@@ -161,14 +168,42 @@ export function useGisAppState(
   ReturnType<typeof useGisAppInspectorNavigation> &
   ReturnType<typeof useGisAppRendering> &
   ReturnType<typeof useGisAppLayerSelection> &
-  ReturnType<typeof useGisAppToolMode> & { avaMap: AvaMap.T } {
+  ReturnType<typeof useGisAppToolMode> & {
+    annotationTextOverlayTarget: AnnotationTextOverlayTarget;
+    avaMap: AvaMap.T;
+    editingTextFeatureId: AvaMapConfig.AnnotationFeatureId | undefined;
+    setEditingTextFeatureId: Dispatch<
+      SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
+    >;
+  } {
   const editor = useAvaMapEditor(avaMap);
   const selection = useGisAppLayerSelection(editor.mapConfig);
   const featureInspector = useFeatureInspector();
   const chrome = useGisAppChrome();
   const inspectorFocus = useGisAppInspectorFocus(chrome.expandPanel);
   const inspectorNavigation = useGisAppInspectorNavigation(chrome);
-  const rendering = useGisAppRendering({ avaMap, chrome, editor });
+  const [editingTextFeatureId, setEditingTextFeatureId] = useState<
+    AvaMapConfig.AnnotationFeatureId | undefined
+  >();
+  const toolMode = useGisAppToolMode();
+  const textOverlayTarget = annotationTextOverlayTarget({
+    annotationFeatures: editor.mapConfig.annotations.features,
+    editingTextFeatureId,
+    mapToolMode: toolMode.mapToolMode,
+    selectedAnnotationFeature: selection.selectedAnnotationFeature,
+  });
+  // The HTML overlay draws its own copy of this text, so the map layer must
+  // not draw a second one underneath it.
+  const overlayTextFeatureId = textOverlayTarget?.feature.id;
+  const hiddenAnnotationFeatureIds = useMemo(() => {
+    return overlayTextFeatureId === undefined ? [] : [overlayTextFeatureId];
+  }, [overlayTextFeatureId]);
+  const rendering = useGisAppRendering({
+    avaMap,
+    chrome,
+    editor,
+    hiddenAnnotationFeatureIds,
+  });
   const callbacks = useGisAppMapCallbacks({
     editor,
     expandPanel: chrome.expandPanel,
@@ -178,7 +213,6 @@ export function useGisAppState(
     setIsAnnotationRowSelected: selection.setIsAnnotationRowSelected,
     setSelectedAnnotationFeatureId: selection.setSelectedAnnotationFeatureId,
   });
-  const toolMode = useGisAppToolMode();
   const canvas = useGisAppCanvas({
     callbacks,
     chrome,
@@ -186,6 +220,7 @@ export function useGisAppState(
     rendering,
     mapToolMode: toolMode.mapToolMode,
     onMapToolModeChange: toolMode.setMapToolMode,
+    onEditingTextFeatureIdChange: setEditingTextFeatureId,
   });
   useGisAppHotkeys({ editor, setIsChromeHidden: chrome.setIsChromeHidden });
   useSelectCreatedAnnotation({
@@ -206,7 +241,10 @@ export function useGisAppState(
     ...rendering,
     ...selection,
     ...toolMode,
+    annotationTextOverlayTarget: textOverlayTarget,
     avaMap,
+    editingTextFeatureId,
+    setEditingTextFeatureId,
   };
 }
 

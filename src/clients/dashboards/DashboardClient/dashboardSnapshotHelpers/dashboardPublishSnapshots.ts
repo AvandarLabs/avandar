@@ -14,7 +14,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
@@ -70,7 +70,7 @@ async function _runWorkspaceSnapshotQuery(
     queriedColumns: options.queriedColumns,
     treatAsAllColumns: options.treatAsAllColumns,
   });
-  return await WorkspaceQetlClient.runQuery({
+  return await WorkspaceQuerySession.runQuery({
     rawSql: materializedSql,
     workspaceId: options.workspaceId,
     returnType: "parquet",

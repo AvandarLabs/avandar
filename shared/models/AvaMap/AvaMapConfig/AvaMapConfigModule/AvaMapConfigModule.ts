@@ -2,6 +2,10 @@ import { Model } from "@avandar/models";
 import { makeSet, prop, propEq, propNotEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import {
+  DEFAULT_EXPORT_LAYOUT,
+  exportLayoutUpdaters,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
+import {
   EMPTY_ANNOTATIONS,
   overlayConfigUpdaters,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/overlayConfigUpdaters/overlayConfigUpdaters.ts";
@@ -75,7 +79,7 @@ export const AvaMapConfigModule = {
   /** A new, empty config with the default basemap and camera and no layers. */
   makeEmpty: (): AvaMapConfigRead => {
     return Model.make("AvaMapConfig", {
-      version: 4,
+      version: 5,
       basemap: { type: "builtIn", style: "avandar" },
       view: DEFAULT_MAP_VIEW_STATE,
       bookmarks: [],
@@ -84,6 +88,7 @@ export const AvaMapConfigModule = {
       timeRange: undefined,
       annotations: EMPTY_ANNOTATIONS,
       annotationsZIndex: 0,
+      exportLayout: DEFAULT_EXPORT_LAYOUT,
     } as const);
   },
 
@@ -259,4 +264,5 @@ export const AvaMapConfigModule = {
   },
 
   ...overlayConfigUpdaters,
+  ...exportLayoutUpdaters,
 };

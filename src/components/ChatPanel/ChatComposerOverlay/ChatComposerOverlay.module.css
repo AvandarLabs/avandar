@@ -1,0 +1,35 @@
+.overlay {
+  animation: overlay-in var(--ava-animation-duration-slow)
+    var(--ava-animation-easing-out);
+  backdrop-filter: var(--ava-overlay-backdrop-filter);
+  background: var(--ava-overlay-background);
+  border: none;
+  cursor: pointer;
+  inset: var(--app-shell-header-offset, 0)
+    var(--ava-chat-composer-width, min(64vw, 960px)) 0 0;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  z-index: var(--mantine-z-index-app-chrome);
+}
+
+.overlay:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: -2px;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: none;
+  }
+}

@@ -1,19 +1,14 @@
 import { Model } from "@avandar/models";
-import {
-  makeObjectFromEntries,
-  pickProps,
-  prop,
-  sortObjList,
-} from "@avandar/utils";
+import { prop, sortObjList } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { uuid } from "$/lib/uuid";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { match } from "ts-pattern";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
-import { PublicQetlClient } from "@/clients/qetl/PublicQetlClient/PublicQetlClient";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient/WorkspaceQetlClient";
+import { PublicQuerySession } from "@/clients/qetl/PublicQuerySession/PublicQuerySession";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
@@ -23,7 +18,6 @@ import type {
   StructuredQueryAuth,
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -81,13 +75,13 @@ async function _runRawSql(
 ): Promise<QueryResult.T<UnknownRow>> {
   return await match(params)
     .with({ auth: "workspace" }, async ({ workspaceId }) => {
-      return await WorkspaceQetlClient.runQuery({
+      return await WorkspaceQuerySession.runQuery({
         rawSql: sqlToRun,
         workspaceId,
       });
     })
     .with({ auth: "public" }, async ({ publicAvaPageId, snapshotRevision }) => {
-      return await PublicQetlClient.runQuery({
+      return await PublicQuerySession.runQuery({
         rawSql: sqlToRun,
         dashboardId: publicAvaPageId,
         visibility: "public",
@@ -97,7 +91,7 @@ async function _runRawSql(
     .with(
       { auth: "workspace_published" },
       async ({ publicAvaPageId, snapshotRevision }) => {
-        return await PublicQetlClient.runQuery({
+        return await PublicQuerySession.runQuery({
           rawSql: sqlToRun,
           dashboardId: publicAvaPageId,
           visibility: "workspace",
@@ -157,7 +151,7 @@ async function _runSourceQuery({
 
   return await Model.match(dataSource, {
     Dataset: async (): Promise<QueryResult.T<UnknownRow>> => {
-      return await WorkspaceQetlClient.runQuery({
+      return await WorkspaceQuerySession.runQuery({
         rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
         workspaceId,
       });
@@ -204,37 +198,7 @@ async function _runConceptQuery({
     workspaceId,
   });
 
-  return _buildConceptQueryResult(attributes, rows);
-}
-
-/**
- * Builds a {@link QueryResult} out of the raw rows `AttributeAssertionClient`
- * returns, remapping each row from attribute ids to the attribute names the
- * rest of the query pipeline expects columns to be keyed by.
- */
-function _buildConceptQueryResult(
-  attributes: readonly ConceptAttribute.T[],
-  rows: ReadonlyArray<Record<ConceptAttribute.Id, unknown>>,
-): QueryResult.T<UnknownRow> {
-  const queryResultColumns: QueryResult.Column[] = attributes.map(
-    pickProps(["name", "dataType"]),
-  );
-
-  return {
-    id: uuid<QueryResult.Id>(),
-    // Mapping over `attributes` rather than over the derived columns keeps
-    // each attribute's id in hand, so no per-row lookup back into
-    // `attributes` is needed.
-    data: rows.map((row) => {
-      return makeObjectFromEntries(
-        attributes.map((attribute) => {
-          return [attribute.name, row[attribute.id]];
-        }),
-      );
-    }),
-    columns: queryResultColumns,
-    numRows: rows.length,
-  };
+  return buildConceptQueryResult(attributes, rows);
 }
 
 /**

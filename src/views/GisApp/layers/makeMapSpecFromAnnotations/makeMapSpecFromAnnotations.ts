@@ -147,15 +147,20 @@ function _buildSymbolLayerSpec(isVisible: boolean): MapLayerSpec {
  */
 export function makeMapSpecFromAnnotations(options: {
   annotations: AvaMapConfig.AnnotationLayer;
+  hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
 }): MapSpec {
-  const { annotations } = options;
+  const { annotations, hiddenAnnotationFeatureIds = [] } = options;
+  const hiddenIds = new Set(hiddenAnnotationFeatureIds);
+  const visibleFeatures = annotations.features.filter((feature) => {
+    return !hiddenIds.has(feature.id);
+  });
   return {
     sources: {
       [MapLayerIds.annotationSource]: {
         type: "geojson",
         data: {
           type: "FeatureCollection",
-          features: annotations.features.map(_makeAnnotationGeoJsonFeature),
+          features: visibleFeatures.map(_makeAnnotationGeoJsonFeature),
         },
       },
     },

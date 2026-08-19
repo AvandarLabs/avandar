@@ -7,6 +7,7 @@ import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
+import { deleteRetainedOriginalFromCloud } from "@/clients/storage/DatasetOriginalFileStorageClient/deleteRetainedOriginalFromCloud/deleteRetainedOriginalFromCloud";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
@@ -16,11 +17,12 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
-  dataSource: CsvFileDataset.T | XlsxFileDataset.T;
+  dataSource: CsvFileDataset.T | PdfFileDataset.T | XlsxFileDataset.T;
 };
 
 /**
@@ -37,6 +39,21 @@ export function ToggleOfflineOnlyButton({
 
   const [makeOfflineOnly, isMakeOfflinePending] = useMutation({
     mutationFn: async (datasetIdToDelete: DatasetId) => {
+      // The retained original goes first, and a failure here aborts the whole
+      // operation. Deleting the parquet while `<datasetId>.original.pdf` sat
+      // in the workspaces bucket would leave the original readable by anyone
+      // with `viewer` on the dataset, which is precisely what the user just
+      // asked us to prevent. Doing it first also means a failure leaves the
+      // dataset fully cloud-synced and self-consistent instead of
+      // half-migrated. This throws (rather than logging and continuing like
+      // `fullDelete` does) because the user's request has not been honoured,
+      // and `onError` must be the one to tell them.
+      await deleteRetainedOriginalFromCloud({
+        workspaceId: workspace.id,
+        datasetId: datasetIdToDelete,
+        sourceType,
+      });
+
       await DatasetParquetStorageClient.deleteDataset({
         workspaceId: workspace.id,
         datasetId: datasetIdToDelete,

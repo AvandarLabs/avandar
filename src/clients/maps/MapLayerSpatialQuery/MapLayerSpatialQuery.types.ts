@@ -13,15 +13,21 @@ export type ResolvedBoundarySource = {
   simplification: MapLayer.GeometrySimplification;
 };
 
+/** A column resolved to its current name, from either a query or boundary. */
+export type ResolvedColumnRef = {
+  type: "queryColumn" | "boundaryColumn";
+  columnName: string;
+};
+
 /** Metadata ready for the spatial SQL compiler. */
 export type ResolvedMapLayerMetadata = {
   type: "resolved";
   sourceColumnNames: ReadonlyMap<QueryColumn.Id, string>;
   boundary: ResolvedBoundarySource | undefined;
   aggregationMeasureColumnName: string | undefined;
-  normalizationDenominator:
-    | { type: "queryColumn" | "boundaryColumn"; columnName: string }
-    | undefined;
+  normalizationDenominator: ResolvedColumnRef | undefined;
+  /** Resolved name of the disputed-status column, when the layer binds one. */
+  disputedStatusColumn: ResolvedColumnRef | undefined;
 };
 
 /** Why stable persisted references cannot currently be compiled. */
@@ -35,7 +41,10 @@ export type MapLayerRebindReason =
   | "aggregationMeasureNotNumeric"
   | "missingBoundaryDenominatorColumn"
   | "normalizationDenominatorNotNumeric"
-  | "unsupportedNormalizationDenominator";
+  | "unsupportedNormalizationDenominator"
+  | "missingDisputedStatusColumn"
+  | "disputedStatusColumnNotText"
+  | "unsupportedDisputedStatusColumn";
 
 /** A saved reference that must be rebound before the layer can run. */
 export type MapLayerRebindRequired = {

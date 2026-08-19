@@ -1,9 +1,11 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Group, Stack, Text } from "@mantine/core";
+import { Box, Group, Stack, Text } from "@mantine/core";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { usePublishNuxGeneralAccessFact } from "@/components/Nux/NuxTour/usePublishNuxGeneralAccessFact/usePublishNuxGeneralAccessFact";
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { GeneralAccessSelect } from "./GeneralAccessSelect";
@@ -94,6 +96,10 @@ export function ShareGeneralAccess({
   onWorkspaceRoleChange,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
+  usePublishNuxGeneralAccessFact({
+    resourceType,
+    displayedValue: value,
+  });
   const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
   const showPublicOptionDisabledReason =
@@ -105,41 +111,45 @@ export function ShareGeneralAccess({
         <Trans>General access</Trans>
       </Text>
       <Group wrap="nowrap" align="flex-end" gap="sm">
-        <GeneralAccessSelect
-          value={value}
-          isBusy={isBusy}
-          generalOptions={GeneralAccessModule.makeDropdownOptionsFromLabels({
-            isOwner,
-            labels: {
-              private: t`Only me`,
-              restricted: t`Restricted`,
-              workspace: t`Anyone in ${app}`,
-              public: t`Anyone with the link`,
-            },
-            isPublicOptionAvailable,
-            isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
-          })}
-          tooltip={_getGeneralAccessTooltip({
-            value,
-            isOwner,
-            app,
-            resource,
-            i18n,
-          })}
-          ariaLabel={t`General access`}
-          describedById={
-            showPublicOptionDisabledReason ?
-              _PUBLIC_OPTION_DISABLED_REASON_ID
-            : undefined
-          }
-          onChange={onChange}
-        />
-        {value === "workspace" ?
-          <ShareWorkspaceRoleSelect
-            role={workspaceShareRole}
-            isDisabled={isBusy}
-            onChange={onWorkspaceRoleChange}
+        <Box flex={1} {...NuxAnchors.props(NuxAnchors.ids.generalAccessSelect)}>
+          <GeneralAccessSelect
+            value={value}
+            isBusy={isBusy}
+            generalOptions={GeneralAccessModule.makeDropdownOptionsFromLabels({
+              isOwner,
+              labels: {
+                private: t`Only me`,
+                restricted: t`Restricted`,
+                workspace: t`Anyone in ${app}`,
+                public: t`Anyone with the link`,
+              },
+              isPublicOptionAvailable,
+              isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
+            })}
+            tooltip={_getGeneralAccessTooltip({
+              value,
+              isOwner,
+              app,
+              resource,
+              i18n,
+            })}
+            ariaLabel={t`General access`}
+            describedById={
+              showPublicOptionDisabledReason ?
+                _PUBLIC_OPTION_DISABLED_REASON_ID
+              : undefined
+            }
+            onChange={onChange}
           />
+        </Box>
+        {value === "workspace" ?
+          <Box {...NuxAnchors.props(NuxAnchors.ids.shareRoleSelect)}>
+            <ShareWorkspaceRoleSelect
+              role={workspaceShareRole}
+              isDisabled={isBusy}
+              onChange={onWorkspaceRoleChange}
+            />
+          </Box>
         : null}
       </Group>
       {showPublicOptionDisabledReason ?

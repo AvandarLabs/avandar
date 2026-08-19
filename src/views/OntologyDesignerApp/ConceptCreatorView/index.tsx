@@ -1,4 +1,4 @@
-import { makeSelectOptions, Paper, Select } from "@avandar/ui";
+import { makeSelectOptions, Select } from "@avandar/ui";
 import { useForm } from "@avandar/ui/hooks";
 import { isDefined, prop, propEq, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -7,10 +7,12 @@ import {
   Button,
   Checkbox,
   Container,
+  Divider,
   Stack,
   Switch,
   Text,
   TextInput,
+  Title,
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
@@ -19,6 +21,7 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
+import css from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorView.module.css";
 import {
   ConceptFormSubmitValues,
   ConceptFormType,
@@ -174,121 +177,136 @@ export function ConceptCreatorView(): JSX.Element {
   }, [datasetColumnAttributes, manualEntryAttributes]);
 
   return (
-    <Container pt="lg" pb="xxl" fluid w="100%">
-      <Paper>
-        <form
-          onSubmit={conceptForm.onSubmit((values) => {
-            return sendConceptForm(values, {
-              onSuccess: () => {
-                navigate(
-                  AppLinks.ontologyDesignerConceptView({
-                    workspaceSlug: workspace.slug,
-                    conceptId,
-                    conceptName,
-                  }),
-                );
-              },
-            });
-          })}
-        >
-          <Stack>
-            <TextInput
-              key={keys.name}
-              required
-              label={t`Profile Name`}
-              placeholder={t`Enter a name for this profile type`}
-              {...inputProps.name()}
-            />
-            <TextInput
-              key={keys.description}
-              label={t`Profile Description`}
-              placeholder={t`Enter a description for this profile type`}
-              {...inputProps.description()}
-            />
-            {IS_MANUAL_DATA_DISABLED ? null : (
-              <Checkbox
-                key={keys.allowManualCreation}
-                label={t`Allow new ${pluralConceptName} to be created manually`}
-                {...inputProps.allowManualCreation({ type: "checkbox" })}
+    <Container className={css.page} pt="xxl" px="lg">
+      <Stack gap="lg">
+        <header className={css.header}>
+          <Title order={2} fw={650}>
+            <Trans>New case type</Trans>
+          </Title>
+          <Text c="dimmed" size="sm" maw={520}>
+            <Trans>
+              Name this case type and say where its fields come from. Map
+              columns from existing datasets, or add fields to fill in by hand.
+            </Trans>
+          </Text>
+        </header>
+        <Divider />
+        <Box className={css.panel}>
+          <form
+            onSubmit={conceptForm.onSubmit((values) => {
+              return sendConceptForm(values, {
+                onSuccess: () => {
+                  navigate(
+                    AppLinks.ontologyDesignerConceptView({
+                      workspaceSlug: workspace.slug,
+                      conceptId,
+                      conceptName,
+                    }),
+                  );
+                },
+              });
+            })}
+          >
+            <Stack gap="md">
+              <TextInput
+                key={keys.name}
+                required
+                label={t`Case type name`}
+                placeholder={t`For example, County or Household`}
+                {...inputProps.name()}
               />
-            )}
-            <Text>
-              <Trans>
-                Tell us about where the {singularConceptName} data should come
-                from...
-              </Trans>
-            </Text>
-            <Switch
-              label={t`Some data should come from existing datasets`}
-              checked={allowDatasetAttributes}
-              onChange={(e) => {
-                setAllowDatasetAttributes(e.currentTarget.checked);
-              }}
-            />
-            {allowDatasetAttributes ?
-              <DatasetColumnAttributesBlock
-                conceptId={conceptId}
-                conceptForm={conceptForm}
-                conceptName={singularConceptName}
+              <TextInput
+                key={keys.description}
+                label={t`Description`}
+                placeholder={t`What does this case type represent?`}
+                {...inputProps.description()}
               />
-            : null}
-            {IS_MANUAL_DATA_DISABLED ? null : (
+              {IS_MANUAL_DATA_DISABLED ? null : (
+                <Checkbox
+                  key={keys.allowManualCreation}
+                  label={t`Allow new ${pluralConceptName} to be created manually`}
+                  {...inputProps.allowManualCreation({ type: "checkbox" })}
+                />
+              )}
+              <Text>
+                <Trans>
+                  Tell us about where the {singularConceptName} data should come
+                  from...
+                </Trans>
+              </Text>
               <Switch
-                label={t`Some data should be manually entered`}
-                checked={allowManualEntryAttributes}
+                label={t`Some data should come from existing datasets`}
+                checked={allowDatasetAttributes}
                 onChange={(e) => {
-                  const displayManualEntryAttributes = e.currentTarget.checked;
-                  setAllowManualEntryAttributes(displayManualEntryAttributes);
-
-                  // clear the list when we turn off the switch
-                  // TODO(jpsyx): we should store a backup of the list for when
-                  // we turn it back on.
-                  if (!displayManualEntryAttributes) {
-                    conceptForm.setFieldValue("manualEntryAttributes", []);
-                  }
-                  if (
-                    displayManualEntryAttributes &&
-                    conceptForm.getValues().manualEntryAttributes.length === 0
-                  ) {
-                    conceptForm.insertListItem(
-                      "manualEntryAttributes",
-                      makeDefaultManualEntryAttribute({
-                        conceptId,
-                        name: t`New field`,
-                      }),
-                    );
-                  }
+                  setAllowDatasetAttributes(e.currentTarget.checked);
                 }}
               />
-            )}
-            {allowManualEntryAttributes ?
-              <ManualEntryAttributesBlock
-                conceptId={conceptId}
-                conceptForm={conceptForm}
+              {allowDatasetAttributes ?
+                <DatasetColumnAttributesBlock
+                  conceptId={conceptId}
+                  conceptForm={conceptForm}
+                  conceptName={conceptName.trim() || t`record`}
+                />
+              : null}
+              {IS_MANUAL_DATA_DISABLED ? null : (
+                <Switch
+                  label={t`Some data should be manually entered`}
+                  checked={allowManualEntryAttributes}
+                  onChange={(e) => {
+                    const displayManualEntryAttributes =
+                      e.currentTarget.checked;
+                    setAllowManualEntryAttributes(displayManualEntryAttributes);
+
+                    // clear the list when we turn off the switch
+                    // TODO(jpsyx): store a backup of the list for when
+                    // we turn it back on.
+                    if (!displayManualEntryAttributes) {
+                      conceptForm.setFieldValue("manualEntryAttributes", []);
+                    }
+                    if (
+                      displayManualEntryAttributes &&
+                      conceptForm.getValues().manualEntryAttributes.length === 0
+                    ) {
+                      conceptForm.insertListItem(
+                        "manualEntryAttributes",
+                        makeDefaultManualEntryAttribute({
+                          conceptId,
+                          name: t`New field`,
+                        }),
+                      );
+                    }
+                  }}
+                />
+              )}
+              {allowManualEntryAttributes ?
+                <ManualEntryAttributesBlock
+                  conceptId={conceptId}
+                  conceptForm={conceptForm}
+                />
+              : null}
+
+              <Select
+                key={keys.labelAttributeId}
+                required
+                data={possibleLabelAttributes}
+                placeholder={
+                  attributes.length === 0 ?
+                    t`No fields have been configured yet`
+                  : t`Select a field`
+                }
+                label={t`What field should be used as a ${singularConceptName}'s name?`}
+                {...inputProps.labelAttributeId()}
               />
-            : null}
 
-            <Select
-              key={keys.labelAttributeId}
-              required
-              data={possibleLabelAttributes}
-              placeholder={
-                attributes.length === 0 ?
-                  t`No fields have been configured yet`
-                : t`Select a field`
-              }
-              label={t`What field should be used as a ${singularConceptName}'s name?`}
-              {...inputProps.labelAttributeId()}
-            />
-
-            <Box>
-              <Button type="submit" loading={isSendConceptFormPending}>
-                <Trans>Create</Trans>
-              </Button>
-            </Box>
-          </Stack>
-        </form>
-      </Paper>
+              <Box>
+                <Button type="submit" loading={isSendConceptFormPending}>
+                  <Trans>Create case type</Trans>
+                </Button>
+              </Box>
+            </Stack>
+          </form>
+        </Box>
+      </Stack>
     </Container>
   );
 }

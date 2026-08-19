@@ -1,4 +1,3 @@
-import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
@@ -19,6 +18,7 @@ type Props = {
   onSaveCurrentView: () => void;
   onGoToBookmark: (bookmark: AvaMapConfig.Bookmark) => void;
   onRemoveBookmark: (id: AvaMapConfig.BookmarkId) => void;
+  onOpenExport: () => void;
 };
 
 /** Renders basemap, view, sharing, and export controls. */
@@ -31,6 +31,7 @@ export function MapOutputActions({
   onSaveCurrentView,
   onGoToBookmark,
   onRemoveBookmark,
+  onOpenExport,
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
@@ -48,18 +49,13 @@ export function MapOutputActions({
         resourceId={avaMapId}
         size="compact-sm"
       />
-      <Tooltip label={t`Print and PDF export arrives in a later release.`}>
-        <Button
-          size="compact-sm"
-          leftSection={<IconDownload size={15} stroke={1.5} />}
-          aria-disabled
-          onClick={(event) => {
-            event.preventDefault();
-          }}
-        >
-          <span className={css.mapOutputActionsLabel}>{t`Export`}</span>
-        </Button>
-      </Tooltip>
+      <Button
+        size="compact-sm"
+        leftSection={<IconDownload size={15} stroke={1.5} />}
+        onClick={onOpenExport}
+      >
+        <span className={css.mapOutputActionsLabel}>{t`Export`}</span>
+      </Button>
     </>
   );
 }

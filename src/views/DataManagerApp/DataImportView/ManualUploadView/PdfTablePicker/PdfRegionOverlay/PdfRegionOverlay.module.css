@@ -1,0 +1,20 @@
+.surface {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.preview {
+  background: rgb(34 139 230 / 12%);
+  border: 2px dashed var(--mantine-color-blue-6);
+  pointer-events: none;
+}
+
+.marker {
+  background: var(--mantine-color-orange-2);
+  border: 2px solid var(--mantine-color-orange-6);
+  border-radius: 50%;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  pointer-events: none;
+  width: 10px;
+}

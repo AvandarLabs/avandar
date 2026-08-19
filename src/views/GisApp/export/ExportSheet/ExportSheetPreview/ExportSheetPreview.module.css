@@ -1,0 +1,40 @@
+.exportSheetPreviewPage {
+  background: white;
+  border: 1px solid var(--mantine-color-default-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.exportSheetPreviewBand {
+  box-sizing: border-box;
+  position: absolute;
+}
+
+.exportSheetPreviewHeader {
+  border-bottom: 1px solid var(--mantine-color-gray-4);
+}
+
+.exportSheetPreviewFooter {
+  border-top: 1px solid var(--mantine-color-gray-4);
+}
+
+.exportSheetPreviewLegend {
+  border: 1px dashed var(--mantine-color-gray-4);
+}
+
+.exportSheetPreviewMapFrame {
+  background: var(--mantine-color-gray-2);
+}
+
+.exportSheetPreviewText {
+  color: var(--mantine-color-dark-6);
+  font-size: 6px;
+  left: 4px;
+  line-height: 1.2;
+  overflow: hidden;
+  position: absolute;
+  right: 4px;
+  text-overflow: ellipsis;
+  top: 2px;
+  white-space: nowrap;
+}

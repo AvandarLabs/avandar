@@ -115,11 +115,12 @@ describe("MapTimeSlider", () => {
     expect(updateConfig).not.toHaveBeenCalled();
   });
 
-  it("writes a time range when the user moves a handle", () => {
+  it("writes a time range when the user moves a handle with the keyboard", () => {
     const updateConfig = _renderSlider({ timeRange: undefined });
     const thumbs = screen.getAllByRole("slider");
     fireEvent.focus(thumbs[1]!);
     fireEvent.keyDown(thumbs[1]!, { key: "ArrowLeft" });
+    fireEvent.keyUp(thumbs[1]!, { key: "ArrowLeft" });
 
     expect(updateConfig).toHaveBeenCalledOnce();
     const updated = updateConfig.mock.calls[0]![0](AvaMapConfig.makeEmpty());

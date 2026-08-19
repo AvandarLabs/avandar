@@ -38,7 +38,7 @@ function _makeQuery(
   filters: QueryFilterGroup = EMPTY_QUERY_FILTER,
 ): PartialStructuredQuery {
   const nameColumn = _makeColumn("name");
-  const ageColumn = _makeColumn("age", "integer");
+  const ageColumn = _makeColumn("age", "bigint");
   return Model.make("StructuredQuery", {
     id: "q1" as StructuredQueryId,
     version: 1 as const,
@@ -124,7 +124,7 @@ describe("structuredQueryToSql", () => {
     expect(sql.toLowerCase()).toContain(" and ");
   });
 
-  it("renders IN list", () => {
+  it("renders IN list, case-insensitively by default", () => {
     const sql = structuredQueryToSql(
       _makeQuery({
         type: "group",
@@ -139,7 +139,65 @@ describe("structuredQueryToSql", () => {
         ],
       }),
     );
+    expect(sql.toLowerCase()).toMatch(/lower\("name"\) in/);
+  });
+
+  it("renders IN list case-sensitively when the rule asks to match case", () => {
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        type: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            columnName: "name",
+            operator: "in",
+            value: ["alice", "bob"],
+            matchCase: true,
+          },
+        ],
+      }),
+    );
     expect(sql.toLowerCase()).toMatch(/"name" in/);
+    expect(sql.toLowerCase()).not.toContain("lower(");
+  });
+
+  it("binds numeric filter values as numbers using the query's column types", () => {
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        type: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            columnName: "age",
+            operator: ">",
+            value: "30",
+          },
+        ],
+      }),
+    );
+    expect(sql).toContain('"age" > 30');
+    expect(sql).not.toContain(`'30'`);
+  });
+
+  it("lets an explicit columnTypes option override the query's columns", () => {
+    const sql = structuredQueryToSql(
+      _makeQuery({
+        type: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            columnName: "name",
+            operator: "=",
+            value: "5",
+          },
+        ],
+      }),
+      { columnTypes: { name: "bigint" } },
+    );
+    expect(sql).toContain('"name" = 5');
   });
 
   it("renders IS NULL", () => {

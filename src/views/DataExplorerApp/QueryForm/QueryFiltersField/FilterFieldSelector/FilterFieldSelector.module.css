@@ -1,0 +1,23 @@
+.filterFieldControl {
+  flex: 2 1 9rem;
+  min-width: 8rem;
+}
+
+.filterFieldTruncatedInput {
+  text-overflow: ellipsis;
+}
+
+/*
+ * Let a dropdown be wider than the control that opens it, so a long column name
+ * reads on one line instead of wrapping, and cap it so it cannot escape a
+ * narrow host.
+ */
+.filterFieldWideDropdown {
+  max-width: min(28rem, 90vw);
+  min-width: 20rem;
+}
+
+.filterFieldWrappingOption {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}

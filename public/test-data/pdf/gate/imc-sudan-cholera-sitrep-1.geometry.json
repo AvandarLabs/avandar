@@ -1,0 +1,1693 @@
+{
+  "sourcePdfSha256": "9a15e32eb738d8b1a7b34eabd0abebb039adb49bfdad8e083e44e72413b98721",
+  "info": {
+    "PDFFormatVersion": "1.6",
+    "Language": "EN-US",
+    "EncryptFilterName": null,
+    "IsLinearized": true,
+    "IsAcroFormPresent": false,
+    "IsXFAPresent": false,
+    "IsCollectionPresent": false,
+    "IsSignaturesPresent": false,
+    "Author": "Roger Shambuyi",
+    "Custom": {
+      "Company": "",
+      "ContentTypeId": "0x0101008F137F5F950D13418B93DA1DE1114A6F",
+      "GrammarlyDocumentId": "54fd145ab7fffe681428451252fba86b7d2190dcfef49db141b0d67506eb8226",
+      "MediaServiceImageTags": "",
+      "SourceModified": "",
+      "grammarly_documentContext": "{\"goals\":[],\"domain\":\"general\",\"emotions\":[],\"dialect\":\"american\"}",
+      "grammarly_documentId": "documentId_2418"
+    },
+    "CreationDate": "D:20250624085143-07'00'",
+    "Creator": "Acrobat PDFMaker 25 for Word",
+    "Keywords": "",
+    "ModDate": "D:20250624085149-07'00'",
+    "Producer": "Adobe PDF Library 25.1.51",
+    "Subject": "",
+    "Title": ""
+  },
+  "page1": {
+    "pageIndex": 0,
+    "width": 612,
+    "height": 792,
+    "textItems": [
+      {
+        "text": "Sudan Cholera Response",
+        "x": 450.48,
+        "y": 729.3,
+        "width": 121.20692999999991,
+        "height": 10.02,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Situation Report #1",
+        "x": 479.94,
+        "y": 715.8,
+        "width": 91.74111599999988,
+        "height": 10.02,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "SITUATION UPDATE",
+        "x": 39.36,
+        "y": 702.18,
+        "width": 173.70879599999998,
+        "height": 16.98,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "June 24, 2025",
+        "x": 506.58,
+        "y": 702.3,
+        "width": 65.03112000000029,
+        "height": 10.02,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "FAST FACTS",
+        "x": 445.8,
+        "y": 660.66,
+        "width": 68.39661600000002,
+        "height": 10.98,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "",
+        "x": 392.52,
+        "y": 642.96,
+        "width": 4.58916,
+        "height": 10.02,
+        "fontName": "font-1",
+        "unmappedCharRatio": 1
+      },
+      {
+        "text": " ",
+        "x": 397.10916,
+        "y": 642.96,
+        "width": 1.338000000000002,
+        "height": 0,
+        "fontName": "font-1",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Sudan is experiencing a",
+        "x": 410.51592,
+        "y": 642.96,
+        "width": 106.79716799999981,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "widespread cholera outbreak",
+        "x": 410.51592,
+        "y": 631.437,
+        "width": 128.44136999999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "affecting 13 states, with more than",
+        "x": 410.51592,
+        "y": 619.97412,
+        "width": 152.3390700000003,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "80,000 cases and 2,000 deaths",
+        "x": 410.51592000000005,
+        "y": 608.45112,
+        "width": 139.52048399999967,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "reported to date.",
+        "x": 410.5059,
+        "y": 596.9281199999999,
+        "width": 73.41152999999996,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "",
+        "x": 392.49996,
+        "y": 585.4652399999999,
+        "width": 4.58916,
+        "height": 10.02,
+        "fontName": "font-1",
+        "unmappedCharRatio": 1
+      },
+      {
+        "text": " ",
+        "x": 397.08912,
+        "y": 585.4652399999999,
+        "width": 1.338000000000002,
+        "height": 0,
+        "fontName": "font-1",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Humanitarian and infrastructure",
+        "x": 410.49588,
+        "y": 585.4652399999999,
+        "width": 140.15875800000006,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "disruptions, including power and",
+        "x": 410.49588,
+        "y": 573.9422399999999,
+        "width": 142.98239400000003,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "water outages and mass",
+        "x": 410.49588,
+        "y": 562.4192399999998,
+        "width": 108.9975599999998,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "displacement across Khartoum,",
+        "x": 410.49588,
+        "y": 550.9563599999998,
+        "width": 140.13671400000007,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Darfur and border regions, have",
+        "x": 410.49588,
+        "y": 539.4333599999998,
+        "width": 141.77999400000002,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "aggravated the outbreak.",
+        "x": 410.49588,
+        "y": 527.9103599999997,
+        "width": 111.27911400000009,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "",
+        "x": 392.49996,
+        "y": 516.4474799999997,
+        "width": 4.58916,
+        "height": 10.02,
+        "fontName": "font-1",
+        "unmappedCharRatio": 1
+      },
+      {
+        "text": " ",
+        "x": 397.08912,
+        "y": 516.4474799999997,
+        "width": 1.338000000000002,
+        "height": 0,
+        "fontName": "font-1",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "An oral cholera vaccination",
+        "x": 410.49588,
+        "y": 516.4474799999997,
+        "width": 120.11975999999991,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "campaign in Khartoum that",
+        "x": 410.49588,
+        "y": 504.9244799999997,
+        "width": 119.54060399999986,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "launched on June 11 has reduced",
+        "x": 410.49588,
+        "y": 493.40147999999965,
+        "width": 150.71282400000007,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "fatality rates.",
+        "x": 410.49588,
+        "y": 481.93859999999967,
+        "width": 56.72322000000005,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "OUR FOOTPRINT",
+        "x": 434.52,
+        "y": 457.56,
+        "width": 90.93965399999999,
+        "height": 10.98,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "An International Medical Corps MHPSS Coordinator conducts a one on-one hygiene",
+        "x": 39.42,
+        "y": 443.88,
+        "width": 335.16839999999974,
+        "height": 9,
+        "fontName": "font-3",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "",
+        "x": 392.52,
+        "y": 439.8,
+        "width": 4.58916,
+        "height": 10.02,
+        "fontName": "font-1",
+        "unmappedCharRatio": 1
+      },
+      {
+        "text": " ",
+        "x": 397.10916,
+        "y": 439.8,
+        "width": 1.338000000000002,
+        "height": 0,
+        "fontName": "font-1",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Since 2004, International Medical",
+        "x": 410.51592,
+        "y": 439.8,
+        "width": 147.91524000000004,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "promotion session at the oral rehydration point at Al Fetah Clinic in Khartoum state.",
+        "x": 39.42,
+        "y": 433.5,
+        "width": 331.17899999999975,
+        "height": 9,
+        "fontName": "font-3",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Corps has been in Sudan providing",
+        "x": 410.51592,
+        "y": 428.33712,
+        "width": 156.23785200000017,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "health, nutrition, protection, mental",
+        "x": 410.51592,
+        "y": 416.81412,
+        "width": 153.4202280000001,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Khartoum state in Sudan is grappling with a significant resurgence of",
+        "x": 36,
+        "y": 415.38,
+        "width": 304.05790199999996,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "health and psychosocial support",
+        "x": 410.50589999999994,
+        "y": 405.29112,
+        "width": 142.94732400000032,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "cholera, with the Ministry of Health (MoH) reporting approximately 700 new",
+        "x": 35.99999999999997,
+        "y": 403.85699999999997,
+        "width": 331.30528800000013,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "(MHPSS), and water, sanitation",
+        "x": 410.50590000000005,
+        "y": 393.82824,
+        "width": 140.09964000000042,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "cases weekly. In June, 21,563 cases and 388 deaths have been reported,",
+        "x": 36.01001999999994,
+        "y": 392.39412,
+        "width": 326.9616180000001,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "and hygiene (WASH) services.",
+        "x": 410.5059,
+        "y": 382.36536,
+        "width": 136.2249060000002,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "including 13 suspected cases (five confirmed) and one death in West Darfur,",
+        "x": 35.99999999999994,
+        "y": 380.87111999999996,
+        "width": 338.60586000000006,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "and 166 cases and 13 deaths reported in South Darfur. The current outbreak",
+        "x": 36,
+        "y": 369.34811999999994,
+        "width": 339.69403200000016,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "is primarily driven by deteriorating environmental conditions, inadequate",
+        "x": 35.98998,
+        "y": 357.88523999999995,
+        "width": 318.01776600000017,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "OUR RESPONSE",
+        "x": 435.66,
+        "y": 357.9,
+        "width": 88.60860000000001,
+        "height": 10.98,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "access to safe drinking water and the return of displaced populations",
+        "x": 35.98998,
+        "y": 346.36223999999993,
+        "width": 304.0769400000002,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "",
+        "x": 392.52,
+        "y": 340.2,
+        "width": 4.58916,
+        "height": 10.02,
+        "fontName": "font-1",
+        "unmappedCharRatio": 1
+      },
+      {
+        "text": " ",
+        "x": 397.10916,
+        "y": 340.2,
+        "width": 1.338000000000002,
+        "height": 0,
+        "fontName": "font-1",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "International Medical Corps is",
+        "x": 410.51592,
+        "y": 340.2,
+        "width": 131.7990719999998,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "following the Sudanese Armed Forces' regaining control of the capital,",
+        "x": 35.98998,
+        "y": 334.8392399999999,
+        "width": 309.8584800000001,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "supporting one cholera treatment",
+        "x": 410.51592,
+        "y": 328.67699999999996,
+        "width": 146.78899200000012,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Khartoum. Drone attacks on power infrastructure in Omdurman have",
+        "x": 35.97996000000006,
+        "y": 323.3763599999999,
+        "width": 303.42664200000013,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "center (CTC) and three rapid",
+        "x": 410.51592,
+        "y": 317.15399999999994,
+        "width": 127.77403799999992,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "disrupted the functioning of water treatment stations, severely limiting",
+        "x": 35.97996000000007,
+        "y": 311.8533599999999,
+        "width": 306.2532839999999,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "response teams (RRT), as well as",
+        "x": 410.49587999999994,
+        "y": 305.69111999999996,
+        "width": 150.68677200000005,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "access to clean water drawn from the Nile. Communities in Southern",
+        "x": 35.97996000000007,
+        "y": 300.33035999999987,
+        "width": 303.4827540000002,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "community-based surveillance and",
+        "x": 410.4858599999999,
+        "y": 294.16811999999993,
+        "width": 154.01140800000022,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Khartoum and Jabal Awliya localities are particularly affected, facing acute",
+        "x": 35.989980000000116,
+        "y": 288.8674799999999,
+        "width": 328.5648180000003,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "WASH activities in Khartoum and",
+        "x": 410.4758399999999,
+        "y": 282.6451199999999,
+        "width": 147.29600399999987,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "shortages of clean water and electricity. Access to essential health services",
+        "x": 35.989980000000145,
+        "y": 277.34447999999986,
+        "width": 333.5788260000001,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "West Darfur.",
+        "x": 410.4758399999999,
+        "y": 271.1221199999999,
+        "width": 56.17813199999993,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "has been severely limited due to damaged infrastructure and the departure",
+        "x": 35.98998000000017,
+        "y": 265.8815999999999,
+        "width": 330.7111019999999,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "of healthcare workers from affected areas.",
+        "x": 35.97996000000015,
+        "y": 254.35859999999988,
+        "width": 187.35896999999997,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "International Medical Corps Response",
+        "x": 36,
+        "y": 231.18,
+        "width": 254.33674200000013,
+        "height": 13.98,
+        "fontName": "font-0",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "International Medical Corps has scaled up its cholera response in Khartoum through a multi-sectoral approach targeting",
+        "x": 36,
+        "y": 211.56,
+        "width": 528.6030959999993,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "high-risk localities. Two RRTs have been deployed, one in Jabal Awliya and another in Ombadah locality, to conduct",
+        "x": 36,
+        "y": 200.037,
+        "width": 514.2574619999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "active disease surveillance, investigate suspected cases, and lead health and hygiene promotion efforts at the community",
+        "x": 36,
+        "y": 188.514,
+        "width": 537.5569679999992,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "level. International Medical Corps is also supporting Al Fetah Clinic to deliver health, nutrition, water, WASH and MHPSS",
+        "x": 36,
+        "y": 177.05112000000003,
+        "width": 533.6752199999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "services for two months. A dedicated oral rehydration point has been established to ensure timely and effective",
+        "x": 36.00000000000006,
+        "y": 165.52812000000003,
+        "width": 490.44192599999934,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "management of suspected cholera cases with a focus on rapid rehydration.",
+        "x": 35.98998000000006,
+        "y": 154.00512000000003,
+        "width": 332.5167060000001,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "To help reduce the risk of cholera transmission, International Medical Corps is distributing 1,000 hygiene kits to vulnerable",
+        "x": 35.98998000000006,
+        "y": 136.54026000000005,
+        "width": 539.1671819999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "households and regularly conducting water-quality testing and chlorination to ensure access to safe drinking water. We",
+        "x": 35.98998000000006,
+        "y": 125.01726000000005,
+        "width": 524.6171399999994,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "have also re-engaged 100 previously trained community-based surveillance volunteers to strengthen early detection and",
+        "x": 35.97995999999989,
+        "y": 113.55438000000005,
+        "width": 532.0118999999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "rapid response at the community level.",
+        "x": 35.96993999999995,
+        "y": 102.03138000000006,
+        "width": 171.26183999999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Throughout June, our teams will deliver training sessions for facility-based health workers, RRT members and CTC staff.",
+        "x": 35.959919999999954,
+        "y": 84.51642000000005,
+        "width": 533.0639999999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "These sessions will focus on cholera case management, risk communication, WASH protocols and infection prevention",
+        "x": 35.95992000000001,
+        "y": 73.05354000000005,
+        "width": 526.4397779999995,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "and control. Additionally, in partnership with Khartoum state’s MoH, we are providing case management support at",
+        "x": 35.95992000000001,
+        "y": 61.53054000000006,
+        "width": 505.8196199999992,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      },
+      {
+        "text": "Ombada Hospital CTC. To date, 237 patients have been admitted, 253 discharged and 10 deaths recorded.",
+        "x": 35.9398799999999,
+        "y": 50.00754000000006,
+        "width": 475.8157319999996,
+        "height": 10.02,
+        "fontName": "font-2",
+        "unmappedCharRatio": 0
+      }
+    ],
+    "rules": [
+      {
+        "orientation": "horizontal",
+        "position": 0.125,
+        "span": [0, 534]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8189697265625]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8189697265625,
+        "span": [700.0800170898438, 738.719970703125]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.719970703125,
+        "span": [300.1199951171875, 578.8189697265625]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.719970703125]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 700.0800170898438,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 578.8800048828125,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 738.780029296875,
+        "span": [300.1199951171875, 578.8800048828125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 300.1199951171875,
+        "span": [700.0800170898438, 738.780029296875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -3299.66796875,
+        "span": [423.2659912109375, 433.0660095214844]
+      },
+      {
+        "orientation": "vertical",
+        "position": 433.0660095214844,
+        "span": [-3299.66796875, -3253.26806640625]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -3253.26806640625,
+        "span": [423.2659912109375, 433.0660095214844]
+      },
+      {
+        "orientation": "vertical",
+        "position": 423.2659912109375,
+        "span": [-3299.66796875, -3253.26806640625]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 721.47900390625,
+        "span": [40.900001525878906, 190.04600524902344]
+      },
+      {
+        "orientation": "vertical",
+        "position": 190.04600524902344,
+        "span": [721.47900390625, 761.9500122070312]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 761.9500122070312,
+        "span": [40.900001525878906, 190.04600524902344]
+      },
+      {
+        "orientation": "vertical",
+        "position": 40.900001525878906,
+        "span": [721.47900390625, 761.9500122070312]
+      },
+      {
+        "orientation": "vertical",
+        "position": 27.200000762939453,
+        "span": [4.099999904632568, 29.100000381469727]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 29.100000381469727,
+        "span": [18.5, 27.200000762939453]
+      },
+      {
+        "orientation": "vertical",
+        "position": 18.5,
+        "span": [6.699999809265137, 29.100000381469727]
+      },
+      {
+        "orientation": "vertical",
+        "position": 9.300000190734863,
+        "span": [4.699999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 28.899999618530273,
+        "span": [0.4000000059604645, 9.300000190734863]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.4000000059604645,
+        "span": [4.199999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8,
+        "span": [5.900000095367432, 23.299999237060547]
+      },
+      {
+        "orientation": "vertical",
+        "position": -16.700000762939453,
+        "span": [5.900000095367432, 24.600000381469727]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -9.25,
+        "span": [-16.399999618530273, -7.400000095367432]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -5.199999809265137,
+        "span": [-15.699999809265137, 4]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -11.699999809265137,
+        "span": [-15.699999809265137, -5.400000095367432]
+      },
+      {
+        "orientation": "vertical",
+        "position": 9.399999618530273,
+        "span": [4.800000190734863, 29]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 29,
+        "span": [0.5, 9.399999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.5,
+        "span": [6, 29]
+      },
+      {
+        "orientation": "vertical",
+        "position": 27.200000762939453,
+        "span": [4.099999904632568, 29.100000381469727]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 29.100000381469727,
+        "span": [18.5, 27.200000762939453]
+      },
+      {
+        "orientation": "vertical",
+        "position": 18.5,
+        "span": [6.699999809265137, 29.100000381469727]
+      },
+      {
+        "orientation": "vertical",
+        "position": 9.300000190734863,
+        "span": [4.699999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 28.899999618530273,
+        "span": [0.4000000059604645, 9.300000190734863]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.4000000059604645,
+        "span": [4.199999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": 26.25,
+        "span": [7.199999809265137, 18.799999237060547]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8,
+        "span": [5.900000095367432, 23.299999237060547]
+      },
+      {
+        "orientation": "vertical",
+        "position": -16.700000762939453,
+        "span": [5.900000095367432, 24.600000381469727]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -9.25,
+        "span": [-16.399999618530273, -7.400000095367432]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 13.300000190734863,
+        "span": [-0.6000000238418579, 8.300000190734863]
+      },
+      {
+        "orientation": "vertical",
+        "position": 8.300000190734863,
+        "span": [12.600000381469727, 47.599998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 47.599998474121094,
+        "span": [-0.6000000238418579, 8.300000190734863]
+      },
+      {
+        "orientation": "vertical",
+        "position": -0.6000000238418579,
+        "span": [14, 47.599998474121094]
+      },
+      {
+        "orientation": "vertical",
+        "position": 27.200000762939453,
+        "span": [4.099999904632568, 29.100000381469727]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 29.100000381469727,
+        "span": [18.5, 27.200000762939453]
+      },
+      {
+        "orientation": "vertical",
+        "position": 18.5,
+        "span": [6.699999809265137, 29.100000381469727]
+      },
+      {
+        "orientation": "vertical",
+        "position": 9.300000190734863,
+        "span": [4.699999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 28.899999618530273,
+        "span": [0.4000000059604645, 9.300000190734863]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.4000000059604645,
+        "span": [4.199999809265137, 28.899999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": 26.300000190734863,
+        "span": [7.199999809265137, 18.700000762939453]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.5,
+        "span": [8.800000190734863, 35.400001525878906]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8.600000381469727,
+        "span": [12.399999618530273, 37.599998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 1.0499999523162842,
+        "span": [-9, 0]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 0,
+        "span": [0, 12]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 0,
+        "span": [27.399999618530273, 39.599998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 46.400001525878906,
+        "span": [34.5, 43.70000076293945]
+      },
+      {
+        "orientation": "vertical",
+        "position": 33.64999961853027,
+        "span": [21.600000381469727, 46.400001525878906]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 46.5,
+        "span": [15.199999809265137, 23.399999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": 5.700000047683716,
+        "span": [22.200000762939453, 46.400001525878906]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 46.400001525878906,
+        "span": [-4.5, 4.900000095367432]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -5.199999809265137,
+        "span": [-15.699999809265137, 4]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -11.699999809265137,
+        "span": [-15.699999809265137, -5.400000095367432]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0,
+        "span": [0, 35.5]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 48,
+        "span": [-6.800000190734863, 1.2000000476837158]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8.800000190734863,
+        "span": [-1.399999976158142, 10.5]
+      },
+      {
+        "orientation": "horizontal",
+        "position": -0.699999988079071,
+        "span": [-8.800000190734863, 0]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8.800000190734863,
+        "span": [22.899999618530273, 39.099998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 13.300000190734863,
+        "span": [-0.699999988079071, 8.199999809265137]
+      },
+      {
+        "orientation": "vertical",
+        "position": 8.199999809265137,
+        "span": [12.600000381469727, 47.599998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 47.599998474121094,
+        "span": [-0.699999988079071, 8.199999809265137]
+      },
+      {
+        "orientation": "vertical",
+        "position": -0.699999988079071,
+        "span": [14, 47.599998474121094]
+      },
+      {
+        "orientation": "vertical",
+        "position": 26.300000190734863,
+        "span": [7.199999809265137, 18.700000762939453]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.5,
+        "span": [8.800000190734863, 35.400001525878906]
+      },
+      {
+        "orientation": "vertical",
+        "position": -8.600000381469727,
+        "span": [12.100000381469727, 37.599998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 0.8999999761581421,
+        "span": [-9, 0]
+      },
+      {
+        "orientation": "vertical",
+        "position": 9.399999618530273,
+        "span": [4.800000190734863, 29]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 29,
+        "span": [0.5, 9.399999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.5,
+        "span": [6.199999809265137, 29]
+      },
+      {
+        "orientation": "vertical",
+        "position": 8.699999809265137,
+        "span": [29.399999618530273, 40.099998474121094]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 41.25,
+        "span": [0.10000000149011612, 8.699999809265137]
+      },
+      {
+        "orientation": "vertical",
+        "position": 0.10000000149011612,
+        "span": [2.9000000953674316, 42.400001525878906]
+      },
+      {
+        "orientation": "vertical",
+        "position": 8.600000381469727,
+        "span": [2.5999999046325684, 19.299999237060547]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 136.8000030517578,
+        "span": [48.900001525878906, 90.4000015258789]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 53.29999923706055,
+        "span": [-69.9000015258789, -60.900001525878906]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 61.900001525878906,
+        "span": [-73.5, -64.80000305175781]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 137.10000610351562,
+        "span": [-132.10000610351562, -89]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 19.299999237060547,
+        "span": [-108.69999694824219, -66.5]
+      },
+      {
+        "orientation": "vertical",
+        "position": -42.04999923706055,
+        "span": [0.800000011920929, 8.899999618530273]
+      },
+      {
+        "orientation": "vertical",
+        "position": -22.399999618530273,
+        "span": [9.100000381469727, 28.299999237060547]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 0,
+        "span": [-9.100000381469727, 0]
+      },
+      {
+        "orientation": "vertical",
+        "position": -4.349999904632568,
+        "span": [10, 25.200000762939453]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 40.20000076293945,
+        "span": [-39.599998474121094, -0.5]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 690.5999755859375,
+        "span": [32.15999984741211, 223.67999267578125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 223.67999267578125,
+        "span": [690.5999755859375, 718.2000122070312]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 718.2000122070312,
+        "span": [32.15999984741211, 223.67999267578125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 32.15999984741211,
+        "span": [690.5999755859375, 718.2000122070312]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 690.5999755859375,
+        "span": [32.15999984741211, 223.67999267578125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 223.67999267578125,
+        "span": [690.5999755859375, 718.2000122070312]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 718.2000122070312,
+        "span": [32.15999984741211, 223.67999267578125]
+      },
+      {
+        "orientation": "vertical",
+        "position": 32.15999984741211,
+        "span": [690.5999755859375, 718.2000122070312]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 226.97999572753906,
+        "span": [34.5, 577.5009765625]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 227.22000122070312,
+        "span": [34.5, 577.5009765625]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 680.8270263671875,
+        "span": [385.04998779296875, 574.9500122070312]
+      },
+      {
+        "orientation": "vertical",
+        "position": 574.9500122070312,
+        "span": [257.5270080566406, 680.8270263671875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 257.5270080566406,
+        "span": [385.04998779296875, 574.9500122070312]
+      },
+      {
+        "orientation": "vertical",
+        "position": 385.04998779296875,
+        "span": [257.5270080566406, 680.8270263671875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 261.4200134277344,
+        "span": [385.32000732421875, 574.6799926757812]
+      },
+      {
+        "orientation": "vertical",
+        "position": 574.6799926757812,
+        "span": [261.4200134277344, 676.97998046875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 676.97998046875,
+        "span": [385.32000732421875, 574.6799926757812]
+      },
+      {
+        "orientation": "vertical",
+        "position": 385.32000732421875,
+        "span": [261.4200134277344, 676.97998046875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.5270080566406,
+        "span": [39.150001525878906, 375.29998779296875]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.29998779296875,
+        "span": [424.7770080566406, 452.5270080566406]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 424.7770080566406,
+        "span": [39.150001525878906, 375.29998779296875]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.150001525878906,
+        "span": [424.7770080566406, 452.5270080566406]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 425.0400085449219,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 375.05999755859375,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 452.27899169921875,
+        "span": [39.41999816894531, 375.05999755859375]
+      },
+      {
+        "orientation": "vertical",
+        "position": 39.41999816894531,
+        "span": [425.0400085449219, 452.27899169921875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 682.3270263671875,
+        "span": [38.20000076293945, 374.3500061035156]
+      },
+      {
+        "orientation": "vertical",
+        "position": 374.3500061035156,
+        "span": [454.2770080566406, 682.3270263671875]
+      },
+      {
+        "orientation": "horizontal",
+        "position": 454.2770080566406,
+        "span": [38.20000076293945, 374.3500061035156]
+      },
+      {
+        "orientation": "vertical",
+        "position": 38.20000076293945,
+        "span": [454.2770080566406, 682.3270263671875]
+      }
+    ],
+    "looksScanned": false
+  }
+}

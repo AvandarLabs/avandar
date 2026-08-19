@@ -4,6 +4,8 @@ import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
+import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -35,9 +37,15 @@ function useDeleteDashboard(
         [
           DashboardClient.QueryKeys.getAll(),
           DashboardClient.QueryKeys.getById({ id: options.dashboardId }),
+          getNuxWorkspaceArtifactsQueryKey(),
         ]
-      : undefined,
+      : [getNuxWorkspaceArtifactsQueryKey()],
     onSuccess: async () => {
+      if (options.dashboardId) {
+        NuxEvents.emit("dashboard.deleted", {
+          dashboardId: options.dashboardId,
+        });
+      }
       notifySuccess(options.successMessage);
       await navigate({
         to: "/$workspaceSlug/dashboards",

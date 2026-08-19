@@ -43,6 +43,7 @@ type PointAggregationCteParts = {
   geometry: string;
   boundaryDataset: string;
   denominatorSelect: string;
+  disputedStatusSelect: string;
   aggregationSql: string;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 };
@@ -77,6 +78,22 @@ function _buildPointAggregationDenominatorSql(
     : { selectSql: "", reportableSql: "NULL" };
 }
 
+/** Selects the boundary's disputed-status column when the layer binds one. */
+function _buildPointAggregationDisputedStatusSql(
+  metadata: ResolvedMapLayerMetadata,
+): { selectSql: string; reportableSql: string } {
+  const reference = metadata.disputedStatusColumn;
+  const alias = quoteSqlIdentifier(
+    MapLayerSpatialFeatureProperties.disputedStatus,
+  );
+  return reference?.type === "boundaryColumn" ?
+      {
+        selectSql: `, ${quoteSqlIdentifier(reference.columnName)} AS ${alias}`,
+        reportableSql: alias,
+      }
+    : { selectSql: "", reportableSql: "NULL" };
+}
+
 function _getMinimumContributorCount(layer: MapLayer.T): number {
   return layer.sensitivity.mode === "aggregateOnly" ?
       layer.sensitivity.minCellCount
@@ -99,7 +116,7 @@ function _buildPointAggregationCtes(parts: PointAggregationCteParts): string {
 ${_buildParsedPointsCte(parts.pointParser)},
 boundary_rows AS (
   SELECT row_number() OVER () AS boundary_feature_id,
-    ${parts.boundaryKey} AS boundary_key, ${parts.displayName} AS boundary_name, ${parts.boundaryParser} AS ${parts.geometry}${parts.denominatorSelect}
+    ${parts.boundaryKey} AS boundary_key, ${parts.displayName} AS boundary_name, ${parts.boundaryParser} AS ${parts.geometry}${parts.denominatorSelect}${parts.disputedStatusSelect}
   FROM ${parts.boundaryDataset}
 ),
 point_boundary_candidates AS (
@@ -146,6 +163,7 @@ function _buildPointSpatialDiagnosticsCte(): string {
 function _buildPointFeatureRowsCte(options: {
   geometry: string;
   reportableDenominator: string;
+  disputedStatusSql: string;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const outputAoiWhere =
@@ -160,6 +178,7 @@ function _buildPointFeatureRowsCte(options: {
     keySql: "boundary_key",
     denominatorSql: options.reportableDenominator,
     contributorCountSql: "contributor_count",
+    disputedStatusSql: options.disputedStatusSql,
   })} AS feature
   FROM classified_areas${outputAoiWhere}
 )`;
@@ -197,6 +216,7 @@ function _buildPointAggregationOutput(options: {
   geometry: string;
   minimumCount: number;
   reportableDenominator: string;
+  disputedStatusSql: string;
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   return `${_buildClassifiedAreasCte(options.minimumCount)},
@@ -204,6 +224,7 @@ ${_buildPointSpatialDiagnosticsCte()},
 ${_buildPointFeatureRowsCte({
   geometry: options.geometry,
   reportableDenominator: options.reportableDenominator,
+  disputedStatusSql: options.disputedStatusSql,
   aoi: options.aoi,
 })},
 ${_buildPointDiagnosticSummaryCte()}
@@ -239,6 +260,9 @@ export function compilePointAggregationQuery(
   const { binding, boundary } = _getPointAggregationBinding(options);
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
   const denominator = _buildPointAggregationDenominatorSql(options.metadata);
+  const disputedStatus = _buildPointAggregationDisputedStatusSql(
+    options.metadata,
+  );
   const aoi = getAppliedAoiFromCompileOptions(options);
   const rawSql = `WITH ${_buildPointAggregationCtes({
     sourceSql: options.sourceSql,
@@ -255,6 +279,7 @@ export function compilePointAggregationQuery(
     geometry,
     boundaryDataset: quoteSqlIdentifier(boundary.datasetId),
     denominatorSelect: denominator.selectSql,
+    disputedStatusSelect: disputedStatus.selectSql,
     aggregationSql: makePointAggregateValueSql({
       aggregation: binding.aggregation,
       metadata: options.metadata,
@@ -265,6 +290,7 @@ ${_buildPointAggregationOutput({
   geometry,
   minimumCount: _getMinimumContributorCount(options.layer),
   reportableDenominator: denominator.reportableSql,
+  disputedStatusSql: disputedStatus.reportableSql,
   aoi,
 })}`;
   return makeSpatialQueryPlan({

@@ -19,6 +19,18 @@
   background-color: var(--mantine-color-neutral-0);
 }
 
-.header {
-  border-bottom: 1px solid var(--ava-border-default);
+.shellComposer {
+  border-left: none;
+  box-shadow:
+    var(--ava-overlay-panel-shadow),
+    -24px 0 32px rgb(16 42 67 / 22%);
+  transition: box-shadow var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shellComposer {
+    box-shadow: var(--ava-overlay-panel-shadow);
+    transition: none;
+  }
 }

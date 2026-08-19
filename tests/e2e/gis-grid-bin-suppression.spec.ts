@@ -172,7 +172,10 @@ test("bins points into cells and hides counts below the minimum", async ({
     ).toBeVisible({ timeout: MEDIUM_WAIT });
 
     await _clickSuppressedCell(page);
-    const featureInspector = page.getByRole("dialog", { name: "Feature" });
+    const featureInspector = page.getByRole("region", {
+      name: "Feature",
+      exact: true,
+    });
     await expect(featureInspector).toBeVisible();
     await expect(featureInspector).toContainText("suppressed");
     await expect(featureInspector).not.toContainText(

@@ -15,12 +15,13 @@
  * private column/result helpers below.
  */
 import { Model } from "@avandar/models";
-import { propEq } from "@avandar/utils";
+import { makeObject, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import {
   parseHavingNode,
   parseWhereNode,
+  stampFilterColumnTypes,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts";
 import { resolveFrom } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/resolveFromClause.ts";
 import {
@@ -343,10 +344,24 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
+  // Column data types keyed by name, so parsed filter rules carry the same
+  // `columnDataType` a rule authored in the form would.
+  const filterColumnTypes = makeObject(dataset?.columns ?? [], {
+    key: "name",
+    valueKey: "dataType",
+  });
+
   // WHERE → filters
   let filters: QueryFilterGroup = EMPTY_QUERY_FILTER;
   if (ast.where) {
-    const parsed = parseWhereNode(ast.where, unmappedReasons);
+    const parsedRaw = parseWhereNode(ast.where, unmappedReasons);
+    const parsed =
+      parsedRaw === undefined ? undefined : (
+        stampFilterColumnTypes({
+          node: parsedRaw,
+          columnTypes: filterColumnTypes,
+        })
+      );
     if (parsed) {
       filters =
         parsed.type === "group" ?
