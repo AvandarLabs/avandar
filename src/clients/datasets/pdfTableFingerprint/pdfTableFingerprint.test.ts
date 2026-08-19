@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  makePdfTableFingerprintFromTable,
   fingerprintsMatch,
+  makePdfTableFingerprintFromTable,
 } from "./pdfTableFingerprint";
 
 const TABLE = {
@@ -64,7 +64,9 @@ describe("fingerprintsMatch", () => {
       headerRows: 1,
     });
 
-    expect(fingerprintsMatch({ original: original, fresh: drifted })).toBe(false);
+    expect(fingerprintsMatch({ original: original, fresh: drifted })).toBe(
+      false,
+    );
   });
 
   it("reports a mismatch when the row count changes", async () => {
@@ -77,6 +79,8 @@ describe("fingerprintsMatch", () => {
       headerRows: 1,
     });
 
-    expect(fingerprintsMatch({ original: original, fresh: truncated })).toBe(false);
+    expect(fingerprintsMatch({ original: original, fresh: truncated })).toBe(
+      false,
+    );
   });
 });

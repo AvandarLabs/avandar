@@ -277,11 +277,7 @@ export function PdfRegionPicker({
 
       <Stack gap="sm" flex={1}>
         {regions.length === 0 ?
-          <Alert
-            variant="light"
-            color="blue"
-            title={t`Nothing selected yet`}
-          >
+          <Alert variant="light" color="blue" title={t`Nothing selected yet`}>
             <Text size="sm">
               {t`Draw a box around a table, chart, map or block of text to extract it.`}
             </Text>

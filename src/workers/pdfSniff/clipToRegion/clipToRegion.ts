@@ -1,4 +1,9 @@
-import type { BBox, PageGeometry, RegionGeometry, TextItem } from "../pdfSniff.types";
+import type {
+  BBox,
+  PageGeometry,
+  RegionGeometry,
+  TextItem,
+} from "../pdfSniff.types";
 
 /**
  * Fraction of a text item's width that must fall inside the box for the item

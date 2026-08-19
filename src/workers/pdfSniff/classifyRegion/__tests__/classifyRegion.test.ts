@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { classifyRegion } from "../classifyRegion";
-import type { RegionGeometry, RuleSegment, TextItem } from "../../pdfSniff.types";
+import type {
+  RegionGeometry,
+  RuleSegment,
+  TextItem,
+} from "../../pdfSniff.types";
 
 function item(text: string, x: number, y: number, fontName = "body"): TextItem {
   return {

@@ -36,13 +36,15 @@ type Props = {
 /**
  * Renders a single PDF page to a canvas and outlines the selected regions.
  *
- * pdf.js (and the `loadPdfDocument` helper that wraps it) are imported dynamically
+ * pdf.js (and the `loadPdfDocument` helper that wraps it) are imported
+ * dynamically
  * so that bundle only loads when a user actually opens a PDF, rather than on
  * every visit to the data manager. This is also the reason
  * `GlobalWorkerOptions.workerSrc` is set here rather than reused from
- * elsewhere: `src/workers/pdfSniff/loadPdfDocument/loadPdfDocument.ts` never has to set it, because
- * it only ever runs inside `pdfSniff.worker.ts`, where it registers pdf.js's
- * message handler directly on the worker's `globalThis` and pdf.js parses
+ * elsewhere: `src/workers/pdfSniff/loadPdfDocument/loadPdfDocument.ts` never
+ * has to set it, because it only ever runs inside `pdfSniff.worker.ts`, where
+ * it registers pdf.js's message handler directly on the worker's `globalThis`
+ * and pdf.js parses
  * in-process instead of spawning a nested worker. This component runs on the
  * main thread, where that registration does not happen, so pdf.js takes its
  * normal path of spawning a real Worker from `workerSrc` -- which throws if

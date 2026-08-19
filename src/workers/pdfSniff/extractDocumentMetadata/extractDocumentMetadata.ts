@@ -1,5 +1,9 @@
 import { groupLines } from "../groupLines/groupLines";
-import type { DocumentMetadata, PageGeometry, TextItem } from "../pdfSniff.types";
+import type {
+  DocumentMetadata,
+  PageGeometry,
+  TextItem,
+} from "../pdfSniff.types";
 
 /** Only text in the top fraction of page one is considered title material. */
 const TITLE_BAND = 0.75;

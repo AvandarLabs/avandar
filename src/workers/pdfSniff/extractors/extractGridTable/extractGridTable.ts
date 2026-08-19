@@ -1,7 +1,11 @@
 import { COLUMN_TOLERANCE, deriveColumns } from "../../deriveColumns";
 import { groupLines } from "../../groupLines/groupLines";
 import { normalizeCellValue } from "../../normalizeCellValue/normalizeCellValue";
-import type { BBox, ExtractedTable, RegionGeometry } from "../../pdfSniff.types";
+import type {
+  BBox,
+  ExtractedTable,
+  RegionGeometry,
+} from "../../pdfSniff.types";
 
 /** Fewer than this many lines is not a table. */
 const MIN_ROWS = 2;

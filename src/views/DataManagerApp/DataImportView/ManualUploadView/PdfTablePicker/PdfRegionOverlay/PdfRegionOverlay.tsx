@@ -1,5 +1,5 @@
-import { Box } from "@mantine/core";
 import { useLingui } from "@lingui/react/macro";
+import { Box } from "@mantine/core";
 import { useRef, useState } from "react";
 import css from "./PdfRegionOverlay.module.css";
 import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";

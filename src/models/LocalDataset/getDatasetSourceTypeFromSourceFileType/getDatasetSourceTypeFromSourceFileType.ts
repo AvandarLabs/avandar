@@ -7,8 +7,9 @@ import type { DatasetSourceType } from "$/models/datasets/DatasetSource/DatasetS
  * `DatasetSourceType` (the domain-level source type, e.g. `"pdf_file"`).
  *
  * Every retention decision (`requiresOriginalFileRetention`,
- * `getOriginalFileExtensionFromSourceType`) is keyed on `DatasetSourceType`, but the
- * LocalDataset row only ever knows its `sourceFileType`. Rather than thread a
+ * `getOriginalFileExtensionFromSourceType`) is keyed on
+ * `DatasetSourceType`, but the LocalDataset row only ever knows its
+ * `sourceFileType`. Rather than thread a
  * second, independently-settable parameter through the local import paths,
  * where it could disagree with the row's own `sourceFileType`, we derive one
  * from the other here.

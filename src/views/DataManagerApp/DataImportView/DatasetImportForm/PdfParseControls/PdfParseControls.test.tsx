@@ -9,7 +9,10 @@ import type {
   DataSourceMetadata,
   PdfDataSourceMetadata,
 } from "../DatasetImportForm.types";
-import type { ExtractedTable, PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
+import type {
+  ExtractedTable,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";

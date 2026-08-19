@@ -139,8 +139,8 @@ function _close(): void {
 /**
  * Whether an inbound message is a request of ours.
  *
- * The port is shared. `loadPdfDocument` imports `pdf.worker.mjs`, which installs
- * pdf.js's own handler on this same global scope and puts its internal
+ * The port is shared. `loadPdfDocument` imports `pdf.worker.mjs`, which
+ * installs pdf.js's own handler on this same global scope and puts its internal
  * protocol traffic (`{ sourceName: "worker", ... }`) through this listener
  * too. Those messages are not requests and must be ignored silently rather
  * than interpreted; treating one as an `extract` would be far worse than the
@@ -279,7 +279,9 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     // page-range cap exists to avoid.
     for (let pageNumber = firstPage; pageNumber <= lastPage; pageNumber += 1) {
       const page = await doc.getPage(pageNumber);
-      pages.push(await extractPageGeometry({ page: page, pageIndex: pageNumber - 1 }));
+      pages.push(
+        await extractPageGeometry({ page: page, pageIndex: pageNumber - 1 }),
+      );
 
       _post({
         type: "progress",

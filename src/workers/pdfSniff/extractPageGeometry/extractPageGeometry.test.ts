@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { extractPageGeometry } from "./extractPageGeometry";
 import { loadPdfDocument } from "../loadPdfDocument/loadPdfDocument";
+import { extractPageGeometry } from "./extractPageGeometry";
 
 const FRONTIERS =
   "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
@@ -11,7 +11,10 @@ async function geometryForPage(path: string, pageNumber: number) {
   const bytes = await readFile(path);
   const doc = await loadPdfDocument(new Uint8Array(bytes));
   const page = await doc.getPage(pageNumber);
-  const geometry = await extractPageGeometry({ page: page, pageIndex: pageNumber - 1 });
+  const geometry = await extractPageGeometry({
+    page: page,
+    pageIndex: pageNumber - 1,
+  });
   await doc.destroy();
   return geometry;
 }

@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type {
+  PageGeometry,
+  PdfRegion,
+  TextItem,
+} from "../pdfSniff/pdfSniff.types";
 import type { PdfExtractResult } from "./pdfSniff.worker";
-import type { PageGeometry, PdfRegion, TextItem } from "../pdfSniff/pdfSniff.types";
 
 /*
  * The worker's extract path, driven the way the main thread drives it.

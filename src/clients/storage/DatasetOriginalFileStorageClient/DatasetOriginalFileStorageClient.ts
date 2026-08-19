@@ -117,9 +117,10 @@ async function _oneShotOriginalFileUpload(options: {
  * @param options.file The original file to upload.
  * @param options.fileExtension The extension to store the original under,
  * with or without a leading dot. Comes from
- * `getOriginalFileExtensionFromSourceType(sourceType)`, never from the file name: the
- * storage path is addressed by source type, so deriving it from the file name
- * here would let a file called `contract.pdf.bak` upload to `.bak` while
+ * `getOriginalFileExtensionFromSourceType(sourceType)`, never from the file
+ * name: the storage path is addressed by source type, so deriving it from the
+ * file name here would let a file called `contract.pdf.bak` upload to
+ * `.bak` while
  * `downloadOriginalFile` / `deleteOriginalFile` look for `.pdf`.
  */
 async function uploadOriginalFile(options: {

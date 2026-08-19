@@ -71,7 +71,10 @@ describe("clipToRegion", () => {
       textItems: [textItem("mostly-in", 480, 450, 40)],
     };
 
-    const clipped = clipToRegion({ page: straddling, bbox: [100, 300, 505, 600] });
+    const clipped = clipToRegion({
+      page: straddling,
+      bbox: [100, 300, 505, 600],
+    });
 
     expect(clipped.textItems).toHaveLength(1);
   });
@@ -82,7 +85,10 @@ describe("clipToRegion", () => {
       textItems: [textItem("mostly-out", 480, 450, 40)],
     };
 
-    const clipped = clipToRegion({ page: straddling, bbox: [100, 300, 490, 600] });
+    const clipped = clipToRegion({
+      page: straddling,
+      bbox: [100, 300, 490, 600],
+    });
 
     expect(clipped.textItems).toHaveLength(0);
   });

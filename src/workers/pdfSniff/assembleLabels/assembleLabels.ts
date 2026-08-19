@@ -52,10 +52,7 @@ export function getLineSpanFromTextItem(item: TextItem): LineSpan {
  * second set of thresholds would drift from these and quietly disagree about
  * what "adjacent" means.
  */
-export function isSameLineRun(options: {
-  a: LineSpan;
-  b: LineSpan;
-}): boolean {
+export function isSameLineRun(options: { a: LineSpan; b: LineSpan }): boolean {
   const { a, b } = options;
   if (Math.abs(a.y - b.y) >= SAME_LINE_TOLERANCE) {
     return false;

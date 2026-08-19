@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { classifyRegion } from "../classifyRegion";
 import { clipToRegion } from "../../clipToRegion/clipToRegion";
 import { extractPageGeometry } from "../../extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "../../loadPdfDocument/loadPdfDocument";
+import { classifyRegion } from "../classifyRegion";
 import type { BBox, PageGeometry } from "../../pdfSniff.types";
 
 /*
@@ -54,14 +54,20 @@ async function pageOf(path: string, pageNumber: number): Promise<PageGeometry> {
   const bytes = await readFile(path);
   const doc = await loadPdfDocument(new Uint8Array(bytes));
   const page = await doc.getPage(pageNumber);
-  const geometry = await extractPageGeometry({ page: page, pageIndex: pageNumber - 1 });
+  const geometry = await extractPageGeometry({
+    page: page,
+    pageIndex: pageNumber - 1,
+  });
   await doc.destroy();
   return geometry;
 }
 
 describe("classifyRegion on real documents", () => {
   it("calls the OCHA choropleth a labelled graphic", async () => {
-    const region = clipToRegion({ page: await pageOf(OCHA, 1), bbox: OCHA_MAP });
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_MAP,
+    });
     const result = classifyRegion(region);
 
     // The rules really are there. They are the map's frame and its state
@@ -79,14 +85,20 @@ describe("classifyRegion on real documents", () => {
   });
 
   it("calls the OCHA weekly trend chart a labelled graphic", async () => {
-    const region = clipToRegion({ page: await pageOf(OCHA, 1), bbox: OCHA_TREND });
+    const region = clipToRegion({
+      page: await pageOf(OCHA, 1),
+      bbox: OCHA_TREND,
+    });
     const result = classifyRegion(region);
 
     expect(result.shape).toBe("labelled_graphic");
   });
 
   it("still calls a horizontally ruled journal table a grid table", async () => {
-    const region = clipToRegion({ page: await pageOf(FRONTIERS, 5), bbox: FRONTIERS_TABLE_PAGE_5, });
+    const region = clipToRegion({
+      page: await pageOf(FRONTIERS, 5),
+      bbox: FRONTIERS_TABLE_PAGE_5,
+    });
     const result = classifyRegion(region);
 
     expect(result.shape).toBe("grid_table");
@@ -97,7 +109,10 @@ describe("classifyRegion on real documents", () => {
   it("still calls the table's continuation page a grid table", async () => {
     // Two rules rather than three, because the continuation carries no top
     // caption rule. The verdict has to survive that.
-    const region = clipToRegion({ page: await pageOf(FRONTIERS, 6), bbox: FRONTIERS_TABLE_PAGE_6, });
+    const region = clipToRegion({
+      page: await pageOf(FRONTIERS, 6),
+      bbox: FRONTIERS_TABLE_PAGE_6,
+    });
 
     expect(classifyRegion(region).shape).toBe("grid_table");
   });

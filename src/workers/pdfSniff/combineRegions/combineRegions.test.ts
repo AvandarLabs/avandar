@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { combineRegions } from "./combineRegions";
-import type { CombinedTable } from "./combineRegions";
 import type { ExtractedTable } from "../pdfSniff.types";
+import type { CombinedTable } from "./combineRegions";
 
 function table(
   regionId: string,

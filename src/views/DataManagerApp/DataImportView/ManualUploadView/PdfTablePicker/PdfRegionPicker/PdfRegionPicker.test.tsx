@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
-import { PdfRegionPicker } from "./PdfRegionPicker";
 import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
+import { PdfRegionPicker } from "./PdfRegionPicker";
 import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
 import type {
   ExtractedTable,
@@ -11,15 +11,19 @@ import type {
 } from "@/workers/pdfSniff/pdfSniff.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-vi.mock("../runRegionModelAssist/runRegionModelAssist", async (importOriginal) => {
-  // Only the network-facing call is stubbed. `getCoverageFlagFromTable` stays real,
-  // because whether the offer appears at all is what these tests are about.
-  const original =
-    await importOriginal<
-      typeof import("../runRegionModelAssist/runRegionModelAssist")
-    >();
-  return { ...original, runRegionModelAssist: vi.fn() };
-});
+vi.mock(
+  "../runRegionModelAssist/runRegionModelAssist",
+  async (importOriginal) => {
+    // Only the network-facing call is stubbed.
+    // `getCoverageFlagFromTable` stays real, because whether the offer appears
+    // at all is what these tests are about.
+    const original =
+      await importOriginal<
+        typeof import("../runRegionModelAssist/runRegionModelAssist")
+      >();
+    return { ...original, runRegionModelAssist: vi.fn() };
+  },
+);
 
 const REGION: PdfRegion = {
   id: "r1",

@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   Alert,
   Box,
@@ -7,7 +8,6 @@ import {
   TextInput,
   Tooltip,
 } from "@mantine/core";
-import { useLingui } from "@lingui/react/macro";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import css from "./PdfReviewGrid.module.css";
 import type {
@@ -26,8 +26,9 @@ type Props = {
 /**
  * A flag with `rowIndex: -1` describes the whole region, not a cell.
  *
- * See `PdfCellFlag` in `src/workers/pdfSniff/pdfSniff.types.ts`. Everything that walks
- * the flag list has to split on this first, because reading `-1` as a
+ * See `PdfCellFlag` in `src/workers/pdfSniff/pdfSniff.types.ts`. Everything
+ * that walks the flag list has to split on this first, because reading `-1`
+ * as a
  * coordinate produces either a phantom flagged row in the counter or a
  * tooltip anchored to a cell that does not exist.
  */
@@ -109,7 +110,8 @@ export function PdfReviewGrid({
           <Text size="sm">
             {flaggedRowCount === 1 ?
               t`${flaggedRowCount} of ${dataRows.length} rows needs review. We matched these values to their labels by position, and these were close calls. Check them against the page.`
-            : t`${flaggedRowCount} of ${dataRows.length} rows need review. We matched these values to their labels by position, and these were close calls. Check them against the page.`}
+            : t`${flaggedRowCount} of ${dataRows.length} rows need review. We matched these values to their labels by position, and these were close calls. Check them against the page.`
+            }
           </Text>
         </Alert>
       : null}

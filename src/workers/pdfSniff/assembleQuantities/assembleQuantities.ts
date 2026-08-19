@@ -1,4 +1,7 @@
-import { isSameLineRun, getLineSpanFromTextItem } from "../assembleLabels/assembleLabels";
+import {
+  getLineSpanFromTextItem,
+  isSameLineRun,
+} from "../assembleLabels/assembleLabels";
 import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
 import type { BBox, PdfValueUnit, TextItem } from "../pdfSniff.types";
 

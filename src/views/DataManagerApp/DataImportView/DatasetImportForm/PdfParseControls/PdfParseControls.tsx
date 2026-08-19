@@ -10,7 +10,11 @@ import type {
   PdfDataSourceMetadata,
 } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { BBox, ExtractedTable, PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
+import type {
+  BBox,
+  ExtractedTable,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
 import type { ReactNode } from "react";
 
 type Props = {
