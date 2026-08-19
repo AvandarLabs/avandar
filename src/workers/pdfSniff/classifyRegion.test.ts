@@ -22,7 +22,7 @@ function region(
 }
 
 describe("classifyRegion", () => {
-  it("calls a ruled region a grid table", () => {
+  it("calls a ruled region whose text lines up a grid table", () => {
     const result = classifyRegion(
       region(
         [
@@ -40,7 +40,9 @@ describe("classifyRegion", () => {
     );
 
     expect(result.shape).toBe("grid_table");
+    expect(result.confidence).toBe("high");
     expect(result.evidence.join(" ")).toMatch(/ruling lines/i);
+    expect(result.evidence.join(" ")).toMatch(/2 columns/i);
   });
 
   it("calls scattered short labels and numbers a labelled graphic", () => {
@@ -56,7 +58,64 @@ describe("classifyRegion", () => {
     );
 
     expect(result.shape).toBe("labelled_graphic");
-    expect(result.evidence.join(" ")).toMatch(/no ruling lines/i);
+    expect(result.evidence.join(" ")).toMatch(
+      /scattered rather than tabulated/i,
+    );
+  });
+
+  it("does not call a ruled graphic a grid table", () => {
+    // The choropleth's shape, in miniature: a frame and a graticule reach the
+    // geometry as ruling lines, but the labels they surround are scattered
+    // across the map rather than lined up in columns. Rules alone used to be
+    // enough for `grid_table`, and `extractGridTable` then returned no rows
+    // at all for exactly this region.
+    const result = classifyRegion(
+      region(
+        [
+          item("KHARTOUM", 480, 302),
+          item("408", 490, 292),
+          item("KASSALA", 560, 402),
+          item("200", 566, 392),
+          item("SENNAR", 300, 500),
+          item("202", 306, 490),
+        ],
+        [
+          { orientation: "horizontal", position: 590, span: [40, 560] },
+          { orientation: "horizontal", position: 250, span: [40, 560] },
+          { orientation: "horizontal", position: 430, span: [120, 180] },
+          { orientation: "vertical", position: 40, span: [250, 590] },
+        ],
+      ),
+    );
+
+    expect(result.shape).toBe("labelled_graphic");
+    expect(result.evidence.join(" ")).toMatch(
+      /borders or gridlines rather than a table's rules/i,
+    );
+  });
+
+  it("says why it discounted the ruling lines", () => {
+    // The rules are the first thing the user sees in the region, so a verdict
+    // that ignores them has to say so or it reads as a mistake.
+    const result = classifyRegion(
+      region(
+        [
+          item(
+            "In June, 21,563 cases and 388 deaths have been reported across",
+            100,
+            600,
+          ),
+          item("the state, including 13 cases in West Darfur.", 100, 580),
+        ],
+        [
+          { orientation: "horizontal", position: 620, span: [90, 500] },
+          { orientation: "horizontal", position: 560, span: [90, 500] },
+        ],
+      ),
+    );
+
+    expect(result.shape).toBe("prose_measures");
+    expect(result.evidence.join(" ")).toMatch(/2 horizontal ruling lines/i);
   });
 
   it("calls run-in labels repeating blocks", () => {

@@ -1,46 +1,10 @@
+import { COLUMN_TOLERANCE, deriveColumns } from "../deriveColumns";
 import { groupLines } from "../groupLines";
 import { normalizeCellValue } from "../normalizeCellValue";
-import type { BBox, ExtractedTable, RegionGeometry, TextLine } from "../types";
-
-/** Left edges within this many points belong to the same column. */
-const COLUMN_TOLERANCE = 6;
+import type { BBox, ExtractedTable, RegionGeometry } from "../types";
 
 /** Fewer than this many lines is not a table. */
 const MIN_ROWS = 2;
-
-/**
- * Fraction of rows that must have an item at a position for it to count as a
- * column. Prose aligns occasionally; a real column is populated consistently.
- */
-const MIN_COLUMN_OCCUPANCY = 0.6;
-
-function _deriveColumns(lines: readonly TextLine[]): number[] {
-  const clusters: Array<{ position: number; rows: Set<number> }> = [];
-
-  lines.forEach((line, rowIndex) => {
-    for (const item of line.items) {
-      const existing = clusters.find((cluster) => {
-        return Math.abs(cluster.position - item.x) <= COLUMN_TOLERANCE;
-      });
-      if (existing) {
-        existing.rows.add(rowIndex);
-      } else {
-        clusters.push({ position: item.x, rows: new Set([rowIndex]) });
-      }
-    }
-  });
-
-  return clusters
-    .filter((cluster) => {
-      return cluster.rows.size / lines.length >= MIN_COLUMN_OCCUPANCY;
-    })
-    .map((cluster) => {
-      return cluster.position;
-    })
-    .sort((a, b) => {
-      return a - b;
-    });
-}
 
 /**
  * Reads a region of aligned cells into rows and columns.
@@ -62,7 +26,7 @@ export function extractGridTable(
   const columns =
     options.gridX && options.gridX.length > 0 ?
       [...options.gridX]
-    : _deriveColumns(lines);
+    : deriveColumns(lines);
 
   if (lines.length < MIN_ROWS || columns.length < 2) {
     return {

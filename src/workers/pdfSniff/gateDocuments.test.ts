@@ -309,6 +309,17 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     expect(labels["GEDAREF"]).toBe("225");
   });
 
+  it("reads the map as a labelled graphic without being told to", async () => {
+    // The user draws a box and the rows appear. Every figure above is only
+    // reachable if the classifier picks this extractor on its own, because
+    // `extractLabelledGraphic` is not what runs otherwise: a region the
+    // classifier calls a grid table is read by `extractGridTable`, which
+    // returns no rows at all for a choropleth.
+    const region = clipToRegion(await pageOf(OCHA, 1), OCHA_MAP);
+
+    expect(classifyRegion(region).shape).toBe("labelled_graphic");
+  });
+
   it("flags no more than 6 map rows for review", async () => {
     // The design measurement flagged 5 of 16. Allowing 6 leaves room for
     // tuning without letting the flag rate quietly become meaningless.
@@ -520,13 +531,12 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     });
     expect(unmatched.length).toBeGreaterThanOrEqual(20);
 
-    // KNOWN DEFECT, pinned deliberately: `classifyRegion` calls this a grid
-    // table with high confidence, because a chart's bars and gridlines reach
-    // `extractPageGeometry` as horizontal rules and two rules plus two lines
-    // is its strongest signal. The same is true of the choropleth. The UI's
-    // shape override (Task 16) is what saves the user today; a rule that
-    // ignores rules shorter than the region is the real fix.
-    expect(classifyRegion(region).shape).toBe("grid_table");
+    // The chart's axes and gridlines reach `extractPageGeometry` as 34
+    // horizontal rules, five of them spanning 88% or more of the region, and
+    // the classifier used to read that as a grid table at high confidence.
+    // It no longer does: those rules organise no columns of text, so they are
+    // chart furniture rather than a table's rules.
+    expect(classifyRegion(region).shape).toBe("labelled_graphic");
   });
 });
 

@@ -1,3 +1,4 @@
+import { deriveColumns } from "./deriveColumns";
 import { groupLines } from "./groupLines";
 import { parseRunInLabels } from "./parseRunInLabels";
 import type { PdfRegionShape, RegionGeometry } from "./types";
@@ -49,15 +50,48 @@ export function classifyRegion(region: RegionGeometry): RegionClassification {
       return sum + line.text.split(/\s+/u).length;
     }, 0) / Math.max(1, lines.length);
 
-  // Ruling lines are the strongest signal available and need no inference.
+  /*
+   * Ruling lines are a strong signal, but only together with the text they
+   * are supposed to be ruling.
+   *
+   * On their own they say almost nothing: a map's borders, a chart's axes and
+   * gridlines, and a figure's frame all reach `extractPageGeometry` as
+   * `RuleSegment`s, and measured on the gate documents they are WIDER and more
+   * numerous than a real table's. The OCHA choropleth carries 17 horizontal
+   * rules and its weekly trend chart 34, five of which span 88% or more of the
+   * region; Table 1 of the Frontiers paper is ruled by three. So neither the
+   * count nor the width of the rules separates a table from a graphic.
+   *
+   * What does separate them is whether the text lines up underneath the rules.
+   * `deriveColumns` is the same function `extractGridTable` uses to decide
+   * where the columns are, and it finds none in either OCHA region and three
+   * in each page of the Frontiers table. Asking it here means the classifier
+   * and the extractor agree by construction: we only call a region a grid
+   * table when the grid extractor can actually read one out of it. Calling it
+   * one when the columns are absent is not a harmless guess, because
+   * `extractGridTable` returns zero rows in that case.
+   */
   const horizontalRules = region.rules.filter((rule) => {
     return rule.orientation === "horizontal";
   });
-  if (horizontalRules.length >= 2 && lines.length >= 2) {
+  const columns = deriveColumns(lines);
+  const isRuled = horizontalRules.length >= 2 && lines.length >= 2;
+  if (isRuled && columns.length >= 2) {
     evidence.push(
-      `${region.rules.length} ruling lines and ${lines.length} rows.`,
+      `${region.rules.length} ruling lines, and ${lines.length} rows ` +
+        `aligned in ${columns.length} columns.`,
     );
     return { shape: "grid_table", confidence: "high", evidence };
+  }
+  if (isRuled) {
+    // Said out loud rather than dropped: the rules are the first thing a user
+    // sees in the region, so the reason we discounted them belongs beside
+    // whatever verdict follows.
+    evidence.push(
+      `${horizontalRules.length} horizontal ruling lines, but the text ` +
+        "does not line up in columns underneath them, so they are borders " +
+        "or gridlines rather than a table's rules.",
+    );
   }
 
   // Run-in labels under a heading are unambiguous when present.
@@ -77,15 +111,15 @@ export function classifyRegion(region: RegionGeometry): RegionClassification {
     );
   });
 
-  // A graphic is numbers and short captions with no rules and no sentences.
+  // A graphic is numbers and short captions with no columns and no sentences.
   if (
     numericItems.length >= 2 &&
     shortLabels.length >= 2 &&
     wordsPerLine < PROSE_WORDS_PER_LINE
   ) {
     evidence.push(
-      `${numericItems.length} numbers, ${shortLabels.length} short labels, ` +
-        "no ruling lines.",
+      `${numericItems.length} numbers and ${shortLabels.length} short ` +
+        "labels, scattered rather than tabulated.",
     );
     return { shape: "labelled_graphic", confidence: "medium", evidence };
   }
