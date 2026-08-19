@@ -51,6 +51,70 @@ export type BasemapConfig =
   | CustomBasemapConfig
   | { type: "none"; background: string };
 
+/** One WGS 84 GeoJSON Polygon used as the map's area of interest. */
+export type AoiPolygon = {
+  type: "Polygon";
+  coordinates: ReadonlyArray<ReadonlyArray<readonly [number, number]>>;
+};
+
+/** Inclusive ISO-8601 instants for the map clock. */
+export type TimeRange = {
+  start: string;
+  end: string;
+};
+
+/** Identifies one persisted annotation feature. */
+export type AnnotationFeatureId = UUID<"AnnotationFeature">;
+
+/** Discriminator for a persisted annotation drawing. */
+export type AnnotationKind =
+  (typeof AvaMapConfigValues.annotationKinds)[number];
+
+/** A persisted drawing on the map that is not a data layer. */
+export type AnnotationFeature =
+  | {
+      id: AnnotationFeatureId;
+      kind: "text";
+      geometry: { type: "Point"; coordinates: [number, number] };
+      text: string;
+      sizePx: number;
+      color: string;
+    }
+  | {
+      id: AnnotationFeatureId;
+      kind: "arrow";
+      geometry: {
+        type: "LineString";
+        coordinates: readonly [[number, number], [number, number]];
+      };
+      color: string;
+      strokeWidthPx: number;
+    }
+  | {
+      id: AnnotationFeatureId;
+      kind: "freehand";
+      geometry: {
+        type: "LineString";
+        coordinates: ReadonlyArray<[number, number]>;
+      };
+      color: string;
+      strokeWidthPx: number;
+    }
+  | {
+      id: AnnotationFeatureId;
+      kind: "area";
+      geometry: AoiPolygon;
+      color: string;
+      opacity: number;
+      stroke: { color: string; widthPx: number };
+    };
+
+/** Visibility and features for the map's annotation overlay. */
+export type AnnotationLayer = {
+  isVisible: boolean;
+  features: readonly AnnotationFeature[];
+};
+
 type AvaMapConfigBody = {
   basemap: BasemapConfig;
   view: MapViewState;
@@ -60,15 +124,30 @@ type AvaMapConfigBody = {
 
   /** Draw order, bottom to top. */
   layers: readonly MapLayer.T[];
+
+  /** Spatial filter polygon, or unset when no AOI is applied. */
+  aoi: AoiPolygon | undefined;
+
+  /** Inclusive time window, or unset when no clock filter is applied. */
+  timeRange: TimeRange | undefined;
+
+  annotations: AnnotationLayer;
+
+  /**
+   * How many data layers from the bottom sit under the annotation overlay.
+   * `0` is under every data layer; `layers.length` is on top.
+   */
+  annotationsZIndex: number;
 };
 
 /**
- * The editable body of a map: a basemap, a camera position, and an ordered
- * layer stack. Persisted as the `config` column of a `maps` row, so it is
- * versioned and carries no row identity of its own.
+ * The editable body of a map: a basemap, a camera position, an ordered
+ * layer stack, and map-level overlay state. Persisted as the `config`
+ * column of a `maps` row, so it is versioned and carries no row identity
+ * of its own.
  */
 export type AvaMapConfigRead = Model.Versioned<
   "AvaMapConfig",
-  3,
+  4,
   AvaMapConfigBody
 >;

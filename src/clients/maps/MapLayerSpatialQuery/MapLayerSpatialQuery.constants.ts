@@ -6,6 +6,7 @@ export const MapLayerSpatialQueryColumns = {
 
 /** Reserved properties attached to spatial map features. */
 export const MapLayerSpatialFeatureProperties = {
+  boundaryKey: "__avandar_boundary_key",
   boundaryName: "__avandar_boundary_name",
   classIndex: "__avandar_class_index",
   contributorCount: "__avandar_contributor_count",

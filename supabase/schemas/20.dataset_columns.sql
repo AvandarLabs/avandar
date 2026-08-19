@@ -50,7 +50,8 @@ select
 ,
   insert,
 update,
-delete on table public.dataset_columns to authenticated;
+delete on table public.dataset_columns to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select dataset_columns in their workspace" on public.dataset_columns for

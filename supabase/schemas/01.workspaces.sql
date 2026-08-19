@@ -26,7 +26,8 @@ select
 ,
   insert,
 update,
-delete on table public.workspaces to authenticated;
+delete on table public.workspaces to authenticated,
+service_role;
 
 /**
  * Trigger the `updated_at` update.

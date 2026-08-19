@@ -1,10 +1,10 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_WAVE_B_BOUNDARIES_CSV_PATH,
-  GIS_WAVE_B_BOUNDARY_ROW_COUNT,
-  GIS_WAVE_B_POINT_ROW_COUNT,
-  GIS_WAVE_B_POINTS_CSV_PATH,
+  GIS_BOUNDARY_POLYGONS_CSV_PATH,
+  GIS_BOUNDARY_POLYGONS_ROW_COUNT,
+  GIS_LAT_LNG_POINTS_CSV_PATH,
+  GIS_LAT_LNG_POINTS_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -17,8 +17,8 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Locator, Page } from "@playwright/test";
 
-const BOUNDARY_DATASET_NAME = "gis-wave-b-boundaries.csv";
-const POINT_DATASET_NAME = "gis-wave-b-points.csv";
+const BOUNDARY_DATASET_NAME = "boundary-polygons.csv";
+const POINT_DATASET_NAME = "lat-lng-points.csv";
 const MAP_NAME = "E2E GIS protected choropleth";
 
 async function _selectOption(
@@ -59,16 +59,16 @@ test("classifies area values without exposing suppressed point metrics", async (
       await importDatasetViaUi({
         page,
         workspaceSlug,
-        filePath: GIS_WAVE_B_BOUNDARIES_CSV_PATH,
-        expectedRowCount: GIS_WAVE_B_BOUNDARY_ROW_COUNT,
+        filePath: GIS_BOUNDARY_POLYGONS_CSV_PATH,
+        expectedRowCount: GIS_BOUNDARY_POLYGONS_ROW_COUNT,
       }),
     );
     datasetIds.push(
       await importDatasetViaUi({
         page,
         workspaceSlug,
-        filePath: GIS_WAVE_B_POINTS_CSV_PATH,
-        expectedRowCount: GIS_WAVE_B_POINT_ROW_COUNT,
+        filePath: GIS_LAT_LNG_POINTS_CSV_PATH,
+        expectedRowCount: GIS_LAT_LNG_POINTS_ROW_COUNT,
       }),
     );
     await page.getByRole("link", { name: "Maps" }).click();

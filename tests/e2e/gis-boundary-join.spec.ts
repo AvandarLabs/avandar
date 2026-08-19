@@ -1,10 +1,10 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_WAVE_B_BOUNDARIES_CSV_PATH,
-  GIS_WAVE_B_BOUNDARY_ROW_COUNT,
-  GIS_WAVE_B_SUMMARY_CSV_PATH,
-  GIS_WAVE_B_SUMMARY_ROW_COUNT,
+  GIS_BOUNDARY_POLYGONS_CSV_PATH,
+  GIS_BOUNDARY_POLYGONS_ROW_COUNT,
+  GIS_BOUNDARY_SUMMARY_CSV_PATH,
+  GIS_BOUNDARY_SUMMARY_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -17,8 +17,8 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Locator, Page } from "@playwright/test";
 
-const BOUNDARY_DATASET_NAME = "gis-wave-b-boundaries.csv";
-const SUMMARY_DATASET_NAME = "gis-wave-b-summary.csv";
+const BOUNDARY_DATASET_NAME = "boundary-polygons.csv";
+const SUMMARY_DATASET_NAME = "boundary-summary.csv";
 const MAP_NAME = "E2E GIS boundary join";
 
 async function _selectOption(
@@ -59,16 +59,16 @@ test("joins normalized source keys to boundaries and reports match health", asyn
       await importDatasetViaUi({
         page,
         workspaceSlug,
-        filePath: GIS_WAVE_B_BOUNDARIES_CSV_PATH,
-        expectedRowCount: GIS_WAVE_B_BOUNDARY_ROW_COUNT,
+        filePath: GIS_BOUNDARY_POLYGONS_CSV_PATH,
+        expectedRowCount: GIS_BOUNDARY_POLYGONS_ROW_COUNT,
       }),
     );
     datasetIds.push(
       await importDatasetViaUi({
         page,
         workspaceSlug,
-        filePath: GIS_WAVE_B_SUMMARY_CSV_PATH,
-        expectedRowCount: GIS_WAVE_B_SUMMARY_ROW_COUNT,
+        filePath: GIS_BOUNDARY_SUMMARY_CSV_PATH,
+        expectedRowCount: GIS_BOUNDARY_SUMMARY_ROW_COUNT,
       }),
     );
     await page.getByRole("link", { name: "Maps" }).click();

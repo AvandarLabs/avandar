@@ -1,6 +1,7 @@
 /*
- * The shell is the map's substrate. It fills the AppLayout canvas, and
- * everything except the furniture strip floats above it.
+ * The shell fills the AppLayout canvas. The map surface takes remaining
+ * height; the feature drawer and furniture strip sit below it in flow so
+ * opening the drawer shrinks the map instead of covering chrome.
  *
  * The container query is on this element rather than the viewport because the
  * workspace nav rail takes a fixed 200px off every viewport width, so the
@@ -12,7 +13,7 @@
   container-name: mapShell;
   container-type: inline-size;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
   height: 100%;
   min-height: 0;
   min-width: 0;

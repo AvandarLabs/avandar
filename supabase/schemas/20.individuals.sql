@@ -33,7 +33,8 @@ select
 ,
   insert,
 update,
-delete on table public.individuals to authenticated;
+delete on table public.individuals to authenticated,
+service_role;
 
 -- Policies
 create policy "User can SELECT individuals in their workspace" on public.individuals for

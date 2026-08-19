@@ -1,4 +1,5 @@
 import { prop } from "@avandar/utils";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it } from "vitest";
@@ -7,6 +8,7 @@ import {
   createBoundLayer,
   createDataset,
   createNumericColumn,
+  createTextColumn,
 } from "./MapLayerUpdates.fixtures";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
@@ -58,6 +60,56 @@ describe("withPopupColumns", () => {
     expect(updatedLayer.source.queryColumns).not.toContain(extra);
   });
 
+  it("keeps a time column the layer needs when it is deselected", () => {
+    const bound = createBoundLayer();
+    const occurredOn = QueryColumn.makeFromDatasetColumn(
+      createTextColumn("occurred_on"),
+    );
+    const layerWithTime = {
+      ...bound,
+      source: {
+        ...bound.source,
+        queryColumns: [...bound.source.queryColumns, occurredOn],
+      },
+      timeColumn: occurredOn.id,
+    };
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: layerWithTime,
+      columns: [],
+    });
+    expect(updatedLayer.popup.columnIds).toEqual([]);
+    expect(updatedLayer.source.queryColumns.map(prop("id"))).toEqual(
+      expect.arrayContaining([occurredOn.id]),
+    );
+  });
+
+  it("prunes popup columns on a buffer-of-layer binding", () => {
+    const extra = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("cases"),
+    );
+    const emptyLayer = MapLayer.makeEmpty("Buffer");
+    const bufferLayer: MapLayer.T = {
+      ...emptyLayer,
+      source: { ...emptyLayer.source, queryColumns: [extra] },
+      geoBinding: {
+        type: "bufferOfLayer",
+        layerId: uuid<MapLayer.Id>(),
+        distanceMeters: MapLayer.defaultBufferDistanceMeters,
+        dissolve: false,
+      },
+      symbology: MapLayer.createDefaultFillSymbology(),
+    };
+    const withPopup = MapLayerUpdates.withPopupColumns({
+      layer: bufferLayer,
+      columns: [extra],
+    });
+    const updatedLayer = MapLayerUpdates.withPopupColumns({
+      layer: withPopup,
+      columns: [],
+    });
+    expect(updatedLayer.source.queryColumns).toEqual([]);
+  });
+
   it("does not select the same base column twice under two ids", () => {
     const bound = createBoundLayer();
     expect(bound.geoBinding?.type).toBe("latLngColumns");
@@ -98,6 +150,46 @@ describe("withDataSource", () => {
     });
 
     expect(updatedLayer.popup).toEqual({ columnIds: "all", action: undefined });
+  });
+
+  it("clears a leftover timeColumn when the source changes", () => {
+    const occurredOn = QueryColumn.makeFromDatasetColumn(
+      createTextColumn("occurred_on"),
+    );
+    const bound = createBoundLayer();
+    const layerWithTime = {
+      ...bound,
+      source: {
+        ...bound.source,
+        queryColumns: [...bound.source.queryColumns, occurredOn],
+      },
+      timeColumn: occurredOn.id,
+    };
+
+    const updatedLayer = MapLayerUpdates.withDataSource({
+      layer: layerWithTime,
+      dataSource: createDataset(),
+    });
+
+    expect(updatedLayer.timeColumn).toBeUndefined();
+  });
+
+  it("does not treat a leftover timeColumn as unchanged", () => {
+    const dataSource = createDataset();
+    const emptyLayer = MapLayer.makeEmpty("Cases");
+    const layerWithTime = {
+      ...emptyLayer,
+      source: { ...emptyLayer.source, dataSource, queryColumns: [] },
+      timeColumn: uuid<QueryColumn.Id>(),
+    };
+
+    const updatedLayer = MapLayerUpdates.withDataSource({
+      layer: layerWithTime,
+      dataSource,
+    });
+
+    expect(updatedLayer).not.toBe(layerWithTime);
+    expect(updatedLayer.timeColumn).toBeUndefined();
   });
 });
 

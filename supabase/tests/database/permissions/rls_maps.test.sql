@@ -414,36 +414,28 @@ select lives_ok (
   'a user outside the workspace reads no maps'
 );
 
--- 6. Anonymous reads nothing.
-select lives_ok (
+-- 6. Anonymous callers cannot reach the table through the Data API.
+select throws_ok (
   $t6$
   set local role anon;
-  do $chk$
-  begin
-    if (select count(*)::int from public.maps) <> 0 then
-      raise exception 'anon read a map';
-    end if;
-  end $chk$;
+  select count(*)::int from public.maps;
   $t6$,
-  'anon reads no maps'
+  '42501',
+  null,
+  'anon cannot select maps'
 );
 
 -- 7. `is_public` is reserved for a future public embed and is inert until
 -- that route has an explicit access policy and matching coverage.
-select lives_ok (
+select throws_ok (
   $t7$
   set local role anon;
-  do $chk$
-  begin
-    if (
-      select count(*)::int
-      from public.maps m
-      where m.id = 'e210a003-0000-4000-8000-000000000003'::uuid
-    ) <> 0 then
-      raise exception 'anon read a map marked is_public';
-    end if;
-  end $chk$;
+  select count(*)::int
+  from public.maps m
+  where m.id = 'e210a003-0000-4000-8000-000000000003'::uuid;
   $t7$,
+  '42501',
+  null,
   'is_public does not make a map anon-readable'
 );
 

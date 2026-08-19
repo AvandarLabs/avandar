@@ -44,7 +44,8 @@ select
 ,
   insert,
 update,
-delete on table public.maps to authenticated;
+delete on table public.maps to authenticated,
+service_role;
 
 /** Prevents a map from being reassigned to another workspace. */
 create or replace function public.maps__prevent_workspace_id_change () returns trigger language plpgsql

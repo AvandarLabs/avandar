@@ -14,6 +14,7 @@ export type LayerChangeHandler = (
 
 type Props = {
   layer: MapLayer.T | undefined;
+  layers?: readonly MapLayer.T[];
   viewState: MapLayerViewState | undefined;
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
@@ -22,6 +23,8 @@ type Props = {
   onInspectorViewChange: (view: LayerInspectorView) => void;
   filterFocusRequest?: number;
 };
+
+const EMPTY_LAYERS: readonly MapLayer.T[] = [];
 
 /** Inspector-local navigation that does not alter persisted collapse state. */
 export type LayerInspectorView =
@@ -72,6 +75,7 @@ function _trackJoinLayerEligibility(options: {
 /** The selected layer's editor, sectioned by the model's axes. */
 export function LayerInspector({
   layer,
+  layers = EMPTY_LAYERS,
   viewState,
   isCollapsed,
   onToggleCollapsed,
@@ -130,6 +134,7 @@ export function LayerInspector({
     >
       <LayerInspectorBody
         layer={layer}
+        layers={layers}
         viewState={viewState}
         onLayerChange={onLayerChange}
         filterFocusRequest={filterFocusRequest}

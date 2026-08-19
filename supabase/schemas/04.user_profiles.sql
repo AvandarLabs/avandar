@@ -30,7 +30,8 @@ select
 ,
   insert,
 update,
-delete on table public.user_profiles to authenticated;
+delete on table public.user_profiles to authenticated,
+service_role;
 
 /**
  * Prevent changes to user_id, workspace_id, and membership_id

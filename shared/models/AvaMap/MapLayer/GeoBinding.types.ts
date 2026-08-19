@@ -1,4 +1,5 @@
 import type { UUID } from "@avandar/utils";
+import type { MapLayerId } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type {
   DatasetColumn, // prettier-ignore
@@ -103,12 +104,21 @@ export type GridBinBinding = {
   aggregation: AreaAggregation;
 };
 
+/** Polygon geometry produced by buffering another layer's features. */
+export type BufferOfLayerBinding = {
+  type: "bufferOfLayer";
+  layerId: MapLayerId;
+  distanceMeters: number;
+  dissolve: boolean;
+};
+
 /** A binding whose output is safe to render as an area. */
 export type AreaGeoBinding =
   | (GeometryColumnBinding & { family: "polygon" })
   | BoundaryJoinBinding
   | PointAggregationBinding
-  | GridBinBinding;
+  | GridBinBinding
+  | BufferOfLayerBinding;
 
 /**
  * How a layer's rows become geometry.
@@ -128,7 +138,8 @@ export type GeoBinding =
   | GeometryColumnBinding
   | BoundaryJoinBinding
   | PointAggregationBinding
-  | GridBinBinding;
+  | GridBinBinding
+  | BufferOfLayerBinding;
 
 /**
  * A {@link GeoBinding} whose column ids have been replaced with the column

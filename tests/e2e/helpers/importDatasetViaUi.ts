@@ -25,16 +25,17 @@ export async function importDatasetViaUi(
   await uploadPanel
     .locator('input[type="file"]')
     .setInputFiles(options.filePath);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
   const rowCount = formatNumber(options.expectedRowCount, { locale: "en-US" });
-  await expect(page.getByText("File parsed successfully")).toBeVisible({
-    timeout: MEDIUM_WAIT,
+  const parsedRowCount = page.getByText(new RegExp(`of ${rowCount}\\. Page`));
+  const uploadButton = uploadPanel.getByRole("button", {
+    name: "Upload",
+    exact: true,
   });
-  await expect(
-    page.getByText(new RegExp(`of ${rowCount}\\. Page`)),
-  ).toBeVisible();
+  if (!(await parsedRowCount.isVisible()) && (await uploadButton.isEnabled())) {
+    await uploadButton.click();
+  }
+  await expect(page.getByRole("alert", { name: "Data Preview" })).toBeVisible();
+  await expect(parsedRowCount).toBeVisible({ timeout: MEDIUM_WAIT });
   await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
   const datasetId = parseDatasetIdFromDataManagerUrl({
     url: page.url(),

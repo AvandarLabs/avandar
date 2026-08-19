@@ -29,7 +29,8 @@ select
 ,
   insert,
 update,
-delete on table public.concept_attributes to authenticated;
+delete on table public.concept_attributes to authenticated,
+service_role;
 
 -- Policies
 create policy "

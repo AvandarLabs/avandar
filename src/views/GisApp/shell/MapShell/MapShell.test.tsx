@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@/test-utils";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
+import type { ReactNode } from "react";
 
-function _renderMapShell(isChromeHidden = false): void {
+function _renderMapShell(
+  options: { isChromeHidden?: boolean; featureDrawer?: ReactNode } = {},
+): void {
+  const { isChromeHidden = false, featureDrawer } = options;
   render(
     <MapShell
       canvas={<div data-testid="canvas">Canvas</div>}
@@ -14,6 +18,7 @@ function _renderMapShell(isChromeHidden = false): void {
       statusCard={<div data-testid="status-card">Status</div>}
       furnitureBar={<div data-testid="furniture-bar">Furniture</div>}
       firstRunCard={<div data-testid="first-run-card">First run</div>}
+      featureDrawer={featureDrawer}
       mapLabel="Map of Cholera response"
       isChromeHidden={isChromeHidden}
       topBarRef={() => {
@@ -62,7 +67,7 @@ describe("MapShell", () => {
   });
 
   it("keeps only the map and furniture visible when chrome is hidden", () => {
-    _renderMapShell(true);
+    _renderMapShell({ isChromeHidden: true });
 
     expect(screen.getByTestId("canvas")).toBeInTheDocument();
     expect(screen.getByTestId("furniture-bar")).toBeInTheDocument();
@@ -79,5 +84,25 @@ describe("MapShell", () => {
     expect(screen.queryByTestId("tool-cluster")).not.toBeInTheDocument();
     expect(screen.queryByTestId("status-card")).not.toBeInTheDocument();
     expect(screen.queryByTestId("first-run-card")).not.toBeInTheDocument();
+  });
+
+  it("docks the feature drawer under the map so chrome stays on the canvas", () => {
+    _renderMapShell({
+      featureDrawer: <div data-testid="feature-drawer">Drawer</div>,
+    });
+
+    const mapRegion = screen.getByRole("region", {
+      name: "Map of Cholera response. Use the layer panel to change what is shown.",
+    });
+    const drawer = screen.getByTestId("feature-drawer");
+    const furniture = screen.getByTestId("furniture-bar");
+
+    expect(mapRegion).toContainElement(screen.getByTestId("tool-cluster"));
+    expect(mapRegion).not.toContainElement(drawer);
+    expect(mapRegion.parentElement).toContainElement(drawer);
+    expect(
+      drawer.compareDocumentPosition(furniture) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

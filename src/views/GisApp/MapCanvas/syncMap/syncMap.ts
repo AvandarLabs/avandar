@@ -6,12 +6,38 @@ import {
   propEq,
   propPasses,
 } from "@avandar/utils";
+import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
 import type {
   MapLayerSpec,
   MapSourceSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
+
+function _isChromeOverlayId(id: string): boolean {
+  return (
+    id === MapChromeOverlayIds.aoiSource ||
+    id === MapChromeOverlayIds.aoiLineLayer ||
+    id === MapChromeOverlayIds.measureSource ||
+    id === MapChromeOverlayIds.measureLineLayer ||
+    id === MapChromeOverlayIds.measureFillLayer ||
+    id === MapChromeOverlayIds.annotationPreviewSource ||
+    id === MapChromeOverlayIds.annotationPreviewLineLayer
+  );
+}
+
+function _raiseChromeOverlayLayers(map: MapLibreMap): void {
+  [
+    MapChromeOverlayIds.aoiLineLayer,
+    MapChromeOverlayIds.measureFillLayer,
+    MapChromeOverlayIds.measureLineLayer,
+    MapChromeOverlayIds.annotationPreviewLineLayer,
+  ].forEach((layerId) => {
+    if (map.getLayer(layerId)) {
+      map.moveLayer(layerId);
+    }
+  });
+}
 
 /** Finds the spec for a layer id within a `MapSpec`, if it is present. */
 function _findLayerSpec(
@@ -78,12 +104,20 @@ function _removeStaleLayersAndSources(
   nextLayerIds: ReadonlySet<string>,
 ): void {
   previousSpec.layers.forEach((layerSpec) => {
-    if (!nextLayerIds.has(layerSpec.id) && map.getLayer(layerSpec.id)) {
+    if (
+      !_isChromeOverlayId(layerSpec.id) &&
+      !nextLayerIds.has(layerSpec.id) &&
+      map.getLayer(layerSpec.id)
+    ) {
       map.removeLayer(layerSpec.id);
     }
   });
   objectKeys(previousSpec.sources).forEach((sourceId) => {
-    if (!(sourceId in nextSpec.sources) && map.getSource(sourceId)) {
+    if (
+      !_isChromeOverlayId(sourceId) &&
+      !(sourceId in nextSpec.sources) &&
+      map.getSource(sourceId)
+    ) {
       map.removeSource(sourceId);
     }
   });
@@ -256,4 +290,5 @@ export function syncMap({
   _removeSourcesWithChangedClusterOptions(map, previousSpec, nextSpec);
   _syncSources(map, previousSpec, nextSpec);
   _applyLayers(map, previousSpec, nextSpec, nextLayerIds);
+  _raiseChromeOverlayLayers(map);
 }

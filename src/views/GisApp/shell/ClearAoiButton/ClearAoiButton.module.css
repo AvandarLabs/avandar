@@ -1,0 +1,5 @@
+.clearAoiButton {
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  box-shadow: var(--mantine-shadow-md);
+}

@@ -9,4 +9,5 @@ export const AvaMapConfigValues = {
     "fiord",
   ] as const,
   customBasemapKinds: ["xyz", "wms", "wmts"] as const,
+  annotationKinds: ["text", "arrow", "freehand", "area"] as const,
 };

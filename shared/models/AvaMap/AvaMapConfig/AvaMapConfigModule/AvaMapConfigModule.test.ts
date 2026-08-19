@@ -6,10 +6,19 @@ import { describe, expect, it } from "vitest";
 describe("AvaMapConfig.makeEmpty", () => {
   it("starts with no layers and the avandar basemap", () => {
     const mapConfig = AvaMapConfig.makeEmpty();
-    expect(mapConfig.version).toBe(3);
+    expect(mapConfig.version).toBe(4);
     expect(mapConfig.layers).toEqual([]);
     expect(mapConfig.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(mapConfig.view).toEqual(AvaMapConfig.defaultViewState);
+  });
+
+  it("starts version 4 maps with no overlay and annotations on top", () => {
+    const config = AvaMapConfig.makeEmpty();
+    expect(config.version).toBe(4);
+    expect(config.aoi).toBeUndefined();
+    expect(config.timeRange).toBeUndefined();
+    expect(config.annotations).toEqual({ isVisible: true, features: [] });
+    expect(config.annotationsZIndex).toBe(0);
   });
 });
 
@@ -136,6 +145,27 @@ describe("layer operations", () => {
     expect(
       AvaMapConfig.withLayerRemoved({ config, layerId: dropped.id }).layers,
     ).toEqual([kept]);
+  });
+
+  it("keeps a dependent buffer when the source layer is removed", () => {
+    const source = MapLayer.makeEmpty("Cases");
+    const buffer: MapLayer.T = {
+      ...MapLayer.createArea("Buffer of Cases"),
+      geoBinding: {
+        type: "bufferOfLayer",
+        layerId: source.id,
+        distanceMeters: 1000,
+        dissolve: false,
+      },
+    };
+    const config = {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [source, buffer],
+    };
+
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: source.id }).layers,
+    ).toEqual([buffer]);
   });
 });
 

@@ -10,6 +10,7 @@ import {
   AvaMapConfigV3Schema,
   V3GeoBindingSchema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV3Schema.ts";
+import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import { z } from "zod";
 // eslint-disable-next-line no-restricted-imports
@@ -19,6 +20,7 @@ type ConfigV1 = z.infer<typeof AvaMapConfigV1Schema>;
 type ConfigV1Layer = z.infer<typeof AvaMapConfigV1LayerSchema>;
 type ConfigV2 = z.infer<typeof AvaMapConfigV2Schema>;
 type ConfigV2Layer = z.infer<typeof AvaMapConfigV2LayerSchema>;
+type ConfigV3 = z.infer<typeof AvaMapConfigV3Schema>;
 
 /** Migrates one version 1 layer without weakening its sensitivity. */
 function _migrateVersion1Layer(layer: ConfigV1Layer): ConfigV2Layer {
@@ -72,8 +74,8 @@ function _migrateVersion2GeoBinding(
   return V3GeoBindingSchema.optional().parse(binding);
 }
 
-/** Migrates a valid version 2 config into the current strict representation. */
-function _migrateVersion2(config: ConfigV2): AvaMapConfigRead {
+/** Migrates a valid version 2 config into the version 3 representation. */
+function _migrateVersion2(config: ConfigV2): ConfigV3 {
   return AvaMapConfigV3Schema.parse({
     ...config,
     version: 3,
@@ -84,6 +86,25 @@ function _migrateVersion2(config: ConfigV2): AvaMapConfigRead {
         legend: { ...layer.legend, sizeStops: [] },
       };
     }),
+  });
+}
+
+/** Migrates a valid version 3 config into the current persisted shape. */
+function _migrateVersion3(config: ConfigV3): AvaMapConfigRead {
+  return AvaMapConfigV4Schema.parse({
+    ...config,
+    version: 4,
+    aoi: undefined,
+    timeRange: undefined,
+    annotations: { isVisible: true, features: [] },
+    annotationsZIndex: config.layers.length,
+    layers: config.layers.map((layer) => {
+      return {
+        ...layer,
+        timeColumn: undefined,
+        applyAoiFilter: true,
+      };
+    }),
   }) as AvaMapConfigRead;
 }
 
@@ -91,9 +112,14 @@ function _migrateVersion2(config: ConfigV2): AvaMapConfigRead {
 export const migrateAvaMapConfig = {
   /** Migrates a valid version 1 config into the current representation. */
   fromV1: (config: ConfigV1): AvaMapConfigRead => {
-    return _migrateVersion2(_migrateVersion1(config));
+    return _migrateVersion3(_migrateVersion2(_migrateVersion1(config)));
   },
 
   /** Migrates a valid version 2 config into the current representation. */
-  fromV2: _migrateVersion2,
+  fromV2: (config: ConfigV2): AvaMapConfigRead => {
+    return _migrateVersion3(_migrateVersion2(config));
+  },
+
+  /** Migrates a valid version 3 config into the current representation. */
+  fromV3: _migrateVersion3,
 };

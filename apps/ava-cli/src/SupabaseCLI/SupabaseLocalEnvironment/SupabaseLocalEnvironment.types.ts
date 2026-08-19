@@ -96,6 +96,8 @@ export type SupabaseLocalEnvironmentIO = {
   readWorktreePath: () => Promise<string>;
   /** Reports whether a TCP port can be bound locally. */
   isPortAvailable: (port: number) => Promise<boolean>;
+  /** Lists host TCP ports Docker has already published. */
+  listPublishedHostPorts: () => Promise<number[]>;
   /** Reports whether Docker contains resources for a project. */
   hasSupabaseResources: (projectId: string) => Promise<boolean>;
   /** Lists Docker resources owned by a project. */
@@ -112,6 +114,33 @@ export type SupabaseLocalEnvironmentIO = {
   ) => Promise<CommandResult>;
   /** Runs the Supabase CLI with the supplied command arguments. */
   runSupabase: (commandArguments: readonly string[]) => Promise<CommandResult>;
+  /** Runs the repository seed against an explicitly addressed local stack. */
+  runSeed: (options: Readonly<SupabaseSeedTarget>) => Promise<CommandResult>;
+};
+
+/** The one local stack a seed run is allowed to write to. */
+export type SupabaseSeedTarget = {
+  supabaseUrl: string;
+  serviceRoleKey: string;
+};
+
+/**
+ * What the seed pass did after a switch activated.
+ *
+ * A failure is reported, never thrown: the stack it would have seeded is
+ * already running and correct, so a bad seed must not cost the user the switch.
+ */
+export type SupabaseSeedOutcome =
+  | { state: "seeded" }
+  | { state: "skipped" }
+  | { state: "failed"; message: string };
+
+/** The active project a completed switch left behind. */
+export type SupabaseSwitchResult = {
+  basePort: number;
+  devServerPort: number;
+  projectId: string;
+  seed: SupabaseSeedOutcome;
 };
 
 /** Everything a switch needs before it starts mutating local files. */
@@ -119,8 +148,41 @@ export type SwitchPreparation = {
   backupDirectory: string;
   configContents: string;
   configPath: string;
+  devServerPort: number;
   envFiles: string[];
   manifest: SupabaseBackupManifest;
+};
+
+/** One development environment file as it exists on disk. */
+export type DevelopmentEnvFile = {
+  filePath: string;
+  contents: string;
+};
+
+/** One labelled value rendered by `ava supabase status`. */
+export type SupabaseStatusEntry = {
+  label: string;
+  value: string;
+};
+
+/** How far one development environment file has drifted from the stack. */
+export type SupabaseEnvironmentDrift = {
+  filePath: string;
+  staleKeys: string[];
+};
+
+/** Identity, ports, and endpoints of the local Supabase this worktree uses. */
+export type SupabaseStatusReport = {
+  isSwitched: boolean;
+  /** Whether the switch state is the healthy one for this branch. */
+  isExpectedForBranch: boolean;
+  isRunning: boolean;
+  branch: string;
+  projectId: string;
+  ports: SupabaseStatusEntry[];
+  environmentValues: SupabaseStatusEntry[];
+  endpoints: SupabaseStatusEntry[];
+  environmentDrift: SupabaseEnvironmentDrift[];
 };
 
 /** A validated backup plus the directories a restore will read. */

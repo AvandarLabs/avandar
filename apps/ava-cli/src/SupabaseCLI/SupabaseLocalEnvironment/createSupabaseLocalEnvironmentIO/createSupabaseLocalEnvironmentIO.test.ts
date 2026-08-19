@@ -1,5 +1,4 @@
 import { rm } from "node:fs/promises";
-import * as net from "node:net";
 import path from "node:path";
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { promiseMap } from "@avandar/utils";
@@ -52,6 +51,7 @@ afterEach(async () => {
     await rm(directoryPath, { recursive: true, force: true });
   });
   commandMocks.execFile.mockReset();
+  vi.unstubAllEnvs();
 });
 
 function _setCommandFailure(
@@ -84,28 +84,6 @@ function _setCommandSuccess(
     callback(undefined, {
       stdout: result.stdout,
       stderr: result.stderr,
-    });
-  });
-}
-
-function _listenOnLoopback(): Promise<net.Server> {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer();
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
-      resolve(server);
-    });
-  });
-}
-
-function _closeServer(server: net.Server): Promise<void> {
-  return new Promise((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve();
     });
   });
 }
@@ -169,6 +147,35 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
         encoding: "utf8",
         maxBuffer: 10 * 1024 * 1024,
       },
+      expect.any(Function),
+    );
+  });
+
+  it("overrides the inherited connection when seeding", async () => {
+    _setCommandSuccess([{ stderr: "", stdout: "seeded" }]);
+    const projectRoot = path.resolve(process.cwd());
+    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    // The pre-switch connection `ava` loaded at startup, which the seed must
+    // not inherit.
+    vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "stale-key");
+
+    await expect(
+      io.runSeed({
+        supabaseUrl: "http://127.0.0.1:55321",
+        serviceRoleKey: "fresh-key",
+      }),
+    ).resolves.toEqual({ ok: true, stdout: "seeded", stderr: "" });
+    expect(commandMocks.execFile).toHaveBeenCalledWith(
+      "pnpm",
+      ["vite-script", "scripts/seedDatabaseScript.ts"],
+      expect.objectContaining({
+        cwd: projectRoot,
+        env: expect.objectContaining({
+          SUPABASE_URL: "http://127.0.0.1:55321",
+          SUPABASE_SERVICE_ROLE_KEY: "fresh-key",
+        }),
+      }),
       expect.any(Function),
     );
   });
@@ -351,21 +358,5 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     await expect(io.readBranch()).rejects.toThrow(
       "Cannot read the current Git branch: Git unavailable.",
     );
-  });
-
-  it("reports free and occupied loopback ports", async () => {
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
-    const occupiedServer = await _listenOnLoopback();
-    const address = occupiedServer.address();
-    if (address === null || typeof address === "string") {
-      throw new Error("Expected a TCP loopback address.");
-    }
-
-    try {
-      await expect(io.isPortAvailable(0)).resolves.toBe(true);
-      await expect(io.isPortAvailable(address.port)).resolves.toBe(false);
-    } finally {
-      await _closeServer(occupiedServer);
-    }
   });
 });

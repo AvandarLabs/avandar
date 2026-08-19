@@ -84,6 +84,9 @@ function _getRequiredSourceColumnIds(
     .with({ type: "binPointsToGrid" }, ({ points }) => {
       return _getRequiredSourceColumnIds(points);
     })
+    .with({ type: "bufferOfLayer" }, () => {
+      return [];
+    })
     .exhaustive();
 }
 

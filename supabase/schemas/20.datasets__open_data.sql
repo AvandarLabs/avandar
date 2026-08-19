@@ -23,7 +23,8 @@ select
 ,
   insert,
 update,
-delete on table public.datasets__open_data to authenticated;
+delete on table public.datasets__open_data to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__open_data in their workspace" on public.datasets__open_data for

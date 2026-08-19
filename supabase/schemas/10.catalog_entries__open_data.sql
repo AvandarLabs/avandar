@@ -60,6 +60,13 @@ grant
 select
   on table public.catalog_entries__open_data to authenticated;
 
+grant
+select
+,
+  insert,
+update,
+delete on table public.catalog_entries__open_data to service_role;
+
 -- Policies
 create policy "User can select open data catalog entries" on public.catalog_entries__open_data for
 select

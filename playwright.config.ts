@@ -10,7 +10,14 @@ import {
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 ensureE2EViteFeatureFlags();
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
+// `ava supabase switch` pins AVA_VITE_DEV_PORT in `.env.development`, so a
+// switched worktree serves the app somewhere other than the standard port.
+const devServerPort = process.env.AVA_VITE_DEV_PORT || "5173";
+const baseUrl =
+  process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${devServerPort}`;
+const parsedBaseUrl = new URL(baseUrl);
+const vitePort =
+  parsedBaseUrl.port || (parsedBaseUrl.protocol === "https:" ? "443" : "80");
 const isCI = !!process.env.CI;
 
 /**
@@ -38,6 +45,7 @@ const defaultTestTimeoutMs = isCI ? 90_000 : 45_000;
 
 export default defineConfig({
   testDir: "tests/e2e",
+  testMatch: "**/*.spec.ts",
 
   // Default `workers: 1`; raising it is safe: each worker gets its own
   // `e2e-test-workspace-w{n}` slug via the worker-scoped `e2eWorkerDb` fixture.
@@ -49,7 +57,7 @@ export default defineConfig({
   timeout: defaultTestTimeoutMs,
   expect: { timeout: SHORT_WAIT },
   use: {
-    baseURL,
+    baseURL: baseUrl,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
 
@@ -63,12 +71,12 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    command: "pnpm exec vite --host 127.0.0.1 --port 5173",
+    command: `pnpm exec vite --host ${parsedBaseUrl.hostname} --port ${vitePort}`,
     env: {
       ...(process.env as Record<string, string>),
       VITE_FEATURE_FLAGS: e2eFeatureFlags,
     },
-    url: baseURL,
+    url: baseUrl,
     reuseExistingServer: shouldReuseE2EViteServer(isCI),
     timeout: 180_000,
   },

@@ -120,6 +120,19 @@ function _makeClusterLayer(): MapLayer.T {
   };
 }
 
+/** A fill layer whose geometry is a buffer of another layer. */
+function _makeBufferLayer(sourceId: MapLayer.Id): MapLayer.T {
+  return {
+    ...MapLayer.createArea("Cases buffer"),
+    geoBinding: {
+      type: "bufferOfLayer",
+      layerId: sourceId,
+      distanceMeters: 1000,
+      dissolve: false,
+    },
+  };
+}
+
 describe("MapLayer.makeEmpty", () => {
   it("is visible, unbound, and exact by default", () => {
     const layer = MapLayer.makeEmpty("Cases");
@@ -139,6 +152,12 @@ describe("MapLayer.makeEmpty", () => {
   it("starts legends with empty size stops", () => {
     expect(MapLayer.makeEmpty("Cases").legend.sizeStops).toEqual([]);
   });
+
+  it("starts overlay fields unset and applying AOI", () => {
+    const layer = MapLayer.makeEmpty("Cases");
+    expect(layer.timeColumn).toBeUndefined();
+    expect(layer.applyAoiFilter).toBe(true);
+  });
 });
 
 describe("MapLayer.createArea", () => {
@@ -153,6 +172,17 @@ describe("MapLayer.createArea", () => {
 });
 
 describe("MapLayer.withSensitivity", () => {
+  it("keeps a buffer binding when switching to aggregate only", () => {
+    const sourceId = uuid<MapLayer.Id>();
+    const layer = MapLayer.withSensitivity(_makeBufferLayer(sourceId), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    });
+    expect(layer.geoBinding?.type).toBe("bufferOfLayer");
+    expect(layer.symbology.type).toBe("fill");
+  });
+
   it("keeps a grid-bin binding when switching to aggregate only", () => {
     const layer = MapLayer.withSensitivity(_makeGridBinLayer(), {
       mode: "aggregateOnly",

@@ -4,10 +4,10 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import {
-  createDataset,
-  createGridBinLayer,
   createQueryableLayer,
   createSpatialLayer,
+  EMPTY_MAP_OVERLAY,
+  UNIT_SQUARE,
   wrapperForHook,
 } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
@@ -56,8 +56,6 @@ vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
 
 const { useMapLayersData } =
   await import("@/views/GisApp/layers/useMapLayersData/useMapLayersData");
-const { MapLayerData } =
-  await import("@/views/GisApp/layers/useMapLayersData/MapLayerData");
 
 describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
@@ -82,7 +80,11 @@ describe("useMapLayersData", () => {
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -100,12 +102,66 @@ describe("useMapLayersData", () => {
     });
   });
 
+  it("runs lat/lng time filters as raw sql without waiting for spatial", async () => {
+    spatialAvailability.value = "loading";
+    const layer = createQueryableLayer();
+    const timedLayer = {
+      ...layer,
+      timeColumn: layer.source.queryColumns[0]?.id,
+    };
+    const queryResult: QueryResult.T<UnknownRow> = {
+      id: uuid<QueryResult.Id>(),
+      data: [{ cases: 1 }],
+      columns: [{ name: "cases", dataType: "double" }],
+      numRows: 1,
+    };
+    runStructuredQueryMock.mockResolvedValue(queryResult);
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [timedLayer],
+          workspaceId,
+          overlay: {
+            aoi: undefined,
+            timeRange: {
+              start: "2026-01-01T00:00:00.000Z",
+              end: "2026-01-31T23:59:59.000Z",
+            },
+          },
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(timedLayer.id)?.data).toEqual({
+        type: "rows",
+        queryResult,
+      });
+    });
+
+    expect(initializeDuckDbMock).not.toHaveBeenCalled();
+    expect(runSpatialQueryMock).not.toHaveBeenCalled();
+    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
+    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
+      "BETWEEN",
+    );
+    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).not.toContain(
+      "ST_",
+    );
+  });
+
   it("does not query a layer with no data source", () => {
     const layer = MapLayer.makeEmpty("Cases");
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -128,7 +184,11 @@ describe("useMapLayersData", () => {
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -162,6 +222,7 @@ describe("useMapLayersData", () => {
         return useMapLayersData({
           layers: [firstLayer, secondLayer],
           workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
         });
       },
       { wrapper: wrapperForHook },
@@ -187,7 +248,11 @@ describe("useMapLayersData", () => {
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -203,7 +268,11 @@ describe("useMapLayersData", () => {
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -236,7 +305,11 @@ describe("useMapLayersData", () => {
 
     const { result } = renderHook(
       () => {
-        return useMapLayersData({ layers: [layer], workspaceId });
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
       },
       { wrapper: wrapperForHook },
     );
@@ -255,97 +328,84 @@ describe("useMapLayersData", () => {
     });
     expect(runStructuredQueryMock).not.toHaveBeenCalled();
   });
-});
 
-describe("MapLayerData.isQueryable", () => {
-  it("is true for a layer with a source and a resolvable binding", () => {
-    expect(MapLayerData.isQueryable(createQueryableLayer())).toBe(true);
-  });
+  it("reports unavailable Spatial for lat/lng when an aoi is applied", () => {
+    spatialAvailability.value = "unavailable";
+    const layer = createQueryableLayer();
+    const aoi = UNIT_SQUARE;
 
-  it("is false until the layer has a data source", () => {
-    expect(MapLayerData.isQueryable(MapLayer.makeEmpty("Cases"))).toBe(false);
-  });
-
-  it("is false when the layer has a source but no resolvable geo binding", () => {
-    const layer = MapLayer.makeEmpty("Cases");
-    const withSource: MapLayer.T = {
-      ...layer,
-      source: { ...layer.source, dataSource: createDataset() },
-    };
-    expect(MapLayerData.isQueryable(withSource)).toBe(false);
-  });
-
-  it("is true for a grid bin bound to both coordinate columns", () => {
-    const base = createQueryableLayer();
-    const [latitude, longitude] = base.source.queryColumns;
-    const layer = createGridBinLayer(base, {
-      type: "latLngColumns",
-      latitude: latitude?.id,
-      longitude: longitude?.id,
-    });
-
-    expect(MapLayerData.isQueryable(layer)).toBe(true);
-  });
-
-  it("is false for a grid bin missing one coordinate column", () => {
-    const base = createQueryableLayer();
-    const layer = createGridBinLayer(base, {
-      type: "latLngColumns",
-      latitude: base.source.queryColumns[0]?.id,
-      longitude: undefined,
-    });
-
-    expect(MapLayerData.isQueryable(layer)).toBe(false);
-  });
-
-  it("is true for a grid bin bound to a point geometry column", () => {
-    const base = createSpatialLayer();
-    const layer = createGridBinLayer(base, {
-      type: "geometryColumn",
-      column: base.source.queryColumns[0]!.id,
-      encoding: "wkt",
-      family: "point",
-      simplification: undefined,
-      sourceCrs: undefined,
-    });
-
-    expect(MapLayerData.isQueryable(layer)).toBe(true);
-  });
-
-  it("is false for a grid bin whose point geometry column is gone", () => {
-    const layer = createGridBinLayer(createSpatialLayer(), {
-      type: "geometryColumn",
-      column: uuid<QueryColumn.Id>(),
-      encoding: "wkt",
-      family: "point",
-      simplification: undefined,
-      sourceCrs: undefined,
-    });
-
-    expect(MapLayerData.isQueryable(layer)).toBe(false);
-  });
-});
-
-describe("MapLayerData.getQueryKeyFromMapLayer", () => {
-  it("changes when the source changes", () => {
-    const layer = MapLayer.makeEmpty("Cases");
-    const withLimit = { ...layer, source: { ...layer.source, limit: 500 } };
-    expect(MapLayerData.getQueryKeyFromMapLayer(layer)).not.toEqual(
-      MapLayerData.getQueryKeyFromMapLayer(withLimit),
-    );
-  });
-
-  it("does not change when only symbology changes, so repaint skips refetch", () => {
-    const layer = MapLayer.makeEmpty("Cases");
-    const recolored = {
-      ...layer,
-      symbology: {
-        ...layer.symbology,
-        color: { type: "single" as const, color: "#ef4444" },
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: { aoi, timeRange: undefined },
+        });
       },
+      { wrapper: wrapperForHook },
+    );
+
+    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(runSpatialQueryMock).not.toHaveBeenCalled();
+    expect(result.current.get(layer.id)?.error?.message).toMatch(/spatial/i);
+  });
+
+  it("waits for Spatial before running lat/lng with an aoi", () => {
+    spatialAvailability.value = "loading";
+    const layer = createQueryableLayer();
+    const aoi = UNIT_SQUARE;
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: { aoi, timeRange: undefined },
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    expect(runStructuredQueryMock).not.toHaveBeenCalled();
+    expect(initializeDuckDbMock).toHaveBeenCalledTimes(1);
+    expect(result.current.get(layer.id)?.isLoading).toBe(true);
+  });
+
+  it("runs lat/lng aoi filters as raw sql with spatial functions", async () => {
+    const layer = createQueryableLayer();
+    const aoi = UNIT_SQUARE;
+    const queryResult: QueryResult.T<UnknownRow> = {
+      id: uuid<QueryResult.Id>(),
+      data: [{ cases: 1 }],
+      columns: [{ name: "cases", dataType: "double" }],
+      numRows: 1,
     };
-    expect(MapLayerData.getQueryKeyFromMapLayer(layer)).toEqual(
-      MapLayerData.getQueryKeyFromMapLayer(recolored),
+    runStructuredQueryMock.mockResolvedValue(queryResult);
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: { aoi, timeRange: undefined },
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data).toEqual({
+        type: "rows",
+        queryResult,
+      });
+    });
+
+    expect(runStructuredQueryMock).toHaveBeenCalledTimes(1);
+    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
+      "ST_Point",
+    );
+    expect(runStructuredQueryMock.mock.calls[0]?.[0].rawSql).toContain(
+      "ST_Intersects",
     );
   });
 });

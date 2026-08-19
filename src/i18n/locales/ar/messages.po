@@ -310,7 +310,7 @@ msgstr "وصف الملف الشخصي"
 msgid "Upload Excel"
 msgstr "تحميل Excel"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 msgid "Go to a coordinate or P-code"
 msgstr "الانتقال إلى إحداثي أو رمز P"
 
@@ -364,7 +364,7 @@ msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" 
 msgstr "أنواع الأعمدة المكتشفة لـ {changedCount} عمود في \"{sourceFileName}\" "
 "تختلف عن المعاينة المستوردة وتم استبدالها بالقيم الفعلية."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry"
 msgstr "الهندسة"
 
@@ -412,6 +412,10 @@ msgstr "تخطيط الشريط الجانبي"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete failed"
 msgstr "فشل الحذف"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
+msgid "Dismiss"
+msgstr "تجاهل"
 
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Your plan does not allow sharing this dashboard with anyone else. "
@@ -495,7 +499,7 @@ msgstr "أضف رسمًا بيانيًا خطيًا يوضح الاتجاهات 
 msgid "Show legend"
 msgstr "إظهار وسيلة الإيضاح"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Pan and select"
 msgstr "التحريك والتحديد"
 
@@ -1156,7 +1160,7 @@ msgstr "تعبير نمطي"
 msgid "Copied"
 msgstr "تم النسخ"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MeasureMapTool.tsx
 msgid "Measure distance and area"
 msgstr "قياس المسافة والمساحة"
 
@@ -1278,9 +1282,14 @@ msgstr "لا تزال النسخة المنشورة متاحة للجمهور ا
 msgid "Column name in SQL"
 msgstr "اسم العمود في SQL"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} m²"
+msgstr "{areaValue} م²"
+
 #: src/components/ChatPanel/ClarificationCard/ClarificationAnswerActions.tsx
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Confirm"
 msgstr "تأكيد"
 
@@ -1303,6 +1312,10 @@ msgstr "اطلب من مالك لوحة المعلومات مشاركتها مع
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should come from existing datasets"
 msgstr "يجب أن تأتي بعض البيانات من مجموعات البيانات الموجودة"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Start of time range: {startLabel}"
+msgstr "بداية النطاق الزمني: {startLabel}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
@@ -1500,7 +1513,7 @@ msgstr "الفلاتر لهذا الرسم البياني"
 msgid "Align"
 msgstr "محاذاة"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
 msgstr "نطاق حول طبقة"
 
@@ -1518,6 +1531,7 @@ msgstr "فشل الاستعلام."
 msgid "{code} - UTM south zone {0}"
 msgstr "{code} - المنطقة الجنوبية من UTM {0}"
 
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "اضغط باستمرار على Alt واضغط على السهم لأعلى أو لأسفل لتحريك هذه الطبقة."
@@ -1611,6 +1625,10 @@ msgstr "يجب ألا يقل طول معرّف مساحة العمل عن {SLUG_
 msgid "Built-in presets"
 msgstr "الإعدادات المدمجة"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Select a data layer to buffer."
+msgstr "حدّد طبقة بيانات لإنشاء نطاق حولها."
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "\"{0}\" is now in your workspace."
@@ -1682,6 +1700,10 @@ msgstr "فجوة"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "اختر مصدر البيانات"
+
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Opacity"
+msgstr "الشفافية"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
@@ -1980,6 +2002,11 @@ msgstr "نقطة واحدة"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "دالة التجميع \"{funcName}\" غير مدعومة في SELECT؛ تم تخطيها."
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+msgid "Annotations"
+msgstr "التعليقات التوضيحية"
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Cluster and Heat require a complete point-producing binding."
 msgstr "يتطلب التجميع والتدرج الحراري ربطًا كاملًا يُنتج نقاطًا."
@@ -2055,6 +2082,11 @@ msgstr "فشل تحديث القيود"
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
 msgstr "دقيق"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool is available when Spatial finishes loading."
+msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
 
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is before"
@@ -2269,6 +2301,7 @@ msgstr "قم بإنشاء استعلام لتكوين هذه التصور."
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls.tsx
 msgid "Select a column"
 msgstr "اختر عمودًا"
@@ -2510,6 +2543,10 @@ msgstr "لون خطوط الشبكة"
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre، مساهمو OpenStreetMap"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Delete annotation"
+msgstr "حذف التعليق التوضيحي"
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
 msgstr "اختر نوع مخطط أعلاه لتهيئته."
@@ -2569,6 +2606,10 @@ msgstr "لم تختار محور X"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "and is also equal to..."
 msgstr "ويساوي أيضًا..."
+
+#: src/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch.tsx
+msgid "Apply area filter"
+msgstr "تطبيق عامل تصفية المساحة"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
@@ -2786,7 +2827,7 @@ msgstr "العمود 11"
 msgid "Column 7"
 msgstr "العمود 7"
 
-#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Feature"
 msgstr "ميزة"
 
@@ -2801,6 +2842,10 @@ msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 "an area that reported nothing from an area that reported zero."
 msgstr "يظل مفعّلًا لخريطة ستتم طباعتها: وإلا فلن يستطيع القارئ التمييز بين "
 "منطقة لم تُبلّغ عن أي شيء ومنطقة أبلغت عن صفر."
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Bind geometry on the selected layer to buffer it."
+msgstr "اربط الشكل الهندسي بالطبقة المحددة لإنشاء نطاق حولها."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
@@ -2901,10 +2946,6 @@ msgstr "مشتق"
 msgid "{0} columns were detected. Review the column info below to make sure "
 "they are correct."
 msgstr "{0} أعمدة تم الكشف عنها. راجع معلومات الأعمدة أدناه للتأكد من صحتها."
-
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
-msgid "This tool is not available."
-msgstr "هذه الأداة غير متاحة."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -3149,6 +3190,11 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "تستخدم عبارة WHERE العامل \"{operator}\" على \"{columnName}\" مع قائمة "
 "غير حرفية."
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Distance (meters)"
+msgstr "المسافة (بالمتر)"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "قالب URL"
@@ -3376,6 +3422,7 @@ msgstr "في أو بعد"
 msgid "Try a different lookup"
 msgstr "جرّب بحثًا مختلفًا"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
 msgstr "عرض المخطط التفصيلي"
@@ -3557,6 +3604,11 @@ msgstr "لا يوجد ملف محدد"
 msgid "Submit"
 msgstr "إرسال"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs DuckDB Spatial, which is unavailable."
+msgstr "تحتاج هذه الأداة إلى DuckDB Spatial، وهو غير متاح."
+
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
@@ -3628,6 +3680,10 @@ msgstr "عرض الحد"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx
 msgid "and"
 msgstr "و"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "End of time range: {endLabel}"
+msgstr "نهاية النطاق الزمني: {endLabel}"
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
@@ -3740,7 +3796,8 @@ msgstr "له قيمة"
 msgid "The custom URL cannot contain spaces"
 msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسافات"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Annotate the map"
 msgstr "إضافة تعليقات توضيحية إلى الخريطة"
 
@@ -3875,6 +3932,10 @@ msgstr "التسمية، على سبيل المثال: المنطقة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select file"
 msgstr "اختر ملف"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} m"
+msgstr "{lengthValue} م"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -4032,6 +4093,10 @@ msgstr "تخطيط المساحة"
 msgid "CTEs (WITH clauses) are not supported in the form."
 msgstr "لا يدعم النموذج CTEs (جمل WITH)."
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{areaValue} km²"
+msgstr "{areaValue} كم²"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Unavailable"
 msgstr "غير متوفر"
@@ -4116,6 +4181,7 @@ msgstr "هل تريد تغيير عنوان URL المخصص؟"
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Color"
@@ -4297,6 +4363,10 @@ msgstr "سيؤدي هذا إلى حذف <0>{0}</0> وجميع بياناتها �
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "تعذّر فتح بوابة الفوترة. يُرجى المحاولة مرة أخرى لاحقًا."
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
+msgid "Time column"
+msgstr "عمود الوقت"
+
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed because there are missing axes or "
 "series."
@@ -4378,7 +4448,7 @@ msgstr " لم يتم النشر بعد."
 msgid "Cancel URL change"
 msgstr "إلغاء تغيير عنوان URL"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 msgid "Draw an area to filter by"
 msgstr "ارسم مساحة للتصفية حسبها"
 
@@ -4394,7 +4464,7 @@ msgstr "احصل على مجموع القيم"
 msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns are available when Spatial finishes loading."
 msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء Spatial من التحميل."
 
@@ -4483,6 +4553,10 @@ msgstr "مخطط شريطي"
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is none of"
 msgstr "ليس أيًّا من"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "That coordinate is out of range."
+msgstr "هذا الإحداثي خارج النطاق."
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureAction.tsx
 msgid "Open the record"
@@ -4672,7 +4746,7 @@ msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plur
 "واحدة} other {# من لوحات المعلومات}} أو نشرها. قم بالترقية إلى خطة "
 "Starter أو Impact لمشاركة العدد الذي تريده من لوحات المعلومات."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Join to boundaries"
 msgstr "الربط بالحدود"
 
@@ -4687,6 +4761,14 @@ msgstr "تم حذف لوحة التحكم بنجاح!"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an arrow"
+msgstr "رسم سهم"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "This tool arrives in a later release."
+msgstr "ستتوفر هذه الأداة في إصدار لاحق."
 
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask about your data..."
@@ -4771,6 +4853,10 @@ msgstr "نصف قطر التجميع"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "No saved datasets found."
 msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
+
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Expand the inspector"
+msgstr "توسيع المفتش"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -4898,6 +4984,11 @@ msgid "We detected both potential personal information and language that may "
 msgstr "لقد اكتشفنا معلومات شخصية محتملة ولغة قد تؤثر على إجابة الذكاء "
 "الاصطناعي. راجع كلاهما أدناه."
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
+"columns."
+msgstr "يتطلب Buffer طبقة ذات شكل هندسي مُجمّع، وليس أعمدة لخط العرض وخط الطول."
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
 msgstr "العرض متاح فقط بحجم الشاشة هذا."
@@ -4943,6 +5034,10 @@ msgstr "طي لوحة السحب"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Share failed"
 msgstr "فشل المشاركة"
+
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "Measure readout"
+msgstr "قراءة القياس"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
 msgid "Timespan"
@@ -4992,7 +5087,7 @@ msgstr "تم ربط {mapped} من أصل {total} صفًا"
 
 #. placeholder {0}: guess.latitudeColumnName
 #. placeholder {1}: guess.longitudeColumnName
-#: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout.tsx
 msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "تمت مطابقة خط العرض وخط الطول من اسمي العمودين {0} و{1}. غيّرهما أعلاه "
@@ -5213,6 +5308,10 @@ msgstr "فتح الشريط الجانبي"
 msgid "Upload dataset"
 msgstr "رفع مجموعة البيانات"
 
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No matching P-code."
+msgstr "لا يوجد رمز P مطابق."
+
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Reset"
@@ -5413,7 +5512,11 @@ msgstr "يجب ألا تكون القيمة الأولى أكبر من الثا�
 msgid "Shared dashboard limit reached"
 msgstr "تم بلوغ حد لوحات المعلومات المشتركة"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+msgid "Buffer of {sourceName}"
+msgstr "نطاق حول {sourceName}"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Geometry columns need DuckDB Spatial, which is unavailable."
 msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، وهو غير متاح."
 
@@ -5455,6 +5558,10 @@ msgstr "اكتب فقرتك هنا..."
 msgid "Send message"
 msgstr "إرسال رسالة"
 
+#: src/views/GisApp/shell/ClearAoiButton/ClearAoiButton.tsx
+msgid "Clear area filter"
+msgstr "مسح عامل تصفية المساحة"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copied!"
 msgstr "تم النسخ!"
@@ -5493,9 +5600,17 @@ msgstr "هل تريد إظهار المواقع الدقيقة؟"
 msgid "Expand the layer panel"
 msgstr "توسيع لوحة الطبقات"
 
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Place text"
+msgstr "وضع نص"
+
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "الطبقة"
+
+#: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
+msgid "Close a valid ring that does not cross itself."
+msgstr "أغلق حلقة صالحة لا تتقاطع مع نفسها."
 
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "1 layer"
@@ -5788,6 +5903,10 @@ msgstr "فشل معالجة البيانات"
 msgid "This feature is not implemented yet."
 msgstr "لم يتم تنفيذ هذه الميزة بعد."
 
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Time range"
+msgstr "النطاق الزمني"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint.tsx
 msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 "anytime."
@@ -5945,7 +6064,7 @@ msgstr "تظهر إعدادات المخطط بعد أن يعرض الاستعل
 msgid "{0} areas are suppressed"
 msgstr "تم حجب {0} من المناطق"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
 msgstr "تجميع النقاط حسب الحدود"
 
@@ -6123,6 +6242,10 @@ msgstr "تحديد وصول التطبيق"
 msgid "Enter dataset name"
 msgstr "أدخل اسم مجموعة البيانات"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Select an annotation on the map to edit it."
+msgstr "حدّد تعليقًا توضيحيًا على الخريطة لتحريره."
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is empty"
 msgstr "خط العرض أو خط الطول فارغ"
@@ -6220,6 +6343,10 @@ msgstr "سماحية التبسيط"
 msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
+#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
+msgid "Collapse the inspector"
+msgstr "طيّ المفتش"
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "فقط ما تم استعلامه"
@@ -6303,6 +6430,10 @@ msgstr "لا توجد أعمدة رقمية"
 msgid "Service"
 msgstr "الخدمة"
 
+#: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
+msgid "{lengthValue} km"
+msgstr "{lengthValue} كم"
+
 #: src/views/IndividualManagerApp/IndividualNavbar.tsx
 msgid "Nothing more to load"
 msgstr "لا يوجد المزيد لتحميله"
@@ -6314,6 +6445,10 @@ msgstr "تعذّر جعله خاصًا"
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Reset app"
 msgstr "إعادة ضبط التطبيق"
+
+#: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
+msgid "Play"
+msgstr "تشغيل"
 
 #. placeholder {0}: workspace.name
 #: src/views/ProfileView/ProfileView.tsx
@@ -6387,6 +6522,11 @@ msgstr "احفظ"
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr "مشاركة هذا {resourceLabel} أو نشره"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Dissolve"
+msgstr "إذابة"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From Google Sheets"
@@ -6641,7 +6781,7 @@ msgstr "جارٍ الحفظ"
 msgid "Role for new share"
 msgstr "الدور للمشاركة الجديدة"
 
-#: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
+#: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "أدوات الخريطة"
 
@@ -6678,6 +6818,10 @@ msgstr "اليسار"
 #: shared/copy/noneOfAboveLabel.ts
 msgid "None of the above"
 msgstr "لا شيء مما سبق"
+
+#: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
+msgid "Isochrone from a point"
+msgstr "منطقة زمن الوصول من نقطة"
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -6755,6 +6899,10 @@ msgstr "لا تحتوي هذه الخريطة على طبقات بعد"
 #: shared/copy/queryFilterOperatorLabel.ts
 msgid "is not blank"
 msgstr "غير فارغ"
+
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+msgid "No boundary layer on this map to look up a P-code."
+msgstr "لا توجد طبقة حدود على هذه الخريطة للبحث عن رمز P."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
@@ -6854,7 +7002,7 @@ msgstr "لا توجد أعمدة متاحة"
 msgid "Size by"
 msgstr "الحجم حسب"
 
-#: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
+#: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "تغيير حجم لوحة السحب"
 
@@ -6873,6 +7021,10 @@ msgstr "H2"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
 msgstr "أضف اقتباسًا بارزًا..."
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw freehand"
+msgstr "رسم حر"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "Per"
@@ -6919,7 +7071,7 @@ msgstr "عمود المصدر"
 msgid "Number of columns"
 msgstr "عدد الأعمدة"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Latitude and longitude columns"
 msgstr "أعمدة خط العرض وخط الطول"
@@ -7111,6 +7263,7 @@ msgid "Thank you for your interest!"
 msgstr "شكرًا لاهتمامك!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
 msgstr "المصدر"
@@ -7210,7 +7363,7 @@ msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنتر�
 msgid "Add a series to choose which numeric column drives the chart."
 msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يقود الرسم البياني."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "عمود الهندسة"
@@ -7294,7 +7447,7 @@ msgid "Choose a workspace preset or customize per app. User groups control "
 msgstr "اختر إعداد مسبق لمساحة العمل أو خصصه لكل تطبيق. تتحكم مجموعات "
 "المستخدمين في تقاطعات الوصول إلى مجموعة البيانات ولوحة المعلومات."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect.tsx
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
 msgstr "التجميع في شبكة"
 
@@ -7753,6 +7906,10 @@ msgstr "مسح الكل"
 msgid "is greater than"
 msgstr "أكبر من"
 
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
+msgid "Close"
+msgstr "إغلاق"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "لقد استخدم مساحة العمل الخاصة بك كل {currentSeatUsage} من {totalSeats} "
@@ -7907,6 +8064,10 @@ msgstr "فضفاض"
 msgid "Suppress areas below"
 msgstr "استبعاد المناطق الأقل من"
 
+#: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
+msgid "Annotation text"
+msgstr "نص التعليق التوضيحي"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "ORDER BY references column \"{columnName}\" not in the SELECT list."
 msgstr "يشير ORDER BY إلى العمود \"{columnName}\" غير الموجود في قائمة SELECT."
@@ -7927,6 +8088,10 @@ msgstr "ترقية الخطة إلى {newPlanName} ({newPlanSubType})"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "تعبير SELECT من النوع \"{exprType}\" غير مدعوم من النموذج."
+
+#: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
+msgid "Draw an annotation area"
+msgstr "رسم مساحة للتعليق التوضيحي"
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

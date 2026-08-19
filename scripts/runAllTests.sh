@@ -59,5 +59,5 @@ pnpm test:db
 if [ "$QUICK" = true ]; then
   echo "Skipping end-to-end tests (--quick)."
 else
-  pnpm test:e2e
+  PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e
 fi

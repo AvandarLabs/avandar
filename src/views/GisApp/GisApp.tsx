@@ -2,7 +2,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import css from "@/views/GisApp/GisApp.module.css";
 import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
-import { useGisApp } from "@/views/GisApp/useGisApp";
+import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
 

@@ -93,6 +93,7 @@ describe("MapInstanceHelpers map click", () => {
         current: ["ava-map-layer-clinics", "ava-map-layer-clinics-unclustered"],
       },
       onFeatureClickRef: { current: onFeatureClick },
+      mapToolModeRef: { current: { type: "pan" } },
     });
 
     eventHandlers.click?.({ point: { x: 10, y: 12 } });
@@ -113,6 +114,7 @@ describe("MapInstanceHelpers map click", () => {
       basemapRef: { current: basemap },
       interactiveLayerIdsRef: { current: [] },
       onFeatureClickRef: { current: onFeatureClick },
+      mapToolModeRef: { current: { type: "pan" } },
     });
 
     eventHandlers.click?.({ point: { x: 10, y: 12 } });
@@ -120,5 +122,21 @@ describe("MapInstanceHelpers map click", () => {
     expect(mapLibreMapMock.queryRenderedFeatures).not.toHaveBeenCalled();
     expect(onFeatureClick).not.toHaveBeenCalled();
     expect(mapLibreMapMock.easeTo).not.toHaveBeenCalled();
+  });
+
+  it("does not inspect features when the map tool mode is not pan", () => {
+    const onFeatureClick = vi.fn();
+    mapLibreMapMock.getLayer.mockReturnValue({ id: "ava-map-layer-clinics" });
+    attachMapWithLatestValues({
+      basemapRef: { current: basemap },
+      interactiveLayerIdsRef: { current: ["ava-map-layer-clinics"] },
+      onFeatureClickRef: { current: onFeatureClick },
+      mapToolModeRef: { current: { type: "aoi" } },
+    });
+
+    eventHandlers.click?.({ point: { x: 10, y: 12 } });
+
+    expect(mapLibreMapMock.queryRenderedFeatures).not.toHaveBeenCalled();
+    expect(onFeatureClick).not.toHaveBeenCalled();
   });
 });
