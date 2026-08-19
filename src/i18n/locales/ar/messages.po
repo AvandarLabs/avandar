@@ -92,7 +92,7 @@ msgstr "قم بتشغيل استعلام لرؤية النتائج."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel, CSV or PDF file from your computer to import"
-msgstr ""
+msgstr "حدّد ملف Excel أو CSV أو PDF من جهاز الكمبيوتر لاستيراده"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
@@ -296,7 +296,7 @@ msgstr "وصف الملف الشخصي"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
-msgstr ""
+msgstr "من PDF"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -405,7 +405,7 @@ msgstr "لا تسمح خطتك بمشاركة لوحة المعلومات هذه
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "PDF file"
-msgstr ""
+msgstr "ملف PDF"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -1330,7 +1330,8 @@ msgstr "انتهت صلاحية جلستك. جارٍ إعادة توجيهك ل�
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Select a region on the page to see data. Draw a box around a table, "
 "chart or block of text, or highlight a sentence."
-msgstr ""
+msgstr "حدّد منطقة في الصفحة لعرض البيانات. ارسم مربعًا حول جدول أو مخطط أو "
+"كتلة نصية، أو ظلّل جملة."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
@@ -2069,7 +2070,7 @@ msgstr "تصوير البيانات"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -5485,7 +5486,7 @@ msgstr "جارٍ تسجيل دخولك مرة أخرى…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "No region selected yet"
-msgstr ""
+msgstr "لم يتم تحديد أي منطقة بعد"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
@@ -5878,7 +5879,7 @@ msgstr "لم يتم نشر لوحة المعلومات هذه بعد. استخد
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a file"
-msgstr ""
+msgstr "تحميل ملف"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
@@ -5891,10 +5892,6 @@ msgstr "إرسال ملاحظات"
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "جارٍ تحميل مجموعات بيانات اللوحة"
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Select an Excel or CSV file from your computer to import"
-#~ msgstr "اختر ملف Excel أو CSV من جهاز الكمبيوتر الخاص بك للاستيراد"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -6152,10 +6149,6 @@ msgstr "مضيق بحري"
 msgid "Suggested rewrite:"
 msgstr "إعادة كتابة مقترحة:"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Upload a spreadsheet"
-#~ msgstr "قم بتحميل جدول بيانات"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -6264,7 +6257,7 @@ msgstr "احفظ"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "PDF files"
-msgstr ""
+msgstr "ملفات PDF"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
@@ -7717,7 +7710,7 @@ msgstr "يتعذر تحميل بوابة الفوترة لأنه ليس لديك
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved, but its original file failed to upload"
-msgstr ""
+msgstr "تم حفظ مجموعة البيانات، ولكن تعذّر تحميل ملفها الأصلي"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx

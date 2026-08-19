@@ -96,7 +96,8 @@ msgstr "Exécutez une requête pour voir les résultats."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel, CSV or PDF file from your computer to import"
-msgstr ""
+msgstr "Sélectionnez un fichier Excel, CSV ou PDF sur votre ordinateur à "
+"importer"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
@@ -304,7 +305,7 @@ msgstr "Description du profil"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
-msgstr ""
+msgstr "Depuis un PDF"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -415,7 +416,7 @@ msgstr "Votre forfait ne permet pas de partager ce tableau de bord avec "
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "PDF file"
-msgstr ""
+msgstr "Fichier PDF"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -1363,7 +1364,9 @@ msgstr "Votre session a expiré. Redirection vers la page de connexion."
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Select a region on the page to see data. Draw a box around a table, "
 "chart or block of text, or highlight a sentence."
-msgstr ""
+msgstr "Sélectionnez une région sur la page pour afficher les données. Dessinez "
+"un cadre autour d’un tableau, d’un graphique ou d’un bloc de texte, ou "
+"surlignez une phrase."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
@@ -2128,7 +2131,7 @@ msgstr "Visualisation des données"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -5628,7 +5631,7 @@ msgstr "Reconnexion en cours…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "No region selected yet"
-msgstr ""
+msgstr "Aucune région sélectionnée pour le moment"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
@@ -6030,7 +6033,7 @@ msgstr "Ce tableau de bord n’est pas encore publié. Utilisez le bouton "
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a file"
-msgstr ""
+msgstr "Importer un fichier"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
@@ -6043,11 +6046,6 @@ msgstr "Envoyer des commentaires"
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "Chargement des jeux de données du tableau de bord"
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Select an Excel or CSV file from your computer to import"
-#~ msgstr "Sélectionnez un fichier Excel ou CSV depuis votre ordinateur pour "
-#~ "importer"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -6309,10 +6307,6 @@ msgstr "Fjord"
 msgid "Suggested rewrite:"
 msgstr "Réécriture suggérée :"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Upload a spreadsheet"
-#~ msgstr "Télécharger une feuille de calcul"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -6425,7 +6419,7 @@ msgstr "Enregistrer"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "PDF files"
-msgstr ""
+msgstr "Fichiers PDF"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
@@ -7908,7 +7902,8 @@ msgstr "Le portail de facturation ne peut pas être chargé, car vous n’avez p
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved, but its original file failed to upload"
-msgstr ""
+msgstr "Jeu de données enregistré, mais l’importation du fichier d’origine a "
+"échoué"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx

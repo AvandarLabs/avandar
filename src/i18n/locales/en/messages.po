@@ -5907,10 +5907,6 @@ msgstr "Send feedback"
 msgid "Loading dashboard datasets"
 msgstr "Loading dashboard datasets"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Select an Excel or CSV file from your computer to import"
-#~ msgstr "Select an Excel or CSV file from your computer to import"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
@@ -6166,10 +6162,6 @@ msgstr "Fiord"
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Suggested rewrite:"
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Upload a spreadsheet"
-#~ msgstr "Upload a spreadsheet"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx

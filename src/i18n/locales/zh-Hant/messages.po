@@ -88,7 +88,7 @@ msgstr "執行查詢以查看結果。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Select an Excel, CSV or PDF file from your computer to import"
-msgstr ""
+msgstr "從您的電腦選取 Excel、CSV 或 PDF 檔案以匯入"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
@@ -286,7 +286,7 @@ msgstr "個人資料描述"
 
 #: src/components/badges/SourceBadge.tsx
 msgid "From PDF"
-msgstr ""
+msgstr "來自 PDF"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -393,7 +393,7 @@ msgstr "您的方案不允許與其他人分享此儀表板。請升級方案，
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "PDF file"
-msgstr ""
+msgstr "PDF 檔案"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -1293,7 +1293,7 @@ msgstr "您的工作階段已過期。正在將您重新導向至登入頁面。
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Select a region on the page to see data. Draw a box around a table, "
 "chart or block of text, or highlight a sentence."
-msgstr ""
+msgstr "選取頁面上的區域以查看資料。在表格、圖表或文字區塊周圍繪製方框，或反白句子。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
@@ -2015,7 +2015,7 @@ msgstr "數據可視化"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -5360,7 +5360,7 @@ msgstr "正在重新登入…"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "No region selected yet"
-msgstr ""
+msgstr "尚未選取區域"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
@@ -5743,7 +5743,7 @@ msgstr "此儀表板尚未發布。請使用下方按鈕，將其發布給您選
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "Upload a file"
-msgstr ""
+msgstr "上傳檔案"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
@@ -5756,10 +5756,6 @@ msgstr "發送反饋"
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
 msgstr "載入儀表板資料集"
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Select an Excel or CSV file from your computer to import"
-#~ msgstr "從您的電腦選擇一個 Excel 或 CSV 檔案以匯入"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -6011,10 +6007,6 @@ msgstr "峽灣"
 msgid "Suggested rewrite:"
 msgstr "建議重寫："
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Upload a spreadsheet"
-#~ msgstr "上傳電子表格"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "We were unable to update your subscription. Please contact "
@@ -6121,7 +6113,7 @@ msgstr "保存"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "PDF files"
-msgstr ""
+msgstr "PDF 檔案"
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
@@ -7541,7 +7533,7 @@ msgstr "因為您尚未訂閱，無法載入帳務入口網站。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
 msgid "Dataset saved, but its original file failed to upload"
-msgstr ""
+msgstr "資料集已儲存，但原始檔案上傳失敗"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
