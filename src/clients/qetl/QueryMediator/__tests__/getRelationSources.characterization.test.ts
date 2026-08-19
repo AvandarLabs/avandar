@@ -5,6 +5,10 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  clearQueryableRelationColumns,
+  rememberQueryableColumns,
+} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const CSV_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
@@ -79,6 +83,7 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  clearQueryableRelationColumns();
   datasetGetAllMock.mockResolvedValue([]);
   csvGetAllMock.mockResolvedValue([]);
   xlsxGetAllMock.mockResolvedValue([]);
@@ -433,5 +438,31 @@ describe("probeRelationCache", () => {
     const result = await probeRelationCache([LOADED_ID, MISSING_ID]);
 
     expect(result).toEqual([MISSING_ID]);
+  });
+
+  it("treats a present table as a miss when its loaded columns do not cover the request", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+    rememberQueryableColumns(LOADED_ID, ["a"]);
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache([LOADED_ID], {
+      [LOADED_ID]: ["a", "b"],
+    });
+
+    expect(result).toEqual([LOADED_ID]);
+  });
+
+  it("still serves a present table whose loaded columns cover the request", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+    rememberQueryableColumns(LOADED_ID, ["a", "b"]);
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache([LOADED_ID], {
+      [LOADED_ID]: ["a"],
+    });
+
+    expect(result).toEqual([]);
   });
 });

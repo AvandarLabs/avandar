@@ -4,7 +4,9 @@ import {
   makePreparedRelationCacheKeyFromKey,
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
+  normalizeColumns,
   serves,
+  unionColumnSets,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.ts";
 import { describe, expect, it } from "vitest";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
@@ -367,5 +369,28 @@ describe("makePreparedRelationCacheKeyFromKey", () => {
       columns: "all",
     });
     expect(prepared.definitionToken).toBe("d0");
+  });
+});
+
+describe("normalizeColumns", () => {
+  it("sorts and deduplicates a finite set, preserving case", () => {
+    expect(normalizeColumns(["b", "a", "b", "A"])).toEqual(["A", "a", "b"]);
+  });
+
+  it("leaves 'all' alone", () => {
+    expect(normalizeColumns("all")).toBe("all");
+  });
+});
+
+describe("unionColumnSets", () => {
+  it("returns 'all' when either side is 'all'", () => {
+    expect(unionColumnSets("all", ["a"])).toBe("all");
+    expect(unionColumnSets(["a"], "all")).toBe("all");
+    expect(unionColumnSets("all", "all")).toBe("all");
+  });
+
+  it("sorts and deduplicates two finite sets, preserving case", () => {
+    expect(unionColumnSets(["b"], ["a", "b"])).toEqual(["a", "b"]);
+    expect(unionColumnSets(["A"], ["a"])).toEqual(["A", "a"]);
   });
 });

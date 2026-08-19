@@ -13,8 +13,9 @@ import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDa
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { getQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { difference } from "@/lib/utils/arrays/difference/difference";
+import { coversColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type {
   DatasetsById,
   DatasetsBySourceType,
@@ -28,23 +29,29 @@ type SourceRecordReaderOptions = {
 };
 
 /**
- * Returns the query's dependencies that are not already present in the
- * queryable relation cache.
+ * Returns the query's dependencies that the queryable tier cannot serve:
+ * missing from DuckDB, or present but too narrow for `neededByDatasetId`.
+ *
+ * A present table with no sidecar entry is treated as `"all"`, which is how
+ * tables loaded outside this recorder still hit.
  */
 export async function probeRelationCache(
   queryDependencies: readonly Dataset.Id[],
+  neededByDatasetId: Readonly<Record<string, readonly string[] | "all">> = {},
 ): Promise<Dataset.Id[]> {
   if (queryDependencies.length === 0) {
     return [];
   }
   const inMemoryRelationIds = await DuckDbClient.getTableOrViewNames();
   const inMemoryRelationIdSet = new Set(inMemoryRelationIds);
-  return difference(
-    queryDependencies,
-    queryDependencies.filter((datasetId) => {
-      return inMemoryRelationIdSet.has(datasetId);
-    }),
-  );
+  return queryDependencies.filter((datasetId) => {
+    if (!inMemoryRelationIdSet.has(datasetId)) {
+      return true;
+    }
+    const loaded = getQueryableColumns(datasetId) ?? "all";
+    const needed = neededByDatasetId[datasetId] ?? "all";
+    return !coversColumns(loaded, needed);
+  });
 }
 
 async function _getCsvExtractors(
