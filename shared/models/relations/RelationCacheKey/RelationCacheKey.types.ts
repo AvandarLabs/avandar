@@ -1,5 +1,5 @@
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 
 /**
  * Which principal a cached relation belongs to. Never optional: a workspace

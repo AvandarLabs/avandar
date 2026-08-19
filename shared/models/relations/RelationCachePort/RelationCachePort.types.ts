@@ -1,10 +1,10 @@
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type {
   PrincipalKey,
   RelationCacheEntryFields,
   RelationCacheIdentity,
   RelationCacheKey,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 
 /**
  * One stored relation's metadata, with no payload. Every field the reuse

@@ -7,8 +7,8 @@ import {
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.ts";
 import { describe, expect, it } from "vitest";
-import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
+import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
 const OTHER_DATASET_ID = "0f2c9f3e-2222-4222-8333-a1b2c3d4e5f6" as Dataset.Id;
