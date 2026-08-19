@@ -22,8 +22,7 @@ msgstr "Delete: {0}"
 msgid "Changes to your payment method can be made in your"
 msgstr "Changes to your payment method can be made in your"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Close chat panel"
 
@@ -45,7 +44,7 @@ msgstr "Return online to view or make the page available offline."
 msgid "Create new entity"
 msgstr "Create new entity"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "You are offline. Download an offline chat model using the cloud icon "
@@ -190,7 +189,7 @@ msgstr "Title field is required"
 msgid "Invite a member"
 msgstr "Invite a member"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Ask Avandar"
 msgstr "Ask Avandar"
 
@@ -627,7 +626,7 @@ msgstr "Dataset failed to process"
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} rows were rejected"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
 msgstr "Replying…"
 
@@ -651,7 +650,7 @@ msgstr "No datasets added yet"
 msgid "Layer name"
 msgstr "Layer name"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "Fixing query…"
 
@@ -1142,7 +1141,7 @@ msgstr "Your question contains language that may bias the AI's answer."
 msgid "Vertical padding"
 msgstr "Vertical padding"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
 msgstr "The cloud assistant is unreachable. Use your downloaded on-device model "
@@ -1606,6 +1605,10 @@ msgstr "Everyone in {app} will lose access."
 msgid "Choose a plan that works best for your workspace."
 msgstr "Choose a plan that works best for your workspace."
 
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Chat"
+msgstr "Chat"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
 "datasets as users tell us which datasets they want in Avandar. If there "
@@ -1637,7 +1640,7 @@ msgstr "decimal"
 msgid "Group by"
 msgstr "Group by"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "Please select a file to import"
 msgstr "Please select a file to import"
 
@@ -2014,7 +2017,7 @@ msgstr "\"{sourceFileName}\" finished processing and is ready to use."
 msgid "Manual"
 msgstr "Manual"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
 msgstr "Understanding your question…"
 
@@ -2101,7 +2104,7 @@ msgstr "Pan, zoom and tap a feature to read it. To edit layers, open this map "
 msgid "Info"
 msgstr "Info"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "Writing query…"
 
@@ -2804,7 +2807,7 @@ msgstr "Microsoft's compact instruct model. Solid structure and instruction "
 msgid "Edit"
 msgstr "Edit"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "SQL was not applied. Approve the assumed filter values to run this "
@@ -3473,6 +3476,10 @@ msgstr "Hide X axis"
 msgid "Exact locations"
 msgstr "Exact locations"
 
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+msgid "New chat"
+msgstr "New chat"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "Search by name, organization, pipeline…"
@@ -3523,7 +3530,7 @@ msgstr "Displace within"
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "Add a bar chart of row counts in {datasetName}"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
 msgstr "No file selected"
 
@@ -3814,7 +3821,7 @@ msgstr "Print and PDF export arrives in a later release."
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Count how many rows there are in {datasetName}"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "Generating SQL…"
 
@@ -3877,7 +3884,7 @@ msgstr "No frequency data available."
 msgid "We'll add this visualization to your new dashboard."
 msgstr "We'll add this visualization to your new dashboard."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "Repairing query…"
 
@@ -3918,7 +3925,7 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 msgstr "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
 msgstr "Here is a query based on your workspace metadata."
 
@@ -4241,7 +4248,7 @@ msgstr "Controls the default for the rest of the workspace. People without app "
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "Count rows in {datasetName} by {groupByColumn}"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL was not applied. Sign in to approve filter values."
 
@@ -4984,7 +4991,7 @@ msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 msgstr "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Chat request failed"
 msgstr "Chat request failed"
 
@@ -5034,6 +5041,10 @@ msgstr "all members of "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Some data should be manually entered"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The results are on the canvas to the left."
+msgstr "The results are on the canvas to the left."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5629,10 +5640,6 @@ msgstr "Your name"
 msgid "Downloading {0} for offline chat"
 msgstr "Downloading {0} for offline chat"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-msgid "Open chat panel"
-msgstr "Open chat panel"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Remove row filter"
@@ -6016,7 +6023,7 @@ msgstr "WHERE clause contains a \"{nodeType}\" node that the form does not "
 msgid "Dashboard published!"
 msgstr "Dashboard published!"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "I could not produce SQL offline. Try rephrasing or reconnect to use "
@@ -6994,7 +7001,7 @@ msgstr "1 field"
 msgid "Language"
 msgstr "Language"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "Close panel (⌘/)"
 
@@ -7376,7 +7383,7 @@ msgstr "Subtle"
 msgid "Activity"
 msgstr "Activity"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "(Message not sent.)"
 

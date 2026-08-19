@@ -44,8 +44,6 @@ function _run(requestBody: Record<string, unknown>) {
     requestBody,
     apiKey: "key",
     referer: "https://example.test",
-    isDataExplorer: true,
-    isDashboards: false,
     lastUserPrompt: "show revenue",
     priorClarifications: 0,
   });

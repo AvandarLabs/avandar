@@ -22,8 +22,7 @@ msgstr "刪除：{0}"
 msgid "Changes to your payment method can be made in your"
 msgstr "您可以在您的付款方式中進行更改"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "關閉聊天面板"
 
@@ -44,7 +43,7 @@ msgstr "返回線上以查看或使頁面可離線使用。"
 msgid "Create new entity"
 msgstr "建立新實體"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下載離線聊天模型，再詢問資料相關問題。"
@@ -185,7 +184,7 @@ msgstr "標題欄位為必填"
 msgid "Invite a member"
 msgstr "邀請一位成員"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Ask Avandar"
 msgstr "詢問 Avandar"
 
@@ -609,7 +608,7 @@ msgstr "數據集處理失敗"
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} 行被拒絕"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
 msgstr "回覆中…"
 
@@ -633,7 +632,7 @@ msgstr "尚未添加任何資料集"
 msgid "Layer name"
 msgstr "圖層名稱"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "修正查詢中…"
 
@@ -1110,7 +1109,7 @@ msgstr "您的問題包含可能會影響 AI 回答的語言。"
 msgid "Vertical padding"
 msgstr "垂直內距"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
 msgstr "無法連線至雲端助理。要使用您下載到裝置上的模型處理此訊息嗎？"
@@ -1567,6 +1566,10 @@ msgstr "{app} 中的所有人都將失去存取權限。"
 msgid "Choose a plan that works best for your workspace."
 msgstr "選擇最適合您工作區的計劃。"
 
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Chat"
+msgstr "聊天"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
 "datasets as users tell us which datasets they want in Avandar. If there "
@@ -1596,7 +1599,7 @@ msgstr "小數"
 msgid "Group by"
 msgstr "按群組"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "Please select a file to import"
 msgstr "請選擇一個檔案以導入"
 
@@ -1961,7 +1964,7 @@ msgstr "\"{sourceFileName}\" 處理完成，準備使用。"
 msgid "Manual"
 msgstr "手動"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
 msgstr "正在了解您的問題…"
 
@@ -2045,7 +2048,7 @@ msgstr "平移、縮放並點選圖徵以閱讀內容。若要編輯圖層，請
 msgid "Info"
 msgstr "資訊"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "正在撰寫查詢…"
 
@@ -2723,7 +2726,7 @@ msgstr "Microsoft 的精簡指令模型。具備穩固的結構和指令遵循�
 msgid "Edit"
 msgstr "編輯"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "尚未套用 SQL。請核准假設的篩選值，以執行此查詢。"
@@ -3378,6 +3381,10 @@ msgstr "隱藏 X 軸"
 msgid "Exact locations"
 msgstr "精確位置"
 
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+msgid "New chat"
+msgstr "新聊天"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "按名稱、組織、管道等搜索…"
@@ -3428,7 +3435,7 @@ msgstr "在範圍內位移"
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "新增一個顯示 {datasetName} 中行數的條形圖"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
 msgstr "未選擇任何檔案"
 
@@ -3716,7 +3723,7 @@ msgstr "列印和 PDF 匯出功能將於後續版本推出。"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "計算 {datasetName} 中有多少行"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "正在產生 SQL…"
 
@@ -3778,7 +3785,7 @@ msgstr "沒有可用的頻率數據。"
 msgid "We'll add this visualization to your new dashboard."
 msgstr "我們將把這個視覺化添加到您的新儀表板。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "正在修復查詢…"
 
@@ -3817,7 +3824,7 @@ msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
 msgstr "任何取得連結的人都能查看此{resource}。下方的人員和群組仍可控制誰能編輯。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
 msgstr "以下是根據您工作區中繼資料建立的查詢。"
 
@@ -4133,7 +4140,7 @@ msgstr "控制工作區其餘部分的預設設定。沒有應用程式存取權
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "依 {groupByColumn} 分組，計算 {datasetName} 中的資料列數"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "未套用 SQL。請登入以核准篩選值。"
 
@@ -4858,7 +4865,7 @@ msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 "Change them above if that is wrong."
 msgstr "已根據欄名稱 {0} 和 {1} 比對緯度與經度。如果不正確，請在上方變更。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Chat request failed"
 msgstr "聊天請求失敗"
 
@@ -4908,6 +4915,10 @@ msgstr "所有成員的 "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The results are on the canvas to the left."
+msgstr "結果位於左側畫布上。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5487,10 +5498,6 @@ msgstr "您的名字"
 msgid "Downloading {0} for offline chat"
 msgstr "正在下載 {0} 以進行離線聊天"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-msgid "Open chat panel"
-msgstr "打開聊天面板"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "移除行篩選"
@@ -5865,7 +5872,7 @@ msgstr "WHERE 子句包含表單不支援的「{nodeType}」節點。"
 msgid "Dashboard published!"
 msgstr "儀表板已發佈！"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
@@ -6822,7 +6829,7 @@ msgstr "1 個欄位"
 msgid "Language"
 msgstr "語言"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "關閉面板 (⌘/)"
 
@@ -7195,7 +7202,7 @@ msgstr "細微"
 msgid "Activity"
 msgstr "活動"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "（訊息未傳送。）"
 

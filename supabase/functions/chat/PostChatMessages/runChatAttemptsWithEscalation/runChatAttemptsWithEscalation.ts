@@ -23,21 +23,12 @@ export async function runChatAttemptsWithEscalation(
     requestBody: Record<string, unknown>;
     apiKey: string;
     referer: string;
-    isDataExplorer: boolean;
-    isDashboards: boolean;
     lastUserPrompt: string;
     priorClarifications: number;
   }>,
 ): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
-  const {
-    requestBody,
-    apiKey,
-    referer,
-    isDataExplorer,
-    isDashboards,
-    lastUserPrompt,
-    priorClarifications,
-  } = options;
+  const { requestBody, apiKey, referer, lastUserPrompt, priorClarifications } =
+    options;
 
   let attemptCount = 0;
   const runAttempt = async (
@@ -52,8 +43,6 @@ export async function runChatAttemptsWithEscalation(
     return parseOpenRouterResponse({
       message: attempt.message,
       attemptText: attempt.text,
-      isDataExplorer,
-      isDashboards,
       lastUserPrompt,
       priorClarifications,
     });

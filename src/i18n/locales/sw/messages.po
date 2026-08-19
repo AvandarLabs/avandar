@@ -22,8 +22,7 @@ msgstr "Futa: {0}"
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Funga paneli ya mazungumzo"
 
@@ -45,7 +44,7 @@ msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
 msgid "Create new entity"
 msgstr "Unda huluki mpya"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
 "next to the composer before asking data questions."
 msgstr "Uko nje ya mtandao. Pakua modeli ya gumzo ya nje ya mtandao ukitumia "
@@ -193,7 +192,7 @@ msgstr "Sehemu ya kichwa inahitajika"
 msgid "Invite a member"
 msgstr "Karibisha mwanachama"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Ask Avandar"
 msgstr "Uliza Avandar"
 
@@ -632,7 +631,7 @@ msgstr "Seti ya data ilishindwa kushughulika"
 msgid " {numRejectedRows} rows were rejected"
 msgstr " {numRejectedRows} safu zilikataliwa"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Replying…"
 msgstr "Inajibu…"
 
@@ -656,7 +655,7 @@ msgstr "Hakuna datasets zilizoongezwa bado"
 msgid "Layer name"
 msgstr "Jina la safu"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
 msgstr "Inarekebisha swali…"
 
@@ -1157,7 +1156,7 @@ msgstr "Swali lako lina lugha ambayo inaweza kuathiri jibu la AI."
 msgid "Vertical padding"
 msgstr "Pengo la wima"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
 "for this message?"
 msgstr "Msaidizi wa wingu hafikiki. Utumie modeli uliyopakua kwenye kifaa kwa "
@@ -1627,6 +1626,10 @@ msgstr "Kila mtu katika {app} hatapata tena idhini ya kufikia."
 msgid "Choose a plan that works best for your workspace."
 msgstr "Chagua mpango unaofaa zaidi kwa eneo lako la kazi."
 
+#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
+msgid "Chat"
+msgstr "Mazungumzo"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "The public open data catalog is still in <0/><1/>We are adding more open "
 "datasets as users tell us which datasets they want in Avandar. If there "
@@ -1659,7 +1662,7 @@ msgstr "decimal"
 msgid "Group by"
 msgstr "Panga kwa"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "Please select a file to import"
 msgstr "Tafadhali chagua faili ya kuagiza"
 
@@ -2039,7 +2042,7 @@ msgstr "\"{sourceFileName}\" imekamilisha usindikaji na iko tayari kutumika."
 msgid "Manual"
 msgstr "Mkononi"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Understanding your question…"
 msgstr "Inaelewa swali lako…"
 
@@ -2130,7 +2133,7 @@ msgstr "Sogeza, kukuza na uguse kipengele ili kukisoma. Ili kuhariri tabaka, "
 msgid "Info"
 msgstr "Maelezo"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Writing query…"
 msgstr "Inaandika swali…"
 
@@ -2840,7 +2843,7 @@ msgstr "Modeli ya Microsoft yenye maagizo mafupi. Muundo thabiti na ufuataji "
 msgid "Edit"
 msgstr "Hariri"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "SQL haikutekelezwa. Kubali thamani za vichujio zilizokadiriwa ili "
@@ -3517,6 +3520,10 @@ msgstr "Ficha mhimili wa X"
 msgid "Exact locations"
 msgstr "Maeneo kamili"
 
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+msgid "New chat"
+msgstr "Mazungumzo mapya"
+
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Search by name, organization, pipeline…"
 msgstr "Tafuta kwa jina, shirika, bomba…"
@@ -3567,7 +3574,7 @@ msgstr "Sambaza ndani ya"
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
 msgstr "Hakuna faili iliyochaguliwa"
 
@@ -3860,7 +3867,7 @@ msgstr "Uchapishaji na uhamishaji wa PDF utapatikana katika toleo lijalo."
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Generating SQL…"
 msgstr "Inazalisha SQL…"
 
@@ -3925,7 +3932,7 @@ msgstr "Hakuna data ya mara kwa mara inapatikana."
 msgid "We'll add this visualization to your new dashboard."
 msgstr "Tutongeza picha hii kwenye dashibodi yako mpya."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Repairing query…"
 msgstr "Inarekebisha hoja…"
 
@@ -3967,7 +3974,7 @@ msgstr "Mtu yeyote aliye na kiungo anaweza kutazama {resource} hii. Watu na "
 "vikundi vilivyo hapa chini bado vinadhibiti ni nani anayeweza "
 "kuihariri."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
 msgstr "Hili hapa ni swali kulingana na metadata ya nafasi yako ya kazi."
 
@@ -4292,7 +4299,7 @@ msgstr "Hudhibiti mipangilio chaguomsingi ya nafasi yote ya kazi. Watu wasio na 
 msgid "Count rows in {datasetName} by {groupByColumn}"
 msgstr "Hesabu safu katika {datasetName} kwa {groupByColumn}"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL haikutumika. Ingia ili kuidhinisha thamani za kichujio."
 
@@ -5042,7 +5049,7 @@ msgid "Latitude and longitude were matched from the column names {0} and {1}. "
 msgstr "Latitudo na longitudo zilinganishwa kutoka kwa majina ya safu wima {0} "
 "na {1}. Yabadilishe hapo juu ikiwa si sahihi."
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Chat request failed"
 msgstr "Ombi la mazungumzo limeshindwa"
 
@@ -5092,6 +5099,10 @@ msgstr "wanachama wote wa "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The results are on the canvas to the left."
+msgstr "Matokeo yako kwenye turubai lililo upande wa kushoto."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
@@ -5689,10 +5700,6 @@ msgstr "Jina lako"
 msgid "Downloading {0} for offline chat"
 msgstr "Inapakua {0} kwa mazungumzo ya mtandaoni"
 
-#: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
-msgid "Open chat panel"
-msgstr "Fungua paneli ya mazungumzo"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Ondoa kichujio cha safu"
@@ -6080,7 +6087,7 @@ msgstr "Kifungu cha WHERE kina nodi ya \"{nodeType}\" ambayo fomu haiungi "
 msgid "Dashboard published!"
 msgstr "Dashibodi imechapishwa!"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
@@ -7064,7 +7071,7 @@ msgstr "Sehemu 1"
 msgid "Language"
 msgstr "Lugha"
 
-#: src/components/ChatPanel/ChatPanel/ChatPanel.tsx
+#: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "Funga paneli (⌘/)"
 
@@ -7448,7 +7455,7 @@ msgstr "Isiyoonekana sana"
 msgid "Activity"
 msgstr "Shughuli"
 
-#: src/components/ChatPanel/useAvandarChatRuntime.ts
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "(Ujumbe haukutumwa.)"
 

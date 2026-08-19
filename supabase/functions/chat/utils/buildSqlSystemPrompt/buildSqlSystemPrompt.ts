@@ -21,6 +21,25 @@ function isSpatialPrompt(prompt: string): boolean {
 }
 
 /**
+ * Spatial-extension notes for a prompt that looks geospatial. Empty when the
+ * prompt has no spatial keywords.
+ */
+export function makeSpatialSqlDocumentationFromPrompt(prompt: string): string {
+  return isSpatialPrompt(prompt) ?
+      `Reference documentation:
+If the query requires any geospatial operations, refer to the following document:
+${DuckDbSpatialExtensionDocumentation}`
+    : "";
+}
+
+type BuildSqlSystemPromptOptions = {
+  prompt: string;
+  datasets: readonly Dataset[];
+  columns: readonly DatasetColumn[];
+  includeSpatialDocumentation?: boolean;
+};
+
+/**
  * Build the schema-aware system prompt used for natural-language → DuckDB SQL
  * generation. Shared between the `queries` edge function (used by the manual
  * "AI query" tab) and the new `chat` edge function (used by the persistent
@@ -29,12 +48,19 @@ function isSpatialPrompt(prompt: string): boolean {
  * The schema is sent as a compact listing (one line per dataset + one line
  * per column), not as JSON, to keep token cost low.
  */
-export function buildSqlSystemPrompt(args: {
-  prompt: string;
-  datasets: readonly Dataset[];
-  columns: readonly DatasetColumn[];
-}): string {
-  const { prompt, datasets, columns } = args;
+export function buildSqlSystemPrompt(
+  options: Readonly<BuildSqlSystemPromptOptions>,
+): string {
+  const {
+    prompt,
+    datasets,
+    columns,
+    includeSpatialDocumentation = true,
+  } = options;
+  const spatialDocs =
+    includeSpatialDocumentation ?
+      makeSpatialSqlDocumentationFromPrompt(prompt)
+    : "";
 
   return `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.
 
@@ -64,11 +90,5 @@ Notes:
 Output:
 Generate only the SQL query, no explanations.
 
-${
-  isSpatialPrompt(prompt) ?
-    `Reference documentation:
-If the query requires any geospatial operations, refer to the following document:
-${DuckDbSpatialExtensionDocumentation}`
-  : ""
-}`;
+${spatialDocs}`;
 }
