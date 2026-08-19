@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/requiresOriginalFileRetention.ts";
+import { describe, expect, it } from "vitest";
 
 describe("requiresOriginalFileRetention", () => {
   it("returns false for source types reconstructable from the parquet blob", () => {

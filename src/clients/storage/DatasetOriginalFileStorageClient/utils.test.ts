@@ -38,22 +38,22 @@ describe("getDatasetOriginalFileStoragePath", () => {
   });
 
   it("throws a clear error mentioning the extension when it is too long for the SQL regex", () => {
-    expect(() =>
-      {return getDatasetOriginalFileStoragePath({
+    expect(() => {
+      return getDatasetOriginalFileStoragePath({
         workspaceId: WORKSPACE_ID,
         datasetId: DATASET_ID,
         fileExtension: "abcdefghijk",
-      })},
-    ).toThrow(/abcdefghijk/);
+      });
+    }).toThrow(/abcdefghijk/);
   });
 
   it("throws a clear error for an empty extension", () => {
-    expect(() =>
-      {return getDatasetOriginalFileStoragePath({
+    expect(() => {
+      return getDatasetOriginalFileStoragePath({
         workspaceId: WORKSPACE_ID,
         datasetId: DATASET_ID,
         fileExtension: "",
-      })},
-    ).toThrow(/extension/i);
+      });
+    }).toThrow(/extension/i);
   });
 });

@@ -33,9 +33,7 @@ export function getDatasetOriginalFileStoragePath(options: {
 }): string {
   const { workspaceId, datasetId, fileExtension } = options;
 
-  const normalizedExtension = fileExtension
-    .replace(/^\./, "")
-    .toLowerCase();
+  const normalizedExtension = fileExtension.replace(/^\./, "").toLowerCase();
 
   if (!VALID_EXTENSION_PATTERN.test(normalizedExtension)) {
     throw new Error(
