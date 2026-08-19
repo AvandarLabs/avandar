@@ -26,9 +26,6 @@ const PSQL_OUTPUT_ARGS = [
   "--set=ON_ERROR_STOP=on",
 ] as const;
 
-/** For a connection string, which already carries user and database. */
-const PSQL_COMMON_ARGS_WITHOUT_DATABASE = PSQL_OUTPUT_ARGS;
-
 const PSQL_COMMON_ARGS = [
   "--username",
   "postgres",
@@ -37,15 +34,6 @@ const PSQL_COMMON_ARGS = [
   ...PSQL_OUTPUT_ARGS,
 ] as const;
 
-// On the host, Postgres is published on 54322. Inside the container it listens
-// on its own 5432, so the host port would refuse the connection.
-const PSQL_HOST_ARGS = [
-  "--host",
-  "127.0.0.1",
-  "--port",
-  "54322",
-  ...PSQL_COMMON_ARGS,
-];
 const PSQL_CONTAINER_ARGS = [
   "--host",
   "127.0.0.1",
@@ -68,13 +56,44 @@ function _run(
   });
 }
 
-/** The Supabase project id from `supabase/config.toml`. */
-export function getProjectIdFromConfig(repoRoot: string): string {
-  return (
-    /^project_id\s*=\s*"([^"]+)"/m.exec(
-      readFileSync(path.join(repoRoot, "supabase", "config.toml"), "utf8"),
-    )?.[1] ?? "avandar"
+/** Returns the local project id and host database port from Supabase config. */
+export function getLocalDatabaseConfigFromRepoRoot(
+  repoRoot: string,
+): { projectId: string; hostPort: string } {
+  const configContents = readFileSync(
+    path.join(repoRoot, "supabase", "config.toml"),
+    "utf8",
   );
+  const projectId = /^project_id\s*=\s*"([^"]+)"/mu.exec(configContents)?.[1];
+  if (projectId === undefined) {
+    throw new Error("Cannot read local Supabase project id from config.toml.");
+  }
+  const databaseSection = configContents.split(/\n(?=\s*\[)/u).find((section) => {
+    return /^\s*\[db\]\s*(?:#.*)?$/mu.test(section);
+  });
+  const hostPort = /^\s*port\s*=\s*(\d+)/mu.exec(databaseSection ?? "")?.[1];
+  if (hostPort === undefined) {
+    throw new Error("Cannot read local Supabase database port from config.toml.");
+  }
+  return { projectId, hostPort };
+}
+
+function _runInProjectContainer(
+  options: Readonly<{ projectId: string; sql: string }>,
+): string {
+  return _run({
+    file: "docker",
+    args: [
+      "exec",
+      "-i",
+      "-e",
+      "PGPASSWORD=postgres",
+      `supabase_db_${options.projectId}`,
+      "psql",
+      ...PSQL_CONTAINER_ARGS,
+    ],
+    sql: options.sql,
+  });
 }
 
 /**
@@ -84,22 +103,32 @@ export function getProjectIdFromConfig(repoRoot: string): string {
  *
  * With no `databaseUrl` it targets the local stack, preferring host `psql` and
  * falling back to the one inside the Supabase container. With a `databaseUrl`
- * it
- * targets that database instead, which is how a drift check runs against
+ * it targets that database instead, which is how a drift check runs against
  * staging or production. A URL requires host `psql`: the container's client
  * cannot be trusted to reach an external host.
  */
 export function makeSqlRunner(
-  projectId: string,
-  databaseUrl?: string,
+  options: Readonly<{
+    projectId: string;
+    hostPort: string;
+    databaseUrl?: string;
+  }>,
 ): (sql: string) => string {
+  const { projectId, hostPort, databaseUrl } = options;
+  const hostArgs = [
+    "--host",
+    "127.0.0.1",
+    "--port",
+    hostPort,
+    ...PSQL_COMMON_ARGS,
+  ];
   let useDocker: boolean | undefined = undefined;
 
   return (sql: string): string => {
     if (databaseUrl !== undefined) {
       return _run({
         file: "psql",
-        args: [databaseUrl, ...PSQL_COMMON_ARGS_WITHOUT_DATABASE],
+        args: [databaseUrl, ...PSQL_OUTPUT_ARGS],
         sql,
       });
     }
@@ -108,7 +137,7 @@ export function makeSqlRunner(
       // because not every machine that runs this repo has a local client.
       useDocker = (() => {
         try {
-          _run({ file: "psql", args: PSQL_HOST_ARGS, sql: "select 1;" });
+          _run({ file: "psql", args: hostArgs, sql: "select 1;" });
           return false;
         } catch {
           return true;
@@ -116,20 +145,8 @@ export function makeSqlRunner(
       })();
     }
     if (!useDocker) {
-      return _run({ file: "psql", args: PSQL_HOST_ARGS, sql });
+      return _run({ file: "psql", args: hostArgs, sql });
     }
-    return _run({
-      file: "docker",
-      args: [
-        "exec",
-        "-i",
-        "-e",
-        "PGPASSWORD=postgres",
-        `supabase_db_${projectId}`,
-        "psql",
-        ...PSQL_CONTAINER_ARGS,
-      ],
-      sql,
-    });
+    return _runInProjectContainer({ projectId, sql });
   };
 }

@@ -150,7 +150,7 @@ async function _activateSwitch(
     }),
   });
   _requireCommandSuccess({
-    result: await io.runSupabase(["start"]),
+    result: await io.runSupabase(["start"], { outputMode: "stream" }),
     stage: "Supabase start",
   });
   const statusResult = await io.runSupabase(["status", "-o", "json"]);

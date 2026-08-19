@@ -127,7 +127,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     });
   });
 
-  it("runs Supabase with exactly the supplied arguments in the project root", async () => {
+  it("runs the repository Supabase CLI in the project root", async () => {
     _setCommandSuccess([{ stderr: "", stdout: "status output" }]);
     const projectRoot = path.resolve(process.cwd());
     const suppliedArgs = ["status", "--output", "json"];
@@ -140,8 +140,8 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     });
     expect(commandMocks.execFile).toHaveBeenCalledTimes(1);
     expect(commandMocks.execFile).toHaveBeenCalledWith(
-      "supabase",
-      suppliedArgs,
+      "pnpm",
+      ["exec", "supabase", ...suppliedArgs],
       {
         cwd: projectRoot,
         encoding: "utf8",

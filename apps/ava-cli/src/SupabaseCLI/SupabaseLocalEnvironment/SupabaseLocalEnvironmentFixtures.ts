@@ -8,9 +8,9 @@ import {
   ORIGINAL_EDGE_ENV,
   ORIGINAL_ENV,
   PROJECT_ROOT,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-import type { FakeHarness } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+import type { FakeHarness } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 
 function _makeBackupDirectory(
   options: Readonly<{ branch?: string; worktreePath?: string }> = {},

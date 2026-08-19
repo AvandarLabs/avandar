@@ -1,5 +1,7 @@
 import path from "node:path";
+import { createSupabaseLocalEnvironmentFakeReadIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/createSupabaseLocalEnvironmentFakeReadIO";
 import type {
+  CommandOutputMode,
   CommandResult,
   SupabaseDockerResource,
   SupabaseDockerResourceInspection,
@@ -79,6 +81,7 @@ export type FakeHarness = {
   files: Map<string, string>;
   directories: Set<string>;
   commands: string[][];
+  commandOutputModes: Array<CommandOutputMode | undefined>;
   copyOperations: Array<[string, string]>;
   operations: string[];
   removedResources: SupabaseDockerResource[];
@@ -90,7 +93,8 @@ export type FakeState = Omit<FakeHarness, "io"> & {
   commandResults: Readonly<Record<string, CommandResult>>;
 };
 
-type FakeFactoryOptions = {
+/** Configuration shared by the fake's focused I/O adapters. */
+export type FakeFactoryOptions = {
   options: Readonly<FakeOptions>;
   state: FakeState;
 };
@@ -110,55 +114,12 @@ function _createFakeState(options: Readonly<FakeOptions>): FakeState {
     ]),
     directories: new Set<string>(),
     commands: [],
+    commandOutputModes: [],
     copyOperations: [],
     operations: [],
     removedResources: [],
     seedTargets: [],
     commandResults: options.commandResults ?? {},
-  };
-}
-
-function _createFakeReadIO(
-  factoryOptions: Readonly<FakeFactoryOptions>,
-): Pick<
-  SupabaseLocalEnvironmentIO,
-  "readTextFile" | "readDirectory" | "isDirectory" | "isFile"
-> {
-  const { state } = factoryOptions;
-  return {
-    readTextFile: async (filePath) => {
-      const contents = state.files.get(filePath);
-      if (contents === undefined) {
-        throw new Error(`Missing fake file ${filePath}`);
-      }
-      return contents;
-    },
-    readDirectory: async (directoryPath) => {
-      return [
-        ...new Set([
-          ...[...state.files.keys()]
-            .filter((filePath) => {
-              return path.dirname(filePath) === directoryPath;
-            })
-            .map((filePath) => {
-              return path.basename(filePath);
-            }),
-          ...[...state.directories]
-            .filter((nestedDirectoryPath) => {
-              return path.dirname(nestedDirectoryPath) === directoryPath;
-            })
-            .map((nestedDirectoryPath) => {
-              return path.basename(nestedDirectoryPath);
-            }),
-        ]),
-      ].sort();
-    },
-    isDirectory: async (targetPath) => {
-      return state.directories.has(targetPath);
-    },
-    isFile: async (targetPath) => {
-      return state.files.has(targetPath);
-    },
   };
 }
 
@@ -338,9 +299,10 @@ function _createFakeCommandIO(
     isPortAvailable: async () => {
       return true;
     },
-    runSupabase: async (commandArguments) => {
+    runSupabase: async (commandArguments, commandOptions) => {
       const command = [...commandArguments];
       state.commands.push(command);
+      state.commandOutputModes.push(commandOptions?.outputMode);
       state.operations.push(`command:${command.join(" ")}`);
       return (
         state.commandResults[command.join(" ")] ?? {
@@ -372,7 +334,7 @@ function _createFakeIO(options: Readonly<FakeOptions> = {}): FakeHarness {
   const factoryOptions = { options, state };
   const io: SupabaseLocalEnvironmentIO = {
     projectRoot: PROJECT_ROOT,
-    ..._createFakeReadIO(factoryOptions),
+    ...createSupabaseLocalEnvironmentFakeReadIO(factoryOptions),
     ..._createFakeDevelopmentEnvIO(factoryOptions),
     ..._createFakeWriteIO(factoryOptions),
     ..._createFakePathIO(factoryOptions),
@@ -384,6 +346,7 @@ function _createFakeIO(options: Readonly<FakeOptions> = {}): FakeHarness {
     files: state.files,
     directories: state.directories,
     commands: state.commands,
+    commandOutputModes: state.commandOutputModes,
     copyOperations: state.copyOperations,
     operations: state.operations,
     removedResources: state.removedResources,
