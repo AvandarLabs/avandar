@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { match } from "ts-pattern";
 import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
+import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { ExportPageGeometry } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
@@ -81,7 +82,11 @@ function _drawHeader(
   document.setTextColor(INK_COLOR);
   document.setFontSize(TITLE_FONT_SIZE_PT);
   if (input.text.title !== undefined) {
-    document.text(input.text.title, block.x, block.y + LINE_GAP_MM);
+    document.text(
+      toPdfSafeText(input.text.title),
+      block.x,
+      block.y + LINE_GAP_MM,
+    );
   }
   document.setFontSize(BODY_FONT_SIZE_PT);
   const lines = [
@@ -92,7 +97,11 @@ function _drawHeader(
     return line !== undefined;
   });
   lines.forEach((line, index) => {
-    document.text(line, block.x, block.y + LINE_GAP_MM * (2 + index));
+    document.text(
+      toPdfSafeText(line),
+      block.x,
+      block.y + LINE_GAP_MM * (2 + index),
+    );
   });
 }
 
@@ -110,7 +119,11 @@ function _drawFooter(
   document.setTextColor(INK_COLOR);
   document.setFontSize(BODY_FONT_SIZE_PT);
   lines.forEach((line, index) => {
-    document.text(line, block.x, block.y + LINE_GAP_MM * (1 + index));
+    document.text(
+      toPdfSafeText(line),
+      block.x,
+      block.y + LINE_GAP_MM * (1 + index),
+    );
   });
 }
 
@@ -131,7 +144,7 @@ function _drawPageNumber(
   document.setTextColor(INK_COLOR);
   document.setFontSize(BODY_FONT_SIZE_PT);
   document.text(
-    input.pageNumberLabel({ page, total }),
+    toPdfSafeText(input.pageNumberLabel({ page, total })),
     block.x,
     block.y + block.height,
   );
@@ -185,7 +198,7 @@ function _drawLegendRows(
       yMm: row.yMm,
     });
     document.setTextColor(INK_COLOR);
-    document.text(row.entry.label, row.xMm + 6, row.yMm + 3.5);
+    document.text(toPdfSafeText(row.entry.label), row.xMm + 6, row.yMm + 3.5);
   });
 }
 
@@ -222,7 +235,7 @@ function _drawScaleBar(
   }
   document.setTextColor(INK_COLOR);
   document.setFontSize(BODY_FONT_SIZE_PT);
-  document.text(scaleLabel, block.x, block.y + block.height - 1);
+  document.text(toPdfSafeText(scaleLabel), block.x, block.y + block.height - 1);
 }
 
 /** The header-to-footer rectangle used for the legend's full-page redraw. */

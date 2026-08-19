@@ -1,9 +1,9 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-import { useSyncExternalStore } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { useDetectedSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { I18n } from "@lingui/core";
@@ -18,9 +18,6 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
-type SpatialAvailability = ReturnType<
-  typeof DuckDbClient.getSpatialAvailability
->;
 type BindingTypeValue =
   | "latLngColumns"
   | "geometryColumn"
@@ -49,7 +46,7 @@ function _hasUsableBoundary(options: readonly BoundarySourceOption[]): boolean {
 
 function _getSpatialDescription(
   i18n: I18n,
-  availability: SpatialAvailability,
+  availability: DuckDbSpatialAvailability,
 ): string | undefined {
   if (availability === "loading") {
     return i18n._(
@@ -67,7 +64,7 @@ function _getSpatialDescription(
 function _getBindingTypeData(options: {
   i18n: I18n;
   isAggregateOnly: boolean;
-  availability: SpatialAvailability;
+  availability: DuckDbSpatialAvailability;
   hasBoundary: boolean;
 }): Array<{ value: string; label: string; disabled?: boolean }> {
   const { i18n, isAggregateOnly, availability, hasBoundary } = options;
@@ -178,14 +175,6 @@ function _applyBindingTypeChange(options: {
   });
 }
 
-function _subscribeSpatialAvailability(listener: () => void): () => void {
-  return DuckDbClient.subscribeSpatialAvailability(listener);
-}
-
-function _getSpatialAvailability(): SpatialAvailability {
-  return DuckDbClient.getSpatialAvailability();
-}
-
 /** Selects the geometry source while reflecting Spatial capability state. */
 export function GeometryBindingTypeSelect({
   layer,
@@ -194,11 +183,10 @@ export function GeometryBindingTypeSelect({
   onLayerChange,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
-  const availability = useSyncExternalStore(
-    _subscribeSpatialAvailability,
-    _getSpatialAvailability,
-    _getSpatialAvailability,
-  );
+  // Reading the capability here also starts detection: the spatial options
+  // below stay disabled until it resolves, and on a map with no spatial layer
+  // nothing else would ever ask.
+  const availability = useDetectedSpatialAvailability();
   return (
     <Select
       label={t`Geometry`}

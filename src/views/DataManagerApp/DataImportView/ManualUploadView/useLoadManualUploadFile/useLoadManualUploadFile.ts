@@ -304,13 +304,18 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           return loadResult;
         })
         .with({ type: "xlsx_file" }, async (xlsxParseOptions) => {
-          const { datasetId, sheetName, hasHeader } = xlsxParseOptions;
+          const { datasetId, sheetName, hasHeader, numRowsToSkip } =
+            xlsxParseOptions;
           const sniff = await LocalDatasetClient.startXlsxImport({
             datasetId,
             workspaceId: workspace.id,
             userId: user!.id as UserId,
             file,
-            parseOptions: { sheet: sheetName, hasHeader },
+            parseOptions: {
+              sheet: sheetName,
+              hasHeader,
+              rowsToSkip: numRowsToSkip,
+            },
           });
           const loadResult: XlsxFileLoadResult = {
             datasetId,

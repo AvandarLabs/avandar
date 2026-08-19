@@ -19,6 +19,7 @@ const XlsxParseOptionsSchema = z.object({
   type: z.literal("xlsx"),
   sheet: z.string().optional(),
   hasHeader: z.boolean().optional(),
+  rowsToSkip: z.number().optional(),
 });
 
 const PdfParseOptionsSchema = z.object({

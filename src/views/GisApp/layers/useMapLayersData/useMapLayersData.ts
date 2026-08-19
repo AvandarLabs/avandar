@@ -2,7 +2,7 @@ import { makeIdLookupMap, propEq } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { compileLatLngOverlaySql } from "@/clients/maps/MapLayerSpatialQuery/compileLatLngOverlaySql/compileLatLngOverlaySql";
 import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
@@ -13,6 +13,7 @@ import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/Work
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
+import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
@@ -267,20 +268,6 @@ async function _runLatLngLayer(options: {
     rawSql: _getLatLngOverlayRawSql(options),
   });
   return { type: "rows", queryResult: result, didAutoLimit };
-}
-
-function useDuckDbSpatialAvailability(): string {
-  return useSyncExternalStore(
-    (listener) => {
-      return DuckDbClient.subscribeSpatialAvailability(listener);
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
-    () => {
-      return DuckDbClient.getSpatialAvailability();
-    },
-  );
 }
 
 function useInitializeDuckDbForSpatialLayers(
