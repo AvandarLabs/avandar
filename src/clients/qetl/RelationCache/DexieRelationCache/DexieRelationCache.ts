@@ -79,34 +79,47 @@ async function _probe(
       }),
     ),
   ];
-  const candidates = await AvaDexie.DB.RelationCacheEntry.where("tableName")
-    .anyOf(tableNames)
-    .toArray();
 
   const result: RelationCacheProbeResult = { hits: [], misses: [] };
   const now = Date.now();
-  const hitIdentityKeys: string[] = [];
 
-  preparedKeys.forEach(({ key, prepared }) => {
-    const hit = candidates.find((entry) => {
-      return serves(entry, prepared);
-    });
-    if (hit) {
-      hitIdentityKeys.push(hit.identityKey);
-      result.hits.push({ key, entry: { ...hit, lastQueriedAt: now } });
-      return;
-    }
-    result.misses.push({
-      key,
-      growFrom: _getGrowFromCandidate(candidates, prepared),
-    });
-  });
+  // The candidate read and the hit stamp run in one `rw` transaction, same
+  // atomicity rationale as `_evict` and `_evictToBudget`: without it, a
+  // concurrent `write` or `evict` could delete a row between the read and
+  // the `.modify()`, and the stamp would silently target a gone row. Scoped
+  // to `RelationCacheEntry` alone (never `RelationCachePayload`), which is
+  // what keeps `probe` from touching a payload row.
+  await AvaDexie.DB.transaction(
+    "rw",
+    AvaDexie.DB.RelationCacheEntry,
+    async () => {
+      const candidates = await AvaDexie.DB.RelationCacheEntry.where("tableName")
+        .anyOf(tableNames)
+        .toArray();
+      const hitIdentityKeys: string[] = [];
 
-  if (hitIdentityKeys.length > 0) {
-    await AvaDexie.DB.RelationCacheEntry.where("identityKey")
-      .anyOf(hitIdentityKeys)
-      .modify({ lastQueriedAt: now });
-  }
+      preparedKeys.forEach(({ key, prepared }) => {
+        const hit = candidates.find((entry) => {
+          return serves(entry, prepared);
+        });
+        if (hit) {
+          hitIdentityKeys.push(hit.identityKey);
+          result.hits.push({ key, entry: { ...hit, lastQueriedAt: now } });
+          return;
+        }
+        result.misses.push({
+          key,
+          growFrom: _getGrowFromCandidate(candidates, prepared),
+        });
+      });
+
+      if (hitIdentityKeys.length > 0) {
+        await AvaDexie.DB.RelationCacheEntry.where("identityKey")
+          .anyOf(hitIdentityKeys)
+          .modify({ lastQueriedAt: now });
+      }
+    },
+  );
 
   return result;
 }
@@ -177,6 +190,11 @@ function _isQuotaExceededError(error: unknown): boolean {
   if (error instanceof Error && error.name === "QuotaExceededError") {
     return true;
   }
+  // `DOMException.code` is deprecated in favor of `.name`, but this is the
+  // deliberate legacy fallback for engines that predate the standardized
+  // `"QuotaExceededError"` name and only ever set the numeric code: `22` is
+  // the legacy `DOMException.QUOTA_EXCEEDED_ERR` constant. Read
+  // intentionally, not accidentally, so keep it rather than remove it.
   return error instanceof DOMException && error.code === 22;
 }
 
@@ -347,9 +365,8 @@ async function _evictToBudget(
     AvaDexie.DB.RelationCacheEntry,
     AvaDexie.DB.RelationCachePayload,
     async () => {
-      const entries = await AvaDexie.DB.RelationCacheEntry.orderBy(
-        "lastQueriedAt",
-      ).toArray();
+      const entries =
+        await AvaDexie.DB.RelationCacheEntry.orderBy("lastQueriedAt").toArray();
       const victimKeys = _selectEvictionVictims(
         entries,
         budgetBytes,

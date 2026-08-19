@@ -3,18 +3,18 @@ import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import Dexie from "dexie";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions/dexieVersions";
-import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
-import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
-import type { RelationCacheWrite } from "$/models/relations/RelationCachePort/RelationCachePort.types";
-import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { RelationCacheWrite } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
 
@@ -60,9 +60,7 @@ function _makeWrite(
   };
 }
 
-function _makeKey(
-  overrides: Partial<RelationCacheKey> = {},
-): RelationCacheKey {
+function _makeKey(overrides: Partial<RelationCacheKey> = {}): RelationCacheKey {
   return {
     principal: WORKSPACE_PRINCIPAL,
     relation: { kind: "dataset", id: DATASET_A },
@@ -195,7 +193,9 @@ describe("DexieRelationCache.probe", () => {
   it("misses once the definition changes, including a reformat that only changes whitespace, with no growFrom offered", async () => {
     await DexieRelationCache.write(
       _makeWrite({
-        identity: { definition: { kind: "virtual-sql", text: "select * from t" } },
+        identity: {
+          definition: { kind: "virtual-sql", text: "select * from t" },
+        },
       }),
     );
 
@@ -277,10 +277,16 @@ describe("DexieRelationCache.probe", () => {
       }),
     ]);
     expect(returnedKeys).toEqual(new Set(keys));
-    expect(hits.map((hit) => {return hit.key})).toEqual([hitKey]);
-    expect(misses.map((miss) => {return miss.key})).toEqual(
-      expect.arrayContaining([growableMissKey, plainMissKey]),
-    );
+    expect(
+      hits.map((hit) => {
+        return hit.key;
+      }),
+    ).toEqual([hitKey]);
+    expect(
+      misses.map((miss) => {
+        return miss.key;
+      }),
+    ).toEqual(expect.arrayContaining([growableMissKey, plainMissKey]));
     const growableMiss = misses.find((miss) => {
       return miss.key === growableMissKey;
     });
@@ -351,6 +357,37 @@ describe("DexieRelationCache.probe", () => {
 
     payloadGet.mockRestore();
     payloadToArray.mockRestore();
+  });
+
+  it("reads its candidates and stamps hits inside one transaction, so a write or evict can never land between them", async () => {
+    // Same atomicity concern, and same technique, as the `_evict` and
+    // `_evictToBudget` tests: reproducing the real race is not possible in
+    // this harness, so this asserts the structural property that closes the
+    // gap instead. `.where()` is called twice inside `probe` — once for the
+    // candidate read, once for the `.modify()` stamp — and both calls must
+    // see the very same live transaction.
+    await DexieRelationCache.write(_makeWrite({ columns: ["a", "b"] }));
+
+    const transactionsSeen: unknown[] = [];
+    const originalWhere = db.RelationCacheEntry.where.bind(
+      db.RelationCacheEntry,
+    );
+    const whereSpy = vi
+      .spyOn(db.RelationCacheEntry, "where")
+      .mockImplementation((index) => {
+        transactionsSeen.push(Dexie.currentTransaction);
+        return originalWhere(index);
+      });
+
+    await DexieRelationCache.probe([_makeKey({ columns: ["a"] })]);
+
+    whereSpy.mockRestore();
+
+    expect(transactionsSeen).toHaveLength(2);
+    transactionsSeen.forEach((transaction) => {
+      expect(transaction).toBeTruthy();
+    });
+    expect(new Set(transactionsSeen).size).toBe(1);
   });
 });
 
@@ -524,6 +561,42 @@ describe("DexieRelationCache.write quota handling", () => {
     expect(cause.inner).toBe(quotaError);
   });
 
+  it("propagates an eviction-infrastructure failure during the quota retry as-is, without wrapping it as RelationCacheWriteFailed", async () => {
+    // If evictToBudget itself throws while write() is trying to make room
+    // for a quota-exceeded retry, that is a genuine Dexie fault, not a
+    // cache-full condition. Wrapping it as RelationCacheWriteFailed would
+    // let a caller swallow real corruption alongside "could not store
+    // this," defeating the point of the typed error, so this pins that the
+    // eviction failure reaches the caller unwrapped rather than being
+    // "improved" into a wrapped one later.
+    const quotaError = new DOMException(
+      "The quota has been exceeded.",
+      "QuotaExceededError",
+    );
+    const putSpy = vi
+      .spyOn(db.RelationCacheEntry, "put")
+      .mockImplementation(() => {
+        throw quotaError;
+      });
+    const evictionFault = new Error("boom: eviction scan failed");
+    const orderBySpy = vi
+      .spyOn(db.RelationCacheEntry, "orderBy")
+      .mockImplementation(() => {
+        throw evictionFault;
+      });
+
+    const failure = await DexieRelationCache.write(_makeWrite()).catch(
+      (error: unknown) => {
+        return error;
+      },
+    );
+
+    putSpy.mockRestore();
+    orderBySpy.mockRestore();
+    expect(failure).toBe(evictionFault);
+    expect(failure).not.toBeInstanceOf(RelationCacheWriteFailed);
+  });
+
   it("propagates a non-quota failure as-is, without attempting eviction", async () => {
     const genuineFault = new Error("boom: corrupted index");
     const putSpy = vi
@@ -546,7 +619,9 @@ describe("DexieRelationCache.write quota handling", () => {
 describe("DexieRelationCache.evict", () => {
   it("forgets every entry for the given relations and principal, leaving other principals untouched", async () => {
     await DexieRelationCache.write(
-      _makeWrite({ identity: { relation: { kind: "dataset", id: DATASET_A } } }),
+      _makeWrite({
+        identity: { relation: { kind: "dataset", id: DATASET_A } },
+      }),
     );
     await DexieRelationCache.write(
       _makeWrite({
@@ -691,10 +766,14 @@ describe("DexieRelationCache.evictToBudget", () => {
 
   it("never reads a RelationCachePayload row while scanning the budget", async () => {
     await DexieRelationCache.write(
-      _makeWrite({ identity: { relation: { kind: "dataset", id: DATASET_A } } }),
+      _makeWrite({
+        identity: { relation: { kind: "dataset", id: DATASET_A } },
+      }),
     );
     await DexieRelationCache.write(
-      _makeWrite({ identity: { relation: { kind: "dataset", id: DATASET_B } } }),
+      _makeWrite({
+        identity: { relation: { kind: "dataset", id: DATASET_B } },
+      }),
     );
 
     const payloadGet = vi.spyOn(db.RelationCachePayload, "get");
@@ -748,10 +827,7 @@ describe("DexieRelationCache.evictToBudget", () => {
       lastQueriedAt: 2_000,
     });
 
-    await DexieRelationCache.evictToBudget(
-      0,
-      new Set([oldest.identityKey]),
-    );
+    await DexieRelationCache.evictToBudget(0, new Set([oldest.identityKey]));
 
     const survivors = await db.RelationCacheEntry.toArray();
     expect(
