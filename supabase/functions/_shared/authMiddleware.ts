@@ -1,5 +1,6 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST, UNAUTHORIZED } from "@sbfn/_shared/httpCodes.ts";
+import { isRedirect } from "@sbfn/_shared/MiniServer/redirect.ts";
 import { responseError } from "@sbfn/_shared/MiniServer/responseError.ts";
 import {
   AvaSupabaseClient,
@@ -114,6 +115,16 @@ export async function authMiddleware(options: {
     }
     return responseError("Invalid JWT", UNAUTHORIZED);
   } catch (e) {
-    return responseError(e?.toString(), UNAUTHORIZED);
+    // This will get caught by any `throw redirect(url)` calls where we are
+    // intentionally trying to do a redirect
+    if (isRedirect(e)) {
+      return e.response;
+    }
+
+    // Passed through as the error itself rather than `e?.toString()` so
+    // `responseError` can read an `AvaHTTPError`'s own status code and
+    // pretty-print a `ZodError`. Stringifying first collapsed every handler
+    // error to an opaque 401 (issue #267).
+    return responseError(e, UNAUTHORIZED);
   }
 }
