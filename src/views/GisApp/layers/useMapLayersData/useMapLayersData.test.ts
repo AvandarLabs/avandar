@@ -106,11 +106,11 @@ describe("useMapLayersData", () => {
     });
 
     expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
-    expect(
-      runStructuredQueryWithMetadataMock.mock.calls[0]?.[0],
-    ).toMatchObject({
-      query: layer.source,
-    });
+    expect(runStructuredQueryWithMetadataMock.mock.calls[0]?.[0]).toMatchObject(
+      {
+        query: layer.source,
+      },
+    );
   });
 
   it("runs lat/lng time filters as raw sql without waiting for spatial", async () => {
@@ -433,23 +433,24 @@ describe("useMapLayersData", () => {
     ).toContain("ST_Intersects");
   });
 
-  it("reports didAutoLimit when a plain lat/lng layer's overlay SQL cannot be built and the query was auto-limited", async () => {
-    // With no time range and no AOI, `compileLatLngOverlaySql` has nothing to
-    // add to the source SQL and returns undefined, so this layer runs as a
-    // structured query rather than caller-supplied raw SQL. That is the path
-    // through which `resolveManualQueryForExecution` can silently auto-limit
-    // a large dataset; this test asserts the flag survives to the result
-    // instead of being dropped.
+  it("passes real raw SQL for a plain lat/lng layer with no AOI or time range, never falling back to the workspace auto-limit gate", async () => {
+    // `runStructuredQueryWithMetadata` only lets
+    // `resolveManualQueryForExecution` auto-limit a large dataset when it
+    // receives `rawSql: undefined` for a workspace caller.
+    // `compileLatLngOverlaySql` always returns the source SQL now, even with
+    // no AOI and no time range, so a plain lat/lng layer can no longer be
+    // silently capped at 100 rows: this asserts the map path always supplies
+    // real SQL instead of `undefined`.
     const layer = createQueryableLayer();
     const queryResult: QueryResult.T<UnknownRow> = {
       id: uuid<QueryResult.Id>(),
       data: [{ cases: 1 }],
       columns: [{ name: "cases", dataType: "double" }],
-      numRows: 100,
+      numRows: 100_000,
     };
     runStructuredQueryWithMetadataMock.mockResolvedValue({
       result: queryResult,
-      didAutoLimit: true,
+      didAutoLimit: false,
     });
 
     const { result } = renderHook(
@@ -467,12 +468,12 @@ describe("useMapLayersData", () => {
       expect(result.current.get(layer.id)?.data).toEqual({
         type: "rows",
         queryResult,
-        didAutoLimit: true,
+        didAutoLimit: false,
       });
     });
 
     expect(
       runStructuredQueryWithMetadataMock.mock.calls[0]?.[0].rawSql,
-    ).toBeUndefined();
+    ).toEqual(expect.any(String));
   });
 });

@@ -16,11 +16,14 @@ type CompileLatLngOverlayOptions = {
 /**
  * Returns lat/lng source SQL with the map clock and AOI applied.
  *
- * @returns Undefined when the overlay does not change the source SQL.
+ * Always returns real SQL, even when neither filter changes the source: a
+ * lat/lng map layer must never pass `undefined` raw SQL downstream, since
+ * that falls back to structured-query execution, where a large dataset with
+ * no filter is silently capped at 100 rows.
  */
 export function compileLatLngOverlaySql(
   options: Readonly<CompileLatLngOverlayOptions>,
-): string | undefined {
+): string {
   const wrappedSql = applyTimePredicateToSourceSql({
     sourceSql: options.sourceSql,
     timeColumnName: options.timeColumnName,
@@ -28,7 +31,7 @@ export function compileLatLngOverlaySql(
   });
   const aoi = options.layer.applyAoiFilter ? options.overlay.aoi : undefined;
   if (!aoi) {
-    return wrappedSql === options.sourceSql ? undefined : wrappedSql;
+    return wrappedSql;
   }
   const pointSql = `ST_Point(${quoteSqlIdentifier(options.longitudeColumnName)}, ${quoteSqlIdentifier(options.latitudeColumnName)})`;
   return `SELECT * FROM (${wrappedSql}) AS overlay_source WHERE ${makeSourceAoiPredicateSql(pointSql, aoi)}`;

@@ -1,9 +1,13 @@
 import { matchLiteral } from "@avandar/utils";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
 import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
 import { makeFillLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeFillLayerSpecsFromMapLayer";
 import { makeHeatmapLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeHeatmapLayerSpecFromMapLayer";
-import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
+import {
+  CLUSTER_AUTO_THRESHOLD,
+  SELECTED_STROKE_COLOR,
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
@@ -13,7 +17,6 @@ import type {
   MapLayerSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
 
 type ProportionalSymbol = Extract<
@@ -190,9 +193,14 @@ function _makeMapLayerSpecs(
       ];
     },
     cluster: () => {
+      const { symbology } = options.layer;
+      if (symbology.type !== "cluster") {
+        throw new Error("Cluster symbology is required");
+      }
       return makeClusterLayerSpecsFromMapLayer({
         layer: options.layer,
         sourceId: options.sourceId,
+        paint: { color: symbology.color.color, stroke: symbology.stroke },
       });
     },
     heatmap: () => {
@@ -207,11 +215,43 @@ function _makeMapLayerSpecs(
   });
 }
 
+/** True for the two point symbologies eligible to auto-cluster. */
+function _isAutoClusterableSymbology(
+  symbology: MapLayer.Symbology,
+): symbology is Extract<
+  MapLayer.Symbology,
+  { type: "circle" | "proportionalSymbol" }
+> {
+  return symbology.type === "circle" || symbology.type === "proportionalSymbol";
+}
+
+/**
+ * Builds cluster paint from a point layer's own color and stroke, since an
+ * auto-clustered layer has no `cluster` symbology to read paint from. This
+ * only reads the layer's symbology; it never writes back to it, so the
+ * user's chosen circle or proportional-symbol styling survives switching
+ * zoom levels or feature counts.
+ */
+function _getAutoClusterPaint(
+  symbology: Extract<
+    MapLayer.Symbology,
+    { type: "circle" | "proportionalSymbol" }
+  >,
+) {
+  return {
+    color: makeColorExpressionFromColor(symbology.color),
+    stroke: symbology.stroke,
+  };
+}
+
 /**
  * Turns one layer plus its data into MapLibre sources and layers.
  *
  * Pure: the same inputs always produce the same JSON, which is what makes
- * paint decisions unit-testable.
+ * paint decisions unit-testable. A `circle` or `proportionalSymbol` layer
+ * renders clustered once its feature count passes
+ * {@link CLUSTER_AUTO_THRESHOLD}, without changing the persisted symbology:
+ * clustering here is a rendering decision, made fresh on every call.
  *
  * @param params The layer to render and the data and statistics behind it.
  * @param params.layer The persisted layer, carrying symbology and sensitivity.
@@ -237,23 +277,37 @@ export function makeLayerSpecFromMapLayer({
     throw new SensitivityViolationError("aggregateOnlyLayerSpec", layer.name);
   }
 
+  const { symbology } = layer;
+  const autoClusterPaint =
+    (
+      _isAutoClusterableSymbology(symbology) &&
+      featureCollection.features.length > CLUSTER_AUTO_THRESHOLD
+    ) ?
+      _getAutoClusterPaint(symbology)
+    : undefined;
+
   const sourceId = MapLayerIds.toSourceId(layer.id);
-  const layerSpecs = _makeMapLayerSpecs({
-    layer,
-    stats,
-    valueColumnName,
-    sourceId,
-  });
+  const layerSpecs =
+    autoClusterPaint !== undefined ?
+      makeClusterLayerSpecsFromMapLayer({
+        layer,
+        sourceId,
+        paint: autoClusterPaint,
+      })
+    : _makeMapLayerSpecs({ layer, stats, valueColumnName, sourceId });
 
   return {
     sources: {
       [sourceId]:
-        layer.symbology.type === "cluster" ?
+        symbology.type === "cluster" || autoClusterPaint !== undefined ?
           {
             type: "geojson",
             data: featureCollection,
             cluster: true,
-            clusterRadius: layer.symbology.radiusPx,
+            clusterRadius:
+              symbology.type === "cluster" ?
+                symbology.radiusPx
+              : MapLayer.defaultClusterRadiusPx,
             clusterMaxZoom: 14,
           }
         : { type: "geojson", data: featureCollection },
