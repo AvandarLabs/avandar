@@ -137,6 +137,25 @@ export type PdfCellFlag = {
 };
 
 /**
+ * A document's identity, read once during the sniff.
+ *
+ * In observations mode these values are stamped onto every row, where they are
+ * the join key that lets SitRep #1 and #2 stack into one series. Every field
+ * is nullable on purpose: a guessed title silently merges two different
+ * documents, which is worse than admitting we do not know.
+ *
+ * This lives here rather than in `shared/` because it is not persisted as its
+ * own column; it is worker-runtime data that ends up inside extracted rows.
+ */
+export type DocumentMetadata = {
+  title: string | null;
+  organisation: string | null;
+  reportNumber: string | null;
+  /** ISO date, or null when none could be read. */
+  publishedAt: string | null;
+};
+
+/**
  * What every extractor returns, whatever shape it read and whether rules or a
  * model produced it. Keeping this one type is what lets the review grid, type
  * inference and import stay ignorant of which extractor ran.
