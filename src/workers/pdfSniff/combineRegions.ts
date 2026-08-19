@@ -1,3 +1,5 @@
+import { extractMeasurements } from "./extractMeasurements";
+import { normalizeCellValue } from "./normalizeCellValue";
 import type { DocumentMetadata, ExtractedTable, PdfCellFlag } from "./types";
 
 export type CombinedTable = {
@@ -38,6 +40,58 @@ function _headerKey(table: ExtractedTable): string {
   // Joined on NUL rather than a space, so that ["a b", "c"] and ["a", "b c"]
   // stay two different schemas.
   return names.join("\u0000");
+}
+
+/** What `normalizeCellValue` leaves behind when a cell really is a number. */
+const NUMERIC = /^-?\d+(\.\d+)?$/u;
+
+/**
+ * Whether a cell can stand in the observations `value` column at all.
+ *
+ * The schema's `value` is numeric, with `unit` absorbing the `$`, `%` or `M`,
+ * so `normalizeCellValue` is the right judge: it is what decides the same
+ * question for the natural-mode dataset.
+ */
+function _isNumericValue(value: string): boolean {
+  return NUMERIC.test(normalizeCellValue(value));
+}
+
+/**
+ * Builds one observation row.
+ *
+ * Both paths below go through here so that the column order can only be
+ * written once. Two hand-maintained fourteen-element arrays would drift, and
+ * a silently transposed pair of columns is not a failure any test would
+ * obviously catch.
+ */
+function _observation(params: {
+  subject: string;
+  metric: string;
+  value: string;
+  unit: string;
+  page: string;
+  regionLabel: string;
+  confidence: "high" | "review";
+  extractedBy: ExtractedTable["extractedBy"];
+  sourceText: string;
+  doc: DocumentMetadata;
+}): string[] {
+  return [
+    params.subject,
+    params.metric,
+    params.value,
+    params.unit,
+    "",
+    params.page,
+    params.regionLabel,
+    params.confidence,
+    params.extractedBy,
+    params.sourceText,
+    params.doc.title ?? "",
+    params.doc.organisation ?? "",
+    params.doc.publishedAt ?? "",
+    params.doc.reportNumber ?? "",
+  ];
 }
 
 function _flaggedRows(flags: readonly PdfCellFlag[]): Set<number> {
@@ -132,24 +186,62 @@ export function combineRegions(params: {
 
     table.cells.slice(table.headerRows).forEach((row, rowIndex) => {
       const provenance = table.rowProvenance[rowIndex];
-      rows.push([
-        row[subjectIndex] ?? "",
-        metricIndex >= 0 ? (row[metricIndex] ?? "") : label,
+      const common = {
+        page: provenance ? String(provenance.page + 1) : "",
+        regionLabel: label,
+        confidence:
+          flagged.has(rowIndex) ? ("review" as const) : ("high" as const),
+        extractedBy: table.extractedBy,
+        doc,
+      };
+      const subject = row[subjectIndex] ?? "";
+      const candidateValue =
         valueIndex >= 0 ?
           (row[valueIndex] ?? "")
-        : (row[fallbackValueIndex] ?? ""),
-        unitIndex >= 0 ? (row[unitIndex] ?? "") : "n",
-        "",
-        provenance ? String(provenance.page + 1) : "",
-        label,
-        flagged.has(rowIndex) ? "review" : "high",
-        table.extractedBy,
-        sourceIndex >= 0 ? (row[sourceIndex] ?? "") : "",
-        doc.title ?? "",
-        doc.organisation ?? "",
-        doc.publishedAt ?? "",
-        doc.reportNumber ?? "",
-      ]);
+        : (row[fallbackValueIndex] ?? "");
+
+      if (_isNumericValue(candidateValue)) {
+        rows.push(
+          _observation({
+            ...common,
+            subject,
+            metric: metricIndex >= 0 ? (row[metricIndex] ?? "") : label,
+            value: candidateValue,
+            unit: unitIndex >= 0 ? (row[unitIndex] ?? "") : "n",
+            sourceText: sourceIndex >= 0 ? (row[sourceIndex] ?? "") : "",
+          }),
+        );
+        return;
+      }
+
+      // The row's "value" is prose, which the spec settles: non-numeric
+      // content has no place in this schema. Selecting the OCHA pillars in
+      // observations mode contributes their embedded figures and drops the
+      // prose, so the row's text is mined for measurements instead of being
+      // poured into a numeric column. Every other column is scanned, not just
+      // the candidate, because a block's figures are spread across its fields.
+      row.forEach((cell, columnIndex) => {
+        if (columnIndex === subjectIndex) {
+          return;
+        }
+        for (const measurement of extractMeasurements(cell)) {
+          rows.push(
+            _observation({
+              ...common,
+              // A measurement that named its own subject ("...in Darfur")
+              // knows better than the row does.
+              subject: measurement.subject ?? subject,
+              metric: measurement.metric,
+              value: String(measurement.value),
+              unit: measurement.unit,
+              sourceText: measurement.sourceText,
+            }),
+          );
+        }
+      });
+
+      // A row that yielded nothing is dropped rather than emitted with an
+      // empty or textual value: an absent row is honest, a lying one is not.
     });
   }
 

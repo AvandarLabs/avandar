@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { combineRegions } from "./combineRegions";
+import type { CombinedTable } from "./combineRegions";
 import type { ExtractedTable } from "./types";
 
 function table(
@@ -190,6 +191,127 @@ describe("combineRegions", () => {
 
     const confidenceIndex = result.cells[0]!.indexOf("confidence");
     expect(result.cells[1]![confidenceIndex]).toBe("review");
+  });
+
+  /**
+   * The spec's rule for this shape: "Selecting the OCHA pillars in
+   * observations mode contributes their embedded figures (573, subject
+   * Surveillance, early detection and case management) and drops the prose."
+   *
+   * Mapping the first field's paragraph into `value` instead would put a
+   * sentence in a numeric column, which is a column that lies.
+   */
+  const PILLAR_HEADER = ["number", "heading", "Responses", "Challenges"];
+
+  /** Looks a column up by name, as the review grid would. */
+  function columnOf(result: CombinedTable, name: string): number {
+    const index = result.cells[0]!.indexOf(name);
+    expect(index).toBeGreaterThanOrEqual(0);
+    return index;
+  }
+
+  /** Combines a pillars row with an unrelated region, forcing observations. */
+  function pillarsWith(pillarRow: readonly string[]): CombinedTable {
+    const result = combineRegions({
+      tables: [
+        table("pillars", [PILLAR_HEADER, pillarRow]),
+        table("kpi", [
+          ["label", "value"],
+          ["Cases", "83000"],
+        ]),
+      ],
+      regionLabels: { pillars: "Response pillars", kpi: "Headline figures" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.outputMode).toBe("observations");
+    return result;
+  }
+
+  function rowsFromPillars(
+    result: CombinedTable,
+  ): ReadonlyArray<readonly string[]> {
+    const labelIndex = columnOf(result, "region_label");
+    return result.cells.slice(1).filter((row) => {
+      return row[labelIndex] === "Response pillars";
+    });
+  }
+
+  it("mines figures out of repeating-blocks prose rather than putting a paragraph in the value column", () => {
+    const sentence =
+      "To strengthen surveillance, WHO has expanded EWARS to 573 health " +
+      "facilities.";
+    const result = pillarsWith([
+      "1",
+      "Surveillance, early detection and case management",
+      sentence,
+      "Reporting delays continue to hinder timely confirmation of cases.",
+    ]);
+    const pillarRows = rowsFromPillars(result);
+
+    expect(pillarRows).toHaveLength(1);
+    expect(pillarRows[0]![columnOf(result, "subject")]).toBe(
+      "Surveillance, early detection and case management",
+    );
+    expect(pillarRows[0]![columnOf(result, "metric")]).toBe(
+      "health facilities",
+    );
+    expect(pillarRows[0]![columnOf(result, "value")]).toBe("573");
+    expect(pillarRows[0]![columnOf(result, "unit")]).toBe("n");
+    expect(pillarRows[0]![columnOf(result, "source_text")]).toBe(sentence);
+  });
+
+  it("prefers a measurement's own subject to the row's heading", () => {
+    const result = pillarsWith([
+      "1",
+      "Surveillance, early detection and case management",
+      "To strengthen surveillance, WHO has expanded EWARS to 573 health " +
+        "facilities in Darfur.",
+      "No figures in this field.",
+    ]);
+    const pillarRows = rowsFromPillars(result);
+
+    expect(pillarRows).toHaveLength(1);
+    expect(pillarRows[0]![columnOf(result, "subject")]).toBe("Darfur");
+    expect(pillarRows[0]![columnOf(result, "value")]).toBe("573");
+  });
+
+  it("drops a repeating-blocks row whose prose carries no figures", () => {
+    const result = pillarsWith([
+      "2",
+      "Community engagement",
+      "Partners continued to hold listening sessions with affected residents.",
+      "Reporting delays continue to hinder timely confirmation.",
+    ]);
+
+    expect(rowsFromPillars(result)).toEqual([]);
+    // The other region still contributes, so this is one dropped row rather
+    // than a combine that gave up.
+    expect(result.cells).toHaveLength(2);
+  });
+
+  it("leaves a row whose value is already numeric on the direct path", () => {
+    const result = combineRegions({
+      tables: [
+        table("map", [
+          ["label", "value"],
+          ["Khartoum", "408"],
+        ]),
+        table("kpi", [
+          ["label", "value", "unit"],
+          ["Case fatality rate", "2.6", "percent"],
+        ]),
+      ],
+      regionLabels: { map: "Deaths by state", kpi: "Headline figures" },
+      documentMetadata: DOC,
+    });
+
+    expect(result.cells).toHaveLength(3);
+    expect(result.cells[1]![columnOf(result, "subject")]).toBe("Khartoum");
+    expect(result.cells[1]![columnOf(result, "value")]).toBe("408");
+    expect(result.cells[1]![columnOf(result, "unit")]).toBe("n");
+    expect(result.cells[2]![columnOf(result, "value")]).toBe("2.6");
+    expect(result.cells[2]![columnOf(result, "unit")]).toBe("percent");
   });
 
   it("returns an empty result for no tables", () => {
