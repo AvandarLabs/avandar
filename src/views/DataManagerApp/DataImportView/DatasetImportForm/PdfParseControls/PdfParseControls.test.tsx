@@ -29,6 +29,14 @@ const REGION: PdfRegion = {
 
 const SECOND_REGION: PdfRegion = { ...REGION, id: "r2", label: "Region 2" };
 
+/** A second region read as something else, so the two cannot share columns. */
+const CHART_REGION: PdfRegion = {
+  ...REGION,
+  id: "r2",
+  label: "Weekly trend",
+  shape: "labelled_graphic",
+};
+
 const RULE_TABLE: ExtractedTable = {
   regionId: "r1",
   cells: [
@@ -183,6 +191,33 @@ describe("PdfParseControls", () => {
     } as User.T);
   });
 
+  it("defaults a region that is not a printed table to one row per number", async () => {
+    // The prose region has no printed table to keep, so offering to keep one
+    // is what this default exists to stop.
+    renderControls();
+
+    expect(
+      await screen.findByRole("radio", { name: /one row per number/i }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole("radio", { name: /keep the measurements as found/i }),
+    ).not.toBeChecked();
+  });
+
+  it("names the options after what the regions were read as", async () => {
+    renderControls();
+
+    expect(await screen.findByText("Rows from this text")).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /keep the measurements as found/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Chosen from what we detected. Switch it if that reads wrong.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("re-extracts through the normal re-parse path when the row shape changes", async () => {
     // The observations schema is decided during extraction, in
     // `combineRegions`. Reshaping the rows already on screen would be a
@@ -190,12 +225,59 @@ describe("PdfParseControls", () => {
     const { onRequestDataReparse } = renderControls();
 
     fireEvent.click(
-      await screen.findByRole("radio", { name: /one row per measurement/i }),
+      await screen.findByRole("radio", {
+        name: /keep the measurements as found/i,
+      }),
     );
 
     expect(onRequestDataReparse).toHaveBeenCalledWith(
-      expect.objectContaining({ outputMode: "observations" }),
+      expect.objectContaining({
+        outputMode: "natural",
+        // Without the flag the next extraction would derive a default straight
+        // over the top of this choice.
+        isOutputModeUserChosen: true,
+      }),
     );
+  });
+
+  it("locks the keep option when the regions print different columns", async () => {
+    const metadata = _metadata();
+    render(
+      <PdfParseControls
+        sourceFile={new File([], "report.pdf", { type: "application/pdf" })}
+        metadata={{
+          ...metadata,
+          parseOptions: {
+            ...metadata.parseOptions,
+            regions: [REGION, CHART_REGION],
+          },
+          datasetLoadResult: {
+            ...metadata.datasetLoadResult,
+            regions: [REGION, CHART_REGION],
+            tables: [
+              RULE_TABLE,
+              {
+                ...RULE_TABLE,
+                regionId: "r2",
+                cells: [
+                  ["label", "value"],
+                  ["Week 1", "12"],
+                ],
+              },
+            ],
+          },
+        }}
+        onDataSourceMetadataChange={vi.fn()}
+        onRequestDataReparse={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("radio", { name: /keep the printed columns/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(/there is no shared set of columns to keep/i),
+    ).toBeInTheDocument();
   });
 
   it("re-extracts through the normal re-parse path when a region changes", async () => {

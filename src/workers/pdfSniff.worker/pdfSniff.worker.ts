@@ -27,6 +27,7 @@ import { extractProseMeasures } from "../pdfSniff/extractors/extractProseMeasure
 import { extractRepeatingBlocks } from "../pdfSniff/extractors/extractRepeatingBlocks/extractRepeatingBlocks";
 import { extractPageGeometry } from "../pdfSniff/extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "../pdfSniff/loadPdfDocument/loadPdfDocument";
+import { resolveOutputMode } from "../pdfSniff/resolveOutputMode/resolveOutputMode";
 import type { RegionClassification } from "../pdfSniff/classifyRegion/classifyRegion";
 import type { CombinedTable } from "../pdfSniff/combineRegions/combineRegions";
 import type {
@@ -236,6 +237,17 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
       }),
     );
 
+    // A request that carries no mode has not been given one by the user, so
+    // the shape is ours to derive from what the regions were read as. The
+    // request's mode is passed through as the user's pick rather than used
+    // directly, because a pick the combiner would override must not be the
+    // mode we report back as the one it used.
+    const outputMode = resolveOutputMode({
+      tables,
+      shapesByRegionId: resolvedShapes,
+      chosenMode: request.outputMode,
+    }).mode;
+
     _post({
       type: "extract_result",
       tables,
@@ -245,7 +257,7 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
         tables,
         regionLabels,
         documentMetadata: request.documentMetadata,
-        outputMode: request.outputMode,
+        outputMode,
       }),
     });
     _close();

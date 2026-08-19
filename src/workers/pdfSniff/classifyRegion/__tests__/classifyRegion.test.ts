@@ -65,6 +65,9 @@ describe("classifyRegion", () => {
     expect(result.evidence.join(" ")).toMatch(
       /scattered rather than tabulated/i,
     );
+    // No marks, so nothing says what it was drawn as. The import UI reads this
+    // to decide whether to call the region a chart or only a graphic.
+    expect(result.graphicKind).toBe("unknown");
   });
 
   it("does not call a ruled graphic a grid table", () => {

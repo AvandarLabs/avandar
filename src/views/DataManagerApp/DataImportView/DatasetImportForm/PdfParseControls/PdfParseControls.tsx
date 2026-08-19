@@ -1,11 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
-import { SegmentedControl, Stack, Text } from "@mantine/core";
+import { Radio, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { getOutputModeCopy } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy";
 import { PdfRegionPicker } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker";
 import { PdfReviewGrid } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid";
-import { combineRegions } from "@/workers/pdfSniff/combineRegions/combineRegions";
+import {
+  combineRegions,
+  OBSERVATION_HEADER,
+} from "@/workers/pdfSniff/combineRegions/combineRegions";
+import { resolveOutputMode } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
 import type {
   DataSourceMetadata,
   PdfDataSourceMetadata,
@@ -53,7 +58,7 @@ export function PdfParseControls({
   onDataSourceMetadataChange,
   onRequestDataReparse,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
   const loadResult = metadata.datasetLoadResult;
@@ -85,7 +90,12 @@ export function PdfParseControls({
    * implementation of the union rule, and the two would drift.
    */
   const onOutputModeChange = (mode: PdfOutputMode): void => {
-    onRequestDataReparse(changeParseOptions({ outputMode: mode }));
+    // The flag rides along with the mode, and is what stops the next
+    // extraction re-deriving a default over the top of this choice. It is the
+    // same distinction `isShapeUserChosen` draws for a region's shape.
+    onRequestDataReparse(
+      changeParseOptions({ outputMode: mode, isOutputModeUserChosen: true }),
+    );
   };
 
   /**
@@ -135,29 +145,71 @@ export function PdfParseControls({
     return table.regionId === activeRegionId;
   });
 
+  /*
+   * The same resolver the worker used, over the same inputs, so the shape the
+   * control shows is the shape the rows below it were built with. Only a mode
+   * the user picked is offered as their choice: passing the resolved one back
+   * in would make every extraction look like a decision.
+   */
+  const resolution = resolveOutputMode({
+    tables: loadResult.tables,
+    shapesByRegionId: Object.fromEntries(
+      regions.map((region) => {
+        return [region.id, region.shape];
+      }),
+    ),
+    chosenMode:
+      metadata.parseOptions.isOutputModeUserChosen === true ?
+        metadata.parseOptions.outputMode
+      : undefined,
+  });
+  const copy = getOutputModeCopy({
+    i18n,
+    resolution,
+    observationColumns: OBSERVATION_HEADER,
+    graphicKind: regions
+      .map((region) => {
+        return loadResult.classifications[region.id]?.graphicKind;
+      })
+      .find((kind) => {
+        return kind !== undefined;
+      }),
+    isUserChosen: metadata.parseOptions.isOutputModeUserChosen === true,
+    regionNames: regions.map((region) => {
+      return region.label;
+    }),
+  });
+
   return (
     <Stack gap="md" w="100%">
       <Stack gap={4}>
-        <Text size="sm" fw={500}>
-          {t`Rows`}
-        </Text>
-        <SegmentedControl
+        <Radio.Group
           size="xs"
-          value={metadata.parseOptions.outputMode ?? "natural"}
-          data={[
-            { value: "natural", label: t`As printed` },
-            { value: "observations", label: t`One row per measurement` },
-          ]}
+          label={copy.groupLabel}
+          value={resolution.mode}
           onChange={(value) => {
             onOutputModeChange(value as PdfOutputMode);
           }}
-        />
-        <Text size="xs" c="dimmed">
-          {metadata.parseOptions.outputMode === "observations" ?
-            t`Every value becomes its own row, stamped with the document's title, organisation and date. Two reports of the same kind then stack into one series.`
-          : t`The columns mirror what this document printed. Regions that disagree about their columns are still split out.`
-          }
-        </Text>
+        >
+          <Stack gap={4} mt={4}>
+            <Radio
+              value="natural"
+              label={copy.keepLabel}
+              description={copy.keepDescription}
+              disabled={!resolution.isKeepAvailable}
+            />
+            <Radio
+              value="observations"
+              label={copy.normaliseLabel}
+              description={copy.normaliseDescription}
+            />
+          </Stack>
+        </Radio.Group>
+        {copy.note ?
+          <Text size="xs" c="dimmed">
+            {copy.note}
+          </Text>
+        : null}
       </Stack>
       <PdfRegionPicker
         file={sourceFile}

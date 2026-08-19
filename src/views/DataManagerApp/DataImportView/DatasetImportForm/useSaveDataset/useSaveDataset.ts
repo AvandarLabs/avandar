@@ -54,6 +54,16 @@ export type PdfParseOptions = {
   pageRange?: readonly [number, number];
   outputMode?: "natural" | "observations";
   /**
+   * True once the user has picked the row shape themselves.
+   *
+   * The same distinction `PdfRegion.isShapeUserChosen` draws, for the same
+   * reason: a resolved mode and a chosen mode are both just a value in
+   * `outputMode`, and only the flag tells the next extraction which one it is
+   * looking at. Not persisted, because a saved dataset's stored `outputMode`
+   * is itself the record of the decision.
+   */
+  isOutputModeUserChosen?: boolean;
+  /**
    * Which model contributed rows, or undefined when the rows came from rules
    * alone. Set by the picker's assist and written to `llm_model` on save,
    * because the workspace privacy log has to be able to answer "did a model

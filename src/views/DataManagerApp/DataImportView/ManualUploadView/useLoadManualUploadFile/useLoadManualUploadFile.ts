@@ -34,6 +34,7 @@ import type {
   PageGeometry,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 
 type FileLoadOptions = {
   file: File;
@@ -70,6 +71,16 @@ export type PdfFileLoadResult = BaseLoadResult & {
    * it as one.
    */
   status: "needs_selection" | "extracted";
+  /**
+   * The row shape the extraction actually used, which is the user's pick when
+   * they made one and the shape derived from the regions' detected kinds when
+   * they did not. Undefined until a region has been selected.
+   *
+   * Reported for the same reason `regions` is: it is what really happened, and
+   * the form seeds the control from it. Defaulting the control to a fixed mode
+   * instead is what offered "keep the printed table" for a line chart.
+   */
+  outputMode: PdfOutputMode | undefined;
   /**
    * The regions as they were actually read, which is the requested regions
    * with each classified shape written back into them.
@@ -214,7 +225,11 @@ function _buildDataSourceMetadataFromLoadResult({
           // of the user again on every extraction.
           regions: pdfLoadResult.regions,
           pageRange: pdfRequest?.pageRange,
-          outputMode: pdfRequest?.outputMode ?? "natural",
+          // The load result's mode, not the request's, for the same reason as
+          // the regions above: it is the mode the extraction really used, and
+          // on a first load the request has none for detection to lose to.
+          outputMode: pdfLoadResult.outputMode ?? pdfRequest?.outputMode,
+          isOutputModeUserChosen: pdfRequest?.isOutputModeUserChosen,
           // Carried through re-parses so the model that contributed rows is
           // still known at save time, whichever re-extraction wrote them.
           llmModel: pdfRequest?.llmModel,
@@ -338,6 +353,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             pageRange,
             regions = [],
             outputMode,
+            isOutputModeUserChosen = false,
           } = pdfParseOptions;
           const sniff = await LocalDatasetClient.startPdfImport({
             datasetId,
@@ -358,6 +374,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
               pageCount: sniff.pageCount,
               pages: sniff.pages,
               status: "needs_selection",
+              outputMode: undefined,
               regions: [],
               columns: [],
               tables: [],
@@ -374,7 +391,10 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             pages: sniff.pages,
             regions,
             documentMetadata: sniff.documentMetadata,
-            outputMode,
+            // Only a mode the user picked is sent. Sending the mode a previous
+            // extraction resolved would read as a choice, and the derived
+            // default could then never change after a region was added.
+            outputMode: isOutputModeUserChosen ? outputMode : undefined,
           });
 
           // What each region was read as, written back into the region. The
@@ -416,6 +436,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             pageCount: sniff.pageCount,
             pages: sniff.pages,
             status: "extracted",
+            outputMode: extracted.combined.outputMode,
             regions: readRegions,
             columns: csvSniff.columns,
             tables: extracted.tables,
