@@ -93,6 +93,9 @@ function _mergeRegionGeometry(
     rules: clipped.flatMap((clip) => {
       return clip.rules;
     }),
+    marks: clipped.flatMap((clip) => {
+      return clip.marks;
+    }),
   };
 }
 

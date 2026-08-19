@@ -22,7 +22,7 @@ function region(
   textItems: readonly TextItem[],
   rules: readonly RuleSegment[] = [],
 ): RegionGeometry {
-  return { pageIndex: 0, bbox: [0, 0, 600, 700], textItems, rules };
+  return { pageIndex: 0, bbox: [0, 0, 600, 700], textItems, rules, marks: [] };
 }
 
 describe("classifyRegion", () => {

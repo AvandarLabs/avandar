@@ -24,6 +24,8 @@ function page(): PageGeometry {
       { orientation: "horizontal", position: 500, span: [100, 400] },
       { orientation: "horizontal", position: 200, span: [100, 400] },
     ],
+    marks: [],
+    marksTruncated: false,
     textItems: [
       textItem("inside", 150, 450),
       textItem("also-inside", 300, 400),
@@ -98,5 +100,42 @@ describe("clipToRegion", () => {
 
     expect(clipped.textItems).toEqual([]);
     expect(clipped.rules).toEqual([]);
+    expect(clipped.marks).toEqual([]);
+  });
+
+  it("keeps marks whose box overlaps the region", () => {
+    const withMarks: PageGeometry = {
+      ...page(),
+      marks: [
+        {
+          kind: "closed",
+          points: [
+            { x: 150, y: 400 },
+            { x: 200, y: 450 },
+          ],
+          bbox: [150, 400, 200, 450],
+          isFilled: true,
+          fill: null,
+        },
+        {
+          kind: "polyline",
+          points: [
+            { x: 10, y: 10 },
+            { x: 20, y: 20 },
+          ],
+          bbox: [10, 10, 20, 20],
+          isFilled: false,
+          fill: null,
+        },
+      ],
+    };
+
+    const clipped = clipToRegion({
+      page: withMarks,
+      bbox: [100, 300, 500, 600],
+    });
+
+    expect(clipped.marks).toHaveLength(1);
+    expect(clipped.marks[0]!.bbox).toEqual([150, 400, 200, 450]);
   });
 });

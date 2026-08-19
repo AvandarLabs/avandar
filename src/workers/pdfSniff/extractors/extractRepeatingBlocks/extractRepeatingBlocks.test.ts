@@ -19,7 +19,13 @@ function items(
 }
 
 function region(textItems: readonly TextItem[]): RegionGeometry {
-  return { pageIndex: 1, bbox: [0, 0, 600, 600], textItems, rules: [] };
+  return {
+    pageIndex: 1,
+    bbox: [0, 0, 600, 600],
+    textItems,
+    rules: [],
+    marks: [],
+  };
 }
 
 describe("extractRepeatingBlocks", () => {

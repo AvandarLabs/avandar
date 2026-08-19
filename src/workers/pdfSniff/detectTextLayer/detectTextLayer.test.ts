@@ -13,6 +13,8 @@ function makePage(options: {
     width: 595,
     height: 842,
     rules: [],
+    marks: [],
+    marksTruncated: false,
     looksScanned: options.looksScanned,
     textItems: Array.from({ length: options.textItemCount }, (_, i) => {
       return {

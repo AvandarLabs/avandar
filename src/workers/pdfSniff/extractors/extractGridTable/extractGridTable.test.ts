@@ -27,7 +27,13 @@ const TABLE: readonly TextItem[] = [
 ];
 
 function region(textItems = TABLE): RegionGeometry {
-  return { pageIndex: 0, bbox: [80, 550, 500, 620], textItems, rules: [] };
+  return {
+    pageIndex: 0,
+    bbox: [80, 550, 500, 620],
+    textItems,
+    rules: [],
+    marks: [],
+  };
 }
 
 describe("extractGridTable", () => {

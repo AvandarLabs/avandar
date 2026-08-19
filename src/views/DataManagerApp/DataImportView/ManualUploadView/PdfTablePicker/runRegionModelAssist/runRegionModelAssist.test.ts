@@ -54,6 +54,8 @@ const PAGE: PageGeometry = {
     _item(OUT_OF_REGION_SENTENCE, 50, 300),
   ],
   rules: [],
+  marks: [],
+  marksTruncated: false,
   looksScanned: false,
 };
 
