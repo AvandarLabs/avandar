@@ -126,6 +126,7 @@ function _loadResult(): PdfFileLoadResult {
     pageCount: 2,
     pages: [],
     status: "extracted",
+    outputMode: "natural",
     regions: [REGION],
     columns: [],
     tables: [RULE_TABLE],
