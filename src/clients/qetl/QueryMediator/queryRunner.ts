@@ -72,13 +72,21 @@ async function _getParquetNeededByDatasetId(
 async function _getNeededParquetColumnsForQuery(
   queryOptions: RunLeasedQueryOptions,
 ): Promise<NeededColumnsByDatasetId> {
+  const inferred = getNeededColumnsFromQuery({
+    conceptRelations: queryOptions.conceptRelations,
+    datasetIds: queryOptions.queryDependencies,
+    rawSql: queryOptions.rawSql,
+  });
   return _getParquetNeededByDatasetId({
     datasetIds: queryOptions.queryDependencies,
-    neededByDatasetId: getNeededColumnsFromQuery({
-      conceptRelations: queryOptions.conceptRelations,
-      datasetIds: queryOptions.queryDependencies,
-      rawSql: queryOptions.rawSql,
-    }),
+    // A caller-stated set replaces inference for the datasets it names, and
+    // only those. Inference reads a select list, which a `CREATE TABLE AS
+    // SELECT` does not expose, so without an override that shape always
+    // acquires `"all"`.
+    neededByDatasetId: {
+      ...inferred,
+      ...queryOptions.neededColumnsByDatasetId,
+    },
   });
 }
 
@@ -265,6 +273,8 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
           rawSql: options.queryOptions.rawSql,
           returnType: options.queryOptions.returnType ?? "js",
           signal: options.queryOptions.signal,
+          neededColumnsByDatasetId:
+            options.queryOptions.neededColumnsByDatasetId,
         },
       });
     },

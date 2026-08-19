@@ -124,6 +124,22 @@ export type RunQetlQueryOptions = {
   returnType?: "parquet" | "js";
   datasetDuckDbLease?: DatasetDuckDbLease;
   signal?: AbortSignal;
+  /**
+   * The columns each dataset must hold, when the caller already knows them.
+   *
+   * `getNeededColumnsFromQuery` infers this from the statement, but it can
+   * only do so for a plain read: a `CREATE TABLE AS SELECT` has no top-level
+   * select list to read, so it fails wide to `"all"` and the query downloads
+   * every column of every relation it names. Individual generation is exactly
+   * that shape and knows its answer exactly (an identifier column and a label
+   * column per contributing dataset), so it states it rather than paying for
+   * columns nothing reads.
+   *
+   * Named datasets not listed here still fall back to inference, and a listed
+   * set that is too narrow fails the query on a missing column rather than
+   * answering from partial data, so this is a caller assertion and not a hint.
+   */
+  neededColumnsByDatasetId?: NeededColumnsByDatasetId;
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
@@ -145,4 +161,6 @@ export type RunLeasedQueryOptions = {
   rawSql: string;
   returnType: "parquet" | "js";
   signal?: AbortSignal;
+  /** The caller's stated column sets, overriding inference per dataset. */
+  neededColumnsByDatasetId?: NeededColumnsByDatasetId;
 };

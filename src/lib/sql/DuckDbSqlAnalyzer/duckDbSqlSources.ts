@@ -1,5 +1,8 @@
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import { getTableNameFromRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
+import {
+  getTableNameFromRowNumberedViewName,
+  isStagingIndividualsTableName,
+} from "@/clients/DuckDbClient/duckDbSqlText";
 import {
   getCopyDirectionKeywordIndexes,
   getCopyRelationSourceIndexes,
@@ -222,6 +225,19 @@ function _getAnalysisFromIdentifierSource(
     identifier.parts.length === 1 &&
     tableName !== undefined &&
     INSPECTABLE_INTERNAL_TABLES.has(tableName)
+  ) {
+    return _readSourceAnalysis([]);
+  }
+  // An `ava_staging_individuals_<conceptId>` table holds rows the caller just
+  // materialized from relations it was already authorized for, so reading it
+  // back names no relation and needs no lease. Individual generation reads its
+  // own staging table through `runRawQuery`, which fails closed on any source
+  // it cannot account for, so without this the upsert stage of every sync
+  // throws `uninspectable-source`.
+  if (
+    identifier.parts.length === 1 &&
+    tableName !== undefined &&
+    isStagingIndividualsTableName(tableName)
   ) {
     return _readSourceAnalysis([]);
   }

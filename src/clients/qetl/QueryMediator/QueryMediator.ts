@@ -6,6 +6,7 @@ import type {
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { Module } from "@avandar/modules";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -53,11 +54,13 @@ export type IQueryMediator = Module<
         rawSql: string;
         returnType?: "js";
         signal?: AbortSignal;
+        neededColumnsByDatasetId?: NeededColumnsByDatasetId;
       }): Promise<QueryResult.T<RowObject>>;
       (params: {
         rawSql: string;
         returnType: "parquet";
         signal?: AbortSignal;
+        neededColumnsByDatasetId?: NeededColumnsByDatasetId;
       }): Promise<Blob>;
     };
   }

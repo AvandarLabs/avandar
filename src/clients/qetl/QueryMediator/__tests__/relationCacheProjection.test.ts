@@ -13,6 +13,7 @@ import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/Relat
 const DATASET_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
 const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111";
+const CONCEPT_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 
 let relationCache = createInMemoryRelationCache();
 
@@ -186,6 +187,27 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
   });
 }
 
+async function _runCreateTableAs(
+  neededColumnsByDatasetId?: Record<string, readonly string[] | "all">,
+): Promise<void> {
+  const mediator = QueryMediatorFactory.create({
+    getQueryDependencies: async () => {
+      return [DATASET_ID];
+    },
+    getDuckDbLeaseDatasetIds: async () => {
+      return [DATASET_ID];
+    },
+    relationCache,
+    principalKey: PRINCIPAL_KEY,
+  });
+  await mediator.runQuery({
+    rawSql: `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS (
+      SELECT DISTINCT "a" AS external_id FROM "${DATASET_ID}"
+    )`,
+    neededColumnsByDatasetId,
+  });
+}
+
 function _mockAcquirableCsvSource(): void {
   datasetGetAllMock.mockResolvedValue([
     {
@@ -279,5 +301,34 @@ describe("QueryMediator relation cache projection", () => {
     await _runSelect(["a"]);
 
     expect(datasetGetAllMock).not.toHaveBeenCalled();
+  });
+  // A `CREATE TABLE AS SELECT` has no top-level select list, so inference
+  // cannot read one and fails wide. Individual generation is exactly that
+  // shape, which is why it acquired every column of every dataset it named.
+  it("acquires 'all' for a CREATE TABLE AS SELECT with no stated columns", async () => {
+    _mockAcquirableCsvSource();
+
+    await _runCreateTableAs();
+
+    expect(acquireMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columns: "all" }),
+      expect.anything(),
+    );
+    expect(projectParquetBlobMock).not.toHaveBeenCalled();
+  });
+
+  it("acquires only the columns a CREATE TABLE AS SELECT states it needs", async () => {
+    _mockAcquirableCsvSource();
+
+    await _runCreateTableAs({ [DATASET_ID]: ["a"] });
+
+    expect(acquireMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columns: ["a"] }),
+      expect.anything(),
+    );
+    expect(projectParquetBlobMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columns: ["a"] }),
+    );
+    expect(await _heldColumns()).toEqual(["a"]);
   });
 });

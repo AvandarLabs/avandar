@@ -50,6 +50,27 @@ type FetchRelationSourceOptions = {
 /** Named so wrapper diagnostics are attributable to relation acquisition. */
 const _relationLogger: ILogger = Logger.appendName("QetlRelations");
 
+/**
+ * Keeps a replacement from naming a column the loaded Parquet does not hold.
+ *
+ * The replacement clauses become `SELECT * EXCLUDE (…) , … AS …`, and DuckDB
+ * binds `EXCLUDE` against the file's real header, so an excluded column that
+ * was projected away fails the view's creation outright. Every relation was
+ * `"all"` when these clauses were written, so the mismatch could not arise;
+ * now that a query can load a subset, the replacements have to be narrowed to
+ * that subset too.
+ */
+function _isColumnInLoadedRelation(
+  loadedColumns: readonly string[] | "all",
+  column: Readonly<DatasetColumn.T>,
+): boolean {
+  return (
+    loadedColumns === "all" ||
+    loadedColumns.includes(column.originalName) ||
+    loadedColumns.includes(column.name)
+  );
+}
+
 function _getColumnReplacements(
   columns: readonly DatasetColumn.T[],
 ): ColumnReplacement[] {
@@ -498,7 +519,11 @@ export async function loadRelationBytes(
       blob: relation.parquetBlob,
       datasetDuckDbLease: options.datasetDuckDbLease,
       columnReplacements: makeIdLookupRecord(
-        _getColumnReplacements(columnsByDatasetId[relation.datasetId] ?? []),
+        _getColumnReplacements(
+          (columnsByDatasetId[relation.datasetId] ?? []).filter((column) => {
+            return _isColumnInLoadedRelation(relation.columns, column);
+          }),
+        ),
         { key: "originalName" },
       ),
     });

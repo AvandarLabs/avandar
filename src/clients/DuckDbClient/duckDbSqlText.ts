@@ -55,6 +55,27 @@ export function getStagingIndividualsTableName(conceptId: string): string {
 }
 
 /**
+ * Reports whether a DuckDB table name is an individual-generation staging
+ * table.
+ *
+ * The SQL analyzer needs this for the same reason it needs
+ * `getTableNameFromRowNumberedViewName`: it fails closed on any source name it
+ * cannot account for, and `generateIndividuals` reads its own staging table
+ * back (`DESCRIBE`, `SELECT count(*)`, and the paged `SELECT`) through
+ * `runRawQuery`. Before the `ava_staging_individuals_` prefix existed the table
+ * was named with the concept's bare id, which the analyzer resolved as a
+ * dataset and therefore allowed; adding the prefix made every one of those
+ * reads `uninspectable-source`, so the sync threw the moment the upsert began.
+ *
+ * Unlike an `ava_rows_` view, a staging table reads no dataset: it is a
+ * materialized table the caller just created from relations it was already
+ * authorized for, so it contributes no relation and needs no lease of its own.
+ */
+export function isStagingIndividualsTableName(tableName: string): boolean {
+  return tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX);
+}
+
+/**
  * The dataset table an `ava_rows_` view reads, or undefined for any other name.
  *
  * The inverse of `getRowNumberedViewName`, and the SQL analyzer's reason for

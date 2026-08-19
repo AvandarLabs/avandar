@@ -14,6 +14,7 @@ import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { Module } from "@avandar/modules";
 import type { EmptyObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -33,6 +34,7 @@ export type IWorkspaceQetlClient = Module<
           workspaceId: Workspace.Id;
           returnType?: "js";
           signal?: AbortSignal;
+          neededColumnsByDatasetId?: NeededColumnsByDatasetId;
         }>,
       ): Promise<QueryResult.T<RowObject>>;
       (
@@ -41,6 +43,7 @@ export type IWorkspaceQetlClient = Module<
           workspaceId: Workspace.Id;
           returnType: "parquet";
           signal?: AbortSignal;
+          neededColumnsByDatasetId?: NeededColumnsByDatasetId;
         }>,
       ): Promise<Blob>;
     };
@@ -179,11 +182,13 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
         workspaceId,
         returnType = "js",
         signal,
+        neededColumnsByDatasetId,
       }: Readonly<{
         rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js" | "parquet";
         signal?: AbortSignal;
+        neededColumnsByDatasetId?: NeededColumnsByDatasetId;
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
         // The assertion owns the session read and hands back the principal it
         // verified, so a query costs one session read rather than two. That
@@ -198,6 +203,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
             rawSql,
             returnType: "parquet",
             signal,
+            neededColumnsByDatasetId,
           });
         }
 
@@ -205,6 +211,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
           rawSql,
           returnType: "js",
           signal,
+          neededColumnsByDatasetId,
         });
       },
     };

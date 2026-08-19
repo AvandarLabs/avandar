@@ -1,7 +1,9 @@
 import {
   assertIsDefined,
   isDefined,
+  makeBucketRecord,
   makeObject,
+  objectValuesMap,
   prop,
   propEq,
   sqlTemplate,
@@ -79,6 +81,25 @@ export async function generateIndividuals(
   // `getStagingIndividualsTableName`.
   const stagingTableName = getStagingIndividualsTableName(concept.id);
 
+  // Spelling out the columns is what keeps this from downloading whole
+  // datasets. The statement below is a `CREATE TABLE AS SELECT`, and column
+  // inference reads a top-level select list, which that shape does not have,
+  // so every relation it names would otherwise be acquired as `"all"`.
+  // Generating individuals reads exactly two columns per contributing dataset:
+  // the identifier the spine is keyed by, and the label the title is picked
+  // from.
+  const neededColumnsByDatasetId = objectValuesMap(
+    makeBucketRecord(
+      datasetColumnMappings.map((mapping) => {
+        return mappingColumnsLookup[mapping.id]!;
+      }),
+      { key: "datasetId" },
+    ),
+    (columns) => {
+      return columns.map(prop("name"));
+    },
+  );
+
   await WorkspaceQuerySession.runQuery({
     rawSql: sqlTemplate(`
       DROP TABLE IF EXISTS "$stagingTableName$";
@@ -126,6 +147,7 @@ export async function generateIndividuals(
       }),
     }),
     workspaceId: concept.workspaceId,
+    neededColumnsByDatasetId,
   });
   Logger.log("Successfully generated all individuals. Starting upsert...");
 

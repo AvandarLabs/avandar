@@ -409,4 +409,37 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       datasetIds: [],
     });
   });
+  // Individual generation stages its rows in `ava_staging_individuals_<id>`
+  // and then reads that table back — `DESCRIBE`, `SELECT count(*)`, and a
+  // paged `SELECT` — through `runRawQuery`, which refuses any source it cannot
+  // account for. The table used to be named with the concept's bare id, which
+  // the analyzer resolved as a dataset; adding the prefix made all three reads
+  // `uninspectable-source`, so every sync threw the moment its upsert began.
+  // It reads no dataset of its own, so it contributes no relation.
+  it("reads an individuals staging table as an internal table naming no relation", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_staging_individuals_${CONCEPT_ID}" LIMIT 1000`,
+      ),
+    ).toEqual({ kind: "read", relations: [] });
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `DESCRIBE "ava_staging_individuals_${CONCEPT_ID}"`,
+      ),
+    ).toEqual({ kind: "read", relations: [] });
+  });
+
+  // The staging table is a bare local table, so a qualified name is something
+  // else entirely and must not inherit its exemption.
+  it("still refuses a qualified name ending in a staging table name", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM other.\"ava_staging_individuals_${CONCEPT_ID}\"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
 });
