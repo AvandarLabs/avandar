@@ -27,7 +27,10 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 const globalWithPdfjsWorker = globalThis as {
   pdfjsWorker?: { WorkerMessageHandler: typeof WorkerMessageHandler };
 };
-if (typeof (globalThis as { importScripts?: unknown }).importScripts === "function") {
+if (
+  typeof (globalThis as { importScripts?: unknown }).importScripts ===
+  "function"
+) {
   globalWithPdfjsWorker.pdfjsWorker = { WorkerMessageHandler };
 }
 

@@ -1,12 +1,41 @@
 # PDF import: region extraction from situation reports
 
-**Status:** design approved, not yet implemented
+**Status:** phases B1 and B2 implemented; B3 outstanding
 **Date:** 2026-08-18
 **Branch:** `feat/pdf-import`
 **Linear:** extends AVA-317; still defers AVA-316
 **Supersedes:** the "Manual region selection", "Qualitative extraction" and
 "LLM-driven extraction" entries under Future phases in
 `2026-08-17-pdf-import-design.md`
+
+> **The merge gate passes.** `src/workers/pdfSniff/gateDocuments.test.ts`
+> asserts against both named situation reports: 16 of 16 state figures from the
+> OCHA choropleth with exact values and zero silently wrong, the KPI tiles, the
+> six response pillars, the document identity, and the IMC prose including the
+> spelled-out `one death` / `West Darfur` construction. The weekly trend chart
+> is asserted absent, so deferring chart-geometry reading stays a decision.
+>
+> Four behaviours came out differently from what this spec anticipated, and are
+> asserted as they actually behave rather than as hoped. Each carries a
+> `KNOWN GAP` or `KNOWN DEFECT` comment at its assertion:
+>
+> 1. **Funding bars emit 12 rows, not 6**, with values and their units split
+>    (`3` paired to `M (15%)`). This is the `unit` gap below. Collapsing it to
+>    6 rows would report WASH at `3` where the document says $3 million, so the
+>    honest 12 rows were kept.
+> 2. **Pillar 6 needs its own region.** A full-page box interleaves the two
+>    magazine columns, so the pillars are read as three column regions, and
+>    pillar 6 straddles a page-3 gutter. A region needs reading order across
+>    fragments to fix this.
+> 3. **A capital-city annotation fuses into its state label** on the
+>    choropleth (`NORTH KORDOFAN Khartoum`). The value is correct. Requiring
+>    matching fonts to merge was implemented and measured, and it made things
+>    worse: it frees `Khartoum` to win the 408 figure from `KHARTOUM` on
+>    distance, unflagged. The real fix is for association to distinguish a
+>    point annotation from an area label.
+> 4. **`doc_org` comes from the PDF `Author` field**, which is a person's name
+>    in the IMC document and null in the OCHA one. It must not be relied on as
+>    a join key.
 
 ## Summary
 

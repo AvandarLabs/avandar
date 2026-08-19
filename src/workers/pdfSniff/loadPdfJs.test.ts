@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { loadPdfDocument } from "./loadPdfJs";
 
-const FIXTURE = "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
+const FIXTURE =
+  "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
 
 describe("loadPdfDocument", () => {
   it("opens a real PDF and reports its page count", async () => {
