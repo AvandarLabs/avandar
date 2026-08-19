@@ -90,6 +90,10 @@ msgstr "Vitendo zaidi vya safu {layerName}"
 msgid "Run a query to see results."
 msgstr "Fanya swali ili kuona matokeo."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Select an Excel, CSV or PDF file from your computer to import"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Anza (mfano: 2024-01-01)"
@@ -292,6 +296,10 @@ msgstr "Filtria za safu"
 msgid "Profile Description"
 msgstr "Maelezo ya Profaili"
 
+#: src/components/badges/SourceBadge.tsx
+msgid "From PDF"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "Pakia Excel"
@@ -397,6 +405,10 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr "Mpango wako hauruhusu kushiriki dashibodi hii na mtu mwingine. Boresha "
 "mpango wako, au acha kushiriki dashibodi nyingine, kisha ujaribu tena."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+msgid "PDF file"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Open"
@@ -1328,6 +1340,11 @@ msgstr "Kuratibu haiwezi kuwekwa kwenye ramani wakati latitudo au longitudo "
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "Kipindi chako kimekwisha. Unapelekwa kwenye ukurasa wa kuingia."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "Select a region on the page to see data. Draw a box around a table, "
+"chart or block of text, or highlight a sentence."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
 msgstr "Safu wima ya 12"
@@ -2078,6 +2095,10 @@ msgstr "Haikuweza kupata seti ya data inayojulikana inayolingana na "
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Uonyeshaji wa Data"
+
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+msgid "PDF"
+msgstr ""
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Choose a saved dataset or import new data into your workspace."
@@ -5536,6 +5557,10 @@ msgstr "Picha ya dashibodi"
 msgid "Signing you back in…"
 msgstr "Inakuingiza tena…"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "No region selected yet"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
 msgstr "Mipaka ya asili"
@@ -5929,6 +5954,10 @@ msgid "This dashboard is not published yet. Use the button below to publish it "
 msgstr "Dashibodi hii bado haijachapishwa. Tumia kitufe kilicho hapa chini "
 "kuichapisha kwa hadhira uliyochagua."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Upload a file"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Link URL"
 msgstr "URL ya kiungo"
@@ -5942,8 +5971,8 @@ msgid "Loading dashboard datasets"
 msgstr "Inapakia seti za data za dashibodi"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Select an Excel or CSV file from your computer to import"
-msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
+#~ msgid "Select an Excel or CSV file from your computer to import"
+#~ msgstr "Chagua faili ya Excel au CSV kutoka kwa kompyuta yako kuingiza"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -6205,8 +6234,8 @@ msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Upload a spreadsheet"
-msgstr "Pakia karatasi ya kazi"
+#~ msgid "Upload a spreadsheet"
+#~ msgstr "Pakia karatasi ya kazi"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
@@ -6315,6 +6344,10 @@ msgstr "Hitilafu katika kuhifadhi seti ya data"
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Save"
 msgstr "Hifadhi"
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "PDF files"
+msgstr ""
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
@@ -7773,6 +7806,10 @@ msgstr "Nukuu"
 msgid "Billing portal cannot be loaded because you do not have a subscription "
 "yet."
 msgstr "Lango la malipo haliwezi kupakiwa kwa sababu bado hujawa na usajili."
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts
+msgid "Dataset saved, but its original file failed to upload"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
