@@ -59,6 +59,7 @@ function _ManualUploadImportForm(
     <DatasetImportForm
       key={dataSourceMetadata.datasetLoadResult.id}
       initialDatasetName={uploadedFile.name}
+      sourceFile={uploadedFile}
       rows={previewRows}
       dataSourceMetadata={dataSourceMetadata}
       parseOptions={dataSourceMetadata.parseOptions}
@@ -93,13 +94,14 @@ export function ManualUploadView({
     <Box {...boxProps}>
       <Stack align="flex-start">
         <FileUploadForm
-          label={t`Upload a spreadsheet`}
-          description={t`Select an Excel or CSV file from your computer to import`}
+          label={t`Upload a file`}
+          description={t`Select an Excel, CSV or PDF file from your computer to import`}
           placeholder={t`Select file`}
           accept={[
             MIMEType.TEXT_CSV,
             MIMEType.APPLICATION_MS_EXCEL,
             MIMEType.APPLICATION_OPENXML_EXCEL,
+            MIMEType.APPLICATION_PDF,
           ]}
           fullWidth
           isSubmitting={manualUpload.isLoadingFile && previewRows === undefined}

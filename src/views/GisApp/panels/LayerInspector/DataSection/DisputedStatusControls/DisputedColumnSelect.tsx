@@ -84,7 +84,7 @@ export function DisputedColumnSelect({
       onChange={(nextValue) => {
         const selected =
           nextValue === null ? undefined : (
-options.find(propEq("value", nextValue))
+            options.find(propEq("value", nextValue))
           );
         onLayerChange((current) => {
           return _bindSelectedColumn(current, selected);

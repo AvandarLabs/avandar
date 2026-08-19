@@ -21,6 +21,11 @@ const XlsxParseOptionsSchema = z.object({
   hasHeader: z.boolean().optional(),
 });
 
+const PdfParseOptionsSchema = z.object({
+  type: z.literal("pdf"),
+  pageRange: z.tuple([z.number(), z.number()]).readonly().optional(),
+});
+
 const DBReadSchema = z.object({
   datasetId: uuidType<DatasetId>(),
   workspaceId: uuidType<WorkspaceId>(),
@@ -31,12 +36,14 @@ const DBReadSchema = z.object({
   parseFailedReason: z.union([z.string(), z.undefined()]),
   sourceBytes: z.union([z.instanceof(Blob), z.undefined()]),
   sourceFileName: z.union([z.string(), z.undefined()]),
-  sourceFileType: z.union([z.enum(["csv", "xlsx"]), z.undefined()]),
+  sourceFileType: z.union([z.enum(["csv", "xlsx", "pdf"]), z.undefined()]),
   sourceFileSize: z.union([z.number(), z.undefined()]),
   lastSourceAccessedAt: z.union([z.number(), z.undefined()]),
+  isSourcePinned: z.union([z.boolean(), z.undefined()]),
   parseOptions: z.union([
     CsvParseOptionsSchema,
     XlsxParseOptionsSchema,
+    PdfParseOptionsSchema,
     z.undefined(),
   ]),
 });

@@ -3,7 +3,8 @@ create type public.datasets__source_type as enum(
   'google_sheets',
   'virtual',
   'open_data',
-  'xlsx_file'
+  'xlsx_file',
+  'pdf_file'
 );
 
 create table public.datasets (

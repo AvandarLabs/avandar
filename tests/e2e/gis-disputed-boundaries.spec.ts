@@ -157,10 +157,7 @@ test("binds a disputed-status column and renders a dashed casing and locked lege
         { timeout: LONG_WAIT },
       )
       .toEqual([3, 2]);
-    const reloadedCasingPaint = await _readLayerPaint(
-      page,
-      "-disputed-casing",
-    );
+    const reloadedCasingPaint = await _readLayerPaint(page, "-disputed-casing");
     const reloadedOutlinePaint = await _readLayerPaint(page, "-outline");
     expect(reloadedCasingPaint?.["line-color"]).not.toEqual(
       reloadedOutlinePaint?.["line-color"],

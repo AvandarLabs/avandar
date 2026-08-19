@@ -3,6 +3,7 @@ import { Tooltip } from "@mantine/core";
 import {
   IconBrandGoogle,
   IconFileTypeCsv,
+  IconFileTypePdf,
   IconFileTypeXls,
   IconTable,
   IconWorld,
@@ -61,6 +62,14 @@ export function SourceBadge({
           return <IconWorld {...props} color="#0072ce" />;
         },
         tooltip: t`From Open Data`,
+      };
+    })
+    .with("pdf_file", () => {
+      return {
+        Icon: (props: React.ComponentProps<typeof IconFileTypePdf>) => {
+          return <IconFileTypePdf {...props} color="#666" />;
+        },
+        tooltip: t`From PDF`,
       };
     })
     .exhaustive(() => {

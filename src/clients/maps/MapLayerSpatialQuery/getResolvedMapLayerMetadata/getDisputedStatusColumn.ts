@@ -1,6 +1,6 @@
+import { propEq } from "@avandar/utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
 import {
   createRebindRequired,

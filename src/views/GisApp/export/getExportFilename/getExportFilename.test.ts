@@ -21,7 +21,8 @@ describe("getExportFilename", () => {
   });
 
   it("truncates a very long title to 60 characters before the date", () => {
-    const title = "Cholera response across every health zone in North Kivu " +
+    const title =
+      "Cholera response across every health zone in North Kivu " +
       "and South Kivu provinces during the wet season outbreak";
 
     const filename = getExportFilename({

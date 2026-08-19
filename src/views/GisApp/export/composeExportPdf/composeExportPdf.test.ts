@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { ExportPdfInput } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
+import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 
 const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
   const document = {
@@ -21,7 +21,12 @@ const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
     }),
     save: vi.fn(),
   };
-  return { fakeDocument: document, jsPDFMock: vi.fn(() => {return document}) };
+  return {
+    fakeDocument: document,
+    jsPDFMock: vi.fn(() => {
+      return document;
+    }),
+  };
 });
 
 vi.mock("jspdf", () => {
@@ -29,9 +34,8 @@ vi.mock("jspdf", () => {
 });
 
 // Imported after the mock so the module under test picks up the fake ctor.
-const { composeExportPdf } = await import(
-  "@/views/GisApp/export/composeExportPdf/composeExportPdf"
-);
+const { composeExportPdf } =
+  await import("@/views/GisApp/export/composeExportPdf/composeExportPdf");
 
 const PAGE = {
   pageMm: { width: 297, height: 210 },
@@ -66,9 +70,8 @@ function _options(
 ): ExportPdfInput {
   const producedAt = overrides.producedAt ?? new Date("2026-08-18T09:00:00Z");
   const hasAoi = overrides.hasAoi ?? false;
-  const timeWindow = "timeWindow" in overrides ? overrides.timeWindow : (
-    undefined
-  );
+  const timeWindow =
+    "timeWindow" in overrides ? overrides.timeWindow : undefined;
   const filterReadoutLines = [
     ...(timeWindow !== undefined ? [`Dates: ${timeWindow}`] : []),
     ...(hasAoi ? ["Area of interest applied"] : []),
@@ -164,9 +167,11 @@ describe("composeExportPdf", () => {
   it("omits page numbers when everything fits on one page", async () => {
     await composeExportPdf(_options({ legendEntryCount: 3 }));
 
-    expect(_writtenText().some((line) => {return line.startsWith("Page ")})).toBe(
-      false,
-    );
+    expect(
+      _writtenText().some((line) => {
+        return line.startsWith("Page ");
+      }),
+    ).toBe(false);
   });
 
   it("names the file from the rendered title and production date", async () => {
@@ -249,9 +254,7 @@ describe("composeExportPdf", () => {
       throw new Error("header boom");
     });
 
-    await expect(composeExportPdf(_options({}))).rejects.toThrow(
-      "header boom",
-    );
+    await expect(composeExportPdf(_options({}))).rejects.toThrow("header boom");
     expect(fakeDocument.save).not.toHaveBeenCalled();
   });
 });

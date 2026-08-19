@@ -4,10 +4,14 @@ import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSaveDataset } from "./useSaveDataset";
-import type { CsvFileLoadResult } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
+import type {
+  CsvFileLoadResult,
+  PdfFileLoadResult,
+} from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   CsvDataSourceMetadata,
   DatasetImportFormValues,
+  PdfDataSourceMetadata,
 } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -72,6 +76,8 @@ const CSV_PARAMS: DatasetImportFormValues & CsvDataSourceMetadata = {
 
 const {
   insertCsvFileDatasetMock,
+  insertPdfFileDatasetMock,
+  transcodeReviewedPdfExtractionMock,
   logEventMock,
   workspaceDatasetsMock,
   notifyErrorMock,
@@ -80,6 +86,8 @@ const {
 } = vi.hoisted(() => {
   return {
     insertCsvFileDatasetMock: vi.fn(),
+    insertPdfFileDatasetMock: vi.fn(),
+    transcodeReviewedPdfExtractionMock: vi.fn(),
     logEventMock: vi.fn(),
     workspaceDatasetsMock: vi.fn(),
     notifyErrorMock: vi.fn(),
@@ -99,7 +107,16 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       useGetAll: workspaceDatasetsMock,
       insertCsvFileDataset: insertCsvFileDatasetMock,
       insertGoogleSheetsDataset: vi.fn(),
+      insertPdfFileDataset: insertPdfFileDatasetMock,
       insertXlsxFileDataset: vi.fn(),
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+  return {
+    LocalDatasetClient: {
+      transcodeReviewedPdfExtraction: transcodeReviewedPdfExtractionMock,
     },
   };
 });
@@ -201,10 +218,69 @@ function _wrapper({ children }: { children: ReactNode }): ReactElement {
   );
 }
 
+function _pdfLoadResult(
+  overrides: Partial<PdfFileLoadResult> = {},
+): PdfFileLoadResult {
+  return {
+    datasetId: SAVED_DATASET.id,
+    numRows: 1,
+    id: "pdf-load-result",
+    type: "pdf",
+    pageCount: 3,
+    pages: [],
+    status: "extracted",
+    regions: [],
+    columns: [_duckDbColumn("subject"), _duckDbColumn("value")],
+    tables: [],
+    classifications: {},
+    documentMetadata: {
+      title: null,
+      organisation: null,
+      reportNumber: null,
+      publishedAt: null,
+    },
+    combinedCells: [
+      ["subject", "value"],
+      ["Kassala", "12"],
+    ],
+    combinedHeaderRows: 1,
+    ...overrides,
+  };
+}
+
+function _pdfParams(
+  overrides: Partial<PdfDataSourceMetadata> = {},
+): DatasetImportFormValues & PdfDataSourceMetadata {
+  return {
+    name: "Imported PDF",
+    description: "",
+    sourceType: "pdf_file",
+    // Offline-only, so the post-save original upload is a no-op here. The
+    // dataset row still records that an original exists, because a PDF is
+    // pinned locally whatever the user chose about the cloud.
+    onlineStorageAllowed: false,
+    sizeInBytes: 4096,
+    datasetLoadResult: _pdfLoadResult(),
+    parseOptions: {
+      type: "pdf_file",
+      regions: [],
+      outputMode: "natural",
+      pageRange: [2, 4],
+    },
+    ...overrides,
+  };
+}
+
 describe("useSaveDataset", () => {
   beforeEach(() => {
     insertCsvFileDatasetMock.mockReset();
     insertCsvFileDatasetMock.mockResolvedValue(SAVED_DATASET);
+    insertPdfFileDatasetMock.mockReset();
+    insertPdfFileDatasetMock.mockResolvedValue(SAVED_DATASET);
+    transcodeReviewedPdfExtractionMock.mockReset();
+    transcodeReviewedPdfExtractionMock.mockResolvedValue({
+      columns: [_duckDbColumn("subject"), _duckDbColumn("value")],
+    });
     logEventMock.mockReset();
     navigateMock.mockReset();
     notifyErrorMock.mockReset();
@@ -307,5 +383,93 @@ describe("useSaveDataset", () => {
     await waitFor(() => {
       expect(onAfterSave).toHaveBeenCalledWith(SAVED_DATASET);
     });
+  });
+  it("refuses to save a PDF with no region selected", async () => {
+    // The save button is disabled in this state, so anything reaching here
+    // bypassed the form. Writing the dataset anyway would hand the user a
+    // saved source with no columns and no rows.
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await expect(
+        result.current[0].async(
+          _pdfParams({
+            datasetLoadResult: _pdfLoadResult({
+              status: "needs_selection",
+              numRows: 0,
+              columns: [],
+              combinedCells: [],
+              combinedHeaderRows: 0,
+            }),
+          }),
+        ),
+      ).rejects.toThrow(/select a region/i);
+    });
+
+    expect(insertPdfFileDatasetMock).not.toHaveBeenCalled();
+  });
+
+  it("records the model, the retained original and the page range", async () => {
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async(
+        _pdfParams({
+          parseOptions: {
+            type: "pdf_file",
+            regions: [],
+            outputMode: "observations",
+            pageRange: [2, 4],
+            llmModel: "anthropic/claude-sonnet-5",
+          },
+        }),
+      );
+    });
+
+    expect(insertPdfFileDatasetMock).toHaveBeenCalledOnce();
+    const params = insertPdfFileDatasetMock.mock.calls[0]![0];
+    // Without this the privacy log cannot answer "did a model see this
+    // document" from the dataset row alone.
+    expect(params.llmModel).toBe("anthropic/claude-sonnet-5");
+    expect(params.outputMode).toBe("observations");
+    expect(params.hasOriginalFile).toBe(true);
+    // The form's range is one-based; the stored one is zero-based, matching
+    // `PageGeometry.pageIndex`.
+    expect(params.pageRangeStart).toBe(1);
+    expect(params.pageRangeEnd).toBe(3);
+    // Fingerprinted from the combination, which is what the rows actually
+    // are, not from any single region.
+    expect(params.fingerprint).toEqual(
+      expect.objectContaining({ headers: ["subject", "value"], shape: [1, 2] }),
+    );
+  });
+
+  it("leaves the model unrecorded when rules did all the work", async () => {
+    workspaceDatasetsMock.mockReturnValue([[], false]);
+    const { result } = renderHook(
+      () => {
+        return useSaveDataset();
+      },
+      { wrapper: _wrapper },
+    );
+
+    await act(async () => {
+      await result.current[0].async(_pdfParams());
+    });
+
+    expect(insertPdfFileDatasetMock).toHaveBeenCalledOnce();
+    expect(insertPdfFileDatasetMock.mock.calls[0]![0].llmModel).toBeUndefined();
   });
 });

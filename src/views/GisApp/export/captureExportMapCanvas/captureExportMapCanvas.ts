@@ -61,8 +61,10 @@ function _isCanvasBlank(canvas: HTMLCanvasElement): boolean {
       isUniformlyTransparent = false;
     }
     const isOpaqueBlack =
-      data[index] === 0 && data[index + 1] === 0 &&
-      data[index + 2] === 0 && alpha === 255;
+      data[index] === 0 &&
+      data[index + 1] === 0 &&
+      data[index + 2] === 0 &&
+      alpha === 255;
     if (!isOpaqueBlack) {
       isUniformlyBlack = false;
     }

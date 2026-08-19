@@ -41,6 +41,7 @@ function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
   return {
     csv_file: t`CSV`,
     xlsx_file: t`Excel`,
+    pdf_file: t`PDF`,
     google_sheets: t`Google Sheets`,
     open_data: t`Open data`,
     virtual: t`Derived`,
@@ -150,9 +151,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       .with("virtual", () => {
         loadVirtualDataset(selectedDataset);
       })
-      .with("csv_file", "xlsx_file", "google_sheets", "open_data", () => {
-        openAsRawPreview(selectedDataset);
-      })
+      .with(
+        "csv_file",
+        "xlsx_file",
+        "pdf_file",
+        "google_sheets",
+        "open_data",
+        () => {
+          openAsRawPreview(selectedDataset);
+        },
+      )
       .exhaustive();
   };
 

@@ -28,6 +28,9 @@ export function useImportedColumns(
       .with(
         { sourceType: "csv_file" },
         { sourceType: "xlsx_file" },
+        // A PDF's columns stay empty until a region is extracted, so this
+        // arm yields `[]` for a freshly-uploaded document.
+        { sourceType: "pdf_file" },
         (metadata) => {
           return _duckDbColumnsToImportedColumns(
             metadata.datasetLoadResult.columns,

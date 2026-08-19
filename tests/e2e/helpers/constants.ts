@@ -52,6 +52,36 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 /** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
+/**
+ * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
+ * provenance and licence). Well under the 50-page import cap, so its page
+ * geometry sniff finishes quickly.
+ */
+export const FRONTIERS_PERU_PDF_PATH = path.join(
+  process.cwd(),
+  "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf",
+);
+
+/**
+ * The OCHA Sudan Cholera Operational Update of 3 July 2025: page 1 carries the
+ * choropleth this suite extracts, and the whole document is 3 pages.
+ *
+ * This is one of the two merge-gate documents (see
+ * `src/workers/pdfSniff/gateDocuments.test.ts`), and the only one that is
+ * committed. The IMC situation report has no confirmed redistribution licence,
+ * so it is gitignored and may be absent, which makes it unusable here.
+ */
+export const OCHA_SUDAN_CHOLERA_PDF_PATH = path.join(
+  process.cwd(),
+  "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf",
+);
+
+/** Page 1 of {@link OCHA_SUDAN_CHOLERA_PDF_PATH}, in PDF points. */
+export const OCHA_SUDAN_CHOLERA_PAGE_SIZE_PT = {
+  width: 595.276,
+  height: 841.89,
+} as const;
+
 /** Directory of GIS geometry, boundary, and point CSV fixtures. */
 const GIS_DATA_DIR = path.join(process.cwd(), "tests/data/gis");
 

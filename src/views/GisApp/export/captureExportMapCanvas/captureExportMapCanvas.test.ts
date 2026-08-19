@@ -75,9 +75,8 @@ vi.mock("@/views/GisApp/MapCanvas/syncMap/syncMap", () => {
   return { syncMap: vi.fn() };
 });
 
-const { captureExportMapCanvas } = await import(
-  "@/views/GisApp/export/captureExportMapCanvas/captureExportMapCanvas"
-);
+const { captureExportMapCanvas } =
+  await import("@/views/GisApp/export/captureExportMapCanvas/captureExportMapCanvas");
 
 /** A minimal, valid export spec: no sources or layers. */
 function _spec(): MapSpec {

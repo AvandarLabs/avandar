@@ -1,17 +1,16 @@
 import { prop } from "@avandar/utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type {
   MapLayerSpec,
   MapSourceSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** Chrome source and layer ids: every layer id below begins with one. */
-const CHROME_ID_PREFIXES: readonly string[] = Object.values(
-  MapChromeOverlayIds,
-);
+const CHROME_ID_PREFIXES: readonly string[] =
+  Object.values(MapChromeOverlayIds);
 
 /** The three MapLibre layer ids the persisted annotation overlay uses. */
 const ANNOTATION_LAYER_IDS: readonly string[] = [
@@ -72,10 +71,7 @@ function _stripFeatureState(layer: MapLayerSpec): MapLayerSpec {
 }
 
 /** Whether a layer belongs in the export, before feature-state is resolved. */
-function _keepLayer(
-  layer: MapLayerSpec,
-  annotationsVisible: boolean,
-): boolean {
+function _keepLayer(layer: MapLayerSpec, annotationsVisible: boolean): boolean {
   if (_isChromeLayerId(layer.id)) {
     return false;
   }
@@ -93,9 +89,7 @@ function _pruneSources(
   sources: Record<string, MapSourceSpec>,
   layers: readonly MapLayerSpec[],
 ): Record<string, MapSourceSpec> {
-  const referencedSourceIds = new Set(
-layers.map(prop("source")),
-  );
+  const referencedSourceIds = new Set(layers.map(prop("source")));
   return Object.fromEntries(
     Object.entries(sources).filter(([sourceId]) => {
       return referencedSourceIds.has(sourceId);
