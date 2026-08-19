@@ -17,7 +17,7 @@ type Props = {
   width: number;
   height: number;
   /**
-   * Canvas pixels per PDF point, used only when the surface has not been laid
+   * Layout pixels per PDF point, used only when the surface has not been laid
    * out. See {@link _pixelsPerPoint}.
    */
   scale: number;
@@ -40,15 +40,17 @@ type Mapping = {
 /**
  * CSS pixels per PDF point, measured from the surface the user dragged on.
  *
- * The `scale` prop cannot answer this. It is the canvas's own scale: how many
- * BITMAP pixels `PdfPagePreview` drew one point as. A pointer event reports
- * CSS pixels, and the two are not the same number here, because every size in
- * this preview goes through Mantine's `rem()` scaling. `--mantine-scale` is
- * 0.9 between 1200 and 1408 CSS pixels of viewport and 0.8 below that (see
+ * The `scale` prop cannot answer this. It is the scale `PdfPagePreview` was
+ * asked to LAY the page out at, which is neither what it drew the bitmap at
+ * nor what the browser ended up showing. A pointer event reports CSS pixels,
+ * and the two are not the same number here, because every size in this
+ * preview goes through Mantine's `rem()` scaling. `--mantine-scale` is 0.9
+ * between 1200 and 1408 CSS pixels of viewport and 0.8 below that (see
  * `src/index.css`), so a 420-point-wide preview is displayed 378 or 336
- * pixels wide while its bitmap stays 420.
+ * pixels wide. The bitmap is a third number again: `PdfPagePreview` draws it
+ * at the device pixel ratio, so on a retina screen it is 840 pixels across.
  *
- * Dividing a pointer offset by the bitmap scale therefore reports a region
+ * Dividing a pointer offset by that scale therefore reports a region
  * nobody drew. Measured in a real browser at `--mantine-scale: 0.9`, a box
  * dragged around the OCHA choropleth came back as [274, 489, 513, 638]
  * instead of the [305, 450, 570, 615] it covered on screen, which cuts six
