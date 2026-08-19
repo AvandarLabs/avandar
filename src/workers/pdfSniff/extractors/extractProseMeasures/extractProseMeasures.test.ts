@@ -22,6 +22,7 @@ function region(texts: readonly string[]): RegionGeometry {
     bbox: [0, 0, 600, 700],
     textItems: lines(texts),
     rules: [],
+    marks: [],
   };
 }
 

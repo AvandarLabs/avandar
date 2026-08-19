@@ -192,6 +192,9 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
         rules: clipped.flatMap((clip) => {
           return clip.rules;
         }),
+        marks: clipped.flatMap((clip) => {
+          return clip.marks;
+        }),
       };
 
       const classification = classifyRegion(merged);

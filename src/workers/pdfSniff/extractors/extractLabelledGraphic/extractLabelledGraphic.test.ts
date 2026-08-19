@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { extractLabelledGraphic } from "./extractLabelledGraphic";
-import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
+import type {
+  RegionGeometry,
+  RuleSegment,
+  TextItem,
+} from "../../pdfSniff.types";
 
 function item(text: string, x: number, y: number, width?: number): TextItem {
   return {
@@ -14,9 +18,24 @@ function item(text: string, x: number, y: number, width?: number): TextItem {
   };
 }
 
-function region(textItems: readonly TextItem[]): RegionGeometry {
-  return { pageIndex: 0, bbox: [0, 0, 600, 600], textItems, rules: [] };
+function region(
+  textItems: readonly TextItem[],
+  rules: readonly RuleSegment[] = [],
+  bbox: RegionGeometry["bbox"] = [0, 0, 600, 600],
+): RegionGeometry {
+  return { pageIndex: 0, bbox, textItems, rules, marks: [] };
 }
+
+/** Axes matching the OCHA weekly trend chart's inner plot. */
+const TREND_RULES: readonly RuleSegment[] = [
+  { orientation: "horizontal", position: 187.8, span: [36, 559.3] },
+  { orientation: "horizontal", position: 93.5, span: [72, 547.9] },
+  { orientation: "horizontal", position: 61.1, span: [36, 559.3] },
+  { orientation: "vertical", position: 36, span: [61.1, 187.8] },
+  { orientation: "vertical", position: 559.3, span: [61.1, 187.8] },
+];
+
+const TREND_BBOX: RegionGeometry["bbox"] = [30, 55, 570, 215];
 
 describe("extractLabelledGraphic", () => {
   it("produces a two-column label-and-value table", () => {
@@ -185,5 +204,48 @@ describe("extractLabelledGraphic", () => {
     );
 
     expect(result.extractedBy).toBe("rules");
+  });
+
+  it("does not pair a chart title or month names when a plot frame is present", () => {
+    const result = extractLabelledGraphic(
+      region(
+        [
+          item("Cholera cases trend", 36, 198.1, 79.5),
+          item("10,000", 42, 180.5, 15.2),
+          item("0", 54.4, 91.8, 2.8),
+          item("1", 70.7, 80.3, 2.8),
+          item("2", 89.7, 80.3, 2.8),
+          item("January", 97.5, 64.9, 25.4),
+          item("February", 182, 64.9, 27.8),
+        ],
+        TREND_RULES,
+        TREND_BBOX,
+      ),
+      { regionId: "trend" },
+    );
+
+    expect(result.cells.slice(1)).toEqual([]);
+    expect(
+      result.flags.filter((flag) => {
+        return flag.reason === "unmatched_value";
+      }),
+    ).toHaveLength(0);
+  });
+
+  it("still pairs a label printed inside the plot", () => {
+    const result = extractLabelledGraphic(
+      region(
+        [
+          item("Cholera cases trend", 36, 198.1, 79.5),
+          item("WASH", 200, 150, 20),
+          item("3", 220, 140, 8),
+        ],
+        TREND_RULES,
+        TREND_BBOX,
+      ),
+      { regionId: "trend" },
+    );
+
+    expect(result.cells.slice(1)).toEqual([["WASH", "3"]]);
   });
 });
