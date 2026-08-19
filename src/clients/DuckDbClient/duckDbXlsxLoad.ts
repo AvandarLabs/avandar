@@ -1,5 +1,9 @@
 import { uuid } from "$/lib/uuid";
-import { buildXlsxReadRange } from "@/clients/DuckDbClient/buildXlsxReadRange/buildXlsxReadRange";
+import {
+  buildXlsxReadRange,
+  buildXlsxWidthProbeRange,
+  getXlsxColumnIndex,
+} from "@/clients/DuckDbClient/buildXlsxReadRange/buildXlsxReadRange";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import {
   assertXlsxFileReadable,
@@ -71,6 +75,79 @@ async function _registerXlsxStagingFile(
   });
 }
 
+/**
+ * How many rows the width probe reads, including the header row. Enough to
+ * catch a column whose header cell is blank but whose data is not, while
+ * staying a bounded read.
+ */
+const XLSX_WIDTH_PROBE_ROWS = 25;
+
+/**
+ * Finds the sheet's last populated column so the transcode's range can be
+ * bounded to the real table, returning `undefined` when it cannot be
+ * determined.
+ *
+ * `read_xlsx` needs a range to skip a title block, and a range with no known
+ * right edge has to name the format's maximum column - which makes the read
+ * return all 16,384 columns, padding the table with thousands of all-NULL
+ * columns. `stop_at_empty` bounds only the rows, so the width has to be
+ * measured here instead.
+ *
+ * The probe unpivots a window of cells and asks which column labels hold a
+ * value, which keeps the result the width of the table rather than the width
+ * of the format. A failure is not fatal: the caller falls back to the
+ * unbounded range, which reads the data correctly, just wastefully.
+ */
+async function _detectLastPopulatedColumn(
+  options: Readonly<{
+    client: DuckDbClientOperations;
+    conn: duckdb.AsyncDuckDBConnection;
+    datasetDuckDbLease: DatasetDuckDbLease;
+    rowsToSkip: number;
+    sheetClause: string;
+    xlsxStagingFile: string;
+  }>,
+): Promise<string | undefined> {
+  const probeRange = buildXlsxWidthProbeRange(
+    options.rowsToSkip,
+    XLSX_WIDTH_PROBE_ROWS,
+  );
+  try {
+    const result = await options.client.runRawQuery<{ cellColumn: string }>(
+      `SELECT DISTINCT cellColumn FROM (
+          UNPIVOT (
+            SELECT * FROM read_xlsx(
+              '$xlsxFile$', header = false, range = '${probeRange}',
+              stop_at_empty = false, all_varchar = true${options.sheetClause}
+            )
+          ) ON COLUMNS(*) INTO NAME cellColumn VALUE cellValue
+        ) WHERE cellValue IS NOT NULL AND trim(cellValue) <> ''`,
+      {
+        conn: options.conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        [TRUSTED_INTERNAL_SQL]: true,
+        params: { xlsxFile: options.xlsxStagingFile },
+      },
+    );
+    let lastColumn: string | undefined;
+    let lastColumnIndex = 0;
+    result.data.forEach((row) => {
+      const columnIndex = getXlsxColumnIndex(row.cellColumn);
+      if (columnIndex > lastColumnIndex) {
+        lastColumnIndex = columnIndex;
+        lastColumn = row.cellColumn;
+      }
+    });
+    return lastColumn;
+  } catch (error) {
+    options.client.logger.log(
+      "Could not detect the XLSX sheet's width; reading the full width instead.",
+      error,
+    );
+    return undefined;
+  }
+}
+
 async function _transcodeXlsxToParquet(
   options: Readonly<{
     client: DuckDbClientOperations;
@@ -87,7 +164,20 @@ async function _transcodeXlsxToParquet(
     options.sheet ?
       `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
     : "";
-  const range = buildXlsxReadRange(options.rowsToSkip);
+  // A range is only needed to skip a title block, and detecting the sheet's
+  // width costs a read of its own, so neither happens without a skip.
+  const lastColumn =
+    options.rowsToSkip > 0 ?
+      await _detectLastPopulatedColumn({
+        client: options.client,
+        conn: options.conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        rowsToSkip: options.rowsToSkip,
+        sheetClause,
+        xlsxStagingFile: options.xlsxStagingFile,
+      })
+    : undefined;
+  const range = buildXlsxReadRange(options.rowsToSkip, lastColumn);
   // Naming a range turns `stop_at_empty` off, which would pad the read out to
   // the format's maximum row, so it is switched back on alongside the range.
   const rangeClause = range ? `, range = '${range}', stop_at_empty = true` : "";
