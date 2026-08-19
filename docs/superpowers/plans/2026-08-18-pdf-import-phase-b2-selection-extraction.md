@@ -34,6 +34,27 @@ Read `docs/superpowers/specs/2026-08-18-pdf-region-extraction-design.md` in
 full first. This plan implements it directly, and several tasks below only make
 sense against the evidence recorded there.
 
+## Known gap: the observations `unit` column
+
+Found while implementing Task 12, deferred deliberately, not covered by the
+Task 20 gate assertions.
+
+In observations mode the numeric path emits `unit: "n"` for every value, so the
+OCHA KPI tile `2.6%` becomes value `2.6` with unit `n`, and the funding bars'
+`3M` loses its currency. The spec's observations schema promises `value` is
+numeric "with `unit` absorbing the `$`, `%` or `M` suffix".
+
+The root cause is that each extractor calls `normalizeCellValue` on the way in,
+so the suffix is already gone by the time `combineRegions` sees the cell. A
+local patch there cannot recover it. The real fix is for the extractors, at
+least `extractLabelledGraphic`, to carry the unit alongside the value, which is
+a change to what an extractor emits and is worth deciding deliberately rather
+than bolting on.
+
+It matters because a percentage and a count sharing `unit: "n"` compare as
+equal across stacked reports, and cross-document comparison is the entire
+reason observations mode exists.
+
 ## Two defects inherited from Phase B1, to fix in this phase
 
 Both were found while implementing B1 Task 13 and confirmed against the code.
