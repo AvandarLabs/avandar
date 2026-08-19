@@ -1,4 +1,5 @@
-import { Stack } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
+import { SegmentedControl, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -15,6 +16,7 @@ import type {
   ExtractedTable,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -51,6 +53,7 @@ export function PdfParseControls({
   onDataSourceMetadataChange,
   onRequestDataReparse,
 }: Readonly<Props>): ReactNode {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
   const loadResult = metadata.datasetLoadResult;
@@ -73,6 +76,16 @@ export function PdfParseControls({
 
   const onRegionsChange = (nextRegions: readonly PdfRegion[]): void => {
     onRequestDataReparse(changeParseOptions({ regions: nextRegions }));
+  };
+
+  /*
+   * The same re-parse a region change goes through, because the output shape
+   * is decided inside `combineRegions` during extraction rather than after
+   * it. Reshaping the rows we already have on this side would mean a second
+   * implementation of the union rule, and the two would drift.
+   */
+  const onOutputModeChange = (mode: PdfOutputMode): void => {
+    onRequestDataReparse(changeParseOptions({ outputMode: mode }));
   };
 
   /**
@@ -124,6 +137,28 @@ export function PdfParseControls({
 
   return (
     <Stack gap="md" w="100%">
+      <Stack gap={4}>
+        <Text size="sm" fw={500}>
+          {t`Rows`}
+        </Text>
+        <SegmentedControl
+          size="xs"
+          value={metadata.parseOptions.outputMode ?? "natural"}
+          data={[
+            { value: "natural", label: t`As printed` },
+            { value: "observations", label: t`One row per measurement` },
+          ]}
+          onChange={(value) => {
+            onOutputModeChange(value as PdfOutputMode);
+          }}
+        />
+        <Text size="xs" c="dimmed">
+          {metadata.parseOptions.outputMode === "observations" ?
+            t`Every value becomes its own row, stamped with the document's title, organisation and date. Two reports of the same kind then stack into one series.`
+          : t`The columns mirror what this document printed. Regions that disagree about their columns are still split out.`
+          }
+        </Text>
+      </Stack>
       <PdfRegionPicker
         file={sourceFile}
         pageCount={loadResult.pageCount}

@@ -286,7 +286,9 @@ describe("PdfRegionPicker", () => {
       ],
     });
 
-    expect(screen.getByText(/y-axis 0 to 10000/i)).toBeInTheDocument();
+    // "Value axis" rather than "y-axis": a horizontal bar chart is calibrated
+    // along x, and the same note is what reports it.
+    expect(screen.getByText(/value axis 0 to 10000/i)).toBeInTheDocument();
     expect(screen.getByText(/fits 6 ticks/i)).toBeInTheDocument();
     expect(screen.getByText(/max error 0.3 pt/i)).toBeInTheDocument();
   });

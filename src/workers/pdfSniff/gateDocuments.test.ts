@@ -427,16 +427,27 @@ describe("gate document: OCHA Sudan Cholera Operational Update", () => {
     // about the bar rather than the bar's own unit.
     expect(table.rowUnits).toEqual(["n", "n", "n", "n", "n", "n"]);
 
-    // Every pillar has its own figure: nothing is unmatched in either
-    // direction. Five of the six pairings are near-ties and say so, which is
-    // the truth about this chart rather than a defect: the pillar names sit
-    // in a column 90 to 180 points to the left, while the rows are only 23
-    // points apart, so a bar's amount is barely closer to its own name than
-    // to the name above it. The values are right and flagged for review.
-    for (const flag of table.flags) {
-      expect(flag.reason).toBe("ambiguous_association");
-    }
-    expect(flaggedRowIndices(table).size).toBe(5);
+    // Nothing is flagged, and that is a change of mechanism rather than a
+    // relaxed assertion. Proximity pairing used to flag five of these six as
+    // near-ties, correctly: the pillar names sit in a column 90 to 180 points
+    // to the left while the rows are only 23 points apart, so a bar's amount
+    // was barely closer to its own name than to the name above it. Reading
+    // the bars themselves removes the contest. A bar occupies a row, its name
+    // and its figure sit on that row, and no distance is being weighed.
+    expect(table.flags).toEqual([]);
+
+    // The trust signal behind that claim: every printed figure is checked
+    // against the length its own bar was drawn at, and the five bars fit one
+    // straight line through 1M, 2M and 3M to within a thousandth of a point.
+    // A mislabelled bar would not survive this, which is why the flags being
+    // empty means something.
+    expect(table.chartAxis?.scale).toBe("linear");
+    expect(table.chartAxis?.tickCount).toBe(5);
+    expect(table.chartAxis?.maxResidual).toBeLessThan(0.01);
+
+    // "Others" is printed as 0 and drawn as nothing, and it still comes out
+    // as a row. A reader that only walked the bars would silently lose it.
+    expect(dataRows(table).at(-1)).toEqual(["Others", "0"]);
   });
 
   it("reads all six response pillars, one column region at a time", async () => {

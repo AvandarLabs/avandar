@@ -2,8 +2,13 @@
 
 **Branch:** `feat/pdf-geometry`, based on `develop` at `d062dbc24` (the commit
 that merged `feat/pdf-import`).
-**Status:** nothing implemented yet. This document is the whole plan.
 **Written:** 2026-08-19.
+
+**Status:** phases 0, 1 and 2 are implemented and merged to `develop`. Phase 3
+is implemented on the branch. See section 10 for what each phase turned out to
+mean; the phase headings there carry the outcome. Sections 1 to 9 are the
+original plan and have not been rewritten, so where the plan and the code
+differ, the code is right and section 10 says why.
 
 > **You have roughly 4 hours to a demo.** Section 10 is the time-boxed plan.
 > Read sections 1 to 4 first (they are short and they change what you build),
@@ -63,19 +68,21 @@ if (dx <= MAX_RULE_THICKNESS && dy >= MIN_RULE_LENGTH) → vertical rule
 Survivors are flattened to `RuleSegment` (`pdfSniff.types.ts:45`):
 
 ```ts
-{ orientation, position, span }   // no colour, no fill/stroke, no path grouping
+{
+  (orientation, position, span);
+} // no colour, no fill/stroke, no path grouping
 ```
 
 Consequences:
 
-| Chart element | Fate today |
-|---|---|
-| Line/area polyline (sloped) | dropped, every segment is diagonal |
-| Area fill (closed path) | dropped |
-| Data point markers (circles, `curveTo`) | dropped |
-| Bar rectangles | edges may survive as 4 unrelated segments; no rect, no colour |
-| Bars shorter than 8pt | dropped entirely |
-| Gridlines and axes | kept (this is all we have) |
+| Chart element                           | Fate today                                                    |
+| --------------------------------------- | ------------------------------------------------------------- |
+| Line/area polyline (sloped)             | dropped, every segment is diagonal                            |
+| Area fill (closed path)                 | dropped                                                       |
+| Data point markers (circles, `curveTo`) | dropped                                                       |
+| Bar rectangles                          | edges may survive as 4 unrelated segments; no rect, no colour |
+| Bars shorter than 8pt                   | dropped entirely                                              |
+| Gridlines and axes                      | kept (this is all we have)                                    |
 
 So for the trend chart the extractor genuinely receives **no data marks at
 all**, only text. That is why it grabs the title and the months: text is
@@ -141,7 +148,7 @@ Implementation notes:
 - Fill colour needs tracking `OPS.setFillRGBColor` (and `setFillGray`) as you
   walk the operator list, holding the current value. Colour is only needed for
   legend matching (Tier 3), so **skip it if time is short** and set `fill:
-  null`.
+null`.
 - Cap the number of marks per page (a few thousand) so a pathological vector
   map cannot blow up memory. Record that you truncated.
 
@@ -185,14 +192,14 @@ interval.
 
 This alone fixes three of the four observed failures and **needs no marks**.
 
-| Where the text sits | Role |
-|---|---|
-| inside the frame | data label |
-| left of frame, numeric, right-aligned | y tick label |
-| below frame, evenly spaced | x tick label (the epi weeks) |
-| below the x tick row, spanning several of them | x group label (the months) |
-| above the frame, larger font | title |
-| below everything, small font | source note / footnote |
+| Where the text sits                            | Role                         |
+| ---------------------------------------------- | ---------------------------- |
+| inside the frame                               | data label                   |
+| left of frame, numeric, right-aligned          | y tick label                 |
+| below frame, evenly spaced                     | x tick label (the epi weeks) |
+| below the x tick row, spanning several of them | x group label (the months)   |
+| above the frame, larger font                   | title                        |
+| below everything, small font                   | source note / footnote       |
 
 Title-as-value, months-as-values and week-numbers-not-recognised are all one
 missing concept: the frame. Feed only "data label" text to the existing
@@ -204,14 +211,14 @@ competing with week labels for the same row. If it survives, look at
 
 ### Step 4. Read the marks (the only type-specific part)
 
-| Type | Marks to find | Value |
-|---|---|---|
-| Bar / column | congruent filled rects sharing one baseline | calibrate(free edge) |
-| Line / area | **marker centres preferred**, else polyline vertices | calibrate(y) |
-| Scatter | congruent small marks, no shared baseline | calibrate both axes |
-| Pie / donut | arcs closing a ring | sweep angle; self-calibrating at 360 |
-| Heatmap | grid of rects with varying fill | fill colour vs legend ramp |
-| Choropleth | irregular polygons, small fill palette | fill colour vs legend ramp |
+| Type         | Marks to find                                        | Value                                |
+| ------------ | ---------------------------------------------------- | ------------------------------------ |
+| Bar / column | congruent filled rects sharing one baseline          | calibrate(free edge)                 |
+| Line / area  | **marker centres preferred**, else polyline vertices | calibrate(y)                         |
+| Scatter      | congruent small marks, no shared baseline            | calibrate both axes                  |
+| Pie / donut  | arcs closing a ring                                  | sweep angle; self-calibrating at 360 |
+| Heatmap      | grid of rects with varying fill                      | fill colour vs legend ramp           |
+| Choropleth   | irregular polygons, small fill palette               | fill colour vs legend ramp           |
 
 Two traps worth stating:
 
@@ -251,7 +258,7 @@ retained**. Discriminators, all deterministic:
 
 Confidence should come from how many features agree. Keep populating the
 existing `evidence: string[]`, which is already the right UI surface: it tells
-the user *why* we guessed, so overriding it is an informed act.
+the user _why_ we guessed, so overriding it is an informed act.
 
 **The dropdown is a confirmation with override, not the primary input.**
 
@@ -299,7 +306,7 @@ and carry the finer type in the region's JSON payload. Do the enum split later.
 ## 8. User hints, ranked by payoff
 
 1. **Two-point manual calibration.** "Click two points on the axis, type their
-   values." Highest value per unit of effort. It makes *any* chart readable,
+   values." Highest value per unit of effort. It makes _any_ chart readable,
    removes the whole failure class where tick detection fails, and it is the
    **only mechanism that works identically for vector and raster**, because the
    user clicks the rendered page rather than the geometry. This is the
@@ -352,7 +359,8 @@ The observations schema only appears today when two regions disagree, because of
 `combineRegions.ts:144`:
 
 ```ts
-const shouldUnion = params.outputMode !== "observations" && headerKeys.size === 1;
+const shouldUnion =
+  params.outputMode !== "observations" && headerKeys.size === 1;
 ```
 
 One region always has one header key, so it always unions to "natural". Adding a
@@ -401,12 +409,54 @@ on the demo document.
 **Demo value:** "and when it cannot work it out, you tell it two numbers and it
 still works." Also covers raster charts.
 
-### Phase 3 (only if time): type detection + dropdown, bar reader.
+### Phase 3 (DONE): type detection + dropdown, bar reader.
 
-- the section 6 discriminators, populating `evidence`
-- bar reader (rect top edge against calibrated axis)
-- the `outputMode` toggle from section 9 (this one is ~15 min and is a good
-  filler if you have an awkward 20 minutes left)
+- `detectGraphicType` runs the section 6 discriminators and its sentence is
+  appended to `classifyRegion`'s `evidence`. It names only `bar_chart`,
+  `column_chart` and `line_area_chart`, and says `unknown` for everything
+  else. The choropleth and the KPI tiles are both `unknown`, deliberately: the
+  section 6 choropleth discriminator is not implementable on the gate document
+  because **the map's state shapes never reach us as polygons at all**. Page 1
+  yields 122 marks in total, the map region holding one background rect, 18
+  copies of the same full-map clip box, and the capital-city markers. This is
+  the section 15 case, and it is the one measurement in this document that
+  contradicts the vector assumption. A KPI-tile discriminator was tried and
+  backed out: separating one tile row from one map needed an area threshold
+  tuned to exactly two data points, and a type nothing acts on is a claim not
+  worth making.
+- `findBarFamily` finds congruent filled rectangles growing from one shared
+  edge, one per row, not all the same length. `readBarChart` reads them.
+- **The bar reader does not calibrate against an axis on this document,
+  because the funding chart has none.** It has no plot frame at all: five bars
+  at a shared left edge of 357.5, lengths 48.7 / 48.7 / 48.7 / 97.3 / 146.0,
+  and the only numbers anywhere are the `3M` / `2M` / `1M` printed on the bars
+  themselves. So the value scale is fitted through those, and the framed path
+  (`findPlotFrame` plus the numeric ticks on the value side) is covered by a
+  synthetic test rather than a document. Order of preference is the user's two
+  points, then the document's axis, then the printed figures.
+- **A printed figure is reported as printed.** The calibration checks it
+  rather than replacing it, and only a bar with no figure beside it is read
+  off the scale. The fit through the funding chart's five bars is out by
+  0.0004 pt, which is the demo's trust signal: the document's own numbers and
+  its own geometry agree to a thousandth of a point.
+- A per-row disagreement is only flagged when the scale came from somewhere
+  other than those same figures. Fitted through the bar labels, least squares
+  spreads one wrong label across every row, so that case is one region-level
+  flag instead.
+- This changed the funding-bars gate test. **Not one value moved**: all six
+  are still the hand-read figures. What went away is five
+  `ambiguous_association` flags, because reading the bars removes the distance
+  contest that produced them. The test now also pins the residual and the
+  `Others` row, which is printed as `0` and drawn as nothing.
+- The `outputMode` toggle from section 9 is on `PdfParseControls`, and goes
+  through the ordinary re-parse rather than reshaping rows on the main thread.
+
+### Still not done
+
+Everything in "Explicitly NOT in the 4 hours" below, plus: the framed bar
+chart path has no real document behind it, and `readCartesianChart` still
+hard-codes a `week` column header, which is right for the gate document and
+wrong for the next one.
 
 ### Explicitly NOT in the 4 hours
 
@@ -496,21 +546,21 @@ and nothing here needs a browser. Unit-test against the committed geometry.
 
 ## 14. Key file anchors
 
-| What | Where |
-|---|---|
-| **The retention funnel (start here)** | `src/workers/pdfSniff/extractPageGeometry/extractPageGeometry.ts:144` |
-| Draw opcodes | same file, `:41` |
-| `RuleSegment` / `PageGeometry` | `src/workers/pdfSniff/pdfSniff.types.ts:45` / `:54` |
-| Shape enum (persisted) | `shared/models/datasets/PdfFileDataset/PdfFileDataset.types.ts:41` |
-| Classifier cascade (text-only today) | `src/workers/pdfSniff/classifyRegion/classifyRegion.ts` |
-| Extractors | `src/workers/pdfSniff/extractors/` |
-| Proximity pairing + ambiguity flag | `src/workers/pdfSniff/pairByProximity/` |
-| Output-mode union rule | `src/workers/pdfSniff/combineRegions/combineRegions.ts:144` |
-| Output-mode default (never overridden) | `.../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts:217` |
-| Region picker UI | `.../ManualUploadView/PdfTablePicker/` |
-| Coordinate mapping (Mantine scale trap) | `.../PdfTablePicker/PdfRegionOverlay/` |
-| Parse controls | `.../DatasetImportForm/PdfParseControls/` |
-| **The gate** | `src/workers/pdfSniff/gateDocuments.test.ts` |
+| What                                    | Where                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------- |
+| **The retention funnel (start here)**   | `src/workers/pdfSniff/extractPageGeometry/extractPageGeometry.ts:144`         |
+| Draw opcodes                            | same file, `:41`                                                              |
+| `RuleSegment` / `PageGeometry`          | `src/workers/pdfSniff/pdfSniff.types.ts:45` / `:54`                           |
+| Shape enum (persisted)                  | `shared/models/datasets/PdfFileDataset/PdfFileDataset.types.ts:41`            |
+| Classifier cascade (text-only today)    | `src/workers/pdfSniff/classifyRegion/classifyRegion.ts`                       |
+| Extractors                              | `src/workers/pdfSniff/extractors/`                                            |
+| Proximity pairing + ambiguity flag      | `src/workers/pdfSniff/pairByProximity/`                                       |
+| Output-mode union rule                  | `src/workers/pdfSniff/combineRegions/combineRegions.ts:144`                   |
+| Output-mode default (never overridden)  | `.../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts:217` |
+| Region picker UI                        | `.../ManualUploadView/PdfTablePicker/`                                        |
+| Coordinate mapping (Mantine scale trap) | `.../PdfTablePicker/PdfRegionOverlay/`                                        |
+| Parse controls                          | `.../DatasetImportForm/PdfParseControls/`                                     |
+| **The gate**                            | `src/workers/pdfSniff/gateDocuments.test.ts`                                  |
 
 ---
 

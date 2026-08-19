@@ -1,4 +1,5 @@
 import { deriveColumns } from "../deriveColumns";
+import { detectGraphicType } from "../detectGraphicType/detectGraphicType";
 import { groupLines } from "../groupLines/groupLines";
 import { parseRunInLabels } from "../parseRunInLabels/parseRunInLabels";
 import type { PdfRegionShape, RegionGeometry } from "../pdfSniff.types";
@@ -116,7 +117,22 @@ export function classifyRegion(region: RegionGeometry): RegionClassification {
     evidence.push(
       `${numericItems.length} numbers and ${shortLabels.length} short labels, scattered rather than tabulated.`,
     );
-    return { shape: "labelled_graphic", confidence: "medium", evidence };
+    /*
+     * What the region was DRAWN as, which the cascade above cannot see. It
+     * does not change the shape, because every one of these is read by the
+     * same extractor and the shape enum is persisted. It changes what we can
+     * say about it, and the user is choosing whether to override us from that
+     * sentence: "5 bars growing from a shared left edge" is a reason, where
+     * "scattered rather than tabulated" is only a description.
+     */
+    const graphic = detectGraphicType(region);
+    evidence.push(...graphic.evidence);
+    return {
+      shape: "labelled_graphic",
+      // Marks that form a chart are a far stronger signal than word counts.
+      confidence: graphic.kind === "unknown" ? "medium" : "high",
+      evidence,
+    };
   }
 
   if (wordsPerLine >= PROSE_WORDS_PER_LINE) {

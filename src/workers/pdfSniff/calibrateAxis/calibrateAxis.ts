@@ -114,3 +114,22 @@ export function applyCalibration(
   const linear = calibration.a * position + calibration.b;
   return calibration.scale === "log" ? Math.exp(linear) : linear;
 }
+
+/**
+ * The position a value would be drawn at, which is how a reading is checked
+ * against the geometry it came from.
+ *
+ * Returns `undefined` for a value a log axis cannot place, rather than the
+ * `-Infinity` that `log(0)` would otherwise propagate into a residual.
+ */
+export function invertCalibration(
+  calibration: AxisCalibration,
+  value: number,
+): number | undefined {
+  if (calibration.scale === "log") {
+    return value > 0 ?
+        (Math.log(value) - calibration.b) / calibration.a
+      : undefined;
+  }
+  return (value - calibration.b) / calibration.a;
+}

@@ -183,6 +183,21 @@ describe("PdfParseControls", () => {
     } as User.T);
   });
 
+  it("re-extracts through the normal re-parse path when the row shape changes", async () => {
+    // The observations schema is decided during extraction, in
+    // `combineRegions`. Reshaping the rows already on screen would be a
+    // second implementation of that rule, so the toggle re-parses instead.
+    const { onRequestDataReparse } = renderControls();
+
+    fireEvent.click(
+      await screen.findByRole("radio", { name: /one row per measurement/i }),
+    );
+
+    expect(onRequestDataReparse).toHaveBeenCalledWith(
+      expect.objectContaining({ outputMode: "observations" }),
+    );
+  });
+
   it("re-extracts through the normal re-parse path when a region changes", async () => {
     // Extraction must not get a second route of its own: a region change is
     // a re-parse, so it goes through the same call the "process again"

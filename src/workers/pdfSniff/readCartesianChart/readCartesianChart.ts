@@ -38,7 +38,17 @@ function _markCoversFrame(mark: PathMark, frame: PlotFrame): boolean {
   return overlapX >= MIN_WIDTH_COVERAGE * (frame.right - frame.left);
 }
 
-function _areaMark(
+/**
+ * The path a line or area series was drawn with, if the region holds one.
+ *
+ * A series is the longest path that crosses most of the plot: an area fill
+ * and its outline both qualify, and a gridline, a legend swatch and a bar do
+ * not, because none of them has more than a handful of vertices.
+ *
+ * Exported so that type detection asks the same question the reader answers.
+ * Two spellings of "is this a line chart" is two things to keep in step.
+ */
+export function findSeriesMark(
   region: RegionGeometry,
   frame: PlotFrame,
 ): PathMark | undefined {
@@ -175,7 +185,7 @@ export function readCartesianChart(
   const partition = partitionTextByFrame(region, frame);
   const axisTicks = _yAxisTicks(partition.yTicks, options.yAxisHints ?? []);
   const calibration = calibrateAxis(axisTicks);
-  const mark = _areaMark(region, frame);
+  const mark = findSeriesMark(region, frame);
   if (calibration === undefined || mark === undefined) {
     return undefined;
   }

@@ -31,7 +31,7 @@ function ChartAxisNote({ axis }: { axis: ChartAxisFit }): ReactNode {
   const residual = axis.maxResidual.toFixed(1);
   return (
     <Text size="xs" c="dimmed">
-      {t`Y-axis ${axis.min} to ${axis.max}, ${scaleLabel}, fits ${axis.tickCount} ticks (max error ${residual} pt)`}
+      {t`Value axis ${axis.min} to ${axis.max}, ${scaleLabel}, fits ${axis.tickCount} ticks (max error ${residual} pt)`}
     </Text>
   );
 }
