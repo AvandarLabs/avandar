@@ -48,4 +48,30 @@ describe("buildSqlSystemPrompt", () => {
       /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
     );
   });
+
+  it("includes spatial docs by default for geospatial prompts", () => {
+    const prompt = buildSqlSystemPrompt({
+      prompt: "count points near the warehouse",
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+      columns: [
+        { dataset_id: CHOLERA_ID, name: "case_id", data_type: "string" },
+      ],
+    });
+
+    expect(prompt).toContain("Reference documentation");
+  });
+
+  it("omits spatial docs when includeSpatialDocumentation is false", () => {
+    const prompt = buildSqlSystemPrompt({
+      prompt: "count points near the warehouse",
+      datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
+      columns: [
+        { dataset_id: CHOLERA_ID, name: "case_id", data_type: "string" },
+      ],
+      includeSpatialDocumentation: false,
+    });
+
+    expect(prompt).not.toContain("Reference documentation");
+    expect(prompt).toContain("- t0: Cholera cases (case_id)");
+  });
 });

@@ -59,6 +59,16 @@ describe("AssistantMessage", () => {
     expect(screen.queryByTestId("message-root")).not.toBeInTheDocument();
   });
 
+  it("omits an internal view-change message", () => {
+    messageState.metadata = {
+      custom: { isViewChange: true },
+    };
+
+    render(<AssistantMessage />);
+
+    expect(screen.queryByTestId("message-root")).not.toBeInTheDocument();
+  });
+
   it("renders an ordinary transcript message", () => {
     render(<AssistantMessage />);
 

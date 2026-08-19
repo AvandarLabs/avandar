@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
 
 const DASHBOARD_TOOL_DEFINITIONS = [
@@ -35,7 +36,7 @@ const DASHBOARD_TOOL_DEFINITIONS = [
           sql: {
             type: "string",
             description:
-              "DataViz only: DuckDB SELECT. Wrap dataset ids and column names in double quotes.",
+              "DataViz only: DuckDB SELECT. Use the short table aliases from the schema (t0, t1, …). Wrap aliases and column names in double quotes.",
           },
           vizType: {
             type: "string",
@@ -115,19 +116,21 @@ const DASHBOARD_TOOL_DEFINITIONS = [
   },
 ] as const;
 
-/** Builds the tool definitions for the active chat surface. */
+/** Builds the always-on OpenRouter tool catalog for unified chat. */
 export function makeChatToolConfigFromOptions(
-  options: Readonly<{
-    isDataExplorer: boolean;
-    isDashboards: boolean;
-    clarificationCapReached: boolean;
-  }>,
+  options: Readonly<{ clarificationCapReached: boolean }>,
 ): Record<string, unknown> {
-  const tools =
-    options.isDashboards ? DASHBOARD_TOOL_DEFINITIONS
-    : options.isDataExplorer ?
-      buildDataExplorerToolDefinitions(options.clarificationCapReached)
-    : undefined;
-
-  return tools ? { tools, tool_choice: "auto" } : {};
+  const explorerTools = buildDataExplorerToolDefinitions(
+    options.clarificationCapReached,
+  );
+  const clarifyTools = explorerTools.filter(propEq("function.name", "clarify"));
+  const generateSqlTools = explorerTools.filter(
+    propEq("function.name", "generateSql"),
+  );
+  const tools = [
+    ...clarifyTools,
+    ...generateSqlTools,
+    ...DASHBOARD_TOOL_DEFINITIONS,
+  ];
+  return { tools, tool_choice: "auto" };
 }

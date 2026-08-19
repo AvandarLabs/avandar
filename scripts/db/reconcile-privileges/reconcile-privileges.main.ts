@@ -85,7 +85,10 @@
 
 import { appendFileSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { getProjectIdFromConfig, makeSqlRunner } from "../lib/psql";
+import {
+  getLocalDatabaseConfigFromRepoRoot,
+  makeSqlRunner,
+} from "../lib/PsqlUtils/PsqlUtils";
 import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
 import type {
   AclEntry,
@@ -538,7 +541,10 @@ function main(): void {
   }
 
   const repoRoot = process.cwd();
-  const runSql = makeSqlRunner(getProjectIdFromConfig(repoRoot), databaseUrl);
+  const runSql = makeSqlRunner({
+    ...getLocalDatabaseConfigFromRepoRoot(repoRoot),
+    databaseUrl,
+  });
 
   const declarations = PrivilegeReconciliation.getDeclarationsFromSchemaFiles(
     _getOrderedSchemaFiles(repoRoot).map((file) => {

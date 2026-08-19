@@ -1,5 +1,6 @@
 import { areaBindingUpdates } from "./areaBindingUpdates";
 import { bufferBindingUpdates } from "./bufferBindingUpdates";
+import { disputedStatusUpdates } from "./disputedStatusUpdates";
 import { geometryBindingUpdates } from "./geometryBindingUpdates";
 import { layerMetaUpdates } from "./layerMetaUpdates";
 import { queryPopupUpdates } from "./queryPopupUpdates";
@@ -23,4 +24,5 @@ export const MapLayerUpdates = {
   ...symbologyPaintUpdates,
   ...layerMetaUpdates,
   ...timeColumnUpdates,
+  ...disputedStatusUpdates,
 };

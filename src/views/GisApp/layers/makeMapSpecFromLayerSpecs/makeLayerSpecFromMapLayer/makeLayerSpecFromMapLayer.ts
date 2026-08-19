@@ -2,6 +2,7 @@ import { matchLiteral } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
 import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
+import { makeDisputedCasingLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeDisputedCasingLayerSpecFromMapLayer";
 import { makeFillLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeFillLayerSpecsFromMapLayer";
 import { makeHeatmapLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeHeatmapLayerSpecFromMapLayer";
 import {
@@ -29,6 +30,8 @@ type MakeLayerSpecFromMapLayerInput = {
   featureCollection: GeoJSON.FeatureCollection;
   stats: LayerStats;
   valueColumnName?: string;
+  /** Which casing ink to use. Every PDF export passes `"light"` explicitly. */
+  canvas?: "light" | "dark";
 };
 
 /** Applies the selected scale to a numeric span. */
@@ -278,6 +281,7 @@ function _getAutoClusterPaint(
  * @param params.stats Value domain used by data-driven paint expressions.
  * @param params.valueColumnName Result column backing data-driven point paint,
  * looked up by the caller from the symbology's column id.
+ * @param params.canvas Which casing ink to use. Defaults to `"light"`.
  * @returns The sources and layers this one layer contributes to the map spec.
  * @throws SensitivityViolationError when the layer's policy forbids drawing
  * it as individual symbols.
@@ -287,6 +291,7 @@ export function makeLayerSpecFromMapLayer({
   featureCollection,
   stats,
   valueColumnName,
+  canvas,
 }: Readonly<MakeLayerSpecFromMapLayerInput>): MapSpec {
   if (
     layer.sensitivity.mode === "aggregateOnly" &&
@@ -313,6 +318,11 @@ export function makeLayerSpecFromMapLayer({
         paint: autoClusterPaint,
       })
     : _makeMapLayerSpecs({ layer, stats, valueColumnName, sourceId });
+  const casingSpecs = makeDisputedCasingLayerSpecFromMapLayer({
+    layer,
+    sourceId,
+    canvas: canvas ?? "light",
+  });
 
   return {
     sources: {
@@ -330,6 +340,6 @@ export function makeLayerSpecFromMapLayer({
           }
         : { type: "geojson", data: featureCollection },
     },
-    layers: layerSpecs,
+    layers: [...layerSpecs, ...casingSpecs],
   };
 }

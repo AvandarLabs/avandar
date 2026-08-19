@@ -97,10 +97,9 @@ test.describe("dashboard chat → P-block", () => {
       { timeout: LONG_WAIT },
     );
 
-    // Open the chat panel. The toggle in the AppToolbar is labelled
-    // "Open chat panel" when collapsed (see ChatAsideToggle); a fresh browser
-    // context always starts collapsed.
-    const chatToggle = page.getByRole("button", { name: /open chat panel/i });
+    // Open the chat panel. The toolbar toggle is labelled "Chat"
+    // (see ChatAsideToggle); a fresh browser context always starts collapsed.
+    const chatToggle = page.getByRole("button", { name: /^chat$/i });
     if (await chatToggle.isVisible()) {
       await chatToggle.click();
     }

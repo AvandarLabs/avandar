@@ -46,7 +46,15 @@ export function createVersion2Json() {
   } as const;
 }
 
-export function omitOverlayFields(layer: MapLayer.T) {
+/**
+ * Generic over a `Pick`, rather than fixed to `MapLayer.T`, so this composes
+ * with `omitExportFields` in either order: the inner call's return type
+ * already lacks some `MapLayer.T` keys, so it would not satisfy a parameter
+ * typed as the full `MapLayer.T`.
+ */
+export function omitOverlayFields<
+  T extends Pick<MapLayer.T, "timeColumn" | "applyAoiFilter">,
+>(layer: T) {
   const {
     timeColumn: _timeColumn,
     applyAoiFilter: _applyAoiFilter,
@@ -62,7 +70,7 @@ export function createVersion3Json() {
     basemap: { type: "builtIn", style: "avandar" },
     view: AvaMapConfig.defaultViewState,
     bookmarks: [],
-    layers: [omitOverlayFields(waveCLayer)],
+    layers: [omitOverlayFields(omitExportFields(waveCLayer))],
   };
 }
 
@@ -70,7 +78,7 @@ export function createEmptyVersion4Json() {
   const config = AvaMapConfig.makeEmpty();
   return {
     __type: config.__type,
-    version: config.version,
+    version: 4,
     basemap: config.basemap,
     view: config.view,
     bookmarks: config.bookmarks,
@@ -90,13 +98,29 @@ export function createVersion4ReversedTimeJson() {
   };
 }
 
+/**
+ * Generic for the same reason as `omitOverlayFields` above: it must accept
+ * `omitOverlayFields`'s already-narrowed return type, not just a full
+ * `MapLayer.T`.
+ */
+export function omitExportFields<
+  T extends Pick<MapLayer.T, "disputedStatusColumn" | "disputedStatusValues">,
+>(layer: T) {
+  const {
+    disputedStatusColumn: _disputedStatusColumn,
+    disputedStatusValues: _disputedStatusValues,
+    ...legacyLayer
+  } = layer;
+  return legacyLayer;
+}
+
 export function createVersion4CyclicBufferJson() {
   const layer = MapLayer.createArea("Buffer of itself");
   return {
     ...createEmptyVersion4Json(),
     layers: [
       {
-        ...layer,
+        ...omitExportFields(layer),
         geoBinding: {
           type: "bufferOfLayer",
           layerId: layer.id,
@@ -114,7 +138,7 @@ export function createMissingBufferSourceJson() {
     ...createEmptyVersion4Json(),
     layers: [
       {
-        ...buffer,
+        ...omitExportFields(buffer),
         geoBinding: {
           type: "bufferOfLayer",
           layerId: uuid<MapLayer.Id>(),
@@ -133,7 +157,7 @@ export function createVersion4TwoLayerBufferCycleJson() {
     ...createEmptyVersion4Json(),
     layers: [
       {
-        ...layerA,
+        ...omitExportFields(layerA),
         geoBinding: {
           type: "bufferOfLayer",
           layerId: layerB.id,
@@ -142,7 +166,7 @@ export function createVersion4TwoLayerBufferCycleJson() {
         },
       },
       {
-        ...layerB,
+        ...omitExportFields(layerB),
         geoBinding: {
           type: "bufferOfLayer",
           layerId: layerA.id,
@@ -177,7 +201,64 @@ export function createValidBufferJson() {
   };
   return {
     ...createEmptyVersion4Json(),
-    layers: [source, buffer],
+    layers: [omitExportFields(source), omitExportFields(buffer)],
+  };
+}
+
+export function createVersion4JsonWithLayer() {
+  const config = AvaMapConfig.makeEmpty();
+  return {
+    __type: config.__type,
+    version: 4,
+    basemap: config.basemap,
+    view: config.view,
+    bookmarks: config.bookmarks,
+    layers: [omitExportFields(waveCLayer)],
+    annotations: config.annotations,
+    annotationsZIndex: 0,
+  };
+}
+
+export function createEmptyVersion5Json() {
+  const config = AvaMapConfig.makeEmpty();
+  return {
+    __type: config.__type,
+    version: config.version,
+    basemap: config.basemap,
+    view: config.view,
+    bookmarks: config.bookmarks,
+    layers: config.layers,
+    annotations: config.annotations,
+    annotationsZIndex: config.annotationsZIndex,
+    exportLayout: config.exportLayout,
+  };
+}
+
+export function createVersion5BlankDisclaimerJson() {
+  const json = createEmptyVersion5Json();
+  return {
+    ...json,
+    exportLayout: { ...json.exportLayout, disclaimer: "" },
+  };
+}
+
+export function createVersion5OverlappingDisputedJson() {
+  const layer = MapLayer.createArea("Admin 1");
+  return {
+    ...createEmptyVersion5Json(),
+    layers: [
+      {
+        ...layer,
+        disputedStatusColumn: {
+          type: "queryColumn",
+          column: uuid<QueryColumn.Id>(),
+        },
+        disputedStatusValues: {
+          disputed: ["Disputed"],
+          undetermined: ["Disputed"],
+        },
+      },
+    ],
   };
 }
 
@@ -207,6 +288,6 @@ export function createMismatchedBufferJson() {
   );
   return {
     ...createEmptyVersion4Json(),
-    layers: [source, buffer],
+    layers: [omitExportFields(source), omitExportFields(buffer)],
   };
 }

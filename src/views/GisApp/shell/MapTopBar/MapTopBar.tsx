@@ -18,6 +18,7 @@ type Props = {
   onSaveCurrentView: () => void;
   onGoToBookmark: (bookmark: AvaMapConfig.Bookmark) => void;
   onRemoveBookmark: (bookmarkId: AvaMapConfig.BookmarkId) => void;
+  onOpenExport: () => void;
 };
 
 /** Renders map identity on the left and map output actions on the right. */
@@ -32,6 +33,7 @@ export function MapTopBar({
   onSaveCurrentView,
   onGoToBookmark,
   onRemoveBookmark,
+  onOpenExport,
 }: Props): ReactNode {
   return (
     <>
@@ -50,6 +52,7 @@ export function MapTopBar({
             onSaveCurrentView,
             onGoToBookmark,
             onRemoveBookmark,
+            onOpenExport,
           }}
         />
       </div>

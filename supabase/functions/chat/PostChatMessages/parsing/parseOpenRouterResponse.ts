@@ -24,8 +24,6 @@ export type ParsedAttempt = {
 export function parseOpenRouterResponse(options: {
   message: OpenRouterMessage | undefined;
   attemptText: string;
-  isDataExplorer: boolean;
-  isDashboards: boolean;
   lastUserPrompt: string;
   priorClarifications: number;
   datasets?: ReadonlyArray<{ id: string; name: string }>;
@@ -64,12 +62,7 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
-  if (
-    !generatedSql &&
-    !clarification &&
-    options.isDataExplorer &&
-    options.attemptText.length > 0
-  ) {
+  if (!generatedSql && !clarification && options.attemptText.length > 0) {
     const extractedSql = extractSqlFromAssistantText(options.attemptText);
     if (extractedSql) {
       generatedSql = {
@@ -79,7 +72,7 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
-  if (!generatedSql && !clarification && options.isDashboards) {
+  if (!generatedSql && !clarification) {
     const blockCall = calls.find((call) => {
       return call?.function?.name === "addDashboardBlock";
     });

@@ -6,8 +6,8 @@ import {
 import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
+import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
-import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import css from "./AssistantMessage.module.css";
 
 /**
@@ -18,10 +18,8 @@ import css from "./AssistantMessage.module.css";
  */
 export function AssistantMessage(): React.ReactNode {
   const { t } = useLingui();
-  const isInternalDiscovery = useMessage((message) => {
-    return DiscoveryContinuationMessage.isInternal(message.metadata);
-  });
-  return isInternalDiscovery ? null : (
+  const isHidden = useMessage(isHiddenChatThreadMessage);
+  return isHidden ? null : (
       <MessagePrimitive.Root className={css.assistantMessageRow}>
         <div className={css.assistantMessageStack}>
           <div className={css.assistantMessageBubble}>

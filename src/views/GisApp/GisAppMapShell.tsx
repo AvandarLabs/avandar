@@ -1,5 +1,9 @@
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
+import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";
 import { GisAppFirstRunCard } from "@/views/GisApp/GisAppFirstRunCard";
 import { GisAppFurnitureBar } from "@/views/GisApp/GisAppFurnitureBar";
 import { GisAppLayerInspector } from "@/views/GisApp/GisAppLayerInspector/GisAppLayerInspector";
@@ -12,6 +16,7 @@ import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapC
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
 import { MapTimeSlider } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider";
+import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
 import { useGisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
@@ -23,6 +28,9 @@ export function GisAppMapShell({ app }: Props): ReactNode {
   const { t } = useLingui();
   const layerActions = useGisAppLayerActions(app);
   const mapSurfaceRef = useRef<HTMLDivElement>(null);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const workspace = useCurrentWorkspace();
+  const basemapAttribution = useBasemapAttribution(app.mapConfig.basemap);
 
   return (
     <MapShell
@@ -33,7 +41,14 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       rightColumnRef={app.rightColumnRef}
       canvasSurfaceRef={mapSurfaceRef}
       canvas={<MapCanvasSurface containerRef={app.containerRef} />}
-      topBar={<GisAppTopBar app={app} />}
+      topBar={
+        <GisAppTopBar
+          app={app}
+          onOpenExport={() => {
+            setIsExportOpen(true);
+          }}
+        />
+      }
       layerPanel={<GisAppLayerPanel app={app} actions={layerActions} />}
       inspector={
         <GisAppLayerInspector
@@ -60,17 +75,37 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       }
       furnitureBar={<GisAppFurnitureBar app={app} />}
       featureDrawer={
-        <FeatureInspector
-          opened={app.isInspectorOpen}
-          onClose={app.closeInspector}
-          feature={app.selectedFeature}
-          cluster={app.selectedCluster}
-          layer={app.selectedLayer}
-          canvasRef={mapSurfaceRef}
-          mapRef={app.mapInstance.mapRef}
-          onRowClick={app.onRowClick}
-          onBackToTable={app.onBackToTable}
-        />
+        <>
+          <FeatureInspector
+            opened={app.isInspectorOpen}
+            onClose={app.closeInspector}
+            feature={app.selectedFeature}
+            cluster={app.selectedCluster}
+            layer={app.selectedLayer}
+            canvasRef={mapSurfaceRef}
+            mapRef={app.mapInstance.mapRef}
+            onRowClick={app.onRowClick}
+            onBackToTable={app.onBackToTable}
+          />
+          <ExportSheet
+            opened={isExportOpen}
+            onClose={() => {
+              setIsExportOpen(false);
+            }}
+            config={app.mapConfig}
+            mapName={app.name}
+            workspaceName={workspace.name}
+            basemapAttribution={basemapAttribution}
+            spec={app.spec}
+            view={app.mapConfig.view}
+            legendEntries={getExportLegendEntries({
+              layers: app.rows.filter(prop("isVisible")),
+              labels: { heatmapLowLabel: t`Low`, heatmapHighLabel: t`High` },
+            })}
+            hasDrawnDisputedFeature={app.hasDrawnDisputedFeature}
+            onConfigChange={app.updateConfig}
+          />
+        </>
       }
     />
   );

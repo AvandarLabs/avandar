@@ -4,6 +4,7 @@ import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { MapTopBar } from "@/views/GisApp/shell/MapTopBar/MapTopBar";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ComponentProps } from "react";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {
@@ -25,49 +26,63 @@ vi.mock(
   },
 );
 
-describe("MapTopBar", () => {
-  it("keeps export reachable and explains why it is unavailable", async () => {
-    const avaMapId = "00000000-0000-4000-8000-000000000001" as AvaMap.Id;
+const AVA_MAP_ID = "00000000-0000-4000-8000-000000000001" as AvaMap.Id;
 
-    render(
-      <MapTopBar
-        avaMapId={avaMapId}
-        name="Response map"
-        saveState="saved"
-        basemap={{ type: "builtIn", style: "avandar" }}
-        bookmarks={[]}
-        onNameChange={vi.fn()}
-        onBasemapChange={vi.fn()}
-        onSaveCurrentView={vi.fn()}
-        onGoToBookmark={vi.fn()}
-        onRemoveBookmark={vi.fn()}
-      />,
-      {
-        wrapper: ({ children }) => {
-          return (
-            <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
-              {children}
-            </ModalsProvider>
-          );
-        },
+/** Renders `MapTopBar` with default props, overridable per test. */
+function _renderTopBar(
+  overrides: Partial<ComponentProps<typeof MapTopBar>>,
+): void {
+  render(
+    <MapTopBar
+      avaMapId={AVA_MAP_ID}
+      name="Response map"
+      saveState="saved"
+      basemap={{ type: "builtIn", style: "avandar" }}
+      bookmarks={[]}
+      onNameChange={vi.fn()}
+      onBasemapChange={vi.fn()}
+      onSaveCurrentView={vi.fn()}
+      onGoToBookmark={vi.fn()}
+      onRemoveBookmark={vi.fn()}
+      onOpenExport={vi.fn()}
+      {...overrides}
+    />,
+    {
+      wrapper: ({ children }) => {
+        return (
+          <ModalsProvider modalProps={DEFAULT_MODAL_PROPS}>
+            {children}
+          </ModalsProvider>
+        );
       },
-    );
+    },
+  );
+}
+
+describe("MapTopBar", () => {
+  it("shares the map through the share button", async () => {
+    _renderTopBar({});
 
     fireEvent.click(screen.getByRole("button", { name: "Share" }));
     await waitFor(() => {
       expect(screen.getByText("Sharing Response map")).toBeVisible();
     });
+  });
 
-    const exportButton = screen.getByRole("button", { name: "Export" });
-    expect(exportButton).toHaveAttribute("aria-disabled", "true");
-    expect(exportButton).not.toBeDisabled();
+  it("opens the export sheet", () => {
+    const onOpenExport = vi.fn();
+    _renderTopBar({ onOpenExport });
 
-    fireEvent.focus(exportButton);
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
 
-    await waitFor(() => {
-      expect(screen.getByRole("tooltip")).toHaveTextContent(
-        "Print and PDF export arrives in a later release.",
-      );
-    });
+    expect(onOpenExport).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not mark export unavailable", () => {
+    _renderTopBar({});
+
+    expect(screen.getByRole("button", { name: "Export" })).not.toHaveAttribute(
+      "aria-disabled",
+    );
   });
 });

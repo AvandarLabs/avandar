@@ -23,8 +23,6 @@ export async function runChatAttemptsWithEscalation(
     requestBody: Record<string, unknown>;
     apiKey: string;
     referer: string;
-    isDataExplorer: boolean;
-    isDashboards: boolean;
     lastUserPrompt: string;
     priorClarifications: number;
     datasets?: ReadonlyArray<{ id: string; name: string }>;
@@ -34,8 +32,6 @@ export async function runChatAttemptsWithEscalation(
     requestBody,
     apiKey,
     referer,
-    isDataExplorer,
-    isDashboards,
     lastUserPrompt,
     priorClarifications,
     datasets,
@@ -54,8 +50,6 @@ export async function runChatAttemptsWithEscalation(
     return parseOpenRouterResponse({
       message: attempt.message,
       attemptText: attempt.text,
-      isDataExplorer,
-      isDashboards,
       lastUserPrompt,
       priorClarifications,
       datasets,

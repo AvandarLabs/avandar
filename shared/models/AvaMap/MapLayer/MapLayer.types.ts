@@ -1,6 +1,10 @@
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
 import type {
+  DisputedStatusRef,
+  DisputedStatusValues,
+} from "$/models/AvaMap/MapLayer/DisputedStatus.types.ts";
+import type {
   AreaGeoBinding,
   GeoBinding,
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
@@ -64,6 +68,12 @@ type MapLayerCommon = {
 
   /** Whether features outside the map's AOI are excluded. */
   applyAoiFilter: boolean;
+
+  /** Column carrying disputed-boundary status, or unset when all settled. */
+  disputedStatusColumn: DisputedStatusRef | undefined;
+
+  /** Which source values mean disputed and which mean undetermined. */
+  disputedStatusValues: DisputedStatusValues;
 };
 
 type LayerProtectionAndRendering =

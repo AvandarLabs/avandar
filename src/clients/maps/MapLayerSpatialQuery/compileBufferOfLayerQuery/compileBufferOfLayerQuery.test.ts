@@ -137,6 +137,7 @@ describe("compileBufferOfLayerQuery", () => {
         boundary: undefined,
         aggregationMeasureColumnName: undefined,
         normalizationDenominator: undefined,
+        disputedStatusColumn: undefined,
       },
       [bufferLayer],
     );
@@ -166,6 +167,7 @@ describe("compileBufferOfLayerQuery", () => {
         boundary: undefined,
         aggregationMeasureColumnName: undefined,
         normalizationDenominator: undefined,
+        disputedStatusColumn: undefined,
       },
       [cyclicFirst, second],
     );

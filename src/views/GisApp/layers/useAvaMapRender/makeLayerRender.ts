@@ -1,4 +1,5 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
@@ -23,6 +24,8 @@ type LayerRender = {
   viewState: MapLayerViewState;
   bounds: MapBounds | undefined;
   legendUpdate: LayerLegendUpdate | undefined;
+  /** True when this layer actually draws a disputed or undetermined feature. */
+  hasDrawnDisputedFeature: boolean;
 };
 
 function _makeRenderedLayerSpec(
@@ -84,7 +87,7 @@ function _getLayerGeometry(options: {
     layerId: options.layer.id,
     binding: options.binding,
     sensitivity: options.layer.sensitivity,
-    propertyColumnNames: MapLayer.toPopupColumnNames(options.layer),
+    propertyColumnNames: MapLayer.toPropertyColumnNames(options.layer),
     rows:
       options.queryState?.data?.type === "rows" ?
         options.queryState.data.queryResult.data
@@ -129,5 +132,11 @@ export function makeLayerRender({
     viewState,
     bounds: getBoundsFromFeatureCollection(geometry.featureCollection),
     legendUpdate,
+    hasDrawnDisputedFeature:
+      isRendered &&
+      DisputedBoundary.hasDrawnDisputedFeature({
+        values: layer.disputedStatusValues,
+        featureCollection: geometry.featureCollection,
+      }),
   };
 }

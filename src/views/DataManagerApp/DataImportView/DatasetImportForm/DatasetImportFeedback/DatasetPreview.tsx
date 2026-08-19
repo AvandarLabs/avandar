@@ -42,6 +42,7 @@ export function DatasetPreview({
             {...dataSourceMetadata}
           />
           <Button
+            type="button"
             onClick={() => {
               return onRequestDataReparse(dataSourceMetadata.parseOptions);
             }}
