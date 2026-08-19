@@ -50,7 +50,6 @@ export async function updateDashboardRowIfUnchanged(
         "snapshot_transition_revision",
         dashboard.snapshotTransitionRevision,
       );
-
-  const { data } = await updateQuery.select("*").limit(1).throwOnError();
+  const { data } = await updateQuery.select("*").throwOnError();
   return data.at(0);
 }
