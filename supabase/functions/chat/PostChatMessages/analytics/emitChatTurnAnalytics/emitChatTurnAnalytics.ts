@@ -44,6 +44,8 @@ function _getAnalyticsAppFromPageApp(
       return "data_sources";
     case "dashboards":
       return "dashboards";
+    case "case-manager":
+      return undefined;
     case "other":
       return undefined;
   }

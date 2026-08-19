@@ -1,5 +1,23 @@
 # feat/qetl-impl status
 
+## Column projection
+
+**Branch:** `feat/qetl-column-projection` (merged)  
+**Spec:** `docs/superpowers/specs/2026-08-19-qetl-column-projection-design.md`  
+**Plan:** `docs/superpowers/plans/2026-08-19-qetl-column-projection.md`
+
+The mediator now probes, acquires, and caches the columns a query needs
+instead of always `"all"`:
+
+- SQL select lists and concept attribute mappings feed `getNeededColumnsFromQuery`.
+- `"all"` still serves a subset. A finite entry does not serve a wider request.
+- A partial miss acquires the union (`growFrom`) and the mediator projects the
+  held blob before write. Wrappers may ignore `AcquireRequest.columns`.
+- Projected files keep source row order (no `DISTINCT`). `file_row_number`
+  still comes from `ava_rows_` at load, not from the cached blob.
+- `SELECT *`, unreadable SQL, and `CREATE TABLE AS SELECT` fail wide to `"all"`.
+- `LocalPublicDatasetRelationCache` stays `"all"`.
+
 ## Chat concept aliases
 
 **Branch:** `feat/chat-concept-aliases` (merged)  

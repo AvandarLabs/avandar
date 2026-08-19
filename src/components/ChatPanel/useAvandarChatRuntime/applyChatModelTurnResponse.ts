@@ -1,4 +1,6 @@
 import { prop, propEq } from "@avandar/utils";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -15,9 +17,11 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { notifyError } from "@/utils/notifications/notify";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -174,8 +178,20 @@ export async function applyChatModelTurnResponse(
           payload,
         });
       },
+      applyCreatedCaseTypes: (caseTypes) => {
+        void applyCreatedCaseTypes({
+          caseTypes,
+          workspaceId: options.workspaceId,
+        }).catch(() => {
+          notifyError({
+            title: i18n._(msg`Could not create those case types`),
+          });
+        });
+      },
       setPendingClarification:
         options.chatPanelDispatch.setPendingClarification,
+      setPendingCaseTypeDraft:
+        options.chatPanelDispatch.setPendingCaseTypeDraft,
       recordClarificationShown: async (clarification) => {
         const questionBias = detectBias(clarification.question);
         if (questionBias.hits.length > 0) {

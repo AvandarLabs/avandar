@@ -204,7 +204,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/ontology-designer",
       params: { workspaceSlug },
       label: (): string => {
-        return t`Profile Designer`;
+        return t`Case Manager`;
       },
       isAvailableOffline: false,
     };
@@ -237,7 +237,7 @@ export const AppLinks = {
       to: "/$workspaceSlug/ontology-designer/concept-creator",
       params: { workspaceSlug },
       label: (): string => {
-        return t`Create new entity`;
+        return t`New case type`;
       },
       isAvailableOffline: false,
     };

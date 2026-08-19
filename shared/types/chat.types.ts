@@ -107,6 +107,116 @@ export type ChatClarifyResponseShape =
       candidateValues: string[];
     };
 
+/**
+ * Which value a dataset-column attribute keeps when the grain of the dataset
+ * yields several rows per case. Mirrors the
+ * `attribute_mappings__value_picker_rule_type` database enum.
+ */
+export type ChatCaseValuePickerRuleType =
+  | "most_frequent"
+  | "first"
+  | "sum"
+  | "avg"
+  | "count"
+  | "max"
+  | "min";
+
+/** One attribute the case-manager model wants stored on a new concept. */
+export type ChatCreatedCaseAttribute =
+  | {
+      name: string;
+      description?: string;
+      kind: "dataset_column";
+      datasetId: string;
+      columnId: string;
+      isLabel?: boolean;
+      valuePickerRuleType?: ChatCaseValuePickerRuleType;
+    }
+  | {
+      name: string;
+      description?: string;
+      kind: "manual_entry";
+    };
+
+/**
+ * One dataset contributing to a case type, and the column carrying its entity
+ * key.
+ *
+ * Every contributing dataset needs an entry: the concept's spine is the union
+ * of these columns' values, and each attribute is read by matching its own
+ * dataset's key column against that spine. A dataset that contributes a column
+ * without an entry here makes the concept unqueryable.
+ */
+export type ChatCaseSourceDataset = {
+  datasetId: string;
+  primaryKeyColumnId: string;
+};
+
+/**
+ * A case type the model asked the client to persist. Attribute values are
+ * later read through the Query mediator; source file type does not matter.
+ *
+ * `identities` holds one entry per contributing dataset, so a case type can be
+ * assembled from columns spread across several datasets rather than being
+ * confined to one.
+ */
+export type ChatCreatedCaseType = {
+  name: string;
+  description?: string;
+  allowManualCreation: boolean;
+  identities: ChatCaseSourceDataset[];
+  attributes: ChatCreatedCaseAttribute[];
+};
+
+/**
+ * One dataset column the model proposes mapping onto a draft case type.
+ * `isIncluded` drives the checkbox preselection in the draft card, so the
+ * model can offer columns it thinks are marginal without forcing them in.
+ */
+export type ChatProposedCaseAttribute = {
+  /** The contributing dataset this column belongs to. */
+  datasetId: string;
+  columnId: string;
+  /** Attribute name, defaulted from the column name and user-editable. */
+  name: string;
+  description?: string;
+  isIncluded: boolean;
+  valuePickerRuleType: ChatCaseValuePickerRuleType;
+};
+
+/** A manual-entry attribute the model proposes on a draft case type. */
+export type ChatProposedManualEntryAttribute = {
+  name: string;
+  description?: string;
+  isIncluded: boolean;
+};
+
+/**
+ * A fully prefilled case-type draft the model produced via `proposeCaseType`.
+ * The client renders it as an editable card so the user tweaks the prefills
+ * instead of answering one question per field. Nothing is persisted until the
+ * user confirms the card, at which point the edited draft is converted to a
+ * `ChatCreatedCaseType` and inserted through the concept creator path.
+ */
+export type ChatProposedCaseType = {
+  name: string;
+  description?: string;
+  allowManualCreation: boolean;
+  /**
+   * Every dataset the draft pulls columns from, each with the column holding
+   * its join key. More than one entry is the normal case: the point of a case
+   * type is to assemble one record from pieces of several datasets.
+   */
+  sourceDatasets: ChatCaseSourceDataset[];
+  /**
+   * Column whose value labels each case in the UI. When set it should name one
+   * of `attributes`; the client falls back to a join key when it does not.
+   */
+  labelColumnId?: string;
+  attributes: ChatProposedCaseAttribute[];
+  manualEntryAttributes: ChatProposedManualEntryAttribute[];
+};
+
 export type ChatClarifyRequest = {
   /** ≤ 25 words, neutrally phrased. */
   question: string;

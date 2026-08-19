@@ -40,6 +40,23 @@ function _getGooglePickerAppId(): string {
   return appId;
 }
 
+/**
+ * The Picker view that lists only Google Sheets.
+ *
+ * Prefers a DocsView so LIST mode can be set: GRID needs thumbnail access
+ * that `drive.file` does not grant. Falls back to `ViewId.SPREADSHEETS` when
+ * DocsView is not a constructor, which is still a valid `addView` argument.
+ */
+function _spreadsheetView(pickerAPI: GooglePickerAPI) {
+  if (typeof pickerAPI.DocsView !== "function") {
+    return pickerAPI.ViewId.SPREADSHEETS;
+  }
+  return new pickerAPI.DocsView(pickerAPI.ViewId.SPREADSHEETS)
+    .setMode(pickerAPI.DocsViewMode.LIST)
+    .setMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
+    .setIncludeFolders(true);
+}
+
 type UseGooglePickerOptions = {
   onGoogleSheetPicked?: (params: {
     document: GPickerDocumentObject;
@@ -103,42 +120,45 @@ export function useGooglePicker({
 
   const accessToken = selectedAccount?.access_token;
   const picker = useMemo(() => {
-    if (pickerAPI && accessToken) {
-      const sheetsView = new pickerAPI.DocsView(pickerAPI.ViewId.SPREADSHEETS)
-        .setMode(pickerAPI.DocsViewMode.LIST)
-        .setMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
-        .setIncludeFolders(true);
-
-      return new pickerAPI.PickerBuilder()
-        .addView(sheetsView)
-        .setOAuthToken(accessToken) // get the accessToken
-        .setDeveloperKey(_getGooglePickerAPIKey()) // get my developer key
-        .setAppId(_getGooglePickerAppId())
-        .setMaxItems(1)
-        .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
-        .setCallback((response: GPickerResponseObject) => {
-          if (
-            response.action === pickerAPI.Action.PICKED &&
-            response.viewToken?.[0] === pickerAPI.ViewId.SPREADSHEETS &&
-            isNonEmptyArray(response.docs)
-          ) {
-            onGoogleSheetPicked({
-              document: response.docs[0],
-              googleAccount: selectedAccount,
-            });
-            return;
-          }
-          if (response.action === pickerAPI.Action.CANCEL) {
-            onCancel();
-            return;
-          }
-          if (response.action === pickerAPI.Action.ERROR) {
-            onError(response);
-          }
-        })
-        .build();
+    if (
+      !pickerAPI ||
+      !accessToken ||
+      !selectedAccount ||
+      typeof pickerAPI.PickerBuilder !== "function"
+    ) {
+      return undefined;
     }
-    return undefined;
+    return new pickerAPI.PickerBuilder()
+      .addView(_spreadsheetView(pickerAPI))
+      .setOAuthToken(accessToken)
+      .setDeveloperKey(_getGooglePickerAPIKey())
+      .setAppId(_getGooglePickerAppId())
+      // Parents the iframe on this page. Without it Google uses the last
+      // loaded resource (often `/favicon.ico`) and the dialog never appears.
+      .setOrigin(window.location.origin)
+      .setMaxItems(1)
+      .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
+      .setCallback((response: GPickerResponseObject) => {
+        if (
+          response.action === pickerAPI.Action.PICKED &&
+          response.viewToken?.[0] === pickerAPI.ViewId.SPREADSHEETS &&
+          isNonEmptyArray(response.docs)
+        ) {
+          onGoogleSheetPicked({
+            document: response.docs[0],
+            googleAccount: selectedAccount,
+          });
+          return;
+        }
+        if (response.action === pickerAPI.Action.CANCEL) {
+          onCancel();
+          return;
+        }
+        if (response.action === pickerAPI.Action.ERROR) {
+          onError(response);
+        }
+      })
+      .build();
   }, [
     pickerAPI,
     accessToken,

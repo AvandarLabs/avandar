@@ -29,7 +29,6 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
-import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -258,7 +257,6 @@ export function Navbar({
             );
           })}
         </Stack>
-        <BetaBadge size="md" style={{ alignSelf: "center" }} />
         <Divider />
         <Stack gap={0} pb="xs" pos="relative">
           {utilityLinks.map((item) => {

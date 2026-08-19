@@ -1,6 +1,6 @@
 # QETL column projection in the mediator - design
 
-**Status:** Ready to implement
+**Status:** Merged into `feat/qetl-impl`
 **Date:** 2026-08-19
 **Lane:** F (`HANDOFF.md` on `feat/qetl-column-projection`)
 **Merge back into:** `feat/qetl-impl`

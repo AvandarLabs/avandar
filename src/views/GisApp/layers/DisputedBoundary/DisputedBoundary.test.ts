@@ -10,7 +10,10 @@ const VALUES = {
 describe("DisputedBoundary.getStatusFromValue", () => {
   it("reads a disputed value", () => {
     expect(
-      DisputedBoundary.getStatusFromValue({ value: "Disputed", values: VALUES }),
+      DisputedBoundary.getStatusFromValue({
+        value: "Disputed",
+        values: VALUES,
+      }),
     ).toBe("disputed");
   });
 

@@ -28,6 +28,7 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import {
+  GPicker,
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
@@ -78,6 +79,22 @@ function _makeWorkbookFile(
     `${workbook.spreadsheetName}.xlsx`,
     { type: MIMEType.APPLICATION_OPENXML_EXCEL },
   );
+}
+
+function _openGooglePicker(params: {
+  picker: GPicker | undefined;
+  onUnavailable: () => void;
+}): void {
+  if (!params.picker) {
+    Logger.error("Google Picker was not built; Pick has nothing to open", {
+      hasGapi: typeof window.gapi !== "undefined",
+      hasPickerNamespace: typeof window.google?.picker !== "undefined",
+      pickerBuilderType: typeof window.google?.picker?.PickerBuilder,
+    });
+    params.onUnavailable();
+    return;
+  }
+  params.picker.setVisible(true);
 }
 
 export function GoogleSheetsImportView({
@@ -282,20 +299,25 @@ export function GoogleSheetsImportView({
     setExportedWorkbook(undefined);
   }, []);
 
+  const notifyPickerCouldNotOpen = useCallback(() => {
+    notifyError({
+      title: t`Google Picker error`,
+      message: t`The Google file picker could not be opened. Please try again.`,
+    });
+  }, [t]);
+
   const onPickerError = useCallback(
     (response: GPickerResponseObject) => {
       Logger.error("The Google Picker reported an error", { response });
-      notifyError({
-        title: t`Google Picker error`,
-        message: t`The Google file picker could not be opened. Please try again.`,
-      });
+      notifyPickerCouldNotOpen();
     },
-    [t],
+    [notifyPickerCouldNotOpen],
   );
 
   const {
     picker,
     selectedGoogleAccount,
+    isLoadingAPI,
     isLoadingGoogleAuthState,
     isGoogleAuthenticated,
   } = useGooglePicker({
@@ -304,14 +326,19 @@ export function GoogleSheetsImportView({
     onError: onPickerError,
   });
 
+  const isPreparingPicker =
+    isGoogleAuthenticated &&
+    !picker &&
+    (isLoadingAPI || !selectedGoogleAccount);
+
   return (
     <Box {...props}>
       <Stack align="flex-start" gap="md">
         <Callout color="warning" messageSize="sm">
           <Text component="div" size="sm">
             <Trans>
-              Connecting to Google Sheets and other data sources are in the
-              works and will be available very soon. If there is a database or
+              New connectors are being added every month.
+               If there is a database or
               service you use that you need to connect to,{" "}
               <UnstyledButton
                 type="button"
@@ -350,15 +377,19 @@ export function GoogleSheetsImportView({
               </Text>
             : null}
 
-            <Button
-              onClick={() => {
-                if (picker) {
-                  picker.setVisible(true);
-                }
-              }}
-            >
-              <Trans>Pick google sheet</Trans>
-            </Button>
+            {isPreparingPicker ?
+              <Loader />
+            : <Button
+                onClick={() => {
+                  _openGooglePicker({
+                    picker,
+                    onUnavailable: notifyPickerCouldNotOpen,
+                  });
+                }}
+              >
+                <Trans>Pick google sheet</Trans>
+              </Button>
+            }
 
             {selectedDocument ?
               <>

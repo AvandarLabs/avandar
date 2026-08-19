@@ -82,6 +82,7 @@ function _makeRecordingPickerAPI(): {
     setAppId: record("setAppId"),
     setMaxItems: record("setMaxItems"),
     setSelectableMimeTypes: record("setSelectableMimeTypes"),
+    setOrigin: record("setOrigin"),
     setCallback: (method: (response: GPickerResponseObject) => void) => {
       callback = method;
       builderCalls.set("setCallback", [method]);
@@ -164,11 +165,7 @@ class _RenderErrorBoundary extends Component<
   }
 }
 
-function _boundaryWrapper({
-  children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
+function _boundaryWrapper({ children }: { children: ReactNode }): JSX.Element {
   return createElement(
     _RenderErrorBoundary,
     null,
@@ -230,6 +227,14 @@ describe("useGooglePicker", () => {
     expect(harness.getCallArgs("setOAuthToken")).toEqual(["test-access-token"]);
   });
 
+  it("parents the Picker on this page origin", async () => {
+    // Without setOrigin, Google parents the iframe on the last loaded resource
+    // (often `/favicon.ico`). The dialog then never appears, with no error.
+    const harness = await _renderPicker();
+
+    expect(harness.getCallArgs("setOrigin")).toEqual([window.location.origin]);
+  });
+
   it("reports a pick to onGoogleSheetPicked", async () => {
     const onGoogleSheetPicked = vi.fn();
     const onCancel = vi.fn();
@@ -288,6 +293,33 @@ describe("useGooglePicker", () => {
     } finally {
       vi.unstubAllEnvs();
     }
+  });
+
+  it("falls back to ViewId.SPREADSHEETS when DocsView is not a constructor", async () => {
+    // gapi.load("picker") can resolve window.google.picker before DocsView is
+    // attached. Constructing it during render takes down the whole route with
+    // the error-boundary "Something went wrong" screen. ViewId.SPREADSHEETS is
+    // a valid addView argument on its own, so the Picker can still open.
+    const harness = _makeRecordingPickerAPI();
+    harness.pickerAPI.DocsView =
+      undefined as unknown as GooglePickerAPI["DocsView"];
+    useGooglePickerAPIMock.mockReturnValue([harness.pickerAPI, false]);
+    const { useGooglePicker } = await import("@/hooks/ui/useGooglePicker");
+
+    renderHook(
+      () => {
+        return useGooglePicker({});
+      },
+      { wrapper: _boundaryWrapper },
+    );
+
+    await waitFor(() => {
+      expect(harness.getCallArgs("build")).toBeDefined();
+    });
+    expect(caughtRenderErrors).toEqual([]);
+    expect(harness.getCallArgs("addView")).toEqual([
+      harness.pickerAPI.ViewId.SPREADSHEETS,
+    ]);
   });
 
   it("reports a Picker failure to onError and not to onGoogleSheetPicked", async () => {

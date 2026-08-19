@@ -35,12 +35,14 @@ flowchart TD
   IB["<b>✓ B-int</b><br/>DatasetParquetWrapper<br/>API fetch + CSV transcode"]
   IC["<b>✓ C-int</b><br/>GoogleSheetsWrapper.acquire<br/>+ capability flip"]
 
-  F["<b>F · Column projection</b><br/>+ Parquet sorted by entity key"]
+  F["<b>✓ F · Column projection</b><br/>merged into impl"]
+  CALIAS["<b>✓ Chat concept aliases</b><br/>merged into impl"]
   S6["<b>✓ S3·6 · Open the concept path</b><br/>throw gone, aggregation gate open"]
 
   S7["<b>S3·7 · Delete _runConceptQuery</b><br/><i>dead path when form is in sync</i>"]
 
-  S9["<b>► S3·9 · Rehearsal / DEMO</b><br/>workspace explorer<br/>concept query with joins"]
+  S9["<b>✓ S3·9 · Rehearsal</b><br/>County queryable in explorer"]
+  CM["<b>► Case Manager chat</b><br/>on impl · ontology via chat"]
 
   PUB["<b>Concepts on a public link</b><br/>no ontology on PublicQuerySession<br/><i>PUNTED · private dashboards only</i>"]
 
@@ -65,11 +67,14 @@ flowchart TD
   S7 -.-> S9
   S8 --> S9
   S9 -.-> PUB
+  S9 --> CM
 
   IA & IB & IC & D & F --> X1
   S9 --> X2
+  CM --> X2
+  CALIAS --> X2
 
-  LEGEND["<b>QETL work DAG</b> · 2026-08-19<br/><i>feat/qetl-impl · demo path is workspace explorer</i><br/><br/><b>green ✓</b> · landed on impl<br/><b>amber ►</b> · current focus: explorer concept joins<br/><b>blue</b> · still to do, not demo-blocking<br/><b>grey dashed</b> · skipped / punted / leftover cleanup<br/><b>dotted</b> · optional, not in this demo"]
+  LEGEND["<b>QETL work DAG</b> · 2026-08-19<br/><i>feat/qetl-impl · F and chat concept aliases merged; Case Manager chat in flight</i><br/><br/><b>green ✓</b> · landed on impl<br/><b>amber ►</b> · kicked off / in flight<br/><b>blue</b> · still to do, not demo-blocking<br/><b>grey dashed</b> · skipped / punted / leftover cleanup<br/><b>dotted</b> · optional, not in this demo"]
 
   classDef done fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#064e3b
   classDef now fill:#fde68a,stroke:#d97706,stroke-width:3px,color:#78350f
@@ -78,9 +83,9 @@ flowchart TD
   classDef exit fill:#ede9fe,stroke:#7c3aed,stroke-width:3px,color:#3b0764
   classDef lg fill:#ffffff,stroke:#d0d7de,stroke-width:1px,color:#24292f
 
-  class M,A,B,C,CHAT,S4a,S4b,MB,P,G,S5,S8,IA,IB,IC,S6 done
-  class S9 now
-  class D,F seq
+  class M,A,B,C,CHAT,S4a,S4b,MB,P,G,S5,S8,IA,IB,IC,S6,S9,F,CALIAS done
+  class CM now
+  class D seq
   class E,EF,S7,PUB owed
   class X1,X2 exit
   class LEGEND lg

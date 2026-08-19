@@ -41,7 +41,7 @@ export function ManualEntryAttributesBlock({
           <TextInput
             key={attributeKeys.name}
             required
-            label={t`Field Name`}
+            label={t`Field name`}
             placeholder={t`Enter a name for the field`}
             flex={1}
             {...attributeInputProps.name()}
@@ -107,7 +107,7 @@ export function ManualEntryAttributesBlock({
             conceptForm.clearFieldError("attributes");
           }}
         >
-          <Trans>Add Field</Trans>
+          <Trans>Add field</Trans>
         </Button>
       </Stack>
     </Fieldset>

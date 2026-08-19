@@ -1,4 +1,5 @@
 import { prop } from "@avandar/utils";
+import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import type { ThreadMessageLike } from "@assistant-ui/react";
@@ -27,7 +28,7 @@ function _messageText(message: Readonly<ThreadMessageSource>): string {
 
 /**
  * Returns whether a thread message is hidden from the transcript (view
- * events and discovery continuations).
+ * events, Case Manager kickoff, and discovery continuations).
  */
 export function isHiddenChatThreadMessage(
   message: Readonly<ThreadMessageSource>,
@@ -36,6 +37,12 @@ export function isHiddenChatThreadMessage(
     return true;
   }
   if (ChatViewEvent.isInternal(message.metadata)) {
+    return true;
+  }
+  if (CaseDesignKickoff.isInternal(message.metadata)) {
+    return true;
+  }
+  if (CaseDesignKickoff.isKickoffContent(_messageText(message))) {
     return true;
   }
   return ChatViewEvent.isViewChangeContent(_messageText(message));

@@ -1,4 +1,5 @@
 import { ThreadPrimitive } from "@assistant-ui/react";
+import { CaseTypeDraftBlock } from "@/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftBlock";
 import { ChatEmptyState } from "@/components/ChatPanel/ChatEmptyState/ChatEmptyState";
 import { AssistantMessage } from "@/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage";
 import { Composer } from "@/components/ChatPanel/ChatThread/Composer/Composer";
@@ -23,6 +24,7 @@ export function ChatThread(): React.ReactNode {
         />
       </ThreadPrimitive.Viewport>
       <RegenerateErrorBanner />
+      <CaseTypeDraftBlock />
       <PendingClarificationBlock />
       <Composer />
     </ThreadPrimitive.Root>

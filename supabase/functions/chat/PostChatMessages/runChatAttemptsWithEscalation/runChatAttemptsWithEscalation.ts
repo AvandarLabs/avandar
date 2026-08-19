@@ -27,6 +27,7 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications: number;
     datasets?: ReadonlyArray<{ id: string; name: string }>;
     concepts?: ReadonlyArray<{ id: string; name: string }>;
+    skipSqlExtraction?: boolean;
   }>,
 ): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
   const {
@@ -37,6 +38,7 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications,
     datasets,
     concepts,
+    skipSqlExtraction,
   } = options;
 
   let attemptCount = 0;
@@ -56,6 +58,7 @@ export async function runChatAttemptsWithEscalation(
       priorClarifications,
       datasets,
       concepts,
+      skipSqlExtraction,
     });
   };
 

@@ -8,6 +8,8 @@
 .root {
   background-color: var(--mantine-navbar-background);
 
+  --ava-chat-composer-width: min(64vw, 960px);
+
   /* Set overflow-x to clip so that the horizontal bleed from AppShell.Main's
    * negative margins is visually clipped without creating a scroll container.
    * Otherwise wheel events are absorbed by .root before reaching the window,
@@ -23,4 +25,20 @@
  */
 .main {
   position: relative;
+}
+
+/*
+ * Composer mode grows the aside with an inline width so it overlays the
+ * canvas. Include width in the same transition Mantine already runs on
+ * transform/top/height.
+ */
+.aside {
+  overflow: visible;
+  transition-property: transform, top, height, width;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aside {
+    transition: none;
+  }
 }

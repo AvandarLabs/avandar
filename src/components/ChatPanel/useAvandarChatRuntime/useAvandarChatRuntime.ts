@@ -2,6 +2,7 @@ import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter";
@@ -228,6 +229,13 @@ export function useAvandarChatRuntime(): {
       });
     }
     chatPanelDispatch.setPendingClarification(undefined);
+    if (pageContextRef.current.app === "case-manager") {
+      runtime.thread.append({
+        role: "user",
+        content: [{ type: "text", text: CaseDesignKickoff.CONTENT }],
+        metadata: CaseDesignKickoff.metadata,
+      });
+    }
   }, [runtime, chatPanelDispatch]);
 
   return { runtime, startNewChat };

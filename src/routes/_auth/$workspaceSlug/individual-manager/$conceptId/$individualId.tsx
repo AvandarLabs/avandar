@@ -49,10 +49,10 @@ function ErrorView({ error }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <Center h="50%" pt="xxxl">
+    <Center h="100%" px="md">
       <Callout
-        title={t`Entity failed to load`}
-        message={t`The entity failed to load. Please try again later or reach out to support.`}
+        title={t`This record failed to load`}
+        message={t`Try again in a moment, or reach out to support if it keeps happening.`}
       />
     </Center>
   );

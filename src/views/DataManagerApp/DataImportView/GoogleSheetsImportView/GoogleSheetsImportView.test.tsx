@@ -13,6 +13,7 @@ import {
 import { fireEvent } from "@testing-library/react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
+import { Logger } from "@/utils/Logger";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
@@ -52,6 +53,8 @@ const {
       | null;
     onCancel: (() => void) | null;
     pickerSetVisible: ReturnType<typeof vi.fn>;
+    picker: { setVisible: ReturnType<typeof vi.fn> } | undefined;
+    isLoadingAPI: boolean;
     /**
      * Whether the mocked `useGooglePicker` reports a connected Google account.
      * A test that exercises the connect button has to set this to `false`,
@@ -62,6 +65,8 @@ const {
     onSheetPicked: null,
     onCancel: null,
     pickerSetVisible: vi.fn(),
+    picker: undefined,
+    isLoadingAPI: false,
     isGoogleAuthenticated: true,
   };
 
@@ -176,9 +181,9 @@ vi.mock("@/hooks/ui/useGooglePicker", () => {
       return {
         googlePickerAPI: undefined,
         isGoogleAuthenticated: googlePickerHarness.isGoogleAuthenticated,
-        isLoadingAPI: false,
+        isLoadingAPI: googlePickerHarness.isLoadingAPI,
         isLoadingGoogleAuthState: false,
-        picker: { setVisible: googlePickerHarness.pickerSetVisible },
+        picker: googlePickerHarness.picker,
         selectedGoogleAccount: _googleAccount(),
       };
     },
@@ -384,6 +389,10 @@ describe("GoogleSheetsImportView", () => {
     navigateToExternalUrlMock.mockClear();
     getGoogleSheetXlsxExportMock.mockClear();
     googlePickerHarness.pickerSetVisible.mockClear();
+    googlePickerHarness.picker = {
+      setVisible: googlePickerHarness.pickerSetVisible,
+    };
+    googlePickerHarness.isLoadingAPI = false;
     googlePickerHarness.isGoogleAuthenticated = true;
     googlePickerHarness.onCancel = null;
 
@@ -414,6 +423,36 @@ describe("GoogleSheetsImportView", () => {
       }
       throw new Error(`Unexpected APIClient.get route: ${String(opts.route)}`);
     }) as typeof APIClient.get);
+  });
+
+  it("waits for the Picker API before offering Pick", () => {
+    googlePickerHarness.picker = undefined;
+    googlePickerHarness.isLoadingAPI = true;
+
+    renderWithProviders(<GoogleSheetsImportView />);
+
+    expect(
+      screen.queryByRole("button", { name: /pick google sheet/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("notifies when Pick is clicked and the Picker was never built", () => {
+    googlePickerHarness.picker = undefined;
+    googlePickerHarness.isLoadingAPI = false;
+    const loggerError = vi.spyOn(Logger, "error").mockImplementation(() => {
+      return undefined;
+    });
+
+    renderWithProviders(<GoogleSheetsImportView />);
+    fireEvent.click(screen.getByRole("button", { name: /pick google sheet/i }));
+
+    expect(notifyErrorMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringMatching(/could not be opened/i),
+      }),
+    );
+    expect(loggerError).toHaveBeenCalled();
+    loggerError.mockRestore();
   });
 
   it("exports the workbook from Drive and reads its first tab", async () => {

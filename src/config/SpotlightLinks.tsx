@@ -62,7 +62,7 @@ export const SpotlightLinks = {
     return {
       link: AppLinks.ontologyDesignerHome(workspaceSlug),
       icon: NavbarLinks.ontologyDesignerHome(workspaceSlug).icon,
-      spotlightDescription: "Go to the ontology designer app",
+      spotlightDescription: "Go to Case Manager",
     };
   },
   ontologyDesignerCreatorView: (workspaceSlug: string) => {

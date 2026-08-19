@@ -1,12 +1,17 @@
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
-export type Dataset = { id: string; name: string };
+export type Dataset = { id: string; name: string; description?: string | null };
 export type DatasetColumn = {
+  id?: string;
   dataset_id: string;
   name: string;
   data_type: string;
 };
-export type Concept = { id: string; name: string };
+export type Concept = {
+  id: string;
+  name: string;
+  description?: string | null;
+};
 export type ConceptAttribute = {
   concept_id: string;
   name: string;
@@ -26,7 +31,7 @@ async function _fetchDatasets(options: {
 }): Promise<{ datasets: Dataset[]; columns: DatasetColumn[] }> {
   const { data: datasets } = await options.supabaseClient
     .from("datasets")
-    .select("id, name, workspace_id")
+    .select("id, name, description, workspace_id")
     .eq("workspace_id", options.workspaceId)
     .throwOnError();
 
@@ -36,7 +41,7 @@ async function _fetchDatasets(options: {
 
   const { data: columns } = await options.supabaseClient
     .from("dataset_columns")
-    .select("dataset_id, name, data_type")
+    .select("id, dataset_id, name, data_type")
     .eq("workspace_id", options.workspaceId)
     .in(
       "dataset_id",
@@ -55,7 +60,7 @@ async function _fetchConcepts(options: {
 }): Promise<{ concepts: Concept[]; conceptAttributes: ConceptAttribute[] }> {
   const { data: concepts } = await options.supabaseClient
     .from("concepts")
-    .select("id, name")
+    .select("id, name, description")
     .eq("workspace_id", options.workspaceId)
     .throwOnError();
 

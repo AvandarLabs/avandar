@@ -9,6 +9,8 @@ import {
   MAX_CLARIFICATIONS_PER_QUESTION,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
+import { caseTypeDraftIntro } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
+import { buildCaseManagerSystemPrompt } from "@sbfn/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts";
 import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
@@ -45,7 +47,13 @@ export const PostChatMessages = POST({
     context: AvaModelSchema({
       type: "ChatPageContext",
       props: {
-        app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
+        app: z.enum([
+          "data-explorer",
+          "data-sources",
+          "dashboards",
+          "case-manager",
+          "other",
+        ]),
         openDatasetId: z.string().optional(),
         lastSql: z.string().optional(),
         lastResultColumns: z
@@ -115,12 +123,22 @@ export const PostChatMessages = POST({
         conceptAttributes: schema.conceptAttributes,
         includeSpatialDocumentation: false,
       });
-      const systemContent = `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
-      const turnSuffix = makeChatTurnSuffixFromOptions({
-        context,
-        retryContext,
-        lastUserPrompt,
-      });
+      const systemContent =
+        context.app === "case-manager" ?
+          buildCaseManagerSystemPrompt({
+            datasets: schema.datasets,
+            columns: schema.columns,
+            concepts: schema.concepts,
+          })
+        : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
+      const turnSuffix =
+        context.app === "case-manager" ?
+          ""
+        : makeChatTurnSuffixFromOptions({
+            context,
+            retryContext,
+            lastUserPrompt,
+          });
 
       const priorClarifications = countClarificationsInHistory(messages);
       const clarificationCapReached =
@@ -136,7 +154,10 @@ export const PostChatMessages = POST({
       };
       Object.assign(
         requestBody,
-        makeChatToolConfigFromOptions({ clarificationCapReached }),
+        makeChatToolConfigFromOptions({
+          clarificationCapReached,
+          app: context.app,
+        }),
       );
 
       const turnStartedAt = performance.now();
@@ -151,6 +172,7 @@ export const PostChatMessages = POST({
           priorClarifications,
           datasets: schema.datasets,
           concepts: schema.concepts,
+          skipSqlExtraction: context.app === "case-manager",
         }));
       } catch (error) {
         await emitChatTurnAnalytics({
@@ -168,7 +190,14 @@ export const PostChatMessages = POST({
         throw error;
       }
 
-      const { text, generatedSql, clarification, dashboardBlock } = parsed;
+      const {
+        text,
+        generatedSql,
+        clarification,
+        dashboardBlock,
+        createdCaseTypes,
+        proposedCaseType,
+      } = parsed;
       const assistantText = ((): string => {
         if (text) {
           return text;
@@ -182,7 +211,19 @@ export const PostChatMessages = POST({
         if (dashboardBlock) {
           return dashboardBlockSummary(dashboardBlock);
         }
-        return "I could not generate a query for that. Try rephrasing.";
+        if (createdCaseTypes && createdCaseTypes.length > 0) {
+          return createdCaseTypes
+            .map((caseType) => {
+              return caseType.name;
+            })
+            .join(", ");
+        }
+        if (proposedCaseType) {
+          return caseTypeDraftIntro(proposedCaseType.name);
+        }
+        return context.app === "case-manager" ?
+            "I could not create those case types. Try choosing again or describing what you want."
+          : "I could not generate a query for that. Try rephrasing.";
       })();
 
       const result: ChatResponse.T = Model.make("ChatResponse", {
@@ -190,6 +231,8 @@ export const PostChatMessages = POST({
         ...(generatedSql ? { generatedSql: generatedSql } : {}),
         ...(clarification ? { clarification } : {}),
         ...(dashboardBlock ? { dashboardBlock } : {}),
+        ...(createdCaseTypes ? { createdCaseTypes } : {}),
+        ...(proposedCaseType ? { proposedCaseType } : {}),
       });
 
       await emitChatTurnAnalytics({
