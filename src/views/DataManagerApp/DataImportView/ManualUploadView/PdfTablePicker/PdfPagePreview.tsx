@@ -3,18 +3,28 @@ import { useEffect, useRef, useState } from "react";
 import type { BBox } from "@/workers/pdfSniff/types";
 import type { ReactNode } from "react";
 
+/** One box drawn over the rendered page. */
+export type Highlight = {
+  /** In PDF points. */
+  bbox: BBox;
+  /** Drawn more prominently, for the region currently being reviewed. */
+  isActive?: boolean;
+};
+
 type Props = {
   file: File;
   /** Zero-based. */
   pageIndex: number;
   /** Drawn over the rendered page, in PDF points. */
-  highlight: BBox | undefined;
+  highlights?: readonly Highlight[];
   /** Rendered width in CSS pixels; height follows the page aspect ratio. */
   width?: number;
+  /** Rendered scale, reported so an overlay can map clicks back to points. */
+  onScaleChange?: (scale: number) => void;
 };
 
 /**
- * Renders a single PDF page to a canvas and outlines the detected table.
+ * Renders a single PDF page to a canvas and outlines the selected regions.
  *
  * pdf.js (and the `loadPdfJs` helper that wraps it) are imported dynamically
  * so that bundle only loads when a user actually opens a PDF, rather than on
@@ -27,12 +37,18 @@ type Props = {
  * main thread, where that registration does not happen, so pdf.js takes its
  * normal path of spawning a real Worker from `workerSrc` -- which throws if
  * unset.
+ *
+ * The highlights are painted onto the same canvas as the page, so changing
+ * them re-renders the page. Callers should therefore keep `highlights` and
+ * `onScaleChange` referentially stable, or every parent render re-parses the
+ * document.
  */
 export function PdfPagePreview({
   file,
   pageIndex,
-  highlight,
+  highlights,
   width = 320,
+  onScaleChange,
 }: Readonly<Props>): ReactNode {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -81,14 +97,20 @@ export function PdfPagePreview({
 
         await page.render({ canvas, canvasContext: context, viewport }).promise;
 
-        if (highlight) {
+        for (const highlight of highlights ?? []) {
           // PDF y grows upward, canvas y grows downward, so the box has to
           // be flipped as well as scaled.
-          const [x0, y0, x1, y1] = highlight;
+          const [x0, y0, x1, y1] = highlight.bbox;
           context.save();
-          context.strokeStyle = "rgba(34, 139, 230, 0.9)";
-          context.fillStyle = "rgba(34, 139, 230, 0.15)";
-          context.lineWidth = 2;
+          context.strokeStyle =
+            highlight.isActive ?
+              "rgba(34, 139, 230, 0.95)"
+            : "rgba(34, 139, 230, 0.5)";
+          context.fillStyle =
+            highlight.isActive ?
+              "rgba(34, 139, 230, 0.18)"
+            : "rgba(34, 139, 230, 0.08)";
+          context.lineWidth = highlight.isActive ? 2 : 1;
           const boxX = x0 * scale;
           const boxY = canvas.height - y1 * scale;
           const boxWidth = (x1 - x0) * scale;
@@ -100,6 +122,9 @@ export function PdfPagePreview({
 
         await doc.destroy();
         if (!isCancelled) {
+          // Reported after rendering rather than before, so an overlay is
+          // never told a scale for a page that has not been drawn.
+          onScaleChange?.(scale);
           setStatus("ready");
         }
       } catch {
@@ -114,7 +139,7 @@ export function PdfPagePreview({
     return () => {
       isCancelled = true;
     };
-  }, [file, pageIndex, highlight, width]);
+  }, [file, pageIndex, highlights, width, onScaleChange]);
 
   return (
     <Box pos="relative" w={width}>
