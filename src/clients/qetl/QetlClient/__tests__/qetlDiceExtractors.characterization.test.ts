@@ -253,9 +253,9 @@ describe("getDiceExtractors", () => {
     const { getDiceExtractors } =
       await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
 
-    await expect(
-      getDiceExtractors([CSV_ID, GOOGLE_SHEETS_ID]),
-    ).rejects.toThrow("Google Sheets extraction is not supported yet");
+    await expect(getDiceExtractors([CSV_ID, GOOGLE_SHEETS_ID])).rejects.toThrow(
+      "Google Sheets extraction is not supported yet",
+    );
   });
 
   it("matches multiple csv_file datasets in one call by their own datasetId", async () => {

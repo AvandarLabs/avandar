@@ -1,7 +1,7 @@
 import { getIsOnline } from "@avandar/browser-utils";
 import { QueryClient } from "@tanstack/react-query";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { SessionExpiredError } from "$/ServerApiClient";
+import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
