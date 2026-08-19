@@ -89,3 +89,7 @@ worktrees/
 
 # Temporary working files
 .temp/
+
+# Gate fixtures we have no confirmed licence to redistribute. Fetched by
+# `pnpm fetch-gate-fixtures`; see public/test-data/pdf/gate/README.md.
+public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf

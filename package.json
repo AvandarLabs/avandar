@@ -16,6 +16,7 @@
     "deploy:dev-fanout-server": "fly deploy --config apps/dev-fanout-server/fly.production.toml",
     "deploy:pipeline-server": "fly deploy --config apps/pipeline-server/fly.production.toml",
     "diff-review": "sh agent-skills/public-skills/skills/diff-review/scripts/dif/run.sh",
+    "fetch-gate-fixtures": "node scripts/fetch-gate-fixtures.mjs",
     "format": "./scripts/format-changed-files/format-changed-files.sh",
     "test": "./scripts/runAllTests.sh",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
