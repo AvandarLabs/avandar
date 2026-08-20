@@ -43,7 +43,7 @@ const DESCRIPTORS = {
     //   `withLegend` field yet, and adding one needs a convertVizConfig sweep.
     // - Legend position is deferred until the side-legend margin bug is fixed:
     //   applyChartStyle sets legendProps align for Left/Right but reserves no
-    //   margin, so those positions already render broken on the XY/radar charts.
+    //   margin, so those positions render broken on the XY/radar charts today.
     ...makeGridDescriptors<ScatterPlotVizConfig>(),
   ],
   series: [],

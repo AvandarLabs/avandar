@@ -50,7 +50,9 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
       group: "Layout",
       control: { kind: "segmented", options: AREA_LAYOUT_OPTIONS },
     },
-    ...makeLegendDescriptors<AreaChartVizConfig>({ withVisibilityToggle: true }),
+    ...makeLegendDescriptors<AreaChartVizConfig>({
+      withVisibilityToggle: true,
+    }),
     ...makeAxisDescriptors<AreaChartVizConfig>({
       axis: "xAxis",
       role: "category",

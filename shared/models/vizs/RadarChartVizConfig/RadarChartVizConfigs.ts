@@ -23,7 +23,9 @@ import type {
 
 const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
   chart: [
-    ...makeLegendDescriptors<RadarChartVizConfig>({ withVisibilityToggle: true }),
+    ...makeLegendDescriptors<RadarChartVizConfig>({
+      withVisibilityToggle: true,
+    }),
   ],
   series: [
     {

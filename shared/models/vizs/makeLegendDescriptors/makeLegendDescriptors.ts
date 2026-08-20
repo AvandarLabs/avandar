@@ -11,7 +11,10 @@ const LEGEND_POSITION_OPTIONS = [
 // Template-literal / fixed string keys remain `string` while `TConfig` is
 // generic; the `ChartStyle` constraint guarantees the `chartStyle.legend.*`
 // path exists, and callers opt into the top-level `withLegend` key explicitly.
-type LegendDescriptor<TConfig> = Omit<ChartSettingDescriptor<TConfig>, "key"> & {
+type LegendDescriptor<TConfig> = Omit<
+  ChartSettingDescriptor<TConfig>,
+  "key"
+> & {
   key: string;
 };
 

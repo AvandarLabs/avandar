@@ -37,7 +37,9 @@ const CURVE_TYPE_OPTIONS = [
 
 const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
   chart: [
-    ...makeLegendDescriptors<LineChartVizConfig>({ withVisibilityToggle: true }),
+    ...makeLegendDescriptors<LineChartVizConfig>({
+      withVisibilityToggle: true,
+    }),
     ...makeAxisDescriptors<LineChartVizConfig>({
       axis: "xAxis",
       role: "category",
