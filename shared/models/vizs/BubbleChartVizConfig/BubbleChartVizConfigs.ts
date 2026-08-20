@@ -1,6 +1,7 @@
 import { hydrateBubbleSeriesFromQuery } from "$/models/vizs/hydrateBubbleSeriesFromQuery.ts";
 import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult/hydrateBubbleSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -37,6 +38,13 @@ const DESCRIPTORS = {
       axis: "yAxis",
       role: "value",
     }),
+    // Grid controls only. Legend controls are intentionally omitted for now:
+    // - The "Show legend" toggle is deferred to AVA-322 — bubble has no
+    //   `withLegend` field yet, and adding one needs a convertVizConfig sweep.
+    // - Legend position is deferred until the side-legend margin bug is fixed:
+    //   applyChartStyle sets legendProps align for Left/Right but reserves no
+    //   margin, so those positions already render broken on the XY/radar charts.
+    ...makeGridDescriptors<BubbleChartVizConfig>(),
   ],
   series: [],
 } as const satisfies VizSettingDescriptors<BubbleChartVizConfig, BubbleSeries>;
