@@ -18,6 +18,7 @@ import type {
 
 const DEFAULT_TICK_FONT_SIZE = 12;
 const DEFAULT_Y_AXIS_WIDTH = 64;
+const SIDE_LEGEND_WIDTH = 120;
 const TICK_DEFAULTS = {
   fontSize: DEFAULT_TICK_FONT_SIZE,
   fill: "currentColor",
@@ -149,6 +150,17 @@ function _buildLegendProps(
   legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
 ): Pick<ChartStyleProps, "legendProps"> {
   const legendPosition = legendStyle?.position ?? "top";
+  // Recharts reserves plot space from the legend's *measured* box. A
+  // horizontal legend is stretched to the full chart width, so a
+  // side-positioned one would reserve every pixel and collapse the plot
+  // to nothing. `layout: "vertical"` plus an explicit width makes the
+  // measured box a real sidebar instead.
+  const sideLayout = matchLiteral(legendPosition, {
+    top: {},
+    bottom: {},
+    left: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
+    right: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
+  });
   return {
     legendProps: {
       verticalAlign: matchLiteral(legendPosition, {
@@ -163,6 +175,7 @@ function _buildLegendProps(
         left: "left" as const,
         right: "right" as const,
       }),
+      ...sideLayout,
     },
   };
 }
