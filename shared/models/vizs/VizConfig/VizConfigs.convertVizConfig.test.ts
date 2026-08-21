@@ -1,3 +1,4 @@
+import { objectEntries } from "@avandar/utils";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import { describe, expect, it } from "vitest";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
@@ -160,8 +161,9 @@ const OPTIONAL_KEYS: { [K in VizType]: ReadonlyArray<keyof VizConfigType<K>> } =
     funnel: ["seriesColors"],
   };
 
-function fixtureFor(vizType: VizType): VizConfig {
-  return FIXTURES[vizType] as VizConfig;
+/** Returns the fully-populated fixture config for a viz type. */
+function _getFixtureFromVizType(vizType: VizType): VizConfig {
+  return FIXTURES[vizType];
 }
 
 describe("VizConfigs.convertVizConfig shape matrix", () => {
@@ -169,7 +171,7 @@ describe("VizConfigs.convertVizConfig shape matrix", () => {
     VizTypes.forEach((targetType) => {
       it(`${sourceType} -> ${targetType} produces a well-formed config`, () => {
         const result = VizConfigs.convertVizConfig(
-          fixtureFor(sourceType),
+          _getFixtureFromVizType(sourceType),
           targetType,
         );
 
@@ -203,9 +205,16 @@ describe("VizConfigs.convertVizConfig shape matrix", () => {
 
 /**
  * Viz types that declare each shared field. A field must survive any single
- * hop between two types that both declare it — that is the whole contract
+ * hop between two types that both declare it: that is the whole contract
  * `convertVizConfig` owes the user.
  */
+type SharedVizFields = {
+  vizType: VizType;
+  chartStyle?: ChartStyle;
+  withLegend?: boolean;
+  seriesColors?: Record<string, string>;
+};
+
 const DECLARED_BY = {
   chartStyle: ["bar", "line", "area", "scatter", "bubble", "radar"],
   withLegend: ["bar", "line", "area", "radar"],
@@ -213,22 +222,18 @@ const DECLARED_BY = {
 } as const satisfies Record<string, readonly VizType[]>;
 
 describe("VizConfigs.convertVizConfig field preservation", () => {
-  describe.each(
-    Object.entries(DECLARED_BY) as ReadonlyArray<
-      [keyof typeof DECLARED_BY, readonly VizType[]]
-    >,
-  )("%s", (field, declaringTypes) => {
+  describe.each(objectEntries(DECLARED_BY))("%s", (field, declaringTypes) => {
     declaringTypes.forEach((sourceType) => {
       declaringTypes.forEach((targetType) => {
         if (sourceType === targetType) {
           return;
         }
         it(`survives ${sourceType} -> ${targetType}`, () => {
-          const source = fixtureFor(sourceType) as Record<string, unknown>;
-          const result = VizConfigs.convertVizConfig(
-            fixtureFor(sourceType),
+          const source: SharedVizFields = _getFixtureFromVizType(sourceType);
+          const result: SharedVizFields = VizConfigs.convertVizConfig(
+            _getFixtureFromVizType(sourceType),
             targetType,
-          ) as Record<string, unknown>;
+          );
 
           expect(result[field]).toEqual(source[field]);
         });
@@ -281,7 +286,7 @@ describe("VizConfigs.convertVizConfig invents no defaults", () => {
       }
       it(`keeps withLegend false across ${sourceType} -> ${targetType}`, () => {
         const result = VizConfigs.convertVizConfig(
-          fixtureFor(sourceType),
+          _getFixtureFromVizType(sourceType),
           targetType,
         ) as { withLegend?: boolean };
 
@@ -302,7 +307,7 @@ describe("VizConfigs.convertVizConfig invents no defaults", () => {
     WITH_LEGEND_TYPES.forEach((targetType) => {
       it(`uses the ${targetType} default for withLegend from ${sourceType}`, () => {
         const result = VizConfigs.convertVizConfig(
-          fixtureFor(sourceType),
+          _getFixtureFromVizType(sourceType),
           targetType,
         ) as { withLegend?: boolean };
         const emptyTarget = VizConfigs.makeEmptyConfig(targetType) as {

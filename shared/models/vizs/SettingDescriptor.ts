@@ -27,7 +27,6 @@ import type { ObjectPaths } from "@avandar/utils";
  * when you talk about "the curve type control" you mean the segmented
  * control widget the user clicks.
  */
-import type { LegendPosition } from "$/models/vizs/ChartStyle.types.ts";
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
 
 /**
@@ -207,23 +206,3 @@ export const EMPTY_VIZ_SETTING_DESCRIPTORS: AnyVizSettingDescriptors = {
   chart: [],
   series: [],
 };
-
-/**
- * Options for the `chartStyle.legend.position` control, shared by every viz
- * type that renders a legend.
- *
- * Shared rather than redeclared per viz module so the positions stay in
- * lockstep and each label keeps a single entry in the
- * `vizSettingControlLabel` catalog.
- *
- * The `satisfies` clause rejects an option whose `value` is not a
- * `LegendPosition`. It does not enforce the reverse: adding a member to
- * `LegendPosition` will not fail this file, only leave the new position
- * unoffered.
- */
-export const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const satisfies ReadonlyArray<SelectOption<LegendPosition>>;

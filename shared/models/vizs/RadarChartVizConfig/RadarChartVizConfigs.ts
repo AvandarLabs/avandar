@@ -1,6 +1,6 @@
 import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
 import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
-import { LEGEND_POSITION_OPTIONS } from "$/models/vizs/SettingDescriptor.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -29,12 +29,7 @@ const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<RadarChartVizConfig>(),
   ],
   series: [
     {
