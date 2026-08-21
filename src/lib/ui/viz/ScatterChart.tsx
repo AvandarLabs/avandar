@@ -1,5 +1,24 @@
-import { ScatterChart as MantineScatterChart } from "@mantine/charts";
+/**
+ * NOTE: This component uses Recharts directly instead of Mantine's
+ * `ScatterChart` wrapper. Mantine's legend maps `data[index].name` with no
+ * bounds check, so removing a series while the legend is shown crashes when
+ * the legend payload and the shrunk `data` array fall out of sync. Building
+ * the Recharts elements directly (mirroring `BubbleChart`) avoids that,
+ * renders per-series color/label explicitly, and lets each axis label carry
+ * its own color instead of Mantine's single shared `axisLabel` style.
+ */
+import { Box } from "@mantine/core";
 import { useMemo } from "react";
+import {
+  CartesianGrid,
+  Legend,
+  ScatterChart as RechartsScatterChart,
+  ResponsiveContainer,
+  Scatter,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
@@ -64,39 +83,90 @@ export function ScatterChart({
     isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
   const xLabel = chartStyle?.xAxis?.label ?? derivedXLabel;
   const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
+  const hasXLabel = xLabel !== undefined && xLabel !== "";
+  const hasYLabel = yLabel !== undefined && yLabel !== "";
 
   return (
-    <MantineScatterChart
-      h={height}
-      data={scatterSeries}
-      dataKey={{ x: "x", y: "y" }}
-      withLegend
-      valueFormatter={formatChartNumber}
-      {...styleProps}
-      // `applyChartStyle` only knows the *configured* label; scatter also
-      // falls back to the column name when none is set, so these go
-      // after the spread. Recharts renders both an axis `label` prop and
-      // any `<Label>` child, so the label must come from exactly one
-      // mechanism: Mantine's, which is also what carries `labelColor`
-      // through `styles.axisLabel`.
-      xAxisLabel={xLabel}
-      yAxisLabel={yLabel}
-      yAxisProps={{
-        ...styleProps.yAxisProps,
-        // Widen to fit the rotated Y label.
-        ...(yLabel !== undefined ? { width: 80 } : {}),
-      }}
-      scatterChartProps={
-        xLabel !== undefined || yLabel !== undefined ?
-          {
-            margin: {
-              bottom: xLabel !== undefined ? 40 : undefined,
-              left: yLabel !== undefined ? 30 : undefined,
-              right: yLabel !== undefined ? 5 : undefined,
-            },
-          }
-        : undefined
-      }
-    />
+    <Box h={height} w="100%">
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsScatterChart
+          margin={{
+            top: 10,
+            right: 10,
+            bottom: hasXLabel ? 30 : 0,
+            left: hasYLabel ? 10 : 0,
+          }}
+        >
+          <CartesianGrid {...styleProps.gridProps} />
+          {styleProps.withXAxis !== false ?
+            <XAxis
+              dataKey="x"
+              type="number"
+              name="x"
+              tickFormatter={(value) => {
+                return formatChartNumber(value, { compact: true });
+              }}
+              {...styleProps.xAxisProps}
+              label={
+                hasXLabel ?
+                  {
+                    value: xLabel,
+                    position: "insideBottom",
+                    offset: -10,
+                    fill: chartStyle?.xAxis?.labelColor,
+                  }
+                : undefined
+              }
+            />
+          : null}
+          {styleProps.withYAxis !== false ?
+            <YAxis
+              dataKey="y"
+              type="number"
+              name="y"
+              width={hasYLabel ? 80 : 64}
+              tickFormatter={(value) => {
+                return formatChartNumber(value, { compact: true });
+              }}
+              {...styleProps.yAxisProps}
+              label={
+                hasYLabel ?
+                  {
+                    value: yLabel,
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: chartStyle?.yAxis?.labelColor,
+                  }
+                : undefined
+              }
+            />
+          : null}
+          <Tooltip
+            cursor={{ strokeDasharray: "3 3" }}
+            formatter={(value: unknown) => {
+              return formatChartNumber(value);
+            }}
+          />
+          {/*
+           * Legend is always rendered (matching scatter's prior behaviour):
+           * unlike Mantine's ScatterChart it reads names off the <Scatter>
+           * elements rather than indexing data[index], so it is safe when the
+           * series array shrinks, and a single-series scatter still shows its
+           * label.
+           */}
+          <Legend {...styleProps.legendProps} />
+          {scatterSeries.map((s, idx) => {
+            return (
+              <Scatter
+                key={`${s.name}-${idx}`}
+                name={s.name}
+                data={s.data}
+                fill={s.color}
+              />
+            );
+          })}
+        </RechartsScatterChart>
+      </ResponsiveContainer>
+    </Box>
   );
 }
