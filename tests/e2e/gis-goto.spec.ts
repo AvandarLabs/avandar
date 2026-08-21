@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "pcode-polygon.csv";
@@ -55,7 +56,7 @@ async function _submitGoTo(page: Page, query: string): Promise<void> {
 
 test(
   "flies the camera to a coordinate and a seeded P-code",
-  { tag: "@online" },
+  { tag: E2E_ONLINE_TAG },
   async ({ page, e2eWorkerDb }) => {
     const admin = createSupabaseAdminClient();
     const { primaryUser, workspaceSlug } = e2eWorkerDb;

@@ -26,9 +26,9 @@ export function useDuckDbSpatialAvailability(): DuckDbSpatialAvailability {
  * the state stays `"loading"` for the life of the page. Reading the capability
  * through this hook is itself the trigger.
  *
- * The trigger is `ensureSpatial` rather than `initialize`: DuckDB now starts
- * without Spatial, so initializing alone would never resolve this and the
- * picker would sit disabled forever.
+ * The trigger is `ensureSpatial`, not `initialize`: DuckDB starts without
+ * Spatial, so initializing alone never resolves this and the picker sits
+ * disabled forever.
  *
  * Prefer {@link useDuckDbSpatialAvailability} where something else already
  * guarantees detection, so a screen that never offers a spatial binding does

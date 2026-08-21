@@ -17,6 +17,7 @@ import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.typ
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type ColumnSet = readonly string[] | "all";
+type TokenAtIndex = { tokens: readonly SqlToken[]; index: number };
 type ColumnSetByDatasetId = Record<string, ColumnSet>;
 
 const SKIP_KEYWORDS = new Set([
@@ -128,10 +129,8 @@ function _selectListHasStar(tokens: readonly SqlToken[]): boolean {
 }
 
 /** True when the two tokens ending at `index` spell the `::` cast operator. */
-function _isCastOperatorEnd(
-  tokens: readonly SqlToken[],
-  index: number,
-): boolean {
+function _isCastOperatorEnd(options: Readonly<TokenAtIndex>): boolean {
+  const { tokens, index } = options;
   return tokens[index]?.value === ":" && tokens[index - 1]?.value === ":";
 }
 
@@ -143,20 +142,20 @@ function _isCastOperatorEnd(
  * a column the Parquet has no chance of holding, and a projection that names a
  * missing column fails the whole query with a binder error rather than merely
  * widening the fetch, so this has to be read rather than guessed at.
- *
- * The walk backwards skips the leading words of a multi-word type such as
- * `DOUBLE PRECISION`, and stops at a keyword so that the alias in
- * `"cases"::DOUBLE AS total` is not mistaken for a second word of the type.
  */
-function _isCastTypeName(tokens: readonly SqlToken[], index: number): boolean {
-  let cursor = index - 1;
-  while (
-    tokens[cursor]?.kind === "identifier" &&
-    !isKeywordToken({ token: tokens[cursor], keywords: SKIP_KEYWORDS })
-  ) {
-    cursor -= 1;
-  }
-  return _isCastOperatorEnd(tokens, cursor);
+function _isCastTypeName(options: Readonly<TokenAtIndex>): boolean {
+  const { tokens, index } = options;
+  // A multi-word type such as `DOUBLE PRECISION` puts several identifiers
+  // after the operator, so the operator sits before the last token that is
+  // not a bare identifier. Stopping at a keyword is what keeps the alias in
+  // `"cases"::DOUBLE AS total` from reading as another word of the type.
+  const operatorEndIndex = tokens.slice(0, index).findLastIndex((token) => {
+    return (
+      token.kind !== "identifier" ||
+      isKeywordToken({ token, keywords: SKIP_KEYWORDS })
+    );
+  });
+  return _isCastOperatorEnd({ tokens, index: operatorEndIndex });
 }
 
 /** Names introduced by `AS` in this statement, which no relation carries. */
@@ -165,7 +164,7 @@ function _getAliasNames(tokens: readonly SqlToken[]): ReadonlySet<string> {
     tokens.flatMap((token, index) => {
       return (
           token.kind === "identifier" &&
-          isKeywordToken({ token: tokens[index - 1], keywords: "AS" })
+            isKeywordToken({ token: tokens[index - 1], keywords: "AS" })
         ) ?
           [token.value]
         : [];
@@ -175,9 +174,9 @@ function _getAliasNames(tokens: readonly SqlToken[]): ReadonlySet<string> {
 
 /** Index of one of the statement's own keywords, ignoring subqueries. */
 function _getTopLevelKeywordIndex(
-  tokens: readonly SqlToken[],
-  keyword: string,
+  options: Readonly<{ tokens: readonly SqlToken[]; keyword: string }>,
 ): number | undefined {
+  const { tokens, keyword } = options;
   return getKeywordIndex({
     depth: 0,
     endIndex: tokens.length,
@@ -197,9 +196,9 @@ function _getTopLevelKeywordIndex(
  */
 function _getAliasScopeIndex(tokens: readonly SqlToken[]): number | undefined {
   const candidates = [
-    _getTopLevelKeywordIndex(tokens, "GROUP"),
-    _getTopLevelKeywordIndex(tokens, "HAVING"),
-    _getTopLevelKeywordIndex(tokens, "ORDER"),
+    _getTopLevelKeywordIndex({ tokens, keyword: "GROUP" }),
+    _getTopLevelKeywordIndex({ tokens, keyword: "HAVING" }),
+    _getTopLevelKeywordIndex({ tokens, keyword: "ORDER" }),
   ].filter(isDefined);
   return candidates.length === 0 ? undefined : Math.min(...candidates);
 }
@@ -218,7 +217,7 @@ function _shouldSkipIdentifier(
   if (tokens[index + 1]?.value === "(") {
     return true;
   }
-  if (_isCastTypeName(tokens, index)) {
+  if (_isCastTypeName({ tokens, index })) {
     return true;
   }
   return isKeywordToken({ token: tokens[index - 1], keywords: "AS" });
@@ -280,15 +279,13 @@ function _getAliasReferenceColumns(
     index: number;
     orderByIndex: number | undefined;
   }>,
-): readonly string[] | "all" {
+): ColumnSet {
   const { aliasScopeIndex, columnName, index, orderByIndex } = options;
-  if (orderByIndex !== undefined && index > orderByIndex) {
-    return [];
-  }
-  if (aliasScopeIndex !== undefined && index > aliasScopeIndex) {
-    return "all";
-  }
-  return [columnName];
+  return (
+    orderByIndex !== undefined && index > orderByIndex ? []
+    : aliasScopeIndex !== undefined && index > aliasScopeIndex ? "all"
+    : [columnName]
+  );
 }
 
 function _collectSqlColumns(
@@ -297,7 +294,7 @@ function _collectSqlColumns(
 ): ColumnSetByDatasetId {
   const aliasNames = _getAliasNames(tokens);
   const aliasScopeIndex = _getAliasScopeIndex(tokens);
-  const orderByIndex = _getTopLevelKeywordIndex(tokens, "ORDER");
+  const orderByIndex = _getTopLevelKeywordIndex({ tokens, keyword: "ORDER" });
   return tokens.reduce<ColumnSetByDatasetId>(
     (columnsByDatasetId, _token, index) => {
       if (_shouldSkipIdentifier(tokens, index)) {

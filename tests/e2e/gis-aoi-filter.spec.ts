@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Page } from "@playwright/test";
 
 const DATASET_NAME = "dated-points.csv";
@@ -88,11 +89,14 @@ async function _inlierFitsPixelRing(page: Page): Promise<boolean> {
 
 /** Clicks a canvas offset from where MapLibre currently projects `origin`. */
 async function _clickMapAtPixelOffset(
-  page: Page,
-  origin: readonly [number, number],
-  offset: readonly [number, number],
-  options: Readonly<{ double?: boolean }> = {},
+  options: Readonly<{
+    isDoubleClick?: boolean;
+    offset: readonly [number, number];
+    origin: readonly [number, number];
+    page: Page;
+  }>,
 ): Promise<void> {
+  const { isDoubleClick = false, offset, origin, page } = options;
   const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
   const mapCanvas = mapRegion.locator(".maplibregl-canvas");
   const projected = await page.evaluate((lngLat) => {
@@ -106,7 +110,7 @@ async function _clickMapAtPixelOffset(
     x: projected.x + offset[0],
     y: projected.y + offset[1],
   };
-  if (options.double === true) {
+  if (isDoubleClick) {
     await mapCanvas.dblclick({ position, force: true });
     return;
   }
@@ -133,18 +137,25 @@ async function _drawAoiAroundInliers(page: Page): Promise<void> {
   // drag instead, so clicking the ring's corners one by one leaves the session
   // idle and Enter commits nothing: the first corner has to open the polygon.
   const [firstOffset, ...remainingOffsets] = PIXEL_RING;
-  await _clickMapAtPixelOffset(page, INLIER_COORDINATE, firstOffset, {
-    double: true,
+  await _clickMapAtPixelOffset({
+    isDoubleClick: true,
+    offset: firstOffset,
+    origin: INLIER_COORDINATE,
+    page,
   });
   for (const offset of remainingOffsets) {
-    await _clickMapAtPixelOffset(page, INLIER_COORDINATE, offset);
+    await _clickMapAtPixelOffset({
+      offset,
+      origin: INLIER_COORDINATE,
+      page,
+    });
   }
   await page.keyboard.press("Enter");
 }
 
 test(
   "draws an AOI that drops the outlier and can opt a layer out",
-  { tag: "@online" },
+  { tag: E2E_ONLINE_TAG },
   async ({ page, e2eWorkerDb }) => {
     const admin = createSupabaseAdminClient();
     const { primaryUser, workspaceSlug } = e2eWorkerDb;

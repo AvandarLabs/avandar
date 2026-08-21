@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "geometry-formats.csv";
@@ -31,7 +32,7 @@ async function _selectOption(
 
 test(
   "renders WKT, hexadecimal WKB, and GeoJSON geometry columns",
-  { tag: "@online" },
+  { tag: E2E_ONLINE_TAG },
   async ({ page, e2eWorkerDb }) => {
     const admin = createSupabaseAdminClient();
     const { primaryUser, workspaceSlug } = e2eWorkerDb;
@@ -117,14 +118,30 @@ test(
         timeout: MEDIUM_WAIT,
       });
 
-      // The reload proves the *config* survives it, and stops there.
-      // Re-asserting the mapped rows would re-run the whole fetch, DuckDB
-      // register and spatial query off the persisted React Query cache, which
-      // a reload restores as `fresh` even when it is stale (see
-      // `docs/rules/e2e-testing.md`). Nothing in a test recovers from that, so
-      // it failed hard rather than slowly, and it is what made this spec
-      // flake. The row count is already asserted above for all three
-      // encodings.
+      // The reload earns its place: it is the only check that a saved
+      // geometry column and encoding come back. The write lands in Postgres,
+      // the route loader's `AvaMapClient.getById` reads it on the next load,
+      // the config schema parses it, and both pickers map the stored values
+      // onto their options. A field that saves but does not read back in that
+      // shape fails nowhere else, and the schema rejects unknown config keys,
+      // so a reshaped write is exactly the kind of regression that lands
+      // here. That bug class is narrow but real.
+      //
+      // Do not add the mapped-row count after the reload. It comes from the
+      // dataset query and its DuckDB register, and a reload can restore that
+      // query's persisted snapshot as `fresh` while it is stale (see
+      // `docs/rules/e2e-testing.md`), which no retry inside a test recovers
+      // from. The count is already asserted above for all three encodings.
+      //
+      // The two assertions below are not equally safe. `Encoding` is a pure
+      // config fact: a static option list, and a value the route loader
+      // refetches every load. `Geometry column` is a Mantine Select whose
+      // visible text is the *label* of an option supplied by the
+      // dataset-columns query (`QueryColumnSingleSelect`), so it needs that
+      // query as well as the config. It is kept because resolving the stored
+      // column id back to a column is worth proving, but it carries a smaller
+      // version of the same restore risk, so it is the first thing to look at
+      // if this spec ever fails right here.
       await page.reload();
       await expect(
         inspector.getByRole("combobox", { name: "Geometry column" }),

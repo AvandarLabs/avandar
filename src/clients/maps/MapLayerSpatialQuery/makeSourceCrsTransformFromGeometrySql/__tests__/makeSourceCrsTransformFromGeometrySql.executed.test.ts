@@ -14,9 +14,8 @@
  * `tests/e2e/gis-geometry-crs.spec.ts` reproject the same coordinates.
  */
 import { describe, expect, it } from "vitest";
-import { makeSourceCrsTransformFromGeometrySql } from "@/clients/maps/MapLayerSpatialQuery/makeSourceCrsTransformFromGeometrySql/makeSourceCrsTransformFromGeometrySql";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { DuckDBConnection } from "@duckdb/node-api";
+import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql";
 
 /** The three Web Mercator points the GIS CRS fixture carries. */
 const _FIXTURE_SQL = `
@@ -27,17 +26,19 @@ const _FIXTURE_SQL = `
   ) AS t(site_id, mercator_wkt);
 `;
 
-const _PARSED_GEOMETRY_SQL = 'TRY(ST_GeomFromText(CAST("mercator_wkt" AS VARCHAR)))';
+/** The parsed-geometry expression the layer compiler feeds the transform. */
+const _PARSED_GEOMETRY_SQL =
+  'TRY(ST_GeomFromText(CAST("mercator_wkt" AS VARCHAR)))';
 
 /** Longitude/latitude pairs the transform yields, rounded to six places. */
-async function _project(
+async function _getLonLatPairsFromSourceCrs(
   sourceCrs: number | undefined,
 ): Promise<Array<[number, number]>> {
   const geometrySql = makeSourceCrsTransformFromGeometrySql({
     geometrySql: _PARSED_GEOMETRY_SQL,
     sourceCrs,
   });
-  return withDuckDb(async (connection: DuckDBConnection) => {
+  return withDuckDb(async (connection) => {
     await connection.run("INSTALL spatial; LOAD spatial;");
     await connection.run(_FIXTURE_SQL);
     const result = await connection.runAndReadAll(
@@ -55,7 +56,7 @@ describe("makeSourceCrsTransformFromGeometrySql executed", () => {
   it("reprojects EPSG:3857 metres to WGS 84 degrees", async () => {
     // Rounded to six places because PROJ returns the round trip a hair off an
     // exact degree (9.99999999970593), which is precision, not disagreement.
-    await expect(_project(3857)).resolves.toEqual([
+    await expect(_getLonLatPairsFromSourceCrs(3857)).resolves.toEqual([
       [10, 10],
       [10.5, 10.5],
       [11, 11],
@@ -66,7 +67,7 @@ describe("makeSourceCrsTransformFromGeometrySql executed", () => {
     // The regression guard for the `undefined` arm: a layer whose data is
     // already WGS 84 must not be transformed, and a transform applied anyway
     // would move these points into the millions rather than leaving degrees.
-    await expect(_project(undefined)).resolves.toEqual([
+    await expect(_getLonLatPairsFromSourceCrs(undefined)).resolves.toEqual([
       [1113194.9079, 1118889.9749],
       [1168854.6533, 1175452.6086],
       [1224514.3987, 1232106.8019],

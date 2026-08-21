@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "disputed-boundaries.csv";
@@ -66,7 +67,7 @@ async function _readLayerPaint(
 
 test(
   "binds a disputed-status column and renders a dashed casing and locked legend row",
-  { tag: "@online" },
+  { tag: E2E_ONLINE_TAG },
   async ({ page, e2eWorkerDb }) => {
     const admin = createSupabaseAdminClient();
     const { primaryUser, workspaceSlug } = e2eWorkerDb;

@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "web-mercator-points.csv";
@@ -63,7 +64,7 @@ async function _readRenderedCoordinates(
 
 test(
   "reprojects a web-mercator geometry column and keeps the source CRS",
-  { tag: "@online" },
+  { tag: E2E_ONLINE_TAG },
   async ({ page, e2eWorkerDb }) => {
     const admin = createSupabaseAdminClient();
     const { primaryUser, workspaceSlug } = e2eWorkerDb;
@@ -123,14 +124,26 @@ test(
         page.getByRole("status", { name: "All changes saved" }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-      // The reload is here to prove the *config* survives it, and stops there.
-      // Re-asserting the mapped rows or the projected coordinates would re-run
-      // the whole fetch, DuckDB register and spatial query off the persisted
-      // React Query cache, which a reload restores as `fresh` even when it is
-      // stale (see `docs/rules/e2e-testing.md`). That is unrecoverable inside a
-      // test, so it read as a hard failure rather than a slow pass, and it is
-      // what made this spec flake. Both facts are already proven above, against
-      // the render this test actually drove.
+      // The reload earns its place: it is the only check that a saved source
+      // CRS comes back. The write lands in Postgres, the route loader's
+      // `AvaMapClient.getById` reads it on the next load, the config schema
+      // parses it, and the picker maps the stored number onto its option. A
+      // field that saves but does not read back in that shape, or that the
+      // control cannot match to an option, fails nowhere else: the schema's
+      // own round-trip tests cover a geometry binding only with `sourceCrs`
+      // unset. That bug class is narrow but real, and this is its only guard.
+      //
+      // The assertion below is a pure config fact, which is what makes it safe
+      // across a reload: the Source CRS options are a static preset list, and
+      // the value comes from the route loader, which refetches every load. Do
+      // not extend that reasoning to a control whose options come from a query.
+      //
+      // Do not add the mapped-row count or the projected coordinates here
+      // either. Those come from the dataset query and its DuckDB register, and
+      // a reload can restore that query's persisted snapshot as `fresh` while
+      // it is stale (see `docs/rules/e2e-testing.md`), which no retry inside a
+      // test recovers from. Both are already proven above, against the render
+      // this test drove.
       await page.reload();
       await expect(
         inspector.getByRole("combobox", { name: "Source CRS" }),

@@ -19,6 +19,7 @@ import {
   isDatasetParquetInStorage,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Page } from "@playwright/test";
 
 /**
@@ -53,7 +54,7 @@ async function expectExcelParsePreview(options: {
   ).toBeVisible({ timeout: SHORT_WAIT });
 }
 
-test.describe("Excel manual upload", () => {
+test.describe("Excel manual upload", { tag: E2E_ONLINE_TAG }, () => {
   // Runs in its own fresh browser process (see `freshBrowserPage`): the large
   // XLSX (17k+ rows) DuckDB-WASM parse is slow enough that, on an aged shared
   // process late in the run, it can exceed its timeout. A clean process removes

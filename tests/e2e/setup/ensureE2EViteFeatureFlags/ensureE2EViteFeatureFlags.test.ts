@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import {
-  ensureE2EViteFeatureFlags,
-  isE2EOfflineMode,
-} from "./ensureE2EViteFeatureFlags";
+import { ensureE2EViteFeatureFlags } from "./ensureE2EViteFeatureFlags";
 
 const originalFlags = process.env.VITE_FEATURE_FLAGS;
 const originalOffline = process.env.PLAYWRIGHT_E2E_OFFLINE;
@@ -20,7 +17,6 @@ describe("ensureE2EViteFeatureFlags", () => {
     ensureE2EViteFeatureFlags();
 
     expect(process.env.VITE_FEATURE_FLAGS).toBe("enable-shared-with-me");
-    expect(isE2EOfflineMode()).toBe(false);
   });
 
   it("strips a stray disable flag rather than trusting the env", () => {
@@ -40,6 +36,5 @@ describe("ensureE2EViteFeatureFlags", () => {
     ensureE2EViteFeatureFlags();
 
     expect(process.env.VITE_FEATURE_FLAGS).toContain("disable-duckdb-spatial");
-    expect(isE2EOfflineMode()).toBe(true);
   });
 });

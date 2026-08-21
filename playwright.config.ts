@@ -2,10 +2,7 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
-import {
-  assertE2EDevServerPortIsFree,
-  assertSupabaseApiIsRunning,
-} from "./tests/e2e/setup/assertE2EDevServerPortIsFree/assertE2EDevServerPortIsFree";
+import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
   E2E_ONLINE_TAG,
   ensureE2EViteFeatureFlags,
@@ -35,8 +32,11 @@ const supabaseUrl =
 // Both checks run here, while the config is still evaluating, because this is
 // the last moment before Playwright starts `webServer`: from `globalSetup` the
 // run's own Vite is already on the port and every run would fail.
-assertE2EDevServerPortIsFree(Number(vitePort));
-assertSupabaseApiIsRunning(`${supabaseUrl}/rest/v1/`);
+E2EPreflight.assertDevServerPortIsFree({
+  host: parsedBaseUrl.hostname,
+  port: Number(vitePort),
+});
+E2EPreflight.assertSupabaseApiIsRunning(`${supabaseUrl}/rest/v1/`);
 
 /**
  * Ensures e2e runs with flags required by share-modal and shared-with-me specs.

@@ -10,57 +10,59 @@ import { MEDIUM_WAIT } from "./helpers/timeouts";
 import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
 import type { Page } from "@playwright/test";
 
-/**
- * Per-viz-type seeds used to verify every visualization renders inside the
- * dashboard editor.
- *
- * Each result is a literal `VALUES` query rather than an aggregation over an
- * uploaded dataset, which is what `docs/rules/e2e-testing.md` asks of a spec
- * that asserts rendering: querying a real dataset here inherited the data
- * pipeline's flakiness for no coverage, because what is under test is whether
- * every viz type draws, not whether a query runs.
- *
- * Concretely, each case navigates to the editor with `page.goto`, and a full
- * page load starts an empty DuckDB and rehydrates a possibly stale-empty
- * workspace-datasets list, which gates the on-demand registration in
- * `WorkspaceQuerySession.runQuery`. Querying by dataset id therefore raced
- * that registration: `renders table` either drew in ~4s or never drew at all,
- * so the spec failed hard at its 15s ceiling roughly one run in three. A
- * literal result has nothing to register. `save-to-dashboard-renders-in-editor`
- * seeds the same way for the same reason.
- *
- * Column names still mirror the old dataset's (varchar Admin2 /
- * Province_State, numeric lat / lng / daily_new_cases, date `date`) so each
- * `vizConfig` below is unchanged.
- */
+/** One visualization type, the SQL that seeds it, and the proof it drew. */
 type VizTypeCase = {
   vizType: SeededVizConfig["vizType"];
-  sql: () => string;
+  sql: string;
   vizConfig: SeededVizConfig;
   /** Selector that proves the visualization rendered for this type. */
   visibleSelector: string;
 };
 
+/** One row per county, for the visualizations keyed on a category name. */
+const TOTAL_CASES_BY_COUNTY_SQL =
+  `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
+  `('Kern', 900.0)) AS t("Admin2", "total_cases")`;
+
+/** One row per day, for the visualizations keyed on a date axis. */
+const TOTAL_CASES_BY_DATE_SQL =
+  `SELECT * FROM (VALUES (DATE '2020-03-01', 10.0), ` +
+  `(DATE '2020-03-02', 20.0), (DATE '2020-03-03', 15.0)) ` +
+  `AS t("date", "total_cases")`;
+
+/**
+ * Per-viz-type seeds used to verify every visualization renders inside the
+ * dashboard editor.
+ *
+ * Each result is a literal `VALUES` query, which is what
+ * `docs/rules/e2e-testing.md` asks of a spec that asserts rendering: what is
+ * under test is whether every viz type draws, not whether a query runs.
+ *
+ * Do not aggregate over an uploaded dataset instead. Each case navigates to
+ * the editor with `page.goto`, and a full page load starts an empty DuckDB and
+ * rehydrates a possibly stale-empty workspace-datasets list, which gates the
+ * on-demand registration in `WorkspaceQuerySession.runQuery`. A query by
+ * dataset id races that registration, so a case either draws in ~4s or never
+ * draws at all and fails hard at its 15s ceiling. A literal result has nothing
+ * to register. `save-to-dashboard-renders-in-editor` seeds the same way for
+ * the same reason.
+ *
+ * The column names in each `sql` below (varchar Admin2 / Province_State,
+ * numeric lat / lng / daily_new_cases, date `date`) are the shape each
+ * `vizConfig` keys on, so a rename here has to be matched there.
+ */
 const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   {
     vizType: "table",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES ('Riverside', 12), ('Orange', 9), ` +
-        `('Kern', 5)) AS t("Admin2", "daily_new_cases")`
-      );
-    },
+    sql:
+      `SELECT * FROM (VALUES ('Riverside', 12), ('Orange', 9), ` +
+      `('Kern', 5)) AS t("Admin2", "daily_new_cases")`,
     vizConfig: { vizType: "table" },
     visibleSelector: '[role="columnheader"]',
   },
   {
     vizType: "bar",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
-        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
-      );
-    },
+    sql: TOTAL_CASES_BY_COUNTY_SQL,
     vizConfig: {
       vizType: "bar",
       xAxisKey: "Admin2",
@@ -71,13 +73,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "line",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES (DATE '2020-03-01', 10.0), ` +
-        `(DATE '2020-03-02', 20.0), (DATE '2020-03-03', 15.0)) ` +
-        `AS t("date", "total_cases")`
-      );
-    },
+    sql: TOTAL_CASES_BY_DATE_SQL,
     vizConfig: {
       vizType: "line",
       xAxisKey: "date",
@@ -89,13 +85,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "area",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES (DATE '2020-03-01', 10.0), ` +
-        `(DATE '2020-03-02', 20.0), (DATE '2020-03-03', 15.0)) ` +
-        `AS t("date", "total_cases")`
-      );
-    },
+    sql: TOTAL_CASES_BY_DATE_SQL,
     vizConfig: {
       vizType: "area",
       xAxisKey: "date",
@@ -107,12 +97,9 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "scatter",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES (33.9, -117.4), (33.7, -117.8), ` +
-        `(35.4, -119.0)) AS t("lat", "lng")`
-      );
-    },
+    sql:
+      `SELECT * FROM (VALUES (33.9, -117.4), (33.7, -117.8), ` +
+      `(35.4, -119.0)) AS t("lat", "lng")`,
     vizConfig: {
       vizType: "scatter",
       xAxisKey: "lat",
@@ -122,12 +109,9 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "pie",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES ('California', 1800.0), ` +
-        `('Nevada', 900.0)) AS t("Province_State", "total_cases")`
-      );
-    },
+    sql:
+      `SELECT * FROM (VALUES ('California', 1800.0), ` +
+      `('Nevada', 900.0)) AS t("Province_State", "total_cases")`,
     vizConfig: {
       vizType: "pie",
       nameKey: "Province_State",
@@ -140,12 +124,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "funnel",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
-        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
-      );
-    },
+    sql: TOTAL_CASES_BY_COUNTY_SQL,
     vizConfig: {
       vizType: "funnel",
       nameKey: "Admin2",
@@ -155,12 +134,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "radar",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
-        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
-      );
-    },
+    sql: TOTAL_CASES_BY_COUNTY_SQL,
     vizConfig: {
       vizType: "radar",
       nameKey: "Admin2",
@@ -170,13 +144,10 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "bubble",
-    sql: () => {
-      return (
-        `SELECT * FROM (VALUES (33.9, -117.4, 12.0), ` +
-        `(33.7, -117.8, 8.0), (35.4, -119.0, 5.0)) ` +
-        `AS t("lat", "lng", "cases")`
-      );
-    },
+    sql:
+      `SELECT * FROM (VALUES (33.9, -117.4, 12.0), ` +
+      `(33.7, -117.8, 8.0), (35.4, -119.0, 5.0)) ` +
+      `AS t("lat", "lng", "cases")`,
     vizConfig: {
       vizType: "bubble",
       xAxisKey: "lat",
@@ -215,7 +186,7 @@ async function _assertEveryVisualization(
         admin: options.admin,
         workspaceId: options.workspaceId,
         ownerEmail: options.ownerEmail,
-        rawSql: vizCase.sql(),
+        rawSql: vizCase.sql,
         vizConfig: vizCase.vizConfig,
       });
       options.dashboardIds.push(dashboardId);

@@ -22,7 +22,7 @@ const CACHE_DIR = path.resolve(
  * is part of the key: bumping `@duckdb/duckdb-wasm` simply misses the cache
  * and refetches rather than serving a binary the new engine cannot load.
  */
-export function getCacheFileName(url: string): string {
+function _getCacheFileName(url: string): string {
   const { pathname } = new URL(url);
   return pathname.replace(/^\/+/, "").replace(/[^a-zA-Z0-9._-]/g, "_");
 }
@@ -36,12 +36,14 @@ async function _readCached(fileName: string): Promise<Buffer | undefined> {
 }
 
 /** Writes through a temp file so concurrent workers cannot read a partial. */
-async function _writeCached(fileName: string, body: Buffer): Promise<void> {
-  const target = path.join(CACHE_DIR, fileName);
+async function _writeCached(
+  options: Readonly<{ body: Buffer; fileName: string }>,
+): Promise<void> {
+  const target = path.join(CACHE_DIR, options.fileName);
   const temporary = `${target}.${process.pid}.tmp`;
   try {
     await fs.mkdir(CACHE_DIR, { recursive: true });
-    await fs.writeFile(temporary, body);
+    await fs.writeFile(temporary, options.body);
     await fs.rename(temporary, target);
   } catch {
     await fs.rm(temporary, { force: true }).catch(() => {});
@@ -54,11 +56,11 @@ async function _writeCached(fileName: string, body: Buffer): Promise<void> {
  * DuckDB-WASM fetches `parquet`, `json`, `excel` and (for GIS) `spatial` from
  * `extensions.duckdb.org` on **every** fresh init, because it cannot persist
  * them across page loads, and the CDN sends no `cache-control`, so the browser
- * cannot help either. Each Playwright test gets a fresh context, so before
- * this every test re-downloaded ~4.5MB and paid ~1.6s for it; a spec that
- * reloads paid twice. That put a third-party CDN in the critical path of the
- * whole suite, which is both slow and a source of timeouts nothing in the
- * repo could fix.
+ * cannot help either. Each Playwright test gets a fresh context, so without a
+ * cache every test refetches ~4.5MB and pays ~1.6s for it, twice for a spec
+ * that reloads. That puts a third-party CDN in the critical path of the whole
+ * suite, which is both slow and a source of timeouts nothing in the repo can
+ * fix.
  *
  * The first run to want a given file fetches it and writes it to disk; every
  * run after that is local, which also makes the suite work offline once
@@ -69,22 +71,33 @@ export async function installDuckDbExtensionCache(
   context: BrowserContext,
 ): Promise<void> {
   await context.route(EXTENSION_URL_PATTERN, async (route) => {
-    const url = route.request().url();
-    const fileName = getCacheFileName(url);
-    const cached = await _readCached(fileName);
-    if (cached) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/wasm",
-        body: cached,
-      });
-      return;
+    try {
+      const url = route.request().url();
+      const fileName = _getCacheFileName(url);
+      const cached = await _readCached(fileName);
+      if (cached) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/wasm",
+          body: cached,
+        });
+        return;
+      }
+      const response = await route.fetch();
+      const body = await response.body();
+      if (response.ok()) {
+        await _writeCached({ body, fileName });
+      }
+      await route.fulfill({ response, body });
+    } catch {
+      // Every path has to end in a resolved route, so this catch covers the
+      // whole handler rather than just the fetch: a cold cache with no route
+      // to the CDN, a disposed response body, a context closing mid-fetch.
+      // An unhandled route leaves the browser waiting instead of failing, so
+      // DuckDB's `LOAD` never reaches the catch that reports the extension as
+      // unavailable and the spec burns its timeout. Aborting surfaces as a
+      // rejected fetch, which that catch does see.
+      await route.abort("failed").catch(() => {});
     }
-    const response = await route.fetch();
-    const body = await response.body();
-    if (response.ok()) {
-      await _writeCached(fileName, body);
-    }
-    await route.fulfill({ response, body });
   });
 }

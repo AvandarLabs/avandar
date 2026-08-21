@@ -94,14 +94,15 @@ async function _disposeDuckDbInstance(
 /**
  * Loads what every query needs, and nothing that only some do.
  *
- * `parquet` is unconditional because every dataset is parquet. `spatial` and
- * `excel` are not: each is fetched from `extensions.duckdb.org` on **every**
- * fresh AsyncDuckDB init, since DuckDB-WASM cannot persist extensions across
- * page loads and the CDN sends no `cache-control`. Loading them here charged
- * every page load ~1.2s and ~3.6MB of third-party traffic for capabilities
- * most sessions never use, and put that CDN in the critical path of opening
- * any dataset at all. They now load through `ensureExtension` at the point of
- * use: see `ensureSpatial` and `ensureExcel`.
+ * `parquet` is unconditional because every dataset is parquet. Do not add
+ * `spatial` or `excel` here: each is fetched from `extensions.duckdb.org` on
+ * **every** fresh AsyncDuckDB init, since DuckDB-WASM cannot persist
+ * extensions across page loads and the CDN sends no `cache-control`, so
+ * loading them here costs every page load ~1.2s and ~3.6MB of third-party
+ * traffic for capabilities most sessions never use, and puts that CDN in the
+ * critical path of opening any dataset at all. They load through
+ * `ensureExtension` at the point of use: see `ensureSpatial` and
+ * `ensureExcel`.
  */
 async function _loadRequiredDuckDbExtensions(
   conn: duckdb.AsyncDuckDBConnection,
@@ -109,11 +110,11 @@ async function _loadRequiredDuckDbExtensions(
   await conn.query("LOAD parquet;");
 }
 
-async function _initializeDuckDb(options: {
-  onBundleSelected: (hasPthreadWorker: boolean) => void;
-}): Promise<duckdb.AsyncDuckDB> {
+async function _initializeDuckDb(
+  onBundleSelected: (hasPthreadWorker: boolean) => void,
+): Promise<duckdb.AsyncDuckDB> {
   const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
-  options.onBundleSelected(bundle.pthreadWorker != null);
+  onBundleSelected(bundle.pthreadWorker != null);
 
   const worker = new Worker(bundle.mainWorker!);
   const duckDbLogger = new duckdb.ConsoleLogger();
@@ -148,10 +149,8 @@ export function makeDuckDbConnectionManager(options: {
 
   const getDb = async (): Promise<duckdb.AsyncDuckDB> => {
     if (!dbPromise) {
-      dbPromise = _initializeDuckDb({
-        onBundleSelected: (selectedHasPthreadWorker) => {
-          hasPthreadWorker = selectedHasPthreadWorker;
-        },
+      dbPromise = _initializeDuckDb((selectedHasPthreadWorker) => {
+        hasPthreadWorker = selectedHasPthreadWorker;
       }).catch((error: unknown) => {
         dbPromise = undefined;
         spatialAvailability.set("unavailable");

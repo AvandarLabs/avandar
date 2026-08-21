@@ -22,6 +22,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "small-california-covid-sample.csv";
@@ -82,7 +83,7 @@ async function _clickKnownFeature(page: Page): Promise<void> {
 test.describe("GIS map layers", () => {
   test(
     "adds a layer, shows its data, and survives a reload",
-    { tag: "@online" },
+    { tag: E2E_ONLINE_TAG },
     async ({ page, e2eWorkerDb }) => {
       const admin = createSupabaseAdminClient();
       const { primaryUser, workspaceSlug } = e2eWorkerDb;

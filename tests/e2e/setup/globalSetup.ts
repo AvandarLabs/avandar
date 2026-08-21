@@ -16,8 +16,8 @@ function _loadDevelopmentEnv(): void {
  * in the worker-scoped `e2eWorkerDb` fixture.
  *
  * This runs *after* `webServer` has started, so it is not a place to check
- * whether the port was already taken: see `assertE2EDevServerPortIsFree`,
- * which runs while `playwright.config.ts` is still evaluating.
+ * whether the port was already taken: see `E2EPreflight`, which runs while
+ * `playwright.config.ts` is still evaluating.
  */
 export default async function globalSetup(): Promise<void> {
   _loadDevelopmentEnv();
