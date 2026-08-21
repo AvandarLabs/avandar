@@ -3,6 +3,7 @@ import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
+import { LEGEND_POSITION_OPTIONS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -39,13 +40,6 @@ const AREA_LAYOUT_OPTIONS = [
   { value: "stacked", label: "Stacked" },
   { value: "percent", label: "100% stacked" },
   { value: "split", label: "Split (+/-)" },
-] as const;
-
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
 ] as const;
 
 const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {

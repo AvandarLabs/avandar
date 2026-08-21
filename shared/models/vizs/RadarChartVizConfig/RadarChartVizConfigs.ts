@@ -1,5 +1,6 @@
 import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
 import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
+import { LEGEND_POSITION_OPTIONS } from "$/models/vizs/SettingDescriptor.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -19,13 +20,6 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
 
 const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
   chart: [
