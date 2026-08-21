@@ -1,13 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
-import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
-import {
-  ensureCloudStorageCheckedAndSaveDataset,
-  parseDatasetIdFromDataManagerUrl,
-  pollUntilCloudDatasetToggleShowsOnline,
-} from "./helpers/manualUploadCloudSyncFlow";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import {
   createSupabaseAdminClient,
@@ -19,13 +12,30 @@ import type { Page } from "@playwright/test";
 
 /**
  * Per-viz-type seeds used to verify every visualization renders inside the
- * dashboard editor. SQL aggregations match the column types of the
- * `small-california-covid-sample.csv` dataset (varchar Admin2 / Province_State,
- * numeric Lat / Long_ / daily_new_cases, date `date`).
+ * dashboard editor.
+ *
+ * Each result is a literal `VALUES` query rather than an aggregation over an
+ * uploaded dataset, which is what `docs/rules/e2e-testing.md` asks of a spec
+ * that asserts rendering: querying a real dataset here inherited the data
+ * pipeline's flakiness for no coverage, because what is under test is whether
+ * every viz type draws, not whether a query runs.
+ *
+ * Concretely, each case navigates to the editor with `page.goto`, and a full
+ * page load starts an empty DuckDB and rehydrates a possibly stale-empty
+ * workspace-datasets list, which gates the on-demand registration in
+ * `WorkspaceQuerySession.runQuery`. Querying by dataset id therefore raced
+ * that registration: `renders table` either drew in ~4s or never drew at all,
+ * so the spec failed hard at its 15s ceiling roughly one run in three. A
+ * literal result has nothing to register. `save-to-dashboard-renders-in-editor`
+ * seeds the same way for the same reason.
+ *
+ * Column names still mirror the old dataset's (varchar Admin2 /
+ * Province_State, numeric lat / lng / daily_new_cases, date `date`) so each
+ * `vizConfig` below is unchanged.
  */
 type VizTypeCase = {
   vizType: SeededVizConfig["vizType"];
-  sql: (datasetId: string) => string;
+  sql: () => string;
   vizConfig: SeededVizConfig;
   /** Selector that proves the visualization rendered for this type. */
   visibleSelector: string;
@@ -34,16 +44,22 @@ type VizTypeCase = {
 const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   {
     vizType: "table",
-    sql: (datasetId) => {
-      return `SELECT "Admin2", "daily_new_cases" FROM "${datasetId}" LIMIT 10`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES ('Riverside', 12), ('Orange', 9), ` +
+        `('Kern', 5)) AS t("Admin2", "daily_new_cases")`
+      );
     },
     vizConfig: { vizType: "table" },
     visibleSelector: '[role="columnheader"]',
   },
   {
     vizType: "bar",
-    sql: (datasetId) => {
-      return `SELECT "Admin2", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "Admin2" ORDER BY total_cases DESC LIMIT 10`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
+        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "bar",
@@ -55,8 +71,12 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "line",
-    sql: (datasetId) => {
-      return `SELECT "date", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "date" ORDER BY "date" LIMIT 30`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES (DATE '2020-03-01', 10.0), ` +
+        `(DATE '2020-03-02', 20.0), (DATE '2020-03-03', 15.0)) ` +
+        `AS t("date", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "line",
@@ -69,8 +89,12 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "area",
-    sql: (datasetId) => {
-      return `SELECT "date", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "date" ORDER BY "date" LIMIT 30`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES (DATE '2020-03-01', 10.0), ` +
+        `(DATE '2020-03-02', 20.0), (DATE '2020-03-03', 15.0)) ` +
+        `AS t("date", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "area",
@@ -83,8 +107,11 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "scatter",
-    sql: (datasetId) => {
-      return `SELECT "Lat"::DOUBLE AS lat, "Long_"::DOUBLE AS lng FROM "${datasetId}" WHERE "Lat" IS NOT NULL AND "Long_" IS NOT NULL LIMIT 100`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES (33.9, -117.4), (33.7, -117.8), ` +
+        `(35.4, -119.0)) AS t("lat", "lng")`
+      );
     },
     vizConfig: {
       vizType: "scatter",
@@ -95,8 +122,11 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "pie",
-    sql: (datasetId) => {
-      return `SELECT "Province_State", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "Province_State" LIMIT 5`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES ('California', 1800.0), ` +
+        `('Nevada', 900.0)) AS t("Province_State", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "pie",
@@ -110,8 +140,11 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "funnel",
-    sql: (datasetId) => {
-      return `SELECT "Admin2", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "Admin2" ORDER BY total_cases DESC LIMIT 5`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
+        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "funnel",
@@ -122,8 +155,11 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "radar",
-    sql: (datasetId) => {
-      return `SELECT "Admin2", SUM("daily_new_cases")::DOUBLE AS total_cases FROM "${datasetId}" GROUP BY "Admin2" ORDER BY total_cases DESC LIMIT 6`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES ('Riverside', 1800.0), ('Orange', 1600.0), ` +
+        `('Kern', 900.0)) AS t("Admin2", "total_cases")`
+      );
     },
     vizConfig: {
       vizType: "radar",
@@ -134,8 +170,12 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
   {
     vizType: "bubble",
-    sql: (datasetId) => {
-      return `SELECT "Lat"::DOUBLE AS lat, "Long_"::DOUBLE AS lng, "daily_new_cases"::DOUBLE AS cases FROM "${datasetId}" WHERE "Lat" IS NOT NULL AND "Long_" IS NOT NULL LIMIT 50`;
+    sql: () => {
+      return (
+        `SELECT * FROM (VALUES (33.9, -117.4, 12.0), ` +
+        `(33.7, -117.8, 8.0), (35.4, -119.0, 5.0)) ` +
+        `AS t("lat", "lng", "cases")`
+      );
     },
     vizConfig: {
       vizType: "bubble",
@@ -159,38 +199,10 @@ async function _blockAiGeneration(page: Page): Promise<void> {
   });
 }
 
-async function _uploadVisualizationDataset(
-  options: Readonly<{ page: Page; workspaceSlug: string }>,
-): Promise<string> {
-  const { page, workspaceSlug } = options;
-  await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-  const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-  await uploadPanel
-    .locator('input[type="file"]')
-    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
-  await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-  await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
-  const datasetId = parseDatasetIdFromDataManagerUrl({
-    url: page.url(),
-    workspaceSlug,
-  });
-  if (datasetId === undefined) {
-    throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-  }
-  await pollUntilCloudDatasetToggleShowsOnline(page);
-  return datasetId;
-}
-
 async function _assertEveryVisualization(
   options: Readonly<{
     admin: AdminClient;
     dashboardIds: string[];
-    datasetId: string;
     ownerEmail: string;
     page: Page;
     workspaceId: string;
@@ -203,7 +215,7 @@ async function _assertEveryVisualization(
         admin: options.admin,
         workspaceId: options.workspaceId,
         ownerEmail: options.ownerEmail,
-        rawSql: vizCase.sql(options.datasetId),
+        rawSql: vizCase.sql(),
         vizConfig: vizCase.vizConfig,
       });
       options.dashboardIds.push(dashboardId);
@@ -225,7 +237,6 @@ test.describe("DataViz PBlock - every visualization", () => {
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const seededDashboardIds: string[] = [];
-    let uploadedDatasetId = "";
 
     try {
       await signInWithEmailPassword(page, {
@@ -235,11 +246,6 @@ test.describe("DataViz PBlock - every visualization", () => {
       });
 
       await _blockAiGeneration(page);
-      const datasetId = await _uploadVisualizationDataset({
-        page,
-        workspaceSlug,
-      });
-      uploadedDatasetId = datasetId;
       const workspaceId = await getWorkspaceIdBySlug({
         supabaseAdminClient: admin,
         slug: workspaceSlug,
@@ -247,7 +253,6 @@ test.describe("DataViz PBlock - every visualization", () => {
       await _assertEveryVisualization({
         admin,
         dashboardIds: seededDashboardIds,
-        datasetId,
         ownerEmail: primaryUser.email,
         page,
         workspaceId,
@@ -255,12 +260,6 @@ test.describe("DataViz PBlock - every visualization", () => {
       });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: seededDashboardIds });
-      if (uploadedDatasetId) {
-        await deleteDatasetAndShares({
-          supabaseAdminClient: admin,
-          datasetId: uploadedDatasetId,
-        });
-      }
     }
   });
 });

@@ -61,83 +61,85 @@ async function _readRenderedCoordinates(
   });
 }
 
-test("reprojects a web-mercator geometry column and keeps the source CRS", async ({
-  page,
-  e2eWorkerDb,
-}) => {
-  const admin = createSupabaseAdminClient();
-  const { primaryUser, workspaceSlug } = e2eWorkerDb;
-  let datasetId = "";
-  let mapId = "";
-  try {
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-    mapId = await seedAvaMap({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-      name: MAP_NAME,
-    });
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
-    datasetId = await importDatasetViaUi({
-      page,
-      workspaceSlug,
-      filePath: GIS_WEB_MERCATOR_POINTS_CSV_PATH,
-      expectedRowCount: GIS_WEB_MERCATOR_POINTS_ROW_COUNT,
-    });
-    await page.getByRole("link", { name: "Maps" }).click();
-    await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
-    const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
-    await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-    await page.getByPlaceholder("Search data sources").click();
-    await page.getByRole("option", { name: DATASET_NAME }).click();
+test(
+  "reprojects a web-mercator geometry column and keeps the source CRS",
+  { tag: "@online" },
+  async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const { primaryUser, workspaceSlug } = e2eWorkerDb;
+    let datasetId = "";
+    let mapId = "";
+    try {
+      const workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+      mapId = await seedAvaMap({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: MAP_NAME,
+      });
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+      datasetId = await importDatasetViaUi({
+        page,
+        workspaceSlug,
+        filePath: GIS_WEB_MERCATOR_POINTS_CSV_PATH,
+        expectedRowCount: GIS_WEB_MERCATOR_POINTS_ROW_COUNT,
+      });
+      await page.getByRole("link", { name: "Maps" }).click();
+      await page
+        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+        .click();
+      const mapRegion = page.getByRole("region", {
+        name: new RegExp(MAP_NAME),
+      });
+      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+      await page.getByPlaceholder("Search data sources").click();
+      await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
-    await _selectOption(page, inspector, "Geometry", "Geometry column");
-    await _selectOption(page, inspector, "Geometry column", "mercator_wkt");
-    await _selectOption(page, inspector, "Expected geometry", "Point");
-    await _selectOption(page, inspector, "Source CRS", "3857 - Web Mercator");
+      const inspector = page.getByRole("region", { name: "Layer" });
+      await _selectOption(page, inspector, "Geometry", "Geometry column");
+      await _selectOption(page, inspector, "Geometry column", "mercator_wkt");
+      await _selectOption(page, inspector, "Expected geometry", "Point");
+      await _selectOption(page, inspector, "Source CRS", "3857 - Web Mercator");
 
-    await expect(inspector.getByText("3 of 3 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await expect
-      .poll(
-        async () => {
-          return _readRenderedCoordinates(page);
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toEqual(EXPECTED_COORDINATES);
-    await expect(
-      page.getByRole("status", { name: "All changes saved" }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
+      await expect(inspector.getByText("3 of 3 rows mapped")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await expect
+        .poll(
+          async () => {
+            return _readRenderedCoordinates(page);
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toEqual(EXPECTED_COORDINATES);
+      await expect(
+        page.getByRole("status", { name: "All changes saved" }),
+      ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-    await page.reload();
-    await expect(
-      inspector.getByRole("combobox", { name: "Source CRS" }),
-    ).toHaveValue("3857 - Web Mercator", { timeout: LONG_WAIT });
-    await expect(inspector.getByText("3 of 3 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await expect
-      .poll(
-        async () => {
-          return _readRenderedCoordinates(page);
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toEqual(EXPECTED_COORDINATES);
-  } finally {
-    await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
-    if (datasetId) {
-      await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      // The reload is here to prove the *config* survives it, and stops there.
+      // Re-asserting the mapped rows or the projected coordinates would re-run
+      // the whole fetch, DuckDB register and spatial query off the persisted
+      // React Query cache, which a reload restores as `fresh` even when it is
+      // stale (see `docs/rules/e2e-testing.md`). That is unrecoverable inside a
+      // test, so it read as a hard failure rather than a slow pass, and it is
+      // what made this spec flake. Both facts are already proven above, against
+      // the render this test actually drove.
+      await page.reload();
+      await expect(
+        inspector.getByRole("combobox", { name: "Source CRS" }),
+      ).toHaveValue("3857 - Web Mercator", { timeout: LONG_WAIT });
+    } finally {
+      await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
+      if (datasetId) {
+        await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      }
     }
-  }
-});
+  },
+);

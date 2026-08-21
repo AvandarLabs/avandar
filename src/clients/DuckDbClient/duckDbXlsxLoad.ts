@@ -239,6 +239,10 @@ export async function loadXlsxIntoDuckDb(
     }
   >,
 ): Promise<DuckDbLoadXlsxResult> {
+  // `read_xlsx` comes from the `excel` extension, which is no longer loaded
+  // for every session: a session that never opens a workbook should not pay
+  // its fetch. Loading is memoized, so repeat imports cost nothing.
+  await options.client.ensureExcel();
   const { client, tableName, sheet } = options;
   const hasHeader = options.hasHeader ?? true;
   const rowsToSkip = options.rowsToSkip ?? 0;

@@ -18,18 +18,23 @@ export function useDuckDbSpatialAvailability(): DuckDbSpatialAvailability {
 /**
  * The DuckDB Spatial capability state, starting detection while it is unknown.
  *
- * The capability is only discovered as a side effect of initializing DuckDB,
- * and DuckDB initializes lazily on its first use. That leaves a deadlock for
- * any control that has to know the capability before the user can create work
- * that would need it: the geometry picker cannot offer a spatial binding until
- * detection has run, and on a map whose layers are all non-spatial nothing else
- * ever triggers it, so the state stays `"loading"` for the life of the page.
- * Reading the capability through this hook is itself the trigger.
+ * The capability is only known once the extension has been asked for, and it
+ * is asked for lazily. That leaves a deadlock for any control that has to know
+ * the capability before the user can create work that would need it: the
+ * geometry picker cannot offer a spatial binding until detection has run, and
+ * on a map whose layers are all non-spatial nothing else ever triggers it, so
+ * the state stays `"loading"` for the life of the page. Reading the capability
+ * through this hook is itself the trigger.
+ *
+ * The trigger is `ensureSpatial` rather than `initialize`: DuckDB now starts
+ * without Spatial, so initializing alone would never resolve this and the
+ * picker would sit disabled forever.
  *
  * Prefer {@link useDuckDbSpatialAvailability} where something else already
- * guarantees initialization, so a map with no spatial layer does not pay for
- * DuckDB startup it never uses. The shorter name keeps the declaration inside
- * the line limit; it is the detecting form of the hook above.
+ * guarantees detection, so a screen that never offers a spatial binding does
+ * not fetch the extension it never uses. The shorter name keeps the
+ * declaration inside the line limit; it is the detecting form of the hook
+ * above.
  */
 export function useDetectedSpatialAvailability(): DuckDbSpatialAvailability {
   const availability = useDuckDbSpatialAvailability();
@@ -38,8 +43,8 @@ export function useDetectedSpatialAvailability(): DuckDbSpatialAvailability {
       if (availability !== "loading") {
         return;
       }
-      void DuckDbClient.initialize().catch(() => {
-        // A failed initialization already moves the store to "unavailable".
+      void DuckDbClient.ensureSpatial().catch(() => {
+        // A failed load already moves the store to "unavailable".
         return undefined;
       });
     },

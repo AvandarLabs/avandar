@@ -16,14 +16,14 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
-  initializeDuckDbMock,
+  ensureSpatialMock,
   runStructuredQueryWithMetadataMock,
   runSpatialQueryMock,
   resolveManualQueryForExecutionMock,
   spatialAvailability,
 } = vi.hoisted(() => {
   return {
-    initializeDuckDbMock: vi.fn(),
+    ensureSpatialMock: vi.fn(),
     runStructuredQueryWithMetadataMock: vi.fn(),
     runSpatialQueryMock: vi.fn(),
     resolveManualQueryForExecutionMock: vi.fn(),
@@ -34,7 +34,7 @@ const {
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return {
     DuckDbClient: {
-      initialize: initializeDuckDbMock,
+      ensureSpatial: ensureSpatialMock,
       getSpatialAvailability: () => {
         return spatialAvailability.value;
       },
@@ -156,8 +156,8 @@ describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
   beforeEach(() => {
-    initializeDuckDbMock.mockReset();
-    initializeDuckDbMock.mockResolvedValue(undefined);
+    ensureSpatialMock.mockReset();
+    ensureSpatialMock.mockResolvedValue(true);
     runStructuredQueryWithMetadataMock.mockReset();
     runSpatialQueryMock.mockReset();
     resolveManualQueryForExecutionMock.mockReset();
@@ -290,7 +290,7 @@ describe("useMapLayersData", () => {
       expect(result.current.get(timedLayer.id)?.data?.type).toBe("rows");
     });
 
-    expect(initializeDuckDbMock).not.toHaveBeenCalled();
+    expect(ensureSpatialMock).not.toHaveBeenCalled();
     expect(getDataSql()[0]).toContain("BETWEEN");
     expect(getDataSql()[0]).not.toContain("ST_");
   });
@@ -387,7 +387,7 @@ describe("useMapLayersData", () => {
     );
 
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
-    expect(initializeDuckDbMock).toHaveBeenCalledTimes(1);
+    expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });
 
@@ -496,7 +496,7 @@ describe("useMapLayersData", () => {
     );
 
     expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
-    expect(initializeDuckDbMock).toHaveBeenCalledTimes(1);
+    expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });
 

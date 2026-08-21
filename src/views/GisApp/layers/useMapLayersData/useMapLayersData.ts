@@ -277,7 +277,11 @@ function useInitializeDuckDbForSpatialLayers(
   useEffect(
     function initializeDuckDbForSpatialLayers() {
       if (hasSpatialLayer && spatialAvailability === "loading") {
-        void DuckDbClient.initialize().catch(() => {
+        // `ensureSpatial`, not `initialize`: the extension is no longer loaded
+        // for every session, so this is what actually fetches it, and it is
+        // what moves `spatialAvailability` off "loading" for the query gate
+        // below.
+        void DuckDbClient.ensureSpatial().catch(() => {
           return undefined;
         });
       }

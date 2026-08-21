@@ -91,6 +91,7 @@ async function _clickMapAtPixelOffset(
   page: Page,
   origin: readonly [number, number],
   offset: readonly [number, number],
+  options: Readonly<{ double?: boolean }> = {},
 ): Promise<void> {
   const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
   const mapCanvas = mapRegion.locator(".maplibregl-canvas");
@@ -101,10 +102,15 @@ async function _clickMapAtPixelOffset(
     }
     return map.project([lngLat[0], lngLat[1]]);
   }, origin);
-  await mapCanvas.click({
-    position: { x: projected.x + offset[0], y: projected.y + offset[1] },
-    force: true,
-  });
+  const position = {
+    x: projected.x + offset[0],
+    y: projected.y + offset[1],
+  };
+  if (options.double === true) {
+    await mapCanvas.dblclick({ position, force: true });
+    return;
+  }
+  await mapCanvas.click({ position, force: true });
 }
 
 /** Draws a closed ring around 10E 10N that excludes the 11E outlier. */
@@ -123,135 +129,147 @@ async function _drawAoiAroundInliers(page: Page): Promise<void> {
       });
     });
   });
-  for (const offset of PIXEL_RING) {
+  // Vertex drawing opens on a double-click. A single click starts a rectangle
+  // drag instead, so clicking the ring's corners one by one leaves the session
+  // idle and Enter commits nothing: the first corner has to open the polygon.
+  const [firstOffset, ...remainingOffsets] = PIXEL_RING;
+  await _clickMapAtPixelOffset(page, INLIER_COORDINATE, firstOffset, {
+    double: true,
+  });
+  for (const offset of remainingOffsets) {
     await _clickMapAtPixelOffset(page, INLIER_COORDINATE, offset);
   }
   await page.keyboard.press("Enter");
 }
 
-test("draws an AOI that drops the outlier and can opt a layer out", async ({
-  page,
-  e2eWorkerDb,
-}) => {
-  const admin = createSupabaseAdminClient();
-  const { primaryUser, workspaceSlug } = e2eWorkerDb;
-  let datasetId = "";
-  let mapId = "";
-  try {
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-    mapId = await seedAvaMap({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-      name: MAP_NAME,
-    });
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
-    datasetId = await importDatasetViaUi({
-      page,
-      workspaceSlug,
-      filePath: GIS_DATED_POINTS_CSV_PATH,
-      expectedRowCount: GIS_DATED_POINTS_ROW_COUNT,
-    });
-    await page.getByRole("link", { name: "Maps" }).click();
-    await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
-    const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
-    await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-    await page.getByPlaceholder("Search data sources").click();
-    await page.getByRole("option", { name: DATASET_NAME }).click();
+test(
+  "draws an AOI that drops the outlier and can opt a layer out",
+  { tag: "@online" },
+  async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const { primaryUser, workspaceSlug } = e2eWorkerDb;
+    let datasetId = "";
+    let mapId = "";
+    try {
+      const workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+      mapId = await seedAvaMap({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: MAP_NAME,
+      });
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+      datasetId = await importDatasetViaUi({
+        page,
+        workspaceSlug,
+        filePath: GIS_DATED_POINTS_CSV_PATH,
+        expectedRowCount: GIS_DATED_POINTS_ROW_COUNT,
+      });
+      await page.getByRole("link", { name: "Maps" }).click();
+      await page
+        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+        .click();
+      const mapRegion = page.getByRole("region", {
+        name: new RegExp(MAP_NAME),
+      });
+      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+      await page.getByPlaceholder("Search data sources").click();
+      await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
-    await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await page
-      .getByRole("button", {
-        name: `More actions for the layer ${DATASET_NAME}`,
-      })
-      .click();
-    await page.getByRole("menuitem", { name: "Duplicate" }).click();
-    await expect(
-      page.getByRole("region", { name: "Layers" }).getByRole("listitem"),
-    ).toHaveCount(2, { timeout: MEDIUM_WAIT });
-
-    await expect(
-      page.getByRole("button", {
-        name: "Draw an area to filter by",
-        exact: true,
-      }),
-    ).toBeVisible({ timeout: LONG_WAIT });
-    await expect
-      .poll(
-        async () => {
-          return _inlierFitsPixelRing(page);
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
-    await expect(async () => {
-      await _drawAoiAroundInliers(page);
+      const inspector = page.getByRole("region", { name: "Layer" });
+      await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await page
+        .getByRole("button", {
+          name: `More actions for the layer ${DATASET_NAME}`,
+        })
+        .click();
+      await page.getByRole("menuitem", { name: "Duplicate" }).click();
       await expect(
-        page.getByRole("button", { name: "Clear area filter" }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }).toPass({ timeout: LONG_WAIT });
-    await expect
-      .poll(
-        async () => {
-          const coordinates = await _readRenderedCoordinates(page);
-          return (
-            _countCoordinate(coordinates, INLIER_COORDINATE) > 0 &&
-            _countCoordinate(coordinates, OUTLIER_COORDINATE) === 0
-          );
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
+        page.getByRole("region", { name: "Layers" }).getByRole("listitem"),
+      ).toHaveCount(2, { timeout: MEDIUM_WAIT });
 
-    const copyName = `${DATASET_NAME} copy`;
-    const copyRow = page
-      .getByRole("region", { name: "Layers" })
-      .getByRole("listitem")
-      .filter({ has: page.getByText(copyName, { exact: true }) });
-    await copyRow
-      .getByRole("button", {
-        name: new RegExp(
-          `^${copyName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\s|$)`,
-        ),
-      })
-      .click();
-    await inspector
-      .getByRole("button", { name: "Filter", exact: true })
-      .click();
-    const applyAreaFilter = inspector.getByRole("switch", {
-      name: "Apply area filter",
-    });
-    await applyAreaFilter.click();
-    await expect(applyAreaFilter).not.toBeChecked();
-    await expect
-      .poll(
-        async () => {
-          const coordinates = await _readRenderedCoordinates(page);
-          return (
-            _countCoordinate(coordinates, OUTLIER_COORDINATE) === 1 &&
-            _countCoordinate(coordinates, INLIER_COORDINATE) > 8
-          );
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
-    await expect(
-      page.getByRole("status", { name: "All changes saved" }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
-  } finally {
-    await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
-    if (datasetId) {
-      await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      await expect(
+        page.getByRole("button", {
+          name: "Draw an area to filter by",
+          exact: true,
+        }),
+      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect
+        .poll(
+          async () => {
+            return _inlierFitsPixelRing(page);
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
+      await expect(async () => {
+        await _drawAoiAroundInliers(page);
+        await expect(
+          page.getByRole("button", { name: "Clear area filter" }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }).toPass({ timeout: LONG_WAIT });
+      await expect
+        .poll(
+          async () => {
+            const coordinates = await _readRenderedCoordinates(page);
+            return (
+              _countCoordinate(coordinates, INLIER_COORDINATE) > 0 &&
+              _countCoordinate(coordinates, OUTLIER_COORDINATE) === 0
+            );
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
+
+      const copyName = `${DATASET_NAME} copy`;
+      const copyRow = page
+        .getByRole("region", { name: "Layers" })
+        .getByRole("listitem")
+        .filter({ has: page.getByText(copyName, { exact: true }) });
+      await copyRow
+        .getByRole("button", {
+          name: new RegExp(
+            `^${copyName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\s|$)`,
+          ),
+        })
+        .click();
+      await inspector
+        .getByRole("button", { name: "Filter", exact: true })
+        .click();
+      const applyAreaFilter = inspector.getByRole("switch", {
+        name: "Apply area filter",
+      });
+      await applyAreaFilter.click();
+      await expect(applyAreaFilter).not.toBeChecked();
+      await expect
+        .poll(
+          async () => {
+            const coordinates = await _readRenderedCoordinates(page);
+            return (
+              _countCoordinate(coordinates, OUTLIER_COORDINATE) === 1 &&
+              _countCoordinate(coordinates, INLIER_COORDINATE) > 8
+            );
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
+      await expect(
+        page.getByRole("status", { name: "All changes saved" }),
+      ).toBeVisible({ timeout: MEDIUM_WAIT });
+    } finally {
+      await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
+      if (datasetId) {
+        await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      }
     }
-  }
-});
+  },
+);

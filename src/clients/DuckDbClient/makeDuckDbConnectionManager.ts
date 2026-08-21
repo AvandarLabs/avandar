@@ -18,6 +18,13 @@ export type DuckDbConnectionManager = {
    * know if we forgot to close any connections.
    */
   openConnections: Set<duckdb.AsyncDuckDBConnection>;
+  /**
+   * Loads DuckDB Spatial if it is not loaded yet, and reports whether GIS
+   * queries can run. Safe to call on every render: the fetch happens once.
+   */
+  ensureSpatial: () => Promise<boolean>;
+  /** Loads the `excel` extension `read_xlsx` needs. Fetched once. */
+  ensureExcel: () => Promise<boolean>;
 };
 
 function _formatDuckDbWorkerError(event: ErrorEvent): string {
@@ -84,57 +91,29 @@ async function _disposeDuckDbInstance(
   await db.terminate().catch(() => {});
 }
 
-async function _loadDuckDbExtensions(
-  options: Readonly<{
-    conn: duckdb.AsyncDuckDBConnection;
-    hasPthreadWorker: boolean;
-    logger: ILogger;
-    spatialAvailability: DuckDbSpatialAvailabilityStore;
-  }>,
+/**
+ * Loads what every query needs, and nothing that only some do.
+ *
+ * `parquet` is unconditional because every dataset is parquet. `spatial` and
+ * `excel` are not: each is fetched from `extensions.duckdb.org` on **every**
+ * fresh AsyncDuckDB init, since DuckDB-WASM cannot persist extensions across
+ * page loads and the CDN sends no `cache-control`. Loading them here charged
+ * every page load ~1.2s and ~3.6MB of third-party traffic for capabilities
+ * most sessions never use, and put that CDN in the critical path of opening
+ * any dataset at all. They now load through `ensureExtension` at the point of
+ * use: see `ensureSpatial` and `ensureExcel`.
+ */
+async function _loadRequiredDuckDbExtensions(
+  conn: duckdb.AsyncDuckDBConnection,
 ): Promise<void> {
-  const { conn, logger } = options;
-  const loadNetworkExtensions = shouldLoadDuckDbNetworkExtensions({
-    isDisableDuckDbSpatialFlagEnabled: isFlagEnabled(
-      FeatureFlag.DisableDuckDbSpatial,
-    ),
-    hasPthreadWorker: options.hasPthreadWorker,
-  });
-
-  // Spatial / excel are fetched from `extensions.duckdb.org` on each fresh
-  // AsyncDuckDB init (DuckDb-WASM does not persist extensions across page
-  // loads). When offline, both fetches throw; we let init succeed without
-  // them so the bulk of the app (parquet queries) still works. Geo or
-  // .xlsx flows hit a runtime "unknown function/format" error instead of
-  // breaking the whole client.
-  // TODO(jpsyx): only load spatial when a geo query needs it.
-  const loadOptionalExtension = async (name: string): Promise<boolean> => {
-    try {
-      await conn.query(`LOAD ${name};`);
-      return true;
-    } catch (error) {
-      logger.warn(
-        `DuckDB extension "${name}" failed to load (likely offline); ` +
-          "queries that need it will fail.",
-        { error },
-      );
-      return false;
-    }
-  };
-  const didLoadSpatial =
-    loadNetworkExtensions && (await loadOptionalExtension("spatial"));
-  options.spatialAvailability.set(didLoadSpatial ? "available" : "unavailable");
   await conn.query("LOAD parquet;");
-  if (loadNetworkExtensions) {
-    await loadOptionalExtension("excel");
-  }
 }
 
 async function _initializeDuckDb(options: {
-  logger: ILogger;
-  spatialAvailability: DuckDbSpatialAvailabilityStore;
+  onBundleSelected: (hasPthreadWorker: boolean) => void;
 }): Promise<duckdb.AsyncDuckDB> {
-  const { logger, spatialAvailability } = options;
   const bundle = await duckdb.selectBundle(buildManualDuckDbBundles());
+  options.onBundleSelected(bundle.pthreadWorker != null);
 
   const worker = new Worker(bundle.mainWorker!);
   const duckDbLogger = new duckdb.ConsoleLogger();
@@ -150,12 +129,7 @@ async function _initializeDuckDb(options: {
   }
 
   const conn = await db.connect();
-  await _loadDuckDbExtensions({
-    conn,
-    hasPthreadWorker: bundle.pthreadWorker != null,
-    logger,
-    spatialAvailability,
-  });
+  await _loadRequiredDuckDbExtensions(conn);
   await conn.close();
 
   return db;
@@ -169,21 +143,77 @@ export function makeDuckDbConnectionManager(options: {
   const { logger, spatialAvailability } = options;
   const openConnections = new Set<duckdb.AsyncDuckDBConnection>();
   let dbPromise: Promise<duckdb.AsyncDuckDB> | undefined;
+  let hasPthreadWorker = false;
+  const extensionPromises = new Map<string, Promise<boolean>>();
 
   const getDb = async (): Promise<duckdb.AsyncDuckDB> => {
     if (!dbPromise) {
-      dbPromise = _initializeDuckDb({ logger, spatialAvailability }).catch(
-        (error: unknown) => {
-          dbPromise = undefined;
-          spatialAvailability.set("unavailable");
-          throw error;
+      dbPromise = _initializeDuckDb({
+        onBundleSelected: (selectedHasPthreadWorker) => {
+          hasPthreadWorker = selectedHasPthreadWorker;
         },
-      );
+      }).catch((error: unknown) => {
+        dbPromise = undefined;
+        spatialAvailability.set("unavailable");
+        throw error;
+      });
     }
     return dbPromise;
   };
 
+  /**
+   * Loads one optional extension, once per page load.
+   *
+   * The promise is memoized rather than the boolean so concurrent callers
+   * share a single fetch instead of racing four of them; a failure is
+   * memoized too, because a fetch that failed offline will fail again and
+   * retrying it per call would stall every caller in turn.
+   */
+  const ensureExtension = (name: string): Promise<boolean> => {
+    const existing = extensionPromises.get(name);
+    if (existing) {
+      return existing;
+    }
+    const loading = (async (): Promise<boolean> => {
+      const db = await getDb();
+      if (
+        !shouldLoadDuckDbNetworkExtensions({
+          isDisableDuckDbSpatialFlagEnabled: isFlagEnabled(
+            FeatureFlag.DisableDuckDbSpatial,
+          ),
+          hasPthreadWorker,
+        })
+      ) {
+        return false;
+      }
+      const conn = await db.connect();
+      try {
+        await conn.query(`LOAD ${name};`);
+        return true;
+      } catch (error) {
+        logger.warn(
+          `DuckDB extension "${name}" failed to load (likely offline); ` +
+            "queries that need it will fail.",
+          { error },
+        );
+        return false;
+      } finally {
+        await conn.close();
+      }
+    })();
+    extensionPromises.set(name, loading);
+    return loading;
+  };
+
   return {
+    ensureExcel: () => {
+      return ensureExtension("excel");
+    },
+    ensureSpatial: async () => {
+      const isAvailable = await ensureExtension("spatial");
+      spatialAvailability.set(isAvailable ? "available" : "unavailable");
+      return isAvailable;
+    },
     closeConnection: async (conn) => {
       openConnections.delete(conn);
       await conn.close();

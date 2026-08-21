@@ -33,36 +33,51 @@ function removeViteFeatureFlag(
     .join(",");
 }
 
-const E2E_REQUIRED_VITE_FEATURE_FLAGS = [
-  "enable-shared-with-me",
-  /** Avoid spatial.duckdb_extension.wasm (breaks offline Playwright). */
-  "disable-duckdb-spatial",
-] as const;
+/** Flags every E2E run needs, regardless of connectivity. */
+const E2E_REQUIRED_VITE_FEATURE_FLAGS = ["enable-shared-with-me"] as const;
+
+/** The tag carried by specs that cannot pass without network access. */
+export const E2E_ONLINE_TAG = "@online";
+
+/**
+ * True when the run was asked to work without network access.
+ *
+ * Off by default, so a bare `pnpm test:e2e` behaves like the product does:
+ * DuckDB fetches its Spatial extension and the GIS specs run. Opting out is
+ * explicit (`pnpm test:e2e:offline`) because the failure mode of guessing
+ * wrong is silent: with Spatial disabled the geometry controls render but stay
+ * disabled, so the specs that need them time out on a dead control instead of
+ * saying why.
+ */
+export function isE2EOfflineMode(): boolean {
+  return process.env.PLAYWRIGHT_E2E_OFFLINE === "1";
+}
 
 /**
  * Ensures feature flags required by Playwright specs are enabled for the test
  * runner and the Vite dev server.
+ *
+ * Offline runs additionally disable DuckDB Spatial, which is fetched from
+ * `extensions.duckdb.org` and therefore cannot load without a network. The
+ * specs that need it are tagged `@online` and skipped by the config in that
+ * mode rather than left to time out.
  */
 export function ensureE2EViteFeatureFlags(): void {
-  const isSpatialEnabled = process.env.PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL === "1";
-  E2E_REQUIRED_VITE_FEATURE_FLAGS.filter((flag) => {
-    return !(isSpatialEnabled && flag === "disable-duckdb-spatial");
-  }).forEach((flag) => {
+  E2E_REQUIRED_VITE_FEATURE_FLAGS.forEach((flag) => {
     process.env.VITE_FEATURE_FLAGS = appendViteFeatureFlag(
       process.env.VITE_FEATURE_FLAGS,
       flag,
     );
   });
-  if (isSpatialEnabled) {
-    process.env.VITE_FEATURE_FLAGS = removeViteFeatureFlag(
-      process.env.VITE_FEATURE_FLAGS,
-      "disable-duckdb-spatial",
-    );
-  }
+  process.env.VITE_FEATURE_FLAGS =
+    isE2EOfflineMode() ?
+      appendViteFeatureFlag(
+        process.env.VITE_FEATURE_FLAGS,
+        "disable-duckdb-spatial",
+      )
+    : removeViteFeatureFlag(
+        process.env.VITE_FEATURE_FLAGS,
+        "disable-duckdb-spatial",
+      );
   process.env.VITE_OFFLINE_CHAT_MOCK = "true";
-}
-
-/** Existing servers are unsafe when a run changes Spatial loading behavior. */
-export function shouldReuseE2EViteServer(isCI: boolean): boolean {
-  return !isCI && process.env.PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL !== "1";
 }

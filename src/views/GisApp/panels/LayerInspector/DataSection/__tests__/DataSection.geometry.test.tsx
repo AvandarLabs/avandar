@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
-  duckDbInitialize,
+  duckDbEnsureSpatial,
   resetDataSectionFixtures,
   spatialAvailability,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
@@ -76,7 +76,7 @@ describe("DataSection geometry", () => {
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
     await waitFor(() => {
-      expect(duckDbInitialize).toHaveBeenCalled();
+      expect(duckDbEnsureSpatial).toHaveBeenCalled();
     });
   });
 
@@ -85,6 +85,6 @@ describe("DataSection geometry", () => {
 
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
-    expect(duckDbInitialize).not.toHaveBeenCalled();
+    expect(duckDbEnsureSpatial).not.toHaveBeenCalled();
   });
 });

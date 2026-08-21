@@ -108,7 +108,6 @@ jobs:
     # to run tests.
     environment: staging
     env:
-      PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL: 1
       POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}

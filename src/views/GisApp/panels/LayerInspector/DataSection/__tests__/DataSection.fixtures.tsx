@@ -37,19 +37,19 @@ const spatialAvailabilityState = vi.hoisted(() => {
 /** Mutable Spatial availability used by the DuckDbClient mock. */
 export const spatialAvailability = spatialAvailabilityState;
 
-const initializeMock = vi.hoisted(() => {
+const ensureSpatialMock = vi.hoisted(() => {
   return vi.fn(async () => {
-    return undefined;
+    return true;
   });
 });
 
-/** The `DuckDbClient.initialize` spy the Spatial deadlock test asserts on. */
-export const duckDbInitialize = initializeMock;
+/** The `ensureSpatial` spy the Spatial deadlock test asserts on. */
+export const duckDbEnsureSpatial = ensureSpatialMock;
 
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return {
     DuckDbClient: {
-      initialize: initializeMock,
+      ensureSpatial: ensureSpatialMock,
       getSpatialAvailability: () => {
         return spatialAvailabilityState.value;
       },
@@ -308,5 +308,5 @@ export function createGridBinLayer(): MapLayer.Standard {
 export function resetDataSectionFixtures(): void {
   fixtures = createFixtures();
   spatialAvailability.value = "available";
-  initializeMock.mockClear();
+  ensureSpatialMock.mockClear();
 }

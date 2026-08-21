@@ -13,9 +13,16 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
+  # Lint, typecheck, and everything except end-to-end tests.
+  #
+  # This job used to run the e2e suite too, on the same 30-minute budget. The
+  # work is closer to an hour, so the run was cancelled at 30m19s every time
+  # and the PR check reported neither pass nor fail. That is how a
+  # deterministically failing test reached `develop`. Splitting mirrors
+  # `staging.yaml`, so each half gets a budget it can finish inside.
   lint-typecheck-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     environment: staging
     env:
       POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
@@ -55,18 +62,69 @@ jobs:
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
       - run: bash scripts/ci/verify-supabase-api-is-running.sh
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test
+      # No `playwright install` here: nothing in the quick suite drives a
+      # browser, and the Chromium download is the single slowest setup step.
+      - run: bash scripts/runAllTests.sh --quick
       - name: Upload Supabase functions log
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: supabase-functions-log-pr-${{ github.run_id }}-${{ github.run_attempt }}
           path: /tmp/supabase-functions.log
           retention-days: 30
           if-no-files-found: warn
+
+  # End-to-end tests, on a budget sized for the whole suite at one worker.
+  # See the matching job in `staging.yaml` for where the number comes from.
+  pr-test-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    environment: staging
+    env:
+      POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
+      UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
+      UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
+      RESEND_SENDING_API_KEY: ${{ secrets.RESEND_SENDING_API_KEY }}
+      RESEND_FULL_ACCESS_API_KEY: ${{ secrets.RESEND_FULL_ACCESS_API_KEY }}
+      RESEND_LOCAL_TEST_SEGMENT_ID: ${{ secrets.RESEND_LOCAL_TEST_SEGMENT_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+      FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
+      AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: corepack enable
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          package-manager-cache: true
+      - run: pnpm install --frozen-lockfile
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.98.2
+      - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
+      - run: bash scripts/ci/prepare-envs/prepare-envs.sh
+      - run: pnpm db:reset
+      - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
+      - run: bash scripts/ci/verify-supabase-api-is-running.sh
+      - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - name: Upload Supabase functions log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-functions-log-pr-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/supabase-functions.log
+          retention-days: 30
+          if-no-files-found: warn
       - name: Upload Playwright report and test results
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-pr-${{ github.run_id }}-${{ github.run_attempt }}

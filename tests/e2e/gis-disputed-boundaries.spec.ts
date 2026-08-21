@@ -64,111 +64,119 @@ async function _readLayerPaint(
   }, layerIdSuffix);
 }
 
-test("binds a disputed-status column and renders a dashed casing and locked legend row", async ({
-  page,
-  e2eWorkerDb,
-}) => {
-  const admin = createSupabaseAdminClient();
-  const { primaryUser, workspaceSlug } = e2eWorkerDb;
-  let datasetId = "";
-  let mapId = "";
-  try {
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-    mapId = await seedAvaMap({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-      name: MAP_NAME,
-    });
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
-    datasetId = await importDatasetViaUi({
-      page,
-      workspaceSlug,
-      filePath: GIS_DISPUTED_BOUNDARIES_CSV_PATH,
-      expectedRowCount: GIS_DISPUTED_BOUNDARIES_ROW_COUNT,
-    });
-    await page.getByRole("link", { name: "Maps" }).click();
-    await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
-    const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
-    await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-    await page.getByPlaceholder("Search data sources").click();
-    await page.getByRole("option", { name: DATASET_NAME }).click();
-
-    const inspector = page.getByRole("region", { name: "Layer" });
-    await _selectOption(page, inspector, "Geometry", "Geometry column");
-    await _selectOption(page, inspector, "Geometry column", "geometry");
-    await _selectOption(page, inspector, "Encoding", "GeoJSON");
-    await _selectOption(page, inspector, "Expected geometry", "Polygon");
-    await expect(inspector.getByText("4 of 4 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-
-    await _selectOption(page, inspector, "Disputed status column", "status");
-    await _addDisputedValue(page, inspector, "Disputed values", "Disputed");
-    await _addDisputedValue(
-      page,
-      inspector,
-      "Undetermined values",
-      "Undetermined",
-    );
-
-    const legend = page.getByRole("region", { name: "Legend" });
-    await expect(
-      legend.getByText("Disputed or undetermined boundary"),
-    ).toBeVisible({ timeout: LONG_WAIT });
-
-    await expect
-      .poll(
-        async () => {
-          const paint = await _readLayerPaint(page, "-disputed-casing");
-          return paint?.["line-dasharray"];
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toEqual([3, 2]);
-
-    const casingPaint = await _readLayerPaint(page, "-disputed-casing");
-    const outlinePaint = await _readLayerPaint(page, "-outline");
-    expect(casingPaint?.["line-color"]).not.toEqual(
-      outlinePaint?.["line-color"],
-    );
-
-    await expect(
-      page.getByRole("status", { name: "All changes saved" }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-    await page.reload();
-    await expect(
-      legend.getByText("Disputed or undetermined boundary"),
-    ).toBeVisible({ timeout: LONG_WAIT });
-    await expect
-      .poll(
-        async () => {
-          const paint = await _readLayerPaint(page, "-disputed-casing");
-          return paint?.["line-dasharray"];
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toEqual([3, 2]);
-    const reloadedCasingPaint = await _readLayerPaint(page, "-disputed-casing");
-    const reloadedOutlinePaint = await _readLayerPaint(page, "-outline");
-    expect(reloadedCasingPaint?.["line-color"]).not.toEqual(
-      reloadedOutlinePaint?.["line-color"],
-    );
-  } finally {
-    await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
-    if (datasetId) {
-      await deleteDatasetAndShares({
+test(
+  "binds a disputed-status column and renders a dashed casing and locked legend row",
+  { tag: "@online" },
+  async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const { primaryUser, workspaceSlug } = e2eWorkerDb;
+    let datasetId = "";
+    let mapId = "";
+    try {
+      const workspaceId = await getWorkspaceIdBySlug({
         supabaseAdminClient: admin,
-        datasetId,
+        slug: workspaceSlug,
       });
+      mapId = await seedAvaMap({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: MAP_NAME,
+      });
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+      datasetId = await importDatasetViaUi({
+        page,
+        workspaceSlug,
+        filePath: GIS_DISPUTED_BOUNDARIES_CSV_PATH,
+        expectedRowCount: GIS_DISPUTED_BOUNDARIES_ROW_COUNT,
+      });
+      await page.getByRole("link", { name: "Maps" }).click();
+      await page
+        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+        .click();
+      const mapRegion = page.getByRole("region", {
+        name: new RegExp(MAP_NAME),
+      });
+      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+      await page.getByPlaceholder("Search data sources").click();
+      await page.getByRole("option", { name: DATASET_NAME }).click();
+
+      const inspector = page.getByRole("region", { name: "Layer" });
+      await _selectOption(page, inspector, "Geometry", "Geometry column");
+      await _selectOption(page, inspector, "Geometry column", "geometry");
+      await _selectOption(page, inspector, "Encoding", "GeoJSON");
+      await _selectOption(page, inspector, "Expected geometry", "Polygon");
+      await expect(inspector.getByText("4 of 4 rows mapped")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+
+      await _selectOption(page, inspector, "Disputed status column", "status");
+      await _addDisputedValue(page, inspector, "Disputed values", "Disputed");
+      await _addDisputedValue(
+        page,
+        inspector,
+        "Undetermined values",
+        "Undetermined",
+      );
+
+      const legend = page.getByRole("region", { name: "Legend" });
+      await expect(
+        legend.getByText("Disputed or undetermined boundary"),
+      ).toBeVisible({ timeout: LONG_WAIT });
+
+      await expect
+        .poll(
+          async () => {
+            const paint = await _readLayerPaint(page, "-disputed-casing");
+            return paint?.["line-dasharray"];
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toEqual([3, 2]);
+
+      const casingPaint = await _readLayerPaint(page, "-disputed-casing");
+      const outlinePaint = await _readLayerPaint(page, "-outline");
+      expect(casingPaint?.["line-color"]).not.toEqual(
+        outlinePaint?.["line-color"],
+      );
+
+      await expect(
+        page.getByRole("status", { name: "All changes saved" }),
+      ).toBeVisible({ timeout: MEDIUM_WAIT });
+
+      await page.reload();
+      await expect(
+        legend.getByText("Disputed or undetermined boundary"),
+      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect
+        .poll(
+          async () => {
+            const paint = await _readLayerPaint(page, "-disputed-casing");
+            return paint?.["line-dasharray"];
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toEqual([3, 2]);
+      const reloadedCasingPaint = await _readLayerPaint(
+        page,
+        "-disputed-casing",
+      );
+      const reloadedOutlinePaint = await _readLayerPaint(page, "-outline");
+      expect(reloadedCasingPaint?.["line-color"]).not.toEqual(
+        reloadedOutlinePaint?.["line-color"],
+      );
+    } finally {
+      await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
+      if (datasetId) {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: admin,
+          datasetId,
+        });
+      }
     }
-  }
-});
+  },
+);
