@@ -223,7 +223,7 @@ describe("structuredQueryToSql executed", () => {
     const total = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
@@ -260,7 +260,7 @@ describe("structuredQueryToSql executed", () => {
     const population = _makeColumn({
       id: "qc_2_population",
       name: "population",
-      dataType: "number",
+      dataType: "bigint",
     });
 
     const sql = structuredQueryToSql(
@@ -301,7 +301,7 @@ describe("structuredQueryToSql executed", () => {
     const cnt = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
     });
 
     const sql = structuredQueryToSql(
@@ -325,7 +325,7 @@ describe("structuredQueryToSql executed", () => {
     const total = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
@@ -370,7 +370,7 @@ describe("structuredQueryToSql executed", () => {
     const total = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
     });
 
     const query = _makeQuery({
@@ -405,7 +405,7 @@ describe("structuredQueryToSql executed", () => {
     const total = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
@@ -438,7 +438,7 @@ describe("structuredQueryToSql executed", () => {
     const total = _makeColumn({
       id: "qc_2_cnt",
       name: "cnt",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
@@ -506,7 +506,7 @@ describe("structuredQueryToSql executed", () => {
     const headcount = _makeConceptAttributeColumn({
       id: "qc_2_headcount",
       name: "headcount",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
@@ -541,7 +541,7 @@ describe("structuredQueryToSql executed", () => {
     const headcount = _makeConceptAttributeColumn({
       id: "qc_2_headcount",
       name: "headcount",
-      dataType: "number",
+      dataType: "bigint",
       aggregation: "sum",
     });
 
