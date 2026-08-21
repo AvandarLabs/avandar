@@ -29,6 +29,37 @@ const SCHEMA = {
 } as const;
 
 describe("repairOfflineGeneratedSql", () => {
+  it("rewrites short table aliases to dataset ids before other repair", () => {
+    const result = repairOfflineGeneratedSql({
+      sql: 'SELECT * FROM "t0" LIMIT 10',
+      schema: SCHEMA,
+      lastUserPrompt: "preview rows",
+    });
+
+    expect(result.sql).toContain(`FROM "${DEATHS_ID}"`);
+    expect(result.sql).not.toContain('"t0"');
+    expect(result.appliedSteps).toContain("apply_sql_table_aliases");
+  });
+
+  it("rewrites concept aliases to concept table names and does not remap them onto a dataset", () => {
+    const conceptId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const result = repairOfflineGeneratedSql({
+      sql: 'SELECT * FROM "c0" LIMIT 10',
+      schema: {
+        datasets: [{ id: DEATHS_ID, name: "LONG_us_deaths.csv" }],
+        columns: [],
+        concepts: [{ id: conceptId, name: "Case" }],
+        conceptAttributes: [],
+      },
+      lastUserPrompt: "preview cases",
+      openDatasetId: DEATHS_ID,
+    });
+
+    expect(result.sql).toContain(`FROM "concept_${conceptId}"`);
+    expect(result.sql).not.toContain(`FROM "${DEATHS_ID}"`);
+    expect(result.sql).not.toContain('"c0"');
+  });
+
   it("remaps covid_deaths and converts TOP to LIMIT", () => {
     const result = repairOfflineGeneratedSql({
       sql: 'SELECT TOP 100 * FROM "covid_deaths"',

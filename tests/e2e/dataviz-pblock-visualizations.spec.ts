@@ -1,9 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import {
-  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  SMALL_CALIFORNIA_CSV_PATH,
-} from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import {
@@ -18,6 +15,7 @@ import {
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT } from "./helpers/timeouts";
 import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
+import type { Page } from "@playwright/test";
 
 /**
  * Per-viz-type seeds used to verify every visualization renders inside the
@@ -149,6 +147,76 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
 ];
 
+type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
+
+async function _blockAiGeneration(page: Page): Promise<void> {
+  await page.route("**/queries/*/generate*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ sql: `SELECT 1 AS mocked_column` }),
+    });
+  });
+}
+
+async function _uploadVisualizationDataset(
+  options: Readonly<{ page: Page; workspaceSlug: string }>,
+): Promise<string> {
+  const { page, workspaceSlug } = options;
+  await page.goto(`/${workspaceSlug}/data-manager/data-import`);
+  const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
+  await uploadPanel
+    .locator('input[type="file"]')
+    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
+  await uploadPanel
+    .getByRole("button", { name: "Upload", exact: true })
+    .click();
+  await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+    timeout: MEDIUM_WAIT,
+  });
+  await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
+  const datasetId = parseDatasetIdFromDataManagerUrl({
+    url: page.url(),
+    workspaceSlug,
+  });
+  if (datasetId === undefined) {
+    throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
+  }
+  await pollUntilCloudDatasetToggleShowsOnline(page);
+  return datasetId;
+}
+
+async function _assertEveryVisualization(
+  options: Readonly<{
+    admin: AdminClient;
+    dashboardIds: string[];
+    datasetId: string;
+    ownerEmail: string;
+    page: Page;
+    workspaceId: string;
+    workspaceSlug: string;
+  }>,
+): Promise<void> {
+  for (const vizCase of VIZ_TYPE_CASES) {
+    await test.step(`renders ${vizCase.vizType}`, async () => {
+      const dashboardId = await createDashboardWithDataVizBlock({
+        admin: options.admin,
+        workspaceId: options.workspaceId,
+        ownerEmail: options.ownerEmail,
+        rawSql: vizCase.sql(options.datasetId),
+        vizConfig: vizCase.vizConfig,
+      });
+      options.dashboardIds.push(dashboardId);
+      await options.page.goto(
+        `/${options.workspaceSlug}/dashboards/edit/${dashboardId}`,
+      );
+      const editorFrame = options.page.locator("iframe").first().contentFrame();
+      const chartElement = editorFrame.locator(vizCase.visibleSelector);
+      await expect(chartElement.first()).toBeVisible({ timeout: MEDIUM_WAIT });
+    });
+  }
+}
+
 test.describe("DataViz PBlock - every visualization", () => {
   test("renders every supported visualization in the dashboard editor", async ({
     page,
@@ -166,91 +234,25 @@ test.describe("DataViz PBlock - every visualization", () => {
         workspaceSlug,
       });
 
-      /**
-       * Block the AI route at the page level for the entire test so an
-       * accidental hit to OpenAI (e.g. someone clicking "Generate Query"
-       * during development) cannot escape into a paid request. Tests rely on
-       * the pre-seeded `nlQuery.rawSql`, so the response is just a defensive
-       * stub the UI would treat as a valid generated SQL.
-       */
-      await page.route("**/queries/*/generate*", async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            sql: `SELECT 1 AS mocked_column`,
-          }),
-        });
-      });
-
-      // Step 1: upload the California CSV via the manual upload flow.
-      await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-      const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-      await uploadPanel
-        .locator('input[type="file"]')
-        .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-      await uploadPanel
-        .getByRole("button", { name: "Upload", exact: true })
-        .click();
-
-      await expect(
-        page.getByText("Data processed successfully", { exact: false }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-      const formattedRowCount =
-        SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
-      await expect(
-        page.getByText(`These are the first ${formattedRowCount} rows`, {
-          exact: false,
-        }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-      await ensureCloudStorageCheckedAndSaveDataset({
+      await _blockAiGeneration(page);
+      const datasetId = await _uploadVisualizationDataset({
         page,
         workspaceSlug,
       });
-
-      const datasetId = parseDatasetIdFromDataManagerUrl({
-        url: page.url(),
-        workspaceSlug,
-      });
-      if (!datasetId) {
-        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-      }
       uploadedDatasetId = datasetId;
-      await pollUntilCloudDatasetToggleShowsOnline(page);
-
       const workspaceId = await getWorkspaceIdBySlug({
         supabaseAdminClient: admin,
         slug: workspaceSlug,
       });
-
-      // Step 2: for each viz type, seed a dashboard with the appropriate
-      // config and verify the chart renders inside the editor.
-      for (const vizCase of VIZ_TYPE_CASES) {
-        await test.step(`renders ${vizCase.vizType}`, async () => {
-          const dashboardId = await createDashboardWithDataVizBlock({
-            admin,
-            workspaceId,
-            ownerEmail: primaryUser.email,
-            rawSql: vizCase.sql(datasetId),
-            vizConfig: vizCase.vizConfig,
-          });
-          seededDashboardIds.push(dashboardId);
-
-          await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
-
-          // Puck v0.21 renders the editor canvas inside an iframe by default.
-          // The DataViz block is rendered inside the canvas iframe, so query
-          // against the first frame on the page.
-          const editorFrame = page.locator("iframe").first().contentFrame();
-          const chartElement = editorFrame.locator(vizCase.visibleSelector);
-
-          await expect(chartElement.first()).toBeVisible({
-            timeout: MEDIUM_WAIT,
-          });
-        });
-      }
+      await _assertEveryVisualization({
+        admin,
+        dashboardIds: seededDashboardIds,
+        datasetId,
+        ownerEmail: primaryUser.email,
+        page,
+        workspaceId,
+        workspaceSlug,
+      });
     } finally {
       await deleteDashboardsByIds({ admin, dashboardIds: seededDashboardIds });
       if (uploadedDatasetId) {

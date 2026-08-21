@@ -4,12 +4,14 @@ import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
-import { AppLinks } from "@/config/AppLinks";
+import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
+import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { AppLinks } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -37,18 +39,21 @@ export function WorkspaceLayoutContents({
       <DataExplorerStateManager.Provider>
         <DashboardEditorStateManager.Provider>
           <ChatPanelProvider>
-            <AppDropzone>
-              <AppShell
-                title={workspace.name}
-                currentWorkspace={workspace}
-                profileLink={profileLink}
-                navbarLinks={mainNavBarLinks}
-                utilityLinks={utilityNavBarLinks}
-                spotlightActions={spotlightActions}
-              >
-                {children}
-              </AppShell>
-            </AppDropzone>
+            <NuxStateManager.Provider>
+              <AppDropzone>
+                <AppShell
+                  title={workspace.name}
+                  currentWorkspace={workspace}
+                  profileLink={profileLink}
+                  navbarLinks={mainNavBarLinks}
+                  utilityLinks={utilityNavBarLinks}
+                  spotlightActions={spotlightActions}
+                >
+                  {children}
+                </AppShell>
+                <NuxRoot />
+              </AppDropzone>
+            </NuxStateManager.Provider>
           </ChatPanelProvider>
         </DashboardEditorStateManager.Provider>
       </DataExplorerStateManager.Provider>

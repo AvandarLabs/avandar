@@ -14,10 +14,7 @@ create or replace view analytics.active_users as
 with
   daily_actives as (
     select
-      date_trunc(
-        'day',
-        e.created_at
-      )::date as activity_date,
+      date_trunc('day', e.created_at)::date as activity_date,
       e.client,
       e.user_id
     from
@@ -33,9 +30,7 @@ with
   reporting_dates as (
     select
       generate_series(
-        min(
-          activity_date
-        ),
+        min(activity_date),
         current_date,
         interval '1 day'
       )::date as activity_date
@@ -59,15 +54,11 @@ with
 select
   d.activity_date,
   d.client,
-  count(
-    distinct a.user_id
-  ) filter (
+  count(distinct a.user_id) filter (
     where
       a.activity_date = d.activity_date
   ) as daily_active_users,
-  count(
-    distinct a.user_id
-  ) as weekly_active_users
+  count(distinct a.user_id) as weekly_active_users
 from
   reporting_days d
   left join daily_actives a on a.client = d.client and

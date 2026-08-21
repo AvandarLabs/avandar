@@ -29,6 +29,8 @@ export const ANIMATION_EASING = {
   spring: "cubic-bezier(0.2, 0.9, 0.25, 1.35)",
   /** Quick ease for swipe-away dismissals. */
   swipeOut: "cubic-bezier(0.45, 0, 0.75, 0.6)",
+  /** Overshoot ease for overlay pop-in (modals, dropzone, tour tooltips). */
+  pop: "cubic-bezier(0.34, 1.56, 0.64, 1)",
 } as const;
 
 /**
@@ -49,6 +51,19 @@ export const ANIMATION_PRESET = {
     durationMs: ANIMATION_DURATION_MS.fast,
     easing: ANIMATION_EASING.swipeOut,
     translateYPx: -12,
+  },
+  /**
+   * Scale-blur overshoot used by modals, the dropzone import card, and
+   * onboarding tour tooltips.
+   */
+  popIn: {
+    className: "ava-animate-pop-in",
+    durationMs: 380,
+    easing: ANIMATION_EASING.pop,
+    from: {
+      transform: "scale(0.72) translateY(20px)",
+      filter: "blur(10px)",
+    },
   },
   reducedMotionDurationMs: 120,
 } as const;
@@ -106,14 +121,14 @@ export const MODAL_CONTENT_TRANSITION = {
     },
     out: {
       opacity: 0,
-      transform: "scale(0.72) translateY(20px)",
-      filter: "blur(10px)",
+      transform: ANIMATION_PRESET.popIn.from.transform,
+      filter: ANIMATION_PRESET.popIn.from.filter,
     },
     common: { transformOrigin: "center center" },
     transitionProperty: "transform, opacity, filter",
   },
-  duration: 380,
-  timingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  duration: ANIMATION_PRESET.popIn.durationMs,
+  timingFunction: ANIMATION_PRESET.popIn.easing,
 } as const;
 
 /** Default Mantine overlay transition presets. */

@@ -54,7 +54,7 @@ vi.mock("@/hooks/users/useCurrentUserProfile", () => {
   };
 });
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       QueryKeys: {
@@ -139,6 +139,7 @@ function _makeDashboard(overrides: Partial<Dashboard.T> = {}): Dashboard.T {
     slug: undefined,
     description: undefined,
     isPublic: false,
+    visibility: "draft",
     isRestricted: false,
     ownerId: "00000000-0000-4000-8000-0000000000bb" as UserId,
     ownerProfileId: "00000000-0000-4000-8000-0000000000cc" as UserProfileId,
@@ -347,6 +348,26 @@ describe("SaveToDashboardModal", () => {
         screen.getByText(/pick a dashboard, or create a new one/i),
       ).toBeInTheDocument();
       expect(screen.getByRole("listbox")).toBeInTheDocument();
+    });
+
+    it("opens in create mode with no Back link when forceCreateMode is set", () => {
+      renderModal({ forceCreateMode: true });
+
+      expect(
+        screen.getByText(/we'll add this visualization to your new dashboard/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /back to dashboards/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText(/search dashboards/i),
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector('[data-nux="explorer-save-to-dashboard-modal"]'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /create dashboard & save/i }),
+      ).toHaveAttribute("data-nux", "explorer-create-dashboard-button");
     });
   });
 });

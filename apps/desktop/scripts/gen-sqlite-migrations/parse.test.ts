@@ -50,6 +50,14 @@ describe("classifyStatement", () => {
     ).toBe("drop");
   });
 
+  it("classifies ALTER DEFAULT PRIVILEGES as drop", () => {
+    expect(
+      classifyStatement(
+        "alter default privileges for role postgres in schema public grant select on tables to anon;",
+      ),
+    ).toBe("drop");
+  });
+
   it("classifies CREATE / DROP POLICY as drop", () => {
     expect(
       classifyStatement(
@@ -93,6 +101,31 @@ describe("classifyStatement", () => {
       "drop",
     );
     expect(classifyStatement("set check_function_bodies = off;")).toBe("drop");
+  });
+
+  it("classifies CREATE SCHEMA as drop", () => {
+    expect(classifyStatement('create schema if not exists "private";')).toBe(
+      "drop",
+    );
+  });
+
+  it("classifies CREATE / DROP VIEW as drop", () => {
+    expect(
+      classifyStatement(
+        'create or replace view "analytics"."active_users" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('create view "analytics"."v" as select 1;')).toBe(
+      "drop",
+    );
+    expect(
+      classifyStatement(
+        'create materialized view "analytics"."m" as select 1;',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('drop view if exists "analytics"."v";')).toBe(
+      "drop",
+    );
   });
 
   it("classifies a leading keyword it does not know as unknown", () => {
@@ -141,16 +174,23 @@ describe("extractStatements", () => {
     expect(stmts[0]!.primaryTable).toBe("datasets");
   });
 
+  it("identifies the primary table when a CREATE INDEX name is quoted", () => {
+    const stmts = extractStatements(
+      'create unique index "subscriptions_polar_subscription_id_key" on public.subscriptions using btree ("polar_subscription_id");',
+    );
+    expect(stmts[0]!.primaryTable).toBe("subscriptions");
+  });
+
   it("does not pick up FK targets as the primary table", () => {
     const stmts = extractStatements(
-      "alter table entity_configs add constraint fk foreign key (workspace_id) references workspaces(id);",
+      "alter table concepts add constraint fk foreign key (workspace_id) references workspaces(id);",
     );
-    expect(stmts[0]!.primaryTable).toBe("entity_configs");
+    expect(stmts[0]!.primaryTable).toBe("concepts");
   });
 
   it("captures FK references with a public schema as unqualified", () => {
     const stmts = extractStatements(
-      "alter table entity_configs add constraint fk foreign key (workspace_id) references public.workspaces(id);",
+      "alter table concepts add constraint fk foreign key (workspace_id) references public.workspaces(id);",
     );
     expect(stmts[0]!.fkReferences).toEqual([
       { schema: undefined, table: "workspaces" },
@@ -159,7 +199,7 @@ describe("extractStatements", () => {
 
   it("captures FK references to a non-public schema as cross-schema", () => {
     const stmts = extractStatements(
-      "alter table entity_configs add constraint fk foreign key (owner_id) references auth.users(id) on update cascade;",
+      "alter table concepts add constraint fk foreign key (owner_id) references auth.users(id) on update cascade;",
     );
     expect(stmts[0]!.fkReferences).toEqual([
       { schema: "auth", table: "users" },
@@ -168,7 +208,7 @@ describe("extractStatements", () => {
 
   it("does not treat GRANT REFERENCES ON TABLE as a FK reference", () => {
     const stmts = extractStatements(
-      'grant references on table "public"."entity_configs" to "anon";',
+      'grant references on table "public"."concepts" to "anon";',
     );
     expect(stmts[0]!.fkReferences).toEqual([]);
   });

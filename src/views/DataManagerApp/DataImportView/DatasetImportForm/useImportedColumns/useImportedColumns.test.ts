@@ -6,7 +6,7 @@ import type {
   CsvFileLoadResult,
   XlsxFileLoadResult,
 } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
-import type { DataSourceMetadata } from "../DatasetImportForm";
+import type { DataSourceMetadata } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
@@ -94,36 +94,20 @@ function _googleSheetsMetadata(
     sourceType: "google_sheets",
     googleAccountId: "google-account",
     googleDocumentId: "google-doc",
-    parseOptions: { type: "google_sheets" },
+    parseOptions: { type: "google_sheets", sheetName: "Kenya" },
     datasetLoadResult: {
       datasetId: DATASET_ID,
       numRows: 1,
-      rawText: "a,b\n1,2",
       spreadsheetName: "sheet-name",
+      availableSheetNames: ["Colombia", "Kenya"],
       sheetLoadMetadata: {
-        type: "csv",
-        id: "00000000-0000-4000-8000-000000000003" as CsvFileLoadResult["id"],
-        csvName: "google-sheet.csv",
+        type: "xlsx",
+        id: "00000000-0000-4000-8000-000000000003" as XlsxFileLoadResult["id"],
+        xlsxName: "google-sheet.xlsx",
         numRows: 1,
-        numRejectedRows: 0,
         columns,
-        errors: { rejectedScans: [], rejectedRows: [] },
         tableName: "temp_google_sheet_table",
-        csvSniff: {
-          Delimiter: ",",
-          Quote: '"',
-          Escape: '"',
-          NewLineDelimiter: "\n",
-          Comment: "#",
-          SkipRows: 0,
-          HasHeader: true,
-          Columns: [],
-          DateFormat: null,
-          TimestampFormat: null,
-          UserArguments: "",
-          Prompt: "",
-          table_name: "temp_google_sheet_table",
-        },
+        sheet: "Kenya",
         parquetData: new Blob(),
       },
     },
@@ -182,7 +166,7 @@ describe("useImportedColumns", () => {
     ]);
   });
 
-  it("maps google_sheets DuckDB columns using the CSV load shape", () => {
+  it("maps google_sheets DuckDB columns using the XLSX load shape", () => {
     const columns = [_duckDbColumn("flag", "BOOLEAN")];
     const metadata = _googleSheetsMetadata(columns);
 

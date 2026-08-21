@@ -1004,6 +1004,52 @@ type AuditLogEntry = Readonly<{
 
 - **One component per file.**
 - Split up components into logical sub-components. Avoid monolithic components.
+- **A top-level function that returns only a JSX block must be its own
+  component, in its own file.** Two signals together make the gate:
+
+  1. the function is declared at the top level of a component file, and
+  2. its body is only a `return` of JSX (leading destructuring or trivial
+     locals do not change this).
+
+  Names like `_renderX`, `_getXContent`, or `_xSection` are the usual tell, but
+  the name is not the rule; the shape is.
+
+  When the function is used **exclusively** by the component whose file it
+  lives in, that component becomes a **directory** and the new component goes
+  inside it. Turning a component into a directory is how we express that a
+  component is tightly coupled to its own exclusive descendants.
+
+  ```txt
+  DashboardCard.tsx                 →   DashboardCard/
+                                          DashboardCard.tsx
+                                          BadgeRow.tsx
+  ```
+
+  ```tsx
+  // Bad: a render function pretending not to be a component.
+  function _renderBadgeRow(
+    options: Readonly<{ dashboard: Dashboard.T; i18n: I18n }>,
+  ): ReactNode {
+    return <Group gap="xs">…</Group>;
+  }
+
+  // Good: DashboardCard/BadgeRow.tsx
+  export function BadgeRow({ dashboard }: Readonly<Props>): ReactNode {
+    return <Group gap="xs">…</Group>;
+  }
+  ```
+
+  Why it matters beyond tidiness: a render function cannot call hooks, so it
+  has to receive everything a hook would have given it. The example above had
+  to thread `i18n` through its options purely because a module-level helper
+  cannot call `useLingui`. As a real component it calls `useLingui` itself and
+  the prop disappears. The same applies to memoisation, state, and context: a
+  render function makes them the caller's problem, and React cannot re-render
+  it independently because it is not a component in the tree.
+
+  A top-level function that returns a value other than JSX is not covered by
+  this rule, and neither is a hook (`useX`), which returns data rather than a
+  JSX block.
 - Use our internal UI library in `src/lib/ui` or Mantine components.
 - Do not build new core UI elements from scratch unless specifically asked to.
 - Define functional components with the function keyword instead of arrow

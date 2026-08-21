@@ -1,5 +1,3 @@
-import { Model } from "@avandar/models";
-import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { GenericSeedData } from "scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
@@ -61,31 +59,6 @@ export const SeedData = {
       name: "My Nonprofit",
       slug: WORKSPACE_SLUGS.myNonprofit,
       otherMembers: [],
-    },
-  ],
-
-  entityConfigs: [
-    {
-      owner: SEED_USERS.primaryTestUser,
-      workspaceSlug: WORKSPACE_SLUGS.primaryTestWorkspace,
-      name: "State",
-      description: "This entity represents a US State",
-      datasetId: null,
-      allowManualCreation: false,
-      fields: [
-        Model.make("EntityFieldConfig", {
-          name: "Name",
-          description: "This entity represents a US State",
-          dataType: "varchar",
-          valueExtractorType: "manual_entry",
-          allowManualEdit: true,
-          isIdField: true,
-          isTitleField: true,
-          isArray: false,
-        } as const),
-      ] satisfies Array<
-        Omit<EntityFieldConfigModel["Insert"], "entityConfigId" | "workspaceId">
-      >,
     },
   ],
 } as const satisfies GenericSeedData;

@@ -5,7 +5,7 @@ import { objectKeys, promiseReduce, sqlTemplate, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
-import { WorkspaceQetlClient } from "@/clients/qetl/WorkspaceQetlClient";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
@@ -115,7 +115,7 @@ function createDatasetQueryClient(): WithLogger<
         const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
-        const { data } = await WorkspaceQetlClient.runQuery({
+        const { data } = await WorkspaceQuerySession.runQuery({
           rawSql: queryString,
           workspaceId,
         });
@@ -139,7 +139,7 @@ function createDatasetQueryClient(): WithLogger<
         });
         const numRows = Number(
           scalar(
-            await WorkspaceQetlClient.runQuery<{ count: bigint }>({
+            await WorkspaceQuerySession.runQuery<{ count: bigint }>({
               workspaceId,
               rawSql: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
@@ -188,7 +188,7 @@ function createDatasetQueryClient(): WithLogger<
 
         const numRows = Number(
           scalar(
-            await WorkspaceQetlClient.runQuery<{
+            await WorkspaceQuerySession.runQuery<{
               count: bigint;
             }>({
               workspaceId,
@@ -246,7 +246,7 @@ async function computeColumnSummary(params: {
 
   const distinctValuesCount = Number(
     scalar(
-      await WorkspaceQetlClient.runQuery<{ count: bigint }>({
+      await WorkspaceQuerySession.runQuery<{ count: bigint }>({
         workspaceId,
         rawSql: sqlTemplate(
           'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
@@ -257,7 +257,7 @@ async function computeColumnSummary(params: {
 
   const emptyValuesCount = Number(
     scalar(
-      await WorkspaceQetlClient.runQuery<{ count: bigint }>({
+      await WorkspaceQuerySession.runQuery<{ count: bigint }>({
         workspaceId,
         rawSql: sqlTemplate(
           `SELECT COUNT("$columnName$") as count
@@ -271,7 +271,7 @@ async function computeColumnSummary(params: {
   );
 
   // Find the maximum count for the most common value(s)
-  const maxCountResult = await WorkspaceQetlClient.runQuery<{
+  const maxCountResult = await WorkspaceQuerySession.runQuery<{
     max_count: bigint;
   }>({
     workspaceId,
@@ -289,7 +289,7 @@ async function computeColumnSummary(params: {
   const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
   // Get all values with the maximum count
-  const mostCommonValuesQuery = await WorkspaceQetlClient.runQuery<{
+  const mostCommonValuesQuery = await WorkspaceQuerySession.runQuery<{
     value: unknown;
     count: bigint;
   }>({
@@ -319,7 +319,7 @@ async function computeColumnSummary(params: {
         avg = NaN,
         stdDev = NaN,
       } = singleton(
-        await WorkspaceQetlClient.runQuery<{
+        await WorkspaceQuerySession.runQuery<{
           max: number;
           min: number;
           avg: number;
@@ -367,7 +367,7 @@ async function computeColumnSummary(params: {
            WHERE "$columnName$" IS NOT NULL`;
 
       const row = singleton(
-        await WorkspaceQetlClient.runQuery<{
+        await WorkspaceQuerySession.runQuery<{
           most_recent: string | null;
           oldest: string | null;
           days: bigint | number | null;
@@ -426,6 +426,6 @@ async function computeColumnSummary(params: {
  * Creates a client to run predefinedqueries on a dataset.
  *
  * If you want to run a custom raw query, then just call
- * WorkspaceQetlClient.runQuery() directly.
+ * WorkspaceQuerySession.runQuery() directly.
  */
 export const DatasetQueryClient = createDatasetQueryClient();

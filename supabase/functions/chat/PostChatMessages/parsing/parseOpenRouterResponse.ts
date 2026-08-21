@@ -1,7 +1,10 @@
 import { parseClarify } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
+import { parseCreateCaseTypes } from "@sbfn/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts";
 import { parseDashboardBlock } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
+import { parseProposeCaseType } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type {
   OpenRouterMessage,
   OpenRouterToolCall,
@@ -9,7 +12,9 @@ import type {
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
   ChatClarifyRequest,
+  ChatCreatedCaseType,
   ChatGeneratedDashboardBlock,
+  ChatProposedCaseType,
 } from "$/types/chat.types.ts";
 
 export type ParsedAttempt = {
@@ -17,21 +22,42 @@ export type ParsedAttempt = {
   generatedSql?: ChatResponse.GeneratedSql;
   clarification?: ChatClarifyRequest;
   dashboardBlock?: ChatGeneratedDashboardBlock;
+  createdCaseTypes?: ChatCreatedCaseType[];
+  proposedCaseType?: ChatProposedCaseType;
 };
 
 /** Parses one OpenRouter message into the chat response alternatives. */
 export function parseOpenRouterResponse(options: {
   message: OpenRouterMessage | undefined;
   attemptText: string;
-  isDataExplorer: boolean;
-  isDashboards: boolean;
   lastUserPrompt: string;
   priorClarifications: number;
+  datasets?: ReadonlyArray<{ id: string; name: string }>;
+  concepts?: ReadonlyArray<{ id: string; name: string }>;
+  skipSqlExtraction?: boolean;
 }): ParsedAttempt {
   const calls: OpenRouterToolCall[] = options.message?.tool_calls ?? [];
   let generatedSql: ChatResponse.GeneratedSql | undefined;
   let clarification: ChatClarifyRequest | undefined;
   let dashboardBlock: ChatGeneratedDashboardBlock | undefined;
+  let createdCaseTypes: ChatCreatedCaseType[] | undefined;
+  let proposedCaseType: ChatProposedCaseType | undefined;
+
+  const createCasesCall = calls.find((call) => {
+    return call?.function?.name === "createCaseTypes";
+  });
+  if (createCasesCall?.function) {
+    createdCaseTypes = parseCreateCaseTypes(createCasesCall.function.arguments);
+  }
+
+  if (!createdCaseTypes) {
+    const proposeCall = calls.find((call) => {
+      return call?.function?.name === "proposeCaseType";
+    });
+    if (proposeCall?.function) {
+      proposedCaseType = parseProposeCaseType(proposeCall.function.arguments);
+    }
+  }
 
   const sqlCall = calls.find((call) => {
     return call?.function?.name === "generateSql";
@@ -50,7 +76,7 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
-  if (!generatedSql) {
+  if (!generatedSql && !createdCaseTypes && !proposedCaseType) {
     const clarifyCall = calls.find((call) => {
       return call?.function?.name === "clarify";
     });
@@ -65,7 +91,9 @@ export function parseOpenRouterResponse(options: {
   if (
     !generatedSql &&
     !clarification &&
-    options.isDataExplorer &&
+    !createdCaseTypes &&
+    !proposedCaseType &&
+    !options.skipSqlExtraction &&
     options.attemptText.length > 0
   ) {
     const extractedSql = extractSqlFromAssistantText(options.attemptText);
@@ -77,7 +105,12 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
-  if (!generatedSql && !clarification && options.isDashboards) {
+  if (
+    !generatedSql &&
+    !clarification &&
+    !createdCaseTypes &&
+    !proposedCaseType
+  ) {
     const blockCall = calls.find((call) => {
       return call?.function?.name === "addDashboardBlock";
     });
@@ -86,10 +119,58 @@ export function parseOpenRouterResponse(options: {
     }
   }
 
+  return applySqlTableAliasesToParsedAttempt(
+    {
+      text: options.attemptText,
+      generatedSql,
+      clarification,
+      dashboardBlock,
+      createdCaseTypes,
+      proposedCaseType,
+    },
+    options.datasets ?? [],
+    options.concepts ?? [],
+  );
+}
+
+function applySqlTableAliasesToParsedAttempt(
+  parsed: ParsedAttempt,
+  datasets: ReadonlyArray<{ id: string; name: string }>,
+  concepts: ReadonlyArray<{ id: string; name: string }>,
+): ParsedAttempt {
+  if (datasets.length === 0 && concepts.length === 0) {
+    return parsed;
+  }
+  const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
+  const generatedSql =
+    parsed.generatedSql ?
+      {
+        ...parsed.generatedSql,
+        sql: SqlTableAlias.applyToSql(parsed.generatedSql.sql, aliases),
+      }
+    : undefined;
+  const clarification = applySqlTableAliasesToClarification(
+    parsed.clarification,
+    aliases,
+  );
+  return { ...parsed, generatedSql, clarification };
+}
+
+function applySqlTableAliasesToClarification(
+  clarification: ChatClarifyRequest | undefined,
+  aliases: readonly SqlTableAlias.T[],
+): ChatClarifyRequest | undefined {
+  if (clarification?.responseShape.kind !== "discovery") {
+    return clarification;
+  }
   return {
-    text: options.attemptText,
-    generatedSql,
-    clarification,
-    dashboardBlock,
+    ...clarification,
+    responseShape: {
+      ...clarification.responseShape,
+      query: SqlTableAlias.applyToSql(
+        clarification.responseShape.query,
+        aliases,
+      ),
+    },
   };
 }

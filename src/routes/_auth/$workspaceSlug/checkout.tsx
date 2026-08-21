@@ -18,7 +18,7 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 

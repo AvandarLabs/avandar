@@ -5,8 +5,8 @@ import { useState } from "react";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
-import { appForResource } from "./copy/appForResource";
 import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "./getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
 import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type {
@@ -37,6 +37,22 @@ type UseGeneralAccessControlOptions = {
   setRestricted: (
     options: Parameters<typeof ResourceShareClient.setResourceRestricted>[0],
   ) => void;
+  /**
+   * Whether "Anyone with the link" is the PENDING selection. Display only, so
+   * the pick does not snap back while a publish is in flight. `false` for
+   * resource types with no published form.
+   */
+  isPublicPublishTargeted: boolean;
+  /**
+   * Whether the resource is publicly published RIGHT NOW. Only this may drive
+   * a warning about real exposure, such as the "Make private" confirmation.
+   *
+   * Separate from `isPublicPublishTargeted` because the two disagree in both
+   * directions: a draft merely selected as public would raise a false alarm,
+   * and a live public dashboard since selected "Restricted" would suppress the
+   * alarm that matters.
+   */
+  isPubliclyPublished: boolean;
 };
 
 type GeneralAccessControl = {
@@ -97,10 +113,11 @@ function _requestMakePrivate(options: Readonly<GeneralAccessActions>): void {
   }
   openMakePrivateConfirmModal({
     resourceName: options.resourceName,
-    app: appLabel(appForResource(options.resourceType)),
+    app: appLabel(getAppTypeFromResourceType(options.resourceType)),
     numUsers,
     numGroups,
     losesWorkspaceAccess,
+    isPubliclyPublished: options.isPubliclyPublished,
     onConfirm: () => {
       options.makePrivate(mutationOptions);
     },
@@ -170,6 +187,13 @@ function _applyGeneralAccessChange(
     workspace: () => {
       _applyWorkspaceAccess(options.actions);
     },
+    public: () => {
+      // Public reads never consult `resource_shares`, so selecting this writes
+      // no share rows: the anon policy and the `is_public` short-circuit in
+      // util__auth_user_may_select_dashboard both fire first. Rewriting shares
+      // here would widen EDIT access as a side effect of a READ decision, and
+      // would destroy the narrowing the owner gets back on a downgrade.
+    },
   });
 }
 
@@ -233,7 +257,10 @@ export function useGeneralAccessControl(
     });
   const derivedValue =
     options.sharingState ?
-      GeneralAccessModule.fromShareState(options.sharingState)
+      GeneralAccessModule.fromResourceState({
+        ...options.sharingState,
+        isPublicSelected: options.isPublicPublishTargeted,
+      })
     : "private";
   const displayedValue =
     derivedValue === "private" && wantsRestricted ? "restricted" : derivedValue;

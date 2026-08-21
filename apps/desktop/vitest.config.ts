@@ -5,6 +5,9 @@ export default defineConfig({
   resolve: {
     alias: {
       $: fileURLToPath(new URL("../../shared", import.meta.url)),
+      "@utils": fileURLToPath(
+        new URL("../../packages/shared/utils/src", import.meta.url),
+      ),
     },
   },
   test: {

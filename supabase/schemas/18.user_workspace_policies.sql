@@ -34,17 +34,13 @@ with
 create policy "User can UPDATE workspaces they admin" on public.workspaces
 for update
   to authenticated using (
-    public.util__can_manage_workspace_settings (
-      public.workspaces.id
-    )
+    public.util__can_manage_workspace_settings (public.workspaces.id)
   )
 with
   check (
     -- The new owner must still be a workspace member
     public.workspaces.owner_id = any (
-      public.util__get_workspace_members (
-        public.workspaces.id
-      )
+      public.util__get_workspace_members (public.workspaces.id)
     )
   );
 
@@ -135,9 +131,7 @@ with
         public.util__get_auth_user_owned_workspaces ()
       )
     ) or
-    public.util__can_manage_workspace_settings (
-      public.user_profiles.workspace_id
-    )
+    public.util__can_manage_workspace_settings (public.user_profiles.workspace_id)
   );
 
 -- This policy allows user_profiles to be updated. It technically means that
@@ -152,9 +146,7 @@ for update
       select
         auth.uid ()
     ) or
-    public.util__can_manage_workspace_settings (
-      public.user_profiles.workspace_id
-    )
+    public.util__can_manage_workspace_settings (public.user_profiles.workspace_id)
   );
 
 create policy "Users can DELETE profiles" on public.user_profiles for delete to authenticated using (
@@ -163,7 +155,5 @@ create policy "Users can DELETE profiles" on public.user_profiles for delete to 
     select
       auth.uid ()
   ) or
-  public.util__can_manage_workspace_settings (
-    public.user_profiles.workspace_id
-  )
+  public.util__can_manage_workspace_settings (public.user_profiles.workspace_id)
 );

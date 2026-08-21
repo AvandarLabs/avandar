@@ -76,6 +76,20 @@ describe("getAvailableBasePortFromPorts", () => {
     ).rejects.toThrow("55322 is already in use");
   });
 
+  it("skips an automatic candidate whose Docker-published port is occupied", async () => {
+    const isPortAvailable = vi.fn(async () => {
+      return true;
+    });
+    await expect(
+      SupabasePorts.getAvailableBasePortFromPorts({
+        currentApiPort: 54321,
+        currentPorts: PORTS,
+        occupiedHostPorts: [55322],
+        isPortAvailable,
+      }),
+    ).resolves.toBe(55341);
+  });
+
   it("skips occupied automatic candidates and returns the first free set", async () => {
     const isPortAvailable = vi.fn(async (port: number) => {
       return port !== 55321;

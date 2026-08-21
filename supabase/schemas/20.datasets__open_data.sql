@@ -17,6 +17,15 @@ create table public.datasets__open_data (
 -- Enable row level security
 alter table public.datasets__open_data enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__open_data to authenticated,
+service_role;
+
 -- Policies
 create policy "User can select datasets__open_data in their workspace" on public.datasets__open_data for
 select

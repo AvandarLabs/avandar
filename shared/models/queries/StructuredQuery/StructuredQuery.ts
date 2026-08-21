@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  QueryFilterGroup,
+  QueryFilterRule,
+} from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import type {
   OrderByDirection as OrderByDirectionType,
   PartialStructuredQuery,
@@ -13,4 +17,6 @@ export namespace StructuredQuery {
   export type Partial = PartialStructuredQuery;
   export type OrderByDirection = OrderByDirectionType;
   export type FilterGroup = QueryFilterGroup;
+  export type FilterRule = QueryFilterRule;
+  export type FilterOperator = QueryFilterOperator;
 }

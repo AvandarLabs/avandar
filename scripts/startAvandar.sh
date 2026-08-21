@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 
 # Get the project root directory
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT="$SCRIPT_DIR/.."
+PROJECT_ROOT="$(realpath "$SCRIPT_DIR/..")"
 cd "$PROJECT_ROOT" || exit 1
 
 # Check if .env.development exists
@@ -45,6 +45,16 @@ if [ -z "$REVERSE_PROXY_URL" ]; then
   exit 1
 fi
 
+# Serve on the port this worktree owns. `ava supabase switch` pins one per
+# switched worktree so several worktrees can run `pnpm dev` side by side.
+VITE_PORT="$("$SCRIPT_DIR/utils/get-dev-server-port.sh")"
+
+# Advertise localhost: Google OAuth and Picker treat localhost and 127.0.0.1
+# as different origins, and Cloud Console is registered for localhost. Bind
+# IPv4 loopback so Node/Playwright (which prefer 127.0.0.1) still connect.
+VITE_HOST="127.0.0.1"
+VITE_PUBLIC_URL="http://localhost:${VITE_PORT}"
+
 # ngrok-free domains need --hostname, while paid/custom domains still use --url.
 REVERSE_PROXY_HOST="${REVERSE_PROXY_URL#http://}"
 REVERSE_PROXY_HOST="${REVERSE_PROXY_HOST#https://}"
@@ -61,19 +71,33 @@ echo -e "${CYAN}Starting Avandar Development Environment${NC}"
 echo -e "${CYAN}==========================================${NC}"
 echo ""
 
-# Stop any prior `pnpm dev` for this repo so the new one can take over.
+# Stops processes matching a pattern, but only the ones started from this
+# worktree. Another worktree's `pnpm dev` keeps running: matching on the command
+# line alone cannot tell the two apart, so the working directory decides.
+stop_worktree_processes() {
+  local pattern="$1"
+  local process_cwd
+  for pid in $(pgrep -f "$pattern" 2>/dev/null || true); do
+    process_cwd=$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)
+    if [ "$process_cwd" = "$PROJECT_ROOT" ]; then
+      kill "$pid" 2>/dev/null || true
+    fi
+  done
+}
+
+# Stop any prior `pnpm dev` for this worktree so the new one can take over.
 # Narrowly targets:
 #  - our concurrently orchestrator (matches the exact flags we pass below)
-#  - whatever is listening on the vite port (5173)
+#  - whatever is listening on this worktree's vite port
 #  - stray supabase functions serve / ngrok processes from the same script
 echo -e "${BLUE}Stopping any prior Avandar dev processes...${NC}"
-pkill -f "concurrently --names vite,functions,ngrok" 2>/dev/null || true
-vite_pids=$(lsof -ti:5173 -sTCP:LISTEN 2>/dev/null || true)
+stop_worktree_processes "concurrently --names vite,functions,ngrok"
+vite_pids=$(lsof -ti:"$VITE_PORT" -sTCP:LISTEN 2>/dev/null || true)
 if [ -n "$vite_pids" ]; then
   kill $vite_pids 2>/dev/null || true
 fi
-pkill -f "supabase functions serve" 2>/dev/null || true
-pkill -f "^ngrok http " 2>/dev/null || true
+stop_worktree_processes "supabase functions serve"
+stop_worktree_processes "^ngrok http "
 sleep 1
 echo -e "${GREEN}✓ Cleared prior dev processes${NC}"
 echo ""
@@ -89,7 +113,7 @@ echo ""
 
 # Step 2: Start development processes concurrently
 echo -e "${BLUE}Step 2: Starting development processes...${NC}"
-echo -e "${CYAN}  - Vite (frontend dev server)${NC}"
+echo -e "${CYAN}  - Vite (frontend dev server) on ${VITE_PUBLIC_URL}${NC}"
 echo -e "${CYAN}  - Supabase Functions (edge functions server)${NC}"
 echo -e "${CYAN}  - ngrok (reverse proxy tunnel)${NC}"
 echo -e "${CYAN}  - fastify server${NC}"
@@ -114,6 +138,12 @@ if ! command -v ngrok &> /dev/null; then
   NGROK_AVAILABLE=false
 fi
 
+# Only one agent at a time can serve REVERSE_PROXY_URL, so ngrok fails when
+# another worktree already holds the tunnel. That is not a reason to take the
+# rest of the dev environment down with it, and --kill-others-on-fail would do
+# exactly that, so a failing tunnel reports itself and exits successfully.
+NGROK_FALLBACK_MESSAGE="Warning: ngrok exited; the reverse-proxy tunnel is unavailable. Another worktree may already serve $REVERSE_PROXY_URL. Webhook-driven flows will not work here."
+
 # Run all processes concurrently with clean output
 if [ "$NGROK_AVAILABLE" = true ]; then
   concurrently \
@@ -121,15 +151,15 @@ if [ "$NGROK_AVAILABLE" = true ]; then
     --prefix-colors "blue,green,yellow" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite --host 127.0.0.1 --port 5173" \
+    "vite --host $VITE_HOST --port $VITE_PORT" \
     "pnpm fns:serve" \
-    "$NGROK_COMMAND"
+    "$NGROK_COMMAND || echo \"$NGROK_FALLBACK_MESSAGE\""
 else
   concurrently \
     --names "vite,functions" \
     --prefix-colors "blue,green" \
     --prefix "{name}" \
     --kill-others-on-fail \
-    "vite --host 127.0.0.1 --port 5173" \
+    "vite --host $VITE_HOST --port $VITE_PORT" \
     "pnpm fns:serve"
 fi

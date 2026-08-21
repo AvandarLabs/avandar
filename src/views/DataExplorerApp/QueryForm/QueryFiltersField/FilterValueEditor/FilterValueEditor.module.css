@@ -1,0 +1,9 @@
+.filterValueControl {
+  flex: 1 1 auto;
+  min-width: 7rem;
+}
+
+.filterValuePair {
+  flex: 1 1 auto;
+  min-width: 12rem;
+}

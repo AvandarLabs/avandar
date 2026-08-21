@@ -23,6 +23,15 @@ create table public.datasets__virtual (
 -- Enable row level security
 alter table public.datasets__virtual enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__virtual to authenticated,
+service_role;
+
 -- Policies
 create policy "User can select datasets__virtual in their workspace" on public.datasets__virtual for
 select

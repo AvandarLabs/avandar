@@ -208,11 +208,12 @@ export default defineConfig(({ mode }) => {
       setupFiles: "./tests/vitest.setup.ts",
       exclude: [
         ...defaultExclude,
-        "tests/e2e/**",
+        "tests/e2e/**/*.spec.ts",
         ".agents/**",
         ".claude/**",
         "apps/**",
         "packages/**",
+        "**/*.executed.test.ts",
       ],
     },
   };

@@ -3,7 +3,8 @@ create type public.datasets__source_type as enum(
   'google_sheets',
   'virtual',
   'open_data',
-  'xlsx_file'
+  'xlsx_file',
+  'pdf_file'
 );
 
 create table public.datasets (
@@ -40,6 +41,15 @@ create table public.datasets (
 -- RLS and policies: `17.rls.datasets.sql`.
 alter table public.datasets enable row level security;
 
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets to authenticated,
+service_role;
+
 /** Prevents a dataset from being reassigned to another workspace. */
 create or replace function public.datasets__prevent_workspace_id_change () returns trigger language plpgsql
 set
@@ -63,7 +73,4 @@ create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();
 
-create index idx_datasets__workspace_owner on public.datasets (
-  workspace_id,
-  owner_id
-);
+create index idx_datasets__workspace_owner on public.datasets (workspace_id, owner_id);

@@ -5,6 +5,22 @@ type AvaRedirect = {
   response: Response;
 };
 
+function _isRedirectResponse(value: unknown): value is Response {
+  if (typeof value !== "object" || value === null || !("status" in value)) {
+    return false;
+  }
+  const { status } = value as { status: unknown };
+  return typeof status === "number" && status >= 300 && status < 400;
+}
+
+/**
+ * True when `value` is the object `redirect()` throws, so MiniServer can
+ * return its Response as the HTTP redirect.
+ *
+ * Recognition is by `type: "redirect"` and a 3xx `response.status`, not
+ * `instanceof Response`. The edge runtime's Response is not an instance of
+ * the constructor this module sees.
+ */
 export function isRedirect(value: unknown): value is AvaRedirect {
   return (
     typeof value === "object" &&
@@ -12,7 +28,7 @@ export function isRedirect(value: unknown): value is AvaRedirect {
     "type" in value &&
     value.type === "redirect" &&
     "response" in value &&
-    value.response instanceof Response
+    _isRedirectResponse(value.response)
   );
 }
 

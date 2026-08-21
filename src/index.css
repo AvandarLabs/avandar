@@ -11,32 +11,6 @@
   list-style: revert;
 }
 
-/*
- * ag-grid v32+ Theming API injects its pagination panel CSS lazily into the
- * parent document's <head> the first time a grid with pagination renders.
- * Puck's editor iframe copies the parent's stylesheets at mount time and
- * watches for new ones, but the lazy `component-PaginationComp` injection
- * can land after Puck has lost track, leaving the iframe without the rule
- * and the pagination items stack vertically (display: block).
- *
- * Replicating the essential layout rules here loads them eagerly via Tailwind
- * so they're in the parent <head> before Puck mounts and are copied into the
- * iframe with the rest of the boot-time styles. The visual styling continues
- * to come from ag-grid; this only restores the flex layout.
- */
-.ag-paging-panel {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap-reverse;
-  justify-content: flex-end;
-}
-
-.ag-paging-page-summary-panel,
-.ag-paging-row-summary-panel {
-  align-items: center;
-  display: flex;
-}
-
 button {
   &:disabled,
   &[data-disabled] {
@@ -92,6 +66,7 @@ button {
   /* z-indexes */
   --mantine-z-index-app-shell-main: ;
   --mantine-z-index-app-chrome: ;
+  --mantine-z-index-floating-panel: ;
   --mantine-z-index-modal: ;
 
   /* other colors */
@@ -102,10 +77,14 @@ button {
   /* animation presets */
   --ava-animation-duration-ooze-in: ;
   --ava-animation-duration-swipe-out: ;
+  --ava-animation-duration-pop-in: ;
   --ava-animation-duration-reduced: ;
   --ava-animation-easing-spring: ;
   --ava-animation-easing-swipe-out: ;
+  --ava-animation-easing-pop: ;
   --ava-animate-swipe-translate-x: ;
+  --ava-animate-pop-in-from-transform: ;
+  --ava-animate-pop-in-from-filter: ;
   --ava-animate-origin-x: ;
   --ava-animate-origin-y: ;
 }

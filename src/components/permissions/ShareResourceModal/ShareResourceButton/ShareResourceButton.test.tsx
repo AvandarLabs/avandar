@@ -1,6 +1,7 @@
+import { modals } from "@mantine/modals";
 import { describe, expect, it, vi } from "vitest";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
-import { act, render, screen, waitFor } from "@/test-utils";
+import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {
@@ -44,6 +45,22 @@ describe("ShareResourceButton", () => {
     );
 
     expect(screen.getByRole("button", { name: "Share" })).toBeInTheDocument();
+  });
+
+  it("opens the modal titled with the resource name", () => {
+    render(
+      <ShareResourceButton
+        resourceName="First dash"
+        resourceType="dashboard"
+        resourceId="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Share" }));
+
+    expect(modals.open).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Share “First dash”" }),
+    );
   });
 
   it.each([

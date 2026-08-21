@@ -16,7 +16,12 @@ function _read(workspaceId: string): OfflineChatSchema | undefined {
     if (!Array.isArray(parsed.datasets) || !Array.isArray(parsed.columns)) {
       return undefined;
     }
-    return parsed;
+    return {
+      ...parsed,
+      concepts: Array.isArray(parsed.concepts) ? parsed.concepts : [],
+      conceptAttributes:
+        Array.isArray(parsed.conceptAttributes) ? parsed.conceptAttributes : [],
+    };
   } catch {
     return undefined;
   }

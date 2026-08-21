@@ -2,7 +2,9 @@ import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
 import type {
   ChatClarifyRequest,
+  ChatCreatedCaseType,
   ChatGeneratedDashboardBlock,
+  ChatProposedCaseType,
 } from "$/types/chat.types.ts";
 
 type ModelType = "ChatResponse";
@@ -32,6 +34,17 @@ export type ChatResponseRead = Model.Base<
      * Puck data via `DashboardEditorStateManager.queuePendingBlock`.
      */
     dashboardBlock?: ChatGeneratedDashboardBlock;
+    /**
+     * Present when the model called `createCaseTypes` in Case Manager.
+     * The client inserts the concepts with the same path as the creator form.
+     */
+    createdCaseTypes?: readonly ChatCreatedCaseType[];
+    /**
+     * Present when the model called `proposeCaseType` in Case Manager. The
+     * client renders it as an editable draft card and only persists the concept
+     * once the user confirms, so nothing reaches the database from this field.
+     */
+    proposedCaseType?: ChatProposedCaseType;
   }
 >;
 

@@ -4,7 +4,7 @@ import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";

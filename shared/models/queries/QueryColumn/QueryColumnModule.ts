@@ -3,16 +3,16 @@ import { uuid } from "$/lib/uuid.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
-import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
+import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 export const QueryColumnModule = {
-  makeFromEntityFieldConfig: (
-    field: EntityFieldConfigModel["Read"],
+  makeFromConceptAttribute: (
+    attribute: ConceptAttributeModel["Read"],
   ): QueryColumn.T => {
     return Model.make("QueryColumn", {
       id: uuid<QueryColumn.Id>(),
-      baseColumn: field,
+      baseColumn: attribute,
       aggregation: undefined,
     });
   },

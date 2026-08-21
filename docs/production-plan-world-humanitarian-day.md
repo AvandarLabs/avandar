@@ -17,21 +17,23 @@ humanitarian data, mapped, and dashboarded for coordination.
 
 **Nothing below is hard-coded to cholera.** Cholera/Ebola is the worked example
 we use to sanity-check that a feature helps a humanitarian org track "cases"
-(entities) of any type. Everything must stay configurable and domain-agnostic.
+(individuals) of any type. Everything must stay configurable and domain-agnostic.
 
 ### Description Logic reframing (naming convention used throughout)
 
 We are adopting Description Logic (DL) theory and nomenclature **internally**
 (engineering + config surfaces), not necessarily in end-user copy:
 
-- **TBox** = the schema / "type" layer: entity types, their fields, allowed
-  statuses, relations. Today this is `EntityConfig` + `EntityFieldConfig` +
-  `ValueExtractor`.
-- **ABox** = the instance / "data" layer: the actual cases/records. Today this
-  is `Entity` + `EntityFieldValue`.
-- **Ontology** = a coherent set of TBoxes + relations for a workspace/domain.
-- **Ontology Designer** = the internal name for the reworked entity
-  config/viewer product.
+- **TBox** = the terminological layer, all of it at once: every concept, its
+  attributes, and the mappings that populate them. In code this is `Concept` +
+  `ConceptAttribute` + `AttributeMapping`. A workspace has one TBox; a
+  **concept** is one element of it, so "a TBox" is never a countable unit.
+- **ABox** = the assertional layer: the actual cases/records. In code this is
+  `Individual` + `AttributeAssertion`.
+- **Ontology** = TBox + ABox for a workspace/domain.
+- **Ontology Designer** = the app that authors the TBox (`OntologyDesignerApp`);
+  `IndividualManagerApp` browses the ABox.
+- Full dictionary: [description-logic-nomenclature.md](description-logic-nomenclature.md).
 
 ---
 
@@ -98,7 +100,7 @@ branching**. `google_sheets` extraction throws "not supported".
 - P0.6 `[NEW]` **Cube eviction / memory management** (MemoryCube LRU, storage
   cube budgeting).
 - P0.7 `[REFACTOR]` Unify `WorkspaceQETLClient` / `PublicQETLClient` /
-  entity-query paths onto the reworked engine; remove the "public querying is a
+  ABox-query paths onto the reworked engine; remove the "public querying is a
   stopgap" path.
 - P0.8 `[NEW]` Live-source dice extractors (feeds P6 connectors): pluggable
   extractor interface for non-parquet sources.
@@ -109,7 +111,7 @@ branching**. `google_sheets` extraction throws "not supported".
 `shared/models/queries/StructuredQuery` with a bidirectional bridge
 (`structuredQueryToSql` via knex, `sqlToStructuredQuery` via node-sql-parser).
 But the LLM path (`supabase/functions/chat`, offline WebLLM) emits **raw SQL**
-via a `generateSql` tool, and `structuredQueryToSql` **throws on EntityConfig
+via a `generateSql` tool, and `structuredQueryToSql` **throws on concept
 sources**. So the "simplified JSON DSL for LLMs" is mostly *wiring the LLM to
 the DSL we already have* + closing gaps.
 
@@ -120,7 +122,7 @@ the DSL we already have* + closing gaps.
   schema and reject/repair invalid output.
 - P1.3 `[NEW]` LLM accuracy harness: eval set of NL→DSL cases (cholera/Ebola
   flavored) to measure accuracy vs the old raw-SQL path.
-- P1.4 `[FIX]` Make `structuredQueryToSql` support **EntityConfig (ABox)**
+- P1.4 `[FIX]` Make `structuredQueryToSql` support **concept (ABox)**
   sources (currently throws) - depends on P2.
 - P1.5 `[REFACTOR]` Keep raw-SQL escape hatch ("sacrosanct" hand SQL) but make
   DSL the default produced/edited artifact.
@@ -129,24 +131,24 @@ the DSL we already have* + closing gaps.
 - `[Depends on: P0 for execution; P2 for ABox querying]`
 
 ### P2. Cross-product query fabric (ABox as a first-class queryable source)
-**Current state:** Entities are virtual; querying them routes through
-`EntityFieldValueClient` (external-id union + per-dataset correlated
-subqueries - the multi-dataset merge). DSL/DuckDB path **throws** for
-EntityConfig. Entity queries don't yet apply group-by/aggregation/sort. This is
+**Current state:** The ABox is virtual; querying it routes through
+`AttributeAssertionClient` (external-id union + per-dataset correlated
+subqueries - the multi-dataset merge). DSL/DuckDB path **throws** for a
+concept source. Concept queries don't yet apply group-by/aggregation/sort. This is
 the "wire all products together for cross-querying" ask.
 
 - P2.1 `[REFACTOR]` Formalize the ABox materialization as a QETL dice/source so
   an ABox can be referenced anywhere a dataset can (query explorer, dashboards,
   GIS, joins). **Preserve the existing multi-dataset merge semantics exactly.**
-- P2.2 `[FIX]` Apply group-by, aggregation, sorting, filters to entity/ABox
+- P2.2 `[FIX]` Apply group-by, aggregation, sorting, filters to ABox
   queries (today "returns all values").
 - P2.3 `[NEW]` ABoxes selectable in Query Explorer data-source picker and
   addable to dashboards as a DataViz source.
 - P2.4 `[NEW]` Cross-source joins: ABox ↔ dataset, ABox ↔ ABox, dataset ↔
   open-data, via the reworked QETL/DSL.
-- P2.5 `[REFACTOR]` Migrate entity generation/hydration off the ad-hoc in-browser
-  path onto the unified QETL engine; keep provenance (`EntityFieldValue.datasetId`,
-  `SourceBadge`).
+- P2.5 `[REFACTOR]` Migrate individual generation/hydration off the ad-hoc
+  in-browser path onto the unified QETL engine; keep provenance
+  (`AttributeAssertion.datasetId`, `SourceBadge`).
 - `[Depends on: P0, P1; BLOCKS: dashboards-on-ABox, GIS-on-ABox, case-mgmt reporting]`
 
 ### P3. Permissions completion and extension
@@ -188,36 +190,36 @@ with a 4-app role matrix. No lightweight external-guest concept exists.
 - `[Depends on: P3]`
 
 ### P5. Ontology Designer refactor (rename + DL model)
-**Current state:** Clean config/instance split already exists
-(`EntityDesignerApp` = config/TBox, `EntityManagerApp` = instances/ABox). Gaps
-vs a real DL/ontology model: **no entity-to-entity relations (DL roles/object
-properties)**, no class hierarchy/subsumption, `manual_entry` extractor
-unimplemented, config delete doesn't cascade, generation is in-browser and
+**Current state:** Clean TBox/ABox split already exists
+(`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 below
+has shipped. Gaps vs a real DL/ontology model: **no roles (object properties)
+between concepts**, no class hierarchy/subsumption, `manual_entry` mapping
+unimplemented, concept delete doesn't cascade, generation is in-browser and
 re-writes all rows (no incremental sync).
 
-- P5.1 `[REFACTOR]` Rename internal domain to DL nomenclature (TBox/ABox/
-  ontology/role) across models, clients, views, routes. **Decided: internal
-  only** - keep user-facing copy approachable (cases, types, fields, statuses);
+- P5.1 `[DONE]` Renamed internal domain to DL nomenclature across models,
+  clients, views, routes and the database. **Internal
+  only** - user-facing copy stays approachable (cases, types, fields, statuses);
   DL terms do not appear in end-user UI. Ship as a mechanical, well-tested
   rename.
-- P5.2 `[NEW]` **Relations / object properties**: entity-type → entity-type
+- P5.2 `[NEW]` **Roles / object properties**: concept → concept
   references (e.g. Case → Patient, Case → Facility, Contact → Case). Model,
   config UI, and materialization.
 - P5.3 `[NEW]` Optional **class hierarchy / subsumption** (a TBox extends
   another) - or explicitly defer with rationale.
-- P5.4 `[FIX]` Implement `manual_entry` value extractor end to end (currently
+- P5.4 `[FIX]` Implement the `manual_entry` attribute mapping end to end (currently
   throws; feature-flagged off) - required for case data typed by humans, not
   just merged from datasets.
-- P5.5 `[FIX]` Cascade delete of an ontology/TBox to its ABox rows + field
-  values.
-- P5.6 `[REFACTOR]` Incremental entity generation (stop full re-upsert every
+- P5.5 `[FIX]` Cascade delete of a concept to its individuals + their
+  attribute assertions.
+- P5.6 `[REFACTOR]` Incremental individual generation (stop full re-upsert every
   sync) and move heavy generation off the main browser thread / onto QETL.
 - P5.7 `[NEW]` Configurable **TBox** (see P5b below) - statuses, allowed
   values, relations are workspace-configurable.
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
-**Current state:** `Entity.status` is a free `string` defaulted to `active`;
+**Current state:** `Individual.status` is a free `string` defaulted to `active`;
 status options are hard-coded in a stub UI. Nothing configurable.
 
 - P5b.1 `[NEW]` Configurable **status sets** per TBox (e.g. Suspected →
@@ -231,7 +233,7 @@ status options are hard-coded in a stub UI. Nothing configurable.
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
 **Current state:** Case-management UI is **stubs with no backend**:
 `ActivityBlock` (comments) calls `notifyNotImplemented`; `StatusPill` is a
-hard-coded combobox with no persistence; `Entity.assignedTo` column exists with
+hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
 no writer/UI. Greenfield.
 
 - P5c.1 `[NEW]` **LLM-configurable case types**: describe a domain in natural
@@ -245,7 +247,7 @@ no writer/UI. Greenfield.
   (P5b.1); status change history.
 - P5c.5 `[NEW]` **Activity/audit log** (status changes, assignments, edits).
 - P5c.6 `[NEW]` ABox **list/grid view** with filtering by status/assignee
-  (today there's only a virtualized navbar + single-entity detail).
+  (today there's only a virtualized navbar + single-individual detail).
 - P5c.7 `[NEW]` Manual case creation + edit (uses P5.4 manual_entry).
 - P5c.8 `[NEW]` Notifications for assignment/mention/status change (reuse email
   client / in-app).
@@ -352,7 +354,7 @@ publishing exists (`is_public` + parquet copy to public bucket + slices).
 - P8.13 `[NEW]` **Internal private dashboards** UX (product side of P3.4):
   create/share a dashboard visible only to me or a group, cleanly separate from
   "publish public". Uses `ShareResourceModal` + `is_restricted`.
-- P8.14 `[NEW]` ABox/entity and open-data sources as DataViz inputs (from P2).
+- P8.14 `[NEW]` ABox and open-data sources as DataViz inputs (from P2).
 - P8.15 `[FIX]` Publishing hardening for new source types (Sheets/Postgres/ABox
   slices to public bucket).
 - `[Depends on: P8.1 for P8.4/P8.5/P8.9; P2 for P8.14; P3 for P8.13]`
@@ -521,7 +523,7 @@ even if later, deeper items are still stabilizing on demo day. Land these first:
 3. **Guests, minimal (P4.1–P4.4)** - view-only guest to a single dashboard.
    High demo value ("invite a field partner to just this dashboard").
 4. **Case management thin slice (P5c.1 lite, P5c.2, P5c.3, P5c.4 with P5b.1)** -
-   comments + assignment + configurable statuses on entities, LLM-generated
+   comments + assignment + configurable statuses on individuals, LLM-generated
    case type for the cholera example. Backend-wire the existing stubs.
 5. **GIS points, cleaned up (P7.1) + plot cases/dataset on a map** - drop
    choropleth/multi-layer for the demo; a clean point map of cases is enough.

@@ -9,9 +9,9 @@
  * DuckDB-specific code path and so callers can override identifier quoting
  * or knex options independently.
  */
-import { Model } from "@avandar/models";
 import {
   makeIdLookupMap,
+  makeObject,
   objectEntries,
   objectValues,
   prop,
@@ -24,30 +24,58 @@ import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/Q
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
-import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts";
+import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import { match } from "ts-pattern";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 import type { Knex } from "knex";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
+/**
+ * The name to sort by, which has to be exactly the name the SELECT list
+ * emitted for that column.
+ *
+ * A query carries each column's aggregation twice: once in the query's
+ * `aggregations` map, keyed by column id, and once on the column itself as
+ * `QueryColumn.aggregation`. Everything else in this emitter reads the map,
+ * including the aliases it emits for aggregated columns, but
+ * `QueryColumn.getDerivedColumnName` reads the column's own field. Nothing
+ * keeps the two copies equal, so when only the map carries an aggregation the
+ * SELECT list aliases `sum(cnt)` while the ORDER BY names the bare `cnt`,
+ * which is neither grouped nor aggregated, and DuckDB rejects the statement.
+ *
+ * So the aggregation is taken from the map here too, and the alias is still
+ * spelled by `getDerivedColumnName` rather than by a second copy of the
+ * naming rule. The map is the source of truth because it is what the SELECT
+ * side already acts on; unifying the other way round would mean teaching
+ * every consumer of `getDerivedColumnName` to carry the map.
+ */
+function _getOrderByColumnName(
+  column: QueryColumn.T,
+  aggregations: PartialStructuredQuery["aggregations"],
+): string {
+  return QueryColumn.getDerivedColumnName({
+    ...column,
+    aggregation: aggregations[column.id],
+  });
+}
+
 export function structuredQueryToSql(
   query: PartialStructuredQuery,
-  { castTimestampsToISO = false }: StructuredQueryToSqlOptions = {},
+  {
+    castTimestampsToISO = false,
+    columnTypes,
+  }: StructuredQueryToSqlOptions = {},
 ): string {
   if (query.dataSource === undefined && query.nestedSubquery === undefined) {
     return "";
-  }
-
-  if (
-    query.dataSource !== undefined &&
-    Model.isOfModelType(query.dataSource, "EntityConfig")
-  ) {
-    throw new Error("Querying EntityConfigs through DuckDB is not supported.");
   }
 
   const {
@@ -67,10 +95,27 @@ export function structuredQueryToSql(
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+
+  // Column types the filter renderer uses for typed literals. Built from the
+  // query's own columns and overlaid with any caller-supplied types.
+  const effectiveColumnTypes: QueryFilterColumnTypes = {
+    ...makeObject(queryColumns, {
+      keyFn: prop("baseColumn.name"),
+      valueFn: prop("baseColumn.dataType"),
+    }),
+    ...(columnTypes ?? {}),
+  };
   const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
     key: "id",
   });
-  const tableName = nestedSubquery ? undefined : dataSource?.id;
+  // A dataset's table name is still its bare id, so stored SQL and bookmarked
+  // `?sql=` URLs are unaffected; a concept resolves to its `concept_` prefixed
+  // view. `RelationRef` owns both spellings, so this emitter never builds a
+  // table name itself.
+  const tableName =
+    nestedSubquery || dataSource === undefined ?
+      undefined
+    : RelationRef.toTableName(makeRelationRefFromQueryDataSource(dataSource));
 
   const groupByColumnNames = [] as string[];
   const atLeastOneColumnHasAggregation = objectValues(aggregations).some(
@@ -81,21 +126,27 @@ export function structuredQueryToSql(
   objectEntries(aggregations).forEach(([columnId, aggregation]) => {
     const column = queryColumnLookup.get(columnId);
 
-    if (Model.isOfModelType(column?.baseColumn, "DatasetColumn")) {
-      if (aggregation !== "group_by" && aggregation !== "none") {
-        duckDbAggregations[column.baseColumn.name] = aggregation;
-      } else {
-        if (atLeastOneColumnHasAggregation || aggregation === "group_by") {
-          groupByColumnNames.push(column.baseColumn.name);
-        }
-      }
+    // Any base column at all, not only a `DatasetColumn`. This used to narrow
+    // to `DatasetColumn`, which meant a `ConceptAttribute` fell straight
+    // through and its group-by and its aggregate were silently dropped: the
+    // query still compiled and still returned plausible rows. Both kinds of
+    // base column carry a `name`, which is the only thing needed here, so
+    // there is nothing to narrow for.
+    if (column === undefined) {
+      return;
+    }
+
+    if (aggregation !== "group_by" && aggregation !== "none") {
+      duckDbAggregations[column.baseColumn.name] = aggregation;
+    } else if (atLeastOneColumnHasAggregation || aggregation === "group_by") {
+      groupByColumnNames.push(column.baseColumn.name);
     }
   });
 
   const selectColumnNames = sortedQueryColumns.map(prop("baseColumn.name"));
   const orderByColumnName =
     orderByColumn && queryColumnLookup.has(orderByColumn) ?
-      QueryColumn.getDerivedColumnName(queryColumnLookup.get(orderByColumn)!)
+      _getOrderByColumnName(queryColumnLookup.get(orderByColumn)!, aggregations)
     : undefined;
 
   const timestampColumnNames = queryColumns
@@ -140,7 +191,9 @@ export function structuredQueryToSql(
 
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
-    sqlQuery = applyFilters(sqlQuery, filters);
+    sqlQuery = applyFilters(sqlQuery, filters, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (groupByColumnNames.length > 0) {
@@ -150,7 +203,9 @@ export function structuredQueryToSql(
 
   // apply HAVING clause (after GROUP BY, before ORDER BY)
   if (!isEmptyQueryFilter(having)) {
-    sqlQuery = applyHaving(sqlQuery, having);
+    sqlQuery = applyHaving(sqlQuery, having, {
+      columnTypes: effectiveColumnTypes,
+    });
   }
 
   if (orderByColumnName && orderByDirection) {

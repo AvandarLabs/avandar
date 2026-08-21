@@ -1,0 +1,9 @@
+.measureReadout {
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-lg);
+  box-shadow: var(--mantine-shadow-md);
+  color: var(--mantine-color-text);
+  font-size: var(--mantine-font-size-sm);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}

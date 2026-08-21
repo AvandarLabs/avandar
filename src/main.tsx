@@ -5,6 +5,7 @@ import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
 import "@mantine/charts/styles.css";
 import "@/index.css";
+import "@/config/Theme/animationPresets.css";
 import { RouterProvider } from "@tanstack/react-router";
 import {
   ModuleRegistry as AGGridModuleRegistry,

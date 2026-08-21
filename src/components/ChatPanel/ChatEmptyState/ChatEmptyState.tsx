@@ -5,11 +5,11 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
@@ -24,6 +24,7 @@ function usePageLabel(app: ChatPageContext.ChatApp): string {
     "data-explorer": t`Data Explorer`,
     "data-sources": t`Data Sources`,
     dashboards: t`Dashboards`,
+    "case-manager": t`Case Manager`,
     other: t`Avandar`,
   });
 }
@@ -90,6 +91,8 @@ export function ChatEmptyState(): React.ReactNode {
         <Text size="md" fw={600} c="neutral.9">
           {context.app === "dashboards" ?
             <Trans>Build a chart in chat</Trans>
+          : context.app === "case-manager" ?
+            <Trans>Design case types in chat</Trans>
           : <Trans>Ask about your data</Trans>}
         </Text>
         <Text size="sm" c="neutral.6" lh={1.5}>
@@ -102,6 +105,11 @@ export function ChatEmptyState(): React.ReactNode {
             <Trans>
               Ask me to add a chart to this dashboard. I will pick a viz type,
               write the SQL, and drop a block onto the page.
+            </Trans>
+          : context.app === "case-manager" ?
+            <Trans>
+              I will propose case types from your dataset names and columns.
+              Pick from the options or tell me what to create.
             </Trans>
           : <Trans>
               Chat is enabled in the Data Explorer and Dashboards.{" "}

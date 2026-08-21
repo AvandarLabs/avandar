@@ -58,6 +58,25 @@
   }
 }
 
+.ava-animate-pop-in {
+  animation: ava-animate-pop-in var(--ava-animation-duration-pop-in)
+    var(--ava-animation-easing-pop) both;
+}
+
+@keyframes ava-animate-pop-in {
+  from {
+    filter: var(--ava-animate-pop-in-from-filter);
+    opacity: 0;
+    transform: var(--ava-animate-pop-in-from-transform);
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ava-animate-ooze-in {
     animation: ava-animate-ooze-in-reduced var(--ava-animation-duration-reduced)
@@ -67,6 +86,11 @@
   .ava-animate-swipe-out {
     animation: ava-animate-swipe-out-reduced
       var(--ava-animation-duration-reduced) ease forwards;
+  }
+
+  .ava-animate-pop-in {
+    animation: ava-animate-pop-in-reduced var(--ava-animation-duration-reduced)
+      ease both;
   }
 
   @keyframes ava-animate-ooze-in-reduced {
@@ -86,6 +110,16 @@
 
     to {
       opacity: 0;
+    }
+  }
+
+  @keyframes ava-animate-pop-in-reduced {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
     }
   }
 }

@@ -1,0 +1,50 @@
+.mapStatusCard {
+  align-items: flex-start;
+  background: var(--ava-surface-overlay);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+  display: flex;
+  font-size: 12px;
+  gap: var(--mantine-spacing-xs);
+  line-height: 1.45;
+  max-width: 440px;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+}
+
+.mapStatusCardIcon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.mapStatusCardIconDanger {
+  color: var(--mantine-color-danger-6);
+}
+
+.mapStatusCardIconWarning {
+  color: var(--mantine-color-warning-8);
+}
+
+.mapStatusCardIconInfo {
+  color: var(--mantine-color-dimmed);
+}
+
+.mapStatusCardTitle {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mapStatusCardBody {
+  color: var(--mantine-color-dimmed);
+  display: block;
+}
+
+.mapStatusCardActions {
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  margin-top: var(--mantine-spacing-xs);
+}
+
+.mapStatusCardDetails {
+  overflow-wrap: anywhere;
+}

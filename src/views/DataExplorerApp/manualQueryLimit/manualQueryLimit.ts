@@ -1,4 +1,4 @@
-import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 /** Default LIMIT shown for a brand-new manual query. */
@@ -37,8 +37,8 @@ export function shouldDefaultManualQueryLimit(
     query.orderByColumn === undefined &&
     query.orderByDirection === undefined &&
     !hasStructuredQueryAggregations(query) &&
-    isEmptyQueryFilter(query.filters) &&
-    isEmptyQueryFilter(query.having) &&
+    StructuredQuery.isEmptyFilter(query.filters) &&
+    StructuredQuery.isEmptyFilter(query.having) &&
     query.joins.length === 0
   );
 }
@@ -66,8 +66,8 @@ export function shouldAutoLimitLargeDataset(
 ): boolean {
   return (
     query.limit === undefined &&
-    isEmptyQueryFilter(query.filters) &&
-    isEmptyQueryFilter(query.having) &&
+    StructuredQuery.isEmptyFilter(query.filters) &&
+    StructuredQuery.isEmptyFilter(query.having) &&
     !hasStructuredQueryAggregations(query)
   );
 }

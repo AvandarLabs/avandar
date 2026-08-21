@@ -13,6 +13,8 @@
  * Google's system. This is the ID you see in the URL when viewing a google
  * sheet)
  * @param p_rows_to_skip: The number of rows to skip
+ * @param p_sheet_name: The spreadsheet tab that backs this dataset (nullable
+ * wrapper). Null means the first tab in the workbook.
  *
  * @returns: The created dataset
  */
@@ -24,7 +26,8 @@ create or replace function public.rpc_datasets__add_google_sheets_dataset (
   p_columns public.dataset_column_input[],
   p_google_account_id text,
   p_google_document_id text,
-  p_rows_to_skip integer default 0
+  p_rows_to_skip integer default 0,
+  p_sheet_name public.util__nullable_text default null
 ) returns public.datasets as $$
 declare
   v_dataset public.datasets;
@@ -43,13 +46,15 @@ begin
     workspace_id,
     google_account_id,
     google_document_id,
-    rows_to_skip
+    rows_to_skip,
+    sheet_name
   ) values (
     v_dataset.id,
     p_workspace_id,
     p_google_account_id,
     p_google_document_id,
-    p_rows_to_skip
+    p_rows_to_skip,
+    p_sheet_name.value
   );
 
   return v_dataset;

@@ -1,0 +1,74 @@
+.mapLegendGroup + .mapLegendGroup {
+  border-top: 1px solid var(--ava-border-default);
+  margin-top: var(--mantine-spacing-xs);
+  padding-top: var(--mantine-spacing-xs);
+}
+
+.mapLegendGroupTitle {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mapLegendGroupUnits {
+  color: var(--mantine-color-dimmed);
+  font-size: 11px;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+.mapLegendGroupList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mapLegendGroupSized {
+  align-items: start;
+  display: grid;
+  gap: var(--mantine-spacing-sm);
+  grid-template-columns: minmax(140px, 1fr) auto;
+}
+
+.mapLegendGroupItem {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  gap: var(--mantine-spacing-xs);
+}
+
+.mapLegendGroupKey {
+  border: 1px solid var(--ava-surface-overlay);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--ava-border-strong);
+  flex: none;
+  height: 14px;
+  width: 14px;
+}
+
+.mapLegendGroupKeyNoData {
+  background-color: var(--mantine-color-gray-4);
+}
+
+.mapLegendGroupKeySuppressed {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 3px,
+    rgb(255 255 255 / 70%) 3px,
+    rgb(255 255 255 / 70%) 5px
+  );
+  border-radius: 2px;
+}
+
+.mapLegendGroupCount {
+  color: var(--mantine-color-dimmed);
+  margin-left: auto;
+  padding-left: var(--mantine-spacing-xs);
+}
+
+[data-mantine-color-scheme="dark"] .mapLegendGroupKeyNoData {
+  background-color: var(--mantine-color-gray-7);
+}

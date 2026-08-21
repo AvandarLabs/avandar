@@ -1,0 +1,4 @@
+.annotateMapToolSubCluster {
+  display: flex;
+  gap: var(--mantine-spacing-xxxs);
+}

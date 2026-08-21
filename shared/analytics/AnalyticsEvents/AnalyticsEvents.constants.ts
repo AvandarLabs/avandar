@@ -21,12 +21,18 @@ export const CLIENT_ANALYTICS_EVENT_NAMES = [
   "query.failed",
   "dashboard.published",
   "dashboard.share_settings_updated",
+  "dashboard.unpublished",
   "dashboard.block_added_via_chat",
   "dashboard.filter_changed",
   "dashboard.pdf_export_opened",
   "dashboard.pdf_exported",
   "chat.message_sent",
   "chat.sql_generated",
+  "nux.started",
+  "nux.milestone_completed",
+  "nux.dismissed",
+  "nux.completed",
+  "nux.restarted",
 ] as const;
 
 /**
@@ -65,8 +71,3 @@ export const ANALYTICS_EVENT_NAMES = [
   ...SERVER_ANALYTICS_EVENT_NAMES,
   ...DB_ANALYTICS_EVENT_NAMES,
 ] as const;
-
-// `dashboard.unpublished` is deliberately absent from every list above: no
-// unpublish flow exists. `DashboardClient.usePublishDashboard` only ever writes
-// `isPublic: true`, and the publish modal offers only Cancel and Publish. Add
-// it back only alongside a real unpublish flow.

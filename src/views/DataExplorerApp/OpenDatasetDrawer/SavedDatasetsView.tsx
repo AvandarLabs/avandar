@@ -17,7 +17,7 @@ import { IconSearch, IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -41,6 +41,7 @@ function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
   return {
     csv_file: t`CSV`,
     xlsx_file: t`Excel`,
+    pdf_file: t`PDF`,
     google_sheets: t`Google Sheets`,
     open_data: t`Open data`,
     virtual: t`Derived`,
@@ -150,9 +151,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       .with("virtual", () => {
         loadVirtualDataset(selectedDataset);
       })
-      .with("csv_file", "xlsx_file", "google_sheets", "open_data", () => {
-        openAsRawPreview(selectedDataset);
-      })
+      .with(
+        "csv_file",
+        "xlsx_file",
+        "pdf_file",
+        "google_sheets",
+        "open_data",
+        () => {
+          openAsRawPreview(selectedDataset);
+        },
+      )
       .exhaustive();
   };
 

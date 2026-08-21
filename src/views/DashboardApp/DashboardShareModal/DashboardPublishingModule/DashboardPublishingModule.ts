@@ -1,0 +1,129 @@
+import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
+/** Which publication state each General access value asks for. */
+const _TARGET_VISIBILITY_BY_ACCESS_VALUE = {
+  private: "draft",
+  restricted: "workspace",
+  workspace: "workspace",
+  public: "public",
+} as const satisfies Record<GeneralAccessValue, Dashboard.Visibility>;
+
+/** What the modal's primary button does next. */
+export type PublishActionKind =
+  | "publish_workspace"
+  | "publish_public"
+  | "republish"
+  | "make_internal"
+  | "unpublish"
+  | "disabled_no_audience";
+
+/**
+ * Which publication state a General access value asks for.
+ *
+ * "Only me" targets `draft` on purpose: publishing keeps a snapshot object and
+ * a live URL alive, and doing that for an audience of one is storage and risk
+ * with no reader. "Restricted" targets `workspace` because a restricted but
+ * published dashboard is exactly the internal-report-for-three-people shape
+ * this feature was asked for.
+ */
+function _getTargetVisibilityFromGeneralAccessValue(
+  value: GeneralAccessValue,
+): Dashboard.Visibility {
+  return _TARGET_VISIBILITY_BY_ACCESS_VALUE[value];
+}
+
+/**
+ * The publish target the modal should open on, given what is already true of
+ * the dashboard.
+ *
+ * A published dashboard opens on its persisted visibility, so a public
+ * dashboard shows "Anyone with the link". A draft opens on the General access
+ * shape already persisted: unrestricted drafts are workspace-shared (the
+ * insert default), so Publish is enabled without making the user re-select
+ * the option the dropdown is already showing. Restricted drafts stay draft
+ * until someone picks an audience, because "Only me" has none.
+ */
+function _getInitialTargetVisibility(
+  dashboard: Readonly<{
+    visibility: Dashboard.Visibility;
+    isRestricted: boolean;
+  }>,
+): Dashboard.Visibility {
+  if (dashboard.visibility !== "draft") {
+    return dashboard.visibility;
+  }
+  return _getTargetVisibilityFromGeneralAccessValue(
+    dashboard.isRestricted ? "private" : "workspace",
+  );
+}
+
+/**
+ * Resolves the primary action from what is persisted and what the dropdown
+ * currently asks for.
+ *
+ * Every kind except `unpublish` and `disabled_no_audience` calls
+ * `publishDashboard` with the target visibility; the kinds differ only in the
+ * label, because "Publish", "Update & republish", and "Make internal" are three
+ * very different sentences for the same call.
+ */
+function _getPublishActionKindFromVisibilities(
+  options: Readonly<{
+    visibility: Dashboard.Visibility;
+    targetVisibility: Dashboard.Visibility;
+  }>,
+): PublishActionKind {
+  if (options.targetVisibility === "draft") {
+    return options.visibility === "draft" ?
+        "disabled_no_audience"
+      : "unpublish";
+  }
+  if (options.visibility === options.targetVisibility) {
+    return "republish";
+  }
+  if (options.targetVisibility === "public") {
+    return "publish_public";
+  }
+  return options.visibility === "public" ?
+      "make_internal"
+    : "publish_workspace";
+}
+
+/** Stateless mappings between General access, visibility, and the action. */
+export const DashboardPublishingModule = {
+  /**
+   * Which publication state a General access value asks for.
+   *
+   * "Only me" targets `draft` on purpose: publishing keeps a snapshot object
+   * and a live URL alive, and doing that for an audience of one is storage and
+   * risk with no reader. "Restricted" targets `workspace` because a restricted
+   * but published dashboard is exactly the
+   * internal-report-for-three-people shape this feature was asked for.
+   */
+  getTargetVisibilityFromGeneralAccessValue:
+    _getTargetVisibilityFromGeneralAccessValue,
+
+  /**
+   * The publish target the modal should open on, given what is already true of
+   * the dashboard.
+   *
+   * A published dashboard opens on its persisted visibility, so a public
+   * dashboard shows "Anyone with the link". A draft opens on the General access
+   * shape already persisted: unrestricted drafts are workspace-shared (the
+   * insert default), so Publish is enabled without making the user re-select
+   * the option the dropdown is already showing. Restricted drafts stay draft
+   * until someone picks an audience, because "Only me" has none.
+   */
+  getInitialTargetVisibility: _getInitialTargetVisibility,
+
+  /**
+   * Resolves the primary action from what is persisted and what the dropdown
+   * currently asks for.
+   *
+   * Every kind except `unpublish` and `disabled_no_audience` calls
+   * `publishDashboard` with the target visibility; the kinds differ only in the
+   * label, because "Publish", "Update & republish", and "Make internal" are
+   * three very different sentences for the same call.
+   */
+  getPublishActionKindFromVisibilities: _getPublishActionKindFromVisibilities,
+} as const;

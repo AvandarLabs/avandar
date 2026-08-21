@@ -1,0 +1,78 @@
+.nuxCompletionModalHeader {
+  justify-content: center;
+  padding-bottom: 0;
+}
+
+.nuxCompletionModalTitle {
+  font-size: var(--mantine-h3-font-size);
+  font-weight: 600;
+  text-align: center;
+  text-wrap: balance;
+  width: 100%;
+}
+
+.nuxCompletionModalBody {
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+.nuxCompletionModalStage {
+  display: grid;
+  height: 6.25rem;
+  place-items: center;
+  position: relative;
+  width: 6.25rem;
+}
+
+.nuxCompletionModalRing {
+  animation: nux-completion-ring 900ms var(--ava-animation-easing-out) both;
+  border: 2px solid
+    color-mix(in srgb, var(--mantine-color-primary-6) 50%, transparent);
+  border-radius: 999px;
+  height: 4.25rem;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4.25rem;
+}
+
+.nuxCompletionModalRingLate {
+  animation-delay: 160ms;
+}
+
+.nuxCompletionModalSeal {
+  align-items: center;
+  background: var(--mantine-color-primary-6);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 0.55rem
+      color-mix(in srgb, var(--mantine-color-primary-6) 16%, transparent),
+    0 12px 28px rgb(15 23 42 / 18%);
+  color: var(--mantine-color-white);
+  display: flex;
+  height: 4.25rem;
+  justify-content: center;
+  position: relative;
+  width: 4.25rem;
+  z-index: 1;
+}
+
+@keyframes nux-completion-ring {
+  0% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nuxCompletionModalRing {
+    display: none;
+  }
+}

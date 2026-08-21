@@ -1,0 +1,11 @@
+.pane {
+  align-self: stretch;
+  background: var(--ava-surface-raised);
+  border-right: 1px solid var(--ava-border-default);
+  min-height: 0;
+}
+
+.list {
+  min-height: 0;
+  position: relative;
+}

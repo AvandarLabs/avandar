@@ -1,17 +1,34 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { UserClient } from "@/clients/UserClient";
 import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
-import type {
-  DashboardId,
-  DashboardRead,
-} from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
+/** Renders the dashboard editor for users with at least editor access. */
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/dashboards/edit/$dashboardId",
 )({
-  loader: async ({ params }): Promise<{ dashboard: DashboardRead }> => {
+  beforeLoad: async ({ params }) => {
+    const canEdit = await UserClient.canAccessResource({
+      resourceType: "dashboard",
+      resourceId: params.dashboardId,
+      minRole: "editor",
+    });
+
+    if (!canEdit) {
+      throw redirect({
+        to: "/$workspaceSlug/dashboards/preview/$dashboardId",
+        params: {
+          workspaceSlug: params.workspaceSlug,
+          dashboardId: params.dashboardId,
+        },
+        replace: true,
+      });
+    }
+  },
+  loader: async ({ params }) => {
     const dashboard = await DashboardClient.getById({
-      id: params.dashboardId as DashboardId,
+      id: params.dashboardId as Dashboard.Id,
     });
 
     if (!dashboard) {
@@ -25,9 +42,7 @@ export const Route = createFileRoute(
 
 function DashboardEditorPage(): JSX.Element {
   const { workspaceSlug } = Route.useParams();
-  const { dashboard } = Route.useLoaderData() as {
-    dashboard: DashboardRead;
-  };
+  const { dashboard } = Route.useLoaderData();
   return (
     <DashboardEditorView dashboard={dashboard} workspaceSlug={workspaceSlug} />
   );

@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
+import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -65,13 +66,13 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       insertCsvFileDataset: vi.fn(),
-      useGetAll: vi.fn(() => {
+      useGetAll: (): [[], boolean] => {
         return [[], false];
-      }),
+      },
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];
@@ -322,5 +323,61 @@ describe("ManualUploadView", () => {
     await waitFor(() => {
       expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
     });
+  });
+
+  it("stops the upload and reparse spinners after an initialFile sniff finishes", async () => {
+    const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
+    const file = new File([csvBuffer], "preloaded.csv", {
+      type: "text/csv",
+    });
+
+    renderWithProviders(
+      <StrictMode>
+        <ManualUploadView initialFile={file} />
+      </StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: "Upload" })).not.toHaveAttribute(
+      "data-loading",
+      "true",
+    );
+    expect(
+      screen.getByRole("button", { name: "Process data again" }),
+    ).not.toHaveAttribute("data-loading", "true");
+  });
+
+  it("does not keep the Upload button loading while a reparse is in flight", async () => {
+    const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
+    const file = new File([csvBuffer], "preloaded.csv", {
+      type: "text/csv",
+    });
+
+    renderWithProviders(<ManualUploadView initialFile={file} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+    });
+
+    startCsvImportMock.mockImplementation(() => {
+      return new Promise(() => {
+        return undefined;
+      });
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Process data again" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Process data again" }),
+      ).toHaveAttribute("data-loading", "true");
+    });
+    expect(screen.getByRole("button", { name: "Upload" })).not.toHaveAttribute(
+      "data-loading",
+      "true",
+    );
   });
 });

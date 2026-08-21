@@ -15,6 +15,7 @@ import type {
   DuckDbLoadXlsxResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type {
+  LocalDataset,
   LocalDatasetCsvParseOptions,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
@@ -37,7 +38,8 @@ async function _reconcileColumns(params: {
 }): Promise<{ changedCount: number }> {
   // Lazy import to avoid a circular module load; these clients pull in
   // LocalDatasetClient transitively for cloud-fetch fallbacks.
-  const { DatasetClient } = await import("@/clients/datasets/DatasetClient");
+  const { DatasetClient } =
+    await import("@/clients/datasets/DatasetClient/DatasetClient");
   const { DatasetColumnClient } =
     await import("@/clients/datasets/DatasetColumnClient");
 
@@ -96,6 +98,40 @@ async function _reconcileColumns(params: {
 }
 
 /**
+ * Builds the Dexie update applied once the parquet transcode succeeds.
+ *
+ * For a pinned row (a retained original, e.g. a PDF) `sourceBytes` must be
+ * left untouched, which means the key has to be omitted from the update
+ * object entirely: Dexie's `update()` treats an explicitly-passed
+ * `undefined` value as an instruction to delete that key from the stored
+ * row, so including `sourceBytes: undefined` here would destroy exactly the
+ * bytes we're supposed to protect. For an unpinned row `sourceBytes` was
+ * only ever a resume cache, so it's cleared now that the parquet has landed.
+ */
+export function makeTranscodeCompletionUpdateFromParquet(params: {
+  parquetData: Blob;
+  isSourcePinned: boolean | undefined;
+}): Partial<LocalDataset> {
+  const base = {
+    parquetData: params.parquetData,
+    parseStatus: "ready" as const,
+    parseFailedReason: undefined,
+  };
+
+  if (params.isSourcePinned) {
+    return base;
+  }
+
+  return {
+    ...base,
+    // Drop the cached source bytes now that the parquet has landed; we no
+    // longer need them for resume.
+    sourceBytes: undefined,
+    lastSourceAccessedAt: undefined,
+  };
+}
+
+/**
  * The background parquet transcoding engine. Updates the
  * LocalDataset row through its parsing → ready lifecycle, drives the
  * DuckDB transcode,
@@ -139,17 +175,17 @@ export async function runBackgroundParquetTranscoding(params: {
           file: params.source.file,
           sheet: params.source.options.sheet,
           hasHeader: params.source.options.hasHeader,
+          rowsToSkip: params.source.options.rowsToSkip,
         });
 
-    await AvaDexie.DB.LocalDataset.update(datasetId, {
-      parquetData: result.parquetData,
-      parseStatus: "ready",
-      parseFailedReason: undefined,
-      // Drop the cached source bytes now that the parquet has landed;
-      // we no longer need them for resume.
-      sourceBytes: undefined,
-      lastSourceAccessedAt: undefined,
-    });
+    const currentRow = await AvaDexie.DB.LocalDataset.get(datasetId);
+    await AvaDexie.DB.LocalDataset.update(
+      datasetId,
+      makeTranscodeCompletionUpdateFromParquet({
+        parquetData: result.parquetData,
+        isSourcePinned: currentRow?.isSourcePinned,
+      }),
+    );
 
     const { changedCount } = await _reconcileColumns({
       datasetId,

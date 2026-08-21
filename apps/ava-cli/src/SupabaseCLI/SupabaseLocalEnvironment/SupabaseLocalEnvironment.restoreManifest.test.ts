@@ -6,7 +6,7 @@ import {
   ORIGINAL_ENV,
   PROJECT_ROOT,
   SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO";
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";

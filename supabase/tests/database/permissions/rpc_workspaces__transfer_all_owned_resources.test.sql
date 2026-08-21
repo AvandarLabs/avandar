@@ -37,10 +37,10 @@ values
   ('a9003003-0000-4000-8000-000000000003'::uuid, 'a9000003-0000-4000-8000-000000000003'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9002003-0000-4000-8000-000000000003'::uuid, 'A9 Target', 'A9 Target');
 
 -- The leaver owns two dashboards and one dataset.
-insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, is_public)
+insert into public.dashboards (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted, visibility)
 values
-  ('a9005001-0000-4000-8000-000000000001'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9000001-0000-4000-8000-000000000001'::uuid, 'a9003001-0000-4000-8000-000000000001'::uuid, 'p1', '{}'::jsonb, true, false),
-  ('a9005002-0000-4000-8000-000000000002'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9000001-0000-4000-8000-000000000001'::uuid, 'a9003001-0000-4000-8000-000000000001'::uuid, 'p2', '{}'::jsonb, false, false);
+  ('a9005001-0000-4000-8000-000000000001'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9000001-0000-4000-8000-000000000001'::uuid, 'a9003001-0000-4000-8000-000000000001'::uuid, 'p1', '{}'::jsonb, true, 'draft'),
+  ('a9005002-0000-4000-8000-000000000002'::uuid, 'a9001001-0000-4000-8000-000000000001'::uuid, 'a9000001-0000-4000-8000-000000000001'::uuid, 'a9003001-0000-4000-8000-000000000001'::uuid, 'p2', '{}'::jsonb, false, 'draft');
 
 insert into public.datasets (id, workspace_id, owner_id, owner_profile_id, name, source_type, is_restricted)
 values (
@@ -53,7 +53,45 @@ values (
   true
 );
 
-select plan(6);
+insert into public.maps (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted)
+values (
+  'a9009001-0000-4000-8000-000000000001'::uuid,
+  'a9001001-0000-4000-8000-000000000001'::uuid,
+  'a9000001-0000-4000-8000-000000000001'::uuid,
+  'a9003001-0000-4000-8000-000000000001'::uuid,
+  'map1',
+  '{}'::jsonb,
+  true
+);
+
+select plan(11);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'authenticated can execute the bulk ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'anon cannot execute the bulk ownership-transfer RPC'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.rpc_workspaces__transfer_all_owned_resources(uuid,uuid,uuid)',
+    'EXECUTE'
+  ),
+  'service_role cannot execute the bulk ownership-transfer RPC'
+);
 
 set local role authenticated;
 
@@ -69,7 +107,7 @@ select is(
     'a9000001-0000-4000-8000-000000000001'::uuid,
     'a9000003-0000-4000-8000-000000000003'::uuid
   ),
-  3,
+  4,
   'returns the number of resources moved'
 );
 
@@ -100,10 +138,31 @@ select is(
 select is(
   (
     select count(*)::int
+    from public.maps
+    where workspace_id = 'a9001001-0000-4000-8000-000000000001'::uuid
+      and owner_id = 'a9000001-0000-4000-8000-000000000001'::uuid
+  ),
+  0,
+  'the leaver owns no maps afterwards'
+);
+
+select is(
+  (
+    select owner_profile_id
+    from public.maps
+    where id = 'a9009001-0000-4000-8000-000000000001'::uuid
+  ),
+  'a9003003-0000-4000-8000-000000000003'::uuid,
+  'bulk map transfer updates owner_profile_id too'
+);
+
+select is(
+  (
+    select count(*)::int
     from public.usage_analytics_events
     where event_name = 'resource.ownership_transferred'
   ),
-  3,
+  4,
   'one audit row per transferred resource'
 );
 

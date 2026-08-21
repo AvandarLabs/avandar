@@ -48,31 +48,22 @@ create table public.usage_analytics_events (
   app_version text
 );
 
-create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (
-  workspace_id,
-  created_at desc
-);
+create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (workspace_id, created_at desc);
 
-create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (
-  event_name,
-  created_at desc
-);
+create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (event_name, created_at desc);
 
-create index usage_analytics_events__event_category__created_at_idx on public.usage_analytics_events (
-  event_category,
-  created_at desc
-);
+create index usage_analytics_events__event_category__created_at_idx on public.usage_analytics_events (event_category, created_at desc);
 
 alter table public.usage_analytics_events enable row level security;
 
 -- Browser-authenticated clients may set only event fields. Database-owned
 -- identity, time, and category columns keep their defaults or trigger values.
--- Column privileges are declared here because table-level INSERT would let a
--- caller backdate events and pollute time-series reporting.
-revoke insert on table public.usage_analytics_events
-from
-  authenticated;
-
+-- The INSERT grant is column-scoped rather than table-level because a
+-- table-level INSERT would let a caller backdate events, set their own
+-- `event_category`, and pollute time-series reporting.
+--
+-- `id`, `created_at`, and `event_category` are deliberately absent from the
+-- list: a column left out of a column-scoped grant cannot be written at all.
 grant insert (
   workspace_id,
   user_id,
@@ -82,6 +73,24 @@ grant insert (
   client,
   app_version
 ) on public.usage_analytics_events to authenticated;
+
+-- SELECT is table-level, stated here alongside the column-level INSERT above
+-- so this table's whole privilege story stays in one place. The "Workspace
+-- managers can SELECT analytics events" policy below narrows it to a caller's
+-- own workspaces.
+--
+-- No UPDATE or DELETE for any Data API role: an event is an immutable fact, and
+-- the only writer is the column-scoped INSERT above.
+grant
+select
+  on table public.usage_analytics_events to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.usage_analytics_events to service_role;
 
 -- INSERT: authenticated clients may record only browser-owned event names as
 -- themselves. Database and server emitters use privileged writers that bypass
@@ -94,10 +103,7 @@ with
       select
         auth.uid ()
     ) and
-    client in (
-      'web',
-      'desktop'
-    ) and
+    client in ('web', 'desktop') and
     event_name in (
       'dataset.imported',
       'query.ran',
@@ -109,7 +115,12 @@ with
       'dashboard.pdf_export_opened',
       'dashboard.pdf_exported',
       'chat.message_sent',
-      'chat.sql_generated'
+      'chat.sql_generated',
+      'nux.started',
+      'nux.milestone_completed',
+      'nux.dismissed',
+      'nux.completed',
+      'nux.restarted'
     ) and
     (
       workspace_id is null or
@@ -156,9 +167,7 @@ select
 --
 -- @param p_event_name: the event's stable name
 -- @returns: the event's funnel stage
-create or replace function public.util__analytics_event_category (
-  p_event_name text
-) returns public.usage_analytics_events__category as $$
+create or replace function public.util__analytics_event_category (p_event_name text) returns public.usage_analytics_events__category as $$
   select (
     case p_event_name
       -- acquisition
@@ -169,6 +178,15 @@ create or replace function public.util__analytics_event_category (
       when 'dataset.imported' then 'activation'
       when 'query.ran' then 'activation'
       when 'dashboard.published' then 'activation'
+      -- Every nux event is an activation-funnel signal, including the two
+      -- negative ones: a dismissal is a drop-off inside activation, and a
+      -- restart is a re-entry into it. Filing them elsewhere would split one
+      -- funnel across two categories.
+      when 'nux.started' then 'activation'
+      when 'nux.milestone_completed' then 'activation'
+      when 'nux.dismissed' then 'activation'
+      when 'nux.completed' then 'activation'
+      when 'nux.restarted' then 'activation'
       -- engagement
       when 'user.signed_in' then 'engagement'
       when 'chat.message_sent' then 'engagement'

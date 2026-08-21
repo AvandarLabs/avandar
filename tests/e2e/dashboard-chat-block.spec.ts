@@ -1,9 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
-} from "./helpers/constants";
+import { CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 
 /**
@@ -85,10 +82,9 @@ test.describe("dashboard chat → P-block", () => {
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
       .click();
-    await expect(
-      page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
-    void CALIFORNIA_CSV_EXPECTED_ROW_COUNT;
+    await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+      timeout: LONG_WAIT,
+    });
 
     // Create a fresh dashboard.
     await page.goto(`/${e2eWorkerDb.workspaceSlug}/dashboards`);
@@ -101,10 +97,9 @@ test.describe("dashboard chat → P-block", () => {
       { timeout: LONG_WAIT },
     );
 
-    // Open the chat panel. The toggle in the AppToolbar is labelled
-    // "Open chat panel" when collapsed (see ChatAsideToggle); a fresh browser
-    // context always starts collapsed.
-    const chatToggle = page.getByRole("button", { name: /open chat panel/i });
+    // Open the chat panel. The toolbar toggle is labelled "Chat"
+    // (see ChatAsideToggle); a fresh browser context always starts collapsed.
+    const chatToggle = page.getByRole("button", { name: /^chat$/i });
     if (await chatToggle.isVisible()) {
       await chatToggle.click();
     }

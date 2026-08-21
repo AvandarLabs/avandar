@@ -225,12 +225,10 @@ test.describe("workspace deletion", () => {
   // fixture makes the secondary user a member (so RLS lets them read the
   // workspace row and the owner check is what rejects them, not RLS).
   //
-  // NOTE: the guard throws `AvaHTTPError(FORBIDDEN)`, but the response
-  // status is 401, not 403, because `authMiddleware` currently collapses
-  // every handler error to 401 (see
-  // https://github.com/AvandarLabs/avandar/issues/267). We assert the
-  // current behavior plus the owner-only message so this still proves the
-  // guard fired; tighten to 403 once #267 is fixed.
+  // The guard throws `AvaHTTPError(FORBIDDEN)` and the response now carries
+  // that status: `authMiddleware` hands the error itself to `responseError`
+  // instead of stringifying it first, so an `AvaHTTPError`'s own code
+  // survives (issue #267).
   test("rejects a non-owner member", async ({
     e2eWorkerDb,
     e2eViewerMembership,
@@ -260,10 +258,10 @@ test.describe("workspace deletion", () => {
       },
     );
 
-    // 401 (not 403) is the current behavior - see issue #267. The message
-    // proves the owner-only guard is what rejected the call, not a generic
-    // auth failure.
-    expect(response.status).toBe(401);
+    // 403, not 401: the message proves the owner-only guard is what rejected
+    // the call, and the status proves the guard's own code reached the client
+    // rather than being collapsed into a generic auth failure.
+    expect(response.status).toBe(403);
     const responseBody = (await response.json()) as { error?: string };
     expect(responseBody.error).toContain(
       "Only the workspace owner can delete a workspace",

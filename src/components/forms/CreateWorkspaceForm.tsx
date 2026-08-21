@@ -6,7 +6,7 @@ import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { notifySuccess } from "@/utils/notifications/notify";
 import type { I18n } from "@lingui/core";
 

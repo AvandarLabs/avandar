@@ -14,17 +14,29 @@ create table public.datasets__google_sheets (
   -- if it is still associated to a dataset, otherwise the
   -- dataset will become inaccessible to the workspace.
   -- Ownership should be transferred to another google account first.
-  google_account_id text not null references public.tokens__google (
-    google_account_id
-  ) on update cascade on delete no action,
+  google_account_id text not null references public.tokens__google (google_account_id) on update cascade on delete no action,
   -- The google sheet id
   google_document_id text not null,
   -- Number of rows to skip at the start of the file
-  rows_to_skip integer not null default 0
+  rows_to_skip integer not null default 0,
+  -- Name of the spreadsheet tab that backs this relation. Nullable when the
+  -- default tab was used (e.g. the first tab in the workbook). Rows imported
+  -- before this column existed carry null, which is what they already read:
+  -- the import path took the first GRID tab.
+  sheet_name text
 );
 
 -- Enable row level security
 alter table public.datasets__google_sheets enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.datasets__google_sheets to authenticated,
+service_role;
 
 -- Policies
 create policy "User can select datasets__google_sheets in their workspace" on public.datasets__google_sheets for

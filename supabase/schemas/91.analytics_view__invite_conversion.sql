@@ -22,9 +22,7 @@ with
       (
         e.payload ->> 'inviteeAlreadyRegistered'
       )::boolean as invitee_already_registered,
-      (
-        e.payload ->> 'memberCountBefore'
-      )::int as member_count_before
+      (e.payload ->> 'memberCountBefore')::int as member_count_before
     from
       public.usage_analytics_events e
     where
@@ -37,9 +35,7 @@ with
       (
         e.payload ->> 'secondsFromInviteToAccept'
       )::numeric as seconds_to_accept,
-      (
-        e.payload ->> 'memberCountAfter'
-      )::int as member_count_after
+      (e.payload ->> 'memberCountAfter')::int as member_count_after
     from
       public.usage_analytics_events e
     where

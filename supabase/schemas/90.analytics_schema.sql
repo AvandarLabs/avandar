@@ -10,19 +10,38 @@
 --    which is what lets them read past RLS for the service role. A view in
 --    `public` without `security_invoker` would bypass RLS *and* be served by
 --    PostgREST, which is the combination this schema exists to avoid.
--- 3. `anon` and `authenticated` are granted nothing here. The revokes below are
---    no-ops on a fresh schema, since Postgres 15 grants a new schema to nobody,
---    and they are written out anyway so the intent survives a future default
---    privilege being added.
+-- 3. `USAGE` is the only privilege ever granted on this schema, and it goes
+--    only to `service_role`. A newly created schema starts with no privileges
+--    for anyone but its owner, so there is nothing to revoke first.
 --
 -- Reads happen with the service role over a direct connection. There is no
 -- in-app reader and no platform-admin concept anywhere in this schema.
 create schema if not exists analytics;
 
-revoke all on schema analytics
-from
-  public,
-  anon,
-  authenticated;
-
+-- KNOWN DIFF ARTIFACT, not a defect to chase.
+--
+-- Every `supabase db diff` may emit a `drop view if exists` plus a
+-- `create or replace view` for all seven `analytics.*` views, even when nothing
+-- in this directory changed. A generated migration must not retain these
+-- statements unless a view definition intentionally changed.
+--
+-- They are semantically no-ops, and this was measured rather than assumed.
+-- The stored definitions are the same on both sides; the ONLY difference is
+-- schema qualification, which `pg_get_viewdef` decides at render time from
+-- `search_path` and does not store:
+--
+--   search_path = public, extensions
+--     -> from usage_analytics_events
+--   search_path = pg_catalog
+--     -> from public.usage_analytics_events
+--
+-- Rendered with `public` out of the path, the live definition is
+-- byte-identical to the one `db diff` wants to install. So the diff compares
+-- two renderings of one parse tree under different connection settings, not
+-- two different views, and no edit to the SQL below can change it.
+--
+-- A view recreation drops its object ACL, and `db diff` cannot see view
+-- grants at all (measured; see the skill). Both gaps are closed automatically
+-- by `pnpm db:new-migration`, which strips the no-op recreations and then
+-- appends whatever ACL the migration still owes. Neither needs hand-editing.
 grant usage on schema analytics to service_role;

@@ -1,7 +1,8 @@
 import { IconPencilPlus, IconUpload, IconUser } from "@tabler/icons-react";
 import { ReactNode } from "react";
-import { AppLink, AppLinkKey, AppLinks } from "@/config/AppLinks";
-import { NavbarLinks } from "@/config/NavbarLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
+import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
+import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
 
 /**
  * This is a link that shows up in the Spotlight (Cmd+K) and is used
@@ -57,18 +58,18 @@ export const SpotlightLinks = {
       spotlightDescription: "Go to the data explorer app",
     };
   },
-  entityDesignerHome: (workspaceSlug: string) => {
+  ontologyDesignerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesignerHome(workspaceSlug),
-      icon: NavbarLinks.entityDesignerHome(workspaceSlug).icon,
-      spotlightDescription: "Go to the entity designer app",
+      link: AppLinks.ontologyDesignerHome(workspaceSlug),
+      icon: NavbarLinks.ontologyDesignerHome(workspaceSlug).icon,
+      spotlightDescription: "Go to Case Manager",
     };
   },
-  entityDesignerCreatorView: (workspaceSlug: string) => {
+  ontologyDesignerCreatorView: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesignerCreatorView(workspaceSlug),
+      link: AppLinks.ontologyDesignerCreatorView(workspaceSlug),
       icon: <IconPencilPlus size={24} stroke={1.5} />,
-      spotlightDescription: "Go to the entity creator page",
+      spotlightDescription: "Go to the individual creator page",
     };
   },
 } as const satisfies SpotlightLinkRecord;

@@ -21,9 +21,9 @@ export enum FeatureFlag {
   DisableSelfRegistration = "disable-self-registration",
 
   /**
-   * Disable manual entity fields. Users are not allowed to manually change
-   * the values of entity fields. This will be removed once the feature is
-   * ready.
+   * Disable manually entered attributes. Users are not allowed to manually
+   * change the values of concept attributes. This will be removed once the
+   * feature is ready.
    */
   DisableManualData = "disable-manual-data",
 
@@ -58,6 +58,15 @@ export enum FeatureFlag {
    * spatial functions.
    */
   DisableDuckDbSpatial = "disable-duckdb-spatial",
+
+  /**
+   * Show the Isochrone map tool in the GIS cluster.
+   *
+   * The control stays a later-release disabled slot until the isochrone
+   * feature is implemented. Off by default so the toolbar only shows tools
+   * that work.
+   */
+  EnableGisIsochrone = "enable-gis-isochrone",
 }
 
 export const FeatureFlagConfig = {
@@ -67,6 +76,7 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableProfileManager]: undefined,
   [FeatureFlag.EnableUserFeedback]: undefined,
   [FeatureFlag.DisableDuckDbSpatial]: undefined,
+  [FeatureFlag.EnableGisIsochrone]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

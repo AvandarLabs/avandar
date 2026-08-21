@@ -1,193 +1,206 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Alert, Flex, Text } from "@mantine/core";
-import { Data, Puck } from "@puckeditor/core";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
+import { useLingui } from "@lingui/react/macro";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
-import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
+import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
-import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
-import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
-import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton";
+import { DashboardEditorContent } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorContent";
 import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
-import { useCallback, useEffect, useMemo } from "react";
-import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "./DashboardEditorView.constants";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { ReactElement } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
   workspaceSlug: string;
 };
-export function DashboardEditorView({
-  dashboard,
-  workspaceSlug,
-}: Props): ReactElement {
-  const { t, i18n } = useLingui();
-  const [appRoles] = useUserAppRoles();
-  const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
-  const { editorData, editorRevision, hasUnsavedChanges } =
-    DashboardEditorStateManager.useState();
 
-  const initialEditorData = useMemo(() => {
-    const dashboardConfigData = dashboard.config as AvaPageData;
-    return upgradeAvaPageData({
-      ...dashboardConfigData,
-      root: {
-        ...dashboardConfigData.root,
-        props: {
-          ...dashboardConfigData.root.props,
-          title: dashboard.name || "Untitled dashboard",
-          schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
-        },
+function _getInitialEditorData(
+  options: Readonly<{ dashboard: Dashboard.T; untitledDashboard: string }>,
+): AvaPageData {
+  const dashboardConfigData = options.dashboard.config as AvaPageData;
+  return upgradeAvaPageData({
+    ...dashboardConfigData,
+    root: {
+      ...dashboardConfigData.root,
+      props: {
+        ...dashboardConfigData.root.props,
+        title: options.dashboard.name || options.untitledDashboard,
+        schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
       },
-    });
-  }, [dashboard.config, dashboard.name]);
+    },
+  });
+}
 
-  // Register / unregister this dashboard as the active editor target. The
-  // chat panel reads this to decide whether to offer the `addDashboardBlock`
-  // tool to the model.
+function useRegisterActiveDashboard(
+  options: Readonly<{
+    dashboardId: Dashboard.Id;
+    initialEditorData: AvaPageData;
+    dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+  }>,
+): void {
+  const { dashboardId, initialEditorData, dispatch } = options;
+  const initialEditorDataRef = useRef(initialEditorData);
+  useEffect(
+    function trackInitialEditorData() {
+      initialEditorDataRef.current = initialEditorData;
+    },
+    [initialEditorData],
+  );
   useEffect(
     function registerActiveDashboard() {
-      dashboardEditorDispatch.setActiveDashboard({
-        dashboardId: dashboard.id,
-        editorData: initialEditorData,
+      // Seed from a ref so a loader refetch with a new dashboard object does
+      // not remount Puck. Unsaved edits live in editorData; bumping
+      // editorRevision would reload the canvas table.
+      dispatch.setActiveDashboard({
+        dashboardId,
+        editorData: initialEditorDataRef.current,
       });
       return () => {
-        dashboardEditorDispatch.setActiveDashboard(undefined);
+        return dispatch.setActiveDashboard(undefined);
       };
     },
-    [dashboard.id, dashboardEditorDispatch, initialEditorData],
+    [dashboardId, dispatch],
   );
-  // True when the user has no dashboards app role; in that case the
-  // dashboard is visible only through a resource share. The banner is
-  // informational and never blocks rendering.
-  const isShareOnlyAccess = !!appRoles && !appRoles.dashboards;
+}
 
-  const dashboardTitle: string = dashboard.name ?? "Untitled dashboard";
+type SaveDashboardOptions = {
+  dashboard: Dashboard.T;
+  dashboardTitle: string;
+  savedMessage: string;
+  dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+};
 
+function useSaveDashboard(
+  options: Readonly<SaveDashboardOptions>,
+): (savedData: AvaPageData) => void {
+  const [saveDashboard] = DashboardClient.useUpdate({
+    queriesToInvalidate: [
+      DashboardClient.QueryKeys.getAll(),
+      DashboardClient.QueryKeys.getById({ id: options.dashboard.id }),
+    ],
+    onSuccess: () => {
+      notifySuccess(options.savedMessage);
+      options.dispatch.markSaved();
+    },
+  });
+  // Depends on the primitives, not on `options`: the caller builds that object
+  // inline, so a new identity arrives on every render and the callback would
+  // memoize nothing.
+  const dashboardId = options.dashboard.id;
+  const { dashboardTitle } = options;
+  return useCallback(
+    (savedData: AvaPageData): void => {
+      saveDashboard({
+        id: dashboardId,
+        data: {
+          name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
+          config: savedData as Dashboard.T["config"],
+        },
+      });
+    },
+    [dashboardId, dashboardTitle, saveDashboard],
+  );
+}
+
+export type DashboardEditorViewState = {
+  dashboardTitle: string;
+  editorData: AvaPageData | undefined;
+  editorRevision: number;
+  hasUnsavedChanges: boolean;
+  initialEditorData: AvaPageData;
+  isShareOnlyAccess: boolean;
+  metadata: ReturnType<typeof getAvaPageMetadataFromDashboard>;
+  onSave: (savedData: AvaPageData) => void;
+  puckConfig: ReturnType<typeof useDashboardPuckConfig>;
+  dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+};
+
+function useInitialEditorData(
+  options: Readonly<{
+    dashboard: Dashboard.T;
+    dashboardTitle: string;
+  }>,
+): AvaPageData {
+  return useMemo(() => {
+    return _getInitialEditorData({
+      dashboard: options.dashboard,
+      untitledDashboard: options.dashboardTitle,
+    });
+  }, [options.dashboard, options.dashboardTitle]);
+}
+
+function useDashboardEditorMetadata(
+  dashboard: Readonly<Dashboard.T>,
+): ReturnType<typeof getAvaPageMetadataFromDashboard> {
+  return useMemo(() => {
+    return getAvaPageMetadataFromDashboard({ dashboard, surface: "editor" });
+  }, [dashboard]);
+}
+
+function useDashboardEditorViewState(
+  dashboard: Readonly<Dashboard.T>,
+): DashboardEditorViewState {
+  const { t, i18n } = useLingui();
+  const [appRoles] = useUserAppRoles();
+  const dispatch = DashboardEditorStateManager.useDispatch();
+  const { editorData, editorRevision, hasUnsavedChanges } =
+    DashboardEditorStateManager.useState();
+  const dashboardTitle = dashboard.name ?? t`Untitled dashboard`;
+  const initialEditorData = useInitialEditorData({
+    dashboard,
+    dashboardTitle,
+  });
+  useRegisterActiveDashboard({
+    dashboardId: dashboard.id,
+    initialEditorData,
+    dispatch,
+  });
   const puckConfig = useDashboardPuckConfig({
     dashboardTitle,
     workspaceId: dashboard.workspaceId,
     dashboardId: dashboard.id,
     i18n,
   });
-
-  const [saveDashboard] = DashboardClient.useUpdate({
-    queriesToInvalidate:
-      dashboard ?
-        [
-          DashboardClient.QueryKeys.getAll(),
-          DashboardClient.QueryKeys.getById({ id: dashboard.id }),
-        ]
-      : undefined,
-    onSuccess: () => {
-      notifySuccess(t`Dashboard saved successfully!`);
-      dashboardEditorDispatch.markSaved();
-    },
+  const onSave = useSaveDashboard({
+    dashboard,
+    dashboardTitle,
+    savedMessage: t`Dashboard saved successfully!`,
+    dispatch,
   });
+  const metadata = useDashboardEditorMetadata(dashboard);
+  return {
+    dashboardTitle,
+    editorData,
+    editorRevision,
+    hasUnsavedChanges,
+    initialEditorData,
+    isShareOnlyAccess: !!appRoles && !appRoles.dashboards,
+    metadata,
+    onSave,
+    puckConfig,
+    dispatch,
+  };
+}
 
-  const onSave = useCallback(
-    (savedData: AvaPageData): void => {
-      if (!dashboard) {
-        notifyError({ message: "Dashboard is not loaded yet." });
-        return;
-      }
-
-      const publishedTitle: string =
-        getDashboardTitleFromPuckData(savedData) ?? dashboardTitle;
-      const publishedConfig: Dashboard.T["config"] =
-        savedData as unknown as Dashboard.T["config"];
-
-      saveDashboard({
-        id: dashboard.id,
-        data: {
-          name: publishedTitle,
-          config: publishedConfig,
-        },
-      });
-    },
-    [dashboard, dashboardTitle, saveDashboard],
-  );
-
-  const avaPageMetadata = useMemo(() => {
-    return getAvaPageMetadataFromDashboard(dashboard);
-  }, [dashboard]);
-
+/** Renders the dashboard editor and its persistence toolbar. */
+export function DashboardEditorView({
+  dashboard,
+  workspaceSlug,
+}: Readonly<Props>): ReactElement {
+  const state = useDashboardEditorViewState(dashboard);
   return (
-    <DashboardFilterStateManager.Provider>
-      <AppLayout floatingToolbar>
-        <Flex direction="column" h="100%" pt={40}>
-          {isShareOnlyAccess ?
-            <Alert
-              color="blue"
-              variant="light"
-              title={t`Shared with you`}
-              m="sm"
-            >
-              <Text size="sm">
-                <Trans>
-                  You can view this dashboard because it was shared with you.
-                </Trans>
-              </Text>
-            </Alert>
-          : null}
-          <Puck
-            key={editorRevision}
-            metadata={avaPageMetadata}
-            config={puckConfig}
-            height="100%"
-            data={editorData ?? initialEditorData}
-            onChange={(d: Data) => {
-              dashboardEditorDispatch.updateEditorData(d as AvaPageData);
-            }}
-            overrides={{
-              headerActions: () => {
-                return (
-                  <>
-                    <SaveDashboardButton onSave={onSave} />
-                    <ShareResourceButton
-                      resourceName={dashboardTitle}
-                      resourceType="dashboard"
-                      resourceId={dashboard.id}
-                      size={DASHBOARD_TOOLBAR_BUTTON_SIZE}
-                    />
-                    <ViewDashboardButton
-                      workspaceSlug={workspaceSlug}
-                      dashboardId={dashboard.id}
-                      hasUnsavedChanges={hasUnsavedChanges}
-                    />
-                    <PublishDashboardButton
-                      dashboard={dashboard}
-                      hasUnsavedChanges={hasUnsavedChanges}
-                    />
-                    <ExportPdfButton
-                      dashboard={dashboard}
-                      hasUnsavedChanges={hasUnsavedChanges}
-                    />
-                    <DeleteDashboardButton
-                      workspaceSlug={workspaceSlug}
-                      dashboardId={dashboard.id}
-                    />
-                  </>
-                );
-              },
-            }}
-          />
-        </Flex>
-      </AppLayout>
-    </DashboardFilterStateManager.Provider>
+    <DashboardEditorContent
+      dashboard={dashboard}
+      state={state}
+      workspaceSlug={workspaceSlug}
+    />
   );
 }

@@ -3,9 +3,7 @@
  *
  * @returns Array of user_group ids (possibly empty).
  */
-create or replace function public.util__get_auth_user_user_group_ids (
-  p_workspace_id uuid
-) returns uuid[] language sql security definer stable
+create or replace function public.util__get_auth_user_user_group_ids (p_workspace_id uuid) returns uuid[] language sql security definer stable
 set
   search_path = public as $$
   select coalesce(
@@ -59,12 +57,7 @@ set
 $$;
 
 revoke
-execute on function public.util__has_non_owner_share (
-  public.resource_type,
-  uuid,
-  uuid,
-  uuid
-)
+execute on function public.util__has_non_owner_share (public.resource_type, uuid, uuid, uuid)
 from
   public,
   anon,
@@ -114,6 +107,15 @@ begin
     from public.datasets ds
     where
       ds.id = p_resource_id;
+  elsif p_resource_type = 'map' then
+    select
+      m.owner_id,
+      m.workspace_id,
+      coalesce(m.is_restricted, false)
+    into v_owner_id, v_workspace_id, v_is_restricted
+    from public.maps m
+    where
+      m.id = p_resource_id;
   else
     return false;
   end if;
@@ -136,17 +138,14 @@ end;
 $$;
 
 revoke
-execute on function public.util__is_resource_private_to_owner (
-  public.resource_type,
-  uuid
-)
+execute on function public.util__is_resource_private_to_owner (public.resource_type, uuid)
 from
   public,
   anon,
   authenticated;
 
 /**
- * Effective role for auth.uid() on a dashboard or dataset row.
+ * Effective role for auth.uid() on a resource row.
  *
  * Most paths merge several independent grants (direct/group/workspace shares,
  * and optionally the user's app role on this resource's app). Each grant is
@@ -218,6 +217,16 @@ begin
     where
       ds.id = p_resource_id;
     v_app := 'data_sources';
+  elsif p_resource_type = 'map' then
+    select
+      m.workspace_id,
+      m.owner_id,
+      coalesce(m.is_restricted, false)
+    into v_workspace_id, v_owner_id, v_is_restricted
+    from public.maps m
+    where
+      m.id = p_resource_id;
+    v_app := 'gis';
   else
     return null;
   end if;
@@ -381,6 +390,10 @@ begin
     select ds.workspace_id into v_resource_workspace_id
     from public.datasets ds
     where ds.id = p_resource_id;
+  elsif p_resource_type = 'map' then
+    select m.workspace_id into v_resource_workspace_id
+    from public.maps m
+    where m.id = p_resource_id;
   else
     return false;
   end if;
@@ -396,16 +409,15 @@ end;
 $$;
 
 /**
- * App catalog entry for a dashboard or dataset resource type.
+ * App catalog entry for a resource type.
  */
-create or replace function public.util__resource_type_to_app_type (
-  p_resource_type public.resource_type
-) returns public.app_type language sql immutable
+create or replace function public.util__resource_type_to_app_type (p_resource_type public.resource_type) returns public.app_type language sql immutable
 set
   search_path = public as $$
   select case p_resource_type
     when 'dashboard'::public.resource_type then 'dashboards'::public.app_type
     when 'dataset'::public.resource_type then 'data_sources'::public.app_type
+    when 'map'::public.resource_type then 'gis'::public.app_type
   end;
 $$;
 
@@ -494,9 +506,7 @@ $$;
  * @param p_dataset_id Primary key of `public.datasets`.
  * @returns True when the row should be visible to `auth.uid()`.
  */
-create or replace function public.util__auth_user_may_select_dataset (
-  p_dataset_id uuid
-) returns boolean language plpgsql security definer stable
+create or replace function public.util__auth_user_may_select_dataset (p_dataset_id uuid) returns boolean language plpgsql security definer stable
 set
   search_path = public as $$
 declare
@@ -624,12 +634,18 @@ $$;
  * Group shares with requires_app_access=true additionally require the auth
  * user to have a dashboards app role.
  *
+ * Dashboards additionally have a publication state that datasets do not.
+ * A `draft` is visible only to those who could edit it: the owner, a settings
+ * admin, and any grant worth `editor` or better. A viewer-level grant, whether
+ * a share or a workspace app role, does NOT open a draft. That is what gives
+ * `draft` its product meaning, that the owner decides when the dashboard is
+ * ready for others to see, and it keeps the `config` jsonb off the wire for
+ * readers the UI would refuse anyway.
+ *
  * @param p_dashboard_id Primary key of `public.dashboards`.
  * @returns True when the row should be visible to `auth.uid()`.
  */
-create or replace function public.util__auth_user_may_select_dashboard (
-  p_dashboard_id uuid
-) returns boolean language plpgsql security definer stable
+create or replace function public.util__auth_user_may_select_dashboard (p_dashboard_id uuid) returns boolean language plpgsql security definer stable
 set
   search_path = public as $$
 declare
@@ -638,9 +654,11 @@ declare
   v_owner uuid;
   v_restricted boolean;
   v_public boolean;
+  v_visibility public.dashboard_visibility;
   v_app_role public.role_level;
   v_editor_rank int := public.util__role_level_rank ('editor'::public.role_level);
   v_user_rank int;
+  v_eff_rank int;
   v_has_share boolean;
 begin
   if v_uid is null then
@@ -651,8 +669,9 @@ begin
     d.workspace_id,
     d.owner_id,
     coalesce(d.is_restricted, false),
-    coalesce(d.is_public, false)
-  into v_ws, v_owner, v_restricted, v_public
+    coalesce(d.is_public, false),
+    d.visibility
+  into v_ws, v_owner, v_restricted, v_public, v_visibility
   from
     public.dashboards d
   where
@@ -677,11 +696,24 @@ begin
     return false;
   end if;
 
-  if not public.util__auth_user_can_access_resource (
-    'dashboard'::public.resource_type,
-    p_dashboard_id,
-    'viewer'::public.role_level
-  ) then
+  -- The effective role is resolved ONCE and reused by both the viewer gate
+  -- below and the `draft` gate further down. `util__auth_user_can_access_resource`
+  -- is exactly `rank(effective_role) >= rank(min_role)` with a null effective
+  -- role meaning "no access", so ranking it here is behaviour-identical to two
+  -- calls, but it avoids re-entering `util__resource_effective_role` (a second
+  -- dashboards fetch, settings-admin join, share aggregate and app-role probe)
+  -- for every draft row the caller does not own. `stable` does not memoize
+  -- across rows, so the duplicate call would double per-row cost on the whole
+  -- dashboards index.
+  v_eff_rank := coalesce(
+    public.util__role_level_rank (
+      public.util__resource_effective_role (
+        'dashboard'::public.resource_type,
+        p_dashboard_id
+      )
+    ), 0);
+
+  if v_eff_rank < public.util__role_level_rank ('viewer'::public.role_level) then
     return false;
   end if;
 
@@ -691,6 +723,16 @@ begin
 
   if v_owner = v_uid then
     return true;
+  end if;
+
+  -- `draft` means the owner has not decided this dashboard is ready for anyone
+  -- else, which is the product meaning P2 gave the state and P3's publishing
+  -- control finally makes actionable. Owners and settings admins short-circuit
+  -- above; what remains here is share holders and workspace app roles, and for
+  -- a draft those need edit rights rather than mere read access.
+  if v_visibility = 'draft'::public.dashboard_visibility
+    and v_eff_rank < v_editor_rank then
+    return false;
   end if;
 
   select exists (
@@ -754,31 +796,230 @@ begin
 end;
 $$;
 
+/** Whether the auth user has a share that applies to a resource row. */
+create or replace function public.util__auth_user_has_resource_share (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid,
+  p_app public.app_type
+) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select exists (
+    select 1
+    from public.resource_shares rs
+    where
+      rs.workspace_id = p_workspace_id and
+      rs.resource_type = p_resource_type and
+      rs.resource_id = p_resource_id and
+      (
+        rs.principal_type = 'workspace'::public.share_principal_type or
+        (
+          rs.principal_type = 'user'::public.share_principal_type and
+          rs.principal_id = (select auth.uid ())
+        ) or
+        (
+          rs.principal_type = 'user_group'::public.share_principal_type and
+          exists (
+            select 1
+            from public.user_group_memberships ugm
+            where
+              ugm.user_group_id = rs.principal_id and
+              ugm.user_id = (select auth.uid ())
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (p_workspace_id, p_app) is not null
+          )
+        )
+      )
+  );
+$$;
+
+revoke
+execute on function public.util__auth_user_has_resource_share (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.app_type
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/** Checks membership and viewer access before map row visibility checks. */
+create or replace function public.util__auth_user_may_select_resource_base (
+  p_resource_type public.resource_type,
+  p_resource_id uuid,
+  p_workspace_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select
+    p_workspace_id = any (
+      array(
+        select public.util__get_auth_user_workspaces ()
+      )
+    ) and
+    public.util__auth_user_can_access_resource (
+      p_resource_type,
+      p_resource_id,
+      'viewer'::public.role_level
+    );
+$$;
+
+revoke
+execute on function public.util__auth_user_may_select_resource_base (public.resource_type, uuid, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/** Applies map-specific visibility grants after workspace checks. */
+create or replace function public.maps__auth_user_may_select_grant (
+  p_map_id uuid,
+  p_workspace_id uuid,
+  p_owner_id uuid,
+  p_is_restricted boolean
+) returns boolean language plpgsql security definer stable
+set
+  search_path = '' as $$
+declare
+  v_app_role public.role_level;
+  v_has_share boolean;
+begin
+  if public.util__can_manage_workspace_settings (p_workspace_id) or
+    p_owner_id = auth.uid () then
+    return true;
+  end if;
+
+  v_has_share := public.util__auth_user_has_resource_share (
+    'map'::public.resource_type, p_map_id, p_workspace_id,
+    'gis'::public.app_type
+  );
+  if p_is_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    p_workspace_id, 'gis'::public.app_type
+  );
+  return coalesce(public.util__role_level_rank (v_app_role), 0) <
+    public.util__role_level_rank ('editor'::public.role_level) or v_has_share;
+end;
+$$;
+
+revoke
+execute on function public.maps__auth_user_may_select_grant (uuid, uuid, uuid, boolean)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/**
+ * Whether the auth user may SELECT a map row under hardened RLS.
+ *
+ * Map visibility has no public-column shortcut. Workspace membership, viewer
+ * access, owner access, settings-manager access, shares, and GIS app roles are
+ * all evaluated by the composed helpers below.
+ */
+create or replace function public.maps__auth_user_may_select (p_map_id uuid) returns boolean language plpgsql security definer stable
+set
+  search_path = '' as $$
+declare
+  v_workspace_id uuid;
+  v_owner_id uuid;
+  v_is_restricted boolean;
+begin
+  select m.workspace_id, m.owner_id, coalesce(m.is_restricted, false)
+  into v_workspace_id, v_owner_id, v_is_restricted
+  from public.maps m
+  where m.id = p_map_id;
+
+  if v_workspace_id is null or not public.util__auth_user_may_select_resource_base (
+    'map'::public.resource_type, p_map_id, v_workspace_id
+  ) then
+    return false;
+  end if;
+
+  return public.maps__auth_user_may_select_grant (
+    p_map_id, v_workspace_id, v_owner_id, v_is_restricted
+  );
+end;
+$$;
+
+revoke
+execute on function public.maps__auth_user_may_select (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.maps__auth_user_may_select (uuid) to authenticated;
+
 /**
  * Dataset id encoded in a `workspaces` storage bucket object name, or null.
  *
- * Object names are `<workspaceId>/datasets/<datasetId>.parquet` (see
- * getDatasetParquetStoragePath in
- * src/clients/storage/DatasetParquetStorageClient/utils.ts). The dataset id
- * lives in the FILENAME, not a folder segment, so storage.foldername() cannot
- * reach it and split_part is used instead.
+ * Exactly two object shapes are recognised, both directly under
+ * `<workspaceId>/datasets/`:
  *
- * Returns null rather than raising when the name does not match that shape, so
- * a storage policy referencing this can never error on an unexpected object
+ *   <datasetId>.parquet         the transcoded data
+ *   <datasetId>.original.<ext>  the retained source file
+ *
+ * The original is kept because some source formats, PDF above all, cannot be
+ * reconstructed from the parquet extracted out of them. The parquet path is
+ * built by getDatasetParquetStoragePath in
+ * src/clients/storage/DatasetParquetStorageClient/utils.ts.
+ *
+ * The dataset id lives in the FILENAME, not a folder segment, so
+ * storage.foldername() cannot reach it and the name is matched whole instead.
+ *
+ * Returns null rather than raising when the name does not match those shapes,
+ * so a storage policy referencing this can never error on an unexpected object
  * name. Callers MUST treat null as "deny": an object whose dataset cannot be
  * identified is not one we can prove the caller may read.
  *
- * @returns The dataset id, or null when the name is not a dataset parquet path.
+ * SECURITY. Every policy on the `workspaces` bucket gates on this function, so
+ * whatever it accepts is granted the named dataset's permissions. Three
+ * properties carry that weight, and each is pinned by
+ * supabase/tests/database/permissions/storage_original_file_object_names.test.sql:
+ *
+ *   1. The suffix is an allow-list, not a prefix match. Accepting any name
+ *      that merely BEGINS with a uuid would let an arbitrary object claim a
+ *      dataset's permissions.
+ *   2. The whole name is matched, so the path depth is exactly three segments.
+ *      A `split_part(p_object_name, '/', 4) = ''` depth guard would NOT be
+ *      sufficient: split_part returns '' both for a trailing slash
+ *      (`ws/datasets/x.parquet/`) and for an empty segment followed by more
+ *      (`ws/datasets/x.parquet//extra`).
+ *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line
+ *      anchors under newline-sensitive matching, which is off here, so
+ *      neither a trailing newline nor a valid line smuggled after a newline
+ *      matches. That differs from PCRE, where `$` matches before a trailing
+ *      newline by default, and object names are arbitrary text.
+ *
+ * The extension is capped at ten characters so an over-long tail reads as
+ * smuggled content rather than a file type, and is case-insensitive because
+ * clients are inconsistent about extension case and the extension is not
+ * itself a boundary: the dataset id in front of it is.
+ *
+ * @returns The dataset id, or null when the name is not a dataset object path.
  */
-create or replace function public.util__storage_object_dataset_id (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_dataset_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
-    when split_part(p_object_name, '/', 3) ~
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
-    then replace(split_part(p_object_name, '/', 3), '.parquet', '')::uuid
+    when p_object_name ~
+      '^[^/]+/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(\.parquet|\.original\.[A-Za-z0-9]{1,10})$'
+    -- Safe: the regex above has already proven segment 3 begins with a uuid,
+    -- and a uuid contains no dot, so field 1 of the dot-split is exactly it.
+    then split_part(split_part(p_object_name, '/', 3), '.', 1)::uuid
     else null
   end;
 $$;
@@ -788,9 +1029,7 @@ $$;
  *
  * @returns The UUID, or NULL when the path segment is not a UUID.
  */
-create or replace function public.util__storage_object_workspace_id (
-  p_object_name text
-) returns uuid language sql immutable
+create or replace function public.util__storage_object_workspace_id (p_object_name text) returns uuid language sql immutable
 set
   search_path = public as $$
   select case
@@ -800,3 +1039,212 @@ set
     else null
   end;
 $$;
+
+/**
+ * Extracts a dashboard UUID from a published snapshot object path.
+ *
+ * Versioned snapshot objects are named
+ * `dashboards/<dashboardId>/revisions/<revision>/datasets/<datasetId>.parquet`.
+ * Legacy objects use `dashboards/<dashboardId>/datasets/<datasetId>.parquet`.
+ *
+ * Returns NULL for any name that does not match that shape, including a
+ * non-UUID id segment. NULL is DENY in the storage policies that call this:
+ * an object whose dashboard cannot be identified is not one we can prove the
+ * caller may read. Returning NULL rather than casting blindly also keeps a
+ * malformed upload a policy denial instead of a storage error.
+ *
+ * @param p_object_name The `storage.objects.name` value.
+ * @returns The dashboard UUID, or NULL when the path is not a snapshot path.
+ */
+create or replace function public.util__storage_object_dashboard_id (p_object_name text) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+      or p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then split_part(p_object_name, '/', 2)::uuid
+    else null
+  end;
+$$;
+
+/**
+ * Extracts a revision UUID from an exact published snapshot object path.
+ *
+ * Exact legacy paths map to the all-zero UUID reserved for the legacy
+ * generation. Returns NULL for malformed or extended paths so storage policies
+ * fail closed instead of authorizing an object whose generation is ambiguous.
+ *
+ * @param p_object_name The `storage.objects.name` value.
+ * @returns The snapshot revision, or NULL when the path is not exact.
+ */
+create or replace function public.util__storage_object_snapshot_revision (p_object_name text) returns uuid language sql immutable
+set
+  search_path = public as $$
+  select case
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then split_part(p_object_name, '/', 4)::uuid
+    when p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+    then '00000000-0000-0000-0000-000000000000'::uuid
+    else null
+  end;
+$$;
+
+/**
+ * Whether the auth user may mutate an uncommitted dashboard snapshot object.
+ *
+ * The security-definer lookup is required because dashboard SELECT RLS can
+ * hide draft dashboards from workspace editors who still have update access.
+ * The authorization check prevents callers from using this helper to probe or
+ * mutate dashboards they cannot edit.
+ *
+ * The bucket is the discriminator for the extra admin requirement because the
+ * bucket, not the claim, is what decides who can read the bytes.
+ * `private.dashboards__enforce_publish_publicly` guards the DECISION to expose
+ * a dashboard to the open internet; this guards the CONTENT that decision
+ * publishes. Without the bucket check an editor could overwrite the objects of
+ * an admin's open public claim, and the admin would then settle a transition
+ * over data no admin ever approved. `published-private` stays editor-tier
+ * because publishing internally is ordinary editor work.
+ *
+ * The admin bar is `util__auth_user_meets_min_app_role`, the same predicate the
+ * transition trigger uses, so the two gates agree; in particular both treat the
+ * workspace owner as an admin.
+ *
+ * @param p_bucket_id The `storage.objects.bucket_id` value.
+ * @param p_object_name The exact `storage.objects.name` value.
+ * @returns True only for an editor, the active staged revision, and its bucket,
+ *   and additionally only for a dashboards admin when the bucket is public.
+ */
+create or replace function private.util__auth_user_can_write_dashboard_snapshot_object (p_bucket_id text, p_object_name text) returns boolean language plpgsql security definer volatile
+set
+  search_path = '' as $$
+declare
+  can_write boolean;
+begin
+  select
+    public.util__auth_user_can_update_resource (
+      'dashboard'::public.resource_type,
+      dashboards.id
+    ) and
+    (
+      p_bucket_id <> 'published' or
+      public.util__auth_user_meets_min_app_role (
+        dashboards.workspace_id,
+        'dashboards'::public.app_type,
+        'admin'::public.role_level
+      )
+    ) and
+    dashboards.snapshot_transition_kind = 'publish' and
+    dashboards.snapshot_transition_revision =
+      public.util__storage_object_snapshot_revision (p_object_name) and
+    (
+      (
+        dashboards.snapshot_transition_target_visibility = 'public' and
+        p_bucket_id = 'published'
+      ) or (
+        dashboards.snapshot_transition_target_visibility = 'workspace' and
+        p_bucket_id = 'published-private'
+      )
+    )
+  into can_write
+  from public.dashboards
+  where
+    dashboards.id = public.util__storage_object_dashboard_id (p_object_name)
+  for share;
+
+  return coalesce(can_write, false);
+end;
+$$;
+
+revoke all on function private.util__auth_user_can_write_dashboard_snapshot_object (text, text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function private.util__auth_user_can_write_dashboard_snapshot_object (text, text) to authenticated;
+
+/**
+ * Whether the auth user may delete a dashboard snapshot object.
+ *
+ * Delete transitions require admin access. Other cleanup paths require editor
+ * access because editors may unpublish or abort their own publication attempt.
+ *
+ * Deliberately NOT mirrored from
+ * `util__auth_user_can_write_dashboard_snapshot_object`: the bucket is not a
+ * discriminator here. Writing into `published` CREATES exposure, so it takes
+ * the dashboards admin bar; deleting from it REMOVES exposure. Requiring admin
+ * to delete would only strand staged bytes in the world-readable bucket
+ * whenever the editor who uploaded them cannot clean them up.
+ *
+ * @param p_bucket_id The `storage.objects.bucket_id` value.
+ * @param p_object_name The exact `storage.objects.name` value.
+ * @returns True only with the required role and matching durable cleanup claim.
+ */
+create or replace function private.util__auth_user_can_delete_dashboard_snapshot_object (p_bucket_id text, p_object_name text) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select coalesce(
+    exists (
+      select 1
+      from public.dashboards
+      where
+        dashboards.id = public.util__storage_object_dashboard_id (
+          p_object_name
+        ) and
+        case dashboards.snapshot_transition_kind
+          when 'delete' then
+            public.util__auth_user_can_delete_resource (
+              'dashboard'::public.resource_type,
+              dashboards.id
+            )
+          else
+            public.util__auth_user_can_update_resource (
+              'dashboard'::public.resource_type,
+              dashboards.id
+            )
+        end and
+        case dashboards.snapshot_transition_kind
+          when 'unpublish' then true
+          when 'delete' then true
+          when 'abort_publish' then
+            dashboards.snapshot_transition_revision =
+              public.util__storage_object_snapshot_revision (p_object_name) and
+            (
+              (
+                dashboards.snapshot_transition_target_visibility = 'public' and
+                p_bucket_id = 'published'
+              ) or (
+                dashboards.snapshot_transition_target_visibility = 'workspace' and
+                p_bucket_id = 'published-private'
+              )
+            )
+          when 'publish' then
+            dashboards.snapshot_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name) and
+            dashboards.snapshot_transition_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name)
+          else
+            dashboards.snapshot_revision is distinct from
+              public.util__storage_object_snapshot_revision (p_object_name)
+        end
+    ),
+    false
+  );
+$$;
+
+revoke all on function private.util__auth_user_can_delete_dashboard_snapshot_object (text, text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function private.util__auth_user_can_delete_dashboard_snapshot_object (text, text) to authenticated;

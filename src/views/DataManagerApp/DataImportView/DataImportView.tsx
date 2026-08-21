@@ -3,7 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";

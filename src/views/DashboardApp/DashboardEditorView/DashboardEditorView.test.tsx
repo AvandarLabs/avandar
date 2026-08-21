@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, RenderOptions, screen } from "@/test-utils";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -27,16 +27,12 @@ vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
 const { DashboardEditorView } =
   await import("@/views/DashboardApp/DashboardEditorView/DashboardEditorView");
 
-const { publishDashboardMock } = vi.hoisted(() => {
-  return { publishDashboardMock: vi.fn() };
-});
-
 vi.mock("@puckeditor/core/puck.css", () => {
   return {};
 });
 
 vi.mock("@puckeditor/core", async () => {
-  const { createElement } = await import("react");
+  const { createElement, useEffect } = await import("react");
 
   type PuckProps = {
     data: { content: unknown[]; root: { props: Record<string, unknown> } };
@@ -45,6 +41,17 @@ vi.mock("@puckeditor/core", async () => {
   };
 
   function PuckMock({ data, onChange, overrides }: PuckProps): ReactElement {
+    useEffect(() => {
+      onChange({
+        ...data,
+        content: [...data.content],
+        root: { ...data.root, props: { ...data.root.props } },
+      });
+      // Puck's load resolve fires once after mount, not on every data identity
+      // change. Matching that keeps this mock from looping.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only echo
+    }, []);
+
     return createElement(
       "div",
       { "data-testid": "puck-mock" },
@@ -109,12 +116,24 @@ vi.mock("@/components/layouts/AppLayout/AppLayout", async () => {
   };
 });
 
+// A probe rather than a null stub: the toolbar's only remaining job around
+// publishing is handing the unsaved-changes flag to the share button, which
+// forwards it to the modal's publish gate. Rendering it as an attribute lets
+// the dirty-state tests below assert that hand-off without mounting the modal.
 vi.mock(
-  "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton",
-  () => {
+  "@/views/DashboardApp/DashboardShareModal/DashboardShareButton",
+  async () => {
+    const { createElement } = await import("react");
     return {
-      ShareResourceButton: () => {
-        return null;
+      DashboardShareButton: ({
+        hasUnsavedChanges,
+      }: {
+        hasUnsavedChanges: boolean;
+      }): ReactElement => {
+        return createElement("div", {
+          "data-testid": "dashboard-share-button",
+          "data-has-unsaved-changes": String(hasUnsavedChanges),
+        });
       },
     };
   },
@@ -135,7 +154,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard",
+  "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard",
   () => {
     return {
       getAvaPageMetadataFromDashboard: (): Record<string, unknown> => {
@@ -164,7 +183,7 @@ vi.mock(
   },
 );
 
-vi.mock("@/clients/dashboards/DashboardClient", () => {
+vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       useUpdate: (config: {
@@ -175,10 +194,7 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
         });
         return [saveFn, false];
       },
-      usePublishDashboard: (): [typeof publishDashboardMock, boolean] => {
-        return [publishDashboardMock, false];
-      },
-      useDelete: (): [ReturnType<typeof vi.fn>, boolean] => {
+      useFullDelete: (): [ReturnType<typeof vi.fn>, boolean] => {
         return [vi.fn(), false];
       },
       QueryKeys: {
@@ -233,6 +249,7 @@ function _makeDashboard(): Dashboard.T {
     slug: "test-dashboard",
     description: undefined,
     isPublic: false,
+    visibility: "draft",
     isRestricted: false,
     ownerId: "00000000-0000-4000-8000-000000000002" as User.Id,
     ownerProfileId: "00000000-0000-4000-8000-000000000003" as UserProfile.Id,
@@ -262,11 +279,11 @@ function _makeDashboard(): Dashboard.T {
 }
 
 describe("DashboardEditorView", () => {
-  beforeEach(() => {
-    publishDashboardMock.mockClear();
-  });
-
-  it("disables Publish after a component is added without saving", () => {
+  // Publishing copies the PERSISTED config, so the share button must learn
+  // about unsaved edits: it is what blocks the modal's publish action. These
+  // three cases pin the flag's transitions; `PublishingActions` covers what the
+  // modal does with it.
+  it("reports unsaved changes to the share button after a component is added", () => {
     renderWithProviders(
       <DashboardEditorView
         dashboard={_makeDashboard()}
@@ -274,28 +291,25 @@ describe("DashboardEditorView", () => {
       />,
     );
 
-    // Sanity check: the dashboard starts with no components and Publish is
-    // enabled (nothing to save yet).
+    // Sanity check: the dashboard starts with no components and nothing to
+    // save yet.
     expect(screen.getByTestId("puck-content-count")).toHaveTextContent("0");
-    expect(
-      screen.getByRole("button", { name: /publish/i }),
-    ).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
+      "false",
+    );
 
     // Add a random component (a HeadingBlock) via the Puck editor.
     fireEvent.click(screen.getByTestId("puck-add-component"));
 
-    // After adding a component the dashboard has unsaved changes, so the
-    // Publish button must be disabled until the user saves. We use
-    // `aria-disabled` (not the HTML `disabled` attribute) so the tooltip
-    // explaining the disabled state can still fire on hover.
     expect(screen.getByTestId("puck-content-count")).toHaveTextContent("1");
-    expect(screen.getByRole("button", { name: /publish/i })).toHaveAttribute(
-      "aria-disabled",
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
       "true",
     );
   });
 
-  it("re-enables Publish after saving the new component", () => {
+  it("clears the unsaved-changes flag after saving the new component", () => {
     renderWithProviders(
       <DashboardEditorView
         dashboard={_makeDashboard()}
@@ -304,16 +318,17 @@ describe("DashboardEditorView", () => {
     );
 
     fireEvent.click(screen.getByTestId("puck-add-component"));
-    expect(screen.getByRole("button", { name: /publish/i })).toHaveAttribute(
-      "aria-disabled",
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
       "true",
     );
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
-    expect(
-      screen.getByRole("button", { name: /publish/i }),
-    ).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
+      "false",
+    );
   });
 
   it("saves the dashboard when mod+S is pressed", () => {
@@ -325,8 +340,8 @@ describe("DashboardEditorView", () => {
     );
 
     fireEvent.click(screen.getByTestId("puck-add-component"));
-    expect(screen.getByRole("button", { name: /publish/i })).toHaveAttribute(
-      "aria-disabled",
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
       "true",
     );
 
@@ -336,49 +351,45 @@ describe("DashboardEditorView", () => {
       metaKey: true,
     });
 
-    expect(
-      screen.getByRole("button", { name: /publish/i }),
-    ).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
+      "data-has-unsaved-changes",
+      "false",
+    );
   });
+});
 
-  it("does not send a publish request if Publish is clicked while there are unsaved changes", () => {
-    renderWithProviders(
-      <DashboardEditorView
-        dashboard={_makeDashboard()}
-        workspaceSlug="test-workspace"
-      />,
+function EditorRevisionProbe(): ReactNode {
+  const { editorRevision } = DashboardEditorStateManager.useState();
+  return <span data-testid="editor-revision">{String(editorRevision)}</span>;
+}
+
+describe("DashboardEditorView Puck remount", () => {
+  it("does not remount Puck when the dashboard record is a new object with the same id", () => {
+    const dashboard = _makeDashboard();
+    const { rerender } = renderWithProviders(
+      <>
+        <EditorRevisionProbe />
+        <DashboardEditorView
+          dashboard={dashboard}
+          workspaceSlug="test-workspace"
+        />
+      </>,
+    );
+    const revisionAfterMount =
+      screen.getByTestId("editor-revision").textContent;
+
+    rerender(
+      <>
+        <EditorRevisionProbe />
+        <DashboardEditorView
+          dashboard={{ ...dashboard }}
+          workspaceSlug="test-workspace"
+        />
+      </>,
     );
 
-    fireEvent.click(screen.getByTestId("puck-add-component"));
-
-    // The button uses `aria-disabled` rather than the HTML `disabled`
-    // attribute (so the tooltip can render on hover), which means a click
-    // event would still fire. The onClick guard must block the request.
-    fireEvent.click(screen.getByRole("button", { name: /publish/i }));
-
-    // The confirm modal must not open and the publish mutation must not run.
-    expect(
-      screen.queryByRole("dialog", { name: /publish dashboard\?/i }),
-    ).not.toBeInTheDocument();
-    expect(publishDashboardMock).not.toHaveBeenCalled();
-  });
-
-  it("shows a tooltip explaining why Publish is disabled when there are unsaved changes", async () => {
-    renderWithProviders(
-      <DashboardEditorView
-        dashboard={_makeDashboard()}
-        workspaceSlug="test-workspace"
-      />,
+    expect(screen.getByTestId("editor-revision")).toHaveTextContent(
+      revisionAfterMount ?? "",
     );
-
-    fireEvent.click(screen.getByTestId("puck-add-component"));
-
-    fireEvent.mouseEnter(screen.getByRole("button", { name: /publish/i }));
-
-    expect(
-      await screen.findByText(
-        /cannot publish while there are unsaved changes/i,
-      ),
-    ).toBeInTheDocument();
   });
 });

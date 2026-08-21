@@ -1,11 +1,7 @@
 -- Named 05z.* so this seeds after 05.utils.workspaces.sql: RLS below calls
 -- public.util__get_auth_user_workspaces(), which that file defines.
 -- Valid feature plan types for a subscription.
-create type public.subscriptions__feature_plan_type as enum(
-  'free',
-  'basic',
-  'premium'
-);
+create type public.subscriptions__feature_plan_type as enum('free', 'basic', 'premium');
 
 create type public.subscriptions__status as enum(
   'incomplete',
@@ -17,10 +13,7 @@ create type public.subscriptions__status as enum(
   'unpaid'
 );
 
-create type public.subscriptions__update_status as enum(
-  'pending',
-  'completed'
-);
+create type public.subscriptions__update_status as enum('pending', 'completed');
 
 -- Table representing existing susbscriptions which associates a subscription
 -- to a workspace and a billing manager (the workspace owner).
@@ -83,23 +76,31 @@ create table public.subscriptions (
   -- this should be kept in sync with the number of paid seats.
   -- Use `null` to indicate unlimited.
   max_shareable_dashboards_allowed integer,
-  constraint subscriptions_polar_subscription_id_key unique (
-    polar_subscription_id
-  )
+  constraint subscriptions_polar_subscription_id_key unique (polar_subscription_id)
 );
 
 -- Indexes to improve performance
-create index idx_subscriptions__workspace_id on public.subscriptions (
-  workspace_id
-);
+create index idx_subscriptions__workspace_id on public.subscriptions (workspace_id);
 
-create index idx_subscriptions__subscription_owner_id_workspace_id on public.subscriptions (
-  subscription_owner_id,
-  workspace_id
-);
+create index idx_subscriptions__subscription_owner_id_workspace_id on public.subscriptions (subscription_owner_id, workspace_id);
 
 -- Enable row level security
 alter table public.subscriptions enable row level security;
+
+-- Data API privileges.
+--
+-- Read-only for the Data API: subscription rows are written by the billing
+-- backend under `service_role`, never by a browser.
+grant
+select
+  on table public.subscriptions to authenticated;
+
+grant
+select
+,
+  insert,
+update,
+delete on table public.subscriptions to service_role;
 
 --------------------------------------------------------------------------------
 -- Policies: subscriptions

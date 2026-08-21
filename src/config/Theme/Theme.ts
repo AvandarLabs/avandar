@@ -69,11 +69,43 @@ export const APP_CHROME_Z_INDEX = 250;
  */
 export const MODAL_ROOT_Z_INDEX = 400;
 
+/**
+ * Onboarding tour overlay. Same layer as modals so share-modal controls can
+ * be spotlighted. Joyride paints the tooltip at this value plus one.
+ */
+export const NUX_TOUR_Z_INDEX = MODAL_ROOT_Z_INDEX;
+
+/**
+ * Onboarding checklist. Above the tour overlay but below the tooltip so
+ * step copy stays readable when it overlaps the "Get started" card.
+ */
+export const NUX_CHECKLIST_Z_INDEX = NUX_TOUR_Z_INDEX + 1;
+
+/**
+ * Product modals that interrupt the tour (drop-to-import confirm, hide-
+ * tutorial confirm) and are not themselves a spotlight target. Must clear
+ * the checklist and Joyride's tooltip, which sits at
+ * `NUX_CHECKLIST_Z_INDEX + 1`.
+ */
+export const MODAL_ABOVE_NUX_TOUR_Z_INDEX = NUX_TOUR_Z_INDEX + 3;
+
+/**
+ * Marks every Mantine `Modal` root so the onboarding checklist can tell a
+ * product modal (share, confirm) apart from Joyride's overlay.
+ */
+export const PRODUCT_MODAL_ROOT_CLASSNAME = "ava-product-modal";
+
+/** Selector for a mounted product modal root. */
+export const PRODUCT_MODAL_ROOT_SELECTOR = `.${PRODUCT_MODAL_ROOT_CLASSNAME}`;
+
 /** Default props for `<Modal>` and `@mantine/modals` ModalsProvider. */
 export const DEFAULT_MODAL_PROPS = {
   zIndex: MODAL_ROOT_Z_INDEX,
   centered: true,
   radius: OverlayTheme.panel.radius,
+  classNames: {
+    root: PRODUCT_MODAL_ROOT_CLASSNAME,
+  },
   overlayProps: {
     backgroundOpacity: 0,
     color: "transparent",
@@ -87,10 +119,11 @@ export const DEFAULT_MODAL_PROPS = {
 } as const;
 
 /**
- * Floating panel z-index. Sits above the app shell (200) but below
- * Mantine's default popover/combobox z-index (300) so that dropdowns
- * opened inside a floating panel render on top of it.
+ * Floating panel z-index. Sits above app chrome so a floating surface
+ * stays reachable over a toolbar, but below `MODAL_ROOT_Z_INDEX` so a
+ * modal always covers it.
  */
+export const FLOATING_PANEL_Z_INDEX = 300;
 
 /**
  * Overlay dropdown z-index for popovers, comboboxes, menus, and tooltips.
@@ -470,6 +503,7 @@ export const Theme = createTheme({
     zIndex: {
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
       appChrome: APP_CHROME_Z_INDEX,
+      floatingPanel: FLOATING_PANEL_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
       popover: POPOVER_Z_INDEX,
       notifications: NOTIFICATIONS_Z_INDEX,
@@ -521,6 +555,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (
 
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
     "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
+    "--mantine-z-index-floating-panel": String(
+      theme.other.zIndex.floatingPanel,
+    ),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
     "--mantine-z-index-popover": String(theme.other.zIndex.popover),
     "--mantine-z-index-notifications": String(theme.other.zIndex.notifications),
@@ -541,10 +578,15 @@ export const cssVariablesResolver: CSSVariablesResolver = (
 
     "--ava-animation-duration-ooze-in": `${AnimationTheme.preset.oozeIn.durationMs}ms`,
     "--ava-animation-duration-swipe-out": `${AnimationTheme.preset.swipeOut.durationMs}ms`,
+    "--ava-animation-duration-pop-in": `${AnimationTheme.preset.popIn.durationMs}ms`,
     "--ava-animation-duration-reduced": `${AnimationTheme.preset.reducedMotionDurationMs}ms`,
     "--ava-animation-easing-spring": AnimationTheme.preset.oozeIn.easing,
     "--ava-animation-easing-swipe-out": AnimationTheme.preset.swipeOut.easing,
+    "--ava-animation-easing-pop": AnimationTheme.easing.pop,
     "--ava-animate-swipe-translate-y": `${AnimationTheme.preset.swipeOut.translateYPx}px`,
+    "--ava-animate-pop-in-from-transform":
+      AnimationTheme.preset.popIn.from.transform,
+    "--ava-animate-pop-in-from-filter": AnimationTheme.preset.popIn.from.filter,
 
     "--ava-overlay-background": OverlayTheme.backdrop.backgroundColor,
     "--ava-overlay-backdrop-filter": OverlayTheme.backdrop.backdropFilter,

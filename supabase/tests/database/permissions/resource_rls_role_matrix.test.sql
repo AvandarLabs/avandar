@@ -172,32 +172,42 @@ insert into public.dashboards (
   owner_profile_id,
   name,
   description,
-  is_public,
+  visibility,
   config,
-  is_restricted
+  is_restricted,
+  snapshot_revision
 )
 values
   (
+    -- Published to the workspace, not a draft: this row is the subject of the
+    -- viewer-share SELECT case below, and the draft gate in
+    -- `util__auth_user_may_select_dashboard` denies a viewer-level grant on a
+    -- draft regardless of the share. Publishing keeps the matrix measuring the
+    -- share ladder rather than the publication state.
     'e200b001-0000-4000-8000-000000000001'::uuid,
     'e2001001-0000-4000-8000-000000000001'::uuid,
     'e2000001-0000-4000-8000-000000000001'::uuid,
     'e2003001-0000-4000-8000-000000000001'::uuid,
     'shared dashboard',
     '',
-    false,
+    'workspace',
     '{}'::jsonb,
-    true
+    true,
+    'e200b0a1-0000-4000-8000-000000000001'::uuid
   ),
   (
+    -- Stays a draft: every grant exercised against it is admin, which clears
+    -- the draft gate on its own.
     'e200b002-0000-4000-8000-000000000002'::uuid,
     'e2001001-0000-4000-8000-000000000001'::uuid,
     'e2000001-0000-4000-8000-000000000001'::uuid,
     'e2003001-0000-4000-8000-000000000001'::uuid,
     'admin delete dashboard',
     '',
-    false,
+    'draft',
     '{}'::jsonb,
-    true
+    true,
+    null
   )
 on conflict (id) do nothing;
 
@@ -665,6 +675,16 @@ select
     declare
       v_deleted int;
     begin
+      update public.dashboards
+      set
+        snapshot_transition_kind = 'delete',
+        snapshot_transition_revision = 'e2009002-0000-4000-8000-000000000002'::uuid,
+        snapshot_transition_prior_revision = snapshot_revision,
+        snapshot_transition_prior_visibility = visibility,
+        snapshot_transition_target_visibility = null
+      where
+        id = 'e200b002-0000-4000-8000-000000000002'::uuid;
+
       delete from public.dashboards
       where
         id = 'e200b002-0000-4000-8000-000000000002'::uuid;
@@ -763,7 +783,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'e200b099-0000-4000-8000-000000000099'::uuid,
@@ -772,7 +792,7 @@ select
       'e2003002-0000-4000-8000-000000000002'::uuid,
       'viewer insert dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_viewer_dash$,
@@ -798,7 +818,7 @@ select
       owner_profile_id,
       name,
       description,
-      is_public,
+      visibility,
       config
     ) values (
       'e200b098-0000-4000-8000-000000000098'::uuid,
@@ -807,7 +827,7 @@ select
       'e2003003-0000-4000-8000-000000000003'::uuid,
       'editor insert dash',
       '',
-      false,
+      'draft',
       '{}'::jsonb
     );
     $ins_editor_dash$

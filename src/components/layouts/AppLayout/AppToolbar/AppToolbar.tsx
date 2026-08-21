@@ -27,7 +27,9 @@ export function AppToolbar({
     <Group
       px="xxs"
       py="xxs"
-      bg="white"
+      // A floating toolbar overlays the view rather than banding across it, so
+      // it stays transparent and lets the surface behind it show through.
+      bg={floatingToolbar ? "transparent" : "white"}
       style={
         floatingToolbar ?
           {

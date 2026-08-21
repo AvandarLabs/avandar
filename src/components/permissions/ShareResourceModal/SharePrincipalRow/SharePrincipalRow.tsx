@@ -11,8 +11,8 @@ import {
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { appForResource } from "../copy/appForResource";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -24,6 +24,11 @@ type Props = {
   displayName: string;
   resourceType: ResourceType;
   isOwnerRow?: boolean;
+  /**
+   * Renders the row without any way to change it. Set for a viewer of the
+   * modal who may publish but may not hand out access.
+   */
+  isReadOnly?: boolean;
   onRoleChange: (role: RoleLevel) => void;
   onToggleRequiresAppAccess?: (next: boolean) => void;
   onRemove: () => void;
@@ -39,6 +44,7 @@ export function SharePrincipalRow({
   displayName,
   resourceType,
   isOwnerRow = false,
+  isReadOnly = false,
   onRoleChange,
   onToggleRequiresAppAccess,
   onRemove,
@@ -48,7 +54,7 @@ export function SharePrincipalRow({
   // these tooltips already had before the copy moved inline.
   const name = displayName;
   const isGroup = share.principalType === "user_group";
-  const app = appLabel(appForResource(resourceType));
+  const app = appLabel(getAppTypeFromResourceType(resourceType));
   const resource = resourceTypeLabel(resourceType);
 
   const roleOptions: Array<{ value: RoleLevel; label: string }> = [
@@ -77,6 +83,7 @@ export function SharePrincipalRow({
       : <Tooltip label={roleSelectTooltip()}>
           <Select
             w={120}
+            disabled={isReadOnly}
             data={roleOptions}
             value={share.role}
             allowDeselect={false}
@@ -97,6 +104,7 @@ export function SharePrincipalRow({
           w={320}
         >
           <Checkbox
+            disabled={isReadOnly}
             checked={share.requiresAppAccess}
             onChange={(event) => {
               onToggleRequiresAppAccess(event.currentTarget.checked);
@@ -113,6 +121,7 @@ export function SharePrincipalRow({
           <ActionIcon
             variant="subtle"
             color="gray"
+            disabled={isReadOnly}
             onClick={onRemove}
             aria-label={t`Remove access for ${displayName}`}
           >

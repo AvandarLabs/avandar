@@ -1,0 +1,42 @@
+/*
+ * Bordered diamond, same construction as Mantine's FloatingArrow. Joyride
+ * parks the caret in a box that sits fully outside the tooltip; the shifts
+ * below pull it onto the Card hairline so the fill covers the seam.
+ */
+.nuxTourCaret {
+  background: white;
+  border: transparent;
+  box-sizing: border-box;
+  display: block;
+  height: 16px;
+  transform: rotate(45deg);
+  width: 16px;
+}
+
+/* Tooltip is to the right of the target; caret is on the tooltip's left edge. */
+.nuxTourCaret[data-side="right"] {
+  clip-path: polygon(0 100%, 0 0, 100% 100%);
+  left: 10px;
+  position: relative;
+}
+
+/* Tooltip is to the left of the target; caret is on the tooltip's right edge. */
+.nuxTourCaret[data-side="left"] {
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  left: -10px;
+  position: relative;
+}
+
+/* Tooltip is above the target; caret is on the tooltip's bottom edge. */
+.nuxTourCaret[data-side="top"] {
+  clip-path: polygon(0 100%, 100% 100%, 100% 0);
+  position: relative;
+  top: -10px;
+}
+
+/* Tooltip is below the target; caret is on the tooltip's top edge. */
+.nuxTourCaret[data-side="bottom"] {
+  clip-path: polygon(0 100%, 0 0, 100% 0);
+  position: relative;
+  top: 10px;
+}

@@ -29,14 +29,13 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
-import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import type { AppLink } from "@/config/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
@@ -258,7 +257,6 @@ export function Navbar({
             );
           })}
         </Stack>
-        <BetaBadge size="md" style={{ alignSelf: "center" }} />
         <Divider />
         <Stack gap={0} pb="xs" pos="relative">
           {utilityLinks.map((item) => {

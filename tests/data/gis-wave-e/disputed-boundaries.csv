@@ -1,0 +1,5 @@
+name,status,geometry
+Alpha,Agreed,"{""type"":""Polygon"",""coordinates"":[[[10,10],[11,10],[11,11],[10,11],[10,10]]]}"
+Beta,Agreed,"{""type"":""Polygon"",""coordinates"":[[[11,10],[12,10],[12,11],[11,11],[11,10]]]}"
+Gamma,Disputed,"{""type"":""Polygon"",""coordinates"":[[[10,11],[11,11],[11,12],[10,12],[10,11]]]}"
+Delta,Undetermined,"{""type"":""Polygon"",""coordinates"":[[[11,11],[12,11],[12,12],[11,12],[11,11]]]}"

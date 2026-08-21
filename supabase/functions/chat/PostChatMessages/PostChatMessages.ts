@@ -1,27 +1,26 @@
 import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { emitChatTurnAnalytics } from "@sbfn/chat/PostChatMessages/analytics/emitChatTurnAnalytics/emitChatTurnAnalytics.ts";
 import { verifyChatConsentAcks } from "@sbfn/chat/PostChatMessages/consent/verifyChatConsentAcks.ts";
 import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
-import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
-import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import {
   countClarificationsInHistory,
   MAX_CLARIFICATIONS_PER_QUESTION,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { dashboardBlockSummary } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
-import {
-  buildRetryContextNote,
-  dashboardsSystemPrefix,
-  dataExplorerSystemPrefix,
-  genericSystemPrompt,
-} from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { caseTypeDraftIntro } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
+import { buildCaseManagerSystemPrompt } from "@sbfn/chat/PostChatMessages/prompt/buildCaseManagerSystemPrompt.ts";
+import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
+import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";
+import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
 import { z } from "zod";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
@@ -30,14 +29,6 @@ if (!openRouterApiKey) {
 }
 
 const openRouterReferer = getAppURL();
-
-// Cheap heuristic for "this prompt is a refinement of the previous turn."
-// When it matches AND the client gave us a `lastSql`, we attach the prior
-// SQL to the system prompt so the model can edit it instead of rebuilding
-// from scratch. The brief calls for "prior prompt + SQL only when relevant"
-// to keep token spend honest; this regex is the relevance gate.
-const REFINEMENT_HINTS =
-  /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;
 
 export const PostChatMessages = POST({
   path: "/:workspaceId/messages",
@@ -56,7 +47,13 @@ export const PostChatMessages = POST({
     context: AvaModelSchema({
       type: "ChatPageContext",
       props: {
-        app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
+        app: z.enum([
+          "data-explorer",
+          "data-sources",
+          "dashboards",
+          "case-manager",
+          "other",
+        ]),
         openDatasetId: z.string().optional(),
         lastSql: z.string().optional(),
         lastResultColumns: z
@@ -94,185 +91,167 @@ export const PostChatMessages = POST({
       })
       .optional(),
   })
-  .action(async ({ pathParams, body, supabaseClient, user }) => {
-    const { workspaceId } = pathParams;
-    const {
-      messages,
-      context,
-      model: requestedModel,
-      consentAcks,
-      retryContext,
-    } = body;
-    const model = enforceChatModelAllowlist(requestedModel);
+  .action(
+    async ({ pathParams, body, supabaseClient, supabaseAdminClient, user }) => {
+      const { workspaceId } = pathParams;
+      const {
+        messages,
+        context,
+        model: requestedModel,
+        consentAcks,
+        retryContext,
+      } = body;
+      const model = enforceChatModelAllowlist(requestedModel);
 
-    await verifyChatConsentAcks({
-      consentAcks,
-      messages,
-      workspaceId,
-      userId: user.id,
-    });
+      await verifyChatConsentAcks({
+        consentAcks,
+        messages,
+        workspaceId,
+        userId: user.id,
+      });
 
-    const isDataExplorer = context.app === "data-explorer";
-    const isDashboards = context.app === "dashboards";
-    const needsSchema = isDataExplorer || isDashboards;
-
-    // Only fetch the schema when we'll actually use it.
-    const schema =
-      needsSchema ?
-        await fetchWorkspaceSchema({ supabaseClient, workspaceId })
-      : { datasets: [], columns: [] };
-
-    const lastUserPrompt =
-      [...messages].reverse().find((m) => {
-        return m.role === "user";
-      })?.content ?? "";
-
-    const sqlSystemPrompt =
-      needsSchema ?
-        buildSqlSystemPrompt({
-          prompt: lastUserPrompt,
-          datasets: schema.datasets,
-          columns: schema.columns,
-        })
-      : "";
-
-    const hasLastSql =
-      typeof context.lastSql === "string" && context.lastSql.length > 0;
-
-    const isLikelyRefinement =
-      isDataExplorer && hasLastSql && REFINEMENT_HINTS.test(lastUserPrompt);
-
-    const refinementContext =
-      isLikelyRefinement && hasLastSql ?
-        `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\``
-      : "";
-
-    // When the prior SQL produced a runtime error and the client passed
-    // it back, surface it so the model can fix the query in this turn.
-    const errorContext =
-      isDataExplorer && hasLastSql && context.lastError ?
-        `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\`\n\nError:\n${context.lastError}`
-      : "";
-
-    // Tell the model the *current* result schema the user is looking at.
-    // After manual SQL edits or pill swaps the user-visible columns can
-    // diverge from the dataset schemas, so this is the source of truth
-    // for "what's on the canvas right now."
-    const resultColumnsContext =
-      (
-        isDataExplorer &&
-        context.lastResultColumns &&
-        context.lastResultColumns.length > 0
-      ) ?
-        `\n\nThe user is currently looking at a result with these columns:\n${context.lastResultColumns
-          .map((c) => {
-            return `- ${c.name} (${c.dataType})`;
+      const schema = await fetchWorkspaceSchema({
+        supabaseClient,
+        workspaceId,
+      });
+      const lastUserPrompt = getLastUserPromptFromMessages(messages);
+      const sqlSystemPrompt = buildSqlSystemPrompt({
+        prompt: lastUserPrompt,
+        datasets: schema.datasets,
+        columns: schema.columns,
+        concepts: schema.concepts,
+        conceptAttributes: schema.conceptAttributes,
+        includeSpatialDocumentation: false,
+      });
+      const systemContent =
+        context.app === "case-manager" ?
+          buildCaseManagerSystemPrompt({
+            datasets: schema.datasets,
+            columns: schema.columns,
+            concepts: schema.concepts,
           })
-          .join(
-            "\n",
-          )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
-      : "";
+        : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
+      const turnSuffix =
+        context.app === "case-manager" ?
+          ""
+        : makeChatTurnSuffixFromOptions({
+            context,
+            retryContext,
+            lastUserPrompt,
+          });
 
-    const retryContextNote = buildRetryContextNote(retryContext);
+      const priorClarifications = countClarificationsInHistory(messages);
+      const clarificationCapReached =
+        priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
+      const requestBody: Record<string, unknown> = {
+        model,
+        messages: [
+          { role: "system", content: systemContent },
+          ...messages,
+          ...(turnSuffix ? [{ role: "user", content: turnSuffix }] : []),
+        ],
+        temperature: 0.3,
+      };
+      Object.assign(
+        requestBody,
+        makeChatToolConfigFromOptions({
+          clarificationCapReached,
+          app: context.app,
+        }),
+      );
 
-    const systemContent =
-      (isDataExplorer ?
-        `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}${resultColumnsContext}`
-      : isDashboards ? `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
-      : genericSystemPrompt) + retryContextNote;
+      const turnStartedAt = performance.now();
+      let parsed: ParsedAttempt;
+      let attemptCount: number;
+      try {
+        ({ parsed, attemptCount } = await runChatAttemptsWithEscalation({
+          requestBody,
+          apiKey: openRouterApiKey,
+          referer: openRouterReferer,
+          lastUserPrompt,
+          priorClarifications,
+          datasets: schema.datasets,
+          concepts: schema.concepts,
+          skipSqlExtraction: context.app === "case-manager",
+        }));
+      } catch (error) {
+        await emitChatTurnAnalytics({
+          supabaseAdminClient,
+          workspaceId,
+          userId: user.id,
+          pageApp: context.app,
+          outcome: {
+            kind: "failed",
+            modelId: model,
+            latencyMs: performance.now() - turnStartedAt,
+            error,
+          },
+        });
+        throw error;
+      }
 
-    const requestBody: Record<string, unknown> = {
-      model,
-      messages: [{ role: "system", content: systemContent }, ...messages],
-      temperature: 0.3,
-    };
+      const {
+        text,
+        generatedSql,
+        clarification,
+        dashboardBlock,
+        createdCaseTypes,
+        proposedCaseType,
+      } = parsed;
+      const assistantText = ((): string => {
+        if (text) {
+          return text;
+        }
+        if (generatedSql) {
+          return "";
+        }
+        if (clarification) {
+          return clarification.question;
+        }
+        if (dashboardBlock) {
+          return dashboardBlockSummary(dashboardBlock);
+        }
+        if (createdCaseTypes && createdCaseTypes.length > 0) {
+          return createdCaseTypes
+            .map((caseType) => {
+              return caseType.name;
+            })
+            .join(", ");
+        }
+        if (proposedCaseType) {
+          return caseTypeDraftIntro(proposedCaseType.name);
+        }
+        return context.app === "case-manager" ?
+            "I could not create those case types. Try choosing again or describing what you want."
+          : "I could not generate a query for that. Try rephrasing.";
+      })();
 
-    const priorClarifications = countClarificationsInHistory(messages);
-    const clarificationCapReached =
-      priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
-    Object.assign(
-      requestBody,
-      makeChatToolConfigFromOptions({
-        isDataExplorer,
-        isDashboards,
-        clarificationCapReached,
-      }),
-    );
-
-    // Single OpenRouter attempt, wrapped in a helper so the
-    // retry-on-empty escalation below can re-call it with different
-    // params. Throws on non-2xx so the outer handler surfaces it.
-    const runAttempt = (attemptRequestBody: Record<string, unknown>) => {
-      return sendOpenRouterRequest({
-        requestBody: attemptRequestBody,
-        apiKey: openRouterApiKey,
-        referer: openRouterReferer,
+      const result: ChatResponse.T = Model.make("ChatResponse", {
+        assistantText,
+        ...(generatedSql ? { generatedSql: generatedSql } : {}),
+        ...(clarification ? { clarification } : {}),
+        ...(dashboardBlock ? { dashboardBlock } : {}),
+        ...(createdCaseTypes ? { createdCaseTypes } : {}),
+        ...(proposedCaseType ? { proposedCaseType } : {}),
       });
-    };
 
-    // Attempt 1: normal call.
-    let attempt = await runAttempt(requestBody);
-    let parsed = parseOpenRouterResponse({
-      message: attempt.message,
-      attemptText: attempt.text,
-      isDataExplorer,
-      isDashboards,
-      lastUserPrompt,
-      priorClarifications,
-    });
-
-    // Attempt 2 (only when attempt 1 returned nothing): literal repeat
-    // with a bumped temperature so we get a meaningfully different
-    // draw rather than the same emptiness twice.
-    if (isEmptyParsedAttempt(parsed)) {
-      attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
-      parsed = parseOpenRouterResponse({
-        message: attempt.message,
-        attemptText: attempt.text,
-        isDataExplorer,
-        isDashboards,
-        lastUserPrompt,
-        priorClarifications,
+      await emitChatTurnAnalytics({
+        supabaseAdminClient,
+        workspaceId,
+        userId: user.id,
+        pageApp: context.app,
+        outcome: {
+          kind: "completed",
+          modelId: model,
+          latencyMs: performance.now() - turnStartedAt,
+          attemptCount,
+          promptChars: lastUserPrompt.length,
+          schemaDatasetCount: schema.datasets.length,
+          assistantText,
+          parsed,
+        },
       });
-    }
 
-    // Attempt 3 (only when attempts 1 and 2 returned nothing): force
-    // the model into one of the registered tools. Skipped on the
-    // generic surface where the request has no tools to pick from.
-    const hasTools =
-      Array.isArray(requestBody.tools) &&
-      (requestBody.tools as unknown[]).length > 0;
-    if (isEmptyParsedAttempt(parsed) && hasTools) {
-      attempt = await runAttempt({
-        ...requestBody,
-        temperature: 0.5,
-        tool_choice: "required",
-      });
-      parsed = parseOpenRouterResponse({
-        message: attempt.message,
-        attemptText: attempt.text,
-        isDataExplorer,
-        isDashboards,
-        lastUserPrompt,
-        priorClarifications,
-      });
-    }
-
-    const { text, generatedSql, clarification, dashboardBlock } = parsed;
-
-    const assistantText =
-      text ||
-      (generatedSql ?
-        "Here is the SQL I ran. Results are on the canvas to the left."
-      : clarification ? clarification.question
-      : dashboardBlock ? dashboardBlockSummary(dashboardBlock)
-      : "I could not generate a query for that. Try rephrasing.");
-
-    const result: ChatResponse.T = Model.make("ChatResponse", {
-      assistantText,
-      ...(generatedSql ? { generatedSql: generatedSql } : {}),
-      ...(clarification ? { clarification } : {}),
-      ...(dashboardBlock ? { dashboardBlock } : {}),
-    });
-    return result;
-  });
+      return result;
+    },
+  );

@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 

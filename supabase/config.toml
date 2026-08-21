@@ -65,6 +65,7 @@ enabled = true
 # is the last word on the storage schema for a local database.
 sql_paths = [
   "./migrations/20260813214231_STORAGE-restore-dropped-object-policies.sql",
+  "./migrations/20260816020300_STORAGE-dashboard-snapshot-buckets.sql",
 ]
 
 [realtime]
@@ -400,6 +401,12 @@ entrypoint = "./functions/queries/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/queries/*.html" ]
+
+[functions.open-data]
+enabled = true
+verify_jwt = false
+import_map = "./functions/open-data/deno.json"
+entrypoint = "./functions/open-data/index.ts"
 
 [functions.healthz]
 enabled = true

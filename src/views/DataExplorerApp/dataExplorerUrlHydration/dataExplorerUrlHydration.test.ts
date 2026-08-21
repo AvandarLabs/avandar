@@ -67,7 +67,7 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: undefined,
         needsColumns: false,
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: false,
       }),
     ).toBe(true);
@@ -80,7 +80,7 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: undefined,
         needsColumns: true,
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
@@ -93,7 +93,7 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: undefined,
         needsColumns: false,
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(true);
@@ -106,7 +106,7 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: DS,
         needsColumns: false,
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
@@ -119,7 +119,7 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: DS,
         needsColumns: true,
         datasetColumns: undefined,
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(true);
@@ -132,20 +132,20 @@ describe("shouldDeferUrlHydrationForStructuredLoading", () => {
         restoredDataSource: DS,
         needsColumns: true,
         datasetColumns: [{ id: "c1" }],
-        entityFieldConfigs: undefined,
+        conceptAttributes: undefined,
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);
   });
 
-  it("does not defer when entity field configs have loaded", () => {
+  it("does not defer when concept attributes have loaded", () => {
     expect(
       shouldDeferUrlHydrationForStructuredLoading({
         urlState: _parsed({ dsId: "x", colNames: ["a"] }),
         restoredDataSource: DS,
         needsColumns: true,
         datasetColumns: undefined,
-        entityFieldConfigs: [{ id: "f1" }],
+        conceptAttributes: [{ id: "f1" }],
         sqlMappingMetadataLoaded: true,
       }),
     ).toBe(false);

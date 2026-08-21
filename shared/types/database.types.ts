@@ -34,6 +34,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      attribute_mappings__dataset_column: {
+        Row: {
+          concept_attribute_id: string
+          created_at: string
+          dataset_column_id: string
+          dataset_id: string
+          id: string
+          updated_at: string
+          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id: string
+        }
+        Insert: {
+          concept_attribute_id: string
+          created_at?: string
+          dataset_column_id: string
+          dataset_id: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id: string
+        }
+        Update: {
+          concept_attribute_id?: string
+          created_at?: string
+          dataset_column_id?: string
+          dataset_id?: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type?: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attribute_mappings__dataset_column_concept_attribute_id_fkey"
+            columns: ["concept_attribute_id"]
+            isOneToOne: true
+            referencedRelation: "concept_attributes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attribute_mappings__dataset_column_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attribute_mappings__manual_entry: {
+        Row: {
+          concept_attribute_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          concept_attribute_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          concept_attribute_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attribute_mappings__manual_entry_concept_attribute_id_fkey"
+            columns: ["concept_attribute_id"]
+            isOneToOne: true
+            referencedRelation: "concept_attributes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attribute_mappings__manual_entry_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catalog_entries__dataset_column: {
         Row: {
           cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
@@ -77,6 +164,13 @@ export type Database = {
       }
       catalog_entries__open_data: {
         Row: {
+          access_kind: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url: string | null
+          api_resource_format: string | null
+          api_resource_id: string | null
+          api_service:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls: string[] | null
           coverage_end_date: string | null
           coverage_start_date: string | null
@@ -92,14 +186,21 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
-          parquet_file_name: string
-          pipeline_name: string
-          pipeline_run_id: string
+          parquet_file_name: string | null
+          pipeline_name: string | null
+          pipeline_run_id: string | null
           source_url: string | null
           update_frequency: string | null
           updated_at: string
         }
         Insert: {
+          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
@@ -115,14 +216,21 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
-          parquet_file_name: string
-          pipeline_name: string
-          pipeline_run_id: string
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
         }
         Update: {
+          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
@@ -138,14 +246,118 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
-          parquet_file_name?: string
-          pipeline_name?: string
-          pipeline_run_id?: string
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      concept_attributes: {
+        Row: {
+          allow_manual_edit: boolean
+          concept_id: string
+          created_at: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description: string | null
+          id: string
+          is_array: boolean
+          is_identifier: boolean
+          is_label: boolean
+          mapping_type: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_manual_edit: boolean
+          concept_id: string
+          created_at?: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description?: string | null
+          id?: string
+          is_array: boolean
+          is_identifier: boolean
+          is_label: boolean
+          mapping_type: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_manual_edit?: boolean
+          concept_id?: string
+          created_at?: string
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
+          description?: string | null
+          id?: string
+          is_array?: boolean
+          is_identifier?: boolean
+          is_label?: boolean
+          mapping_type?: Database["public"]["Enums"]["concept_attributes__mapping_type"]
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concept_attributes_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concept_attributes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concepts: {
+        Row: {
+          allow_manual_creation: boolean
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          allow_manual_creation: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          allow_manual_creation?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concepts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dashboards: {
         Row: {
@@ -159,7 +371,20 @@ export type Database = {
           owner_id: string
           owner_profile_id: string
           slug: string | null
+          snapshot_revision: string | null
+          snapshot_transition_kind:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision: string | null
+          snapshot_transition_prior_visibility:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision: string | null
+          snapshot_transition_target_visibility:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at: string
+          visibility: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id: string
         }
         Insert: {
@@ -173,7 +398,20 @@ export type Database = {
           owner_id?: string
           owner_profile_id: string
           slug?: string | null
+          snapshot_revision?: string | null
+          snapshot_transition_kind?:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision?: string | null
+          snapshot_transition_prior_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision?: string | null
+          snapshot_transition_target_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at?: string
+          visibility?: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id: string
         }
         Update: {
@@ -187,7 +425,20 @@ export type Database = {
           owner_id?: string
           owner_profile_id?: string
           slug?: string | null
+          snapshot_revision?: string | null
+          snapshot_transition_kind?:
+            | Database["public"]["Enums"]["dashboard_snapshot_transition_kind"]
+            | null
+          snapshot_transition_prior_revision?: string | null
+          snapshot_transition_prior_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
+          snapshot_transition_revision?: string | null
+          snapshot_transition_target_visibility?:
+            | Database["public"]["Enums"]["dashboard_visibility"]
+            | null
           updated_at?: string
+          visibility?: Database["public"]["Enums"]["dashboard_visibility"]
           workspace_id?: string
         }
         Relationships: [
@@ -404,6 +655,7 @@ export type Database = {
           google_document_id: string
           id: string
           rows_to_skip: number
+          sheet_name: string | null
           updated_at: string
           workspace_id: string
         }
@@ -414,6 +666,7 @@ export type Database = {
           google_document_id: string
           id?: string
           rows_to_skip?: number
+          sheet_name?: string | null
           updated_at?: string
           workspace_id: string
         }
@@ -424,6 +677,7 @@ export type Database = {
           google_document_id?: string
           id?: string
           rows_to_skip?: number
+          sheet_name?: string | null
           updated_at?: string
           workspace_id?: string
         }
@@ -493,6 +747,72 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__open_data_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      datasets__pdf_file: {
+        Row: {
+          created_at: string
+          dataset_id: string
+          fingerprint: Json
+          has_original_file: boolean
+          id: string
+          is_in_cloud_storage: boolean
+          llm_model: string | null
+          output_mode: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end: number | null
+          page_range_start: number | null
+          regions: Json
+          size_in_bytes: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id: string
+          fingerprint: Json
+          has_original_file?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end?: number | null
+          page_range_start?: number | null
+          regions: Json
+          size_in_bytes: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string
+          fingerprint?: Json
+          has_original_file?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          llm_model?: string | null
+          output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          page_range_end?: number | null
+          page_range_start?: number | null
+          regions?: Json
+          size_in_bytes?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__pdf_file_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__pdf_file_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -632,11 +952,11 @@ export type Database = {
         }
         Relationships: []
       }
-      entities: {
+      individuals: {
         Row: {
           assigned_to: string | null
+          concept_id: string
           created_at: string
-          entity_config_id: string
           external_id: string
           id: string
           name: string
@@ -646,8 +966,8 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          concept_id: string
           created_at?: string
-          entity_config_id: string
           external_id: string
           id?: string
           name: string
@@ -657,8 +977,8 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          concept_id?: string
           created_at?: string
-          entity_config_id?: string
           external_id?: string
           id?: string
           name?: string
@@ -668,14 +988,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "entities_entity_config_id_fkey"
-            columns: ["entity_config_id"]
+            foreignKeyName: "individuals_concept_id_fkey"
+            columns: ["concept_id"]
             isOneToOne: false
-            referencedRelation: "entity_configs"
+            referencedRelation: "concepts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "entities_workspace_id_fkey"
+            foreignKeyName: "individuals_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -683,103 +1003,59 @@ export type Database = {
           },
         ]
       }
-      entity_configs: {
+      maps: {
         Row: {
-          allow_manual_creation: boolean
+          config: Json
           created_at: string
           description: string | null
           id: string
+          is_public: boolean
+          is_restricted: boolean
           name: string
           owner_id: string
+          owner_profile_id: string
+          slug: string | null
           updated_at: string
           workspace_id: string
         }
         Insert: {
-          allow_manual_creation: boolean
+          config: Json
           created_at?: string
           description?: string | null
           id?: string
+          is_public?: boolean
+          is_restricted?: boolean
           name: string
           owner_id?: string
+          owner_profile_id: string
+          slug?: string | null
           updated_at?: string
           workspace_id: string
         }
         Update: {
-          allow_manual_creation?: boolean
+          config?: Json
           created_at?: string
           description?: string | null
           id?: string
+          is_public?: boolean
+          is_restricted?: boolean
           name?: string
           owner_id?: string
+          owner_profile_id?: string
+          slug?: string | null
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "entity_configs_workspace_id_fkey"
-            columns: ["workspace_id"]
+            foreignKeyName: "maps_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
             isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      entity_field_configs: {
-        Row: {
-          allow_manual_edit: boolean
-          created_at: string
-          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description: string | null
-          entity_config_id: string
-          id: string
-          is_array: boolean
-          is_id_field: boolean
-          is_title_field: boolean
-          name: string
-          updated_at: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id: string
-        }
-        Insert: {
-          allow_manual_edit: boolean
-          created_at?: string
-          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description?: string | null
-          entity_config_id: string
-          id?: string
-          is_array: boolean
-          is_id_field: boolean
-          is_title_field: boolean
-          name: string
-          updated_at?: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id: string
-        }
-        Update: {
-          allow_manual_edit?: boolean
-          created_at?: string
-          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
-          description?: string | null
-          entity_config_id?: string
-          id?: string
-          is_array?: boolean
-          is_id_field?: boolean
-          is_title_field?: boolean
-          name?: string
-          updated_at?: string
-          value_extractor_type?: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "entity_field_configs_entity_config_id_fkey"
-            columns: ["entity_config_id"]
-            isOneToOne: false
-            referencedRelation: "entity_configs"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "entity_field_configs_workspace_id_fkey"
+            foreignKeyName: "maps_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1131,6 +1407,39 @@ export type Database = {
           },
         ]
       }
+      user_nux_progress: {
+        Row: {
+          catch_up_suppressed: boolean
+          completed_milestones: string[]
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["nux_status"]
+          tutorial_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          catch_up_suppressed?: boolean
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          catch_up_suppressed?: boolean
+          completed_milestones?: string[]
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["nux_status"]
+          tutorial_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string
@@ -1178,93 +1487,6 @@ export type Database = {
           },
           {
             foreignKeyName: "user_profiles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      value_extractors__dataset_column_value: {
-        Row: {
-          created_at: string
-          dataset_column_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id: string
-          updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          dataset_column_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          dataset_column_id?: string
-          dataset_id?: string
-          entity_field_config_id?: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__dataset_column_va_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__dataset_column_value_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      value_extractors__manual_entry: {
-        Row: {
-          created_at: string
-          entity_field_config_id: string
-          id: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          entity_field_config_id: string
-          id?: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          entity_field_config_id?: string
-          id?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__manual_entry_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__manual_entry_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1406,6 +1628,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      maps__auth_user_may_select: {
+        Args: { p_map_id: string }
+        Returns: boolean
+      }
+      maps__auth_user_may_select_grant: {
+        Args: {
+          p_is_restricted: boolean
+          p_map_id: string
+          p_owner_id: string
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      maps__owner_id_matches_stored: {
+        Args: { p_map_id: string; p_owner_id: string }
+        Returns: boolean
+      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1482,6 +1721,7 @@ export type Database = {
           p_google_account_id: string
           p_google_document_id: string
           p_rows_to_skip?: number
+          p_sheet_name?: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_workspace_id: string
         }
         Returns: {
@@ -1511,6 +1751,43 @@ export type Database = {
           p_dataset_description: string
           p_dataset_id: string
           p_dataset_name: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      rpc_datasets__add_pdf_file_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_fingerprint: Json
+          p_has_original_file: boolean
+          p_is_in_cloud_storage: boolean
+          p_llm_model?: string
+          p_output_mode?: Database["public"]["Enums"]["datasets__pdf_output_mode"]
+          p_page_range_end: number
+          p_page_range_start: number
+          p_regions: Json
+          p_size_in_bytes: number
           p_workspace_id: string
         }
         Returns: {
@@ -1638,6 +1915,7 @@ export type Database = {
         Returns: {
           private_dashboard_count: number
           private_dataset_count: number
+          private_map_count: number
           user_id: string
         }[]
       }
@@ -1692,12 +1970,29 @@ export type Database = {
         }
         Returns: boolean
       }
+      util__auth_user_has_resource_share: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
       util__auth_user_may_select_dashboard: {
         Args: { p_dashboard_id: string }
         Returns: boolean
       }
       util__auth_user_may_select_dataset: {
         Args: { p_dataset_id: string }
+        Returns: boolean
+      }
+      util__auth_user_may_select_resource_base: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
         Returns: boolean
       }
       util__auth_user_meets_min_app_role: {
@@ -1710,6 +2005,10 @@ export type Database = {
       }
       util__can_manage_workspace_settings: {
         Args: { p_workspace_id: string }
+        Returns: boolean
+      }
+      util__dashboard_counts_as_shareable: {
+        Args: { p_dashboard_id: string }
         Returns: boolean
       }
       util__email_domain: { Args: { p_email: string }; Returns: string }
@@ -1784,7 +2083,15 @@ export type Database = {
         Args: { p_workspace_id: string }
         Returns: undefined
       }
+      util__storage_object_dashboard_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
       util__storage_object_dataset_id: {
+        Args: { p_object_name: string }
+        Returns: string
+      }
+      util__storage_object_snapshot_revision: {
         Args: { p_object_name: string }
         Returns: string
       }
@@ -1798,6 +2105,10 @@ export type Database = {
         }
         Returns: number
       }
+      util__workspace_max_shareable_dashboards: {
+        Args: { p_workspace_id: string }
+        Returns: number
+      }
     }
     Enums: {
       app_type:
@@ -1806,6 +2117,25 @@ export type Database = {
         | "dashboards"
         | "settings"
         | "gis"
+      attribute_mappings__value_picker_rule_type:
+        | "most_frequent"
+        | "first"
+        | "sum"
+        | "avg"
+        | "count"
+        | "max"
+        | "min"
+      catalog_entries__open_data__access_kind:
+        | "pipeline_parquet"
+        | "api_resource"
+      catalog_entries__open_data__api_service: "ckan"
+      concept_attributes__mapping_type: "dataset_column" | "manual_entry"
+      dashboard_snapshot_transition_kind:
+        | "publish"
+        | "abort_publish"
+        | "unpublish"
+        | "delete"
+      dashboard_visibility: "draft" | "workspace" | "public"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -1845,16 +2175,22 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
+      datasets__pdf_detection_mode: "tagged" | "lattice" | "stream" | "manual"
+      datasets__pdf_output_mode: "natural" | "observations"
+      datasets__pdf_region_shape:
+        | "grid_table"
+        | "labelled_graphic"
+        | "repeating_blocks"
+        | "prose_measures"
       datasets__source_type:
         | "csv_file"
         | "google_sheets"
         | "virtual"
         | "open_data"
         | "xlsx_file"
-      entity_field_configs__value_extractor_type:
-        | "dataset_column_value"
-        | "manual_entry"
-      resource_type: "dashboard" | "dataset"
+        | "pdf_file"
+      nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
+      resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
       share_principal_type: "user" | "user_group" | "workspace"
       subscriptions__feature_plan_type: "free" | "basic" | "premium"
@@ -1875,14 +2211,6 @@ export type Database = {
         | "revenue"
         | "other"
       usage_analytics_events__client: "web" | "desktop" | "server" | "db"
-      value_extractors__value_picker_rule_type:
-        | "most_frequent"
-        | "first"
-        | "sum"
-        | "avg"
-        | "count"
-        | "max"
-        | "min"
       workspace_invites__status: "pending" | "accepted"
     }
     CompositeTypes: {
@@ -2038,6 +2366,28 @@ export const Constants = {
         "settings",
         "gis",
       ],
+      attribute_mappings__value_picker_rule_type: [
+        "most_frequent",
+        "first",
+        "sum",
+        "avg",
+        "count",
+        "max",
+        "min",
+      ],
+      catalog_entries__open_data__access_kind: [
+        "pipeline_parquet",
+        "api_resource",
+      ],
+      catalog_entries__open_data__api_service: ["ckan"],
+      concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
+      dashboard_snapshot_transition_kind: [
+        "publish",
+        "abort_publish",
+        "unpublish",
+        "delete",
+      ],
+      dashboard_visibility: ["draft", "workspace", "public"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -2079,18 +2429,24 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
+      datasets__pdf_detection_mode: ["tagged", "lattice", "stream", "manual"],
+      datasets__pdf_output_mode: ["natural", "observations"],
+      datasets__pdf_region_shape: [
+        "grid_table",
+        "labelled_graphic",
+        "repeating_blocks",
+        "prose_measures",
+      ],
       datasets__source_type: [
         "csv_file",
         "google_sheets",
         "virtual",
         "open_data",
         "xlsx_file",
+        "pdf_file",
       ],
-      entity_field_configs__value_extractor_type: [
-        "dataset_column_value",
-        "manual_entry",
-      ],
-      resource_type: ["dashboard", "dataset"],
+      nux_status: ["not_started", "in_progress", "completed", "dismissed"],
+      resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],
       share_principal_type: ["user", "user_group", "workspace"],
       subscriptions__feature_plan_type: ["free", "basic", "premium"],
@@ -2113,15 +2469,6 @@ export const Constants = {
         "other",
       ],
       usage_analytics_events__client: ["web", "desktop", "server", "db"],
-      value_extractors__value_picker_rule_type: [
-        "most_frequent",
-        "first",
-        "sum",
-        "avg",
-        "count",
-        "max",
-        "min",
-      ],
       workspace_invites__status: ["pending", "accepted"],
     },
   },

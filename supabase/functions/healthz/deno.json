@@ -1,5 +1,6 @@
 {
   "imports": {
+    "$/": "../../../shared/",
     "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
     "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
     "@avandar/models": "../../../packages/shared/models/src/index.ts",
@@ -14,9 +15,9 @@
     "@models/": "../../../packages/shared/models/src/",
     "@modules/": "../../../packages/shared/modules/src/",
     "@sbfn/": "../",
+    "@supabase/postgrest-js": "npm:@supabase/postgrest-js@2",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@utils/": "../../../packages/shared/utils/src/",
-    "$/": "../../../shared/",
     "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
   },

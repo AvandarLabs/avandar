@@ -38,7 +38,10 @@ export function ChatPanelProvider({
       initialStateOverrides={{
         isOpen: _readInitialChatPanelOpenState(),
         isAvailable: isChatAvailable,
+        layout: "docked",
+        caseDesignSessionNonce: 0,
         pendingClarification: undefined,
+        pendingCaseTypeDraft: undefined,
       }}
     >
       <ChatPanelContents>{children}</ChatPanelContents>

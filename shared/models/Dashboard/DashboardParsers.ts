@@ -9,6 +9,10 @@ import {
   undefinedsToNullsDeep,
 } from "@avandar/utils";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
+import {
+  DASHBOARD_SNAPSHOT_TRANSITION_KINDS,
+  DASHBOARD_VISIBILITIES,
+} from "$/models/Dashboard/Dashboard.constants.ts";
 import { z } from "zod";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
@@ -26,11 +30,24 @@ const DBReadSchema = z.object({
   description: z.string().nullable(),
   id: z.uuid(),
   is_public: z.boolean(),
+  visibility: z.enum(DASHBOARD_VISIBILITIES),
   is_restricted: z.boolean(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),
   slug: z.string().nullable(),
+  snapshot_revision: z.uuid().nullable(),
+  snapshot_transition_kind: z
+    .enum(DASHBOARD_SNAPSHOT_TRANSITION_KINDS)
+    .nullable(),
+  snapshot_transition_prior_revision: z.uuid().nullable(),
+  snapshot_transition_prior_visibility: z
+    .enum(DASHBOARD_VISIBILITIES)
+    .nullable(),
+  snapshot_transition_revision: z.uuid().nullable(),
+  snapshot_transition_target_visibility: z
+    .enum(DASHBOARD_VISIBILITIES)
+    .nullable(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
 });
@@ -54,12 +71,32 @@ export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
   fromModelInsertToDBInsert: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps(["config", "description", "slug"]),
+    excludeNullsExceptInProps([
+      "config",
+      "description",
+      "slug",
+      "snapshot_revision",
+      "snapshot_transition_kind",
+      "snapshot_transition_prior_revision",
+      "snapshot_transition_prior_visibility",
+      "snapshot_transition_revision",
+      "snapshot_transition_target_visibility",
+    ]),
   ),
   fromModelUpdateToDBUpdate: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps(["config", "description", "slug"]),
+    excludeNullsExceptInProps([
+      "config",
+      "description",
+      "slug",
+      "snapshot_revision",
+      "snapshot_transition_kind",
+      "snapshot_transition_prior_revision",
+      "snapshot_transition_prior_visibility",
+      "snapshot_transition_revision",
+      "snapshot_transition_target_visibility",
+    ]),
   ),
 });
 

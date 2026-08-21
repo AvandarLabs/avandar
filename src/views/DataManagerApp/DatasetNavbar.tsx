@@ -17,7 +17,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
-import { AppLinks } from "@/config/AppLinks";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";

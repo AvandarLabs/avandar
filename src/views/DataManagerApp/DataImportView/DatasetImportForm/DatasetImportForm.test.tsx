@@ -10,7 +10,7 @@ import { DatasetImportForm } from "./DatasetImportForm";
 import type {
   CsvDataSourceMetadata,
   DataSourceMetadata,
-} from "./DatasetImportForm";
+} from "./DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 const CSV_DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
@@ -33,7 +33,7 @@ vi.mock("./useSaveDataset/useSaveDataset", async () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetClient", () => {
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
       QueryKeys: {
@@ -193,6 +193,7 @@ describe("DatasetImportForm", () => {
       numRowsToSkip: 1,
       delimiter: ",",
     });
+    expect(saveDatasetMock).not.toHaveBeenCalled();
   });
 
   it("renders CSV parse controls and updates metadata", () => {
@@ -212,6 +213,15 @@ describe("DatasetImportForm", () => {
         </AvandarAppProvider>
       </I18nProvider>,
     );
+
+    expect(
+      screen.queryByText("Data processed successfully"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("These are the first 1 rows of your dataset.", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Delimiter"), {
       target: { value: ";" },
