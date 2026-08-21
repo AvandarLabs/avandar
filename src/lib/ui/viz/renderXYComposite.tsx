@@ -1,8 +1,10 @@
 import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
+import { Label } from "recharts";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
 import type { ComponentProps } from "react";
 
@@ -15,6 +17,7 @@ type Props = {
   tooltipProps?: ComponentProps<typeof MantineCompositeChart>["tooltipProps"];
   styleProps: ReturnType<typeof applyChartStyle>;
   valueFormatter?: (value: number) => string;
+  chartStyle?: ChartStyle;
 };
 
 /**
@@ -33,10 +36,27 @@ export function renderXYComposite({
   tooltipProps,
   styleProps,
   valueFormatter,
+  chartStyle,
 }: Props): JSX.Element {
   const compositeSeries: CompositeChartSeries[] = series.map((s) => {
     return { name: s.key, label: s.label, color: s.color, type: s.renderAs };
   });
+
+  // Mantine collapses both axis labels into one shared `styles.axisLabel` fill.
+  // Render per-axis <Label> children with their own `fill`; reserve margins.
+  const {
+    styles: _sharedAxisLabelStyle,
+    xAxisLabel: _xAxisLabel,
+    yAxisLabel: _yAxisLabel,
+    xAxisProps,
+    yAxisProps,
+    ...restStyleProps
+  } = styleProps;
+
+  const xLabelText = chartStyle?.xAxis?.label;
+  const yLabelText = chartStyle?.yAxis?.label;
+  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
+  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
 
   return (
     <MantineCompositeChart
@@ -88,7 +108,42 @@ export function renderXYComposite({
           ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
         };
       }}
-      {...styleProps}
+      composedChartProps={{
+        margin: {
+          bottom: hasXLabel ? 30 : undefined,
+          left: hasYLabel ? 10 : undefined,
+          right: hasYLabel ? 5 : undefined,
+        },
+      }}
+      xAxisProps={{
+        ...xAxisProps,
+        children:
+          hasXLabel ?
+            <Label
+              value={xLabelText}
+              position="insideBottom"
+              offset={-20}
+              fontSize={12}
+              fill={chartStyle?.xAxis?.labelColor}
+            />
+          : xAxisProps?.children,
+      }}
+      yAxisProps={{
+        ...yAxisProps,
+        children:
+          hasYLabel ?
+            <Label
+              value={yLabelText}
+              position="insideLeft"
+              angle={-90}
+              textAnchor="middle"
+              offset={-5}
+              fontSize={12}
+              fill={chartStyle?.yAxis?.labelColor}
+            />
+          : yAxisProps?.children,
+      }}
+      {...restStyleProps}
     />
   );
 }

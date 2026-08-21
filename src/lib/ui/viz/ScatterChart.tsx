@@ -1,5 +1,6 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { Label } from "recharts";
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
@@ -64,6 +65,24 @@ export function ScatterChart({
     isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
   const xLabel = chartStyle?.xAxis?.label ?? derivedXLabel;
   const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
+  const hasXLabel = xLabel !== undefined && xLabel !== "";
+  const hasYLabel = yLabel !== undefined && yLabel !== "";
+
+  // Mantine paints both axis labels through a single `styles.axisLabel` fill
+  // (one shared `getStyles("axisLabel")` selector), so a per-axis label color
+  // would collapse into one. Drop that shared mechanism and render our own
+  // per-axis <Label> children with independent `fill`, matching AreaChart and
+  // BubbleChart. The label *text* keeps scatter's column-name fallback
+  // (`xLabel` / `yLabel`); only the color comes from `chartStyle`. Margins are
+  // reserved manually since Mantine only reserves them for its own labels.
+  const {
+    styles: _sharedAxisLabelStyle,
+    xAxisLabel: _xAxisLabel,
+    yAxisLabel: _yAxisLabel,
+    xAxisProps,
+    yAxisProps,
+    ...restStyleProps
+  } = styleProps;
 
   return (
     <MantineScatterChart
@@ -72,31 +91,48 @@ export function ScatterChart({
       dataKey={{ x: "x", y: "y" }}
       withLegend
       valueFormatter={formatChartNumber}
-      {...styleProps}
-      // `applyChartStyle` only knows the *configured* label; scatter also
-      // falls back to the column name when none is set, so these go
-      // after the spread. Recharts renders both an axis `label` prop and
-      // any `<Label>` child, so the label must come from exactly one
-      // mechanism: Mantine's, which is also what carries `labelColor`
-      // through `styles.axisLabel`.
-      xAxisLabel={xLabel}
-      yAxisLabel={yLabel}
+      xAxisProps={{
+        ...xAxisProps,
+        children:
+          hasXLabel ?
+            <Label
+              value={xLabel}
+              position="insideBottom"
+              offset={-20}
+              fontSize={12}
+              fill={chartStyle?.xAxis?.labelColor}
+            />
+          : xAxisProps?.children,
+      }}
       yAxisProps={{
-        ...styleProps.yAxisProps,
+        ...yAxisProps,
         // Widen to fit the rotated Y label.
-        ...(yLabel !== undefined ? { width: 80 } : {}),
+        ...(hasYLabel ? { width: 80 } : {}),
+        children:
+          hasYLabel ?
+            <Label
+              value={yLabel}
+              position="insideLeft"
+              angle={-90}
+              textAnchor="middle"
+              offset={-5}
+              fontSize={12}
+              fill={chartStyle?.yAxis?.labelColor}
+            />
+          : yAxisProps?.children,
       }}
       scatterChartProps={
-        xLabel !== undefined || yLabel !== undefined ?
+        hasXLabel || hasYLabel ?
           {
             margin: {
-              bottom: xLabel !== undefined ? 40 : undefined,
-              left: yLabel !== undefined ? 30 : undefined,
-              right: yLabel !== undefined ? 5 : undefined,
+              bottom: hasXLabel ? 40 : undefined,
+              left: hasYLabel ? 30 : undefined,
+              right: hasYLabel ? 5 : undefined,
             },
           }
         : undefined
       }
+      {...restStyleProps}
     />
   );
 }

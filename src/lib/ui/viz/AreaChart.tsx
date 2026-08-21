@@ -128,6 +128,7 @@ export function AreaChart({
       tooltipProps: { labelFormatter },
       styleProps,
       valueFormatter: formatChartNumber,
+      chartStyle,
     });
   }
 

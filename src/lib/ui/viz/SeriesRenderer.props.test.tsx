@@ -183,17 +183,29 @@ describe("BarChart — chart-level settings reach Mantine", () => {
     expect(props.withYAxis).toBe(false);
   });
 
-  it("applies axis label via xAxisLabel and color via styles.axisLabel.fill", () => {
+  it("renders per-axis labels with independent colors via <Label> children", () => {
     renderBar({
       ...BAR_BASELINE,
-      chartStyle: { xAxis: { label: "Month", labelColor: "#ff0000" } },
+      chartStyle: {
+        xAxis: { label: "Month", labelColor: "#ff0000" },
+        yAxis: { label: "Revenue", labelColor: "#0000ff" },
+      },
     });
     const props = lastProps<{
       xAxisLabel?: string;
       styles?: { axisLabel?: { fill?: string } };
+      xAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
+      yAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
     }>(mantineBarChartMock);
-    expect(props.xAxisLabel).toBe("Month");
-    expect(props.styles?.axisLabel?.fill).toBe("#ff0000");
+    // Label text + color now ride on per-axis <Label> children, not Mantine's
+    // shared xAxisLabel / styles.axisLabel (which collapsed both axes to one
+    // color). Each axis keeps its own fill.
+    expect(props.xAxisLabel).toBeUndefined();
+    expect(props.styles?.axisLabel?.fill).toBeUndefined();
+    expect(props.xAxisProps?.children?.props?.value).toBe("Month");
+    expect(props.xAxisProps?.children?.props?.fill).toBe("#ff0000");
+    expect(props.yAxisProps?.children?.props?.value).toBe("Revenue");
+    expect(props.yAxisProps?.children?.props?.fill).toBe("#0000ff");
   });
 
   it("applies tick color via xAxisProps.tick.fill", () => {
@@ -577,25 +589,34 @@ describe("ScatterChart: both axes are value axes", () => {
 
   it("prefers a configured axis label over the derived column name", () => {
     _renderScatter({ xAxis: { label: "Spend" } });
-    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
-    expect(props.xAxisLabel).toBe("Spend");
+    const props = lastProps<{
+      xAxisProps?: { children?: { props?: { value?: string } } };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.children?.props?.value).toBe("Spend");
   });
 
   it("derives the axis label from the column when unset", () => {
     _renderScatter(undefined);
-    const props = lastProps<{ xAxisLabel?: string }>(mantineScatterChartMock);
-    expect(props.xAxisLabel).toBe("v");
+    const props = lastProps<{
+      xAxisProps?: { children?: { props?: { value?: string } } };
+    }>(mantineScatterChartMock);
+    expect(props.xAxisProps?.children?.props?.value).toBe("v");
   });
 
-  it("labels each axis exactly once", () => {
+  it("labels each axis through exactly one mechanism", () => {
     _renderScatter({ xAxis: { label: "Spend" } });
     const props = lastProps<{
       xAxisLabel?: string;
-      xAxisProps?: { label?: unknown };
+      xAxisProps?: {
+        label?: unknown;
+        children?: { props?: { value?: string } };
+      };
     }>(mantineScatterChartMock);
-    // Recharts renders both an axis `label` prop and any `<Label>`
-    // child, so exactly one of these two may be set.
-    expect(props.xAxisLabel).toBe("Spend");
+    // The label now rides on a single <Label> child; Mantine's own xAxisLabel
+    // and the Recharts `label` prop must both stay unset so it is not
+    // double-rendered.
+    expect(props.xAxisProps?.children?.props?.value).toBe("Spend");
+    expect(props.xAxisLabel).toBeUndefined();
     expect(props.xAxisProps?.label).toBeUndefined();
   });
 
