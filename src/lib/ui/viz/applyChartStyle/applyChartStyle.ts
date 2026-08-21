@@ -2,6 +2,7 @@ import { matchLiteral } from "@avandar/utils";
 import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
@@ -145,28 +146,6 @@ function _buildGridProps(
   return { gridProps, gridColor: gridStyle?.color };
 }
 
-function _buildLegendProps(
-  legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
-): Pick<ChartStyleProps, "legendProps"> {
-  const legendPosition = legendStyle?.position ?? "top";
-  return {
-    legendProps: {
-      verticalAlign: matchLiteral(legendPosition, {
-        top: "top" as const,
-        bottom: "bottom" as const,
-        left: "middle" as const,
-        right: "middle" as const,
-      }),
-      align: matchLiteral(legendPosition, {
-        top: "center" as const,
-        bottom: "center" as const,
-        left: "left" as const,
-        right: "right" as const,
-      }),
-    },
-  };
-}
-
 function _buildAxisLabels({
   xAxisStyle,
   yAxisStyle,
@@ -198,8 +177,8 @@ function _buildAxisLabels({
  *
  * Not for radar, pie, or funnel. Every field it produces (`withXAxis`,
  * `xAxisProps`, `yAxisProps`, grid, axis labels) describes an x/y plot, and
- * those three have no cartesian axes. Radar takes the one piece that does
- * apply to it, `chartStyle.legend.position`, straight from the config.
+ * those three have no cartesian axes. Radar shares the one piece that
+ * does apply to it through `makeLegendPropsFromPosition`.
  */
 export function applyChartStyle(
   options: Readonly<ApplyChartStyleOptions> = {},
@@ -231,7 +210,7 @@ export function applyChartStyle(
       role: axisRoles.y,
     }),
     ..._buildGridProps(style?.grid),
-    ..._buildLegendProps(style?.legend),
+    legendProps: makeLegendPropsFromPosition(style?.legend?.position),
     ..._buildAxisLabels({ xAxisStyle, yAxisStyle }),
   };
 }
