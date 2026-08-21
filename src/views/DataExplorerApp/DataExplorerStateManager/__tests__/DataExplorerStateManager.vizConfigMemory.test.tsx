@@ -9,10 +9,8 @@
  * `DataExplorerStateManager.test.ts` does, so a break in the actual action
  * wiring is caught here.
  */
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
-import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { RenderHookResult } from "@testing-library/react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -37,7 +35,7 @@ const STYLED_BAR_CONFIG: BarChartVizConfig = {
   },
 };
 
-function _wrapper({ children }: { children: ReactNode }): ReactNode {
+function _Wrapper({ children }: { children: ReactNode }): ReactNode {
   return (
     <DataExplorerStateManager.Provider>
       {children}
@@ -53,7 +51,7 @@ function _renderStateManager(): RenderHookResult<
     () => {
       return DataExplorerStateManager.useContext();
     },
-    { wrapper: _wrapper },
+    { wrapper: _Wrapper },
   );
 }
 
@@ -111,14 +109,19 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("line");
     });
 
-    // With no memory the action must behave exactly as it did before the
-    // memory existed: convert, then apply structured hydration.
-    expect(result.current[0].vizConfig).toStrictEqual(
-      VizConfigs.hydrateFromQuery(
-        VizConfigs.convertVizConfig(STYLED_BAR_CONFIG, "line"),
-        INITIAL_DATA_EXPLORER_STATE.query,
-      ),
-    );
+    // With no memory for the target type, the action converts the current
+    // config and then applies structured hydration. Hydration prunes keys the
+    // (empty) structured query cannot account for, which is why xAxisKey does
+    // not survive here.
+    const converted = result.current[0].vizConfig;
+    expect(converted.vizType).toBe("line");
+    expect(converted).toStrictEqual({
+      vizType: "line",
+      xAxisKey: undefined,
+      series: [],
+      withLegend: false,
+      chartStyle: STYLED_BAR_CONFIG.chartStyle,
+    });
   });
 
   it("remembers the outgoing config keyed by its own viz type", () => {
@@ -178,9 +181,20 @@ describe("Data Explorer viz config memory", () => {
     });
 
     const restored = result.current[0].vizConfig as BarChartVizConfig;
+
+    // The stale series key is gone.
     const seriesKeys = restored.series.map((entry) => {
       return entry.key;
     });
     expect(seriesKeys).not.toContain("revenue");
+
+    // ...and what is left is the remembered bar config repaired in place, not
+    // a fresh projection of the pie config. Only the remembered config can
+    // carry chartStyle, since a pie config has nowhere to hold it, so these
+    // assertions are what distinguish "restored and repaired" from "never
+    // remembered at all".
+    expect(restored.chartStyle?.grid?.color).toBe("#e0e0e0");
+    expect(restored.chartStyle?.legend?.position).toBe("left");
+    expect(restored.layout).toBe("stack");
   });
 });

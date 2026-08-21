@@ -25,6 +25,7 @@ import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
   VizConfig,
+  VizConfigRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -242,10 +243,18 @@ export const DataExplorerStateManager = createAppStateManager({
             columns: lastResultColumns,
           });
 
+      // TypeScript widens the computed union key to `string` and so cannot see
+      // that `vizConfig` lands under its own `vizType`. The key is taken from
+      // the value itself, so the correlation holds by construction.
+      const nextMemory = {
+        ...vizConfigMemory,
+        [vizConfig.vizType]: vizConfig,
+      } as Partial<VizConfigRegistry>;
+
       return {
         ...state,
         vizConfig: nextVizConfig,
-        vizConfigMemory: { ...vizConfigMemory, [vizConfig.vizType]: vizConfig },
+        vizConfigMemory: nextMemory,
       };
     },
 

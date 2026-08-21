@@ -8,7 +8,7 @@ import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sq
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type {
   VizConfig,
-  VizType,
+  VizConfigRegistry,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
@@ -62,10 +62,13 @@ export type DataExplorerAppState = {
    * stale when the query changes; they are reconciled against the current
    * result columns on restore rather than being invalidated up front.
    *
+   * `Partial<VizConfigRegistry>` correlates each entry with the viz type it
+   * is filed under, so a bar config cannot be stored under `"pie"`.
+   *
    * In-memory only: this state manager is never persisted, so a reload
    * starts empty.
    */
-  vizConfigMemory: Partial<Record<VizType, VizConfig>>;
+  vizConfigMemory: Partial<VizConfigRegistry>;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;

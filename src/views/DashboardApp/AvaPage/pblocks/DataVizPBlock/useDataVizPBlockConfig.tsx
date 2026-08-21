@@ -15,6 +15,7 @@ import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/p
 import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
 import type { Field, Fields } from "@puckeditor/core";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { RefObject } from "react";
 
 const DEFAULT_VIZ_TYPE = "table" as const;
 
@@ -45,7 +46,7 @@ type DataVizPBlockConfigOptions = {
    * config. The ref object identity is stable, so the rebuilt closure still
    * sees earlier switches.
    */
-  vizConfigMemoryRef: { current: DataVizConfigMemory };
+  vizConfigMemoryRef: RefObject<DataVizConfigMemory>;
 };
 
 type UseDataVizPBlockConfigOptions = {

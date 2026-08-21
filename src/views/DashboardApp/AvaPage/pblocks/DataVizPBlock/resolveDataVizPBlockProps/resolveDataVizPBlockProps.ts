@@ -2,10 +2,7 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
-import type {
-  VizConfig,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
+import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * The last config the user saw for each viz type, per DataViz block.
@@ -15,11 +12,12 @@ import type {
  * block on the page. Without the outer key, two blocks would overwrite each
  * other's memory, which looks correct until a dashboard holds more than one
  * chart.
+ *
+ * The inner map is a `Partial<VizConfigRegistry>`, so each entry's config is
+ * correlated with the viz type it is filed under: a bar config cannot be
+ * stored under `"pie"`. The whole design rests on that correlation holding.
  */
-export type DataVizConfigMemory = Record<
-  string,
-  Partial<Record<VizType, VizConfig>>
->;
+export type DataVizConfigMemory = Record<string, Partial<VizConfigRegistry>>;
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 
@@ -88,12 +86,17 @@ export function resolveDataVizPBlockProps(input: {
     nextProps.vizConfig =
       remembered ?? VizConfigs.convertVizConfig(outgoing, nextProps.vizType);
 
+    // TypeScript widens the computed union key to `string` and so cannot see
+    // that `outgoing` lands under its own `vizType`. The key is taken from the
+    // value itself, so the correlation holds by construction.
+    const nextBlockMemory = {
+      ...blockMemory,
+      [outgoing.vizType]: outgoing,
+    } as Partial<VizConfigRegistry>;
+
     return {
       props: nextProps,
-      vizConfigMemory: {
-        ...vizConfigMemory,
-        [blockId]: { ...blockMemory, [outgoing.vizType]: outgoing },
-      },
+      vizConfigMemory: { ...vizConfigMemory, [blockId]: nextBlockMemory },
     };
   }
 

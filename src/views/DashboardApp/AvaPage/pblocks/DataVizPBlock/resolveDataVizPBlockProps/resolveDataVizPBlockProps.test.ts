@@ -10,7 +10,7 @@ type ResolveInput = Parameters<typeof resolveDataVizPBlockProps>[0];
  * Resolve with a single block and empty memory, returning just the props.
  * Memory behavior has its own describe block below.
  */
-function _resolveProps(
+function _getProps(
   input: Omit<ResolveInput, "blockId" | "vizConfigMemory">,
 ): DataVizPBlockProps {
   return resolveDataVizPBlockProps({
@@ -31,7 +31,7 @@ const STYLED_BAR_CONFIG: BarChartVizConfig = {
 
 describe("resolveDataVizPBlockProps", () => {
   it("converts vizConfig to match the new vizType when vizType changes", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         nlQuery: { prompt: "", rawSql: "", generations: [] },
         vizType: "bar",
@@ -44,7 +44,7 @@ describe("resolveDataVizPBlockProps", () => {
   });
 
   it("converts vizConfig from one chart type to another", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         nlQuery: { prompt: "", rawSql: "", generations: [] },
         vizType: "line",
@@ -62,7 +62,7 @@ describe("resolveDataVizPBlockProps", () => {
   });
 
   it("syncs vizType from vizConfig when vizConfig changes type but vizType has not caught up", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         nlQuery: { prompt: "", rawSql: "", generations: [] },
         vizType: "table",
@@ -82,7 +82,7 @@ describe("resolveDataVizPBlockProps", () => {
   });
 
   it("fills in missing vizType and vizConfig with defaults", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         nlQuery: { prompt: "", rawSql: "", generations: [] },
       },
@@ -93,7 +93,7 @@ describe("resolveDataVizPBlockProps", () => {
   });
 
   it("fills in missing nlQuery with empty defaults", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         vizType: "table",
         vizConfig: { vizType: "table" },
@@ -121,12 +121,12 @@ describe("resolveDataVizPBlockProps", () => {
       globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
       localFilters: [],
     };
-    const next = _resolveProps({ props, changed: {} });
+    const next = _getProps({ props, changed: {} });
     expect(next).toEqual(props);
   });
 
   it("preserves axis keys present in both types when converting bar→line", () => {
-    const next = _resolveProps({
+    const next = _getProps({
       props: {
         nlQuery: { prompt: "", rawSql: "", generations: [] },
         vizType: "line",
@@ -154,7 +154,7 @@ describe("resolveDataVizPBlockProps", () => {
       vizType: "table",
       vizConfig: { vizType: "table" },
     };
-    const next = _resolveProps({
+    const next = _getProps({
       props,
       changed: { vizType: true, vizConfig: true, nlQuery: true },
       trigger: "load",
@@ -170,7 +170,7 @@ describe("resolveDataVizPBlockProps", () => {
       vizType: "bar",
       vizConfig: { vizType: "table" },
     };
-    const next = _resolveProps({
+    const next = _getProps({
       props,
       changed: { vizType: true },
       trigger: "load",
@@ -277,7 +277,9 @@ describe("resolveDataVizPBlockProps viz config memory", () => {
   });
 
   it("writes no memory on Puck's load pass", () => {
-    const existing: DataVizConfigMemory = {};
+    const existing: DataVizConfigMemory = {
+      "block-1": { bar: STYLED_BAR_CONFIG },
+    };
     const next = resolveDataVizPBlockProps({
       props: { vizType: "bar", vizConfig: { vizType: "table" } },
       changed: { vizType: true },
@@ -287,10 +289,15 @@ describe("resolveDataVizPBlockProps viz config memory", () => {
     });
 
     expect(next.vizConfigMemory).toBe(existing);
+    expect(next.vizConfigMemory["block-1"]?.bar).toStrictEqual(
+      STYLED_BAR_CONFIG,
+    );
   });
 
   it("leaves memory untouched when only vizConfig changed", () => {
-    const existing: DataVizConfigMemory = {};
+    const existing: DataVizConfigMemory = {
+      "block-1": { bar: STYLED_BAR_CONFIG },
+    };
     const next = resolveDataVizPBlockProps({
       props: {
         vizType: "table",
@@ -303,5 +310,8 @@ describe("resolveDataVizPBlockProps viz config memory", () => {
 
     expect(next.props.vizType).toBe("bar");
     expect(next.vizConfigMemory).toBe(existing);
+    expect(next.vizConfigMemory["block-1"]?.bar).toStrictEqual(
+      STYLED_BAR_CONFIG,
+    );
   });
 });
