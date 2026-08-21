@@ -222,7 +222,13 @@ export const LineChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =

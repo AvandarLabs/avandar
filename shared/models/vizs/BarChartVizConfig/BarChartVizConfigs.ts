@@ -1,3 +1,4 @@
+import { barLayoutToAreaLayout } from "$/models/vizs/ChartLayout.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
@@ -156,7 +157,7 @@ export const BarChartVizConfigs = {
     vizConfig: BarChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, series, withLegend, chartStyle } = vizConfig;
+    const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
@@ -184,7 +185,7 @@ export const BarChartVizConfigs = {
           series: series.map((s) => {
             return convertSeriesRenderAs(s, "area");
           }) as XYSeries[],
-          layout: "default",
+          layout: barLayoutToAreaLayout(layout),
           withLegend,
           chartStyle,
         };
@@ -219,7 +220,13 @@ export const BarChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
