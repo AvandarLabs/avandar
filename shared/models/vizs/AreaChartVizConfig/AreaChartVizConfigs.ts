@@ -1,6 +1,8 @@
+import { ChartLayout } from "$/models/vizs/ChartLayout.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -40,13 +42,6 @@ const AREA_LAYOUT_OPTIONS = [
   { value: "split", label: "Split (+/-)" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
   chart: [
     {
@@ -61,12 +56,7 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<AreaChartVizConfig>(),
     ...makeAxisDescriptors<AreaChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -180,7 +170,7 @@ export const AreaChartVizConfigs = {
     vizConfig: AreaChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, series, withLegend, chartStyle } = vizConfig;
+    const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
@@ -194,7 +184,7 @@ export const AreaChartVizConfigs = {
           series: series.map((s) => {
             return convertSeriesRenderAs(s, "bar");
           }) as XYSeries[],
-          layout: "group",
+          layout: ChartLayout.getBarLayoutFromAreaLayout(layout),
           withLegend,
           chartStyle,
         };
@@ -243,7 +233,13 @@ export const AreaChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
