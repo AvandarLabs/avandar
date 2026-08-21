@@ -2,6 +2,22 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
+import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
+
+/**
+ * The last config the user saw for each viz type, per DataViz block.
+ *
+ * Keyed by block id first because Puck registers one `ComponentConfig` per
+ * component *type*, so a single `resolveData` closure serves every DataViz
+ * block on the page. Without the outer key, two blocks would overwrite each
+ * other's memory, which looks correct until a dashboard holds more than one
+ * chart.
+ *
+ * The inner map is a `Partial<VizConfigRegistry>`, so each entry's config is
+ * correlated with the viz type it is filed under: a bar config cannot be
+ * stored under `"pie"`. The whole design rests on that correlation holding.
+ */
+export type DataVizConfigMemory = Record<string, Partial<VizConfigRegistry>>;
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 
@@ -16,9 +32,16 @@ const DEFAULT_NL_QUERY: DataVizPBlockProps["nlQuery"] = {
 /**
  * Pure data-rewrite used by the DataViz block's Puck `resolveData` hook.
  *
- * Keeps `vizType` and `vizConfig.vizType` in sync by running
- * `VizConfigs.convertVizConfig` whenever the user picks a different type from
- * the top-level select. Also fills in defaults for missing fields so older
+ * Keeps `vizType` and `vizConfig.vizType` in sync whenever the user picks a
+ * different type from the top-level select: the outgoing config is
+ * remembered under its own viz type, and the incoming one is restored from
+ * memory when the user has been there before, falling back to
+ * `VizConfigs.convertVizConfig` when they have not. Restoring is what makes
+ * a bar -> pie -> bar round trip keep styling that a pie config cannot hold.
+ *
+ * Stays pure: the memory is passed in and the updated memory is returned,
+ * so the mutable holder lives in the hook and this function remains
+ * directly testable. Also fills in defaults for missing fields so older
  * saved blocks or freshly created ones always resolve to a fully-shaped
  * `DataVizPBlockProps`.
  */
@@ -26,13 +49,17 @@ export function resolveDataVizPBlockProps(input: {
   props: Partial<DataVizPBlockProps>;
   changed: ChangedFlags;
   trigger?: ResolveDataTrigger;
-}): DataVizPBlockProps {
-  const { props, changed, trigger } = input;
+  /** Puck's per-instance id, threaded in because the props type omits it. */
+  blockId: string;
+  vizConfigMemory: DataVizConfigMemory;
+}): { props: DataVizPBlockProps; vizConfigMemory: DataVizConfigMemory } {
+  const { props, changed, trigger, blockId, vizConfigMemory } = input;
   // Puck's load pass marks every field `changed` because its resolver cache
-  // is empty. Rewriting here would look like an unsaved edit. Missing filter
+  // is empty. Rewriting here would look like an unsaved edit, and seeding
+  // memory from it would record a switch the user never made. Missing filter
   // defaults are filled at render time instead.
   if (trigger === "load") {
-    return props as DataVizPBlockProps;
+    return { props: props as DataVizPBlockProps, vizConfigMemory };
   }
 
   const nextProps: DataVizPBlockProps = {
@@ -48,16 +75,34 @@ export function resolveDataVizPBlockProps(input: {
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {
-    nextProps.vizConfig = VizConfigs.convertVizConfig(
-      nextProps.vizConfig,
-      nextProps.vizType,
-    );
-  } else if (
-    changed.vizConfig &&
-    nextProps.vizConfig.vizType !== nextProps.vizType
-  ) {
+    const outgoing = nextProps.vizConfig;
+    const blockMemory = vizConfigMemory[blockId] ?? {};
+    const remembered = blockMemory[nextProps.vizType];
+
+    // A remembered config can name columns the current query no longer
+    // returns. `DataVizPBlock` runs `applyVizConfigFromQueryResult` on every
+    // render, so it is reconciled there rather than here, where the result
+    // columns are not available.
+    nextProps.vizConfig =
+      remembered ?? VizConfigs.convertVizConfig(outgoing, nextProps.vizType);
+
+    // TypeScript widens the computed union key to `string` and so cannot see
+    // that `outgoing` lands under its own `vizType`. The key is taken from the
+    // value itself, so the correlation holds by construction.
+    const nextBlockMemory = {
+      ...blockMemory,
+      [outgoing.vizType]: outgoing,
+    } as Partial<VizConfigRegistry>;
+
+    return {
+      props: nextProps,
+      vizConfigMemory: { ...vizConfigMemory, [blockId]: nextBlockMemory },
+    };
+  }
+
+  if (changed.vizConfig && nextProps.vizConfig.vizType !== nextProps.vizType) {
     nextProps.vizType = nextProps.vizConfig.vizType;
   }
 
-  return nextProps;
+  return { props: nextProps, vizConfigMemory };
 }
