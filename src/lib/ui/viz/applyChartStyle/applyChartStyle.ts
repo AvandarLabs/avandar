@@ -2,6 +2,7 @@ import { matchLiteral } from "@avandar/utils";
 import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
@@ -18,7 +19,6 @@ import type {
 
 const DEFAULT_TICK_FONT_SIZE = 12;
 const DEFAULT_Y_AXIS_WIDTH = 64;
-const SIDE_LEGEND_WIDTH = 120;
 const TICK_DEFAULTS = {
   fontSize: DEFAULT_TICK_FONT_SIZE,
   fill: "currentColor",
@@ -149,34 +149,8 @@ function _buildGridProps(
 function _buildLegendProps(
   legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
 ): Pick<ChartStyleProps, "legendProps"> {
-  const legendPosition = legendStyle?.position ?? "top";
-  // Recharts reserves plot space from the legend's *measured* box. A
-  // horizontal legend is stretched to the full chart width, so a
-  // side-positioned one would reserve every pixel and collapse the plot
-  // to nothing. `layout: "vertical"` plus an explicit width makes the
-  // measured box a real sidebar instead.
-  const sideLayout = matchLiteral(legendPosition, {
-    top: {},
-    bottom: {},
-    left: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
-    right: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
-  });
   return {
-    legendProps: {
-      verticalAlign: matchLiteral(legendPosition, {
-        top: "top" as const,
-        bottom: "bottom" as const,
-        left: "middle" as const,
-        right: "middle" as const,
-      }),
-      align: matchLiteral(legendPosition, {
-        top: "center" as const,
-        bottom: "center" as const,
-        left: "left" as const,
-        right: "right" as const,
-      }),
-      ...sideLayout,
-    },
+    legendProps: makeLegendPropsFromPosition(legendStyle?.position),
   };
 }
 

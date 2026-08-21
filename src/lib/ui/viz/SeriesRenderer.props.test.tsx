@@ -59,6 +59,15 @@ const DATA = [
   { x: "c", v: 3, w: 3 },
 ];
 
+type LegendPropsHolder = {
+  legendProps?: {
+    verticalAlign?: string;
+    align?: string;
+    layout?: string;
+    width?: number;
+  };
+};
+
 function lastProps<T>(mock: ReturnType<typeof vi.fn>): T {
   const call = mock.mock.lastCall;
   if (call === undefined) {
@@ -235,10 +244,50 @@ describe("BarChart — chart-level settings reach Mantine", () => {
       ...BAR_BASELINE,
       chartStyle: { legend: { position: "bottom" } },
     });
-    const props = lastProps<{
-      legendProps?: { verticalAlign?: string; align?: string };
-    }>(mantineBarChartMock);
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
     expect(props.legendProps?.verticalAlign).toBe("bottom");
+    expect(props.legendProps?.align).toBe("center");
+  });
+
+  // A side legend also needs `layout` and `width`. Recharts sizes a
+  // horizontal legend to the full chart width and reserves that much
+  // plot space, which collapsed the plot to zero width for left/right.
+  it("gives a left legend a vertical layout and its own width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "left" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps).toEqual({
+      verticalAlign: "middle",
+      align: "left",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("gives a right legend a vertical layout and its own width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "right" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps).toEqual({
+      verticalAlign: "middle",
+      align: "right",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("leaves a horizontal legend without a width, so it keeps the full plot width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "top" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps?.layout).toBeUndefined();
+    expect(props.legendProps?.width).toBeUndefined();
   });
 });
 
@@ -391,6 +440,33 @@ describe("RadarChart — series settings reach Mantine", () => {
     expect(
       lastProps<{ withLegend: boolean }>(mantineRadarChartMock).withLegend,
     ).toBe(false);
+  });
+
+  // Radar has no cartesian axes, so it cannot use `applyChartStyle`, but
+  // it shares the legend mapping and must place a side legend identically.
+  it("gives a side legend the same vertical layout as the cartesian charts", () => {
+    renderRadar({
+      ...RADAR_BASELINE,
+      chartStyle: { legend: { position: "left" } },
+    });
+    expect(
+      lastProps<LegendPropsHolder>(mantineRadarChartMock).legendProps,
+    ).toEqual({
+      verticalAlign: "middle",
+      align: "left",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("maps legend.position bottom without reserving a width", () => {
+    renderRadar({
+      ...RADAR_BASELINE,
+      chartStyle: { legend: { position: "bottom" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineRadarChartMock);
+    expect(props.legendProps?.verticalAlign).toBe("bottom");
+    expect(props.legendProps?.width).toBeUndefined();
   });
 });
 
