@@ -1,6 +1,8 @@
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
+import { makeLegendDescriptors } from "$/models/vizs/makeLegendDescriptors/makeLegendDescriptors.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -32,13 +34,6 @@ const BAR_LAYOUT_OPTIONS = [
   { value: "percent", label: "100% stacked" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
   chart: [
     {
@@ -47,18 +42,7 @@ const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
       group: "Layout",
       control: { kind: "segmented", options: BAR_LAYOUT_OPTIONS },
     },
-    {
-      key: "withLegend",
-      label: "Show legend",
-      group: "Legend",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    ...makeLegendDescriptors<BarChartVizConfig>({ withVisibilityToggle: true }),
     ...makeAxisDescriptors<BarChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -68,24 +52,7 @@ const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
       axis: "yAxis",
       role: "value",
     }),
-    {
-      key: "chartStyle.grid.color",
-      label: "Gridline color",
-      group: "Grid",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.grid.horizontal",
-      label: "Horizontal gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.grid.vertical",
-      label: "Vertical gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
+    ...makeGridDescriptors<BarChartVizConfig>(),
   ],
   series: [
     {
