@@ -11,7 +11,7 @@ import type { LegendProps } from "recharts";
 const SIDE_LEGEND_WIDTH = 120;
 
 /** The subset of Recharts legend props that a position resolves to. */
-export type LegendPositionProps = Pick<
+type LegendPositionProps = Pick<
   Omit<LegendProps, "ref">,
   "verticalAlign" | "align" | "layout" | "width"
 >;
@@ -28,30 +28,23 @@ export type LegendPositionProps = Pick<
 export function makeLegendPropsFromPosition(
   position: LegendPosition | undefined,
 ): LegendPositionProps {
-  const legendPosition = position ?? "top";
-
   // Recharts reserves plot space from the legend's *measured* box, and
-  // only treats the legend as a sidebar when the layout is vertical.
-  const sideLayout = matchLiteral(legendPosition, {
-    top: {},
-    bottom: {},
-    left: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
-    right: { layout: "vertical" as const, width: SIDE_LEGEND_WIDTH },
-  });
-
-  return {
-    verticalAlign: matchLiteral(legendPosition, {
-      top: "top" as const,
-      bottom: "bottom" as const,
-      left: "middle" as const,
-      right: "middle" as const,
-    }),
-    align: matchLiteral(legendPosition, {
-      top: "center" as const,
-      bottom: "center" as const,
-      left: "left" as const,
-      right: "right" as const,
-    }),
-    ...sideLayout,
-  };
+  // only treats the legend as a sidebar when the layout is vertical, so
+  // a side position carries its own layout and width.
+  return matchLiteral(position ?? "top", {
+    top: { verticalAlign: "top", align: "center" },
+    bottom: { verticalAlign: "bottom", align: "center" },
+    left: {
+      verticalAlign: "middle",
+      align: "left",
+      layout: "vertical",
+      width: SIDE_LEGEND_WIDTH,
+    },
+    right: {
+      verticalAlign: "middle",
+      align: "right",
+      layout: "vertical",
+      width: SIDE_LEGEND_WIDTH,
+    },
+  } as const satisfies Record<LegendPosition, LegendPositionProps>);
 }

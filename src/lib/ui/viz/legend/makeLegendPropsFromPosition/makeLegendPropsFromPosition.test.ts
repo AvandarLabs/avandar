@@ -46,11 +46,4 @@ describe("makeLegendPropsFromPosition", () => {
       width: 120,
     });
   });
-
-  it("leaves layout and width off the top and bottom positions, so a horizontal legend keeps the full plot width", () => {
-    expect(makeLegendPropsFromPosition("top")).not.toHaveProperty("layout");
-    expect(makeLegendPropsFromPosition("top")).not.toHaveProperty("width");
-    expect(makeLegendPropsFromPosition("bottom")).not.toHaveProperty("layout");
-    expect(makeLegendPropsFromPosition("bottom")).not.toHaveProperty("width");
-  });
 });

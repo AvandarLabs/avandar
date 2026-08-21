@@ -146,14 +146,6 @@ function _buildGridProps(
   return { gridProps, gridColor: gridStyle?.color };
 }
 
-function _buildLegendProps(
-  legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
-): Pick<ChartStyleProps, "legendProps"> {
-  return {
-    legendProps: makeLegendPropsFromPosition(legendStyle?.position),
-  };
-}
-
 function _buildAxisLabels({
   xAxisStyle,
   yAxisStyle,
@@ -185,8 +177,8 @@ function _buildAxisLabels({
  *
  * Not for radar, pie, or funnel. Every field it produces (`withXAxis`,
  * `xAxisProps`, `yAxisProps`, grid, axis labels) describes an x/y plot, and
- * those three have no cartesian axes. Radar takes the one piece that does
- * apply to it, `chartStyle.legend.position`, straight from the config.
+ * those three have no cartesian axes. Radar shares the one piece that
+ * does apply to it through `makeLegendPropsFromPosition`.
  */
 export function applyChartStyle(
   options: Readonly<ApplyChartStyleOptions> = {},
@@ -218,7 +210,7 @@ export function applyChartStyle(
       role: axisRoles.y,
     }),
     ..._buildGridProps(style?.grid),
-    ..._buildLegendProps(style?.legend),
+    legendProps: makeLegendPropsFromPosition(style?.legend?.position),
     ..._buildAxisLabels({ xAxisStyle, yAxisStyle }),
   };
 }

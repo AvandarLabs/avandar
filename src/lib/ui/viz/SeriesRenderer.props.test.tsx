@@ -251,7 +251,8 @@ describe("BarChart — chart-level settings reach Mantine", () => {
 
   // A side legend also needs `layout` and `width`. Recharts sizes a
   // horizontal legend to the full chart width and reserves that much
-  // plot space, which collapsed the plot to zero width for left/right.
+  // plot space, which would collapse the plot to zero width for
+  // left/right.
   it("gives a left legend a vertical layout and its own width", () => {
     renderBar({
       ...BAR_BASELINE,

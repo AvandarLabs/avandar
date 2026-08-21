@@ -36,9 +36,7 @@ export function RadarChart({
     });
   }, [series]);
 
-  const legendProps = useMemo(() => {
-    return makeLegendPropsFromPosition(chartStyle?.legend?.position);
-  }, [chartStyle?.legend?.position]);
+  const legendProps = makeLegendPropsFromPosition(chartStyle?.legend?.position);
 
   return (
     <MantineRadarChart
