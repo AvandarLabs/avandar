@@ -45,11 +45,11 @@ the product into something that truly serves your mission.
 
    `pnpm install` also points your git hooks at the repo's `.githooks/`
    directory (via the `prepare` script). A `pre-push` hook then runs
-   `prettier`, `eslint --fix`, and `stylelint --fix` on files changed on
-   the current branch before letting a push through, and blocks the push if
-   any files were reformatted so you can review and commit the changes. If
-   you ever need to bypass it for a one-off, `git push --no-verify` skips
-   the hook.
+   `oxfmt`, `prettier` (Supabase schema SQL only), `eslint --fix`, and
+   `stylelint --fix` on files changed on the current branch before letting a
+   push through, and blocks the push if any files were reformatted so you can
+   review and commit the changes. If you ever need to bypass it for a one-off,
+   `git push --no-verify` skips the hook.
 
 2. Initiate a local instance of Supabase (you need to have installed Supabase
    CLI for this)

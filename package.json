@@ -18,6 +18,7 @@
     "diff-review": "sh agent-skills/public-skills/skills/diff-review/scripts/dif/run.sh",
     "fetch-gate-fixtures": "node scripts/fetch-gate-fixtures.mjs",
     "format": "./scripts/format-changed-files/format-changed-files.sh",
+    "format:oxfmt": "oxfmt --ignore-path .oxfmtignore",
     "test": "./scripts/runAllTests.sh",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
     "test:etl": "pnpm --filter @avandar/etl test",
