@@ -1,6 +1,6 @@
 /**
  * GisApp must sit inside AppLayout so the map uses the shared canvas Paper,
- * and it owns the only DuckDB Spatial trigger in the GIS view.
+ * and it is the only place in the GIS view that asks for DuckDB Spatial.
  */
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
@@ -92,7 +92,7 @@ describe("GisApp", () => {
   // Nothing downstream asks for Spatial: `useMapLayersData` and the Area and
   // Buffer map tools all read the capability passively, so if this call stops
   // happening they wait on "loading" for the life of the page.
-  it("starts the Spatial fetch on mount, before any layer exists", () => {
+  it("requests the Spatial extension on mount, before any layer exists", () => {
     render(<GisApp avaMap={_createAvaMap()} />);
 
     expect(ensureSpatialMock).toHaveBeenCalledTimes(1);

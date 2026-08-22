@@ -70,7 +70,7 @@ describe("DataSection geometry", () => {
     ).toBeInTheDocument();
   });
 
-  it("starts Spatial detection while the geometry picker waits on it", async () => {
+  it("requests Spatial while the geometry picker waits on it", async () => {
     spatialAvailability.value = "loading";
 
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
@@ -80,7 +80,7 @@ describe("DataSection geometry", () => {
     });
   });
 
-  it("does not start Spatial detection once the capability is known", () => {
+  it("does not request Spatial once the capability is known", () => {
     spatialAvailability.value = "available";
 
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);

@@ -156,8 +156,10 @@ describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
   beforeEach(() => {
+    // Only ever asserted as never called: this hook reads the capability and
+    // `GisApp` is what asks for the extension. The spy is what makes that
+    // contract testable, so a re-added request here fails instead of passing.
     ensureSpatialMock.mockReset();
-    ensureSpatialMock.mockResolvedValue(true);
     runStructuredQueryWithMetadataMock.mockReset();
     runSpatialQueryMock.mockReset();
     resolveManualQueryForExecutionMock.mockReset();
@@ -387,8 +389,6 @@ describe("useMapLayersData", () => {
     );
 
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
-    // The hook waits for the capability without asking for it: `GisApp` owns
-    // the only trigger, so a second one here would be dead weight.
     expect(ensureSpatialMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });

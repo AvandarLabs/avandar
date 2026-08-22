@@ -48,7 +48,7 @@ function _layerNeedsSpatial(layer: MapLayer.T, overlay: MapOverlay): boolean {
   );
 }
 
-/** True while a configured spatial layer waits for capability detection. */
+/** True while a configured spatial layer waits on the Spatial request. */
 function _isWaitingForSpatial(
   layer: MapLayer.T,
   overlay: MapOverlay,
@@ -389,10 +389,10 @@ function _toLayerQueryStateMap(
 /**
  * Runs the independent structured query for every configured map layer.
  *
- * Reads the Spatial capability but never triggers its fetch: `GisApp` calls
- * `useDetectedSpatialAvailability` on mount, unconditionally and before any
- * layer exists, so by the time a spatial layer can be configured the fetch is
- * already in flight. Triggering it again from here would only re-request a
+ * Reads the Spatial capability but never asks for the extension: `GisApp`
+ * calls `useEnsuredSpatialAvailability` on mount, unconditionally and before
+ * any layer exists, so by the time a spatial layer can be configured the
+ * request is already in flight. Asking again from here would only re-request a
  * memoized promise, and would do it later and for a strict subset of the cases
  * the view root already covers.
  */

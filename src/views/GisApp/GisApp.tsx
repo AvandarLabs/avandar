@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import css from "@/views/GisApp/GisApp.module.css";
 import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
-import { useDetectedSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import { useEnsuredSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
 import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -19,12 +19,12 @@ export function GisApp({ avaMap }: Props): ReactNode {
   // instead of waiting until the user first attempts to add a layer which
   // would leave the layer picker controls disabled while the extension loads.
   //
-  // This is the only trigger in the GIS view, and everything downstream reads
-  // the capability passively: `useMapLayersData` gates spatial layer queries
-  // on it, and the Area and Buffer map tools gate themselves on it. Removing
-  // this line leaves all three waiting on "loading" forever, and none of them
-  // would look wrong.
-  useDetectedSpatialAvailability();
+  // This is the only place in the GIS view that asks for the extension, and
+  // everything downstream reads the capability without asking:
+  // `useMapLayersData` gates spatial layer queries on it, and the Area and
+  // Buffer map tools gate themselves on it. Removing this line leaves all
+  // three waiting on "loading" forever, and none of them would look wrong.
+  useEnsuredSpatialAvailability();
 
   return (
     <AppLayout containerProps={{ className: css.canvas }}>
