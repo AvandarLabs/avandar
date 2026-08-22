@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { parseTemplate } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
 import type { TemplateParams } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
+import type { FormatConfig } from "oxfmt";
 
 // TODO(jpsyx): we need a better way to get the project root. This is not
 // accurate.
@@ -15,6 +16,16 @@ function _getPrettier(): Promise<typeof import("prettier")> {
   }
 
   return _prettierPromise;
+}
+
+let _oxfmtPromise: Promise<typeof import("oxfmt")> | undefined;
+
+function _getOxfmt(): Promise<typeof import("oxfmt")> {
+  if (_oxfmtPromise === undefined) {
+    _oxfmtPromise = import("oxfmt");
+  }
+
+  return _oxfmtPromise;
 }
 
 /**
@@ -51,7 +62,7 @@ export function writeFileFromTemplate(options: {
   const contents = parseTemplate({ template, params: options.params });
   _writeNewFile({ filePath: outputAbsPath, contents });
 
-  void _formatFileWithPrettier(outputAbsPath);
+  void _formatGeneratedFile(outputAbsPath);
 }
 
 function _readTemplateFile(templateFilePath: string): string {
@@ -69,6 +80,54 @@ function _writeNewFile(options: { filePath: string; contents: string }): void {
 
   fs.mkdirSync(path.dirname(options.filePath), { recursive: true });
   fs.writeFileSync(options.filePath, options.contents, "utf8");
+}
+
+/**
+ * Formats a freshly generated file with whichever formatter owns its
+ * language. Prettier is caged to SQL by the repo's `.prettierignore`;
+ * everything else belongs to oxfmt.
+ */
+async function _formatGeneratedFile(filePath: string): Promise<void> {
+  if (filePath.endsWith(".sql")) {
+    await _formatFileWithPrettier(filePath);
+    return;
+  }
+
+  await _formatFileWithOxfmt(filePath);
+}
+
+/**
+ * Formats one file with oxfmt.
+ *
+ * oxfmt's `format()` takes its options as an argument and does no config
+ * discovery of its own, so the repo's `.oxfmtrc.json` is read and passed
+ * through. Without it the file would be written at oxfmt's default
+ * `printWidth` of 100 and the next `pnpm format` would immediately rewrite
+ * it at 80.
+ */
+async function _formatFileWithOxfmt(filePath: string): Promise<void> {
+  const { format } = await _getOxfmt();
+  const fileContents = await fs.promises.readFile(filePath, "utf8");
+  const formatted = await format(filePath, fileContents, _readOxfmtConfig());
+
+  if (formatted.code === fileContents) {
+    return;
+  }
+
+  await fs.promises.writeFile(filePath, formatted.code, "utf8");
+}
+
+/**
+ * Reads `.oxfmtrc.json` from the project root, or returns undefined when the
+ * generator is running outside a repo that has one.
+ */
+function _readOxfmtConfig(): FormatConfig | undefined {
+  const configPath = path.join(PROJECT_ROOT, ".oxfmtrc.json");
+  if (!fs.existsSync(configPath)) {
+    return undefined;
+  }
+
+  return JSON.parse(fs.readFileSync(configPath, "utf8")) as FormatConfig;
 }
 
 async function _formatFileWithPrettier(filePath: string): Promise<void> {

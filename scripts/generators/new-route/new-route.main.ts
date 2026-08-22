@@ -4,8 +4,9 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { toPascalCase } from "@avandar/utils";
 import { program } from "commander";
-import prettier from "prettier";
+import { format } from "oxfmt";
 import { z } from "zod";
+import type { FormatConfig } from "oxfmt";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -177,12 +178,15 @@ async function createRouteFile(
 
   const processedContent = processTemplate(templatePath, tanstackRouterPath);
 
-  // Format with prettier
-  const prettierConfig = await prettier.resolveConfig(routeFilePath);
-  const formattedContent = await prettier.format(processedContent, {
-    ...prettierConfig,
-    filepath: routeFilePath,
-  });
+  // Format with oxfmt. `format()` does no config discovery of its own, so
+  // the repo's `.oxfmtrc.json` has to be handed to it explicitly or the
+  // route lands at oxfmt's default printWidth of 100.
+  const oxfmtConfig = JSON.parse(
+    readFileSync(join(getProjectRoot(), ".oxfmtrc.json"), "utf-8"),
+  ) as FormatConfig;
+  const formattedContent = (
+    await format(routeFilePath, processedContent, oxfmtConfig)
+  ).code;
 
   writeFileSync(routeFilePath, formattedContent, "utf-8");
 

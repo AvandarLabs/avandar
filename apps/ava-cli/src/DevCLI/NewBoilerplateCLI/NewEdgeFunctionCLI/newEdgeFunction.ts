@@ -180,13 +180,21 @@ export function writeEdgeFunctionTemplateFiles(
 }
 
 /**
- * Runs Prettier on a file via the repo toolchain.
+ * Runs the repo's formatter for this file's language: Prettier owns SQL,
+ * oxfmt owns everything else.
+ *
+ * oxfmt needs `--ignore-path .oxfmtignore`; left to its defaults it reads
+ * `.prettierignore`, which is now `*`, and would format nothing.
  */
-export function formatFileWithRepoPrettier(options: {
+export function formatGeneratedFile(options: {
   projectRoot: string;
   filePath: string;
 }): void {
-  execSync(`pnpm exec prettier --write "${options.filePath}"`, {
+  const formatter =
+    options.filePath.endsWith(".sql") ?
+      `pnpm exec prettier --write "${options.filePath}"`
+    : `pnpm exec oxfmt --ignore-path .oxfmtignore "${options.filePath}"`;
+  execSync(formatter, {
     cwd: options.projectRoot,
     stdio: "pipe",
   });
@@ -327,11 +335,11 @@ export function runNewEdgeFunction(options: RunNewEdgeFunctionOptions): void {
     "http-api.types.ts",
   );
   updateHTTPAPITypes({ httpAPITypesPath, functionName });
-  formatFileWithRepoPrettier({
+  formatGeneratedFile({
     projectRoot,
     filePath: httpAPITypesPath,
   });
-  formatFileWithRepoPrettier({
+  formatGeneratedFile({
     projectRoot,
     filePath: rootDenoJSONPath,
   });
