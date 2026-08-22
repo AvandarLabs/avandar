@@ -13,11 +13,11 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
-  # The gate every expensive job hangs off. Lint and typecheck share one job
-  # rather than the two chained ones in `staging.yaml`, because a PR pays for
-  # `pnpm install` per job and neither check needs the other's output: one
-  # checkout and one install is the cheapest way to have an answer before the
-  # heavy jobs start.
+  # The gate every expensive job hangs off. Lint and typecheck share one job,
+  # as in `staging.yaml` and `production.yaml`, because every job pays for its
+  # own checkout and `pnpm install` and neither check needs the other's
+  # output: one install is the cheapest way to have an answer before the heavy
+  # jobs start.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15
