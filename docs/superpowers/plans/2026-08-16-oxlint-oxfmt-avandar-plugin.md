@@ -88,6 +88,42 @@ remaining type-3 judgement.
 
 Do not touch ESLint in this phase. `pnpm lint` still runs `eslint .`.
 
+### Phase 1 as built (deviations from the text below)
+
+Implemented against oxfmt 0.64.0. Seven places where reality differed from
+the plan; Phase 2 has to work with the result, not the text.
+
+1. **oxfmt does not auto-discover `.oxfmtignore`.** It reads `.gitignore` and
+   `.prettierignore` from the cwd. Because Task 2 inverts `.prettierignore`
+   to `*`, a bare `oxfmt` formats nothing. Every invocation therefore passes
+   `--ignore-path .oxfmtignore`, and `pnpm format:oxfmt` wraps it.
+   `.gitignore` is honoured regardless of the flag.
+2. **`sortImports.internalPattern` takes literal prefixes, not regexes.** The
+   plan's `["^@/", "^\$/"]` silently matches nothing; the config uses
+   `["@/", "$/"]`.
+3. **`sortPackageJson` defaults to on** in oxfmt and reordered every
+   `package.json`. It is explicitly `false`.
+4. **`.jsonc` needed a `trailingComma: "none"` override**, carried over from
+   the old `.prettierrc`. Plain `.json` was already left alone.
+5. **`.prettierrc` keeps `expressionWidth: 40`**, not the 8 the plan names,
+   which would have reflowed every schema file.
+6. **`.oxfmtignore` mirrors ESLint's ignore list** (`agent-skills/**`,
+   `.claude/**`, `playwright-report/**`, and so on). Two files under
+   `agent-skills/` are deliberate IIFE fragments that no parser reads
+   standalone, and vendored skill content should not be restyled.
+7. **Losing `experimentalTernaries` broke `max-len` in three files.** Two
+   needed comments rewrapped. `AnalyticsEventPayloads` is 29 conditionals
+   deep and its tail arms start past column 80 whatever they contain, so it
+   carries a scoped `eslint-disable max-len`. Flattening that chain into a
+   keyed payload map is open follow-up work, and Phase 4 should expect the
+   same class of problem wherever a deep ternary chain survives.
+
+One judgement call left for review: the `groups` list combines
+`value-builtin` and `value-external` into one alphabetical group, exactly as
+written below, so `node:*` imports no longer lead a file. That is a change
+from the old `<BUILTIN_MODULES>` / `<THIRD_PARTY_MODULES>` split. Splitting
+them back is a one-line config edit plus a re-run of `pnpm format:oxfmt`.
+
 ### Task 1: Install oxfmt and write its config
 
 **Files:**
@@ -103,7 +139,7 @@ Do not touch ESLint in this phase. `pnpm lint` still runs `eslint .`.
 - Produces: oxfmt that formats JS/TS/JSON/CSS/Markdown with width 80.
   `experimentalTernaries` is unsupported; do not try to preserve it.
 
-- [ ] **Step 1: Install oxfmt**
+- [x] **Step 1: Install oxfmt**
 
 ```bash
 pnpm add -D oxfmt@latest
@@ -113,7 +149,7 @@ Expected: lockfile updates. If `minimumReleaseAge` rejects the latest
 release, install the newest version published more than 3 days ago
 (`npm view oxfmt time --json` to pick).
 
-- [ ] **Step 2: Generate and hand-tune config**
+- [x] **Step 2: Generate and hand-tune config**
 
 ```bash
 pnpm exec oxfmt --migrate=prettier
@@ -146,7 +182,7 @@ Then edit `.oxfmtrc.json` so it contains at least:
 Delete any migrated `experimentalTernaries`. Default oxfmt `printWidth` is
 100; leaving it unset is a bug.
 
-- [ ] **Step 3: Write `.oxfmtignore`**
+- [x] **Step 3: Write `.oxfmtignore`**
 
 Copy today's `.prettierignore` and add `*.sql` so oxfmt never touches SQL:
 
@@ -163,7 +199,7 @@ supabase/tests/**/*.sql
 *.sql
 ```
 
-- [ ] **Step 4: Smoke-check one file without writing the repo**
+- [x] **Step 4: Smoke-check one file without writing the repo**
 
 ```bash
 pnpm exec oxfmt --check src/main.tsx
@@ -172,7 +208,7 @@ pnpm exec oxfmt --check src/main.tsx
 Expected: either "all files formatted" or a list of diffs. Do **not** run
 `oxfmt` without `--check` on the whole tree yet.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json pnpm-lock.yaml .oxfmtrc.json .oxfmtignore
@@ -199,7 +235,7 @@ EOF
 - Produces: `pnpm exec prettier --write some.ts` is a no-op (ignored);
   `pnpm exec prettier --write supabase/schemas/<file>.sql` still formats.
 
-- [ ] **Step 1: Replace `.prettierrc` with SQL-only config**
+- [x] **Step 1: Replace `.prettierrc` with SQL-only config**
 
 ```json
 {
@@ -223,7 +259,7 @@ EOF
 }
 ```
 
-- [ ] **Step 2: Invert `.prettierignore`**
+- [x] **Step 2: Invert `.prettierignore`**
 
 ```
 *
@@ -232,7 +268,7 @@ EOF
 !supabase/schemas/**
 ```
 
-- [ ] **Step 3: Drop JS Prettier plugins**
+- [x] **Step 3: Drop JS Prettier plugins**
 
 ```bash
 pnpm remove @ianvs/prettier-plugin-sort-imports prettier-plugin-tailwindcss
@@ -240,7 +276,7 @@ pnpm remove @ianvs/prettier-plugin-sort-imports prettier-plugin-tailwindcss
 
 Keep `prettier` and `prettier-plugin-sql`.
 
-- [ ] **Step 4: Verify the cage**
+- [x] **Step 4: Verify the cage**
 
 ```bash
 pnpm exec prettier --write --log-level warn src/main.tsx
@@ -250,7 +286,7 @@ pnpm exec prettier --check supabase/schemas
 Expected: first command does not rewrite `src/main.tsx`. Second command
 runs the SQL plugin on schema files (check or already-formatted is fine).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .prettierrc .prettierignore package.json pnpm-lock.yaml
@@ -277,7 +313,7 @@ EOF
 - Produces: oxfmt on non-SQL files, prettier on `*.sql`, eslint --fix still
   on JS/TS, stylelint --fix on CSS. Exit 2 if any rewriter changed a file.
 
-- [ ] **Step 1: Split Stage 6 of the format script**
+- [x] **Step 1: Split Stage 6 of the format script**
 
 Replace the single `prettier --write --ignore-unknown` invocation with:
 
@@ -306,7 +342,7 @@ Update the file header comment from "Runs prettier, eslint --fix" to
 
 Leave Stage 8 as `eslint --fix` until Phase 2.
 
-- [ ] **Step 2: Point the editor at Oxc, Prettier only for SQL**
+- [x] **Step 2: Point the editor at Oxc, Prettier only for SQL**
 
 In `.vscode/settings.json` set:
 
@@ -336,7 +372,7 @@ In `.vscode/settings.json` set:
 
 Keep the existing Deno / Stylelint / TypeScript keys.
 
-- [ ] **Step 3: Docs**
+- [x] **Step 3: Docs**
 
 `README.md` pre-push sentence becomes: oxfmt, prettier on SQL schemas,
 eslint --fix, stylelint --fix.
@@ -350,7 +386,7 @@ eslint --fix, stylelint --fix.
 
 (Linter line stays until Phase 2.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/format-changed-files/format-changed-files.sh .vscode/settings.json README.md .cursor/rules/global.mdc
@@ -377,7 +413,7 @@ EOF
 - Consumes: generated file path + contents.
 - Produces: JS/TS/JSON/etc formatted with oxfmt; `.sql` still Prettier.
 
-- [ ] **Step 1: Add oxfmt to ava-cli**
+- [x] **Step 1: Add oxfmt to ava-cli**
 
 ```bash
 pnpm --filter @avandar/ava-cli add oxfmt
@@ -385,7 +421,7 @@ pnpm --filter @avandar/ava-cli add oxfmt
 
 Keep `prettier` on ava-cli. It still formats SQL.
 
-- [ ] **Step 2: Branch `writeFileFromTemplate` on extension**
+- [x] **Step 2: Branch `writeFileFromTemplate` on extension**
 
 Replace `_formatFileWithPrettier` with:
 
@@ -414,7 +450,7 @@ returns.
 Call `_formatGeneratedFile` where `_formatFileWithPrettier` is called
 today.
 
-- [ ] **Step 3: `formatFileWithRepoPrettier` in newEdgeFunction.ts**
+- [x] **Step 3: `formatFileWithRepoPrettier` in newEdgeFunction.ts**
 
 Rename to `formatGeneratedFile` and switch the `execSync` to:
 
@@ -425,7 +461,7 @@ const formatter = options.filePath.endsWith(".sql")
 execSync(formatter, { cwd: options.projectRoot, stdio: "pipe" });
 ```
 
-- [ ] **Step 4: `scripts/generators/new-route/new-route.main.ts`**
+- [x] **Step 4: `scripts/generators/new-route/new-route.main.ts`**
 
 Replace the `prettier` import + `resolveConfig`/`format` block with:
 
@@ -437,7 +473,7 @@ const formattedContent = (await format(routeFilePath, processedContent)).code;
 
 (Adjust `.code` if the API differs; same check as Step 2.)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/ava-cli scripts/generators/new-route/new-route.main.ts pnpm-lock.yaml
@@ -460,7 +496,7 @@ EOF
 - Produces: a single formatting commit so later phases do not mix style
   churn with lint/plugin work.
 
-- [ ] **Step 1: Write**
+- [x] **Step 1: Write**
 
 ```bash
 pnpm exec oxfmt
@@ -468,7 +504,7 @@ pnpm exec oxfmt
 
 Do not pass SQL paths. `.oxfmtignore` already has `*.sql`.
 
-- [ ] **Step 2: Sanity**
+- [x] **Step 2: Sanity**
 
 ```bash
 pnpm exec oxfmt --check
@@ -477,7 +513,7 @@ pnpm exec prettier --check supabase/schemas
 
 Expected: both exit 0. If oxfmt wants a second pass, run it again.
 
-- [ ] **Step 3: Commit only formatting**
+- [x] **Step 3: Commit only formatting**
 
 ```bash
 git add -u
