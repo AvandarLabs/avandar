@@ -249,6 +249,7 @@
     "googleapis": "^154.0.0",
     "jsdom": "^26.1.0",
     "nodemon": "^3.1.10",
+    "oxfmt": "^0.64.0",
     "postcss": "^8.5.3",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
