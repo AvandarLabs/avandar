@@ -1956,9 +1956,9 @@ msgid "Smooth"
 msgstr "平滑"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
-"can take a moment on a slow connection."
-msgstr "DuckDB Spatial 下载完成后即可使用几何列；在网络较慢时可能需要稍等。"
+#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
+#~ "can take a moment on a slow connection."
+#~ msgstr "DuckDB Spatial 下载完成后即可使用几何列；在网络较慢时可能需要稍等。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
@@ -2340,8 +2340,8 @@ msgstr "放弃"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "Spatial 完成加载后即可使用此工具。"
+#~ msgid "This tool is available when Spatial finishes loading."
+#~ msgstr "Spatial 完成加载后即可使用此工具。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2530,9 +2530,9 @@ msgid "Workspace ID"
 msgstr "工作区 ID"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "图层配置已保存。请在网络连接恢复或 Spatial 扩展可用后重试。"
+#~ msgid "The layer configuration is saved. Retry after connectivity or the "
+#~ "Spatial extension becomes available."
+#~ msgstr "图层配置已保存。请在网络连接恢复或 Spatial 扩展可用后重试。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2742,6 +2742,11 @@ msgstr "您的数据集"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "单色"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "几何功能正在下载。在网络较慢时可能需要稍等。"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3305,6 +3310,11 @@ msgstr "您的数据已汇总"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "内边距"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "图层配置已保存。恢复网络连接后重试，或重新加载页面。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -3982,8 +3992,8 @@ msgstr "提交"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "此工具需要 DuckDB Spatial，但当前不可用。"
+#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
+#~ msgstr "此工具需要 DuckDB Spatial，但当前不可用。"
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -4942,6 +4952,10 @@ msgstr "注销失败"
 msgid "You have successfully connected to {0}"
 msgstr "您已成功连接到 {0}"
 
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "几何功能不可用"
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "X column"
@@ -5882,6 +5896,10 @@ msgstr "此数据似乎包含健康或患者信息。将其发送给 AI 提供�
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "通过探索您的工作区或上传您的第一个数据集开始。"
 
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "几何功能不可用"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr "堆叠"
@@ -6055,8 +6073,8 @@ msgid "Buffer of {sourceName}"
 msgstr "{sourceName} 的缓冲区"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "几何列需要 DuckDB Spatial，但当前不可用。"
+#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
+#~ msgstr "几何列需要 DuckDB Spatial，但当前不可用。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6427,6 +6445,11 @@ msgstr "离线聊天模型已准备好"
 msgid "Column description updated successfully!"
 msgstr "列描述更新成功！"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "此工具需要几何功能，但该功能无法加载。"
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "请先保存您的更改：PDF反映已保存的仪表板。"
@@ -6730,6 +6753,10 @@ msgstr "加载仪表板数据集"
 msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
 "computer. No spreadsheet handy? <0>Download our sample</0> and use that."
 msgstr "欢迎使用数据源管理器。从电脑中选择一个 CSV 或 Excel 文件。手头没有电子表格？<0>下载我们的示例</0>并使用它。"
+
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "几何功能不可用"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7238,6 +7265,11 @@ msgstr "位移"
 msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "此工作区已不存在，或您已被撤销访问权限。如果您认为这是错误，请联系工作区所有者。"
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "几何功能下载完成后即可使用此工具。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -8398,8 +8430,8 @@ msgid "Delete user group"
 msgstr "删除用户组"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "空间信息不可用"
+#~ msgid "Spatial unavailable"
+#~ msgstr "空间信息不可用"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
@@ -8698,6 +8730,10 @@ msgstr "要确认，请在下面输入 <0>{confirmationTarget}</0>："
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} 和 {groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "这些选项需要几何功能，但该功能无法加载。"
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -8788,8 +8824,8 @@ msgstr "未报告"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "空间信息不可用"
+#~ msgid "Spatial is unavailable"
+#~ msgstr "空间信息不可用"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

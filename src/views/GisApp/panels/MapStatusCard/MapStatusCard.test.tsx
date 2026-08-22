@@ -163,7 +163,7 @@ describe("MapStatusCard", () => {
 
     expect(
       screen.getByText(
-        "The layer configuration is saved. Retry after connectivity or the Spatial extension becomes available.",
+        "The layer configuration is saved. Try again once your connection is back, or reload the page.",
       ),
     ).toBeInTheDocument();
   });

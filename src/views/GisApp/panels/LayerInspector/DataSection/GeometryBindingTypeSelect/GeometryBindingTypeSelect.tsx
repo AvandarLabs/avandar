@@ -49,16 +49,17 @@ function _getSpatialDescription(
   availability: DuckDbSpatialAvailability,
 ): string | undefined {
   if (availability === "loading") {
-    // Says "downloading", not "loading": the wait is a ~6MB fetch of DuckDB
-    // Spatial from a CDN, so on a slow connection it is long enough that a
-    // disabled control with no explanation reads as broken.
+    // "geometry support", not "DuckDB Spatial": the engine's name means
+    // nothing to the person reading this. And "downloading", not "loading",
+    // because the wait is a ~6MB fetch from a CDN, long enough on a slow
+    // connection that a dimmed option with no explanation reads as broken.
     return i18n._(
-      msg`Geometry columns turn on when DuckDB Spatial finishes downloading, which can take a moment on a slow connection.`,
+      msg`Geometry support is still downloading. This can take a moment on a slow connection.`,
     );
   }
   if (availability === "unavailable") {
     return i18n._(
-      msg`Geometry columns need DuckDB Spatial, which is unavailable.`,
+      msg`These options need geometry support, which could not be loaded.`,
     );
   }
   return undefined;

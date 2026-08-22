@@ -32,10 +32,14 @@ function _bufferUnavailableReason(
   selectedLayer: MapLayer.T | undefined,
 ): string | undefined {
   if (availability === "loading") {
-    return i18n._(msg`This tool is available when Spatial finishes loading.`);
+    return i18n._(
+      msg`This tool turns on when geometry support finishes downloading.`,
+    );
   }
   if (availability !== "available") {
-    return i18n._(msg`This tool needs DuckDB Spatial, which is unavailable.`);
+    return i18n._(
+      msg`This tool needs geometry support, which could not be loaded.`,
+    );
   }
   if (!selectedLayer) {
     return i18n._(msg`Select a data layer to buffer.`);
