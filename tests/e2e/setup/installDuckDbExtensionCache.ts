@@ -57,15 +57,22 @@ async function _writeCached(
  * `extensions.duckdb.org` on **every** fresh init, because it cannot persist
  * them across page loads, and the CDN sends no `cache-control`, so the browser
  * cannot help either. Each Playwright test gets a fresh context, so without a
- * cache every test refetches ~4.5MB and pays ~1.6s for it, twice for a spec
- * that reloads. That puts a third-party CDN in the critical path of the whole
- * suite, which is both slow and a source of timeouts nothing in the repo can
- * fix.
+ * cache every test refetches ~7.1MB over the wire (~27MB once decompressed)
+ * and pays ~1.6s for it, twice for a spec that reloads. That puts a
+ * third-party CDN in the critical path of the whole suite, which is both slow
+ * and a source of timeouts nothing in the repo can fix.
  *
  * The first run to want a given file fetches it and writes it to disk; every
  * run after that is local, which also makes the suite work offline once
  * warmed. Requests come from DuckDB's Web Worker and are still routable,
  * which is what makes this possible at all.
+ *
+ * Sizes above are for DuckDB v1.4.4 `wasm_eh`, and every size in this repo's
+ * DuckDB comments is quoted the same way: "over the wire" is the gzipped
+ * transfer the CDN actually sends, "decompressed" is what lands in this cache
+ * directory. Per extension, decompressed / wire: spatial 22.4 / 6.0MB,
+ * parquet 2.9 / 0.7MB, json 0.8 / 0.2MB, excel 0.6 / 0.2MB. Re-measure by
+ * listing this directory and piping each file through `gzip -c`.
  */
 export async function installDuckDbExtensionCache(
   context: BrowserContext,

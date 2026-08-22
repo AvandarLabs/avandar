@@ -49,8 +49,11 @@ function _getSpatialDescription(
   availability: DuckDbSpatialAvailability,
 ): string | undefined {
   if (availability === "loading") {
+    // Says "downloading", not "loading": the wait is a ~6MB fetch of DuckDB
+    // Spatial from a CDN, so on a slow connection it is long enough that a
+    // disabled control with no explanation reads as broken.
     return i18n._(
-      msg`Geometry columns are available when Spatial finishes loading.`,
+      msg`Geometry columns turn on when DuckDB Spatial finishes downloading, which can take a moment on a slow connection.`,
     );
   }
   if (availability === "unavailable") {

@@ -2063,6 +2063,13 @@ msgstr "Adresse e-mail"
 msgid "Smooth"
 msgstr "Lissé"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
+"can take a moment on a slow connection."
+msgstr "Les colonnes de géométrie s'activent une fois le téléchargement de "
+"DuckDB Spatial terminé, ce qui peut prendre un moment avec une "
+"connexion lente."
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Entrez un nom pour le champ"
@@ -5136,9 +5143,9 @@ msgid "Type your answer..."
 msgstr "Tapez votre réponse..."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "Les colonnes de géométrie seront disponibles une fois le chargement de "
-"Spatial terminé."
+#~ msgid "Geometry columns are available when Spatial finishes loading."
+#~ msgstr "Les colonnes de géométrie seront disponibles une fois le chargement de "
+#~ "Spatial terminé."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"

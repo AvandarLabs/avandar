@@ -14,10 +14,11 @@ export function GisApp({ avaMap }: Props): ReactNode {
   const app = useGisApp(avaMap);
   // Starts the Spatial fetch as the map opens rather than when the geometry
   // picker first renders. DuckDB loads Spatial only when something asks, so
-  // this screen has to ask, and asking here gives the ~23MB extension the
-  // whole time the user spends adding a layer to arrive. Do not ask only from
-  // the picker instead: that leaves the control disabled for seconds after the
-  // inspector opens, which reads as broken rather than loading.
+  // this screen has to ask, and asking here gives the extension (~6MB over the
+  // wire, ~22MB decompressed) the whole time the user spends adding a layer to
+  // arrive. Do not ask only from the picker instead: that leaves the control
+  // disabled for seconds after the inspector opens, which reads as broken
+  // rather than loading.
   useDetectedSpatialAvailability();
 
   return (

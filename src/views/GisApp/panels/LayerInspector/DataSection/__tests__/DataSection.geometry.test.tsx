@@ -47,7 +47,7 @@ describe("DataSection geometry", () => {
     ).toHaveAttribute("data-combobox-disabled", "true");
     expect(
       screen.getByText(
-        "Geometry columns are available when Spatial finishes loading.",
+        "Geometry columns turn on when DuckDB Spatial finishes downloading, which can take a moment on a slow connection.",
       ),
     ).toBeInTheDocument();
   });

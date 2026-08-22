@@ -98,11 +98,11 @@ async function _disposeDuckDbInstance(
  * `spatial` or `excel` here: each is fetched from `extensions.duckdb.org` on
  * **every** fresh AsyncDuckDB init, since DuckDB-WASM cannot persist
  * extensions across page loads and the CDN sends no `cache-control`, so
- * loading them here costs every page load ~1.2s and ~3.6MB of third-party
- * traffic for capabilities most sessions never use, and puts that CDN in the
- * critical path of opening any dataset at all. They load through
- * `ensureExtension` at the point of use: see `ensureSpatial` and
- * `ensureExcel`.
+ * loading them here costs every page load ~1.2s and ~6.2MB over the wire
+ * (~23MB once decompressed) of third-party traffic for capabilities most
+ * sessions never use, and puts that CDN in the critical path of opening any
+ * dataset at all. They load through `ensureExtension` at the point of use:
+ * see `ensureSpatial` and `ensureExcel`.
  */
 async function _loadRequiredDuckDbExtensions(
   conn: duckdb.AsyncDuckDBConnection,
