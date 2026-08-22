@@ -1,10 +1,11 @@
 /**
- * GisApp must sit inside AppLayout so the map uses the shared canvas Paper.
+ * GisApp must sit inside AppLayout so the map uses the shared canvas Paper,
+ * and it owns the only DuckDB Spatial trigger in the GIS view.
  */
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import { GisApp } from "@/views/GisApp/GisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
@@ -12,6 +13,26 @@ import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
+
+const { ensureSpatialMock } = vi.hoisted(() => {
+  return { ensureSpatialMock: vi.fn() };
+});
+
+vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+  return {
+    DuckDbClient: {
+      ensureSpatial: ensureSpatialMock,
+      getSpatialAvailability: () => {
+        return "loading";
+      },
+      subscribeSpatialAvailability: () => {
+        return () => {
+          return undefined;
+        };
+      },
+    },
+  };
+});
 
 vi.mock("@/views/GisApp/useGisApp/useGisApp", () => {
   return {
@@ -55,11 +76,25 @@ function _createAvaMap(): AvaMap.T {
 }
 
 describe("GisApp", () => {
+  beforeEach(() => {
+    ensureSpatialMock.mockReset();
+    ensureSpatialMock.mockResolvedValue(true);
+  });
+
   it("renders the map shell inside the shared app canvas layout", () => {
     render(<GisApp avaMap={_createAvaMap()} />);
 
     expect(screen.getByTestId("app-layout")).toContainElement(
       screen.getByTestId("gis-map-shell"),
     );
+  });
+
+  // Nothing downstream asks for Spatial: `useMapLayersData` and the Area and
+  // Buffer map tools all read the capability passively, so if this call stops
+  // happening they wait on "loading" for the life of the page.
+  it("starts the Spatial fetch on mount, before any layer exists", () => {
+    render(<GisApp avaMap={_createAvaMap()} />);
+
+    expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -387,7 +387,9 @@ describe("useMapLayersData", () => {
     );
 
     expect(runSpatialQueryMock).not.toHaveBeenCalled();
-    expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
+    // The hook waits for the capability without asking for it: `GisApp` owns
+    // the only trigger, so a second one here would be dead weight.
+    expect(ensureSpatialMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });
 
@@ -496,7 +498,7 @@ describe("useMapLayersData", () => {
     );
 
     expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
-    expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
+    expect(ensureSpatialMock).not.toHaveBeenCalled();
     expect(result.current.get(layer.id)?.isLoading).toBe(true);
   });
 

@@ -2,8 +2,6 @@ import { makeIdLookupMap, propEq } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { useEffect } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { compileLatLngOverlaySql } from "@/clients/maps/MapLayerSpatialQuery/compileLatLngOverlaySql/compileLatLngOverlaySql";
 import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
@@ -270,25 +268,6 @@ async function _runLatLngLayer(options: {
   return { type: "rows", queryResult: result, didAutoLimit };
 }
 
-function useInitializeDuckDbForSpatialLayers(
-  hasSpatialLayer: boolean,
-  spatialAvailability: string,
-): void {
-  useEffect(
-    function initializeDuckDbForSpatialLayers() {
-      if (hasSpatialLayer && spatialAvailability === "loading") {
-        // `ensureSpatial`, not `initialize`: DuckDB starts without the
-        // extension, so this is what fetches it and what moves
-        // `spatialAvailability` off "loading" for the query gate below.
-        void DuckDbClient.ensureSpatial().catch(() => {
-          return undefined;
-        });
-      }
-    },
-    [hasSpatialLayer, spatialAvailability],
-  );
-}
-
 type LayerQueryContext = {
   layers: readonly MapLayer.T[];
   workspaceId: Workspace.Id;
@@ -407,7 +386,16 @@ function _toLayerQueryStateMap(
   );
 }
 
-/** Runs the independent structured query for every configured map layer. */
+/**
+ * Runs the independent structured query for every configured map layer.
+ *
+ * Reads the Spatial capability but never triggers its fetch: `GisApp` calls
+ * `useDetectedSpatialAvailability` on mount, unconditionally and before any
+ * layer exists, so by the time a spatial layer can be configured the fetch is
+ * already in flight. Triggering it again from here would only re-request a
+ * memoized promise, and would do it later and for a strict subset of the cases
+ * the view root already covers.
+ */
 export function useMapLayersData({
   layers,
   workspaceId,
@@ -427,10 +415,6 @@ export function useMapLayersData({
 }): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
-  const hasSpatialLayer = layers.some((layer) => {
-    return _layerNeedsSpatial(layer, overlay);
-  });
-  useInitializeDuckDbForSpatialLayers(hasSpatialLayer, spatialAvailability);
   const results = useQueries({
     queries: layers.map((layer) => {
       return _createLayerQuery(layer, {
