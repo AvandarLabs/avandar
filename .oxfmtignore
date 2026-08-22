@@ -18,3 +18,19 @@ src/i18n/locales/*/messages.ts
 
 # Prettier owns SQL. oxfmt must never touch it.
 *.sql
+
+# Trees ESLint already excludes, kept in sync so the formatter and the linter
+# agree on what is "our" code. Most are gitignored too, but not all:
+# `agent-skills/` is vendored third-party skill content that we do not restyle,
+# and two of its files (the `dif` web shell's `shell.js` / `boot.js`) are
+# deliberate IIFE fragments that no parser can read standalone.
+.agents/**
+.claude
+.claude/**
+agent-skills/**
+apps/desktop/build/**
+apps/desktop/bundle/**
+apps/desktop/.electrobun-cache/**
+playwright-report/**
+.temp/**
+supabase/.temp/**
