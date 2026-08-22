@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
+import type { ReactNode } from "react";
 
 type Props = {
   /**

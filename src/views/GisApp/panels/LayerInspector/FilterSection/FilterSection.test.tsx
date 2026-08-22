@@ -1,20 +1,18 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { Model } from "@avandar/models";
 import { assertIsDefined } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { fireEvent, render, screen } from "@/test-utils";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSection/FilterSection";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 const queryColumn = QueryColumn.makeFromDatasetColumn(
   Model.make("DatasetColumn", {

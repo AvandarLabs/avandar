@@ -1,9 +1,4 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-import type { UnknownDataFrame } from "@avandar/utils";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
 import { fireEvent, render, screen, within } from "@/test-utils";
@@ -11,6 +6,9 @@ import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
 } from "@/test-utils/pickMantineSelectOption";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 const COLUMNS: readonly QueryResultColumn[] = [
   { name: "category", dataType: "varchar" },

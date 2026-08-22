@@ -3,7 +3,6 @@
  * throw.
  */
 import { describe, expect, it } from "vitest";
-
 import {
   isOfflineContextWindowOverflow,
   offlineChatOverflowAssistantText,

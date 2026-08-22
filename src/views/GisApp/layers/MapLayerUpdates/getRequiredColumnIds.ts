@@ -1,8 +1,7 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { isDefined, makeSet } from "@avandar/utils";
 import { match } from "ts-pattern";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 function _getGeoBindingColumnIds(
   binding: MapLayer.GeoBinding | undefined,

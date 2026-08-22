@@ -1,12 +1,10 @@
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ReactElement } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-
 import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactElement } from "react";
 
 type Props = AvaPageFieldProps<readonly LocalFilter[]>;
 

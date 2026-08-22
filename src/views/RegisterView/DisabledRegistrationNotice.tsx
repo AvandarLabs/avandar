@@ -1,9 +1,7 @@
-import type { ReactElement } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Anchor, Divider, Stack, Text, Title } from "@mantine/core";
-
 import { INFO_EMAIL } from "$/config/GlobalAppConfig";
+import type { ReactElement } from "react";
 
 /** Explains why self-registration is unavailable and offers a contact path. */
 export function DisabledRegistrationNotice(): ReactElement {

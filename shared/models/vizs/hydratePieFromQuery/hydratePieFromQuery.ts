@@ -1,8 +1,6 @@
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-
 import { isNonEmptyArray } from "@avandar/utils";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;

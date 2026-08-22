@@ -1,11 +1,9 @@
-import type { CodeHeaderProps } from "@assistant-ui/react-markdown";
-
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, CopyButton, Text } from "@mantine/core";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
-
 import css from "./MarkdownCodeHeader.module.css";
+import type { CodeHeaderProps } from "@assistant-ui/react-markdown";
 
 type Props = CodeHeaderProps;
 

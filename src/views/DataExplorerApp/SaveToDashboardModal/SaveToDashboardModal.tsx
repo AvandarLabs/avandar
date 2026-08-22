@@ -1,17 +1,9 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type {
-  VizConfig,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
-
 import { Model } from "@avandar/models";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
@@ -23,6 +15,12 @@ import { notifyError } from "@/utils/notifications/notify";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   rawSql: string;

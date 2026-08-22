@@ -1,7 +1,4 @@
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
@@ -11,6 +8,7 @@ import {
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 beforeEach(() => {
   resetDataSectionFixtures();

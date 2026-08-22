@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { shouldCelebrateFirstDashboardCompletion } from "@/components/Nux/NuxCompletionModal/shouldCelebrateFirstDashboardCompletion/shouldCelebrateFirstDashboardCompletion";
 
 const FINALE_MILESTONES = [

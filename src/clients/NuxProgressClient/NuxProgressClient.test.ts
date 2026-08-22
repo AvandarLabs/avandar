@@ -1,13 +1,11 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { describe, expect, it } from "vitest";
-
 import {
   createNuxWorkspaceArtifacts,
   getNuxWorkspaceArtifactsQueryKey,
   NuxProgressClient,
   NuxProgressDBReadToModelReadSchema,
 } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const DB_ROW = {
   id: "11111111-1111-4111-8111-111111111111",

@@ -1,10 +1,9 @@
+import { isDefined, matchLiteral } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type {
   DashboardFilterRecord,
   DashboardFilterValue,
 } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-
-import { isDefined, matchLiteral } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
 
 function _formatSqlLiteral(value: string | number | boolean): string {
   if (typeof value === "number") {

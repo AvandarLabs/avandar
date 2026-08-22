@@ -1,6 +1,3 @@
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -11,8 +8,9 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-
 import css from "./LocalFiltersPField.module.css";
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactNode } from "react";
 
 type Props = {
   filter: LocalFilter;

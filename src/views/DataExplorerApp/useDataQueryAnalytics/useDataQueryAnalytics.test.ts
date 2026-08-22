@@ -1,18 +1,16 @@
-import type { QueryAnalyticsSurface } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
-import type { QueryAnalyticsObserverState } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
-import type { RenderHookResult } from "@testing-library/react";
-
 /**
  * These behaviours decide whether this instrumentation is trustworthy: a cache
  * hit must not count as a run, a retry must not count twice, only the Data
  * Explorer records successes, and a public page records nothing.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { renderHook } from "@/test-utils";
 import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
+import type { QueryAnalyticsSurface } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
+import type { QueryAnalyticsObserverState } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
+import type { RenderHookResult } from "@testing-library/react";
 
 const { logEventMock } = vi.hoisted(() => {
   return { logEventMock: vi.fn() };

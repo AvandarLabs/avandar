@@ -1,6 +1,5 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-
 import { propEq } from "@avandar/utils";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 /**
  * Resolve a viz config column key (a column name) against the columns of a

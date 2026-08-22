@@ -1,8 +1,6 @@
-import type { PlatformImpls } from "../PlatformProvider/PlatformProvider";
-
 import { afterEach, describe, expect, it } from "vitest";
-
 import { PlatformRegistry } from "./PlatformRegistry";
+import type { PlatformImpls } from "../PlatformProvider/PlatformProvider";
 
 const fakeImpls = {
   duckDb: { __tag: "duckDb" },

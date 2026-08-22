@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Menu } from "@mantine/core";
 import { IconDotsVertical } from "@tabler/icons-react";
-
 import { LayerActionItems } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems";
+import type { ReactNode } from "react";
 
 type Props = {
   layerName: string;

@@ -1,9 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
-
 import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
-
 import { ImportConfirmBody } from "./ImportConfirmBody";
 
 /**

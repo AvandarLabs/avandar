@@ -1,9 +1,7 @@
+import { randomUUID } from "node:crypto";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-
-import { randomUUID } from "node:crypto";
-
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 
 type UpsertPaidSubscriptionForE2EOptions = {
   supabaseAdminClient: AvaSupabaseDBClient;

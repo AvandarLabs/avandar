@@ -1,9 +1,5 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { makeDatasetOriginalFileStoragePathFromIds } from "@/clients/storage/DatasetOriginalFileStorageClient/makeDatasetOriginalFileStoragePathFromIds/makeDatasetOriginalFileStoragePathFromIds";
@@ -11,6 +7,8 @@ import {
   DIRECT_UPLOAD_MAX_BYTES,
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function _getTusHeaders(): Promise<Record<string, string>> {
   const session = await AuthClient.getCurrentSession();

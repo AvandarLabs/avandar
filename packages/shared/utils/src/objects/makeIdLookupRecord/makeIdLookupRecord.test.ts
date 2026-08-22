@@ -1,7 +1,6 @@
-import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
-
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord.ts";
 import { describe, expect, it } from "vitest";
+import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
 
 describe("makeIdLookupRecord", () => {
   it("indexes records by the default id key and keeps the last duplicate entry", () => {

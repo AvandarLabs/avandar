@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import {
   base64UrlDecode,
   base64UrlEncode,

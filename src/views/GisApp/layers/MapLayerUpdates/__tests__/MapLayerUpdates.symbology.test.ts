@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-
 import {
   createNumericColumn,
   createTextColumn,

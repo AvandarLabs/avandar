@@ -1,11 +1,9 @@
-import type { RefObject } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
-
 import { notifyError } from "@/utils/notifications/notify";
 import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExport";
 import { runTimedExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/runTimedExport/runTimedExport";
+import type { RefObject } from "react";
 
 type UseAnnotatedPdfExportOptions = {
   sourceElement: HTMLElement | undefined;

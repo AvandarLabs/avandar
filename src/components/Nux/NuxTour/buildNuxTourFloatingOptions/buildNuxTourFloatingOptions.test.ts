@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { buildNuxTourFloatingOptions } from "@/components/Nux/NuxTour/buildNuxTourFloatingOptions/buildNuxTourFloatingOptions";
 
 describe("buildNuxTourFloatingOptions", () => {

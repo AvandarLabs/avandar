@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Alert, Anchor, Code, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import type { ReactNode } from "react";
 
 type Props = {
   /** The last query error, or `undefined` when the query succeeded. */

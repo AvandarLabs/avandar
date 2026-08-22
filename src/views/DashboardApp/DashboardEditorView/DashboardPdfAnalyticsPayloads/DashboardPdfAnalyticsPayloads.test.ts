@@ -1,13 +1,11 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 /**
  * Block count is what makes an export duration interpretable: a slow export of
  * two blocks and a slow export of forty are different problems.
  */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
-
 import { DashboardPdfAnalyticsPayloads } from "@/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 function _makeDashboard(blockCount: number): Dashboard.T {
   return Model.make("Dashboard", {

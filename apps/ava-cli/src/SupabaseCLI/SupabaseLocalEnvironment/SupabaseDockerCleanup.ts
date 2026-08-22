@@ -1,8 +1,3 @@
-import type {
-  SupabaseDockerResource,
-  SupabaseLocalEnvironmentIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import {
   constant,
@@ -11,6 +6,10 @@ import {
   prop,
   propEq,
 } from "@avandar/utils";
+import type {
+  SupabaseDockerResource,
+  SupabaseLocalEnvironmentIO,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const DOCKER_IDENTIFIER_PATTERN = /^[a-f0-9]{64}$/;
 

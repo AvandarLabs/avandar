@@ -1,8 +1,7 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { ReactNode } from "react";
-
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { ReactNode } from "react";
 
 type Props = {
   milestoneKey: NuxProgress.MilestoneKey;

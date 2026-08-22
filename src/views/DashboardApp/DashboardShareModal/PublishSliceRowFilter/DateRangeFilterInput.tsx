@@ -1,8 +1,7 @@
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Group, Text, TextInput } from "@mantine/core";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   rowFilter: Extract<PublishSliceConfig.RowFilter, { kind: "range_date" }>;

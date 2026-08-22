@@ -1,8 +1,6 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { withQueryColumn } from "./withQueryColumn";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** Repaints the layer's symbols in `color`. */
 function withSymbolColor(

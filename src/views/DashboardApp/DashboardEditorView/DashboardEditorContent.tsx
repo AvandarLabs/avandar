@@ -1,12 +1,5 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { DashboardEditorViewState } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
-import type { Data } from "@puckeditor/core";
-import type { ReactElement } from "react";
-
 import { Flex } from "@mantine/core";
 import { Puck } from "@puckeditor/core";
-
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { CanvasAgGridStyles } from "@/views/DashboardApp/DashboardEditorView/CanvasAgGridStyles";
 import { DashboardEditorToolbar } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorToolbar";
@@ -15,6 +8,11 @@ import css from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.mo
 import { ShareOnlyAccessAlert } from "@/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert";
 import { useFullWidthCanvasViewport } from "@/views/DashboardApp/DashboardEditorView/useFullWidthCanvasViewport/useFullWidthCanvasViewport";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { DashboardEditorViewState } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
+import type { Data } from "@puckeditor/core";
+import type { ReactElement } from "react";
 
 type Props = {
   dashboard: Dashboard.T;

@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 

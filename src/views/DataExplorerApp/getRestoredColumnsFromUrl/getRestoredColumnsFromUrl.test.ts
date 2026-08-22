@@ -1,9 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 /**
  * A shared Data Explorer URL can outlive the schema it names. These pin that a
  * stale column name degrades to a partial restore rather than failing the whole
@@ -12,9 +6,13 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import { Model } from "@avandar/models";
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 function _makeDatasetColumn(name: string): DatasetColumn.T {
   const now = "2026-01-01T00:00:00.000Z";

@@ -1,13 +1,11 @@
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDeleteDatasetMenuItem } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { ReactNode } from "react";
 
 /** Save-over and delete items for the dataset currently open in Explorer. */
 export function DataExplorerOpenDatasetMenuItems(): ReactNode {

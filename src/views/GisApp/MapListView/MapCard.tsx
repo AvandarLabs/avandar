@@ -1,13 +1,11 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ReactNode } from "react";
-
 import { Link, Paper } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconMap } from "@tabler/icons-react";
-
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { DeleteMapButton } from "@/views/GisApp/MapListView/DeleteMapButton";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ReactNode } from "react";
 
 type Props = { avaMap: AvaMap.T; workspaceSlug: string };
 

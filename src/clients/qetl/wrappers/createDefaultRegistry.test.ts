@@ -1,10 +1,8 @@
+import { describe, expect, it, vi } from "vitest";
+import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-
-import { describe, expect, it, vi } from "vitest";
-
-import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 
 const DATASET_REF = {
   kind: "dataset",

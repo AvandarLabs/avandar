@@ -1,9 +1,8 @@
-import type { DevDuckDbTable } from "@/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView";
-import type { ReactNode } from "react";
-
 import { ObjectDescriptionList } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
+import type { DevDuckDbTable } from "@/components/spotlight-modals/DevDuckDbTableSchemaView/DevDuckDbTableSchemaView";
+import type { ReactNode } from "react";
 
 type Props = {
   tables: readonly DevDuckDbTable[] | undefined;

@@ -1,9 +1,8 @@
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type {
   ChatClarifyRequest,
   ChatProposedCaseType,
 } from "$/types/chat.types";
-
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 /** Clarification carrying an optional audit log row id so telemetry can
  *  link the "shown" event with the eventual answered/cancelled outcome. */

@@ -1,9 +1,8 @@
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
 
 type Props = {
   pointsType: MapLayer.PointBinding["type"];

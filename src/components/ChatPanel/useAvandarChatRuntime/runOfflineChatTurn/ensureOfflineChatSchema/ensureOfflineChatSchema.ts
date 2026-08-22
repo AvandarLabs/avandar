@@ -1,6 +1,5 @@
-import type { OfflineChatSchema } from "$/types/offlineChat.types";
-
 import { propEq } from "@avandar/utils";
+import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
 /**
  * When the session schema cache is empty offline, still allow repair if the

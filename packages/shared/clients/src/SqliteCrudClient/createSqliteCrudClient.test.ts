@@ -1,10 +1,9 @@
-import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { makeParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /*
  * A fake SQLite transport. `createSqliteCrudClient` takes its database access

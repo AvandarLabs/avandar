@@ -1,12 +1,10 @@
+import { useLingui } from "@lingui/react/macro";
+import { Button, Pagination, Table } from "@mantine/core";
+import css from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.module.css";
+import { getClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumns/getClusterTableColumns";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumnsFromLeaves/getClusterTableColumnsFromLeaves";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Button, Pagination, Table } from "@mantine/core";
-
-import css from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.module.css";
-import { getClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumns/getClusterTableColumns";
 
 type Props = {
   leaves: readonly GeoJSON.Feature[];

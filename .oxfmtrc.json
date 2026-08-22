@@ -5,11 +5,13 @@
   "tabWidth": 2,
   "sortImports": {
     "internalPattern": ["@/", "$/"],
+    "newlinesBetween": false,
     "groups": [
-      "type-import",
-      ["value-builtin", "value-external"],
+      "value-builtin",
+      "value-external",
       "value-internal",
       ["value-parent", "value-sibling", "value-index"],
+      "type-import",
       "unknown"
     ]
   },

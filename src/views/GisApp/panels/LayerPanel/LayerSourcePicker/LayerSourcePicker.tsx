@@ -1,10 +1,8 @@
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { ReactNode } from "react";
-
 import { Popover } from "@mantine/core";
 import { useState } from "react";
-
 import { LayerSourcePickerDropdown } from "@/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Renders the trigger with the props that control the picker. */

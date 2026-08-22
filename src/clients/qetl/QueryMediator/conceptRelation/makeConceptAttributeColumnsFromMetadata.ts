@@ -1,11 +1,10 @@
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 
 /** Each contributing dataset's key column, by dataset id. */
 type PrimaryKeyColumnNameByDatasetId = Record<Dataset.Id, string | undefined>;

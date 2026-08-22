@@ -1,12 +1,10 @@
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Image, Modal, Stack, Text } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
-
 import { notifyError } from "@/utils/notifications/notify";
+import type { ReactNode } from "react";
 
 type Props = {
   /** The URL the QR code encodes, also shown as the caption. */

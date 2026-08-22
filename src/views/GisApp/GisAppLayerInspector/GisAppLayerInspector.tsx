@@ -1,9 +1,8 @@
+import { AnnotationInspectorPanel } from "@/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel";
+import { LayerInspector } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { GisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
 import type { ReactNode } from "react";
-
-import { AnnotationInspectorPanel } from "@/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel";
-import { LayerInspector } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 type Props = {
   app: GisAppState;

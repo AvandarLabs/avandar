@@ -1,6 +1,5 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** Basemap style URLs, keyed by the model's basemap style union. */
 export const MapStyles = {

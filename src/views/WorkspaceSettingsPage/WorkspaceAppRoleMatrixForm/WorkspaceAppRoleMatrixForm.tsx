@@ -1,15 +1,13 @@
+import { matchLiteral } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Radio, SegmentedControl, Stack, Table, Text } from "@mantine/core";
+import { appLabel } from "$/copy/appLabel";
+import { Permissions } from "$/models/Permissions/Permissions";
+import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 import type {
   RoleLevel,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions";
-
-import { matchLiteral } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Radio, SegmentedControl, Stack, Table, Text } from "@mantine/core";
-
-import { appLabel } from "$/copy/appLabel";
-import { Permissions } from "$/models/Permissions/Permissions";
-import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices";
 
 type AppTypeCellValue = RoleLevel | "none";
 

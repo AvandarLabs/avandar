@@ -1,3 +1,4 @@
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -6,8 +7,6 @@ import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.

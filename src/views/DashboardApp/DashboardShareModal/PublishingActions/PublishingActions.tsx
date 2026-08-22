@@ -1,13 +1,11 @@
-import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
-import type { ReactNode } from "react";
-
 import { Tooltip } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, Button, Group } from "@mantine/core";
 import { IconWorld } from "@tabler/icons-react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { PrimaryActionLabel } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel";
+import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
+import type { ReactNode } from "react";
 
 type Props = {
   actionKind: PublishActionKind;

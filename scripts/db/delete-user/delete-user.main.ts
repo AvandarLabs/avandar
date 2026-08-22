@@ -1,10 +1,9 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { program } from "commander";
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { program } from "commander";
 import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
-
 import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
 import { Database } from "$/types/database.types";
 

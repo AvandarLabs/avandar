@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { ConceptCreatorView } from "@/views/OntologyDesignerApp/ConceptCreatorView";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore";
 

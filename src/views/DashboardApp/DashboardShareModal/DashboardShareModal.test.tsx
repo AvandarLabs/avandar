@@ -1,10 +1,8 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactElement } from "react";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
 
 /**
  * The modal owns every gate on publishing, so these are the tests that keep

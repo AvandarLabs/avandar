@@ -1,10 +1,8 @@
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-
 import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
-
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 /**
  * Creates the callback that turns a discovery query into clarification

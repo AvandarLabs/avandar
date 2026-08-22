@@ -1,11 +1,10 @@
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { prettifyError } from "zod";
 import type {
   WebhookFailureResponse,
   WebhookSuccessResponse,
 } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type { ZodError } from "zod";
-
-import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
-import { prettifyError } from "zod";
 
 export const MAX_FREE_PLAN_SEATS = 2;
 export const MAX_FREE_PLAN_DATASETS = 5;

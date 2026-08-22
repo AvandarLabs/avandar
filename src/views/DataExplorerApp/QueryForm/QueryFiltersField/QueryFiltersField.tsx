@@ -1,20 +1,13 @@
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { FilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
-import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
-import type { ReactNode } from "react";
-import type { Field, RuleGroupType } from "react-querybuilder";
-
 import { makeObject, prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Stack, Text } from "@mantine/core";
 import { QueryBuilderMantine } from "@react-querybuilder/mantine";
-import "react-querybuilder/dist/query-builder.css";
 import { useCallback, useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import "react-querybuilder/dist/query-builder.css";
 import { FilterAddAction } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterAddAction/FilterAddAction";
 import { FilterCombinatorSelector } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterCombinatorSelector/FilterCombinatorSelector";
 import { FilterFieldSelector } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector";
@@ -22,8 +15,12 @@ import { FilterOperatorSelector } from "@/views/DataExplorerApp/QueryForm/QueryF
 import { FilterRemoveAction } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction";
 import { FilterValueEditorControl } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditorControl/FilterValueEditorControl";
 import { useFilterTreeState } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState/useFilterTreeState";
-
 import classes from "./QueryFiltersField.module.css";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { FilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
+import type { ReactNode } from "react";
+import type { Field, RuleGroupType } from "react-querybuilder";
 
 type Props = {
   /**

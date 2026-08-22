@@ -1,8 +1,6 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.module.css";
+import type { ReactNode } from "react";
 
 type Props = { dragId: string; keyboardMoveId: string };
 

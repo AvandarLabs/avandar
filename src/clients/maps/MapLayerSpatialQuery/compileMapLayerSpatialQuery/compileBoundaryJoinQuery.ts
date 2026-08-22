@@ -1,17 +1,4 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type {
-  MapLayerSpatialQueryPlan,
-  ResolvedBoundarySource,
-  ResolvedMapLayerMetadata,
-} from "../MapLayerSpatialQuery.types";
-import type {
-  CompileOptions,
-  CompileSourceOptions,
-} from "./compileMapLayerSpatialQuery.types";
-
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
 import { makeOutputAoiPredicateSql } from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
 import { makeNormalizedBoundaryKeyFromValueExpression } from "../makeNormalizedBoundaryKeyFromValueExpression/makeNormalizedBoundaryKeyFromValueExpression";
@@ -29,6 +16,17 @@ import {
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
 } from "./compileMapLayerSpatialQueryHelpers";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type {
+  MapLayerSpatialQueryPlan,
+  ResolvedBoundarySource,
+  ResolvedMapLayerMetadata,
+} from "../MapLayerSpatialQuery.types";
+import type {
+  CompileOptions,
+  CompileSourceOptions,
+} from "./compileMapLayerSpatialQuery.types";
 
 type BoundaryJoinBinding = Extract<
   MapLayer.GeoBinding,

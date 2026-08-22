@@ -1,14 +1,12 @@
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
-
 import { InputTextForm } from "@avandar/ui";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 
 type GisAppLayerAction = (layerId: MapLayer.Id) => void;
 

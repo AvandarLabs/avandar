@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useNuxJoyrideTargetEpoch } from "@/components/Nux/NuxTour/useNuxJoyrideTargetEpoch";
 import { useNuxLaidOutTarget } from "@/components/Nux/NuxTour/useNuxLaidOutTarget/useNuxLaidOutTarget";
 import { act, render, screen, waitFor } from "@/test-utils";
+import type { ReactNode } from "react";
 
 const _LAID_OUT_RECT = {
   x: 800,

@@ -1,7 +1,6 @@
-import type { ComboboxStore } from "@mantine/core";
-
 import { useCombobox } from "@mantine/core";
 import { useState } from "react";
+import type { ComboboxStore } from "@mantine/core";
 
 function _normalize(value: string): string {
   return value.trim().toLowerCase();

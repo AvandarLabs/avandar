@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import {
   createDataVizBlock,

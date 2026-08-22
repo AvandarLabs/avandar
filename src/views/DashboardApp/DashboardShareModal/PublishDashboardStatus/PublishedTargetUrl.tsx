@@ -1,18 +1,15 @@
-import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
-import type { ReactNode } from "react";
-
 import { ActionIcon } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Code, Group } from "@mantine/core";
 import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
 import { useRef, useState } from "react";
-
 import { ShareUrlActions } from "@/views/DashboardApp/DashboardShareModal/ShareUrlActions";
 import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
-
 import { doesVanitySlugChangeInvalidatePreviousUrl } from "./doesVanitySlugChangeInvalidatePreviousUrl";
 import { openVanitySlugChangeConfirmModal } from "./openVanitySlugChangeConfirmModal";
 import css from "./PublishDashboardStatus.module.css";
+import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
+import type { ReactNode } from "react";
 
 type Props = {
   targetUrl: string;

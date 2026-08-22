@@ -1,16 +1,14 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ButtonProps } from "@mantine/core";
-import type { ReactNode } from "react";
-
 import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
 import { DashboardShareModal } from "@/views/DashboardApp/DashboardShareModal/DashboardShareModal";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ButtonProps } from "@mantine/core";
+import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T | undefined;

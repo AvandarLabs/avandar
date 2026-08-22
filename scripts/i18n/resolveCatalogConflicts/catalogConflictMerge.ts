@@ -1,6 +1,5 @@
-import type { PoEntry } from "../translateWithLlm/poCatalog";
-
 import { PoCatalog } from "../translateWithLlm/poCatalog";
+import type { PoEntry } from "../translateWithLlm/poCatalog";
 
 /** The two sides of a conflicted file, each a complete PO document. */
 export type CatalogSides = {

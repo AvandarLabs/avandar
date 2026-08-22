@@ -1,10 +1,9 @@
+import { useRef } from "react";
 import type {
   DataQueryRunMetadata,
   DataQueryRunOutcome,
 } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type { RefObject } from "react";
-
-import { useRef } from "react";
 
 type DataQueryRunRecorder = {
   /**

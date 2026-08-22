@@ -1,12 +1,10 @@
-// eslint-disable-next-line no-restricted-imports
-import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
-
 import { isPlainObject } from "@avandar/utils";
 import { z } from "zod";
-
 import { uuidType } from "$/lib/zodHelpers.ts";
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
 import { isSafePopupUrlTemplate } from "$/models/AvaMap/AvaMapConfig/isSafePopupUrlTemplate.ts";
+// eslint-disable-next-line no-restricted-imports
+import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 type StructuredQueryPartial = AvaMapConfigRead["layers"][number]["source"];
 

@@ -1,12 +1,9 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
-
 import { match } from "ts-pattern";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { hasQueryColumn } from "./hasQueryColumn";
 import { withQueryColumn } from "./withQueryColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 
 function _getStroke(layer: MapLayer.T): MapLayer.ClusterSymbology["stroke"] {
   return layer.symbology.type === "heatmap"

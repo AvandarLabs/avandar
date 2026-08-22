@@ -1,7 +1,6 @@
-import type { AvaQueryErrorReporter } from "@query-hooks/ErrorReporterContext";
-
 import { ErrorReporterContext } from "@query-hooks/ErrorReporterContext";
 import { useContext } from "react";
+import type { AvaQueryErrorReporter } from "@query-hooks/ErrorReporterContext";
 
 /**
  * Returns the configured error reporter, falling back to `console.error` when

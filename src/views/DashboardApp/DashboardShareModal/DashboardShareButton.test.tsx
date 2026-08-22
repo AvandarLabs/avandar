@@ -1,10 +1,8 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { modals } from "@mantine/modals";
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { DashboardShareButton } from "@/views/DashboardApp/DashboardShareModal/DashboardShareButton";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {

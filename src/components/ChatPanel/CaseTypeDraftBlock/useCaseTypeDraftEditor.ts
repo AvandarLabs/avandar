@@ -1,10 +1,9 @@
+import { useState } from "react";
 import type {
   ChatCaseValuePickerRuleType,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
 } from "$/types/chat.types";
-
-import { useState } from "react";
 
 /** One contributing dataset's attributes, for rendering the card per source. */
 export type CaseTypeDraftSourceGroup = {

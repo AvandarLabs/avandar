@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 
 describe("LocalChatModel.Catalog", () => {

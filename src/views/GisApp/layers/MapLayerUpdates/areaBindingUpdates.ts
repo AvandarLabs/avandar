@@ -1,12 +1,9 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { isDefined, makeSet } from "@avandar/utils";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { withGeometryFamilySymbology } from "./withGeometryFamilySymbology";
 import { withQueryColumn } from "./withQueryColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 type AreaBinding = Extract<
   MapLayer.GeoBinding,

@@ -1,6 +1,5 @@
-import type { RelationRefT } from "$/models/relations/RelationRef/RelationRef.types.ts";
-
 import { match } from "ts-pattern";
+import type { RelationRefT } from "$/models/relations/RelationRef/RelationRef.types.ts";
 
 /**
  * Matches a bare UUID, case-insensitively. Case is never normalized: a

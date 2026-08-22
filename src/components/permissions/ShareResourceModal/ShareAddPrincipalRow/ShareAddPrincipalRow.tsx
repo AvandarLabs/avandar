@@ -1,8 +1,7 @@
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Option = { value: string; label: string };
 

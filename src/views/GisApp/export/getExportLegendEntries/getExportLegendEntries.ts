@@ -1,7 +1,6 @@
+import { matchLiteral } from "@avandar/utils";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
-
-import { matchLiteral } from "@avandar/utils";
 
 /** The swatch shape that matches a layer's active symbology. */
 type SwatchShape = ExportLegendEntry["swatch"]["type"];

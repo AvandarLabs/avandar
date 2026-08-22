@@ -1,9 +1,3 @@
-import type {
-  SupabaseSeedOutcome,
-  SupabaseSwitchResult,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-import type { RunSupabaseSwitchOutcome } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
-
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 import {
@@ -13,6 +7,11 @@ import {
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
+import type {
+  SupabaseSeedOutcome,
+  SupabaseSwitchResult,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { RunSupabaseSwitchOutcome } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 
 /** How to seed by hand once a switch has already finished. */
 const MANUAL_SEED_COMMAND = "pnpm db:seed";

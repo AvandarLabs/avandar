@@ -1,9 +1,8 @@
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
 import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { UnknownArray } from "type-fest";
-
-import { isArray } from "@utils/guards/isArray/isArray.ts";
-import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
 
 /**
  * Gets the type of a value from an object given a key path in

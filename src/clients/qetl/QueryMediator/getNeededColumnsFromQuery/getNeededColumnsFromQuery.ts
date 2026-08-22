@@ -1,8 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import {
   normalizeColumns,
   unionColumnSets,
@@ -15,6 +10,10 @@ import {
   getSqlTokens,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 type ColumnSet = readonly string[] | "all";
 type ColumnSetByDatasetId = Record<string, ColumnSet>;

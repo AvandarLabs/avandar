@@ -1,9 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Box, Loader, Stack, VisuallyHidden } from "@mantine/core";
 import { useState } from "react";
-
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-
 import { PrivateResourcesNotice } from "./PrivateResourcesNotice";
 import { PrivateResourcesTable } from "./PrivateResourcesTable";
 import { ReassignOwnerModal } from "./ReassignOwnerModal";

@@ -1,3 +1,6 @@
+import { Simplify } from "type-fest";
+import { createServerApiClient } from "$/ServerApiClient";
+import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import type {
   API,
   APIBody,
@@ -6,11 +9,6 @@ import type {
   APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
-
-import { Simplify } from "type-fest";
-
-import { createServerApiClient } from "$/ServerApiClient";
-import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 
 // Platform-aware server API client. On web this delegates to the registered
 // Supabase client's `functions.invoke`; on desktop it bridges

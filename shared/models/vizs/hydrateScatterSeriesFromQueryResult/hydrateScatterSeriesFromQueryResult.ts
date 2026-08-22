@@ -1,8 +1,7 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type ScatterSeriesConfig = {
   series: readonly ScatterSeries[];

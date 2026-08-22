@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { mapToolCursor } from "@/views/GisApp/tools/mapToolCursor/mapToolCursor";
 
 describe("mapToolCursor", () => {

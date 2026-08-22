@@ -1,6 +1,5 @@
-import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
-
 import { objectEntries, objectKeys, prop } from "@avandar/utils";
+import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Escapes a value for use inside a single-quoted SQL string literal. */
 export function escapeSqlSingleQuotedLiteral(value: string): string {

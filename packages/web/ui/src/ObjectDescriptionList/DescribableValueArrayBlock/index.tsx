@@ -1,19 +1,7 @@
-import type {
-  DescribableObject,
-  DescribableValueArrayRenderOptions,
-  GenericRootData,
-  GetChildObjects,
-  NestedArrayRenderOptions,
-  ObjectArrayRenderOptions,
-  PrimitiveValue,
-  PrimitiveValueRenderOptions,
-} from "../ObjectDescriptionList.types";
-
 import { pick } from "@avandar/utils";
 import { ScrollArea, Stack, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
-
 import {
   isDescribableObject,
   isDescribableValueArray,
@@ -24,6 +12,16 @@ import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.ty
 import { NestedArraysBlock } from "./NestedArraysBlock";
 import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
+import type {
+  DescribableObject,
+  DescribableValueArrayRenderOptions,
+  GenericRootData,
+  GetChildObjects,
+  NestedArrayRenderOptions,
+  ObjectArrayRenderOptions,
+  PrimitiveValue,
+  PrimitiveValueRenderOptions,
+} from "../ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];

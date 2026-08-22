@@ -1,8 +1,7 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-
 import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* Test JSON fixtures: return types are inferred from `as const` payloads. */

@@ -1,6 +1,3 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-
 import { propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -19,9 +16,10 @@ import {
 } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   dashboards: readonly Dashboard.T[];

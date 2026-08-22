@@ -1,8 +1,7 @@
+import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
-
-import { collectDatasetIds } from "$/models/Dashboard/collectDatasetIds/collectDatasetIds";
 
 /**
  * How much of a dashboard can be opened with no network.

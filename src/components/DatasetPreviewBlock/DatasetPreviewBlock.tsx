@@ -1,13 +1,11 @@
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
-
 import { Callout, ObjectDescriptionList } from "@avandar/ui";
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   /** The preview rows to display in the data grid */

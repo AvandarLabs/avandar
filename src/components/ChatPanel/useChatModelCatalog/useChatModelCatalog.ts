@@ -1,6 +1,5 @@
 import { isNonEmptyArray, prop, propEq, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { useDownloadedLocalChatModelIds } from "@/components/ChatPanel/useChatModelCatalog/useDownloadedLocalChatModelIds/useDownloadedLocalChatModelIds";

@@ -1,8 +1,3 @@
-import type {
-  BuiltinPresetType,
-  UserAppRolesMatrix,
-} from "$/models/Permissions/Permissions.types";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
@@ -13,12 +8,15 @@ import {
   useRef,
   useState,
 } from "react";
-
 import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaField } from "@/components/forms/AvaForm/AvaField";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
+import type {
+  BuiltinPresetType,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types";
 
 export type WorkspaceInviteModalFieldsRef = {
   getState: () => {

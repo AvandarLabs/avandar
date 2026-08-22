@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { Combobox } from "@mantine/core";
-
 import { CREATE_OPTION_VALUE } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/DisputedValuesInput.constants";
 import { OptionsDropdown } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown";
 import { PillsFieldTarget } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget";
 import { useValuesFieldState } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/useValuesFieldState";
+import type { ReactNode } from "react";
 
 type Props = {
   label: string;

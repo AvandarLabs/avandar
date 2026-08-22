@@ -1,8 +1,7 @@
+import { useCallback } from "react";
 import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import type { Simplify } from "type-fest";
-
-import { useCallback } from "react";
 
 type GetPathTail<
   Path,

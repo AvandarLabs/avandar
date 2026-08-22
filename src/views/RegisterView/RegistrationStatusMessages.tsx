@@ -1,7 +1,6 @@
-import type { ReactElement } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Alert, Text } from "@mantine/core";
+import type { ReactElement } from "react";
 
 type Props = {
   isOnline: boolean;

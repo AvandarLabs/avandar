@@ -1,9 +1,4 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { describe, expect, it } from "vitest";
-
 /**
  * Go-to P-code lookup against loaded boundary FeatureCollections.
  */
@@ -11,6 +6,9 @@ import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { findBoundaryFeatureByPcode } from "@/views/GisApp/tools/findBoundaryFeatureByPcode/findBoundaryFeatureByPcode";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 function _createJoinLayer(): MapLayer.T {
   return {

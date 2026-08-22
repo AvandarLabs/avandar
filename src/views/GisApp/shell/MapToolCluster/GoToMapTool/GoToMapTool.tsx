@@ -1,19 +1,17 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { TextInput } from "@mantine/core";
 import { useState } from "react";
 import { match } from "ts-pattern";
-
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import css from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.module.css";
 import { findBoundaryFeatureByPcode } from "@/views/GisApp/tools/findBoundaryFeatureByPcode/findBoundaryFeatureByPcode";
 import { parseMapGoToQuery } from "@/views/GisApp/tools/parseMapGoToQuery/parseMapGoToQuery";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   layers?: readonly MapLayer.T[];

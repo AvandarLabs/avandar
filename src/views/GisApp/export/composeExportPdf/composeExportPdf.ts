@@ -1,14 +1,12 @@
+import jsPDF from "jspdf";
+import { match } from "ts-pattern";
+import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
+import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";
+import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { ExportPageGeometry } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
 import type { ExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
-
-import jsPDF from "jspdf";
-import { match } from "ts-pattern";
-
-import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
-import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";
-import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 
 /** A millimetre rectangle on the printed page. */
 type RectMm = Readonly<{ x: number; y: number; width: number; height: number }>;

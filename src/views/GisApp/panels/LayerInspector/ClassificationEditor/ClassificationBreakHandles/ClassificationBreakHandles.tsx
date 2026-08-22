@@ -1,12 +1,9 @@
+import { useLingui } from "@lingui/react/macro";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import css from "./ClassificationBreakHandles.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { KeyboardEvent, PointerEvent, ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-
-import css from "./ClassificationBreakHandles.module.css";
 
 type Props = {
   layer: MapLayer.T;

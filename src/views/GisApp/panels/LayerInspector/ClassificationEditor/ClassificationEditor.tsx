@@ -1,7 +1,3 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { CategoricalControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/CategoricalControls";
 import { ClassificationColorModeSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect";
 import css from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.module.css";
@@ -9,6 +5,9 @@ import { ClassificationEditorHeader } from "@/views/GisApp/panels/LayerInspector
 import { ClassificationHistogram } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram/ClassificationHistogram";
 import { GraduatedControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls";
 import { NoDataControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

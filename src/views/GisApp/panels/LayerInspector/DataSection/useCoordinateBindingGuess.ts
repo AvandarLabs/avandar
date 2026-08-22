@@ -1,12 +1,10 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-
 import { useEffect, useMemo } from "react";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { getGeoBindingGuessFromColumns } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 function _getGuess(
   columns: readonly QueryColumn.T[],

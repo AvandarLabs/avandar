@@ -1,15 +1,13 @@
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
-import type { MessageDescriptor } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { formatNumber } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
-
 import css from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.module.css";
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
 import { useMapPointerCoordinates } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+import type { MessageDescriptor } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   mapInstance: MapInstance;

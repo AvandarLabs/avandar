@@ -1,11 +1,9 @@
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { ReactNode } from "react";
-
 import { unknownToString } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
-
 import css from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.module.css";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { ReactNode } from "react";
 
 export type RecordAttributeRow = {
   name: string;

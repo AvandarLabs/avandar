@@ -1,8 +1,7 @@
-import type { MantineColor } from "@mantine/core";
-
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { notifications } from "@mantine/notifications";
+import type { MantineColor } from "@mantine/core";
 
 const DEFAULT_ERROR_TITLE = msg`Error`;
 const DEFAULT_SUCCESS_TITLE = msg`Success`;

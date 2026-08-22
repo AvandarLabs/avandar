@@ -1,10 +1,8 @@
+import { useEffect, useRef } from "react";
+import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { AttachMapInstanceInput } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { RefObject } from "react";
-
-import { useEffect, useRef } from "react";
-
-import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 
 type UseAttachMapInstanceInput = Omit<
   AttachMapInstanceInput,

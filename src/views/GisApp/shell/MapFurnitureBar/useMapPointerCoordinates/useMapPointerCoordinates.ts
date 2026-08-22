@@ -1,7 +1,6 @@
+import { useEffect, useState } from "react";
 import type maplibregl from "maplibre-gl";
 import type { RefObject } from "react";
-
-import { useEffect, useState } from "react";
 
 /** Geographic coordinates under the pointer, in degrees. */
 export type MapPointerCoordinates = { longitude: number; latitude: number };

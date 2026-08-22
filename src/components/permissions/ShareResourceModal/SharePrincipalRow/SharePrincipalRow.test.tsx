@@ -1,10 +1,8 @@
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { SharePrincipalRow } from "@/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 
 const baseShare: ResourceShareRow = {
   id: "s-1",

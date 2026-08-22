@@ -1,8 +1,6 @@
-import type { TextItem } from "../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { assembleQuantities } from "./assembleQuantities";
+import type { TextItem } from "../pdfSniff.types";
 
 function item(text: string, x: number, y: number, width?: number): TextItem {
   return {

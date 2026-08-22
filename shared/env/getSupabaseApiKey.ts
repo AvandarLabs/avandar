@@ -1,5 +1,4 @@
 import process from "node:process";
-
 import { isBunDesktopRuntime } from "$/env/isBunDesktopRuntime.ts";
 import { isDenoRuntime } from "$/env/isDenoRuntime.ts";
 import { isNodeRuntime } from "$/env/isNodeRuntime.ts";

@@ -1,3 +1,4 @@
+import { ValueItemContainer } from "./ValueItemContainer";
 import type { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock/index";
 import type {
   AnyDescribableValueRenderOptions,
@@ -5,8 +6,6 @@ import type {
   GenericRootData,
 } from "./ObjectDescriptionList.types";
 import type { ObjectDescriptionListBlockProps } from "./ObjectDescriptionListBlock";
-
-import { ValueItemContainer } from "./ValueItemContainer";
 
 type DescribableObjectProps<
   T extends DescribableObject,

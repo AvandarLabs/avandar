@@ -1,6 +1,5 @@
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
-
 import { useEffect, useState } from "react";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 /** Describes whether the furniture bar can show a truthful scale. */
 export type MapScale =

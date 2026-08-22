@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 
 const DATA = [

@@ -1,11 +1,9 @@
+import { Trans } from "@lingui/react/macro";
+import { Badge, Group, Stack, Text } from "@mantine/core";
+import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ReactNode } from "react";
-
-import { Trans } from "@lingui/react/macro";
-import { Badge, Group, Stack, Text } from "@mantine/core";
-
-import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 
 type Attribute = NonNullable<Concept.T<"Full">["attributes"]>[number];
 

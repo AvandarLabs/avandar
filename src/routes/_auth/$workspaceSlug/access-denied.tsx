@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-
 import { WorkspaceAppAccessDenied } from "@/components/WorkspaceAppAccessDenied/WorkspaceAppAccessDenied";
 
 const AccessDeniedSearchSchema = z.object({

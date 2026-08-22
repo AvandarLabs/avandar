@@ -1,17 +1,15 @@
+import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
-
-import { Model } from "@avandar/models";
-import { describe, expect, it, vi } from "vitest";
-
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
 
 // `MapInstanceHelpers` imports the real `maplibre-gl` package, whose own
 // top-level code reaches for `window.URL.createObjectURL`, unavailable in

@@ -1,10 +1,9 @@
-import type { PDFDocumentProxy } from "pdfjs-dist";
-
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 // pdfjs-dist ships no declaration file for the worker entry point itself
 // (only for the main `pdf.mjs` bundle), so this import is implicitly `any`.
 // @ts-expect-error -- see comment above
 import { WorkerMessageHandler } from "pdfjs-dist/legacy/build/pdf.worker.mjs";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 
 // pdf.js normally off-loads parsing to its own nested worker, spawned from
 // `GlobalWorkerOptions.workerSrc`. Spawning a worker from a worker is

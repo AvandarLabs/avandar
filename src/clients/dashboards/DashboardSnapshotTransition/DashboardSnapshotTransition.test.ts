@@ -1,8 +1,6 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { DashboardSnapshotTransition } from "./DashboardSnapshotTransition";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 

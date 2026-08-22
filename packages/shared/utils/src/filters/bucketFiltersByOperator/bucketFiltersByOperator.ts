@@ -1,15 +1,14 @@
+import { isArrayValueOperator } from "@utils/filters/isArrayValueOperator/isArrayValueOperator.ts";
+import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
+import { isSingleValueOperator } from "@utils/filters/isSingleValueOperator/isSingleValueOperator.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { objectKeys } from "@utils/objects/objectKeys.ts";
 import type {
   FilterOperatorRecord,
   FiltersByColumn,
   FiltersByOperator,
 } from "@utils/filters/filters.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
-
-import { isArrayValueOperator } from "@utils/filters/isArrayValueOperator/isArrayValueOperator.ts";
-import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
-import { isSingleValueOperator } from "@utils/filters/isSingleValueOperator/isSingleValueOperator.ts";
-import { isArray } from "@utils/guards/isArray/isArray.ts";
-import { objectKeys } from "@utils/objects/objectKeys.ts";
 
 export function bucketFiltersByOperator<T extends UnknownObject>(
   filtersByColumn: FiltersByColumn<T> | undefined,

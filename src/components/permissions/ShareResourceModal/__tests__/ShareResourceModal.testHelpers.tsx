@@ -1,11 +1,9 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ComponentProps } from "react";
-
 import { ModalsProvider } from "@mantine/modals";
 import { vi } from "vitest";
-
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ComponentProps } from "react";
 
 type ShareResourceModalProps = ComponentProps<typeof ShareResourceModal>;
 

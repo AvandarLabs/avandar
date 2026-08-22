@@ -1,10 +1,9 @@
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { LayerPanel } from "@/views/GisApp/panels/LayerPanel/LayerPanel";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { GisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
 import type { ReactNode } from "react";
-
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { LayerPanel } from "@/views/GisApp/panels/LayerPanel/LayerPanel";
 
 type Props = { app: GisAppState; actions: GisAppLayerActions };
 

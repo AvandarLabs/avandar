@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Text, ThemeIcon, Title } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-
 import css from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   onCreate: () => void;

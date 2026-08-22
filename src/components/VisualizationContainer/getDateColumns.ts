@@ -1,9 +1,7 @@
+import { isEpochMs, isISODateString, prop } from "@avandar/utils";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { UnknownDataFrame } from "@avandar/utils";
-
-import { isEpochMs, isISODateString, prop } from "@avandar/utils";
-
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 /**
  * Returns the set of column names that should be treated as dates based on

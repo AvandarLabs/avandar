@@ -1,7 +1,6 @@
+import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
-
-import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 
 /**
  * Reads one tab out of workbook bytes.

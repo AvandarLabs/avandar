@@ -7,7 +7,6 @@ import {
 } from "@mantine/core";
 import clsx from "clsx";
 import { ReactNode, useState } from "react";
-
 import classes from "./Tabs.module.css";
 
 export type TabsIndicatorVariant = "underline" | "floating";

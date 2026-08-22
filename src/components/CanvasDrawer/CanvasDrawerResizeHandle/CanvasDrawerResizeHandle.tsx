@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { useCanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerContext";
 import css from "@/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.module.css";
 import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
+import type { ReactNode } from "react";
 
 /** Drag and keyboard separator that resizes an open canvas-docked drawer. */
 export function CanvasDrawerResizeHandle(): ReactNode {

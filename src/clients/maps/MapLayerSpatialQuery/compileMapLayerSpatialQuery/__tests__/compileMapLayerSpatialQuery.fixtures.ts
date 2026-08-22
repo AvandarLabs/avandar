@@ -1,3 +1,7 @@
+import { Model } from "@avandar/models";
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -6,12 +10,6 @@ import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
 import type { CompileOptions } from "../compileMapLayerSpatialQuery.types";
-
-import { Model } from "@avandar/models";
-
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /** Unit square used by AOI compiler tests. */
 export const SAMPLE_AOI: AvaMapConfig.AoiPolygon = {

@@ -1,12 +1,10 @@
-import type { ReactNode } from "react";
-
 import { assertIsDefined } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { LegendSection } from "@/views/GisApp/panels/LayerInspector/LegendSection/LegendSection";
+import type { ReactNode } from "react";
 
 vi.mock(
   "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection",

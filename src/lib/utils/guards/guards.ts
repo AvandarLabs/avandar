@@ -1,7 +1,6 @@
+import { isArray } from "@avandar/utils";
 import type { UnknownObject } from "@avandar/utils";
 import type { SetRequired } from "type-fest";
-
-import { isArray } from "@avandar/utils";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.

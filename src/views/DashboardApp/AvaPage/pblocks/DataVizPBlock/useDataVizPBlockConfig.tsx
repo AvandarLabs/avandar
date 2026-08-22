@@ -1,11 +1,6 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import type { Field, Fields } from "@puckeditor/core";
-
 import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
 import { useMemo } from "react";
-
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
@@ -16,6 +11,9 @@ import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/Av
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { Field, Fields } from "@puckeditor/core";
 
 const DEFAULT_VIZ_TYPE = "table" as const;
 

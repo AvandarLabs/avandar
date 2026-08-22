@@ -1,3 +1,4 @@
+import { createModule } from "@modules/createModule.ts";
 import type { EmptyObject } from "@avandar/utils";
 import type {
   Accessors,
@@ -7,8 +8,6 @@ import type {
   NameOfModule,
   StateOfModule,
 } from "@modules/createModule.ts";
-
-import { createModule } from "@modules/createModule.ts";
 
 export type ModuleFactory<ChildModule extends AnyModule> = Module<
   `${NameOfModule<ChildModule>}Factory`,

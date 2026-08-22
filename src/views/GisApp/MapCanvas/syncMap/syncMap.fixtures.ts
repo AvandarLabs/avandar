@@ -1,8 +1,7 @@
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { Map as MapLibreMap } from "maplibre-gl";
-
 import { makeObject } from "@avandar/utils";
 import { vi } from "vitest";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { Map as MapLibreMap } from "maplibre-gl";
 
 type FakeSource = { setData: ReturnType<typeof vi.fn> };
 

@@ -1,9 +1,8 @@
+import { makeBucketMap, prop, propEq } from "@avandar/utils";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "$/types/offlineChat.types";
-
-import { makeBucketMap, prop, propEq } from "@avandar/utils";
 
 const MAX_DATASETS = 12;
 const MAX_COLUMNS_TOTAL = 80;

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-
 import {
   isReadOnlyDiscoveryQuery,
   MAX_DISCOVERY_QUERY_CHARS,

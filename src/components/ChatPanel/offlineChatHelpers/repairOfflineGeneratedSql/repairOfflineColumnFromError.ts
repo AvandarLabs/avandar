@@ -1,10 +1,9 @@
+import { isDefined } from "@avandar/utils";
+import Fuse from "fuse.js";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaColumn,
 } from "$/types/offlineChat.types";
-
-import { isDefined } from "@avandar/utils";
-import Fuse from "fuse.js";
 
 const COLUMN_ERROR_RE = /(?:Referenced column|column)\s+"([^"]+)"\s+not found/i;
 

@@ -1,7 +1,4 @@
-import type { Page } from "@playwright/test";
-
 import { unknownToString } from "@avandar/utils";
-
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -22,6 +19,7 @@ import {
 } from "./helpers/workspaceBillingFlow";
 import { openWorkspaceSettingsTab } from "./helpers/workspaceTagsFlow";
 import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
+import type { Page } from "@playwright/test";
 
 type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
 

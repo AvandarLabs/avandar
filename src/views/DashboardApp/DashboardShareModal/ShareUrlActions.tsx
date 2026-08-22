@@ -1,12 +1,10 @@
-import type { ReactNode } from "react";
-
 import { ActionIcon } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { CopyButton, Group } from "@mantine/core";
 import { IconCheck, IconCopy, IconQrcode } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { ShareUrlQrModal } from "@/views/DashboardApp/DashboardShareModal/ShareUrlQrModal";
+import type { ReactNode } from "react";
 
 type Props = {
   url: string;

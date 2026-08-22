@@ -1,8 +1,7 @@
+import { registry, StringKeyOf } from "@avandar/utils";
 import type { SelectData } from "../inputs/Select/Select";
 import type { FormattableTimezone, UnknownObject } from "@avandar/utils";
 import type { ReactNode } from "react";
-
-import { registry, StringKeyOf } from "@avandar/utils";
 
 export type ObjectKeyTransformationType = "camel-to-title-case" | "none";
 

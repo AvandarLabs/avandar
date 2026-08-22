@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
 
 describe("doesAxisNeedValueExtent", () => {

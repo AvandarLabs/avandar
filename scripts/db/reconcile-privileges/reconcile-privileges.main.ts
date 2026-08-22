@@ -83,20 +83,18 @@
  * `supabase test db`, which is exactly that.
  */
 
-import type {
-  AclEntry,
-  AclKind,
-  Declarations,
-} from "./PrivilegeReconciliation/PrivilegeReconciliation";
-
 import { appendFileSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
-
 import {
   getLocalDatabaseConfigFromRepoRoot,
   makeSqlRunner,
 } from "../lib/PsqlUtils/PsqlUtils";
 import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
+import type {
+  AclEntry,
+  AclKind,
+  Declarations,
+} from "./PrivilegeReconciliation/PrivilegeReconciliation";
 
 // ASCII unit separator. Object names can contain dots, quotes, and
 // parentheses, so the delimiter has to be something an identifier cannot hold.

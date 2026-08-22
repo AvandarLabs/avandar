@@ -1,10 +1,8 @@
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Switch } from "@mantine/core";
-
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = { isEnabled: boolean; onLayerChange: LayerChangeHandler };
 

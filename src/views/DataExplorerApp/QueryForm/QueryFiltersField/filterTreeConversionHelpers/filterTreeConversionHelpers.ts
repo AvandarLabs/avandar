@@ -1,10 +1,8 @@
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
-
 import { isArray } from "@avandar/utils";
 import { match } from "ts-pattern";
-
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
 
 /**
  * A rule in `react-querybuilder`'s shape. Operator names are our own internal

@@ -1,3 +1,8 @@
+import { match } from "ts-pattern";
+import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
+import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
+import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -20,13 +25,6 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-import { match } from "ts-pattern";
-
-import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
-import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
-import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
-import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 
 const BAR_LAYOUT_OPTIONS = [
   { value: "group", label: "Grouped" },

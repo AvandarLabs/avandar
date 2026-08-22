@@ -1,5 +1,3 @@
-import type { Tables } from "$/types/database.types.ts";
-
 import { promiseMap } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
@@ -10,8 +8,8 @@ import {
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 import { z } from "zod";
-
 import { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { Tables } from "$/types/database.types.ts";
 
 /**
  * Search for subscriptions by a user's Avandar ID and update them in our

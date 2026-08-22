@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import { lazy, Suspense } from "react";
+import type { ReactNode } from "react";
 
 const LazyNuxTour = lazy(async () => {
   const module = await import("@/components/Nux/NuxTour/NuxTour");

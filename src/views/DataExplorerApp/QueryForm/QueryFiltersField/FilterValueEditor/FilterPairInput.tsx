@@ -1,14 +1,11 @@
+import { useLingui } from "@lingui/react/macro";
+import { Group, Text } from "@mantine/core";
+import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
+import { FilterScalarInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterScalarInput";
+import classes from "./FilterValueEditor.module.css";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Group, Text } from "@mantine/core";
-
-import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
-import { FilterScalarInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterScalarInput";
-
-import classes from "./FilterValueEditor.module.css";
 
 type Props = {
   dataType: AvaDataType.T | undefined;

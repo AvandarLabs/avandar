@@ -1,3 +1,19 @@
+import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { useCallback, useMemo } from "react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
+import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
+import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
+import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -10,24 +26,6 @@ import type {
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
-
-import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
-import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import { useCallback, useMemo } from "react";
-
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
-import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
-import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
-import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
-import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
-import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
 type RadarHostConfig = RadarChartVizConfig;

@@ -1,11 +1,3 @@
-import type {
-  EmptyObject,
-  ObjectPaths,
-  PathValue,
-  UnknownObject,
-} from "@avandar/utils";
-import type { Simplify } from "type-fest";
-
 import {
   getValue,
   isFunction,
@@ -14,6 +6,13 @@ import {
   objectValuesMap,
   setValue,
 } from "@avandar/utils";
+import type {
+  EmptyObject,
+  ObjectPaths,
+  PathValue,
+  UnknownObject,
+} from "@avandar/utils";
+import type { Simplify } from "type-fest";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyModule = Module<any, any, any>;

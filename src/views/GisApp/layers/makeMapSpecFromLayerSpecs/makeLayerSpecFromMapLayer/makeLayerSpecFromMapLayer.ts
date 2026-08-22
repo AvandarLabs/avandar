@@ -1,15 +1,4 @@
-import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
-import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
-import type {
-  CircleRadiusValue,
-  MapLayerSpec,
-  MapSpec,
-} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { ExpressionSpecification } from "maplibre-gl";
-
 import { matchLiteral } from "@avandar/utils";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
 import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
@@ -22,6 +11,15 @@ import {
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
+import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
+import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
+import type {
+  CircleRadiusValue,
+  MapLayerSpec,
+  MapSpec,
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { ExpressionSpecification } from "maplibre-gl";
 
 type ProportionalSymbol = Extract<
   MapLayer.Symbology,

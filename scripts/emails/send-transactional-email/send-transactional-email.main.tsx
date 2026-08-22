@@ -1,8 +1,7 @@
-import { program } from "commander";
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
+import { program } from "commander";
 import { z } from "zod";
-
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";

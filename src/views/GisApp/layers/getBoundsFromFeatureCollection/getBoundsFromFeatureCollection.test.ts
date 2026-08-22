@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
 function _createPoint({

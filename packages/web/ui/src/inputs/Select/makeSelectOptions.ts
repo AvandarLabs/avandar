@@ -1,8 +1,7 @@
+import { identity } from "@avandar/utils";
 import type { SelectOption } from "./Select";
 import type { UnknownObject } from "@avandar/utils";
 import type { ConditionalKeys } from "type-fest";
-
-import { identity } from "@avandar/utils";
 
 /**
  * Given a list of objects, conver this to a list of objects with `value`

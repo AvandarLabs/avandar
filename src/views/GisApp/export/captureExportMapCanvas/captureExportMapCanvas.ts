@@ -1,10 +1,8 @@
+import maplibregl from "maplibre-gl";
+import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { Map as MapLibreMap, StyleSpecification } from "maplibre-gl";
-
-import maplibregl from "maplibre-gl";
-
-import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
 
 /** How long the offscreen map may take to reach idle, in milliseconds. */
 const IDLE_TIMEOUT_MS = 15_000;

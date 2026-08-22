@@ -1,6 +1,5 @@
-import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { createExternalStore } from "@/lib/utils/state/createExternalStore";
+import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 /**
  * Live facts the tutorial's `when` conditions read.

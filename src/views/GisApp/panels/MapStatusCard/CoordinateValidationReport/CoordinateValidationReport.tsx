@@ -1,11 +1,9 @@
-import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
-
 import { CoordinateValidationReason } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason";
 import css from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.module.css";
+import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import type { ReactNode } from "react";
 
 type Props = {
   drops: readonly GeometryDropReport[];

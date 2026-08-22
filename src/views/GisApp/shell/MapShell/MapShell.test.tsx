@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { describe, expect, it } from "vitest";
-
 import { render, screen } from "@/test-utils";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
+import type { ReactNode } from "react";
 
 function _renderMapShell(
   options: { isChromeHidden?: boolean; featureDrawer?: ReactNode } = {},

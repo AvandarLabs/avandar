@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { NuxExplorerSaveMenu } from "@/components/Nux/NuxTour/NuxExplorerSaveMenu/NuxExplorerSaveMenu";
 
 const HAS_RESULTS = {

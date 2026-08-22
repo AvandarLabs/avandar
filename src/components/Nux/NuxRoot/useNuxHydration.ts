@@ -1,10 +1,8 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { useEffect, useRef } from "react";
-
 import { hydrateNuxProgressForWorkspace } from "@/components/Nux/NuxRoot/hydrateNuxProgressForWorkspace/hydrateNuxProgressForWorkspace";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** Loads the progress row once per workspace and seeds the tutorial's state. */
 export function useNuxHydration(): void {

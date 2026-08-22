@@ -1,10 +1,8 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
-
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { GeneralAccessModule } from "./GeneralAccessModule";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 
 const OWNER_ID = "owner-1";
 

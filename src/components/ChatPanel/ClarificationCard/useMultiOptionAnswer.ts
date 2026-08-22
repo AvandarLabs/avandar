@@ -1,10 +1,8 @@
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
-import type { Dispatch, KeyboardEventHandler, SetStateAction } from "react";
-
 import { valNotEq } from "@avandar/utils";
 import { useState } from "react";
-
 import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
+import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
+import type { Dispatch, KeyboardEventHandler, SetStateAction } from "react";
 
 function _createSubmitAnswer(
   parameters: Readonly<{

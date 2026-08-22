@@ -1,10 +1,8 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { BasemapControl } from "@/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl";
 import { CustomBasemapForm } from "@/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const BUILT_IN_BASEMAP = {
   type: "builtIn",

@@ -1,14 +1,11 @@
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { ReactNode } from "react";
-
 import clsx from "clsx";
-
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { useSqlDisplayCatalog } from "@/components/sql/sql-helpers/useSqlDisplayCatalog";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
-
 import css from "./AvaSqlBlock.module.css";
 import { AvaSqlBlockEditable } from "./AvaSqlBlockEditable";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { ReactNode } from "react";
 
 export type AvaSqlBlockProps = {
   value: string;

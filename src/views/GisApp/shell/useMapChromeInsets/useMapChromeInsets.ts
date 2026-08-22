@@ -1,7 +1,6 @@
-import type { RefCallback, RefObject } from "react";
-
 import { isNonNullish, objectValues, prop } from "@avandar/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import type { RefCallback, RefObject } from "react";
 
 /** Padding, in CSS pixels, that keeps map data clear of floating chrome. */
 export type MapChromeInsets = {

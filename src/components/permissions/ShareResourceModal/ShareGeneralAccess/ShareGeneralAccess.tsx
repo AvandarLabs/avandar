@@ -1,23 +1,20 @@
+import { matchLiteral } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Box, Group, Stack, Text } from "@mantine/core";
+import { appLabel } from "$/copy/appLabel";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { usePublishNuxGeneralAccessFact } from "@/components/Nux/NuxTour/usePublishNuxGeneralAccessFact/usePublishNuxGeneralAccessFact";
+import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
+import { GeneralAccessSelect } from "./GeneralAccessSelect";
+import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
-
-import { matchLiteral } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Box, Group, Stack, Text } from "@mantine/core";
-
-import { appLabel } from "$/copy/appLabel";
-import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
-import { usePublishNuxGeneralAccessFact } from "@/components/Nux/NuxTour/usePublishNuxGeneralAccessFact/usePublishNuxGeneralAccessFact";
-
-import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
-import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
-import { GeneralAccessSelect } from "./GeneralAccessSelect";
-import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
 
 // Only one `ShareGeneralAccess` renders per modal, so a static id is safe:
 // there is no risk of two instances colliding in the same document.

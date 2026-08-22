@@ -1,14 +1,12 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Divider, Group, Stack, Text, Title } from "@mantine/core";
-
 import { restartFirstDashboardTutorial } from "@/components/Nux/NuxRoot/restartFirstDashboardTutorial/restartFirstDashboardTutorial";
 import { useNuxNavigation } from "@/components/Nux/NuxRoot/useNuxNavigation";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import type { ReactNode } from "react";
 
 /**
  * Lets a user replay the onboarding tutorial.

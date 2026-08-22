@@ -1,7 +1,6 @@
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterAll, describe, expect, it, vi } from "vitest";
-
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,

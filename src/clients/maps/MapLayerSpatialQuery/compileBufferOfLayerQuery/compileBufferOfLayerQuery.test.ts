@@ -1,18 +1,15 @@
-import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-
 import { describe, expect, it } from "vitest";
-
 /**
  * Buffer-of-layer compilation for compileMapLayerSpatialQuery.
  */
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-
 import {
   createGeometryLayerFixture,
   createGridBinLayerFixture,
 } from "../compileMapLayerSpatialQuery/__tests__/compileMapLayerSpatialQuery.fixtures";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
+import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 
 const emptyOverlay: CompileOptions["overlay"] = {
   aoi: undefined,

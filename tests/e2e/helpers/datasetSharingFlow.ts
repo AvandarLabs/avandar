@@ -1,8 +1,4 @@
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type { Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { SMALL_CALIFORNIA_CSV_PATH } from "./constants";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
 import {
@@ -12,6 +8,8 @@ import {
   setGeneralAccess,
 } from "./shareModalFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { Page } from "@playwright/test";
 
 /**
  * Uploads the California CSV sample, sets the dataset name, saves, and returns

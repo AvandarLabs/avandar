@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";

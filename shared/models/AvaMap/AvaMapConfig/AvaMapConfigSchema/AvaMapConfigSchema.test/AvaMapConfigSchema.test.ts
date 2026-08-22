@@ -1,19 +1,17 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-
 import { describe, expect, it } from "vitest";
-
 import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
-import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v4SchemaSuites.ts";
-import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v5SchemaSuites.ts";
 import {
   createVersion1Json,
   createVersion2Json,
   omitExportFields,
   omitOverlayFields,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/schemaTestFixtures.ts";
+import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v4SchemaSuites.ts";
+import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v5SchemaSuites.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 describe("AvaMapConfigSchema", () => {
   it("migrates an empty version 1 config to the current version", () => {

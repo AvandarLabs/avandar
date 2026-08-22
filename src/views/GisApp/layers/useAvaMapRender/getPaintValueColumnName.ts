@@ -1,5 +1,4 @@
 import { propEq } from "@avandar/utils";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 

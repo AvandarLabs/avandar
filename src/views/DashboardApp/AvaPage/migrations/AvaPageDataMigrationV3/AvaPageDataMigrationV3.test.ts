@@ -1,14 +1,12 @@
+import { propEq } from "@avandar/utils";
+import { beforeAll, describe, expect, it } from "vitest";
+import { AvaPageDataMigrationV3 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3";
+import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
   V2_AvaPageData,
   V3_AvaPageData,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
-
-import { propEq } from "@avandar/utils";
-import { beforeAll, describe, expect, it } from "vitest";
-
-import { AvaPageDataMigrationV3 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3";
-import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
-import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 
 const TEST_PROMPT = "Find me data";
 const TEST_SQL = "SELECT * FROM t;";

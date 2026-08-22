@@ -1,10 +1,3 @@
-import type {
-  CsvParseResolvedOptions,
-  CsvParseUserHints,
-  DuckDbSniffCsvRow,
-} from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
-
 import {
   DEFAULT_CSV_ESCAPE_CHAR,
   DEFAULT_CSV_QUOTE_CHAR,
@@ -15,6 +8,12 @@ import {
   normalizeNewlineDelimiterForDuckDb,
   optionalTrimmedCsvFormat,
 } from "@/clients/DuckDbClient/csvParse/duckDbCsvTokens";
+import type {
+  CsvParseResolvedOptions,
+  CsvParseUserHints,
+  DuckDbSniffCsvRow,
+} from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 const RECOVERABLE_REJECT_ERROR_TYPES = new Set([
   "CAST",

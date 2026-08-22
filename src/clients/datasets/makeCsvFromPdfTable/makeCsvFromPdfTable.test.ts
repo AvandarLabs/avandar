@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { makeCsvFromPdfTable } from "./makeCsvFromPdfTable";
 
 describe("makeCsvFromPdfTable", () => {

@@ -1,6 +1,5 @@
 import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
-
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);

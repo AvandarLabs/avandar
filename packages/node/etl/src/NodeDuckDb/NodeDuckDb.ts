@@ -1,14 +1,13 @@
-import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
-
+import { randomUUID } from "node:crypto";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   duckDbDescribeColumnTypeToSniffable,
   SNIFF_CSV_MAX_ROWS,
 } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import duckdb from "duckdb";
-import { randomUUID } from "node:crypto";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 type UnknownRow = Record<string, unknown>;
 

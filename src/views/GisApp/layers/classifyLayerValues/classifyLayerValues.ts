@@ -1,8 +1,6 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { isDefined } from "@avandar/utils";
-
 import { makeJenksBreaksFromValues } from "./makeJenksBreaksFromValues/makeJenksBreaksFromValues";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** One feature id paired with the value used for classification. */
 export type LayerValue = { featureId: string; value: unknown };

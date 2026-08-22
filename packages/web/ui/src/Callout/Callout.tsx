@@ -1,7 +1,6 @@
-import type { AlertProps, TextProps } from "@mantine/core";
-
 import { Alert, Stack, Text, Title } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
+import type { AlertProps, TextProps } from "@mantine/core";
 
 type Props = {
   title?: string;

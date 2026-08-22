@@ -1,6 +1,3 @@
-import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
-import type { Page } from "@playwright/test";
-
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
@@ -17,6 +14,8 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT } from "./helpers/timeouts";
+import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
+import type { Page } from "@playwright/test";
 
 /**
  * Per-viz-type seeds used to verify every visualization renders inside the

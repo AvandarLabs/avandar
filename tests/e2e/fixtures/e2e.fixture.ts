@@ -1,7 +1,4 @@
-import type { Page, TestInfo } from "@playwright/test";
-
 import { test as base } from "@playwright/test";
-
 import { cleanupTestUser } from "../helpers/cleanupTestUser";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import { suppressNuxTutorialForUser } from "../helpers/suppressNuxTutorial";
@@ -16,6 +13,7 @@ import {
   purgeE2EWorkspacesForOwner,
 } from "../setup/e2eTestWorkspaceLifecycle";
 import { ensureAuthUserExists } from "../setup/ensureAuthUser";
+import type { Page, TestInfo } from "@playwright/test";
 
 export { expect } from "@playwright/test";
 

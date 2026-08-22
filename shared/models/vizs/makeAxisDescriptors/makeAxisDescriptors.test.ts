@@ -1,6 +1,5 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";

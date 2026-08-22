@@ -1,15 +1,13 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { NavLinkProps } from "@avandar/ui";
-import type { CSSProperties, RefObject } from "react";
-
 import { constant } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
-
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { NavLinkProps } from "@avandar/ui";
+import type { CSSProperties, RefObject } from "react";
 
 const ROW_HEIGHT_PX = 50;
 

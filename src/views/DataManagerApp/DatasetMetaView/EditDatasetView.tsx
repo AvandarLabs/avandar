@@ -1,10 +1,8 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 import { InputTextForm } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   dataset: Dataset.T;

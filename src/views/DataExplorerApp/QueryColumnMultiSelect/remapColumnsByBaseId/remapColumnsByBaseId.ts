@@ -1,6 +1,5 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { isNonNullish } from "@avandar/utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
  * Re-maps a selection of `QueryColumn`s to canonical instances from the

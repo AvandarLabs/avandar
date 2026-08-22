@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { CoordinateValidationReport } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport";
 

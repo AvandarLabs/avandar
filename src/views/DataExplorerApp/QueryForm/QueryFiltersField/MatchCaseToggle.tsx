@@ -1,12 +1,10 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { IconLetterCase } from "@tabler/icons-react";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ReactNode } from "react";
 
 type Props = {
   operator: QueryFilterOperator;

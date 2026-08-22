@@ -1,10 +1,8 @@
-import type { ErrorResponse as ResendError } from "resend";
-
 import { PostgrestError } from "@supabase/supabase-js";
 import { z } from "zod";
-
 import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig.ts";
 import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes.ts";
+import type { ErrorResponse as ResendError } from "resend";
 
 /**
  * This is our custom error class that extends the built-in Error class.

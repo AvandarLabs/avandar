@@ -1,3 +1,5 @@
+import * as fs from "node:fs";
+import * as path from "node:path";
 import {
   EDGE_FUNCTION_DENO_TEMPLATE_PATH,
   PACKAGES_DIR,
@@ -7,8 +9,6 @@ import {
 } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewPackageCLI/constants";
 import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { Acclimate } from "@avandar/acclimate";
-import * as fs from "node:fs";
-import * as path from "node:path";
 
 export type PackageType = "shared" | "web" | "node";
 

@@ -1,20 +1,18 @@
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { objectKeys, promiseReduce, sqlTemplate, where } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
 import type { UnknownDataFrame } from "@avandar/utils";
-
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { withQueryHooks } from "@avandar/query-hooks";
-import { objectKeys, promiseReduce, sqlTemplate, where } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
-import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { notifyDevAlert } from "@/utils/notifications/notifyDevAlert";
 
 type TextFieldSummary = {
   type: "text";

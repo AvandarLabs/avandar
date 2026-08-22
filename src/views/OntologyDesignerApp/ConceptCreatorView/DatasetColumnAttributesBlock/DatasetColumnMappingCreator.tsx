@@ -1,12 +1,10 @@
-import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import type { FormType } from "@avandar/ui/hooks";
-
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
-
 import { DatasetColumnMappings } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
+import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import type { FormType } from "@avandar/ui/hooks";
 
 type Props = {
   conceptForm: FormType<ConceptFormValues>;

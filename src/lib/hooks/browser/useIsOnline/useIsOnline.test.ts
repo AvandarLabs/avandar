@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { renderHook } from "@/test-utils";
 

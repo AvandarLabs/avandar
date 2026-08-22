@@ -1,12 +1,10 @@
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { ReactNode } from "react";
-
 import { Paper } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Stack, Text, Title } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-
 import { LayerSourcePicker } from "@/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePicker";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { ReactNode } from "react";
 
 type Props = {
   onAddLayerFromSource: (dataSource: QueryDataSource.T) => void;

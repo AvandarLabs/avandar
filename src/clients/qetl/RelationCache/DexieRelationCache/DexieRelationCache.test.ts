@@ -1,12 +1,6 @@
 import "fake-indexeddb/auto";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
-import type { RelationCacheWrite } from "$/models/relations/RelationCachePort/RelationCachePort.types";
-
 import Dexie from "dexie";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
-
 import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
@@ -17,6 +11,10 @@ import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions/dexieVersions";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { RelationCacheWrite } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
 

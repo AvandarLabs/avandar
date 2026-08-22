@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
 import { Radio, Stack } from "@mantine/core";
-
 import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {

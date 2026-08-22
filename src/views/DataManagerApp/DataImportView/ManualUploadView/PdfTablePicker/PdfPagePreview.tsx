@@ -1,11 +1,9 @@
-import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Box, Loader, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-
 import css from "./PdfPagePreview.module.css";
+import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode } from "react";
 
 /**
  * Ceiling on the device pixel ratio the page bitmap is drawn at.

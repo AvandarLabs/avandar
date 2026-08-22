@@ -1,6 +1,3 @@
-import type { ServiceClient } from "@avandar/clients";
-import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
-
 import {
   AnyFunction,
   capitalize,
@@ -26,6 +23,8 @@ import {
   UseQueryFunctionsRecord,
   WithQueryHooks,
 } from "@query-hooks/withQueryHooks/withQueryHooks.types";
+import type { ServiceClient } from "@avandar/clients";
+import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
 
 function isSingletonObject(arg: unknown): arg is { arg: unknown } {
   return isPlainObject(arg) && "arg" in arg && objectKeys(arg).length === 1;

@@ -1,6 +1,3 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ReactNode } from "react";
-
 import { hasDefinedProps } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Text } from "@mantine/core";
@@ -8,7 +5,6 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -16,6 +12,8 @@ import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
 import { ViewRecordsButton } from "@/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ReactNode } from "react";
 
 type Props = {
   concept: Concept.T;

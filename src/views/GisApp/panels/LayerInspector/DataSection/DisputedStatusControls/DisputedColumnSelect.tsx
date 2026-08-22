@@ -1,15 +1,13 @@
+import { propEq } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { withQueryColumn } from "@/views/GisApp/layers/MapLayerUpdates/withQueryColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ColumnOption } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnOption.types";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
-
-import { propEq } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
-
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { withQueryColumn } from "@/views/GisApp/layers/MapLayerUpdates/withQueryColumn";
 
 type Props = {
   value: string | null;

@@ -1,3 +1,10 @@
+import { isDefined } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
+import { match } from "ts-pattern";
+import { ChatSuggestionColumnPicker } from "./ChatSuggestionColumnPicker/ChatSuggestionColumnPicker";
+import { getCachedDatasetColumnSummaries } from "./getCachedDatasetColumnSummaries";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -5,15 +12,6 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { I18n } from "@lingui/core";
 import type { QueryClient } from "@tanstack/react-query";
-
-import { isDefined } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { useLingui } from "@lingui/react/macro";
-import { useMemo } from "react";
-import { match } from "ts-pattern";
-
-import { ChatSuggestionColumnPicker } from "./ChatSuggestionColumnPicker/ChatSuggestionColumnPicker";
-import { getCachedDatasetColumnSummaries } from "./getCachedDatasetColumnSummaries";
 
 type SuggestionTarget = Pick<Dataset.T, "name"> & {
   datasetId: Dataset.Id;

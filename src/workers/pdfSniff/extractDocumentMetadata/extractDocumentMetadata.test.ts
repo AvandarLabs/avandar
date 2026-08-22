@@ -1,8 +1,6 @@
-import type { PageGeometry, TextItem } from "../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { extractDocumentMetadata } from "./extractDocumentMetadata";
+import type { PageGeometry, TextItem } from "../pdfSniff.types";
 
 function item(text: string, y: number, height = 10, x = 36): TextItem {
   return {

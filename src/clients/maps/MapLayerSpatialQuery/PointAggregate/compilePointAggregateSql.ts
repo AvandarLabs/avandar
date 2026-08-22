@@ -1,5 +1,4 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
 import {
   PointAggregateProperties,
   WEB_MERCATOR_MAX_LATITUDE,

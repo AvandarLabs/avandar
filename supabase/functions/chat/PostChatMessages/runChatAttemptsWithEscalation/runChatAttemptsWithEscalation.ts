@@ -1,8 +1,7 @@
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
-
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 
 /**
  * Runs a chat turn against OpenRouter, escalating up to three times while the

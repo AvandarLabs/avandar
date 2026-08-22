@@ -1,9 +1,3 @@
-import type { User } from "$/models/User/User.ts";
-import type {
-  AvaPolarProduct,
-  SubscriptionsAPI,
-} from "@sbfn/subscriptions/SubscriptionsRoutes.types.ts";
-
 import { assertIsNonNullish } from "@avandar/utils";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
@@ -16,9 +10,13 @@ import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-syn
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
-
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { User } from "$/models/User/User.ts";
+import type {
+  AvaPolarProduct,
+  SubscriptionsAPI,
+} from "@sbfn/subscriptions/SubscriptionsRoutes.types.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.

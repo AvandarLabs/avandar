@@ -1,8 +1,3 @@
-import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
-import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
-
 import { makeSegmentedControlItems, SegmentedControl } from "@avandar/ui";
 import { identity, makeObject, prop, propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -18,7 +13,6 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
-
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
@@ -30,6 +24,10 @@ import {
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
 import { IdentifierBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index";
+import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 
 type Props = {
   conceptForm: ConceptFormType;

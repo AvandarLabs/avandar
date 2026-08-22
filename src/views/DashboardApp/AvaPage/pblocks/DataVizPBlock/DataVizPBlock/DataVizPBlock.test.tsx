@@ -1,13 +1,11 @@
-import type { PuckContext } from "@puckeditor/core";
-import type { ReactElement } from "react";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { PuckContext } from "@puckeditor/core";
+import type { ReactElement } from "react";
 
 const { useDataQueryMock } = vi.hoisted(() => {
   return {

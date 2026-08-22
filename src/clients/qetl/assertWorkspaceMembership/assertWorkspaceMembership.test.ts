@@ -1,14 +1,12 @@
 /** Tests principal-level workspace authorization for the QETL query path. */
 
-import type { UserId } from "$/models/User/User.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { QueryClient } from "@tanstack/react-query";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { QueryClient } from "@tanstack/react-query";
 
 const USER_ID = "66666666-6666-4666-8666-666666666666" as UserId;
 const OTHER_USER_ID = "77777777-7777-4777-8777-777777777777" as UserId;

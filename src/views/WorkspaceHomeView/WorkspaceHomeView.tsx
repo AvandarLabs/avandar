@@ -1,5 +1,3 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { mantineColorVar, Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -14,11 +12,11 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   workspace: Workspace.WithSubscription;

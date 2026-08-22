@@ -1,8 +1,6 @@
-import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
-
 import { describe, expect, it } from "vitest";
-
 import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
+import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 
 /** Builds `count` distinct fill-swatch entries, labelled `Entry 0`, etc. */
 function _makeEntries(count: number): ExportLegendEntry[] {

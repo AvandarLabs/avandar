@@ -1,11 +1,9 @@
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { ReactNode } from "react";
-
 import { formatNumber } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
-
 import { NumberColumnStat } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnStat";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "number" };

@@ -1,8 +1,7 @@
+import { propEq } from "@avandar/utils";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-
-import { propEq } from "@avandar/utils";
 
 type Options = {
   annotationFeatures: readonly AvaMapConfig.AnnotationFeature[];

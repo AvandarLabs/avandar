@@ -1,5 +1,3 @@
-import type { FormatToken } from "@utils/dates/date-utils/formatPatternConstants.ts";
-
 import { escapeRegexLiteral } from "@utils/dates/date-utils/escapeRegexLiteral.ts";
 import { FORMAT_TOKEN_ORDER } from "@utils/dates/date-utils/formatPatternConstants.ts";
 import {
@@ -13,6 +11,7 @@ import {
   weekdayLongRegexSource,
   weekdayShortRegexSource,
 } from "@utils/dates/date-utils/weekdayNameRegex.ts";
+import type { FormatToken } from "@utils/dates/date-utils/formatPatternConstants.ts";
 
 type PatternPiece =
   | { kind: "literal"; text: string }

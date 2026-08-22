@@ -1,7 +1,5 @@
 import { MessagePrimitive, useMessage } from "@assistant-ui/react";
-
 import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
-
 import { MessageTextPart } from "../MessageTextPart/MessageTextPart";
 import css from "./UserMessage.module.css";
 

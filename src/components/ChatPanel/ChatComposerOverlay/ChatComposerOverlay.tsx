@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-
 import css from "./ChatComposerOverlay.module.css";
 
 type Props = {

@@ -1,17 +1,14 @@
-import type { ChatProposedCaseType } from "$/types/chat.types";
-
 import { where } from "@avandar/utils";
 import { Box } from "@mantine/core";
 import { useMemo } from "react";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-
 import { CaseTypeDraftCard } from "./CaseTypeDraftCard";
 import { useCaseTypeDraftCreation } from "./useCaseTypeDraftCreation";
 import { useCaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 type CardProps = {
   draft: ChatProposedCaseType;

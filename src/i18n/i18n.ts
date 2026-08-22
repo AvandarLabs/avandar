@@ -1,8 +1,6 @@
-import type { SupportedLocale } from "./locales";
-
 import { i18n } from "@lingui/core";
-
 import { DEFAULT_LOCALE } from "./locales";
+import type { SupportedLocale } from "./locales";
 
 /**
  * Dynamically import a compiled catalog and activate it on the shared i18n

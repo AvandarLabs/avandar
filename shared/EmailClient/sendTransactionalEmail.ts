@@ -1,7 +1,6 @@
 import { render } from "@react-email/render";
 import { ReactNode } from "react";
 import { CreateEmailResponseSuccess } from "resend";
-
 import { ResendClient } from "$/EmailClient/ResendClient.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 

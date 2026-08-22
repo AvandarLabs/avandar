@@ -1,13 +1,10 @@
-import type { ReactNode } from "react";
-import type { CombinatorSelectorProps } from "react-querybuilder";
-
 import { isPlainObject } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-
 import { getOptionNameFromUnknown } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
-
 import classes from "./FilterCombinatorSelector.module.css";
+import type { ReactNode } from "react";
+import type { CombinatorSelectorProps } from "react-querybuilder";
 
 type Props = CombinatorSelectorProps;
 

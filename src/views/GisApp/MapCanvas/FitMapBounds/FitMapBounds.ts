@@ -1,9 +1,8 @@
+import { useReducedMotion } from "@mantine/hooks";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { MapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
 import type { RefObject } from "react";
-
-import { useReducedMotion } from "@mantine/hooks";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 function _areBoundsEqual(
   options: Readonly<{

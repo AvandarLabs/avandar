@@ -1,9 +1,8 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { PrivateResourceCount } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
-
 import { PrivateResourceAdminClient } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { PrivateResourceCount } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
 
 /** Loads fresh private-resource counts and matching member names. */
 export function usePrivateResourcesPanelData(workspaceId: Workspace.Id): {

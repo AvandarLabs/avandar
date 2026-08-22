@@ -1,7 +1,7 @@
+import * as path from "node:path";
 import { TEMPLATES_DIR } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/constants";
 import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { Acclimate } from "@avandar/acclimate";
-import * as path from "node:path";
 
 /**
  * Writes a non-Supabase model folder: `<ModelName>.ts`, `<ModelName>.types.ts`,

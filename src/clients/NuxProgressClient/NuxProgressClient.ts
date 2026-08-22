@@ -1,19 +1,17 @@
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { z } from "zod";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import { User } from "$/models/User/User";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { Tables } from "$/types/database.types";
 import type { ServiceClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
 import type { QueryKey, WithQueryHooks } from "@avandar/query-hooks";
-
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { withQueryHooks } from "@avandar/query-hooks";
-import { z } from "zod";
-
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import { User } from "$/models/User/User";
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 /** What already exists in the workspace, used once per user for catch-up. */
 export type NuxWorkspaceArtifacts = {

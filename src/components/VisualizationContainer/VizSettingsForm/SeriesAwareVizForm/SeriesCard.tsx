@@ -1,13 +1,3 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type {
-  RadarSeries,
-  RenderAs,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig";
-import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
-import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
-import type { ReactNode } from "react";
-
 import { makeBucketMap, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -21,13 +11,21 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
-
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type {
+  RadarSeries,
+  RenderAs,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig";
+import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
+import type { ReactNode } from "react";
 
 /**
  * Build the localized render-as options. Labels stay in sync with the active

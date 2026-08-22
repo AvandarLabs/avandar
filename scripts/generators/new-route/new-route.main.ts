@@ -1,13 +1,12 @@
-import type { FormatConfig } from "oxfmt";
-
-import { toPascalCase } from "@avandar/utils";
-import { program } from "commander";
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { toPascalCase } from "@avandar/utils";
+import { program } from "commander";
 import { format } from "oxfmt";
 import { z } from "zod";
+import type { FormatConfig } from "oxfmt";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

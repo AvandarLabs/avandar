@@ -1,6 +1,5 @@
-import type { UnknownObject } from "@utils/types/common.types.ts";
-
 import { pick } from "@utils/objects/pick/pick.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 /**
  * Returns a function that picks the specified keys from an object.

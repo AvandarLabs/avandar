@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { describe, expect, it } from "vitest";
-
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxScrollParentToTop } from "@/components/Nux/NuxTour/useNuxScrollParentToTop/useNuxScrollParentToTop";
 import { render, waitFor } from "@/test-utils";
+import type { ReactNode } from "react";
 
 function Harness(): ReactNode {
   useNuxScrollParentToTop();

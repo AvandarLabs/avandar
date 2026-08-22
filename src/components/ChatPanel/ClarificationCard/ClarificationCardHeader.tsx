@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Group, Stack, Text } from "@mantine/core";
 import { IconHelp } from "@tabler/icons-react";
-
 import css from "./ClarificationCard.module.css";
 
 type Props = {

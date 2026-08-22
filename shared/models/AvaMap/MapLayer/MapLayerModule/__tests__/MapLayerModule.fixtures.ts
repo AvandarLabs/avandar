@@ -1,3 +1,9 @@
+import { Model } from "@avandar/models";
+import { uuid } from "$/lib/uuid.ts";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import {
+  QueryColumn, // prettier-ignore
+} from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type {
   DatasetColumn, // prettier-ignore
@@ -5,14 +11,6 @@ import type {
 import type { User } from "$/models/User/User.ts";
 import type { UserProfile } from "$/models/User/UserProfile.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
-
-import { Model } from "@avandar/models";
-
-import { uuid } from "$/lib/uuid.ts";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-import {
-  QueryColumn, // prettier-ignore
-} from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /** An honest `DatasetColumn`, built through `Model.make` with no cast. */
 export function createNumericColumn(name: string): DatasetColumn.T {

@@ -1,13 +1,11 @@
-import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxPrerequisiteFacts } from "@/components/Nux/NuxPrerequisites/NuxPrerequisite.types";
-
 import { describe, expect, it } from "vitest";
-
 import { addDatasetPrerequisite } from "@/components/Nux/NuxPrerequisites/firstDashboard/addDatasetPrerequisite";
 import { FIRST_DASHBOARD_PREREQUISITES } from "@/components/Nux/NuxPrerequisites/firstDashboard/firstDashboardPrerequisites/firstDashboardPrerequisites";
 import { runQueryPrerequisite } from "@/components/Nux/NuxPrerequisites/firstDashboard/runQueryPrerequisite/runQueryPrerequisite";
 import { shareDashboardPrerequisite } from "@/components/Nux/NuxPrerequisites/firstDashboard/shareDashboardPrerequisite/shareDashboardPrerequisite";
 import { NuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/NuxPrerequisiteJudge/NuxPrerequisiteJudge";
+import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
+import type { NuxPrerequisiteFacts } from "@/components/Nux/NuxPrerequisites/NuxPrerequisite.types";
 
 const EMPTY_FACTS: NuxPrerequisiteFacts = {
   hasDataset: false,

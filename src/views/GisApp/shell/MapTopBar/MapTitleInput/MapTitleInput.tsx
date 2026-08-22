@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import { MapTitleEditor } from "@/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleEditor";
+import type { ReactNode } from "react";
 
 type Props = {
   name: string;

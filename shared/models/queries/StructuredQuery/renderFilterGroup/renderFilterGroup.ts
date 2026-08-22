@@ -1,3 +1,5 @@
+import { isDefined, matchLiteral, prop } from "@avandar/utils";
+import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 import type {
   QueryFilter,
   QueryFilterGroup,
@@ -6,10 +8,6 @@ import type {
   RenderFilterRuleOptions,
   SqlFragment,
 } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
-
-import { isDefined, matchLiteral, prop } from "@avandar/utils";
-
-import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 
 function _renderNode(
   node: QueryFilter,

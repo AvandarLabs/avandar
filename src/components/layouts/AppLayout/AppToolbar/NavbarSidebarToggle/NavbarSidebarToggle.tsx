@@ -5,7 +5,6 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
-
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 
 /**

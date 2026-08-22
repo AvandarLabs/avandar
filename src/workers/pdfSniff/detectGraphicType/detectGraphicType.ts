@@ -1,10 +1,9 @@
-import type { BarFamily } from "../findBarFamily/findBarFamily";
-import type { PlotFrame } from "../findPlotFrame/findPlotFrame";
-import type { RegionGeometry } from "../pdfSniff.types";
-
 import { findBarFamily } from "../findBarFamily/findBarFamily";
 import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
 import { findSeriesMark } from "../readCartesianChart/readCartesianChart";
+import type { BarFamily } from "../findBarFamily/findBarFamily";
+import type { PlotFrame } from "../findPlotFrame/findPlotFrame";
+import type { RegionGeometry } from "../pdfSniff.types";
 
 /**
  * What a graphic region was drawn as, judged from its marks alone.

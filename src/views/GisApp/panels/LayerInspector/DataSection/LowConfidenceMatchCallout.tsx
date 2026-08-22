@@ -1,9 +1,8 @@
-import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
-import type { ReactNode } from "react";
-
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
+import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
+import type { ReactNode } from "react";
 
 type Props = {
   guess: GeoBindingGuess;

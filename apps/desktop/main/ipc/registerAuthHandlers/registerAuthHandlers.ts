@@ -1,7 +1,6 @@
+import { AuthContracts } from "../../../../../shared/platform/ipc/contracts/AuthContracts";
 import type { Keychain } from "../../services/createKeychain/createKeychain";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
-
-import { AuthContracts } from "../../../../../shared/platform/ipc/contracts/AuthContracts";
 
 /*
  * Keychain identifiers for the Avandar desktop shell. Stable strings so a

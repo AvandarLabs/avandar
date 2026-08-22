@@ -1,13 +1,11 @@
-import type { ReactNode, RefObject } from "react";
-
 import clsx from "clsx";
 import { useMemo } from "react";
-
 import css from "@/components/CanvasDrawer/CanvasDrawer.module.css";
 import { CanvasDrawerBody } from "@/components/CanvasDrawer/CanvasDrawerBody/CanvasDrawerBody";
 import { CanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerContext";
 import { CanvasDrawerResizeHandle } from "@/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle";
 import { useDrawerResize } from "@/components/CanvasDrawer/useDrawerResize/useDrawerResize";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   /** Whether the collapsible body is expanded. */

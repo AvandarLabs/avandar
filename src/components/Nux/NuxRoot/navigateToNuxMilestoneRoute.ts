@@ -1,10 +1,8 @@
-import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types";
-import type { useNavigate } from "@tanstack/react-router";
-
 import { matchLiteral } from "@avandar/utils";
-
 import { isNuxMilestoneRouteCurrent } from "@/components/Nux/NuxRoot/isNuxMilestoneRouteCurrent/isNuxMilestoneRouteCurrent";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types";
+import type { useNavigate } from "@tanstack/react-router";
 
 type Options = {
   milestone: NuxMilestone;

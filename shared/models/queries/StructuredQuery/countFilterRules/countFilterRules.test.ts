@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { countFilterRules } from "$/models/queries/StructuredQuery/countFilterRules/countFilterRules.ts";
 
 describe("countFilterRules", () => {

@@ -1,11 +1,9 @@
-import type { Database } from "../../../shared/types/database.types";
-
 import { createClient } from "@supabase/supabase-js";
-
 import {
   tryGetSupabaseServiceRoleKeyFromEnv,
   tryGetSupabaseUrlFromEnv,
 } from "./supabaseEnv";
+import type { Database } from "../../../shared/types/database.types";
 
 /**
  * Deletes a Supabase user by email. We use this function to clean up after

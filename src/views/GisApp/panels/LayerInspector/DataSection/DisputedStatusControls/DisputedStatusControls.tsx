@@ -1,11 +1,5 @@
-import type { ColumnOption } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnOption.types";
-import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -13,6 +7,10 @@ import { DisputedColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataS
 import { DisputedStatusValueFields } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
+import type { ColumnOption } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnOption.types";
+import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

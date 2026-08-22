@@ -1,6 +1,5 @@
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
-
 import { isPlainObject } from "@avandar/utils";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
 
 /**
  * Everything our controls need beyond what react-querybuilder gives them,

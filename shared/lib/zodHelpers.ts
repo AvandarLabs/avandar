@@ -6,7 +6,6 @@ import {
   UUID,
 } from "@avandar/utils";
 import { z } from "zod";
-
 import { Json } from "$/types/database.types.ts";
 
 /**

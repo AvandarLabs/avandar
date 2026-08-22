@@ -1,9 +1,7 @@
+import { describe, expect, it } from "vitest";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
-
-import { describe, expect, it } from "vitest";
-
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001" as WorkspaceId;
 

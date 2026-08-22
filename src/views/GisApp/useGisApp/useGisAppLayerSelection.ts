@@ -1,10 +1,8 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dispatch, SetStateAction } from "react";
-
 import { propEq } from "@avandar/utils";
 import { useState } from "react";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dispatch, SetStateAction } from "react";
 
 /** Selected layer or annotation row for the current map config. */
 export type GisAppLayerSelection = {

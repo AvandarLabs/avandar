@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
 
 describe("getDashboardDesignTokens", () => {

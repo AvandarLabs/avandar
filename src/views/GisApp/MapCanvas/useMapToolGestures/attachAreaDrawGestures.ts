@@ -1,7 +1,3 @@
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
-import type { Dispatch, SetStateAction } from "react";
-
 import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
 import { isPointerNearVertex } from "@/views/GisApp/tools/isPointerNearVertex/isPointerNearVertex";
 import { makeRectangleRing } from "@/views/GisApp/tools/makeRectangleRing/makeRectangleRing";
@@ -9,6 +5,9 @@ import {
   MAP_TOOL_DRAG_THRESHOLD_PX,
   MAP_TOOL_SNAP_RADIUS_PX,
 } from "@/views/GisApp/tools/MapToolGesture.constants";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
+import type { Dispatch, SetStateAction } from "react";
 
 type Vertex = [number, number];
 

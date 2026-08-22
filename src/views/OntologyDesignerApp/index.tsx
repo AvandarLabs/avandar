@@ -2,7 +2,6 @@ import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Flex, ScrollArea } from "@mantine/core";
 import { Outlet, useMatchRoute } from "@tanstack/react-router";
-
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

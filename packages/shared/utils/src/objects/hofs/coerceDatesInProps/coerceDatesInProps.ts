@@ -1,6 +1,5 @@
-import type { UnknownObject } from "@utils/types/common.types.ts";
-
 import { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 /**
  * Returns a function that coerces the specified keys into dates.

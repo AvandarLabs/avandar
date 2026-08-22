@@ -1,10 +1,8 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
-
 import { BuiltInBasemapItems } from "@/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 const NO_BASEMAP_BACKGROUND = "#eaeef2";
 

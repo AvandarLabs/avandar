@@ -1,12 +1,11 @@
-import type {
-  RelationCacheEntry,
-  RelationCachePort,
-} from "$/models/relations/RelationCachePort/RelationCachePort.types";
-
 import {
   coversColumns,
   normalizeColumns,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import type {
+  RelationCacheEntry,
+  RelationCachePort,
+} from "$/models/relations/RelationCachePort/RelationCachePort.types";
 
 /**
  * An in-memory `RelationCachePort` for tests that need a real storage tier

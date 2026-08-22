@@ -1,14 +1,12 @@
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { ButtonProps } from "@mantine/core";
-
 import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconShare } from "@tabler/icons-react";
-
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { ButtonProps } from "@mantine/core";
 
 type Props = {
   resourceName: string;

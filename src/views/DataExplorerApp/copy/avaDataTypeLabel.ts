@@ -1,7 +1,6 @@
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 /**
  * The translated name of a column data type, for copy that names a type to the

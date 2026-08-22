@@ -1,10 +1,5 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button, ColorInput } from "@mantine/core";
-
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { CircleRadiusControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl";
@@ -13,6 +8,9 @@ import { HeatmapControls } from "@/views/GisApp/panels/LayerInspector/StyleSecti
 import { ProportionalSymbolControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls";
 import { StrokeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls";
 import { SymbologyTypeControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

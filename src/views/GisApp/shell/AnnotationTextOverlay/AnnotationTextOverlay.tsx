@@ -1,13 +1,11 @@
-import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { KeyboardEvent, ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { useLayoutEffect, useRef } from "react";
-
 import css from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.module.css";
 import { AnnotationTextSelectFrame } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame";
 import { useProjectedOverlayPoint } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
+import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { KeyboardEvent, ReactNode } from "react";
 
 type EditProps = {
   map: MapLibreMap;

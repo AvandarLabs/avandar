@@ -1,9 +1,8 @@
-import type { DuckDbSniffCsvRow } from "@/clients/DuckDbClient/csvParse/csvParse.types";
-
 import {
   DuckDbDataType,
   DuckDbDataTypes,
 } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { DuckDbSniffCsvRow } from "@/clients/DuckDbClient/csvParse/csvParse.types";
 
 export function duckDbDataTypeFromString(typeString: string): DuckDbDataType {
   const normalizedType = typeString.toUpperCase() as DuckDbDataType;

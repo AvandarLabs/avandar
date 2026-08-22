@@ -1,7 +1,6 @@
-import type { QueryKey } from "@avandar/query-hooks";
-
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import type { QueryKey } from "@avandar/query-hooks";
 
 /**
  * Every cached answer a plan change makes wrong: the workspace row the app

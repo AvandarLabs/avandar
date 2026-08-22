@@ -1,13 +1,11 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
-
 import { isAutomaticClassificationMethod } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ClassificationBreakList } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;
 

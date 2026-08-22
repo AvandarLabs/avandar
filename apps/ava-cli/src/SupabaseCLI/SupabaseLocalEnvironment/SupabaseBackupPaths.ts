@@ -1,6 +1,5 @@
-import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
 import path from "node:path";
+import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 function _getBranchKeyFromBranch(branch: string): string {
   return Buffer.from(branch, "utf8").toString("base64url");

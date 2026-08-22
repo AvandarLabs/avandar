@@ -1,11 +1,9 @@
+import { describe, expect, it } from "vitest";
+import { BasicPlanConfig, FreePlanConfig } from "$/config/FeaturePlansConfig";
+import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UUID } from "@avandar/utils";
-
-import { describe, expect, it } from "vitest";
-
-import { BasicPlanConfig, FreePlanConfig } from "$/config/FeaturePlansConfig";
-import { getBillingActionFromSelectedPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/getBillingActionFromSelectedPlan";
 
 const FREE_PLAN: SubscriptionPlan = {
   priceType: "free",

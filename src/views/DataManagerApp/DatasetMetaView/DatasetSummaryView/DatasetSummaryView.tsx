@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Anchor,
@@ -11,7 +9,6 @@ import {
   Text,
 } from "@mantine/core";
 import { useState } from "react";
-
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -19,8 +16,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection";
 import { buildShortDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
-
 import css from "./DatasetSummaryView.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;

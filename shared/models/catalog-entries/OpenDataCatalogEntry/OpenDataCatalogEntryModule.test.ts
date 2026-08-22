@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";

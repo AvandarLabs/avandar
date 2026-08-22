@@ -1,5 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 import { EditableDisplayText, Paper, Tabs } from "@avandar/ui";
 import { prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -18,7 +16,6 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -35,6 +32,7 @@ import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/Data
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   dataset: Dataset.T;

@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Paper } from "@avandar/ui";
 import { Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import clsx from "clsx";
-
 import css from "@/components/CanvasEmptyState/CanvasEmptyState.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   title: ReactNode;

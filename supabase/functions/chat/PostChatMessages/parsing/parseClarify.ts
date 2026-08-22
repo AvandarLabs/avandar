@@ -1,9 +1,7 @@
-import type { ChatClarifyRequest } from "$/types/chat.types.ts";
-
 import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
 import { match } from "ts-pattern";
-
 import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
+import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 const CLARIFICATION_MARKER_RE = /^\[Clarification answer:/m;

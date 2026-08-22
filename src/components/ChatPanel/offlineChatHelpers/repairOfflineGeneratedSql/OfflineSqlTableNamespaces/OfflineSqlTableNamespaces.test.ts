@@ -1,6 +1,5 @@
 import pkg from "node-sql-parser";
 import { describe, expect, it } from "vitest";
-
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 
 const { Parser } = pkg;

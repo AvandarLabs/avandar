@@ -1,6 +1,3 @@
-import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -17,7 +14,6 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -41,6 +37,8 @@ import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/s
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
+import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
+import type { ReactNode } from "react";
 
 type Props = {
   urlSearch: DataExplorerUrlSearch;

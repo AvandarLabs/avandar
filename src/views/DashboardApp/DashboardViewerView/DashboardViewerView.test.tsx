@@ -1,14 +1,12 @@
+import { Model } from "@avandar/models";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { TestProviders } from "@/test-utils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
-
-import { Model } from "@avandar/models";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { TestProviders } from "@/test-utils";
 
 const { navigateMock, puckRenderMock, publishedDatasetsState } = vi.hoisted(
   () => {

@@ -1,10 +1,9 @@
+import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
+import { describe, expect, it } from "vitest";
 import type {
   FiltersByColumn,
   FiltersByOperator,
 } from "@utils/filters/filters.ts";
-
-import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
-import { describe, expect, it } from "vitest";
 
 type Row = { id: string };
 

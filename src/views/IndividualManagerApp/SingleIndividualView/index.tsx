@@ -1,10 +1,3 @@
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-
 import { Paper } from "@avandar/ui";
 import {
   isNonNullish,
@@ -18,12 +11,17 @@ import {
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Loader, Stack, Title } from "@mantine/core";
 import { useMemo } from "react";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
 import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
 
 type HydratedIndividual = Individual.T & {
   identifierAttribute?: ConceptAttribute.T;

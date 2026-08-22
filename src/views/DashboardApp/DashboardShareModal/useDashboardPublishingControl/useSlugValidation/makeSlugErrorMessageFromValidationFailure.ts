@@ -1,8 +1,7 @@
-import type { I18n } from "@lingui/core";
-import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
-
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
+import type { I18n } from "@lingui/core";
+import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 
 /**
  * Turns a server slug rejection into the sentence shown under the field.

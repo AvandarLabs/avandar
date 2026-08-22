@@ -1,3 +1,6 @@
+import { match } from "ts-pattern";
+import { AvaSelectInput } from "@/components/forms/AvaForm/AvaSelectInput/AvaSelectInput";
+import { AvaTextInput } from "@/components/forms/AvaForm/AvaTextInput/AvaTextInput";
 import type {
   FormFieldSchema,
   GenericFormSchemaRecord,
@@ -6,11 +9,6 @@ import type {
 } from "@/components/forms/AvaForm/AvaForm.types";
 import type { SelectData } from "@avandar/ui";
 import type { FormType } from "@avandar/ui/hooks";
-
-import { match } from "ts-pattern";
-
-import { AvaSelectInput } from "@/components/forms/AvaForm/AvaSelectInput/AvaSelectInput";
-import { AvaTextInput } from "@/components/forms/AvaForm/AvaTextInput/AvaTextInput";
 
 type Props<
   FieldKey extends string,

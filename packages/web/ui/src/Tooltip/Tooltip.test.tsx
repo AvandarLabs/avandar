@@ -1,7 +1,6 @@
 import { MantineProvider } from "@mantine/core";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-
 import { Tooltip } from "./Tooltip";
 
 function renderTooltip(ui: JSX.Element) {

@@ -1,6 +1,5 @@
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-
 import { Badge, Group, Text } from "@mantine/core";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 
 type Props = {
   /** Caption shown before the badges (e.g. "Detected:", "Bias detected:"). */

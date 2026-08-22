@@ -1,13 +1,8 @@
-import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-
 import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { match } from "ts-pattern";
-
 import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { APIClient } from "@/clients/APIClient";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
@@ -17,6 +12,9 @@ import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
 import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";
 import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
+import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 function _featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {
   return match(featurePlanType)

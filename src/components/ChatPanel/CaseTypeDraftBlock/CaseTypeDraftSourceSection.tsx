@@ -1,14 +1,12 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
+import { IconDatabase, IconTrash } from "@tabler/icons-react";
+import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
+import css from "./CaseTypeDraftCard.module.css";
 import type {
   CaseTypeDraftEditor,
   CaseTypeDraftSourceGroup,
 } from "./useCaseTypeDraftEditor";
-
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
-import { IconDatabase, IconTrash } from "@tabler/icons-react";
-
-import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
-import css from "./CaseTypeDraftCard.module.css";
 
 type Props = {
   group: CaseTypeDraftSourceGroup;

@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useCallback, useState } from "react";
-
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";

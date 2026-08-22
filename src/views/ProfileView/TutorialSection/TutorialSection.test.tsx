@@ -1,8 +1,4 @@
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { restartFirstDashboardTutorial } from "@/components/Nux/NuxRoot/restartFirstDashboardTutorial/restartFirstDashboardTutorial";
 import { useNuxNavigation } from "@/components/Nux/NuxRoot/useNuxNavigation";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
@@ -10,6 +6,8 @@ import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxElig
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen } from "@/test-utils";
 import { TutorialSection } from "@/views/ProfileView/TutorialSection/TutorialSection";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
 
 vi.mock("@/components/Nux/useNuxEligibility/useNuxEligibility", () => {
   return { useNuxEligibility: vi.fn() };

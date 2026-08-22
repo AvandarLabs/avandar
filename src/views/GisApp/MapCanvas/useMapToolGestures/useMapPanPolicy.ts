@@ -1,10 +1,8 @@
+import { useEffect, useState } from "react";
+import { mapToolCursor } from "@/views/GisApp/tools/mapToolCursor/mapToolCursor";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
-
-import { useEffect, useState } from "react";
-
-import { mapToolCursor } from "@/views/GisApp/tools/mapToolCursor/mapToolCursor";
 
 type Options = {
   mapRef: RefObject<MapLibreMap | undefined>;

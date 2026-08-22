@@ -1,6 +1,5 @@
-import type { FilterOperator } from "@utils/filters/filters.ts";
-
 import { match } from "ts-pattern";
+import type { FilterOperator } from "@utils/filters/filters.ts";
 
 export const isSingleValueOperator = (
   operator: FilterOperator,

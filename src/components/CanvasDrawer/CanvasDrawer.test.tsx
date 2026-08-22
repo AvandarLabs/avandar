@@ -1,5 +1,3 @@
-import type { ReactElement, RefObject } from "react";
-
 /**
  * Behavioral tests for the shared canvas-docked drawer: that it stays in
  * document flow rather than overlaying as a dialog, and that the resize
@@ -7,9 +5,9 @@ import type { ReactElement, RefObject } from "react";
  */
 import { createRef } from "react";
 import { describe, expect, it } from "vitest";
-
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
 import { render, screen } from "@/test-utils";
+import type { ReactElement, RefObject } from "react";
 
 function _drawer(
   opened: boolean,

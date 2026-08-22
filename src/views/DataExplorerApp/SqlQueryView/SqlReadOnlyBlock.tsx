@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, Paper, Stack } from "@mantine/core";
-
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import css from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   /** SQL to display, already formatted for reading. */

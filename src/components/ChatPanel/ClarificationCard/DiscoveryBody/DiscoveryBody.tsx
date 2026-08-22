@@ -1,10 +1,8 @@
-import type { ClarificationAnswerHandler } from "../ClarificationAnswerModule/ClarificationAnswer";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-
 import { useCallback } from "react";
-
 import { useDiscoveryOptions } from "../useDiscoveryOptions/useDiscoveryOptions";
 import { DiscoveryStateBody } from "./DiscoveryStateBody/DiscoveryStateBody";
+import type { ClarificationAnswerHandler } from "../ClarificationAnswerModule/ClarificationAnswer";
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 type Props = {
   header: React.ReactNode;

@@ -1,13 +1,11 @@
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
 import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 
 /** The spine's alias inside the view, and the column it exposes. */
 const SPINE_ALIAS = "individuals";

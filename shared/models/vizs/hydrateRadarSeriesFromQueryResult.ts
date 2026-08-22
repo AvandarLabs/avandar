@@ -1,11 +1,10 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import {
   columnNameSet,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: string | undefined;

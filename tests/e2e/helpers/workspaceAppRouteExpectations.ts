@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { LONG_WAIT } from "./timeouts";
+import type { Page } from "@playwright/test";
 
 /**
  * Hard navigation so TanStack Query refetches roles after admin-side role

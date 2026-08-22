@@ -1,10 +1,8 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { TextInput } from "@mantine/core";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ReactNode } from "react";
 
 type Props = {
   testId: string;

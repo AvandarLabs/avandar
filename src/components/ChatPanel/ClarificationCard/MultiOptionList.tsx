@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Stack } from "@mantine/core";
-
 import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {

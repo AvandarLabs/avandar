@@ -1,6 +1,5 @@
 import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
 import { describe, expect, it } from "vitest";
-
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 describe("enforceChatModelAllowlist", () => {

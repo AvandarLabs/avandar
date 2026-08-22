@@ -1,16 +1,14 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 /**
  * AOI geometry SQL and ST_Intersects predicates.
  */
 import { quoteSqlLiteral } from "@avandar/utils/sql";
 import { describe, expect, it } from "vitest";
-
 import {
   makeAoiGeometrySql,
   makeOutputAoiPredicateSql,
   makeSourceAoiPredicateSql,
 } from "./AoiPredicateSqlHelpers";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const sampleAoi: AvaMapConfig.AoiPolygon = {
   type: "Polygon",

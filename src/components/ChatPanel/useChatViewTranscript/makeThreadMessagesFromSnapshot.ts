@@ -1,8 +1,7 @@
+import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatViewSnapshot } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import type { ThreadMessageLike } from "@assistant-ui/react";
-
-import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 
 /**
  * Builds the coalesced thread list for a page snapshot.

@@ -1,8 +1,7 @@
-import type { MigrationsSnapshot } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks.types";
-
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import * as path from "node:path";
+import type { MigrationsSnapshot } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks.types";
 
 const MIGRATIONS_DIR = path.join("supabase", "migrations");
 const CONFIG_TOML = path.join("supabase", "config.toml");

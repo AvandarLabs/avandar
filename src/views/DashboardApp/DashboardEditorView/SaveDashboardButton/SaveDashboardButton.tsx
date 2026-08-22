@@ -1,17 +1,14 @@
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { ReactElement } from "react";
-
 import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Kbd } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 import { useCallback } from "react";
-
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import { useDashboardPuck } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuck";
-
 import classes from "./SaveDashboardButton.module.css";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 type Props = {
   onSave: (data: AvaPageData) => void;

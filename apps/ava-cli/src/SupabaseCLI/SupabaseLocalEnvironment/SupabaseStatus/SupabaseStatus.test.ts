@@ -1,11 +1,10 @@
+import { SupabaseStatus } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
+import { prop, propEq } from "@avandar/utils";
+import { describe, expect, it } from "vitest";
 import type {
   SupabaseBackupManifest,
   SupabaseStatusEntry,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-import { SupabaseStatus } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
-import { prop, propEq } from "@avandar/utils";
-import { describe, expect, it } from "vitest";
 
 const STANDARD_CONFIG = `project_id = "avandar"
 

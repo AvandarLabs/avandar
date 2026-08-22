@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-
 import { getResendFullAccessAPIKey } from "$/env/getResendFullAccessAPIKey.ts";
 import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
 

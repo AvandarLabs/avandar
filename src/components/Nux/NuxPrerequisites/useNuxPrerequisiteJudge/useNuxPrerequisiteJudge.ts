@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { FIRST_DASHBOARD_PREREQUISITES } from "@/components/Nux/NuxPrerequisites/firstDashboard/firstDashboardPrerequisites/firstDashboardPrerequisites";
 import { NuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/NuxPrerequisiteJudge/NuxPrerequisiteJudge";

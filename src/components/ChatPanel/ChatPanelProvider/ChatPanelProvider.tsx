@@ -1,10 +1,9 @@
-import type { ReactNode } from "react";
-
 import {
   CHAT_PANEL_LOCAL_STORAGE_KEY,
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { ReactNode } from "react";
 
 function _readInitialChatPanelOpenState(): boolean {
   // wrap in try-catch in case localStorage is not available

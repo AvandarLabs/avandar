@@ -1,13 +1,11 @@
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
-
 import { describe, expect, it } from "vitest";
-
 import {
   shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerUrlHydration/dataExplorerUrlHydration";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 const _minimalBarViz: VizConfig = {
   vizType: "bar",

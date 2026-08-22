@@ -17,7 +17,6 @@
  *     is the only practical way to keep the import form responsive.
  */
 import * as XLSX from "xlsx";
-
 import { buildXlsxPreviewRange } from "@/workers/xlsxSniff/buildXlsxPreviewRange/buildXlsxPreviewRange";
 
 type SniffRequest = {

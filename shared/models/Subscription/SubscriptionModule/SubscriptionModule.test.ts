@@ -1,13 +1,11 @@
+import { describe, expect, it } from "vitest";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 import type {
   SubscriptionId,
   SubscriptionRead,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
-
-import { describe, expect, it } from "vitest";
-
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule.ts";
 
 function _subscription(
   overrides: Partial<SubscriptionRead> = {},

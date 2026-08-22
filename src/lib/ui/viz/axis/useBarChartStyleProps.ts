@@ -1,3 +1,10 @@
+import { useMemo } from "react";
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
+import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
+import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
+import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
+import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
+import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
 import type {
@@ -6,15 +13,6 @@ import type {
 } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { UnknownDataFrame } from "@avandar/utils";
-
-import { useMemo } from "react";
-
-import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
-import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
-import { doesAxisNeedValueExtent } from "@/lib/ui/viz/axis/doesAxisNeedValueExtent/doesAxisNeedValueExtent";
-import { getValueExtentFromSeries } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
-import { useXTickLabels } from "@/lib/ui/viz/axis/useXTickLabels";
 
 function _computeBarValueExtent({
   data,

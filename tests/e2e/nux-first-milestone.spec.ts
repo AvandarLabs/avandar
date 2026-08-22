@@ -1,7 +1,4 @@
-import type { E2EWorkerCredentials } from "./fixtures/e2e.fixture";
-
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -18,6 +15,7 @@ import {
 } from "./helpers/supabaseAdminClient";
 import { suppressNuxTutorialForUser } from "./helpers/suppressNuxTutorial";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import type { E2EWorkerCredentials } from "./fixtures/e2e.fixture";
 
 /**
  * Puts the worker's primary user back where a brand-new user starts.

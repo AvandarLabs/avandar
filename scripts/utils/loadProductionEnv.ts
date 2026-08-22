@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import dotenv from "dotenv";
 
 const RED = "\x1b[31m";
 const RESET = "\x1b[0m";

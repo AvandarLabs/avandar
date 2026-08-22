@@ -1,10 +1,8 @@
-import type { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Badge } from "@mantine/core";
-
 import { ReadyLayerStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus";
+import type { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
+import type { ReactNode } from "react";
 
 type Props = {
   droppedRowCount: number;

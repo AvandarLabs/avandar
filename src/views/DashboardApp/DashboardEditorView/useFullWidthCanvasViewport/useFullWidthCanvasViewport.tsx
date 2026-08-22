@@ -1,10 +1,8 @@
-import type { OnAction, Overrides } from "@puckeditor/core";
-
 import { isPlainObject } from "@avandar/utils";
 import { useCallback, useRef } from "react";
-
 import { FULL_WIDTH_CANVAS_VIEWPORT } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import { FullWidthCanvasViewportPin } from "@/views/DashboardApp/DashboardEditorView/useFullWidthCanvasViewport/FullWidthCanvasViewportPin";
+import type { OnAction, Overrides } from "@puckeditor/core";
 
 type FullWidthCanvasViewport = {
   /** Pass to `<Puck onAction>` so user viewport choices are respected. */

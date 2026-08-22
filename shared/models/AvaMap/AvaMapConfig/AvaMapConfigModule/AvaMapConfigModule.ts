@@ -1,13 +1,5 @@
-import type {
-  AvaMapConfigRead,
-  MapBookmark,
-  MapBookmarkId,
-  MapViewState,
-} from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
-
 import { Model } from "@avandar/models";
 import { makeSet, prop, propEq, propNotEq } from "@avandar/utils";
-
 import { uuid } from "$/lib/uuid.ts";
 import {
   DEFAULT_EXPORT_LAYOUT,
@@ -18,6 +10,12 @@ import {
   overlayConfigUpdaters,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/overlayConfigUpdaters/overlayConfigUpdaters.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type {
+  AvaMapConfigRead,
+  MapBookmark,
+  MapBookmarkId,
+  MapViewState,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 
 /** Opening camera position when a map has no data to fit yet. */
 const DEFAULT_MAP_VIEW_STATE: MapViewState = {

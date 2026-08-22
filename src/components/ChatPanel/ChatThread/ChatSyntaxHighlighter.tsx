@@ -6,7 +6,6 @@ import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
 import python from "react-syntax-highlighter/dist/esm/languages/prism/python";
 import sql from "react-syntax-highlighter/dist/esm/languages/prism/sql";
 import tsx from "react-syntax-highlighter/dist/esm/languages/prism/tsx";
-
 import { Theme } from "@/config/Theme";
 
 function _registerChatPrismLanguages(): void {

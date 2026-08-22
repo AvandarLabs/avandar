@@ -1,3 +1,5 @@
+import path from "node:path";
+import { createSupabaseLocalEnvironmentFakeReadIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/createSupabaseLocalEnvironmentFakeReadIO";
 import type {
   CommandOutputMode,
   CommandResult,
@@ -6,9 +8,6 @@ import type {
   SupabaseLocalEnvironmentIO,
   SupabaseSeedTarget,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-import { createSupabaseLocalEnvironmentFakeReadIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/createSupabaseLocalEnvironmentFakeReadIO";
-import path from "node:path";
 
 /** Canonical project root used by the local-environment fake. */
 export const PROJECT_ROOT = "/repo";

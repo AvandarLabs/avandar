@@ -1,3 +1,5 @@
+import { assert } from "@avandar/utils";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type {
   LogicalDefinition,
   PrincipalKey,
@@ -6,10 +8,6 @@ import type {
   RelationCacheKey,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
-
-import { assert } from "@avandar/utils";
-
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 
 /**
  * The only two snapshot bucket names a public principal may embed, mirrored

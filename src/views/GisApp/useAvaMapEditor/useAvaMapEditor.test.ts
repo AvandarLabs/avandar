@@ -1,16 +1,14 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { User } from "$/models/User/User";
-import type { UserProfile } from "$/models/User/UserProfile";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { Model } from "@avandar/models";
 import { noop, sleep } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { act, renderHook, waitFor } from "@/test-utils";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const { saveMapConfigMock } = vi.hoisted(() => {
   return { saveMapConfigMock: vi.fn() };

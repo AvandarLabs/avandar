@@ -1,14 +1,12 @@
-import type { NuxJoyrideStepData } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
-import type { ReactNode } from "react";
-import type { TooltipRenderProps } from "react-joyride";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NuxTooltip } from "@/components/Nux/NuxTour/NuxTooltip/NuxTooltip";
 import { ANIMATION_PRESET } from "@/config/Theme";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { NuxJoyrideStepData } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
+import type { ReactNode } from "react";
+import type { TooltipRenderProps } from "react-joyride";
 
 function _tooltipProps(
   data: NuxJoyrideStepData | undefined,

@@ -1,14 +1,11 @@
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
-
 import { Stack } from "@mantine/core";
-
 import { noneOfAboveLabel } from "$/copy/noneOfAboveLabel";
 import { somethingElseLabel } from "$/copy/somethingElseLabel";
-
 import { ClarificationAnswerActions } from "./ClarificationAnswerActions";
 import { ClarificationCustomTextInput } from "./ClarificationCustomTextInput";
 import { SingleOptionList } from "./SingleOptionList";
 import { useSingleOptionAnswer } from "./useSingleOptionAnswer";
+import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   options: readonly string[];

@@ -1,14 +1,12 @@
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
-
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 
 function _shouldOpenBillingSetupModal(options: {
   subscription: SubscriptionRead | undefined;

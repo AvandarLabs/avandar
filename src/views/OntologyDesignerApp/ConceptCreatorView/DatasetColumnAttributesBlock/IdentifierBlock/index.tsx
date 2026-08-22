@@ -1,12 +1,10 @@
-import type { ConceptFormType } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-
 import { makeSelectOptions, Select } from "@avandar/ui";
 import { isDefined, makeObject, prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import type { ConceptFormType } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 type Props = {
   conceptForm: ConceptFormType;

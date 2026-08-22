@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconInbox, IconListDetails } from "@tabler/icons-react";
-
 import { CanvasEmptyState } from "@/components/CanvasEmptyState/CanvasEmptyState";
+import type { ReactNode } from "react";
 
 type Props = {
   conceptName: string;

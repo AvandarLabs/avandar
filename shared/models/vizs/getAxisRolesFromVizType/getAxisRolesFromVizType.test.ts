@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType.ts";
 
 describe("getAxisRolesFromVizType", () => {

@@ -1,8 +1,7 @@
-import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import type { ResolveDataTrigger } from "@puckeditor/core";
-
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { ResolveDataTrigger } from "@puckeditor/core";
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 

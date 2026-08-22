@@ -1,7 +1,6 @@
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
-
 import { MultiOptionBody } from "./MultiOptionBody";
 import { SingleOptionBody } from "./SingleOptionBody";
+import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   options: readonly string[];

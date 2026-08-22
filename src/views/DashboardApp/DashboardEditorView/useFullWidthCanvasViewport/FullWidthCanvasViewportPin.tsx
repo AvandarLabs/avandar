@@ -1,9 +1,7 @@
-import type { ReactElement, ReactNode, RefObject } from "react";
-
 import { useEffect } from "react";
-
 import { FULL_WIDTH_CANVAS_VIEWPORT } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
 import { useDashboardPuck } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuck";
+import type { ReactElement, ReactNode, RefObject } from "react";
 
 type Props = {
   children: ReactNode;

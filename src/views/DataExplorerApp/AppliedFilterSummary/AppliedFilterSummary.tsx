@@ -1,10 +1,8 @@
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { ReactNode } from "react";
-
 import { Plural, Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
-
 import { countFilterRules } from "$/models/queries/StructuredQuery/countFilterRules/countFilterRules";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ReactNode } from "react";
 
 type Props = {
   filters: StructuredQuery.FilterGroup;

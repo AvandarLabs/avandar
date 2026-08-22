@@ -1,14 +1,12 @@
+import { useLingui } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { SymbologyOptions } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions";
+import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.module.css";
+import { useSymbologyTypeChange } from "@/views/GisApp/panels/LayerInspector/StyleSection/useSymbologyTypeChange";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Text } from "@mantine/core";
-
-import { SymbologyOptions } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions";
-import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.module.css";
-import { useSymbologyTypeChange } from "@/views/GisApp/panels/LayerInspector/StyleSection/useSymbologyTypeChange";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 

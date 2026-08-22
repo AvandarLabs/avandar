@@ -1,9 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-
 /**
  * Tests for the concept relation allowlist and expansion.
  *
@@ -15,6 +9,11 @@ import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/Concep
  * query names.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
 const OTHER_CONCEPT_ID = "dddddddd-4444-4444-8444-dddddddddddd" as Concept.Id;

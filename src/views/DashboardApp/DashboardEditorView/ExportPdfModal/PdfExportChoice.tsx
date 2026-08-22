@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Alert, Button, Group, Stack, Text } from "@mantine/core";
-
 import { PdfExportActions } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportActions";
+import type { ReactNode } from "react";
 
 type Props = {
   hiddenRender: ReactNode;

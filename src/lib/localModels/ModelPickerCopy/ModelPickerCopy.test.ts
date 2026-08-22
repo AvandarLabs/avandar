@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { ModelPickerCopy } from "./ModelPickerCopy";
 
 describe("formatModelPickerCopy", () => {

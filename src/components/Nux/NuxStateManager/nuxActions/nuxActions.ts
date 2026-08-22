@@ -1,9 +1,4 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-
 import { propEq } from "@avandar/utils";
-
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import {
   completeAlreadyRecordedMilestone,
@@ -14,6 +9,9 @@ import {
 } from "@/components/Nux/NuxStateManager/nuxActions/nuxActionHelpers";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 
 /**
  * Every transition the tutorial can make, as pure functions.

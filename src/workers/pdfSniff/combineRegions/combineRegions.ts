@@ -1,11 +1,10 @@
+import { extractMeasurements } from "../extractMeasurements/extractMeasurements";
+import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
 import type {
   DocumentMetadata,
   ExtractedTable,
   PdfCellFlag,
 } from "../pdfSniff.types";
-
-import { extractMeasurements } from "../extractMeasurements/extractMeasurements";
-import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
 
 export type CombinedTable = {
   outputMode: "natural" | "observations";

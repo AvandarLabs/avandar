@@ -1,6 +1,5 @@
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 /** Default LIMIT shown for a brand-new manual query. */
 export const DEFAULT_MANUAL_QUERY_LIMIT = 100;

@@ -1,17 +1,15 @@
+import {
+  validatePolarSubscription,
+  webhookFailureResponse,
+  webhookSuccessResponse,
+} from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 import type {
   PolarEventDataSchemas,
   PolarWebhookHandlerOptions,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 import type { WebhookResponse } from "@sbfn/polar-public/PolarPublicRoutes.types.ts";
 import type { z } from "zod";
-
-import {
-  validatePolarSubscription,
-  webhookFailureResponse,
-  webhookSuccessResponse,
-} from "@sbfn/polar-public/polarWebhookUtils.ts";
-
-import { Subscription } from "$/models/Subscription/Subscription.ts";
 
 type SubscriptionUpdatedData = z.infer<
   typeof PolarEventDataSchemas.SubscriptionUpdated

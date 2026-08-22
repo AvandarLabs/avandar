@@ -1,10 +1,8 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { render, screen } from "@/test-utils";
 import { DashboardListView } from "@/views/DashboardApp/DashboardListView/DashboardListView";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
 
 /**
  * The ownership badge is driven by a comparison against the current user's

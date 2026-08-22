@@ -1,3 +1,4 @@
+import path from "node:path";
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import {
   CONFIG_PATH,
@@ -9,7 +10,6 @@ import {
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { propNotEq } from "@avandar/utils";
-import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;

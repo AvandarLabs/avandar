@@ -1,11 +1,9 @@
+import { useLingui } from "@lingui/react/macro";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { DisputedValuesInput } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/DisputedValuesInput";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { DisputedValuesInput } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/DisputedValuesInput";
 
 type Props = {
   layer: MapLayer.T;

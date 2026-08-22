@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { valueColumnId } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/__tests__/makeLayerSpecFromMapLayer.fixtures";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";

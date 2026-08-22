@@ -1,8 +1,4 @@
-import type { UserId } from "$/models/User/User.types";
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
-
 import { isDefined, prop } from "@avandar/utils";
-
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
@@ -12,6 +8,8 @@ import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { UserId } from "$/models/User/User.types";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 // Platform-aware server API client; lazy-readable from any mutation/query.
 const serverApi = createServerApiClient();

@@ -1,5 +1,4 @@
 import path from "node:path";
-
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 
 /** Navbar workspace menu button shows the workspace display name. */

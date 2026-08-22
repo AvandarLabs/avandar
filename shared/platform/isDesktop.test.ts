@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from "vitest";
-
 import { isDesktop } from "$/platform/isDesktop.ts";
 
 type WindowWithMarker = {

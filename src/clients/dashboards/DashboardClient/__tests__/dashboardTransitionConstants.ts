@@ -1,9 +1,8 @@
+/** Identifiers and the base dashboard row the transition tests build on. */
+import { Model } from "@avandar/models";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
-
-/** Identifiers and the base dashboard row the transition tests build on. */
-import { Model } from "@avandar/models";
 
 export const DASHBOARD_ID =
   "11111111-1111-4111-8111-111111111111" as Dashboard.Id;

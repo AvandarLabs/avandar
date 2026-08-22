@@ -1,13 +1,11 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
-
 import { propNotEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-
 import { DisputedLegendRow } from "@/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.module.css";
 import { MapLegendGroup } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Visible layers in panel row order, so the legend reads top down. */

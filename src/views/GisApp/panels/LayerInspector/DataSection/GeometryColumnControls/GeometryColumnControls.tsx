@@ -1,13 +1,12 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { CrsOverrideField } from "@/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField";
 import { GeometryEncodingSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect";
 import { GeometryFamilySelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect";
 import { GeometrySourceColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect";
 import { SimplificationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 

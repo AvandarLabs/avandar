@@ -1,7 +1,6 @@
-import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
-
 import { useLingui } from "@lingui/react/macro";
 import { Select, Stack, TextInput } from "@mantine/core";
+import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
   editor: CaseTypeDraftEditor;

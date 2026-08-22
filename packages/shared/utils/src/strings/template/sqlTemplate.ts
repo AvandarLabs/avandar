@@ -1,6 +1,5 @@
-import type { UnknownToStringOptions } from "@utils/strings/unknownToString/unknownToString.ts";
-
 import { template } from "@utils/strings/template/template.ts";
+import type { UnknownToStringOptions } from "@utils/strings/unknownToString/unknownToString.ts";
 
 /**
  * Like `template`, but for SQL: numbers are not locale-formatted (no

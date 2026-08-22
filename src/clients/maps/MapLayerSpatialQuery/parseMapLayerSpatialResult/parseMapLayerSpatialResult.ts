@@ -1,11 +1,9 @@
+import { isGeometryFamily } from "$/models/AvaMap/MapLayer/MapLayer";
+import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { MapLayerSpatialDiagnostics } from "../MapLayerSpatialQuery.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-
-import { isGeometryFamily } from "$/models/AvaMap/MapLayer/MapLayer";
-
-import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
 
 type ParsedMapLayerSpatialResult = {
   featureCollection: GeoJSON.FeatureCollection;

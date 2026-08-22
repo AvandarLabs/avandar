@@ -1,6 +1,5 @@
-import type { ConditionalKeys } from "type-fest";
-
 import { makeObject } from "@utils/objects/makeObject/makeObject.ts";
+import type { ConditionalKeys } from "type-fest";
 
 /**
  * Creates a lookup from a list of objects, indexed by an object's id field.

@@ -1,5 +1,3 @@
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-
 import { useLingui } from "@lingui/react/macro";
 import { Tooltip } from "@mantine/core";
 import {
@@ -11,6 +9,7 @@ import {
   IconWorld,
 } from "@tabler/icons-react";
 import { match } from "ts-pattern";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 
 export function SourceBadge({
   sourceType,

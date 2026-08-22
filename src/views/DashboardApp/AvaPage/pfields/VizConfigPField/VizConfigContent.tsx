@@ -1,10 +1,8 @@
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
-import type { ReactElement } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Box, Text } from "@mantine/core";
-
 import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { ReactElement } from "react";
 
 type Props = {
   value: VizConfig.T;

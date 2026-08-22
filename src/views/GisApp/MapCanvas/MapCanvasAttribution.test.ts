@@ -1,9 +1,8 @@
+import { objectKeys } from "@avandar/utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
-
-import { objectKeys } from "@avandar/utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { eventHandlers, mapConstructorMock, mapLibreMapMock } = vi.hoisted(
   () => {

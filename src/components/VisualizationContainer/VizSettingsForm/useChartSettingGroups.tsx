@@ -1,18 +1,16 @@
+import { makeBucketMap } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+import { useMemo } from "react";
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
+import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
+import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import type {
   AnyChartSettingDescriptor,
   VizSettingGroup,
 } from "$/models/vizs/SettingDescriptor";
 import type { SettingsColumnGroup } from "@/components/SettingsColumns/SettingsColumns";
-
-import { makeBucketMap } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Stack } from "@mantine/core";
-import { useMemo } from "react";
-
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
-import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 
 type Options = {
   /** Chart-level descriptors to render, in registry order. */

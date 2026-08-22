@@ -1,9 +1,8 @@
-import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, NumberInput, Stack, Text } from "@mantine/core";
 import { useState } from "react";
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
+import type { ReactNode } from "react";
 
 type PdfPoint = { x: number; y: number };
 

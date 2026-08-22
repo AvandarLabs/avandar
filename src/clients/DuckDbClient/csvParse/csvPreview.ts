@@ -1,3 +1,9 @@
+import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
+import {
+  buildDuckDbCsvSniffResultFromResolved,
+  buildDuckDbCsvSniffResultFromSniffRow,
+} from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
+import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type {
   CsvParseResolvedOptions,
   DuckDbSniffCsvRow,
@@ -9,13 +15,6 @@ import type {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbRunRawQuery } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type * as duckdb from "@duckdb/duckdb-wasm";
-
-import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
-import {
-  buildDuckDbCsvSniffResultFromResolved,
-  buildDuckDbCsvSniffResultFromSniffRow,
-} from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
-import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** The columns and first rows read from a CSV without transcoding it. */
 export type CsvPreviewData = {

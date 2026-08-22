@@ -1,5 +1,3 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
@@ -9,11 +7,11 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-
 import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { Logger } from "@/utils/Logger";
 import { IndividualManagerApp } from "@/views/IndividualManagerApp";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/$conceptId",

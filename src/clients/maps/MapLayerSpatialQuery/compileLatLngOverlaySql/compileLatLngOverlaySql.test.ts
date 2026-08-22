@@ -1,15 +1,12 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { describe, expect, it } from "vitest";
-
 /**
  * Latitude/longitude overlay SQL compilation for time and AOI filters.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { compileLatLngOverlaySql } from "./compileLatLngOverlaySql";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 const january: AvaMapConfig.TimeRange = {
   start: "2026-01-01T00:00:00.000Z",

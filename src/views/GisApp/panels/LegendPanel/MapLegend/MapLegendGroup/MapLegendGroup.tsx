@@ -1,10 +1,8 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { LayerLegendContent } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LayerLegendContent";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T };
 

@@ -1,8 +1,6 @@
-import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { msg } from "@lingui/core/macro";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 /**
  * How long a step waits for a target that only appears after the user does

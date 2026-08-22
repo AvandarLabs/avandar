@@ -1,14 +1,12 @@
+import { Stack } from "@mantine/core";
+import { ColumnPicker } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker";
+import { RowFilterEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type {
   FilterableColumn,
   PublishSliceDataset,
 } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
-
-import { Stack } from "@mantine/core";
-
-import { ColumnPicker } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker";
-import { RowFilterEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor";
 
 type Props = {
   dataset: PublishSliceDataset;

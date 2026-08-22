@@ -1,9 +1,7 @@
-import type { DrawerProps as MantineDrawerProps } from "@mantine/core";
-
 import { Drawer as MantineDrawer } from "@mantine/core";
 import clsx from "clsx";
-
 import classes from "./Drawer.module.css";
+import type { DrawerProps as MantineDrawerProps } from "@mantine/core";
 
 type Props = MantineDrawerProps & {
   /**

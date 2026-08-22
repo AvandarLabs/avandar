@@ -1,9 +1,6 @@
-import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
-
 import { useLingui } from "@lingui/react/macro";
 import { SegmentedControlItem } from "@mantine/core";
 import { match } from "ts-pattern";
-
 import {
   BasicPlanConfig,
   FreePlanConfig,
@@ -20,6 +17,7 @@ import {
   PaidPlanVariants,
   SubscriptionPlan,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
 
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];

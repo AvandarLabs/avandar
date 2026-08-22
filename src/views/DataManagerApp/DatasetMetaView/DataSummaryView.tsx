@@ -1,11 +1,9 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-
 import { ObjectDescriptionList } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Loader, Stack } from "@mantine/core";
-
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   datasetId: DatasetId;

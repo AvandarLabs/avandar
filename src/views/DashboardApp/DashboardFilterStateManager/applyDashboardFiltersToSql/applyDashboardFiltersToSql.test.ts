@@ -1,8 +1,6 @@
-import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-
 import { describe, expect, it } from "vitest";
-
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
+import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 const FILTER_REGION_EQUALS: DashboardFilterRecord = {
   filterId: "region",

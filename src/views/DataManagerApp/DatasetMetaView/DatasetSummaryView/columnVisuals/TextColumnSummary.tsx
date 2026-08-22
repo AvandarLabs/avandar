@@ -1,10 +1,8 @@
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-
 import { TextFrequencyBar } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextFrequencyBar";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "text" };

@@ -1,11 +1,9 @@
-import type { GooglePickerAPI } from "@/lib/types/google-picker";
-import type { APIReturnType } from "@/types/http-api.types";
-
 import { t } from "@lingui/core/macro";
 import { useEffect, useState } from "react";
-
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
+import type { GooglePickerAPI } from "@/lib/types/google-picker";
+import type { APIReturnType } from "@/types/http-api.types";
 
 const GOOGLE_API_JS_URL = "https://apis.google.com/js/api.js";
 const SCRIPT_SELECTOR = `script[src="${GOOGLE_API_JS_URL}"]`;

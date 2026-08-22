@@ -1,13 +1,11 @@
-import type { WithPuckProps } from "@puckeditor/core";
-import type { ReactElement } from "react";
-
 import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useEffect, useMemo } from "react";
-
 import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { WithPuckProps } from "@puckeditor/core";
+import type { ReactElement } from "react";
 
 export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
 

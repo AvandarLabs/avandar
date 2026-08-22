@@ -1,5 +1,3 @@
-import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
-
 import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -13,9 +11,9 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {
   /** Selected catalog entry, or none when nothing is selected. */

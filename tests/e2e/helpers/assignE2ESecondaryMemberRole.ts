@@ -1,11 +1,10 @@
+import { Permissions } from "$/models/Permissions/Permissions";
 import type {
   AppType,
   RoleLevel,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-
-import { Permissions } from "$/models/Permissions/Permissions";
 
 export type BuiltinRoleGroupName =
   | "Global Admin"

@@ -1,7 +1,4 @@
-import type { Locator, Page, Request } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { switchToWorkspaceUser } from "./auth";
 import { expectDatasetMetaPageDenied } from "./datasetSharingFlow";
 import {
@@ -12,6 +9,7 @@ import {
   setGeneralAccess,
 } from "./shareModalFlow";
 import { MEDIUM_WAIT } from "./timeouts";
+import type { Locator, Page, Request } from "@playwright/test";
 
 type WorkspaceUser = Readonly<{
   email: string;

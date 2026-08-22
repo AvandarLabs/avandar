@@ -1,6 +1,5 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 

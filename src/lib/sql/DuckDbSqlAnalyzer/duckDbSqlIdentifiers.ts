@@ -1,9 +1,8 @@
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   IdentifierParts,
   SqlToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 
 /** Matches the dataset IDs that name bare DuckDB tables. */
 export const UUID_REGEX =

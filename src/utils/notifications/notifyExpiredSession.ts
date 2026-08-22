@@ -1,6 +1,5 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-
 import { notifyError } from "./notify";
 
 const EXPIRED_SESSION_TITLE = msg`Your session has expired`;

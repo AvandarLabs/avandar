@@ -1,6 +1,5 @@
-import type { NuxMilestoneRoute } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { matchLiteral } from "@avandar/utils";
+import type { NuxMilestoneRoute } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 /**
  * Whether the browser is already on the page a milestone's checklist click

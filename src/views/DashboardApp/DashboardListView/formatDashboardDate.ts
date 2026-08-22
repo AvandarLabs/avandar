@@ -1,6 +1,5 @@
-import type { I18n } from "@lingui/core";
-
 import { msg } from "@lingui/core/macro";
+import type { I18n } from "@lingui/core";
 
 /**
  * Formats a dashboard's ISO timestamp into a short locale-aware date

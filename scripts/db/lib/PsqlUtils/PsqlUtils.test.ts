@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { getLocalDatabaseConfigFromRepoRoot, makeSqlRunner } from "./PsqlUtils";
 
 const processMocks = vi.hoisted(() => {

@@ -1,16 +1,6 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
-import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
-import type { UseQueryOptions } from "@tanstack/react-query";
-
 import { makeIdLookupMap, propEq } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
 import { useEffect } from "react";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -24,6 +14,14 @@ import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQ
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
+import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
+import type { UseQueryOptions } from "@tanstack/react-query";
 
 /** One layer's query, as the map render pipeline needs to see it. */
 export type MapLayerQueryState = {

@@ -1,3 +1,9 @@
+import { isDefined } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
+import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type {
@@ -7,14 +13,6 @@ import type {
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-import { isDefined } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
-import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
-import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
   vizConfig: VizConfig;

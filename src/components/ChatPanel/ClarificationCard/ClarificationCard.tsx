@@ -1,12 +1,10 @@
-import type { ChatClarifyRequest } from "$/types/chat.types";
-import type { ClarificationAnswerHandler } from "./ClarificationAnswerModule/ClarificationAnswer";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-
 import { Paper, Stack } from "@mantine/core";
-
 import css from "./ClarificationCard.module.css";
 import { ClarificationCardBody } from "./ClarificationCardBody";
 import { ClarificationCardHeader } from "./ClarificationCardHeader";
+import type { ChatClarifyRequest } from "$/types/chat.types";
+import type { ClarificationAnswerHandler } from "./ClarificationAnswerModule/ClarificationAnswer";
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 export type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 

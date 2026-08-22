@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import { Callout } from "@avandar/ui";
+import type { ReactNode } from "react";
 
 type Props = {
   numRows: number;

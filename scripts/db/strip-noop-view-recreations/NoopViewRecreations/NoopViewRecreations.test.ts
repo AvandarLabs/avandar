@@ -1,9 +1,7 @@
-import type { CreateViewStatement, NoopVerdict } from "./NoopViewRecreations";
-
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { NoopViewRecreations } from "./NoopViewRecreations";
+import type { CreateViewStatement, NoopVerdict } from "./NoopViewRecreations";
 
 const {
   getStatementsFromSql,

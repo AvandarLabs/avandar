@@ -1,10 +1,8 @@
-import type {} from "$/types/env.d.ts";
-
 import process from "node:process";
-
 import { isDenoRuntime } from "$/env/isDenoRuntime.ts";
 import { isNodeRuntime } from "$/env/isNodeRuntime.ts";
 import { isViteBrowserRuntime } from "$/env/isViteBrowserRuntime.ts";
+import type {} from "$/types/env.d.ts";
 
 // remove trailing slash if it's present
 function _cleanOrigin(origin: string | undefined): string {

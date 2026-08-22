@@ -1,11 +1,10 @@
+import { prop } from "@avandar/utils";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
 import type {
   NuxPrerequisite,
   NuxPrerequisiteFacts,
 } from "@/components/Nux/NuxPrerequisites/NuxPrerequisite.types";
-
-import { prop } from "@avandar/utils";
 
 type GetCatchUpKeysOptions = {
   facts: Readonly<NuxPrerequisiteFacts>;

@@ -1,7 +1,3 @@
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
-import type { UnknownDataFrame } from "@avandar/utils";
-
 /**
  * NOTE: This component uses Recharts directly instead of Mantine's
  * `BubbleChart` wrapper. Mantine's BubbleChart is single-series only
@@ -22,13 +18,15 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-
 import { useBubbleChartStyleProps } from "@/lib/ui/viz/axis/useBubbleChartStyleProps";
 import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   data: UnknownDataFrame;

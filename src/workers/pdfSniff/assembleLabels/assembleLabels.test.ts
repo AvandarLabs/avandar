@@ -1,8 +1,6 @@
-import type { TextItem } from "../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { assembleLabels } from "./assembleLabels";
+import type { TextItem } from "../pdfSniff.types";
 
 function label(text: string, x: number, y: number, width?: number): TextItem {
   return {

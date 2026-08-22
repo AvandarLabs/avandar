@@ -1,8 +1,6 @@
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-
 import { propEq } from "@avandar/utils";
-
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type DashboardEditorPendingBlock = {
   /**

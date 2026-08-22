@@ -1,5 +1,3 @@
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
-
 import { checkDevelopCI } from "@ava-cli/ReleaseCLI/checkDevelopCI";
 import { describeCIStatus } from "@ava-cli/ReleaseCLI/describeCIStatus";
 import {
@@ -29,6 +27,7 @@ import {
   printSuccess,
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /**
  * The individual stages of a release, in the order `runRelease` calls them.

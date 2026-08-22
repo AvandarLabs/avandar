@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getOrderedKeys } from "./getOrderedKeys";
 
 const ALL_KEYS = ["id", "name", "email", "created_at", "updated_at"] as const;

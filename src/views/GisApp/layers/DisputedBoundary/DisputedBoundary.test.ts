@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 

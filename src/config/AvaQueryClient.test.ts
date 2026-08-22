@@ -1,10 +1,8 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { SessionExpiredError } from "$/ServerApiClient";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACE_ID = "11111111-1111-4111-8111-111111111111" as Workspace.Id;
 

@@ -1,7 +1,6 @@
+import { useEffect } from "react";
 import type { Overrides } from "@puckeditor/core";
 import type { ReactElement } from "react";
-
-import { useEffect } from "react";
 
 /** ag-grid tags every stylesheet it injects at runtime with this attribute. */
 const AG_GRID_STYLE_SELECTOR = "style[data-ag-global-css]";

@@ -1,5 +1,4 @@
 import { capitalize } from "@avandar/utils";
-
 import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";
 
 type Props = {

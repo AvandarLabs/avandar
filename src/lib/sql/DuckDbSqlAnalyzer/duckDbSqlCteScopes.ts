@@ -1,13 +1,12 @@
-import type {
-  CteAlias,
-  SqlToken,
-} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import {
   getClosingParenthesisIndex,
   getParenthesisDepths,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type {
+  CteAlias,
+  SqlToken,
+} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 function _getIndexAfterCteColumns(
   options: Readonly<{ tokens: readonly SqlToken[]; aliasIndex: number }>,

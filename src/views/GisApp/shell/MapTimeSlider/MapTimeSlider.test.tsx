@@ -1,17 +1,15 @@
-import type { AvaMapConfig as AvaMapConfigT } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 /**
  * Map clock range slider, play, and reduced-motion behavior.
  */
 import { useReducedMotion } from "@mantine/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { AvaMapConfig as AvaMapConfigT } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 vi.mock("@mantine/hooks", async () => {
   const actual =

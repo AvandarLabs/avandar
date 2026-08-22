@@ -1,9 +1,7 @@
-import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
-
 import { describe, expect, it } from "vitest";
-
 import { render, screen } from "@/test-utils";
 import { SaveStateIndicator } from "@/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator";
+import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 
 const SAVE_STATE_CASES: Array<{
   saveState: MapSaveState;

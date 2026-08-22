@@ -1,15 +1,8 @@
-import type {
-  SettingsColumnGroup,
-  SettingsColumnsLayout,
-} from "@/components/SettingsColumns/SettingsColumns";
-import type { ReactNode } from "react";
-
 import { isDefined, matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay/formatSqlForDisplay";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
@@ -17,8 +10,12 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import { SqlReadOnlyBlock } from "@/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock";
 import { SqlSyncWarningNotes } from "@/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes";
-
 import css from "./SqlQueryView.module.css";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
+import type { ReactNode } from "react";
 
 const SQL_EDITOR_MIN_ROWS = 10;
 

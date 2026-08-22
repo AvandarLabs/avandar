@@ -1,13 +1,11 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconAdjustments } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ReactNode } from "react";
 
 type Props = {
   concept: Concept.T;

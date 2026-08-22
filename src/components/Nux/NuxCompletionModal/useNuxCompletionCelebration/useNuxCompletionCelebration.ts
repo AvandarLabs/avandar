@@ -1,10 +1,8 @@
-import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
-
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import { shouldCelebrateFirstDashboardCompletion } from "@/components/Nux/NuxCompletionModal/shouldCelebrateFirstDashboardCompletion/shouldCelebrateFirstDashboardCompletion";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
+import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
 
 type NuxCompletionCelebration = {
   isOpen: boolean;

@@ -1,9 +1,8 @@
+import { isArray, isPlainObject } from "@avandar/utils";
 import type {
   DescribableObject,
   PrimitiveValue,
 } from "./ObjectDescriptionList.types";
-
-import { isArray, isPlainObject } from "@avandar/utils";
 
 export function isPrimitiveDescribableValue(
   value: unknown,

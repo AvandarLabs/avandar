@@ -1,6 +1,5 @@
-import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
-
 import { useCallback, useState } from "react";
+import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 
 /**
  * Where the drawer is in its lifecycle. One value rather than a pair of

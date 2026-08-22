@@ -1,10 +1,9 @@
-import type { SelectData } from "@avandar/ui";
-
 import {
   AnyFormValues,
   SelectFieldSchema,
   TextFieldSchema,
 } from "@/components/forms/AvaForm/AvaForm.types";
+import type { SelectData } from "@avandar/ui";
 
 export const AvaField = {
   text: <

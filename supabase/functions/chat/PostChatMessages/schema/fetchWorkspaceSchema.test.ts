@@ -1,11 +1,10 @@
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-
 /**
  * Chat schema fetch must load concept names even when the workspace has no
  * datasets, and must not pull attribute values.
  */
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { describe, expect, it } from "vitest";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 function createFakeClient(rowsByTable: Record<string, unknown[]>): {
   supabaseClient: AvaSupabaseClient;

@@ -1,6 +1,3 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
@@ -12,8 +9,9 @@ import {
 } from "@mantine/core";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
-
 import css from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.module.css";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   feature: AvaMapConfig.AnnotationFeature;

@@ -1,18 +1,16 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { ParseManualFileOptions } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
-
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
-
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifyError } from "@/utils/notifications/notify";
 import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import { useLoadManualUploadFile } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
+import type { ParseManualFileOptions } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 
 type LoadFile = ReturnType<typeof useLoadManualUploadFile>["loadFile"];
 

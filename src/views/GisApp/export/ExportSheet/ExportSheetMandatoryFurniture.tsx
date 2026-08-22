@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
-
 import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Stack } from "@mantine/core";
+import type { ReactNode } from "react";
 
 /**
  * The three furniture rows the export can never omit: source attribution,

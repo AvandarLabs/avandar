@@ -1,15 +1,9 @@
-import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
-import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
-
 import { useMutation } from "@avandar/query-hooks";
 import { ActionIcon } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
-
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
@@ -21,6 +15,10 @@ import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;

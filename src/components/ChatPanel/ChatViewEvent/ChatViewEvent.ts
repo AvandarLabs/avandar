@@ -1,7 +1,6 @@
+import { prop } from "@avandar/utils";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ThreadMessageLike } from "@assistant-ui/react";
-
-import { prop } from "@avandar/utils";
 
 /** Route-scoped view snapshot for hidden chat view-change messages. */
 export type ChatViewSnapshot = {

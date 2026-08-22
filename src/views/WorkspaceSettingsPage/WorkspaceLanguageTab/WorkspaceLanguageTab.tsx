@@ -1,8 +1,5 @@
-import type { SupportedLocale } from "@/i18n/locales";
-
 import { Trans } from "@lingui/react/macro";
 import { Card, Group, Radio, Stack, Text, Title } from "@mantine/core";
-
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
   isSupportedLocale,
@@ -10,6 +7,7 @@ import {
   SUPPORTED_LOCALES,
 } from "@/i18n/locales";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
+import type { SupportedLocale } from "@/i18n/locales";
 
 /**
  * Workspace-scoped language picker. The selection is persisted per workspace

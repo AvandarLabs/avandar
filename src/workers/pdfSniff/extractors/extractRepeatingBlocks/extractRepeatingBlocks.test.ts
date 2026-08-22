@@ -1,8 +1,6 @@
-import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { extractRepeatingBlocks } from "./extractRepeatingBlocks";
+import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
 
 function items(
   lines: ReadonlyArray<readonly [string, number, string?]>,

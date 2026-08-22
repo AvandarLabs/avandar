@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import { abortDuckDbQuery } from "./abortDuckDbQuery";
 
 describe("abortDuckDbQuery", () => {

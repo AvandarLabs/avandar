@@ -1,6 +1,5 @@
 /** Dashboard blocks queue only when a dashboard id is known. */
 import { describe, expect, it } from "vitest";
-
 import { shouldQueueDashboardBlock } from "./shouldQueueDashboardBlock";
 
 describe("shouldQueueDashboardBlock", () => {

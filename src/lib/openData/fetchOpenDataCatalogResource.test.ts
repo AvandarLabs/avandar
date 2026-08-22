@@ -1,10 +1,8 @@
 /** Tests the open-data edge-function proxy the browser uses for CKAN bytes. */
 
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
+import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 
 const CATALOG_ENTRY_ID =
   "55555555-5555-4555-8555-555555555555" as OpenDataCatalogEntry.Id;

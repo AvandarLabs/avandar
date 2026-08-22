@@ -1,15 +1,13 @@
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
-import type { ReactElement } from "react";
-
 import { createUsePuck } from "@puckeditor/core";
 import { useMemo } from "react";
-
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { ReactElement } from "react";
 
 const usePuckSelector = createUsePuck();
 

@@ -1,5 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 import { NavLinkList } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
@@ -16,7 +14,6 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
-
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
@@ -25,6 +22,7 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   datasets: Dataset.T[];

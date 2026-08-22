@@ -1,3 +1,9 @@
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { objectKeys } from "@avandar/utils";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { isDesktop } from "$/platform/isDesktop";
 import type {
   AnalyticsApp,
   ClientAnalyticsEvent,
@@ -6,14 +12,6 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ServiceClient } from "@avandar/clients";
 import type { WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
-
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { withQueryHooks } from "@avandar/query-hooks";
-import { objectKeys } from "@avandar/utils";
-
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { isDesktop } from "$/platform/isDesktop";
 
 /**
  * A client-emitted event plus its optional scoping. `ClientAnalyticsEvent` is

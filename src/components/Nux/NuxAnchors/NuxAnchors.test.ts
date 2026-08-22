@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 const _ZERO_RECT = {

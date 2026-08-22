@@ -1,21 +1,4 @@
-import type {
-  CsvParseResolvedOptions,
-  CsvParseUserHints,
-  DuckDbSniffCsvRow,
-} from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type {
-  CsvParseAttemptState,
-  SniffCsvWithDuckDbResult,
-} from "@/clients/DuckDbClient/csvParse/csvSniff";
-import type {
-  DuckDbRejectedRow,
-  DuckDbScan,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-
 import { isNonEmptyArray } from "@avandar/utils";
-
 import {
   DEFAULT_CSV_ESCAPE_CHAR,
   DEFAULT_CSV_QUOTE_CHAR,
@@ -32,6 +15,21 @@ import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvA
 import { sniffCsvWithDuckDb } from "@/clients/DuckDbClient/csvParse/csvSniff";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import { Logger } from "@/utils/Logger";
+import type {
+  CsvParseResolvedOptions,
+  CsvParseUserHints,
+  DuckDbSniffCsvRow,
+} from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type {
+  CsvParseAttemptState,
+  SniffCsvWithDuckDbResult,
+} from "@/clients/DuckDbClient/csvParse/csvSniff";
+import type {
+  DuckDbRejectedRow,
+  DuckDbScan,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 
 type RunCsvParseAttemptsOptions = {
   client: DuckDbClientOperations;

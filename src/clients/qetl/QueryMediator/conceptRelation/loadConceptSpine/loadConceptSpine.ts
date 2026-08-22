@@ -1,11 +1,9 @@
-import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn";
+import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
 /**
  * The spine table's name suffix, and the one column it carries.

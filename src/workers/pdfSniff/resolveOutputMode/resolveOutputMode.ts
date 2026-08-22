@@ -1,10 +1,9 @@
-import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
-import type { ExtractedTable, PdfRegionShape } from "../pdfSniff.types";
-
 import {
   canKeepPrintedColumns,
   getPopulatedTables,
 } from "../combineRegions/combineRegions";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
+import type { ExtractedTable, PdfRegionShape } from "../pdfSniff.types";
 
 /** Why keeping the printed columns is not on offer. */
 export type PdfKeepBlockedReason = "no_rows" | "mixed_columns";

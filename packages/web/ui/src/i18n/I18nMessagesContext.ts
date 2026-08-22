@@ -1,7 +1,6 @@
-import type { I18nMessages } from "@ui/i18n/i18nMessages";
-
 import { defaultI18nMessages } from "@ui/i18n/i18nMessages";
 import { createContext } from "react";
+import type { I18nMessages } from "@ui/i18n/i18nMessages";
 
 /**
  * Carries the active translations to every AvaUI component.

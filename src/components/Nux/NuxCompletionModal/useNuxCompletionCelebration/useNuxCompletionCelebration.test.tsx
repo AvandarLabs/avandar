@@ -1,14 +1,12 @@
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
-
 import { act } from "react";
 import { describe, expect, it } from "vitest";
-
 import { useNuxCompletionCelebration } from "@/components/Nux/NuxCompletionModal/useNuxCompletionCelebration/useNuxCompletionCelebration";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { render, screen } from "@/test-utils";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
 
 function CelebrationProbe(): ReactNode {
   const { isOpen, onClose } = useNuxCompletionCelebration();

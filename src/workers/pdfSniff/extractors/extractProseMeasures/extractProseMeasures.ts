@@ -1,3 +1,5 @@
+import { extractMeasurements } from "../../extractMeasurements/extractMeasurements";
+import { groupLines } from "../../groupLines/groupLines";
 import type {
   BBox,
   ExtractedTable,
@@ -5,9 +7,6 @@ import type {
   RegionGeometry,
   TextLine,
 } from "../../pdfSniff.types";
-
-import { extractMeasurements } from "../../extractMeasurements/extractMeasurements";
-import { groupLines } from "../../groupLines/groupLines";
 
 /**
  * Below this fraction of the region's numerals appearing in extracted rows,

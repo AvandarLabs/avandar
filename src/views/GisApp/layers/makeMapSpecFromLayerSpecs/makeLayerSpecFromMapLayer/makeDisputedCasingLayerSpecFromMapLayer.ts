@@ -1,8 +1,7 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 /** Casing width, in pixels. Wide enough to read as a distinct line. */
 const CASING_WIDTH_PX = 1.5;

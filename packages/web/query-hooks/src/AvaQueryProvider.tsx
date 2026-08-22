@@ -1,11 +1,10 @@
-import type { AvaQueryErrorReporter } from "@query-hooks/ErrorReporterContext";
-import type { ReactElement, ReactNode } from "react";
-
 import {
   defaultReportError,
   ErrorReporterContext,
 } from "@query-hooks/ErrorReporterContext";
 import { useMemo } from "react";
+import type { AvaQueryErrorReporter } from "@query-hooks/ErrorReporterContext";
+import type { ReactElement, ReactNode } from "react";
 
 /**
  * Supplies configuration to `@avandar/query-hooks` hooks.

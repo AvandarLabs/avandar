@@ -1,3 +1,6 @@
+import { Trans } from "@lingui/react";
+import { Anchor } from "@mantine/core";
+import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
 import type {
@@ -7,11 +10,6 @@ import type {
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
 import type { Step } from "react-joyride";
-
-import { Trans } from "@lingui/react";
-import { Anchor } from "@mantine/core";
-
-import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 /**
  * What a tour step stashes on Joyride's untyped `step.data`.

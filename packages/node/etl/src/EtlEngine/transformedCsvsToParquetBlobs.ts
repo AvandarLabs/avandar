@@ -1,9 +1,8 @@
-import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
-
-import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
+import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
+import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /**
  * Column metadata for CSV → Parquet conversion (DuckDB cast names).

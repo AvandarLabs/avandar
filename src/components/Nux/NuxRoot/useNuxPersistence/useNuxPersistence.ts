@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 

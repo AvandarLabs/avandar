@@ -1,3 +1,17 @@
+import { Model } from "@avandar/models";
+import { isDefined, propEq } from "@avandar/utils";
+import { uuid } from "$/lib/uuid.ts";
+import {
+  areDisputedStatusValuesDisjoint,
+  canBindDisputedStatus,
+  EMPTY_DISPUTED_STATUS_VALUES,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
+import {
+  QueryColumn, // prettier-ignore
+} from "$/models/queries/QueryColumn/QueryColumn.ts";
+import {
+  StructuredQuery, // prettier-ignore
+} from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type {
   AreaGeoBinding,
   GeoBindingColumnNames, // prettier-ignore
@@ -14,22 +28,6 @@ import type {
 import type {
   QueryDataSource, // prettier-ignore
 } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
-
-import { Model } from "@avandar/models";
-import { isDefined, propEq } from "@avandar/utils";
-
-import { uuid } from "$/lib/uuid.ts";
-import {
-  areDisputedStatusValuesDisjoint,
-  canBindDisputedStatus,
-  EMPTY_DISPUTED_STATUS_VALUES,
-} from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
-import {
-  QueryColumn, // prettier-ignore
-} from "$/models/queries/QueryColumn/QueryColumn.ts";
-import {
-  StructuredQuery, // prettier-ignore
-} from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
 /** Fallback symbol color when the author has not picked one. */
 const DEFAULT_SYMBOL_COLOR = "#3b82f6";

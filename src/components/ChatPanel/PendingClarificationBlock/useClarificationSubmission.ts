@@ -1,18 +1,15 @@
+import { useThreadRuntime } from "@assistant-ui/react";
+import { useCallback } from "react";
+import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
+import { resolveClarificationAnswer } from "./resolveClarificationAnswer";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-
-import { useThreadRuntime } from "@assistant-ui/react";
-import { useCallback } from "react";
-
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
-import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
-
-import { resolveClarificationAnswer } from "./resolveClarificationAnswer";
 
 /** Builds the submit handler for one pending clarification request. */
 export function useClarificationSubmission(

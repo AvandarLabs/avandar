@@ -1,9 +1,8 @@
+import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { ReactNode } from "react";
-
-import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 
 type Props = {
   queryColumns: StructuredQuery.Partial["queryColumns"];

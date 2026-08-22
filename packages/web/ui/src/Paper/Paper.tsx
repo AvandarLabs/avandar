@@ -1,7 +1,6 @@
+import { Paper as MantinePaper } from "@mantine/core";
 import type { PaperProps } from "@mantine/core";
 import type { ReactNode } from "react";
-
-import { Paper as MantinePaper } from "@mantine/core";
 
 type Props = {
   children?: ReactNode;

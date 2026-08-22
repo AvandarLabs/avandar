@@ -1,3 +1,6 @@
+import { match } from "ts-pattern";
+import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
+import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -16,11 +19,6 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-import { match } from "ts-pattern";
-
-import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
-import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
 
 const LEGEND_POSITION_OPTIONS = [
   { value: "top", label: "Top" },

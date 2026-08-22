@@ -1,7 +1,6 @@
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-
 import { logAnalyticsEvent } from "@sbfn/_shared/analytics/logAnalyticsEvent/logAnalyticsEvent.ts";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 type FakeClient = {
   client: AvaSupabaseClient;

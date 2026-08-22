@@ -1,9 +1,6 @@
-import type { BBox, ExtractedTable, PageGeometry } from "./pdfSniff.types";
-
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-
 import { classifyRegion } from "./classifyRegion/classifyRegion";
 import { clipToRegion } from "./clipToRegion/clipToRegion";
 import { combineRegions } from "./combineRegions/combineRegions";
@@ -13,6 +10,7 @@ import { extractProseMeasures } from "./extractors/extractProseMeasures/extractP
 import { extractRepeatingBlocks } from "./extractors/extractRepeatingBlocks/extractRepeatingBlocks";
 import { extractPageGeometry } from "./extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "./loadPdfDocument/loadPdfDocument";
+import type { BBox, ExtractedTable, PageGeometry } from "./pdfSniff.types";
 
 /*
  * The executable merge gate.

@@ -1,6 +1,5 @@
-import type { SupabaseRestClient } from "../../SupabaseRest";
-
 import { mock } from "bun:test";
+import type { SupabaseRestClient } from "../../SupabaseRest";
 
 /**
  * A `SupabaseRestClient` that answers from a fixed table-to-rows map, plus the

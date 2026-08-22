@@ -1,10 +1,8 @@
-import type { RoleLevel } from "$/models/Permissions/Permissions";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
+import type { RoleLevel } from "$/models/Permissions/Permissions";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 
 const _ROLE_RANK = {
   viewer: 1,

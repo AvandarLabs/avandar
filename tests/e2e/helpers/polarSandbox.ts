@@ -1,8 +1,6 @@
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-
 import { Polar } from "@polar-sh/sdk";
-
 import { getSubscriptionRowForWorkspaceSlug } from "./subscriptionAssertions";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 type PolarServerType = "sandbox" | "production";
 

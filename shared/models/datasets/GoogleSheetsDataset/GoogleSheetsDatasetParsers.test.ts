@@ -1,8 +1,6 @@
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.ts";
-
 import { describe, expect, it } from "vitest";
-
 import { GoogleSheetsDatasetParsers } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDatasetParsers.ts";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.ts";
 
 /**
  * A Google account id as the database actually stores it.

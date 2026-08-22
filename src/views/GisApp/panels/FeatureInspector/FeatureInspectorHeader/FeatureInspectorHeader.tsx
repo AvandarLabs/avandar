@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { ActionIcon } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Group, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   onClose: () => void;

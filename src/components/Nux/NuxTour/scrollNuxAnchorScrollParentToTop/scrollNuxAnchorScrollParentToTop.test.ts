@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { scrollNuxAnchorScrollParentToTop } from "@/components/Nux/NuxTour/scrollNuxAnchorScrollParentToTop/scrollNuxAnchorScrollParentToTop";
 
 describe("scrollNuxAnchorScrollParentToTop", () => {

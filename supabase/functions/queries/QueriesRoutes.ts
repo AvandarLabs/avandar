@@ -1,12 +1,10 @@
-import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types.ts";
-
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { z } from "zod";
-
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+import type { QueriesAPI } from "@sbfn/queries/QueriesRoutes.types.ts";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 if (!openaiApiKey) {

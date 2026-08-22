@@ -5,7 +5,6 @@
  * pattern in `SeriesRenderer.props.test.tsx`.
  */
 import { describe, expect, it } from "vitest";
-
 import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 
 describe("getAreaStackingFromLayout", () => {

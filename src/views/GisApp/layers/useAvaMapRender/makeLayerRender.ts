@@ -1,13 +1,3 @@
-import type {
-  createLayerGeometryCache,
-  LayerGeometry,
-} from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
-import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
@@ -18,6 +8,15 @@ import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { classifyLayerGeometry } from "@/views/GisApp/layers/useAvaMapRender/classifyLayerGeometry";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { makeLayerViewState } from "@/views/GisApp/layers/useAvaMapRender/makeLayerViewState";
+import type {
+  createLayerGeometryCache,
+  LayerGeometry,
+} from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
+import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 
 type LayerRender = {
   layerId: MapLayer.Id;

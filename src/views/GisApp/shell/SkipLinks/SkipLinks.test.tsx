@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { SkipLinks } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";

@@ -1,6 +1,5 @@
-import type { BBox, ExtractedTable } from "../../pdfSniff.types";
-
 import { z } from "zod";
+import type { BBox, ExtractedTable } from "../../pdfSniff.types";
 
 const MeasurementSchema = z.object({
   subject: z.string().nullable(),

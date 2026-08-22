@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 
 /**

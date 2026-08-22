@@ -1,9 +1,8 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-
 import {
   pickCategoryColumnName,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type XYAxesConfig = {
   xAxisKey: string | undefined;

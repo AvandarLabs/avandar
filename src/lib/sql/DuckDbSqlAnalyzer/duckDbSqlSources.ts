@@ -1,13 +1,3 @@
-import type {
-  CteAlias,
-  DuckDbSqlAnalysis,
-  DuckDbUnsafeSqlReason,
-  IdentifierParts,
-  NestedSqlAnalyzer,
-  SourceAnalysis,
-  SqlToken,
-} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import {
   getTableNameFromRowNumberedViewName,
@@ -33,6 +23,15 @@ import {
   getParenthesisDepths,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type {
+  CteAlias,
+  DuckDbSqlAnalysis,
+  DuckDbUnsafeSqlReason,
+  IdentifierParts,
+  NestedSqlAnalyzer,
+  SourceAnalysis,
+  SqlToken,
+} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 type TableFunctionOptions = {
   functionNameIndex: number;

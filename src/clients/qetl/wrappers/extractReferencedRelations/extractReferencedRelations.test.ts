@@ -1,7 +1,6 @@
 /** Tests the adapter from DuckDB SQL analysis to referenced relations. */
 
 import { describe, expect, it } from "vitest";
-
 import { extractReferencedRelations } from "@/clients/qetl/wrappers/extractReferencedRelations/extractReferencedRelations";
 
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6";

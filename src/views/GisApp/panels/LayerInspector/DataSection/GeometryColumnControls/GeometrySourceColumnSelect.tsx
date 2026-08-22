@@ -1,13 +1,11 @@
+import { Model } from "@avandar/models";
+import { useLingui } from "@lingui/react/macro";
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
-
-import { Model } from "@avandar/models";
-import { useLingui } from "@lingui/react/macro";
-
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 
 type Props = {
   layer: MapLayer.T;

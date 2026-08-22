@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
-
 import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { LoadingOverlay, Stack, Text, Title } from "@mantine/core";
+import type { ReactNode } from "react";
 
 /** Shown while the dashboard's published datasets are still downloading. */
 export function DashboardLoadingState(): ReactNode {

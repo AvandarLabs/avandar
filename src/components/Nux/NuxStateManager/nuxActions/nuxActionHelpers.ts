@@ -1,13 +1,11 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-
 import { propEq } from "@avandar/utils";
-
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { getVisibleNuxSteps } from "@/components/Nux/tutorials/getVisibleNuxSteps/getVisibleNuxSteps";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 
 /** Drops `key` from a milestone-key list. */
 export function withoutMilestoneKey(

@@ -1,3 +1,6 @@
+import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
+import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
+import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
@@ -7,10 +10,6 @@ import type {
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
-
-import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
-import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
-import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 

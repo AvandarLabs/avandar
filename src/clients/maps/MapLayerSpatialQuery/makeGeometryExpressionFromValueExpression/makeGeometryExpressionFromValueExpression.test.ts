@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { makeGeometryExpressionFromValueExpression } from "./makeGeometryExpressionFromValueExpression";
 
 describe("makeGeometryExpressionFromValueExpression", () => {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getVisibleAsideWidthPx } from "@/components/Nux/NuxChecklistPanel/getVisibleAsideWidthPx/getVisibleAsideWidthPx";
 
 describe("getVisibleAsideWidthPx", () => {

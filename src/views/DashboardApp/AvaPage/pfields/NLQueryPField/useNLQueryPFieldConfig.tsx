@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
-
 import {
   NLQuery,
   NLQueryPField,

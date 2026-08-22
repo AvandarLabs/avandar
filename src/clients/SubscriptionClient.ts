@@ -1,9 +1,8 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { APIClient } from "@/clients/APIClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export const SubscriptionClient = createUsableServiceClient(
   createRdbCrudClient({

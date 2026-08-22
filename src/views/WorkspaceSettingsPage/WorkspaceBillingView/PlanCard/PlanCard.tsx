@@ -1,12 +1,3 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type {
-  FreePlanVariants,
-  FreeSubscriptionPlanGroup,
-  PaidPlanVariants,
-  PaidSubscriptionPlanGroup,
-  SubscriptionPlan,
-} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-
 import { getCurrentUrl } from "@avandar/browser-utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -22,7 +13,6 @@ import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { match } from "ts-pattern";
-
 import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
@@ -42,6 +32,14 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type {
+  FreePlanVariants,
+  FreeSubscriptionPlanGroup,
+  PaidPlanVariants,
+  PaidSubscriptionPlanGroup,
+  SubscriptionPlan,
+} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 type Props = {
   workspaceId: Workspace.Id;

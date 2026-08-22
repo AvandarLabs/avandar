@@ -1,16 +1,13 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-
 import { propEq } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle";
-
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { makeSpatialQueryPlan } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQueryHelpers";
 import { makeMetersCrsSql } from "../makeMetersCrsSql";
 import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
 
 function _getBufferBinding(layer: MapLayer.T): MapLayer.BufferOfLayerBinding {
   const binding = layer.geoBinding;

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { uuidType } from "$/lib/zodHelpers.ts";
 import {
   BasemapSchema,

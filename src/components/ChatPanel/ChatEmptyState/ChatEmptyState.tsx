@@ -1,5 +1,3 @@
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-
 import { useThreadRuntime } from "@assistant-ui/react";
 import { Link, TruncatedText } from "@avandar/ui";
 import { getRandomItem, matchLiteral, where } from "@avandar/utils";
@@ -7,7 +5,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useChatSuggestions";
@@ -15,8 +12,8 @@ import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-
 import css from "./ChatEmptyState.module.css";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
 /**
  * Returns the localized label for the page chip shown in the empty state.

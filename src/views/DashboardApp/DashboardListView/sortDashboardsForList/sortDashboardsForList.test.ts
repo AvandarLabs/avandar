@@ -1,8 +1,6 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { describe, expect, it } from "vitest";
-
 import { sortDashboardsForList } from "@/views/DashboardApp/DashboardListView/sortDashboardsForList/sortDashboardsForList";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 function makeDashboard(
   id: string,

@@ -3,7 +3,6 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks/AppLinks";

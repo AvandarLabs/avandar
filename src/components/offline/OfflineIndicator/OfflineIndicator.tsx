@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Group, Text } from "@mantine/core";
 import { IconWifiOff } from "@tabler/icons-react";
-
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 
 /**

@@ -1,7 +1,6 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { verifyAckToken } from "@sbfn/_shared/privacy/verifyAckToken.ts";
-
 import { hashTextPayload } from "$/utils/privacy/sessionSecretUtils.ts";
 
 type ConsentAck = {

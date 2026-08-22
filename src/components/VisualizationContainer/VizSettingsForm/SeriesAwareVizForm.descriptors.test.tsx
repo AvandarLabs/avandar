@@ -1,14 +1,3 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
-import type {
-  AnyChartSettingDescriptor,
-  AnySeriesSettingDescriptor,
-  ControlSpec,
-} from "$/models/vizs/SettingDescriptor";
-
 /**
  * Per-descriptor change-effect tests for `SeriesAwareVizForm`.
  *
@@ -21,12 +10,21 @@ import type {
  */
 import { getValue } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
+import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
+import type {
+  AnyChartSettingDescriptor,
+  AnySeriesSettingDescriptor,
+  ControlSpec,
+} from "$/models/vizs/SettingDescriptor";
 
 function readSetting(obj: unknown, key: string): unknown {
   return getValue(obj as never, key as never, { throwError: false });

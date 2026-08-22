@@ -1,10 +1,8 @@
 /** Tests QETL dataset leases through final DuckDB query execution. */
 
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const VIRTUAL_DATASET_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;

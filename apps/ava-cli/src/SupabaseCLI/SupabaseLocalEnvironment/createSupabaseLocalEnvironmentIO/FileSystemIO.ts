@@ -1,7 +1,3 @@
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
-import { propPasses } from "@avandar/utils";
 import {
   copyFile,
   lstat,
@@ -13,6 +9,9 @@ import {
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
+import { propPasses } from "@avandar/utils";
+import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 function _getAbsolutePathFromFilePath(filePath: string): string {
   if (!path.isAbsolute(filePath)) {

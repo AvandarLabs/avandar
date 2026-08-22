@@ -1,10 +1,4 @@
-import type {
-  RestorePaths,
-  RestorePreparation,
-  SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
+import path from "node:path";
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
@@ -15,7 +9,12 @@ import {
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseManifestPathChecks } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseManifestPathChecks";
 import { makeMap, makeSet, promiseMap, propEq } from "@avandar/utils";
-import path from "node:path";
+import type {
+  RestorePaths,
+  RestorePreparation,
+  SupabaseBackupManifest,
+  SupabaseLocalEnvironmentIO,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type DeterministicManifestFilesOptions = {
   manifest: SupabaseBackupManifest;

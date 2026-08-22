@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { LayerActionsMenu } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu";
 

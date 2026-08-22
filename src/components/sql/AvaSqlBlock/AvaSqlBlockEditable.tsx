@@ -1,16 +1,13 @@
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { ReactNode } from "react";
-
 import { EditorView } from "@codemirror/view";
 import clsx from "clsx";
 import { useMemo, useRef, useState } from "react";
-
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
-
 import css from "./AvaSqlBlock.module.css";
 import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { ReactNode } from "react";
 
 type EditableProps = {
   value: string;

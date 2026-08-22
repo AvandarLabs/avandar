@@ -1,10 +1,8 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Stack, Textarea, TextInput } from "@mantine/core";
-
 import { updateExportLayout } from "@/views/GisApp/export/ExportSheet/updateExportLayout";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   exportLayout: AvaMapConfig.ExportLayout;

@@ -1,7 +1,6 @@
-import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
-
 import { useDisclosure } from "@mantine/hooks";
 import { useCallback, useState } from "react";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 
 type FeatureInspectorState = {
   selectedFeature: GeoJSON.Feature | undefined;

@@ -1,8 +1,6 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 import { describe, expect, it } from "vitest";
-
 import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const textFeature = {
   id: "text-1" as AvaMapConfig.AnnotationFeatureId,

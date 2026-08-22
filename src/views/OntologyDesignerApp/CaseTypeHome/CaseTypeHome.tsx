@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Loader, Text, Title } from "@mantine/core";
-
 import { CaseTypeCard } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard";
 import css from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.module.css";
 import { NewCaseTypeCard } from "@/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard";
+import type { ReactNode } from "react";
 
 export type CaseTypeHomeItem = {
   id: string;

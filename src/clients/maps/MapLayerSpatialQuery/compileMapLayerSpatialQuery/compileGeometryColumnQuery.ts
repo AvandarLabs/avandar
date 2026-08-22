@@ -1,11 +1,5 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-import type { CompileSourceOptions } from "./compileMapLayerSpatialQuery.types";
-
 import { isDefined, prop } from "@avandar/utils";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
-
 import {
   makeOutputAoiPredicateSql,
   makeSourceAoiPredicateSql,
@@ -26,6 +20,10 @@ import {
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
 } from "./compileMapLayerSpatialQueryHelpers";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
+import type { CompileSourceOptions } from "./compileMapLayerSpatialQuery.types";
 
 type GeometryColumnBinding = Extract<
   MapLayer.GeoBinding,

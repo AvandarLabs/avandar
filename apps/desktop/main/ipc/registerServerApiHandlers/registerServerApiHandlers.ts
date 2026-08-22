@@ -1,7 +1,6 @@
+import { ServerApiContracts } from "../../../../../shared/platform/ipc/contracts/ServerApiContracts";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 import type { AuthState } from "../registerAuthHandlers/registerAuthHandlers";
-
-import { ServerApiContracts } from "../../../../../shared/platform/ipc/contracts/ServerApiContracts";
 
 /*
  * Bun-main implementation of the Supabase server-API surface (PostgREST

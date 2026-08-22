@@ -1,8 +1,6 @@
-import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { useMemo, useSyncExternalStore } from "react";
-
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
+import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 /** Live explorer facts for the open tutorial's `when` conditions. */
 export function useNuxStepFacts(): NuxStepFacts {

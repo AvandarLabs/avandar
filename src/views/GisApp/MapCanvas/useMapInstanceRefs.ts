@@ -1,9 +1,7 @@
+import { useRef } from "react";
+import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { Map as MapLibreMap } from "maplibre-gl";
-
-import { useRef } from "react";
-
-import { EMPTY_MAP_SPEC } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 
 /** Creates the mutable refs owned by one MapLibre canvas instance. */
 export function useMapInstanceRefs(): MapInstanceRefs {

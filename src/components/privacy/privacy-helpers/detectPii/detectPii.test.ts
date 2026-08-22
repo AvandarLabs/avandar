@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 describe("detectPii", () => {

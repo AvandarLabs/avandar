@@ -1,14 +1,12 @@
+import { Select } from "@avandar/ui";
+import { useLingui } from "@lingui/react/macro";
+import { MultiSelect, TextInput } from "@mantine/core";
+import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type {
   LocalFilter,
   LocalFilterValue,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { ReactNode } from "react";
-
-import { Select } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { MultiSelect, TextInput } from "@mantine/core";
-
-import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 type Props = {
   filter: LocalFilter;

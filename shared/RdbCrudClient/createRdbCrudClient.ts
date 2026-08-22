@@ -1,3 +1,10 @@
+import {
+  createSqliteCrudClient,
+  createSupabaseCrudClient,
+} from "@avandar/clients";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { isDesktop } from "$/platform/isDesktop.ts";
+import { ipcSqliteTransport } from "$/RdbCrudClient/ipcSqliteTransport.ts";
 import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type {
   AnySupabaseCrudModelSpec,
@@ -5,15 +12,6 @@ import type {
   SupabaseCrudClient,
 } from "@avandar/clients";
 import type { EmptyObject } from "type-fest";
-
-import {
-  createSqliteCrudClient,
-  createSupabaseCrudClient,
-} from "@avandar/clients";
-
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
-import { isDesktop } from "$/platform/isDesktop.ts";
-import { ipcSqliteTransport } from "$/RdbCrudClient/ipcSqliteTransport.ts";
 
 /**
  * Platform-aware CRUD client factory.

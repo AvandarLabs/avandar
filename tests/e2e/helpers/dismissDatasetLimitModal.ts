@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { MEDIUM_WAIT } from "./timeouts";
+import type { Page } from "@playwright/test";
 
 /**
  * Closes the dataset-cap modal so later assertions can read the page. Upload

@@ -1,11 +1,8 @@
-import type { ThreadMessageLike } from "@assistant-ui/react";
-
 /** Behavioral tests for the live chat thread localStorage slot. */
 import { afterEach, describe, expect, it } from "vitest";
-
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
-
 import { ChatThreadStore } from "./ChatThreadStore";
+import type { ThreadMessageLike } from "@assistant-ui/react";
 
 const WORKSPACE_ID = "ws-1";
 const USER_ID = "user-1";

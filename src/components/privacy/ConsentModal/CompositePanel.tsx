@@ -1,14 +1,12 @@
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
 import { Trans } from "@lingui/react/macro";
 import { Alert, Checkbox, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-
 import { BiasHitBadges } from "./BiasHitBadges";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 type Props = {
   /** PII findings driving the warning. */

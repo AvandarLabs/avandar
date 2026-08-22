@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getLayerStatsFromFeatureCollection } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 
 function _createCollection(

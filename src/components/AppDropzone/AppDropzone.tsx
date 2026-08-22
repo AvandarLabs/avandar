@@ -1,13 +1,11 @@
-import type { ReactNode } from "react";
-
 import { MIMEType } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
-
 import classes from "./AppDropzone.module.css";
 import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
+import type { ReactNode } from "react";
 
 const ACCEPTED_MIME_TYPES = [
   MIMEType.TEXT_CSV,

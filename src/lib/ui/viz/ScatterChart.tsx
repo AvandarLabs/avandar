@@ -1,14 +1,12 @@
+import { ScatterChart as MantineScatterChart } from "@mantine/charts";
+import { useMemo } from "react";
+import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
-
-import { ScatterChart as MantineScatterChart } from "@mantine/charts";
-import { useMemo } from "react";
-
-import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 
 type Props = {
   data: UnknownDataFrame;

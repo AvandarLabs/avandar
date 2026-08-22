@@ -1,12 +1,10 @@
+import { makeBucketRecord } from "@avandar/utils";
+import { isGlobalSchemaShape } from "./parse";
 import type {
   PartitionResult,
   PartitionStatementsOptions,
   Statement,
 } from "./types";
-
-import { makeBucketRecord } from "@avandar/utils";
-
-import { isGlobalSchemaShape } from "./parse";
 
 function _getStatementPartition(
   options: Readonly<{

@@ -1,3 +1,9 @@
+import { Paper } from "@avandar/ui";
+import { Trans } from "@lingui/react/macro";
+import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
+import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
+import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type {
@@ -6,14 +12,6 @@ import type {
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactElement } from "react";
-
-import { Paper } from "@avandar/ui";
-import { Trans } from "@lingui/react/macro";
-import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
-
-import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
-import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilters";
-import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
 
 type Props = {
   prompt: string;

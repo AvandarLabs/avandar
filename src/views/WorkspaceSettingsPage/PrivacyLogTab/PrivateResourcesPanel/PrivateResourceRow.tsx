@@ -1,7 +1,6 @@
-import type { PrivateResourceCount } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Table } from "@mantine/core";
+import type { PrivateResourceCount } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
 
 type Props = {
   privateResourceCount: PrivateResourceCount;

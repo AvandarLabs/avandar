@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 describe("AppLinks map destinations", () => {

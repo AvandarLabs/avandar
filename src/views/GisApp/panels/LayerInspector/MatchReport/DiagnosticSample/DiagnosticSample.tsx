@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import css from "./DiagnosticSample.module.css";
+import type { ReactNode } from "react";
 
 type Props = { values: readonly string[] | undefined };
 

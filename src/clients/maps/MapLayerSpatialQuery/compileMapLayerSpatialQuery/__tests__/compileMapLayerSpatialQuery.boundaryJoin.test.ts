@@ -1,21 +1,18 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
-
 import { describe, expect, it } from "vitest";
-
 /**
  * Boundary-join compilation for compileMapLayerSpatialQuery.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
   createGeometryLayerFixture,
   withAoiOverlay,
   withEmptyOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
 
 function _createBoundaryJoinLayer(
   fixture: ReturnType<typeof createGeometryLayerFixture>,

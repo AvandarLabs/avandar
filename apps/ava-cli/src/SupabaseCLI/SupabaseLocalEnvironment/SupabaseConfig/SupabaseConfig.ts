@@ -1,9 +1,8 @@
+import { EnvFileLine } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
 import type {
   SupabaseConfigState,
   SupabaseLocalStatus,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-import { EnvFileLine } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
 
 const PROJECT_ID_PATTERN = /^(\s*project_id\s*=\s*)"([^"]+)"(\s*(?:#.*)?)$/;
 const SECTION_PATTERN = /^\s*\[([^\]]+)\]\s*(?:#.*)?$/;

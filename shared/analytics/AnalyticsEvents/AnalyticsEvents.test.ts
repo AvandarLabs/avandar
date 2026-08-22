@@ -1,3 +1,5 @@
+import { describe, expect, expectTypeOf, it } from "vitest";
+import { ANALYTICS_EVENT_NAMES } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 import type {
   AnalyticsEventPayloads,
   ChatTurnErrorClass,
@@ -7,10 +9,6 @@ import type {
   QueryErrorClass,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
 import type { Database } from "$/types/database.types.ts";
-
-import { describe, expect, expectTypeOf, it } from "vitest";
-
-import { ANALYTICS_EVENT_NAMES } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 
 type FeaturePlanType =
   Database["public"]["Enums"]["subscriptions__feature_plan_type"];

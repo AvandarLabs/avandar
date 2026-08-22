@@ -1,6 +1,5 @@
-import type { SupabaseConfigState } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
 import { objectValuesMap, promiseMap, propEq } from "@avandar/utils";
+import type { SupabaseConfigState } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const MIN_PORT = 1;
 const MAX_PORT = 65_535;

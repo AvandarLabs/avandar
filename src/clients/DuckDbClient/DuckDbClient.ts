@@ -1,26 +1,3 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { SniffCsvOptions } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type {
-  DuckDbColumnSchema,
-  DuckDbCsvSniffResult,
-  DuckDbLoadCsvResult,
-  DuckDbLoadParquetResult,
-  DuckDbLoadXlsxResult,
-  DuckDbStructuredQuery,
-  UnknownRow,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  DuckDbClientOperations,
-  DuckDbLoadParquetOptions,
-  RawQueryOptions,
-} from "@/clients/DuckDbClient/duckDbClientOperations";
-import type { DuckDbLoadCsvOptions } from "@/clients/DuckDbClient/duckDbCsvLoad";
-import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";
-import type { ILogger } from "@avandar/logger";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-
 import { sniffCsvFile } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { loadCsvIntoDuckDb } from "@/clients/DuckDbClient/duckDbCsvLoad";
@@ -43,6 +20,28 @@ import { loadXlsxIntoDuckDb } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import { makeDuckDbConnectionManager } from "@/clients/DuckDbClient/makeDuckDbConnectionManager";
 import { projectParquetBlob as projectParquetBlobWithClient } from "@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob";
 import { Logger } from "@/utils/Logger";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { SniffCsvOptions } from "@/clients/DuckDbClient/csvParse/sniffCsvFile";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type {
+  DuckDbColumnSchema,
+  DuckDbCsvSniffResult,
+  DuckDbLoadCsvResult,
+  DuckDbLoadParquetResult,
+  DuckDbLoadXlsxResult,
+  DuckDbStructuredQuery,
+  UnknownRow,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  DuckDbClientOperations,
+  DuckDbLoadParquetOptions,
+  RawQueryOptions,
+} from "@/clients/DuckDbClient/duckDbClientOperations";
+import type { DuckDbLoadCsvOptions } from "@/clients/DuckDbClient/duckDbCsvLoad";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";
+import type { ILogger } from "@avandar/logger";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 
 export type { DuckDbLoadCsvOptions } from "@/clients/DuckDbClient/duckDbCsvLoad";
 export type { DuckDbLoadXlsxOptions } from "@/clients/DuckDbClient/duckDbXlsxLoad";

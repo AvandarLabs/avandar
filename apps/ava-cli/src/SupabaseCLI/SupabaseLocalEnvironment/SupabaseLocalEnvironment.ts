@@ -1,3 +1,9 @@
+import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
+import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
+import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseDockerCleanup";
+import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseRestorePreparation";
+import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 import type {
   CommandResult,
   RestorePreparation,
@@ -8,13 +14,6 @@ import type {
   SupabaseSwitchResult,
   SwitchPreparation,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
-import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
-import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseDockerCleanup";
-import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseRestorePreparation";
-import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 
 type RollbackSwitchOptions = {
   io: SupabaseLocalEnvironmentIO;

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { UtmEpsg } from "./UtmEpsg";
 
 describe("UtmEpsg.fromLongitudeLatitude", () => {

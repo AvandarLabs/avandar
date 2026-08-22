@@ -1,12 +1,10 @@
+import { Get } from "type-fest";
+import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
   AvaPageData,
   AvaPageGenericData,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-
-import { Get } from "type-fest";
-
-import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
-import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 
 type MigrationFunction<
   InputData extends AvaPageGenericData,

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 /**
  * Paint decisions for a layer whose features are DuckDB-aggregated cells
  * rather than source rows.

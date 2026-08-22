@@ -1,6 +1,5 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
-
 import { makeMainNavbarLinksFromPermissions } from "@/components/layouts/RootLayout/makeMainNavbarLinksFromPermissions";
 
 describe("workspace navigation permissions", () => {

@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { RouteMiddleware } from "@/utils/RouteMiddleware";
 import { DataManagerApp } from "@/views/DataManagerApp/DataManagerApp";
 

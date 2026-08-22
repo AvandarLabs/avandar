@@ -1,11 +1,10 @@
+import { formatNumber } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Box, Stack, Text } from "@mantine/core";
 import type {
   AnnualPaidSeatsPlan,
   MonthlyPaidSeatsPlan,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-
-import { formatNumber } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
-import { Box, Stack, Text } from "@mantine/core";
 
 type Props = {
   discount: number | undefined;

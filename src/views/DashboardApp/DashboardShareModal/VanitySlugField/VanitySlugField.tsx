@@ -1,10 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Stack, Text, TextInput, Title } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-
 import css from "./VanitySlugField.module.css";
+import type { ReactNode } from "react";
 
 export type VanitySlugFieldProps = {
   slugInput: string;

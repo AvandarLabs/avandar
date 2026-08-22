@@ -1,13 +1,11 @@
+import { describe, expect, it } from "vitest";
+import { getCkanResourceFromPackage } from "$/open-data/getCkanResourceFromPackage.ts";
+import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 import type {
   CkanPackage,
   CkanResource,
 } from "$/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
-
-import { describe, expect, it } from "vitest";
-
-import { getCkanResourceFromPackage } from "$/open-data/getCkanResourceFromPackage.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 
 const BASE_URL = "https://data.humdata.org";
 const README_ID = "435ed157-6f7a-4e8f-a63a-2aa177b9bd05";

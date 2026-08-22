@@ -1,8 +1,6 @@
-import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { describe, expect, it } from "vitest";
-
 import { getVisibleNuxSteps } from "@/components/Nux/tutorials/getVisibleNuxSteps/getVisibleNuxSteps";
+import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 const ALWAYS: NuxStep = {
   anchor: "explorer-save-menu",

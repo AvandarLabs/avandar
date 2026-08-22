@@ -1,8 +1,6 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-
 import { constant, makeObject, prop, valEq } from "@avandar/utils";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 
 /** How many values an operator's editor collects. */
 export type QueryFilterValueArity = "none" | "scalar" | "list" | "pair";

@@ -1,3 +1,11 @@
+import { objectEntries, prop } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import * as arrow from "apache-arrow";
+import knex from "knex";
+import { match } from "ts-pattern";
+import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
@@ -8,16 +16,6 @@ import type {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { Knex } from "knex";
-
-import { objectEntries, prop } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import * as arrow from "apache-arrow";
-import knex from "knex";
-import { match } from "ts-pattern";
-
-import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 
 const sql = knex({
   client: "sqlite3",

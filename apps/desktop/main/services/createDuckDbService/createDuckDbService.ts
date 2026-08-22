@@ -14,9 +14,9 @@
  * so this module is just the typed shim over the callback-based binding.
  */
 
-import duckdb from "duckdb";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import duckdb from "duckdb";
 
 /**
  * Public surface of the native DuckDB service. The IPC handler layer is

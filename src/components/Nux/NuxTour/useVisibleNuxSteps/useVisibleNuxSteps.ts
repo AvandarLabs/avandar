@@ -1,11 +1,9 @@
-import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
-
 import { useMemo } from "react";
-
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxStepFacts } from "@/components/Nux/NuxTour/useNuxStepFacts";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { getVisibleNuxSteps } from "@/components/Nux/tutorials/getVisibleNuxSteps/getVisibleNuxSteps";
+import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
 
 /**
  * The open milestone's tooltips after applying live `when` conditions.

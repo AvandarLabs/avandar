@@ -1,7 +1,4 @@
-import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
-
 import { describe, expect, it } from "vitest";
-
 import {
   createCsvParseOptionsFromUserHints,
   mergeSniffCsvRowIntoParseOptions,
@@ -9,6 +6,7 @@ import {
   resolveParseOptionsAfterEmptyStagingLoad,
   shouldRetryCsvParse,
 } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
+import type { DuckDbRejectedRow } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 describe("refineCsvParseOptionsAfterFailure", () => {
   it("enables double-quote when rejects show column misalignment", () => {

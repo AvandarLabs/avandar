@@ -1,5 +1,3 @@
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -16,11 +14,11 @@ import {
 import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-
 import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv";
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 type FilterValue = "all" | ConsentAuditEntry.T["decision"];
 

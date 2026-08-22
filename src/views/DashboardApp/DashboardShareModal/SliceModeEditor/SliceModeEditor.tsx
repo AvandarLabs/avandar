@@ -1,14 +1,12 @@
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
-import type { ReactNode } from "react";
-
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-
 import { CustomSliceEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/CustomSliceEditor";
 import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardShareModal/QueriedSlicePreview";
 import { SliceModeOptions } from "@/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeOptions";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
+import type { ReactNode } from "react";
 
 type Props = {
   dataset: PublishSliceDataset;

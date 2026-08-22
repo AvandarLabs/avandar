@@ -1,14 +1,12 @@
+import { useLingui } from "@lingui/react/macro";
+import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
+import clsx from "clsx";
+import css from "./CaseTypeDraftCard.module.css";
 import type {
   ChatCaseValuePickerRuleType,
   ChatProposedCaseAttribute,
 } from "$/types/chat.types";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
-
-import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
-import clsx from "clsx";
-
-import css from "./CaseTypeDraftCard.module.css";
 
 type Props = {
   attribute: ChatProposedCaseAttribute;

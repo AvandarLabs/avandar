@@ -1,8 +1,7 @@
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { OpenDataContentKind } from "$/open-data/acquireOpenDataResource";
-
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 /** One catalog resource as the open-data edge function returns it. */
 export type FetchedOpenDataCatalogResource = {

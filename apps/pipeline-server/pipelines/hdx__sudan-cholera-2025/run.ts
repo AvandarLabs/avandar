@@ -1,8 +1,3 @@
-import type {
-  SudanCholeraCatalogEntry, // prettier-ignore
-} from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import {
   buildOpenDataCatalogRow, // prettier-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/buildOpenDataCatalogRow";
@@ -10,6 +5,10 @@ import {
   SUDAN_CHOLERA_CATALOG_ENTRIES, // prettier-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import { createClient } from "@supabase/supabase-js";
+import type {
+  SudanCholeraCatalogEntry, // prettier-ignore
+} from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Writes one catalog entry, replacing the existing row for the same resource.

@@ -1,10 +1,3 @@
-import type {
-  BBox,
-  ExtractedTable,
-  PdfCellFlag,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -16,8 +9,13 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-
 import css from "./PdfReviewGrid.module.css";
+import type {
+  BBox,
+  ExtractedTable,
+  PdfCellFlag,
+} from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode } from "react";
 
 type Props = {
   table: ExtractedTable;

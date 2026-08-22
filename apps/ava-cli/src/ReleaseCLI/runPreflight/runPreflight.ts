@@ -1,5 +1,3 @@
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
-
 import { describeCommandFailure } from "@ava-cli/ReleaseCLI/describeCommandFailure/describeCommandFailure";
 import {
   getCurrentBranch,
@@ -9,6 +7,7 @@ import {
   refExists,
   revParse,
 } from "@ava-cli/ReleaseCLI/releaseGitHelpers";
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /** The branch releases are cut from. */
 export const RELEASE_SOURCE_BRANCH = "develop";

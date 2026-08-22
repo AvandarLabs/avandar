@@ -1,8 +1,3 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { AppLink } from "@/config/AppLinks/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-import type { CSSProperties, ReactNode } from "react";
-
 import { useToggleBoolean } from "@avandar/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
@@ -14,7 +9,6 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
-
 import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
@@ -28,6 +22,10 @@ import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type { CSSProperties, ReactNode } from "react";
 
 // `-webkit-app-region: drag` is what Electrobun's preload detects on
 // mousedown to send `startWindowMove` to native. We render a real <div>

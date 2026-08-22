@@ -1,12 +1,11 @@
+import { callIpc } from "$/platform/ipc/client.ts";
+import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts.ts";
 import type {
   AuthCredentials,
   AuthProvider,
   Session,
   Unsubscribe,
 } from "$/platform/types/AuthProvider.types.ts";
-
-import { callIpc } from "$/platform/ipc/client.ts";
-import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts.ts";
 
 const listeners = new Set<(session: Session | undefined) => void>();
 

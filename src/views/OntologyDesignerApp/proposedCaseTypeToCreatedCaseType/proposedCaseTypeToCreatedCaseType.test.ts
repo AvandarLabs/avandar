@@ -1,5 +1,3 @@
-import type { ChatProposedCaseType } from "$/types/chat.types";
-
 /**
  * The draft card hands its edited state straight to the concept insert path, so
  * this conversion decides what actually gets persisted: which attributes
@@ -9,8 +7,8 @@ import type { ChatProposedCaseType } from "$/types/chat.types";
  * source is matched on are covered here too.
  */
 import { describe, expect, it } from "vitest";
-
 import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DEATHS_DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATASET_ID = "0f2c9f3e-bbbb-4bbb-8ccc-ddddeeeeffff";

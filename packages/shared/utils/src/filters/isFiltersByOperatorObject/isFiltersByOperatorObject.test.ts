@@ -1,10 +1,9 @@
+import { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
+import { describe, expect, it } from "vitest";
 import type {
   FiltersByColumn,
   FiltersByOperator,
 } from "@utils/filters/filters.ts";
-
-import { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
-import { describe, expect, it } from "vitest";
 
 type Row = { id: string };
 

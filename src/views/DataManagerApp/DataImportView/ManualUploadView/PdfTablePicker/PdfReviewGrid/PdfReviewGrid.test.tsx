@@ -1,10 +1,7 @@
-import type { ExtractedTable } from "@/workers/pdfSniff/pdfSniff.types";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
-
 import { PdfReviewGrid } from "./PdfReviewGrid";
+import type { ExtractedTable } from "@/workers/pdfSniff/pdfSniff.types";
 
 const TABLE: ExtractedTable = {
   regionId: "r1",

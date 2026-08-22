@@ -1,13 +1,11 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { __setIpcBridgeForTests, callIpc } from "$/platform/ipc/client.ts";
+import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
 import type { IpcBridge } from "$/platform/ipc/client.ts";
 import type {
   ReplyEnvelope,
   RequestEnvelope,
 } from "$/platform/ipc/envelopes.ts";
-
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { __setIpcBridgeForTests, callIpc } from "$/platform/ipc/client.ts";
-import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
 
 describe("callIpc", () => {
   const sendMock = vi.fn();

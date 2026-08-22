@@ -1,8 +1,6 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { describe, expect, it } from "vitest";
-
 import { classifyLayerValues } from "./classifyLayerValues";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const ramp = ["#fee", "#fcc", "#f99", "#f66", "#f00"];
 const noData = { color: "#ccc", label: "" };

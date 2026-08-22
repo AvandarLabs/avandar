@@ -1,11 +1,10 @@
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { Map as MapLibreMap } from "maplibre-gl";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { clipFreehandByEraser } from "@/views/GisApp/tools/clipFreehandByEraser/clipFreehandByEraser";
 import { hitTestAnnotation } from "@/views/GisApp/tools/hitTestAnnotation/hitTestAnnotation";
 import { makeFreehandAnnotationFeature } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 import { MAP_TOOL_ERASER_RADIUS_PX } from "@/views/GisApp/tools/MapToolGesture.constants";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { Map as MapLibreMap } from "maplibre-gl";
 
 type EraseCallbacks = {
   onMapToolModeChange: (mode: MapToolMode) => void;

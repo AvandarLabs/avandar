@@ -1,9 +1,8 @@
+import { prop } from "@avandar/utils";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
 } from "$/types/offlineChat.types";
-
-import { prop } from "@avandar/utils";
 
 export type MockOfflineChatResponse = {
   match: RegExp | string;

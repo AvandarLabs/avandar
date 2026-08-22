@@ -1,9 +1,8 @@
+import { isDefined } from "@avandar/utils";
 import type {
   QueryFilter,
   QueryFilterGroup,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
-import { isDefined } from "@avandar/utils";
 
 /** A pruned filter tree plus the column names whose rules were removed. */
 export type PruneFilterColumnsResult = {

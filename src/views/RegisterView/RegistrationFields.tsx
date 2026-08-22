@@ -1,9 +1,8 @@
+import { useLingui } from "@lingui/react/macro";
+import { PasswordInput, TextInput } from "@mantine/core";
 import type { RegistrationFormValues } from "@/views/RegisterView/RegisterView.types";
 import type { FormType } from "@avandar/ui/hooks";
 import type { ReactElement } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { PasswordInput, TextInput } from "@mantine/core";
 
 type Props = {
   registrationForm: FormType<RegistrationFormValues>;

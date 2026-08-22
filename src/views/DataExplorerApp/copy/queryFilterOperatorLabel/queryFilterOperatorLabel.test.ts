@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { queryFilterOperatorLabel } from "@/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel";
 

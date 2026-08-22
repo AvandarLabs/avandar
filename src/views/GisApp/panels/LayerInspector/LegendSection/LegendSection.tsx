@@ -1,14 +1,12 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { LegendNoDataSwitch } from "@/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch";
 import { LegendPositionSelect } from "@/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect";
 import { LegendTextControls } from "@/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 

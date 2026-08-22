@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { compare, formatDiff } from "./compare";
 
 describe("compare", () => {

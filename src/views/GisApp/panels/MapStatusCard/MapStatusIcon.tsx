@@ -1,6 +1,3 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { Loader } from "@mantine/core";
 import {
@@ -8,6 +5,8 @@ import {
   IconCircleX,
   IconInfoCircle,
 } from "@tabler/icons-react";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
 
 type Props = {
   status: MapLayerViewState["status"];

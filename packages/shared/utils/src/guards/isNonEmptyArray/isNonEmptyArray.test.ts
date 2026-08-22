@@ -1,7 +1,6 @@
-import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
-
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { describe, expect, it } from "vitest";
+import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
 
 describe("isNonEmptyArray", () => {
   it("returns true for non-empty arrays", () => {

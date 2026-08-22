@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Modal, Select, Stack, Text } from "@mantine/core";
-
 import { useReassignOwnerModal } from "./useReassignOwnerModal";
 
 type Props = {

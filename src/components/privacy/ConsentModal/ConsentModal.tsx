@@ -1,16 +1,14 @@
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { useState } from "react";
-
 import { BiasNudgePanel } from "./BiasNudgePanel";
 import { CleanPanel } from "./CleanPanel";
 import { CompositePanel } from "./CompositePanel";
 import { ConsentActions } from "./ConsentActions";
 import { MedicalStrictPanel } from "./MedicalStrictPanel";
 import { PiiWarningPanel } from "./PiiWarningPanel";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 /** Consent modal state selected by the privacy boundary. */
 export type ConsentModalMode =

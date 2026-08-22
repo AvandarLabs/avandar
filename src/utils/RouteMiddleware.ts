@@ -1,3 +1,10 @@
+import { propEq } from "@avandar/utils";
+import { redirect } from "@tanstack/react-router";
+import { Permissions } from "$/models/Permissions/Permissions";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
+import { UserClient } from "@/clients/UserClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AppLinks } from "@/config/AppLinks/AppLinks";
 import type {
   PermissionKey,
   RoleLevel,
@@ -5,15 +12,6 @@ import type {
 import type { User } from "$/models/User/User";
 import type { ResourceType } from "@/clients/UserClient";
 import type { QueryClient } from "@tanstack/react-query";
-
-import { propEq } from "@avandar/utils";
-import { redirect } from "@tanstack/react-router";
-
-import { Permissions } from "$/models/Permissions/Permissions";
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { UserClient } from "@/clients/UserClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 /**
  * Optional fallback for `checkUserPermissions` that lets a user reach a

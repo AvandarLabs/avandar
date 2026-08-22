@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardListView } from "@/views/DashboardApp/DashboardListView/DashboardListView";

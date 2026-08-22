@@ -9,7 +9,6 @@
  * each range that reaches the parent refetches every time-filtered layer.
  */
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 
 vi.mock("@mantine/core", async () => {

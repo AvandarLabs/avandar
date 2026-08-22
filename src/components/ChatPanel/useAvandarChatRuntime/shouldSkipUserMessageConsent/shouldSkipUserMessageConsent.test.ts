@@ -1,8 +1,6 @@
 /** View-change lines must not go through user-message bias/consent. */
 import { describe, expect, it } from "vitest";
-
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
-
 import { shouldSkipUserMessageConsent } from "./shouldSkipUserMessageConsent";
 
 describe("shouldSkipUserMessageConsent", () => {

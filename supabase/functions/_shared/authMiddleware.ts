@@ -1,5 +1,3 @@
-import type { User } from "@supabase/supabase-js";
-
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST, UNAUTHORIZED } from "@sbfn/_shared/httpCodes.ts";
 import { isRedirect } from "@sbfn/_shared/MiniServer/redirect.ts";
@@ -9,6 +7,7 @@ import {
   createSupabaseClient,
 } from "@sbfn/_shared/supabase.ts";
 import * as jose from "jsr:@panva/jose@6";
+import type { User } from "@supabase/supabase-js";
 
 const SUPABASE_JWT_ISSUER =
   Deno.env.get("SB_JWT_ISSUER") ?? Deno.env.get("SUPABASE_URL") + "/auth/v1";

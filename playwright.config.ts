@@ -1,7 +1,6 @@
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
-import path from "node:path";
-
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 import {
   ensureE2EViteFeatureFlags,

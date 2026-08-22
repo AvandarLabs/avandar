@@ -1,12 +1,6 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";
-import type { ShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
-import type { ReactNode } from "react";
-
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
-
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { SharingSettingsLoading } from "@/components/permissions/ShareResourceModal/SharingSettingsLoading";
 import { useShareButtonState } from "@/components/permissions/useShareButtonState";
@@ -17,6 +11,10 @@ import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/Publ
 import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal";
 import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";
+import type { ShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
+import type { ReactNode } from "react";
 
 type PublishingControl = ReturnType<typeof useDashboardPublishingControl>;
 

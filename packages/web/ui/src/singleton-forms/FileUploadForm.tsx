@@ -1,12 +1,10 @@
-import type { FileInputProps } from "@mantine/core";
-
 import { isArray, MIMEType } from "@avandar/utils";
 import { Box, Button, FileInput, Group } from "@mantine/core";
 import { useForm } from "@ui/hooks/useForm/useForm";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useRef, useState } from "react";
-
 import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
+import type { FileInputProps } from "@mantine/core";
 
 type Props = {
   /**

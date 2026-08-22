@@ -1,11 +1,9 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ReactNode } from "react";
 
 type Props = {
   isDeletingDataset: boolean;

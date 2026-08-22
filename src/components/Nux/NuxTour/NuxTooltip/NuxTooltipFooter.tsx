@@ -1,8 +1,7 @@
-import type { MouseEvent, ReactNode } from "react";
-import type { TooltipRenderProps } from "react-joyride";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
+import type { MouseEvent, ReactNode } from "react";
+import type { TooltipRenderProps } from "react-joyride";
 
 type Props = {
   backProps: TooltipRenderProps["backProps"];

@@ -1,7 +1,6 @@
+import { useLayoutEffect, useState } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Map as MapLibreMap } from "maplibre-gl";
-
-import { useLayoutEffect, useState } from "react";
 
 export type TextFeature = Extract<
   AvaMapConfig.AnnotationFeature,

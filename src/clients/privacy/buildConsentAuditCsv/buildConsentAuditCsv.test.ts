@@ -1,8 +1,6 @@
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
-
 import { describe, expect, it } from "vitest";
-
 import { buildConsentAuditCsv } from "./buildConsentAuditCsv";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const entry: ConsentAuditEntry.T = {
   id: "00000000-0000-4000-8000-000000000001" as ConsentAuditEntry.Id,

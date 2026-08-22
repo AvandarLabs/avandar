@@ -1,9 +1,7 @@
+import { isNonEmptyArray } from "@avandar/utils";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
-
-import { isNonEmptyArray } from "@avandar/utils";
-
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 type XYSeriesConfig = {
   xAxisKey: string | undefined;

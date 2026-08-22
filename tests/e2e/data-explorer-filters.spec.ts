@@ -1,5 +1,3 @@
-import type { Page } from "@playwright/test";
-
 /**
  * Filter semantics, driven through the filter panel.
  *
@@ -32,6 +30,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import type { Page } from "@playwright/test";
 
 const DATASET_NAME = "small-california-covid-sample.csv";
 

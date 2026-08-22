@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 /**
  * Offline prompts must show short table aliases, never dataset UUIDs.
  */

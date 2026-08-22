@@ -1,8 +1,6 @@
-import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { FreeTextBody } from "../FreeTextBody";
+import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   onSubmit: (answer: ClarificationSubmitAnswer) => void;

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { isNuxMilestoneRouteCurrent } from "@/components/Nux/NuxRoot/isNuxMilestoneRouteCurrent/isNuxMilestoneRouteCurrent";
 
 const WORKSPACE_SLUG = "acme";

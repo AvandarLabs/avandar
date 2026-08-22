@@ -1,6 +1,5 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-
 import { loadPdfDocument } from "../loadPdfDocument/loadPdfDocument";
 import { extractPageGeometry } from "./extractPageGeometry";
 

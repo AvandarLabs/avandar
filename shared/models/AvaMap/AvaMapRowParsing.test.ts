@@ -1,6 +1,5 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
-
 import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";

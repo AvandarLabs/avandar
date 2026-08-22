@@ -1,15 +1,9 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { MapLayerSpatialQueryPlan } from "../../MapLayerSpatialQuery.types";
-
 import { describe, expect, it } from "vitest";
-
 /**
  * Disputed-status property emission for compileMapLayerSpatialQuery.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { MapLayerSpatialFeatureProperties } from "../../MapLayerSpatialQuery.constants";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
@@ -17,6 +11,9 @@ import {
   createGridBinLayerFixture,
   withEmptyOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { MapLayerSpatialQueryPlan } from "../../MapLayerSpatialQuery.types";
 
 /** Shorthand for the compiled plan type, to keep helper signatures narrow. */
 type Plan = MapLayerSpatialQueryPlan;

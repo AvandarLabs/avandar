@@ -1,15 +1,13 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-
 import {
   estimateRemainingTimeFromJob,
   useImportJob,
 } from "@/clients/datasets/ImportJobsManager";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   datasetId: DatasetId;

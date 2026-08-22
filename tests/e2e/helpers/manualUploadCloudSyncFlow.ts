@@ -1,8 +1,6 @@
-import type { Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
+import type { Page } from "@playwright/test";
 
 /**
  * Parses the dataset id from a data-manager dataset URL.

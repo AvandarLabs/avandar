@@ -1,6 +1,5 @@
-import type { UnknownDataFrame } from "@avandar/utils";
-
 import { useMemo } from "react";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 /** Returns formatted X tick labels when rotation needs them for axis sizing. */
 export function useXTickLabels({

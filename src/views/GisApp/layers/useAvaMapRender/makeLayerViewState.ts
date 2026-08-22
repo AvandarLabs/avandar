@@ -1,3 +1,5 @@
+import { noop, sortObjList } from "@avandar/utils";
+import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
   PointAggregation,
@@ -10,10 +12,6 @@ import type {
 } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-
-import { noop, sortObjList } from "@avandar/utils";
-
-import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 
 type GetLayerStatusInput = {
   hasBinding: boolean;

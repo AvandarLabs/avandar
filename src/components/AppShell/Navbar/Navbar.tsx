@@ -1,7 +1,3 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { AppLink } from "@/config/AppLinks/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-
 import { useBoolean } from "@avandar/hooks";
 import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -27,7 +23,6 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-
 import { APP_NAME } from "$/config/GlobalAppConfig";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -39,6 +34,9 @@ import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 
 type Props = {
   isMobileNavbarOpened: boolean;

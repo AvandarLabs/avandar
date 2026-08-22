@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
-
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";

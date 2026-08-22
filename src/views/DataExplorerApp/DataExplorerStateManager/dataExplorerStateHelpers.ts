@@ -1,8 +1,7 @@
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DataExplorerAppState } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 
 /**
  * Try to compute a fresh SQL string from the structured query. Used by

@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxChecklistDockButton } from "@/components/Nux/NuxChecklistPanel/NuxChecklistDockButton";
@@ -10,6 +8,7 @@ import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxS
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NUX_CHECKLIST_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { ReactNode } from "react";
 
 type Props = {
   onOpenMilestone: (key: NuxProgress.MilestoneKey) => void;

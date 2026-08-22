@@ -1,13 +1,11 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { propEq } from "@avandar/utils";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
 import { Logger } from "@/utils/Logger";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Get the current workspace.

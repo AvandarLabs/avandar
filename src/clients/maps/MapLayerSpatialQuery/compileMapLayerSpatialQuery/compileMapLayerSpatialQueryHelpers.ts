@@ -1,3 +1,8 @@
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { getSimplificationToleranceFromZoomBand } from "../getSimplificationToleranceFromZoomBand/getSimplificationToleranceFromZoomBand";
+import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
+import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql/makeSourceCrsTransformFromGeometrySql";
+import { MapLayerSpatialFeatureProperties } from "../MapLayerSpatialQuery.constants";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
@@ -5,13 +10,6 @@ import type {
   ResolvedMapLayerMetadata,
 } from "../MapLayerSpatialQuery.types";
 import type { CompileOptions } from "./compileMapLayerSpatialQuery.types";
-
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
-
-import { getSimplificationToleranceFromZoomBand } from "../getSimplificationToleranceFromZoomBand/getSimplificationToleranceFromZoomBand";
-import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
-import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql/makeSourceCrsTransformFromGeometrySql";
-import { MapLayerSpatialFeatureProperties } from "../MapLayerSpatialQuery.constants";
 
 /**
  * Shared SQL fragment builders used by every spatial-layer compiler.

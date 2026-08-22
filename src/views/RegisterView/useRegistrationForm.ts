@@ -1,15 +1,13 @@
-import type {
-  RegistrationFormController,
-  RegistrationFormValues,
-} from "@/views/RegisterView/RegisterView.types";
-
 import { useForm } from "@avandar/ui/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { isEmail } from "@mantine/form";
 import { getRouteApi } from "@tanstack/react-router";
-
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useRegisterUser } from "@/views/RegisterView/useRegisterUser";
+import type {
+  RegistrationFormController,
+  RegistrationFormValues,
+} from "@/views/RegisterView/RegisterView.types";
 
 const REGISTER_ROUTE = getRouteApi("/register");
 

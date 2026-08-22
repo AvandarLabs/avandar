@@ -1,11 +1,7 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 /** Fixture builders and mock wiring for each transition scenario. */
 import { Model } from "@avandar/models";
 import { makeObjectFromEntries } from "@avandar/utils";
 import { vi } from "vitest";
-
 import {
   apiPostMock,
   dbDeleteThrowOnErrorMock,
@@ -31,6 +27,8 @@ import {
   SNAPSHOT_REVISION,
   WORKSPACE_ID,
 } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 export function makePublishConfig(): {
   slices: Record<Dataset.Id, { mode: "all_columns" } | { mode: "queried" }>;

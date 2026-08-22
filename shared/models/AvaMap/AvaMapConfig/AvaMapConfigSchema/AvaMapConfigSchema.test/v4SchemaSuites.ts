@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import {
   createMismatchedBufferJson,

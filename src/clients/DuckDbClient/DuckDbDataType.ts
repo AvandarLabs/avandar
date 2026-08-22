@@ -1,8 +1,7 @@
-import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-
 import { constant } from "@avandar/utils";
 import { match } from "ts-pattern";
+import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
 /**
  * This is a subset of DuckDBDataType. These are the possible data that

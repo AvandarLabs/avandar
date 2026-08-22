@@ -1,5 +1,3 @@
-import type { NgrokDevURLTarget } from "@ava-cli/DevCLI/NgrokURLCLI/sendNgrokURLManagerRequest";
-
 import { sendNgrokURLManagerRequest } from "@ava-cli/DevCLI/NgrokURLCLI/sendNgrokURLManagerRequest";
 import {
   printError,
@@ -7,6 +5,7 @@ import {
   printSuccess,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
+import type { NgrokDevURLTarget } from "@ava-cli/DevCLI/NgrokURLCLI/sendNgrokURLManagerRequest";
 
 function _formatTimestampForDisplay(isoTimestamp: string): string {
   return new Date(isoTimestamp).toUTCString();

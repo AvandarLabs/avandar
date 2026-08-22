@@ -1,3 +1,9 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
+import { APIClient } from "@/clients/APIClient";
+import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { runRegionModelAssist } from "./runRegionModelAssist";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CrossBoundaryRequest } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import type {
@@ -6,15 +12,6 @@ import type {
   PdfRegion,
   TextItem,
 } from "@/workers/pdfSniff/pdfSniff.types";
-
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
-import { APIClient } from "@/clients/APIClient";
-import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
-import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
-
-import { runRegionModelAssist } from "./runRegionModelAssist";
 
 vi.mock(
   "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary",

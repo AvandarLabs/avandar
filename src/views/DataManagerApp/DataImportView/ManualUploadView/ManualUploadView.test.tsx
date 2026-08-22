@@ -1,19 +1,9 @@
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type {
-  DuckDbColumnSchema,
-  DuckDbLoadCsvResult,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UnknownObject } from "@avandar/utils";
-import type { ReactElement, ReactNode } from "react";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Papa from "papaparse";
 import { StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -26,6 +16,14 @@ import {
   waitFor,
 } from "@/test-utils";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type {
+  DuckDbColumnSchema,
+  DuckDbLoadCsvResult,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { UnknownObject } from "@avandar/utils";
+import type { ReactElement, ReactNode } from "react";
 
 const FIXTURE_CSV_PATH = path.resolve(
   process.cwd(),

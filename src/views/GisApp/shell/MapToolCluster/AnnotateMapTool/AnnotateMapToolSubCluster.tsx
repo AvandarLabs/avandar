@@ -1,7 +1,3 @@
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { Tooltip } from "@avandar/ui";
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
@@ -12,10 +8,12 @@ import {
   IconPolygon,
   IconScribble,
 } from "@tabler/icons-react";
-
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues";
 import subClusterCss from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.module.css";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type AnnotateKind = Extract<MapToolMode, { type: "annotate" }>["kind"];
 

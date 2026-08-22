@@ -1,12 +1,10 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import css from "@/views/GisApp/shell/MapToolCluster/MeasureReadout.module.css";
 import { formatMapMeasureReadout } from "@/views/GisApp/tools/formatMapMeasureReadout/formatMapMeasureReadout";
 import { getSphericalDistanceMeters } from "@/views/GisApp/tools/geodesy/getSphericalDistanceMeters/getSphericalDistanceMeters";
 import { getSphericalPolygonAreaSquareMeters } from "@/views/GisApp/tools/geodesy/getSphericalPolygonAreaSquareMeters/getSphericalPolygonAreaSquareMeters";
 import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
+import type { ReactNode } from "react";
 
 type Props = {
   vertices: ReadonlyArray<[number, number]>;

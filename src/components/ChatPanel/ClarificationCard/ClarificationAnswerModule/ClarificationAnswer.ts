@@ -1,6 +1,5 @@
-import type { ChatClarifyResponseShape } from "$/types/chat.types";
-
 import { match } from "ts-pattern";
+import type { ChatClarifyResponseShape } from "$/types/chat.types";
 
 /** Answer submitted through the clarification card. */
 export type ClarificationSubmitAnswer =

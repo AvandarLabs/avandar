@@ -1,13 +1,11 @@
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { FilterableColumn } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
-import type { ReactNode } from "react";
-
 import { propEq } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Group, Stack, Text } from "@mantine/core";
-
 import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardShareModal/AddRowFilterMenu";
 import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { FilterableColumn } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
+import type { ReactNode } from "react";
 
 type Props = {
   filterableColumns: readonly FilterableColumn[];

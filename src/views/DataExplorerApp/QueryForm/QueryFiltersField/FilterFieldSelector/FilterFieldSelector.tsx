@@ -1,12 +1,9 @@
-import type { ReactNode } from "react";
-import type { FieldSelectorProps } from "react-querybuilder";
-
 import { useLingui } from "@lingui/react/macro";
 import { Select, Tooltip } from "@mantine/core";
-
 import { getOptionNameFromUnknown } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
-
 import classes from "./FilterFieldSelector.module.css";
+import type { ReactNode } from "react";
+import type { FieldSelectorProps } from "react-querybuilder";
 
 type Props = FieldSelectorProps;
 

@@ -1,9 +1,3 @@
-import type {
-  GenericRootData,
-  PrimitiveValue,
-  PrimitiveValueRenderOptions,
-} from "../ObjectDescriptionList.types";
-
 import {
   isBoolean,
   isDate,
@@ -15,13 +9,17 @@ import {
 import { Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { match } from "ts-pattern";
-
 import { isStringOrNumber } from "../guards";
 import { BooleanValueItem } from "./BooleanValueItem";
 import { DateValueItem } from "./DateValueItem";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 import { NumberValueItem } from "./NumberValueItem";
 import { TextValueItem } from "./TextValueItem";
+import type {
+  GenericRootData,
+  PrimitiveValue,
+  PrimitiveValueRenderOptions,
+} from "../ObjectDescriptionList.types";
 
 type Props<
   T extends PrimitiveValue,

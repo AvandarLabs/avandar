@@ -1,10 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type {
-  DatasetId,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-
 import {
   makeSegmentedControlItems,
   SegmentedControl,
@@ -30,12 +23,17 @@ import {
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type {
+  DatasetId,
+  DatasetWithColumns,
+} from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 type Props = {
   /**

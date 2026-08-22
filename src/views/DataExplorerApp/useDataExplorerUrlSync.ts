@@ -1,8 +1,5 @@
-import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
-
 import { where } from "@avandar/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -24,6 +21,7 @@ import {
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import { buildSqlMappingDatasets } from "@/views/DataExplorerApp/QueryForm/buildSqlMappingDatasets";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
+import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 
 type Options = {
   urlSearch: DataExplorerUrlSearch;

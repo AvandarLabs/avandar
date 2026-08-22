@@ -1,11 +1,10 @@
+import { matchLiteral } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { AxisRole } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType.ts";
 import type {
   ChartSettingDescriptor,
   VizSettingGroup,
 } from "$/models/vizs/SettingDescriptor.ts";
-
-import { matchLiteral } from "@avandar/utils";
 
 /** Which axis of `chartStyle` the descriptors address. */
 export type AxisKey = "xAxis" | "yAxis";

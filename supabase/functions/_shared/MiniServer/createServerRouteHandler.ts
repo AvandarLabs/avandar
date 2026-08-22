@@ -1,3 +1,11 @@
+import {
+  object,
+  record,
+  string,
+  never as zNever,
+  ZodType,
+  undefined as zUndefined,
+} from "npm:zod@4";
 import type {
   AnyValidPathParamsRecord,
   HTTPMethod,
@@ -22,15 +30,6 @@ import type {
   ValidPathParamsSchemaShape,
 } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import type { z } from "npm:zod@4";
-
-import {
-  object,
-  record,
-  string,
-  never as zNever,
-  ZodType,
-  undefined as zUndefined,
-} from "npm:zod@4";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyZodType = ZodType<any, any>;

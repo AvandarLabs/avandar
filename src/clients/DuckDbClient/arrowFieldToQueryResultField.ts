@@ -2,7 +2,6 @@ import { ILogger } from "@avandar/logger";
 import { constant } from "@avandar/utils";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { Logger } from "@/utils/Logger";
 

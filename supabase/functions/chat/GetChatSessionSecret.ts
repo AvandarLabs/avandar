@@ -1,9 +1,8 @@
-import type { ChatSessionSecretResponse } from "$/types/chat.types.ts";
-
 import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { deriveSessionSecret } from "@sbfn/_shared/privacy/deriveSessionSecret.ts";
 import { uint8ToBase64 } from "@utils/encoding/index.ts";
 import { z } from "zod";
+import type { ChatSessionSecretResponse } from "$/types/chat.types.ts";
 
 /**
  * Returns the secret used to sign acknowledgements for flagged chat payloads,

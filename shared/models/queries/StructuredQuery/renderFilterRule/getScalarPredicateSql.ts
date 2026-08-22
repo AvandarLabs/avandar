@@ -1,8 +1,6 @@
-import type { FilterPredicateParts } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
-
 import { matchLiteral, prop, propEq } from "@avandar/utils";
-
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
+import type { FilterPredicateParts } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
 
 /**
  * The scalar-arity operators, which all bind exactly one value. Derived from

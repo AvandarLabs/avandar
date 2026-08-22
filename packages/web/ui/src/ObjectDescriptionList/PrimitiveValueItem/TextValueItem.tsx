@@ -1,12 +1,10 @@
-import type { SelectData } from "../../inputs/Select/Select";
-import type { ReactNode } from "react";
-
 import { isNullish } from "@avandar/utils";
 import { Text, TextInput } from "@mantine/core";
-
 import { Select } from "../../inputs/Select/Select";
 import { isStringOrNumber } from "../guards";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import type { SelectData } from "../../inputs/Select/Select";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Whether to render the value in edit mode. */

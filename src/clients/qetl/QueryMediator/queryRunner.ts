@@ -1,18 +1,4 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type {
-  NeededColumnsByDatasetId,
-  QetlRunnerOptions,
-  QetlRunQuery,
-  RunLeasedQueryOptions,
-  RunQetlQueryOptions,
-} from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { UnknownObject } from "@avandar/utils";
-
 import { makeBucketRecord, where } from "@avandar/utils";
-
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -31,6 +17,18 @@ import {
   probeStorageRelationCache,
 } from "@/clients/qetl/QueryMediator/relationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  NeededColumnsByDatasetId,
+  QetlRunnerOptions,
+  QetlRunQuery,
+  RunLeasedQueryOptions,
+  RunQetlQueryOptions,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { UnknownObject } from "@avandar/utils";
 
 function _hasFiniteColumnSet(
   neededByDatasetId: NeededColumnsByDatasetId,

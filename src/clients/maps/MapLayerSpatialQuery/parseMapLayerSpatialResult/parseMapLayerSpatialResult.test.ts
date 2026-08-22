@@ -1,12 +1,9 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-
 import { describe, expect, it } from "vitest";
-
 import { uuid } from "$/lib/uuid";
-
 import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
 import { parseMapLayerSpatialResult } from "./parseMapLayerSpatialResult";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 function _createResult(
   featureCollection: unknown,

@@ -1,10 +1,8 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
-
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 
 /**
  * The label the operator dropdown shows for one filter operator.

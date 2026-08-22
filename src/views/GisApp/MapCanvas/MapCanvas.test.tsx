@@ -1,10 +1,8 @@
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { renderHook } from "@/test-utils";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 vi.mock("@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds", () => {
   return { FitMapBounds: { useFitMapBounds: vi.fn() } };

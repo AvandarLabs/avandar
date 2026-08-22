@@ -1,12 +1,10 @@
-import type { UserId } from "$/models/User/User.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { propEq } from "@avandar/utils";
-
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Rejects a caller who is not a member of `workspaceId`, and returns the

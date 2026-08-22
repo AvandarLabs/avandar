@@ -1,10 +1,8 @@
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { msg } from "@lingui/core/macro";
 import { Button } from "@mantine/core";
-
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   layerName: string;

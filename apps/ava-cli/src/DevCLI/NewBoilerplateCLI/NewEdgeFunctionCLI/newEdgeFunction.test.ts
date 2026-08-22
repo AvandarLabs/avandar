@@ -1,3 +1,6 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import {
   replaceTemplateVariables,
   setEdgeFunctionVerifyJWTInConfigTOML,
@@ -6,9 +9,6 @@ import {
   updateHTTPAPITypes,
   updateRootDenoWorkspace,
 } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewEdgeFunctionCLI/newEdgeFunction";
-import * as fs from "node:fs";
-import * as os from "node:os";
-import * as path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@avandar/acclimate", () => {

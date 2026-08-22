@@ -1,12 +1,11 @@
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
 import type {
   AnyChartSettingDescriptor,
   VizSettingGroup,
 } from "$/models/vizs/SettingDescriptor";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
-
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
 
 type Props = {
   /** Chart-level descriptors to render, in registry order. */

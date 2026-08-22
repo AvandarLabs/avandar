@@ -1,21 +1,3 @@
-import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
-import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { QueryJoin } from "$/models/queries/StructuredQuery/QueryJoin.types";
-import type {
-  OrderByDirection,
-  PartialStructuredQuery,
-  StructuredQueryId,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { DuckDBConnection } from "@duckdb/node-api";
-
 /**
  * Row-level tests for {@link structuredQueryToSql}. Every case builds a
  * structured query, runs the emitted SQL against a real in-memory DuckDB,
@@ -33,11 +15,27 @@ import type { DuckDBConnection } from "@duckdb/node-api";
  */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
-
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
+import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { QueryJoin } from "$/models/queries/StructuredQuery/QueryJoin.types";
+import type {
+  OrderByDirection,
+  PartialStructuredQuery,
+  StructuredQueryId,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**
  * A concept, and the table name the emitter has to derive for it.

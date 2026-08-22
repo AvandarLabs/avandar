@@ -1,15 +1,13 @@
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
-
 import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useNuxCompletionEvents } from "@/components/Nux/NuxRoot/useNuxCompletionEvents/useNuxCompletionEvents";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render, screen } from "@/test-utils";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
 
 const { logEventMock } = vi.hoisted(() => {
   return { logEventMock: vi.fn() };

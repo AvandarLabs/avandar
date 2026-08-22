@@ -1,6 +1,5 @@
-import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import { isDefined, propEq } from "@avandar/utils";
+import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 type KeywordIndexOptions = {
   depth?: number;

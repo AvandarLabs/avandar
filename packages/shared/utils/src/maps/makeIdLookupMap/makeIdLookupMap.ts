@@ -1,7 +1,6 @@
+import { getValue } from "@utils/objects/getValue/getValue.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
 import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
-
-import { getValue } from "@utils/objects/getValue/getValue.ts";
 
 /**
  * Creates a lookup from a list of objects, indexed by an object's id field.

@@ -1,9 +1,7 @@
+import { useState } from "react";
+import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 import type { Dispatch, KeyboardEventHandler, SetStateAction } from "react";
-
-import { useState } from "react";
-
-import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 function _createSubmitAnswer(
   parameters: Readonly<{

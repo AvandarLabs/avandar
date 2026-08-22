@@ -1,14 +1,12 @@
+import { matchLiteral } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import type {
   FilterPredicateParts,
   SqlFragment,
 } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
-
-import { matchLiteral } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
 
 /**
  * The operators that bind more than one value: the list and pair arities.

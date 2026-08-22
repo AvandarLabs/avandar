@@ -1,3 +1,14 @@
+import { assembleLabels } from "../assembleLabels/assembleLabels";
+import { assembleQuantities } from "../assembleQuantities/assembleQuantities";
+import {
+  applyCalibration,
+  calibrateAxis,
+  invertCalibration,
+} from "../calibrateAxis/calibrateAxis";
+import { findBarFamily } from "../findBarFamily/findBarFamily";
+import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
+import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
+import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 import type { AssembledQuantity } from "../assembleQuantities/assembleQuantities";
 import type { AxisCalibration, AxisTick } from "../calibrateAxis/calibrateAxis";
 import type { Bar, BarFamily } from "../findBarFamily/findBarFamily";
@@ -11,18 +22,6 @@ import type {
   RegionGeometry,
   TextItem,
 } from "../pdfSniff.types";
-
-import { assembleLabels } from "../assembleLabels/assembleLabels";
-import { assembleQuantities } from "../assembleQuantities/assembleQuantities";
-import {
-  applyCalibration,
-  calibrateAxis,
-  invertCalibration,
-} from "../calibrateAxis/calibrateAxis";
-import { findBarFamily } from "../findBarFamily/findBarFamily";
-import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
-import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
-import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 
 /**
  * How far a printed figure may sit from the length its own bar was drawn at

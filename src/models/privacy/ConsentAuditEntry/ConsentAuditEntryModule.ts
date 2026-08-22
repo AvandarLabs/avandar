@@ -1,11 +1,3 @@
-import type {
-  ConsentAuditContext,
-  ConsentAuditMedicalTier,
-  ConsentAuditMode,
-  ConsentAuditWarning,
-  ConsentDecisionKind,
-} from "./ConsentAuditEntry.types";
-
 import {
   ConsentAuditContexts,
   ConsentAuditMedicalTiers,
@@ -13,6 +5,13 @@ import {
   ConsentAuditWarnings,
   ConsentDecisionKinds,
 } from "./ConsentAuditEntry.constants";
+import type {
+  ConsentAuditContext,
+  ConsentAuditMedicalTier,
+  ConsentAuditMode,
+  ConsentAuditWarning,
+  ConsentDecisionKind,
+} from "./ConsentAuditEntry.types";
 
 export const ConsentAuditEntryModule = {
   /** Checks whether a string is a persisted consent decision. */

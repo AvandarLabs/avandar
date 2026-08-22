@@ -1,10 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type {
-  DatasetsById,
-  DatasetsBySourceType,
-  RelationSource,
-} from "@/clients/qetl/QueryMediator/QueryMediator.types";
-
 import {
   makeBucketRecord,
   makeIdLookupRecord,
@@ -13,7 +6,6 @@ import {
   prop,
   where,
 } from "@avandar/utils";
-
 import { coversColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
@@ -25,6 +17,12 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type {
+  DatasetsById,
+  DatasetsBySourceType,
+  RelationSource,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 type SourceRecordReaderOptions = {
   ids: readonly Dataset.Id[];

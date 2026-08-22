@@ -1,11 +1,9 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
 import { match } from "ts-pattern";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 /**
  * Why a rule cannot be applied. Structured codes rather than sentences: this

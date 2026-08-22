@@ -1,7 +1,4 @@
-import type { Page } from "@playwright/test";
-
 import path from "node:path";
-
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { formatImportPreviewRowCount } from "./helpers/constants";
@@ -15,6 +12,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import type { Page } from "@playwright/test";
 
 /** Quotes appear only after the first 20_480-byte DuckDB sniff window. */
 const GLOBAL_DEATHS_LATE_QUOTES_CSV_PATH = path.join(

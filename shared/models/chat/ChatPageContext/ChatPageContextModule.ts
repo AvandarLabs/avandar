@@ -1,6 +1,5 @@
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
-
 import { Model } from "@avandar/models";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 export const ChatPageContextModule = {
   /**

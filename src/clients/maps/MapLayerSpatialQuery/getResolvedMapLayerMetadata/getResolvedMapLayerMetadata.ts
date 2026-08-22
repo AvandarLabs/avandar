@@ -1,3 +1,12 @@
+import { Model } from "@avandar/models";
+import { isDefined, propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { getDisputedStatusColumn } from "./getDisputedStatusColumn";
+import {
+  createRebindRequired,
+  findBoundaryColumn,
+} from "./getResolvedMapLayerMetadataHelpers";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -10,18 +19,6 @@ import type {
   BoundaryBinding,
   ResolveOptions,
 } from "./getResolvedMapLayerMetadata.types";
-
-import { Model } from "@avandar/models";
-import { isDefined, propEq } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
-import { getDisputedStatusColumn } from "./getDisputedStatusColumn";
-import {
-  createRebindRequired,
-  findBoundaryColumn,
-} from "./getResolvedMapLayerMetadataHelpers";
 
 type AggregatingBinding = BoundaryBinding | MapLayer.GridBinBinding;
 

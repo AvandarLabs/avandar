@@ -1,16 +1,13 @@
-import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-import type { CompileOptions } from "./compileMapLayerSpatialQuery.types";
-
 import { match } from "ts-pattern";
-
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-
 import { applyTimePredicateToSourceSql } from "../applyTimePredicateToSourceSql/applyTimePredicateToSourceSql";
 import { compileBufferOfLayerQuery } from "../compileBufferOfLayerQuery/compileBufferOfLayerQuery";
 import { compileBoundaryJoinQuery } from "./compileBoundaryJoinQuery";
 import { compileGeometryColumnQuery } from "./compileGeometryColumnQuery";
 import { compileGridBinQuery } from "./compileGridBinQuery";
 import { compilePointAggregationQuery } from "./compilePointAggregationQuery";
+import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
+import type { CompileOptions } from "./compileMapLayerSpatialQuery.types";
 
 function _getTimeColumnName(
   options: Readonly<CompileOptions>,

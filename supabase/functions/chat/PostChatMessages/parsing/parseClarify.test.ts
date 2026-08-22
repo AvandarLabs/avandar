@@ -1,10 +1,9 @@
-import type { ChatClarifyRequest } from "$/types/chat.types.ts";
-
 import {
   countClarificationsInHistory,
   parseClarify,
 } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
 import { describe, expect, it } from "vitest";
+import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 const DISCOVERY_CLARIFICATION_ARGUMENTS = {
   question: "Which stored state represents California?",

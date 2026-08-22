@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 
 describe("QueryFilterOperator.getForDataType", () => {

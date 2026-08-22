@@ -1,11 +1,9 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { CSSProperties, ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { ExportPageLayout } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
 import css from "@/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.module.css";
 import { getExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   config: AvaMapConfig.T;

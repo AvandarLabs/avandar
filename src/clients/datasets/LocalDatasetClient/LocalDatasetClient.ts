@@ -1,3 +1,15 @@
+import { match } from "ts-pattern";
+import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
+import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
+import { sniffPdfFile } from "@/clients/datasets/pdfSniff";
+import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
+import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/getDatasetSourceTypeFromSourceFileType/getDatasetSourceTypeFromSourceFileType";
+import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
+import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -17,20 +29,6 @@ import type {
 } from "@/models/LocalDataset/LocalDataset.types";
 import type { PdfSniffResult } from "@/workers/pdfSniff.worker/pdfSniff.worker";
 import type { ILogger } from "@avandar/logger";
-
-import { match } from "ts-pattern";
-
-import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
-import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
-import { sniffPdfFile } from "@/clients/datasets/pdfSniff";
-import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
-import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/getDatasetSourceTypeFromSourceFileType/getDatasetSourceTypeFromSourceFileType";
-import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
-import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 /**
  * Per-file ceiling for the source-bytes cache. Files above this don't

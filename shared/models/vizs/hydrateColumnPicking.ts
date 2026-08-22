@@ -1,8 +1,6 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-
 import { prop } from "@avandar/utils";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 /**
  * Shared helpers for choosing default axis / series columns when hydrating

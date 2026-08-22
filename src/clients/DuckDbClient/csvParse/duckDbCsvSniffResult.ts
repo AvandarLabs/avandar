@@ -1,12 +1,3 @@
-import type {
-  CsvParseResolvedOptions,
-  DuckDbSniffCsvRow,
-} from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type {
-  DuckDbCsvSniffResult,
-  DuckDbScan,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { buildReadCsvPromptFromResolved } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 import {
@@ -17,6 +8,14 @@ import {
   normalizeDuckDbCsvOptionToken,
   optionalTrimmedCsvFormat,
 } from "@/clients/DuckDbClient/csvParse/duckDbCsvTokens";
+import type {
+  CsvParseResolvedOptions,
+  DuckDbSniffCsvRow,
+} from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type {
+  DuckDbCsvSniffResult,
+  DuckDbScan,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
 
 function _parseRejectScanColumns(
   columnsString: string,

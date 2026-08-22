@@ -5,7 +5,6 @@ import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSys
 import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";
 import { describe, expect, it } from "vitest";
-
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 describe("makeChatTurnSuffixFromOptions", () => {

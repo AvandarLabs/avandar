@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 /**
  * In-place annotation text overlay: focus, select-all, Enter and blur commit.
  */

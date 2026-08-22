@@ -1,9 +1,7 @@
+import { Button } from "@mantine/core";
+import classes from "./FilterAddAction.module.css";
 import type { ReactNode } from "react";
 import type { ActionProps } from "react-querybuilder";
-
-import { Button } from "@mantine/core";
-
-import classes from "./FilterAddAction.module.css";
 
 type Props = ActionProps;
 

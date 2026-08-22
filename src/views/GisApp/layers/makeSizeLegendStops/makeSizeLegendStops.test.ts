@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { makeSizeLegendStops } from "./makeSizeLegendStops";
 
 describe("makeSizeLegendStops", () => {

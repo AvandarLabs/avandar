@@ -1,14 +1,12 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatProposedCaseType } from "$/types/chat.types";
-
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useState } from "react";
-
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
 import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 /**
  * Persists a reviewed draft through the same path the concept creator form

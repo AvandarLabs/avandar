@@ -1,10 +1,8 @@
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { useFilterTreeState } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState/useFilterTreeState";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 const COLUMN_TYPES: Readonly<Record<string, AvaDataType.T>> = {
   Admin2: "varchar",

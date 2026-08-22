@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { isPointerNearVertex } from "@/views/GisApp/tools/isPointerNearVertex/isPointerNearVertex";
 
 function _identityProject(vertex: readonly [number, number]): {

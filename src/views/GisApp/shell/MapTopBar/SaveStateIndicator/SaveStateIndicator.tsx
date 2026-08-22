@@ -1,12 +1,10 @@
-import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconAlertTriangle, IconCheck, IconPencil } from "@tabler/icons-react";
-
 import css from "@/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.module.css";
+import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
+import type { ReactNode } from "react";
 
 type Props = { saveState: MapSaveState };
 

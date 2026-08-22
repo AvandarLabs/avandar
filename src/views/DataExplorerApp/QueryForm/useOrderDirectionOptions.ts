@@ -1,7 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { SelectData } from "@avandar/ui";
-
-import { useLingui } from "@lingui/react/macro";
 
 type OrderDirectionOptions = SelectData<StructuredQuery.OrderByDirection>;
 

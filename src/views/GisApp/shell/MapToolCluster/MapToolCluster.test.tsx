@@ -1,11 +1,5 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { FeatureFlag } from "@/config/FeatureFlagConfig";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { ReactNode } from "react";
-
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 /**
  * Tool cluster: Area gating, pressed state, Escape, and AOI commit.
  */
@@ -22,6 +16,10 @@ import {
   AreaToolHarness,
   MeasureToolHarness,
 } from "@/views/GisApp/shell/MapToolCluster/mapToolClusterHarness";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { FeatureFlag } from "@/config/FeatureFlagConfig";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
 
 const spatialAvailability = vi.hoisted(() => {
   return {

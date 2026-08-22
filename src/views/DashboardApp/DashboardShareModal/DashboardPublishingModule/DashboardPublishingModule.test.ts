@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 
 describe("getTargetVisibilityFromGeneralAccessValue", () => {

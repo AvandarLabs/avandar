@@ -1,10 +1,9 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { KeyboardEvent, ReactNode } from "react";
-
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection/LayerRowSelection.module.css";
 import { LayerStatusBadge } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge";
 import { LayerSwatch } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerSwatch/LayerSwatch";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { KeyboardEvent, ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

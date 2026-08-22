@@ -1,7 +1,6 @@
-import type { UnknownToStringOptions } from "@utils/strings/unknownToString/unknownToString.ts";
-
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+import type { UnknownToStringOptions } from "@utils/strings/unknownToString/unknownToString.ts";
 
 /**
  * Creates a template string parser. The template string is a string that

@@ -1,7 +1,6 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ExportPdfInput } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
-
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
   const document = {

@@ -1,18 +1,16 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { ReactNode, RefObject } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button, Stack } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
-
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
 import { ClusterFeatureTable } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable";
 import { FeatureAction } from "@/views/GisApp/panels/FeatureInspector/FeatureAction";
 import { FeatureFields } from "@/views/GisApp/panels/FeatureInspector/FeatureFields";
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspector.module.css";
 import { FeatureInspectorHeader } from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { ReactNode, RefObject } from "react";
 
 const FEATURE_DRAWER_REGION_ID = "gis-feature-drawer-region";
 const FEATURE_DRAWER_TITLE_ID = "gis-feature-drawer-title";

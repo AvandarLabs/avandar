@@ -1,12 +1,9 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-
 import { describe, expect, it } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
-
 import { AvaSqlBlock } from "./AvaSqlBlock";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 const DATASET_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;
 

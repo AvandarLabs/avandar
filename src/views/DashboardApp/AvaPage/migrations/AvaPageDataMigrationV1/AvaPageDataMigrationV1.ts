@@ -1,3 +1,5 @@
+import { transformProps } from "@puckeditor/core";
+import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   V0_AvaPageData,
   V0_AvaPageRootProps,
@@ -6,10 +8,6 @@ import type {
   V1_AvaPageRootProps,
   V1_PBlockPropsRegistry,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1.types";
-
-import { transformProps } from "@puckeditor/core";
-
-import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 
 const SCHEMA_VERSION = 1;
 

@@ -1,10 +1,4 @@
-import type {
-  MutationTargetAnalysis,
-  SqlToken,
-} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import { prop } from "@avandar/utils";
-
 import { getCopyDirection } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlCopyStatements";
 import { getTopLevelMutationIndexes } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlStatements";
 import {
@@ -13,6 +7,10 @@ import {
   getStatementEndIndex,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type {
+  MutationTargetAnalysis,
+  SqlToken,
+} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 type RelationIndexAfterKeywordOptions = {
   endIndex: number;

@@ -1,9 +1,7 @@
+import { isArray, isNullish } from "@avandar/utils";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
-import { isArray, isNullish } from "@avandar/utils";
-
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 
 type FilterValue = QueryFilterRule["value"];
 

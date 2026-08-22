@@ -1,8 +1,7 @@
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
+import path from "node:path";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { promiseMapSequential } from "@avandar/utils";
-import path from "node:path";
+import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type PrepareBackupHierarchyOptions = {
   io: SupabaseLocalEnvironmentIO;

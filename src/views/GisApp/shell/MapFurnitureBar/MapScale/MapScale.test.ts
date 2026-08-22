@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
 
 describe("getMapScaleFromMetersPerPixel", () => {

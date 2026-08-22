@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { ActionIcon } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
-
 import css from "@/views/GisApp/shell/MapChromePanel/MapChromePanel.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   title: string;

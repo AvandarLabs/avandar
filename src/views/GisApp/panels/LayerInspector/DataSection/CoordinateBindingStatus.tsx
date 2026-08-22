@@ -1,12 +1,10 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
-import type { ReactNode } from "react";
-
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-
 import { LowConfidenceMatchCallout } from "@/views/GisApp/panels/LayerInspector/DataSection/LowConfidenceMatchCallout";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { GeoBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

@@ -1,10 +1,8 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-
 import { makeLikeFromThreadMessage } from "./threadMessageHelpers";
 
 /**

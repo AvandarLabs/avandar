@@ -1,9 +1,8 @@
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
 
 type PointAggregationBinding = Extract<
   MapLayer.GeoBinding,

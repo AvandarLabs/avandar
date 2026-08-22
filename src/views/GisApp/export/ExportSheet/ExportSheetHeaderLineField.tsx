@@ -1,7 +1,6 @@
+import { Group, Switch, TextInput } from "@mantine/core";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ReactNode } from "react";
-
-import { Group, Switch, TextInput } from "@mantine/core";
 
 type Props = {
   label: string;

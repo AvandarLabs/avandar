@@ -9,7 +9,6 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";
 

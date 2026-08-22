@@ -1,10 +1,8 @@
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { ReactNode } from "react";
-
 import { Box, Group } from "@mantine/core";
-
 import { AppliedFilterSummary } from "@/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary";
 import { QueryResultsError } from "@/views/DataExplorerApp/QueryResultsError/QueryResultsError";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ReactNode } from "react";
 
 type Props = {
   lastQueryError: string | undefined;

@@ -1,12 +1,10 @@
+import { prop } from "@avandar/utils";
+import { reviewGeneratedSqlAssumptions } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { User } from "$/models/User/User";
 import type { ChatRetryContext } from "$/types/chat.types";
 import type { OfflineChatPipelineCopy } from "$/types/offlineChat.types";
-
-import { prop } from "@avandar/utils";
-
-import { reviewGeneratedSqlAssumptions } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 
 /** Translated strings the chat adapter interpolates into assistant turns. */
 export type ChatRuntimeCopy = OfflineChatPipelineCopy & {

@@ -1,15 +1,13 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
-
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { BasemapControl } from "@/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl";
 import css from "@/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.module.css";
 import { ViewsMenu } from "@/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   avaMapId: AvaMap.Id;

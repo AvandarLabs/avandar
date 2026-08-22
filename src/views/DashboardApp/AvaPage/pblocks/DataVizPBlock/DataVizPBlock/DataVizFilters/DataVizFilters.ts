@@ -1,7 +1,6 @@
+import { matchLiteral, prop } from "@avandar/utils";
 import type { DashboardFilterMode } from "$/types/dashboard.types";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-
-import { matchLiteral, prop } from "@avandar/utils";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 

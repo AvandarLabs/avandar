@@ -1,3 +1,5 @@
+import { match } from "ts-pattern";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
@@ -13,10 +15,6 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-import { match } from "ts-pattern";
-
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 
 export const TableVizConfigs = {
   vizType: "table",

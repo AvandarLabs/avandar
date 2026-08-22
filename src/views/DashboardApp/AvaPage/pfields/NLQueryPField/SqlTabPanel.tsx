@@ -1,6 +1,3 @@
-import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type { ReactElement } from "react";
-
 import { mantineColorVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -15,11 +12,12 @@ import {
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
 import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
+import type { ReactElement } from "react";
 
 type Props = {
   rawSql: string;

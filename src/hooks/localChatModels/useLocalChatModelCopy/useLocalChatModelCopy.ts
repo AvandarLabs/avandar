@@ -1,7 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
-
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 
 /** Returns translated display copy for an offline chat model. */

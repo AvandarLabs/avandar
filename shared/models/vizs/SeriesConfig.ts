@@ -1,6 +1,5 @@
-import type { CurveType } from "$/models/vizs/CurveType.ts";
-
 import { match } from "ts-pattern";
+import type { CurveType } from "$/models/vizs/CurveType.ts";
 
 /**
  * Mark types that a single series can render as inside an XY chart host

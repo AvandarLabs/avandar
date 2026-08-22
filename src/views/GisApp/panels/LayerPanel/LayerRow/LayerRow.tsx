@@ -1,15 +1,13 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
-
 import { useSortable } from "@dnd-kit/react/sortable";
-
 import { LayerActionsMenu } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu";
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow.module.css";
 import { LayerRowDragHandle } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle";
 import { LayerRowInstructions } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions";
 import { LayerRowSelection } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection/LayerRowSelection";
 import { LayerVisibilityButton } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

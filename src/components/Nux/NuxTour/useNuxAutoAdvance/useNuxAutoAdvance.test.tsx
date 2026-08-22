@@ -1,11 +1,9 @@
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
-
 import { describe, expect, it } from "vitest";
-
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxAutoAdvance } from "@/components/Nux/NuxTour/useNuxAutoAdvance/useNuxAutoAdvance";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
 
 function StepIndex(): ReactNode {
   useNuxAutoAdvance();

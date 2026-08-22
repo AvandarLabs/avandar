@@ -1,9 +1,8 @@
-import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types.ts";
-
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getAuthURL } from "@sbfn/google-auth/getAuthURL.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
 import { z } from "zod";
+import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types.ts";
 
 export const GoogleAuthRoutes = defineRoutes<GoogleAuthAPI>("google-auth", {
   /**

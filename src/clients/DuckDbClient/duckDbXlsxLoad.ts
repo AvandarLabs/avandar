@@ -1,8 +1,3 @@
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-
 import { uuid } from "$/lib/uuid";
 import {
   buildXlsxReadRange,
@@ -16,6 +11,10 @@ import {
   registerXlsxFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
 import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 
 type BaseDuckDbLoadXlsxOptions = {
   tableName: string;

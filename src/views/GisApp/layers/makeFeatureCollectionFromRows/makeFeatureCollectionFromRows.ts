@@ -1,6 +1,3 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-
 import {
   getFiniteNumberFromValue,
   isDefined,
@@ -11,9 +8,10 @@ import {
   prop,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
-
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 /** Why a source row produced no feature. */
 export type DropReason =

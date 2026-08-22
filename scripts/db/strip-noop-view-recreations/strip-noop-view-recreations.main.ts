@@ -51,22 +51,20 @@
  * nothing.
  */
 
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
+import {
+  getLocalDatabaseConfigFromRepoRoot,
+  makeSqlRunner,
+} from "../lib/PsqlUtils/PsqlUtils";
+import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
   CreateViewStatement,
   Decision,
   NoopVerdict,
   Statement,
 } from "./NoopViewRecreations/NoopViewRecreations";
-
-import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
-
-import {
-  getLocalDatabaseConfigFromRepoRoot,
-  makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
-import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 
 const PROBE_SCHEMA = "_noop_view_check";
 

@@ -1,13 +1,11 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ReactNode } from "react";
-
 import { prop } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { MapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { ReactNode } from "react";
 
 vi.mock("@/views/GisApp/shell/MapChromePanel/MapChromePanel", () => {
   return {

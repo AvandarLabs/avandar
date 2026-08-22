@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 
 describe("NavbarLinks map destination", () => {

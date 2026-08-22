@@ -2,7 +2,6 @@
  * Haversine path length on the mean Earth sphere.
  */
 import { describe, expect, it } from "vitest";
-
 import { getSphericalDistanceMeters } from "@/views/GisApp/tools/geodesy/getSphericalDistanceMeters/getSphericalDistanceMeters";
 
 const EQUATOR_DEGREE_METERS = 111_195;

@@ -118,11 +118,17 @@ the plan; Phase 2 has to work with the result, not the text.
    class of problem wherever a deep ternary chain survives: rewrap the
    comment if that is all it is, otherwise flatten the chain.
 
-One judgement call left for review: the `groups` list combines
-`value-builtin` and `value-external` into one alphabetical group, exactly as
-written below, so `node:*` imports no longer lead a file. That is a change
-from the old `<BUILTIN_MODULES>` / `<THIRD_PARTY_MODULES>` split. Splitting
-them back is a one-line config edit plus a re-run of `pnpm format:oxfmt`.
+8. **`sortImports` is tuned for parity, not for the `groups` list below.**
+   The plan's list merges `value-builtin` with `value-external`, puts
+   `type-import` first, and leaves `newlinesBetween` at its default of
+   `true`. All three diverge from the old `@ianvs` `importOrder`, which
+   kept builtins ahead of third-party, put `<TYPES>` last, and never broke
+   the import block with blank lines. Measured across the tree, the plan's
+   list rewrites 2585 files against 1351 for the parity list, so the config
+   uses builtins, external, internal, relative, then types, with
+   `newlinesBetween: false`. `internalPattern` still claims `$/` even
+   though the old `importOrder` did not, since `$/` is `shared/` and
+   genuinely is our code; that costs about 68 files of churn.
 
 ### Task 1: Install oxfmt and write its config
 

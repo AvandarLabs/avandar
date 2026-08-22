@@ -1,13 +1,4 @@
-import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type {
-  OfflineChatPipelineCopy,
-  OfflineChatTurnResult,
-} from "$/types/offlineChat.types";
-
 import { propEq } from "@avandar/utils";
-
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { ensureOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/ensureOfflineChatSchema/ensureOfflineChatSchema";
@@ -16,6 +7,13 @@ import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvand
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type {
+  OfflineChatPipelineCopy,
+  OfflineChatTurnResult,
+} from "$/types/offlineChat.types";
 
 export type RunOfflineChatTurnArgs = {
   workspace: Workspace.T;

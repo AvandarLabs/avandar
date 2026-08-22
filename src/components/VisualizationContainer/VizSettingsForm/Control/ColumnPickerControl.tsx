@@ -1,12 +1,10 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { ReactNode } from "react";
-
 import { makeSelectOptions, Select } from "@avandar/ui";
 import { propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Display label for the picker. */

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import type {
@@ -5,8 +6,6 @@ import type {
   SlugValidationResult,
 } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation.types";
 import type { Dispatch, RefObject, SetStateAction } from "react";
-
-import { useEffect } from "react";
 
 /** How long the field stays quiet before a slug check goes out. */
 const SLUG_VALIDATION_DEBOUNCE_MS = 500;

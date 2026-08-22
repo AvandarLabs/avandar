@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { clipFreehandByEraser } from "@/views/GisApp/tools/clipFreehandByEraser/clipFreehandByEraser";
 
 function _identityProject(vertex: readonly [number, number]): {

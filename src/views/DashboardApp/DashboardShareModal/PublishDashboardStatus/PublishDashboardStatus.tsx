@@ -1,13 +1,11 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-
 import { DivergenceAlert } from "./DivergenceAlert";
 import { PublishedTargetUrl } from "./PublishedTargetUrl";
 import { VisibilityAlert } from "./VisibilityAlert";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
+import type { ReactNode } from "react";
 
 type Props = {
   visibility: Dashboard.Visibility;

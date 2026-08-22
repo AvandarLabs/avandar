@@ -1,12 +1,10 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
-
 import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
 import css from "@/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.module.css";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
 
 type Props = {
   viewState: MapLayerViewState | undefined;

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 /**
  * SqlTableAlias assigns workspace-scoped short names and formats the
  * model-facing schema block. DuckDB still uses dataset UUIDs and

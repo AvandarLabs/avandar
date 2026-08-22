@@ -1,8 +1,7 @@
-import type { RawCellValue, RawDataRow } from "@avandar/utils";
-
 import { isNonEmptyArray, MIMEType } from "@avandar/utils";
 import Papa from "papaparse";
 import { match } from "ts-pattern";
+import type { RawCellValue, RawDataRow } from "@avandar/utils";
 
 /**
  * Convert a dataset back into a raw string. Only CSVs are supported for now.

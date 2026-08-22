@@ -1,16 +1,7 @@
-import type {
-  AoiGestureCallbacks,
-  MeasureGestureCallbacks,
-} from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { Dispatch, RefObject, SetStateAction } from "react";
-
 import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
 import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
@@ -19,6 +10,13 @@ import {
   attachMeasureGestures,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
+import type {
+  AoiGestureCallbacks,
+  MeasureGestureCallbacks,
+} from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
 type Vertex = [number, number];
 

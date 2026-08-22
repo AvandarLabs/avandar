@@ -2,7 +2,6 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Box, Stack } from "@mantine/core";
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
-
 import { ChatPanelHeader } from "@/components/ChatPanel/ChatPanelHeader/ChatPanelHeader";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
@@ -10,7 +9,6 @@ import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRunt
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
 import { NuxOpenChatPanelEffect } from "@/components/Nux/NuxTour/useNuxOpenChatPanel/NuxOpenChatPanelEffect";
-
 import css from "./ChatPanel.module.css";
 
 /**

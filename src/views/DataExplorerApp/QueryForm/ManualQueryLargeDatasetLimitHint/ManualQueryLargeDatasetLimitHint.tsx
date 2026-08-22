@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Paper, Text, Transition } from "@mantine/core";
-
 import css from "./ManualQueryLargeDatasetLimitHint.module.css";
+import type { ReactNode } from "react";
 
 /** How long the large-dataset limit hint stays visible before fading out. */
 export const LARGE_DATASET_LIMIT_HINT_VISIBLE_MS = 4_000;

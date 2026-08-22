@@ -1,7 +1,6 @@
-import type { ModelBase } from "@models/Model/Model.types.ts";
-
 import { ModelModule } from "@models/Model/ModelModule/ModelModule.ts";
 import { describe, expect, it } from "vitest";
+import type { ModelBase } from "@models/Model/Model.types.ts";
 
 describe("Model.make", () => {
   it("creates a model with the given type and props", () => {

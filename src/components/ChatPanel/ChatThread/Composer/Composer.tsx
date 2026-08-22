@@ -4,13 +4,11 @@ import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
-
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
-
 import css from "./Composer.module.css";
 
 /**

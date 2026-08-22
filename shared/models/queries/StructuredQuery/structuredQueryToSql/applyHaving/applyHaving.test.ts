@@ -1,10 +1,8 @@
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
 import { describe, expect, it } from "vitest";
-
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 function _having(group: QueryFilterGroup): string {
   const builder = sqlBuilder.queryBuilder().select("*").from("t").groupBy("g");

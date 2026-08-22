@@ -1,13 +1,3 @@
-import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
-import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
-import type {
-  ChartAxisFit,
-  ExtractedTable,
-  PdfRegion,
-  PdfRegionShape,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -22,10 +12,18 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
-
 import { PdfAxisCalibration } from "./PdfAxisCalibration/PdfAxisCalibration";
 import css from "./PdfRegionCard.module.css";
 import { getCoverageFlagFromTable } from "./runRegionModelAssist/runRegionModelAssist";
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
+import type {
+  ChartAxisFit,
+  ExtractedTable,
+  PdfRegion,
+  PdfRegionShape,
+} from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode } from "react";
 
 function ChartAxisNote({ axis }: { axis: ChartAxisFit }): ReactNode {
   const { t } = useLingui();

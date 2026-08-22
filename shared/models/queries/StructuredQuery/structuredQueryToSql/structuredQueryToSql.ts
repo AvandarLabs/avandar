@@ -1,9 +1,3 @@
-import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
-import type { Knex } from "knex";
-
 /**
  * Convert a {@link PartialStructuredQuery} into a raw SQL string using knex.
  *
@@ -26,7 +20,6 @@ import {
 } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { match } from "ts-pattern";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -37,6 +30,11 @@ import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSq
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
+import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
+import type { Knex } from "knex";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 

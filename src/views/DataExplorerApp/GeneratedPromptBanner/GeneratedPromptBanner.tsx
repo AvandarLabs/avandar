@@ -8,10 +8,8 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
-
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-
 import css from "./GeneratedPromptBanner.module.css";
 
 /**

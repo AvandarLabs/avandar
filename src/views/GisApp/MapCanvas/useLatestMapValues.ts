@@ -1,9 +1,8 @@
+import { useEffect, useRef } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { RefObject } from "react";
-
-import { useEffect, useRef } from "react";
 
 /** Receives a feature together with the MapLibre layer that rendered it. */
 export type MapFeatureClickHandler = (

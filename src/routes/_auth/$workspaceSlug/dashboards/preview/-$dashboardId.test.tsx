@@ -1,15 +1,13 @@
+/** Route-adapter coverage for dashboard preview edit access. */
+import { Model } from "@avandar/models";
+import { QueryClient } from "@tanstack/react-query";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen } from "@/test-utils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
-
-/** Route-adapter coverage for dashboard preview edit access. */
-import { Model } from "@avandar/models";
-import { QueryClient } from "@tanstack/react-query";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { render, screen } from "@/test-utils";
 
 const {
   canAccessResourceMock,

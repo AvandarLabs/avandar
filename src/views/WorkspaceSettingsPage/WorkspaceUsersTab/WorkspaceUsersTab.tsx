@@ -1,5 +1,3 @@
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
-
 import { capitalize } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -18,7 +16,6 @@ import { modals } from "@mantine/modals";
 import { IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -31,8 +28,8 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
-
 import { usePrivateResourceRemovalState } from "./usePrivateResourceRemovalState/usePrivateResourceRemovalState";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 /**
  * Members and pending invites table with invite and per-member permissions.

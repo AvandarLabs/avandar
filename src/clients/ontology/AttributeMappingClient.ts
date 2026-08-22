@@ -1,6 +1,5 @@
 import { makeBucketRecord, objectKeys, prop } from "@avandar/utils";
 import { match } from "ts-pattern";
-
 import {
   AttributeMapping,
   AttributeMappingRegistry,

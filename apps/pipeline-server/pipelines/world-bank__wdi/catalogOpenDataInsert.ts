@@ -1,9 +1,8 @@
-import type { NodeDuckDb } from "@avandar/etl";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { duckDbDescribeColumnTypeToSniffable } from "@avandar/etl";
 import { getWdiCatalogDatasetPresentation } from "@pipelines/world-bank__wdi/wdiCatalogDatasetConfig";
 import { createClient } from "@supabase/supabase-js";
+import type { NodeDuckDb } from "@avandar/etl";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const OPENDATA_BUCKET_DEFAULT = "opendata";
 

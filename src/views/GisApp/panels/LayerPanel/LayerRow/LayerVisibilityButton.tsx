@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import type { ReactNode } from "react";
 
 type Props = { layerName: string; isVisible: boolean; onClick: () => void };
 

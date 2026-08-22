@@ -1,6 +1,5 @@
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-
 import { email, iso, number, object, string, enum as zEnum } from "zod";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 const PolarSubscriptionStatus = zEnum([
   "active",

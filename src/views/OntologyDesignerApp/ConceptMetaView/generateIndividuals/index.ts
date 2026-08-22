@@ -1,6 +1,3 @@
-import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
-import type { Individual } from "$/models/ontology/Individual/Individual";
-
 import {
   assertIsDefined,
   isDefined,
@@ -12,7 +9,6 @@ import {
   sqlTemplate,
   where,
 } from "@avandar/utils";
-
 import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -21,6 +17,8 @@ import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClie
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { Logger } from "@/utils/Logger";
+import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
+import type { Individual } from "$/models/ontology/Individual/Individual";
 
 /**
  * Run a basic Qetl pipeline to generate individuals.

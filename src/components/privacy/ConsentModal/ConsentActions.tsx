@@ -1,8 +1,7 @@
-import type { ConsentDecision, ConsentModalMode } from "./ConsentModal";
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-
 import { Trans } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
+import type { ConsentDecision, ConsentModalMode } from "./ConsentModal";
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 
 type Props = {
   /** Active consent mode, which drives button colors and gating. */

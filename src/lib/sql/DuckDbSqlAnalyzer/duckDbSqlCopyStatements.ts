@@ -1,5 +1,3 @@
-import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-
 import {
   getDatasetIdFromRelationAtIndex,
   getIdentifierParts,
@@ -10,6 +8,7 @@ import {
   getStatementEndIndex,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 /** Where a COPY statement moves data, and which relation it names. */
 export type CopyDirection = {

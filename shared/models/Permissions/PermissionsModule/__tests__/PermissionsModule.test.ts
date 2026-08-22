@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { PermissionRegistry } from "$/models/Permissions/PermissionsModule/PermissionRegistry.ts";
 import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";

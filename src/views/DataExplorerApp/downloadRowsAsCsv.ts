@@ -1,6 +1,5 @@
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-
 import { objectKeys, unknownToString } from "@avandar/utils";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 // Helper to escape fields for CSV
 function _escapeCsvValue(value: unknown): string {

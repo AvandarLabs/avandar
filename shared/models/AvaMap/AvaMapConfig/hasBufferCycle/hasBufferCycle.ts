@@ -1,6 +1,5 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-
 import { makeIdLookupMap } from "@avandar/utils";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
 /**
  * Returns whether following `bufferOfLayer` links from `startLayerId`

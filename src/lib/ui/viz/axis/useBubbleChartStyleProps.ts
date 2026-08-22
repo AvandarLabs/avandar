@@ -1,14 +1,12 @@
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
-import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
-import type { UnknownDataFrame } from "@avandar/utils";
-
 import { useMemo } from "react";
-
 import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 /** Returns the resolved axis style props for a bubble chart. */
 export function useBubbleChartStyleProps({

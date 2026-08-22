@@ -1,3 +1,10 @@
+import { objectKeys, pick } from "@avandar/utils";
+import { ScrollArea } from "@mantine/core";
+import { DescriptionList } from "../DescriptionList/index";
+import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "./ObjectDescriptionList.types";
+import { ValueItemContainer } from "./ValueItemContainer";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -6,15 +13,6 @@ import type {
   ObjectRenderOptions,
   PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
-
-import { objectKeys, pick } from "@avandar/utils";
-import { ScrollArea } from "@mantine/core";
-
-import { DescriptionList } from "../DescriptionList/index";
-import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
-import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";
-import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "./ObjectDescriptionList.types";
-import { ValueItemContainer } from "./ValueItemContainer";
 
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   data: T;

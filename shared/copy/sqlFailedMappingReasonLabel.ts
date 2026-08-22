@@ -1,7 +1,6 @@
-import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
-
 import { t } from "@lingui/core/macro";
 import { match } from "ts-pattern";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 /**
  * Returns the human-readable explanation for a {@link SqlFailedMappingReason}.

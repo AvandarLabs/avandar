@@ -1,19 +1,16 @@
-import type { AuthProvider } from "$/platform/types/AuthProvider.types";
-import type { DatasetBlobStore } from "$/platform/types/DatasetBlobStore.types";
-import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
-import type { ReactNode } from "react";
-
 import { createContext, useContext, useMemo } from "react";
-
 import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { DesktopDatasetBlobStore } from "$/platform/desktop/DesktopDatasetBlobStore";
 import { DesktopDuckDbClient } from "$/platform/desktop/DesktopDuckDbClient";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
-
 import { createWebAuthProvider } from "../createWebAuthProvider";
 import { createWebDatasetBlobStore } from "../createWebDatasetBlobStore";
 import { createWebDuckDbClient } from "../createWebDuckDbClient";
 import { PlatformRegistry } from "../PlatformRegistry/PlatformRegistry";
+import type { AuthProvider } from "$/platform/types/AuthProvider.types";
+import type { DatasetBlobStore } from "$/platform/types/DatasetBlobStore.types";
+import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
+import type { ReactNode } from "react";
 
 /**
  * The three platform-agnostic services consumers reach through

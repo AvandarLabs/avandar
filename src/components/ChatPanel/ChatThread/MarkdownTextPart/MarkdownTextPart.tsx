@@ -4,9 +4,7 @@ import {
 } from "@assistant-ui/react-markdown";
 import clsx from "clsx";
 import remarkGfm from "remark-gfm";
-
 import { MarkdownCodeHeader } from "@/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader";
-
 import { ChatSyntaxHighlighterRouter } from "./ChatSyntaxHighlighterRouter";
 import css from "./MarkdownTextPart.module.css";
 

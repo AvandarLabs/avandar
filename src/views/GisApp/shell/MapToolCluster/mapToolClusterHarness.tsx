@@ -1,15 +1,13 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { ReactNode } from "react";
-
 /**
  * Shared map-tool harnesses for MapToolCluster tests.
  */
 import { useRef, useState } from "react";
-
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
 
 type HarnessProps = {
   updateConfig: (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => void;

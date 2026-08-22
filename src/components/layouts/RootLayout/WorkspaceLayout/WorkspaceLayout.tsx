@@ -1,10 +1,6 @@
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-import type { ReactNode } from "react";
-
 import { where } from "@avandar/utils";
 import { Outlet } from "@tanstack/react-router";
 import { useMemo } from "react";
-
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { makeMainNavbarLinksFromPermissions } from "@/components/layouts/RootLayout/makeMainNavbarLinksFromPermissions";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
@@ -16,6 +12,8 @@ import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlob
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceLanguage } from "@/i18n/useLanguagePreference";
 import { WorkspaceI18nProvider } from "@/i18n/WorkspaceI18nProvider";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type { ReactNode } from "react";
 
 type Props = {
   /**

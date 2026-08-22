@@ -10,7 +10,6 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { z } from "zod";
-
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";

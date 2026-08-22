@@ -1,3 +1,11 @@
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { isDefined, propPasses } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+import { useMemo } from "react";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 import type {
@@ -5,16 +13,6 @@ import type {
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@avandar/utils";
-
-import { makeSelectOptions, Select } from "@avandar/ui";
-import { isDefined, propPasses } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Stack } from "@mantine/core";
-import { useMemo } from "react";
-
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
 
 type Props = {
   fields: readonly QueryResultColumn[];

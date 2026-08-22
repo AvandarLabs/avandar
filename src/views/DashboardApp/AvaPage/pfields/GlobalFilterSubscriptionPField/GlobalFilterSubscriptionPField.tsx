@@ -1,10 +1,3 @@
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type {
-  GlobalFilterSubscription,
-  GlobalFilterSubscriptionMode,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ReactElement } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -15,9 +8,14 @@ import {
   Text,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
-
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type {
+  GlobalFilterSubscription,
+  GlobalFilterSubscriptionMode,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactElement } from "react";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 

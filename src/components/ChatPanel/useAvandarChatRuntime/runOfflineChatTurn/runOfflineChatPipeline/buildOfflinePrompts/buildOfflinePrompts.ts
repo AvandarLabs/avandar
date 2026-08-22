@@ -15,15 +15,13 @@
  *   queries to a remote model
  */
 
+import { isDefined, propEq } from "@avandar/utils";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "$/types/offlineChat.types";
-
-import { isDefined, propEq } from "@avandar/utils";
-
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 
 const REFINEMENT_HINTS =
   /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also|drop|add|clean|remove)\b/i;

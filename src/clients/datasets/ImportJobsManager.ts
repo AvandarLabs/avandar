@@ -1,6 +1,5 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-
 import { useSyncExternalStore } from "react";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
  * In-memory registry of in-flight CSV / XLSX background parquet transcoding

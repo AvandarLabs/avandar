@@ -26,7 +26,6 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-
 import { runGenerator } from "../gen-sqlite-migrations/runGenerator/runGenerator";
 import { compare, formatDiff } from "./compare";
 

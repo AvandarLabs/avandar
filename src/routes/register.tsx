@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
-
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { RegisterView } from "@/views/RegisterView/RegisterView";
 

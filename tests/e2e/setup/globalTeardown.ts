@@ -1,6 +1,5 @@
-import { config } from "dotenv";
 import path from "node:path";
-
+import { config } from "dotenv";
 import {
   E2E_PRIMARY_USER_EMAIL,
   E2E_SECONDARY_USER_EMAIL,

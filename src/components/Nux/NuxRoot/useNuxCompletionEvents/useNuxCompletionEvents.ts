@@ -1,12 +1,10 @@
-import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
-
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
-
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { onNuxCompletionEvent } from "@/components/Nux/NuxRoot/useNuxCompletionEvents/onNuxCompletionEvent";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
 
 /**
  * Advances the tutorial when a real outcome lands.

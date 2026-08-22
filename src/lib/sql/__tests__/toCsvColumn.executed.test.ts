@@ -12,7 +12,6 @@ import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-
 import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 

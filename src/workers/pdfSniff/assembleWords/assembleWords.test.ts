@@ -1,8 +1,6 @@
-import type { TextItem } from "../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { assembleWords } from "./assembleWords";
+import type { TextItem } from "../pdfSniff.types";
 
 function glyph(text: string, x: number, y = 100, width = 6): TextItem {
   return {

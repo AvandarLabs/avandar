@@ -1,13 +1,11 @@
+import { Trans } from "@lingui/react/macro";
+import { Stack, Text } from "@mantine/core";
+import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
+import css from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.module.css";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
-
-import { Trans } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
-
-import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody/VizSettingsFormBody";
-import css from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.module.css";
 
 type Props = {
   columns: readonly QueryResult.Column[];

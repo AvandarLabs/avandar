@@ -1,13 +1,11 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Button, Text } from "@mantine/core";
-
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   layerName: string;

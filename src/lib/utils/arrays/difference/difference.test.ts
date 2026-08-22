@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { difference } from "@/lib/utils/arrays/difference/difference";
 
 describe("difference", () => {

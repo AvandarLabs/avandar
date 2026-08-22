@@ -1,8 +1,6 @@
-import type { I18n, MessageDescriptor } from "@lingui/core";
-
 import { msg } from "@lingui/core/macro";
-
 import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import type { I18n, MessageDescriptor } from "@lingui/core";
 
 /** The notification a failed Google Sheets import shows. */
 export type GoogleSheetImportErrorCopy = {

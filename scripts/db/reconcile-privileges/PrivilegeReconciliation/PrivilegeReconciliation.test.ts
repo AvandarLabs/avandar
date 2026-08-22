@@ -1,8 +1,6 @@
-import type { AclEntry } from "./PrivilegeReconciliation";
-
 import { describe, expect, it } from "vitest";
-
 import { PrivilegeReconciliation } from "./PrivilegeReconciliation";
+import type { AclEntry } from "./PrivilegeReconciliation";
 
 const { getDeclarationsFromSchemaFiles, reconcile } = PrivilegeReconciliation;
 

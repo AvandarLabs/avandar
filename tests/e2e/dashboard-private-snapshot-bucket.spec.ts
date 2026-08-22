@@ -1,8 +1,7 @@
-import type { APIRequestContext } from "@playwright/test";
-
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { deleteDashboardsByIds, seedDashboard } from "./helpers/seedDashboard";
 import { createE2ESupabaseViewerClient } from "./helpers/supabase";
+import type { APIRequestContext } from "@playwright/test";
 
 const PRIVATE_BUCKET = "published-private";
 

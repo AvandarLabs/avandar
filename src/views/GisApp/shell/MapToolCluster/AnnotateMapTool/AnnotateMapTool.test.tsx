@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 /**
  * Annotate sub-cluster: four drawing tools, persist, and the pinned row.
  */

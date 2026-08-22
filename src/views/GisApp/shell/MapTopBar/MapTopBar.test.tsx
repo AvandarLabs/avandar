@@ -1,12 +1,10 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ComponentProps } from "react";
-
 import { ModalsProvider } from "@mantine/modals";
 import { describe, expect, it, vi } from "vitest";
-
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { MapTopBar } from "@/views/GisApp/shell/MapTopBar/MapTopBar";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ComponentProps } from "react";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {

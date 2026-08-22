@@ -1,15 +1,13 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
-import type { UnknownDataFrame } from "@avandar/utils";
-
 import { match } from "ts-pattern";
-
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
 import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm";
 import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   columns: readonly QueryResultColumn[];

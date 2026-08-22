@@ -1,12 +1,10 @@
-import type { ReactElement } from "react";
-
 import { SegmentedControl } from "@avandar/ui";
 import { isPlainObject } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
-
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 

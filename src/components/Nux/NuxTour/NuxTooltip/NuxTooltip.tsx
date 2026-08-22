@@ -1,13 +1,11 @@
-import type { NuxJoyrideStepData } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
-import type { ReactNode } from "react";
-import type { TooltipRenderProps } from "react-joyride";
-
 import { Card, Stack, Text, Title } from "@mantine/core";
-
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NuxTooltipFooter } from "@/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter";
 import { useNuxAnchorPresent } from "@/components/Nux/NuxTour/useNuxAnchorPresent";
 import { ANIMATION_PRESET } from "@/config/Theme";
+import type { NuxJoyrideStepData } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
+import type { ReactNode } from "react";
+import type { TooltipRenderProps } from "react-joyride";
 
 function _tourButtonVisibility(options: {
   index: number;

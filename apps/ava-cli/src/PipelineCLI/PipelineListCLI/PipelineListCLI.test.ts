@@ -1,7 +1,7 @@
-import { Acclimate } from "@avandar/acclimate";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { Acclimate } from "@avandar/acclimate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 function _getCombinedLogs(): string {

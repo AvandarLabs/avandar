@@ -1,15 +1,5 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  DuckDbClientOperations,
-  RawQueryOptions,
-} from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-
 import { MIMEType } from "@avandar/utils";
 import * as arrow from "apache-arrow";
-
 import { uuid } from "$/lib/uuid";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
@@ -20,6 +10,14 @@ import {
   mergeDuckDbDatasetIds,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  DuckDbClientOperations,
+  RawQueryOptions,
+} from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 
 type RawQueryExecutionPlan = {
   datasetIds: string[];

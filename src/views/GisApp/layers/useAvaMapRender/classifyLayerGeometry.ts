@@ -1,8 +1,4 @@
-import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
-import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
-
 import { isNumber, propEq } from "@avandar/utils";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
@@ -11,6 +7,8 @@ import { normalizeLayerValue } from "@/views/GisApp/layers/classifyLayerValues/n
 import { makeSizeLegendStops } from "@/views/GisApp/layers/makeSizeLegendStops/makeSizeLegendStops";
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
+import type { LayerGeometry } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
+import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 
 type ClassifiedGeometry = {
   geometry: LayerGeometry;

@@ -1,9 +1,5 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
-
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-
 /**
  * Pinned annotation row: first feature creates it, last delete removes it.
  */
@@ -14,6 +10,8 @@ import { fireEvent, render, screen, within } from "@/test-utils";
 import { AnnotationLayerRow } from "@/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
 import { LayerPanel } from "@/views/GisApp/panels/LayerPanel/LayerPanel";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
 
 const sortableMock = vi.hoisted(() => {
   return {

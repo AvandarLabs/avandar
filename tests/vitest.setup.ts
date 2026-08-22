@@ -1,9 +1,9 @@
-import { i18n } from "@lingui/core";
+import path from "node:path";
 import "@testing-library/jest-dom";
+import { i18n } from "@lingui/core";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { cleanup } from "@testing-library/react";
 import dotenv from "dotenv";
-import path from "node:path";
 import { afterEach, expect } from "vitest";
 
 // Activate the Lingui singleton with an empty English catalog so any test

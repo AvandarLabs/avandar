@@ -1,10 +1,8 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * The unpublish mutation plus its toast and analytics event.

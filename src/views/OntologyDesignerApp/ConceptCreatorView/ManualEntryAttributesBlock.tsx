@@ -1,6 +1,3 @@
-import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
-import type { FormType } from "@avandar/ui/hooks";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -13,11 +10,12 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-
 import {
   ConceptFormValues,
   makeDefaultManualEntryAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { FormType } from "@avandar/ui/hooks";
 
 type Props = {
   conceptForm: FormType<ConceptFormValues>;

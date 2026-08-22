@@ -1,11 +1,7 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-import "@puckeditor/core/puck.css";
 import { useEffect, useMemo } from "react";
-
 import { notifyError } from "@/utils/notifications/notify";
+import "@puckeditor/core/puck.css";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
@@ -13,6 +9,8 @@ import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAv
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardViewerContent } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerContent";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets/useEnsurePublishedDashboardDatasets";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T;

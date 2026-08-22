@@ -1,12 +1,10 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Button } from "@mantine/core";
-
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   droppedRowCount: number;

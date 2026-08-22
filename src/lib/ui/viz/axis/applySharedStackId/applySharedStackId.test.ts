@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { applySharedStackId } from "@/lib/ui/viz/axis/applySharedStackId/applySharedStackId";
 
 describe("applySharedStackId", () => {

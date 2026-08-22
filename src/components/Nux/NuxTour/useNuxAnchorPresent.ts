@@ -1,8 +1,6 @@
-import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
-
 import { useSyncExternalStore } from "react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 function _isAnchorInDocument(anchor: NuxAnchor | undefined): boolean {
   if (anchor === undefined) {

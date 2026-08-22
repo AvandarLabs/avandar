@@ -1,6 +1,5 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 import { formatDate } from "@avandar/utils";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** Filters disclosed in furniture rather than drawn on the map. */
 export type ExportFilterReadout = {

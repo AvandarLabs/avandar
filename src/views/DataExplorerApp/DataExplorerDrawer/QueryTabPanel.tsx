@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { matchLiteral } from "@avandar/utils";
-
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
+import type { ReactNode } from "react";
 
 /**
  * The editors the Query tab can show, in rail order. Exported so the rail's

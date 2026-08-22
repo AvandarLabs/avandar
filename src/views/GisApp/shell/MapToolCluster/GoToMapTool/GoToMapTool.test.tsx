@@ -1,10 +1,4 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-
 import { describe, expect, it, vi } from "vitest";
-
 /**
  * Go-to search: coordinate fly, P-code lookup, and inline errors.
  */
@@ -13,6 +7,10 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { fireEvent, render, screen } from "@/test-utils";
 import { GoToMapTool } from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 
 function _submitGoTo(value: string): void {
   const input = screen.getByRole("textbox", {

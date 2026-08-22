@@ -1,15 +1,13 @@
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { ReactNode } from "react";
-
 /**
  * Alt-pan and tool cursor: drag-pan is off unless Select or Alt is active.
  */
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
-
 import { fireEvent, render } from "@/test-utils";
 import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
 import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
 
 function PanPolicyHarness(options: {
   fakeMap: ReturnType<typeof createFakeMap>;

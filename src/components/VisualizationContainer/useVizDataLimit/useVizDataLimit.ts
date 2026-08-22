@@ -1,11 +1,9 @@
-import type { VizRenderLimitKey } from "$/config/GlobalVizConfig";
-
 import { t } from "@lingui/core/macro";
 import { useEffect, useMemo, useRef } from "react";
-
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { notifyWarning } from "@/utils/notifications/notify";
+import type { VizRenderLimitKey } from "$/config/GlobalVizConfig";
 
 /**
  * Caps `data` at the per-viz row limit defined in `VIZ_RENDER_LIMITS` and

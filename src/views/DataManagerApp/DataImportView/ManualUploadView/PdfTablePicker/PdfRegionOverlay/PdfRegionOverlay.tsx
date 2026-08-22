@@ -1,11 +1,9 @@
-import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode, PointerEvent as ReactPointerEvent } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { useRef, useState } from "react";
-
 import css from "./PdfRegionOverlay.module.css";
+import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode, PointerEvent as ReactPointerEvent } from "react";
 
 /** A drag shorter than this in either axis is a click, not a selection. */
 const MIN_DRAG_PX = 4;

@@ -1,7 +1,6 @@
+import { prop } from "@avandar/utils";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
-import { prop } from "@avandar/utils";
 
 /** Header and footer strings the page prints, with fallbacks resolved. */
 export type ExportFurnitureText = {

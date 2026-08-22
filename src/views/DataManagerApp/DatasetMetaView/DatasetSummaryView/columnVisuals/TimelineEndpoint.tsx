@@ -1,8 +1,6 @@
-import type { ReactElement } from "react";
-
 import { Box } from "@mantine/core";
-
 import css from "./TimelineEndpoint.module.css";
+import type { ReactElement } from "react";
 
 /** Marks an endpoint on a date-column timeline. */
 export function TimelineEndpoint(): ReactElement {

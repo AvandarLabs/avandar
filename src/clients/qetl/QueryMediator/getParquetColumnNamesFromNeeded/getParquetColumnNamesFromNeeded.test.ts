@@ -1,7 +1,6 @@
 /** Maps query-facing column names to Parquet originalName headers. */
 
 import { describe, expect, it } from "vitest";
-
 import { getParquetColumnNamesFromNeeded } from "@/clients/qetl/QueryMediator/getParquetColumnNamesFromNeeded/getParquetColumnNamesFromNeeded";
 
 describe("getParquetColumnNamesFromNeeded", () => {

@@ -1,13 +1,3 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type {
-  ComboboxItem,
-  ComboboxParsedItem,
-  MultiSelectProps,
-  OptionsFilter,
-} from "@mantine/core";
-import type { ReactNode } from "react";
-
 import { Model } from "@avandar/models";
 import { makeSelectOptions } from "@avandar/ui";
 import { isNonNullish, makeIdLookupMap, prop } from "@avandar/utils";
@@ -20,10 +10,18 @@ import {
 import { useUncontrolled } from "@mantine/hooks";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
-
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type {
+  ComboboxItem,
+  ComboboxParsedItem,
+  MultiSelectProps,
+  OptionsFilter,
+} from "@mantine/core";
+import type { ReactNode } from "react";
 
 /**
  * Maps combobox option values to items, including nested group items.

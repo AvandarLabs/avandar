@@ -1,10 +1,3 @@
-import type {
-  AnnotatedStatement,
-  GeneratorSummary,
-  PartitionResult,
-} from "../types";
-
-import { prop } from "@avandar/utils";
 import {
   existsSync,
   mkdirSync,
@@ -14,7 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-
+import { prop } from "@avandar/utils";
 import {
   EXCLUDED_TABLES,
   SYNCABLE_TABLES,
@@ -32,6 +25,11 @@ import {
   printDroppedFkInfo,
   printHandEditWarning,
 } from "../warnings";
+import type {
+  AnnotatedStatement,
+  GeneratorSummary,
+  PartitionResult,
+} from "../types";
 
 type SourceFileResult = {
   included: number;

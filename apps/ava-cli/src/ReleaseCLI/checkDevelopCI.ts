@@ -1,7 +1,6 @@
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
-
 import { describeCommandFailure } from "@ava-cli/ReleaseCLI/describeCommandFailure/describeCommandFailure";
 import { propEq } from "@avandar/utils";
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /** The workflow that gates develop. See .github/workflows/staging.yaml. */
 const STAGING_WORKFLOW = "staging.yaml";

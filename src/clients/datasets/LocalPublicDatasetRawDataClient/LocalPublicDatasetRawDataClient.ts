@@ -1,3 +1,10 @@
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks } from "@avandar/query-hooks";
+import { isDefined, promiseMap } from "@avandar/utils";
+import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient/LocalPublicDatasetClient";
+import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
@@ -6,15 +13,6 @@ import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublic
 import type { ServiceClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
 import type { WithQueryHooks } from "@avandar/query-hooks";
-
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { withQueryHooks } from "@avandar/query-hooks";
-import { isDefined, promiseMap } from "@avandar/utils";
-
-import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient/LocalPublicDatasetClient";
-import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 
 type LoadDatasetsToMemoryParams = {
   bucket: SnapshotBucketName;

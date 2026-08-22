@@ -1,3 +1,12 @@
+import { objectKeys, StringKeyOf } from "@avandar/utils";
+import { List, Table, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+import { useMemo } from "react";
+import { CollapsibleItem } from "../../CollapsibleItem";
+import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
+import { ValueItemContainer } from "../../ValueItemContainer";
+import { ObjectTableRow } from "./ObjectTableRow";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -6,17 +15,6 @@ import type {
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../../ObjectDescriptionList.types";
-
-import { objectKeys, StringKeyOf } from "@avandar/utils";
-import { List, Table, Text } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { useMemo } from "react";
-
-import { CollapsibleItem } from "../../CollapsibleItem";
-import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
-import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
-import { ValueItemContainer } from "../../ValueItemContainer";
-import { ObjectTableRow } from "./ObjectTableRow";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";

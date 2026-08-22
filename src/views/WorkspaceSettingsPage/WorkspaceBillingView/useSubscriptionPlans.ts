@@ -1,9 +1,5 @@
-import type { SubscriptionPlanGroup } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { UseQueryResultTuple } from "@avandar/query-hooks";
-
 import { useQuery } from "@avandar/query-hooks";
 import { isDefined, makeBucketMap, prop } from "@avandar/utils";
-
 import { APIClient } from "@/clients/APIClient";
 import {
   isAnnualPaidSeatsPlan,
@@ -13,6 +9,8 @@ import {
   isSeatBasedPlan,
   makeSubscriptionPlanFromPolarProduct,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
+import type { SubscriptionPlanGroup } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { UseQueryResultTuple } from "@avandar/query-hooks";
 
 export function useSubscriptionPlans(): UseQueryResultTuple<
   SubscriptionPlanGroup[]

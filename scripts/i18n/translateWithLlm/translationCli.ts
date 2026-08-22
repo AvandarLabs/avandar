@@ -4,9 +4,8 @@
  * tested directly.
  */
 
-import dotenv from "dotenv";
 import path from "node:path";
-
+import dotenv from "dotenv";
 import { PROJECT_ROOT } from "./config";
 
 export type CliOptions = {

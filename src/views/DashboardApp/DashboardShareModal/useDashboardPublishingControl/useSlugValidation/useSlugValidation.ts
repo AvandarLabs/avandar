@@ -1,16 +1,14 @@
+import { useLingui } from "@lingui/react/macro";
+import { useRef, useState } from "react";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { makeSlugErrorMessageFromValidationFailure } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure";
+import { useDebouncedSlugValidation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useDebouncedSlugValidation";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type {
   SlugValidationRequest,
   SlugValidationResult,
   SlugValidationState,
 } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation.types";
-
-import { useLingui } from "@lingui/react/macro";
-import { useRef, useState } from "react";
-
-import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
-import { makeSlugErrorMessageFromValidationFailure } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure";
-import { useDebouncedSlugValidation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useDebouncedSlugValidation";
 
 /**
  * Tracks what the server has said about the slug currently in the field.

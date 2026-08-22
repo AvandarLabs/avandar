@@ -1,11 +1,10 @@
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import { loadConceptSpine } from "@/clients/qetl/QueryMediator/conceptRelation/loadConceptSpine/loadConceptSpine";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 /**
  * Makes one planned concept queryable: its spine, then its view.

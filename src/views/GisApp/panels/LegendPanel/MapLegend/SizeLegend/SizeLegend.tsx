@@ -1,9 +1,7 @@
+import { useLingui } from "@lingui/react/macro";
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.module.css";
 
 type Props = {
   sizeStops: readonly MapLayer.SizeLegendStop[];

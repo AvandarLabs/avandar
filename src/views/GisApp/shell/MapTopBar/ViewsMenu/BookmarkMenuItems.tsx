@@ -1,9 +1,8 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Menu, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   bookmarks: readonly AvaMapConfig.Bookmark[];

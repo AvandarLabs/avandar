@@ -2,12 +2,10 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { useRouterState } from "@tanstack/react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { renderHook } from "@/test-utils";
-
 import {
   makeNewChatThreadMessagesFromPageContext,
   makeThreadMessagesFromSnapshot,

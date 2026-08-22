@@ -1,11 +1,5 @@
-import type { TextOverlayDrag } from "@/views/GisApp/shell/AnnotationTextOverlay/textOverlayDrag";
-import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { ReactNode, RefObject } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
-
 import css from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay.module.css";
 import {
   applyTextOverlayDrag,
@@ -17,6 +11,10 @@ import {
   MAP_TOOL_TEXT_SIZE_MAX_PX,
   MAP_TOOL_TEXT_SIZE_MIN_PX,
 } from "@/views/GisApp/tools/MapToolGesture.constants";
+import type { TextOverlayDrag } from "@/views/GisApp/shell/AnnotationTextOverlay/textOverlayDrag";
+import type { TextFeature } from "@/views/GisApp/shell/AnnotationTextOverlay/useProjectedOverlayPoint";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   map: MapLibreMap;

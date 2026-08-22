@@ -1,10 +1,9 @@
+import { assertIsDefined, objectKeys } from "@avandar/utils";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types.ts";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types.ts";
 import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { AnyFunction, AnyFunctionWithArguments } from "@avandar/utils";
 import type { Simplify } from "type-fest";
-
-import { assertIsDefined, objectKeys } from "@avandar/utils";
 
 type ConceptAttributeWithMapping = ConceptAttributeModel["Read"] & {
   mapping: AttributeMapping;

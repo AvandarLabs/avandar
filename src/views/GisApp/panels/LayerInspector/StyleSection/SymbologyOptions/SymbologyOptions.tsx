@@ -1,9 +1,8 @@
+import { SYMBOLOGY_OPTIONS } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
+import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
 import type { ReactNode } from "react";
-
-import { SYMBOLOGY_OPTIONS } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
-import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.module.css";
 
 type Props = {
   activeType: MapLayer.Symbology["type"];

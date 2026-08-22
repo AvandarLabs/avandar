@@ -1,12 +1,10 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { isDefined, isPlainObject, isString, traverse } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { Parser } from "node-sql-parser";
 import { match } from "ts-pattern";
-
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 const UUID_REGEX = new RegExp(
   [

@@ -1,3 +1,10 @@
+import {
+  applyCalibration,
+  calibrateAxis,
+} from "../calibrateAxis/calibrateAxis";
+import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
+import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
+import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 import type { AxisCalibration, AxisTick } from "../calibrateAxis/calibrateAxis";
 import type { PlotFrame } from "../findPlotFrame/findPlotFrame";
 import type {
@@ -10,14 +17,6 @@ import type {
   RegionGeometry,
   TextItem,
 } from "../pdfSniff.types";
-
-import {
-  applyCalibration,
-  calibrateAxis,
-} from "../calibrateAxis/calibrateAxis";
-import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
-import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
-import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 
 const BASELINE_TOLERANCE = 1;
 const MIN_SERIES_POINTS = 8;

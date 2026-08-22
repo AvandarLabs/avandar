@@ -1,5 +1,3 @@
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -11,9 +9,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
 type ClarificationOutcome = ClarificationAuditEntry.T["outcome"];
 

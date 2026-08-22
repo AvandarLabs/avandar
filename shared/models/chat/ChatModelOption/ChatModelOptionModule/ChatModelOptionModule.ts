@@ -1,9 +1,8 @@
+import { Model } from "@avandar/models";
+import { prop } from "@avandar/utils";
 // This import must stay `import type`. `ChatModelOption.ts` value-re-exports
 // this module, so a value import here would close a real runtime cycle.
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
-
-import { Model } from "@avandar/models";
-import { prop } from "@avandar/utils";
 
 /**
  * Cloud chat models offered in the picker, proprietary models first so the

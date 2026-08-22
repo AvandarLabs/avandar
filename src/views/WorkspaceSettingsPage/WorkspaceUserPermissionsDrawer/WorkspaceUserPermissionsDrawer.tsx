@@ -1,13 +1,11 @@
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
-import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
-
 import { useLingui } from "@lingui/react/macro";
 import { Center, Drawer, Loader, Title } from "@mantine/core";
-
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceMemberPermissionsEditor } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 
 type Props = {
   isOpen: boolean;

@@ -1,18 +1,15 @@
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
 import { FilterListInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput";
 import { FilterPairInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput";
 import { FilterScalarInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterScalarInput";
-
 import classes from "./FilterValueEditor.module.css";
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ReactNode } from "react";
 
 /** Inputs for the per-rule value editor. */
 export type Props = {

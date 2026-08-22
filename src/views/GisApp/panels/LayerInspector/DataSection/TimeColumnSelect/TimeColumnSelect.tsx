@@ -1,17 +1,15 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { Model } from "@avandar/models";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { withQueryColumn } from "@/views/GisApp/layers/MapLayerUpdates/withQueryColumn";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

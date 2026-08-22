@@ -1,11 +1,3 @@
-import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
-import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
-import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
-import type { RelationCacheEntryModel } from "@/models/RelationCacheEntry/RelationCacheEntry.types";
-import type { RelationCachePayloadModel } from "@/models/RelationCachePayload/RelationCachePayload.types";
-
 /**
  * This file defines the current Dexie version and previous versions, along with
  * their upgrade (migration) functions.
@@ -48,11 +40,17 @@ import type { RelationCachePayloadModel } from "@/models/RelationCachePayload/Re
 import { clearOpfs } from "@avandar/browser-utils";
 import { prop } from "@avandar/utils";
 import Dexie from "dexie";
-
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";
 import { Logger } from "@/utils/Logger";
+import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
+import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
+import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+import type { RelationCacheEntryModel } from "@/models/RelationCacheEntry/RelationCacheEntry.types";
+import type { RelationCachePayloadModel } from "@/models/RelationCachePayload/RelationCachePayload.types";
 
 const db = new Dexie("AvandarDB");
 

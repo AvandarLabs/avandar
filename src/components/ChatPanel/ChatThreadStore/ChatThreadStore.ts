@@ -1,8 +1,6 @@
-import type { ThreadMessageLike } from "@assistant-ui/react";
-
 import { prop } from "@avandar/utils";
-
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
+import type { ThreadMessageLike } from "@assistant-ui/react";
 
 type StoredThread = {
   messages: ThreadMessageLike[];

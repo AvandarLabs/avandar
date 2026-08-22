@@ -1,3 +1,9 @@
+import { useQuery } from "@avandar/query-hooks";
+import { isNonEmptyArray, MIMEType, noop } from "@avandar/utils";
+import { useEffect, useMemo, useState } from "react";
+import { APIClient } from "@/clients/APIClient";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
   GooglePickerAPI,
@@ -5,14 +11,6 @@ import type {
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
-
-import { useQuery } from "@avandar/query-hooks";
-import { isNonEmptyArray, MIMEType, noop } from "@avandar/utils";
-import { useEffect, useMemo, useState } from "react";
-
-import { APIClient } from "@/clients/APIClient";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
 
 function _getGooglePickerAPIKey(): string {
   const key = import.meta.env.VITE_GOOGLE_PICKER_API_KEY;

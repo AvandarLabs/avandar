@@ -1,7 +1,3 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactNode } from "react";
-
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
 import { NuxCompletionModal } from "@/components/Nux/NuxCompletionModal/NuxCompletionModal";
 import { useNuxCompletionCelebration } from "@/components/Nux/NuxCompletionModal/useNuxCompletionCelebration/useNuxCompletionCelebration";
@@ -17,6 +13,9 @@ import { NuxTourLazy } from "@/components/Nux/NuxTour/NuxTourLazy";
 import { NuxWelcomeModal } from "@/components/Nux/NuxWelcomeModal/NuxWelcomeModal";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
 
 function _startFirstDashboardTour(options: {
   completedMilestones: readonly NuxProgress.MilestoneKey[];

@@ -1,11 +1,3 @@
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
-import type {
-  DataExplorerAppState,
-  OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-
 import {
   isNonNullish,
   makeObjectFromEntries,
@@ -13,8 +5,14 @@ import {
   propEq,
 } from "@avandar/utils";
 import { z } from "zod";
-
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  DataExplorerAppState,
+  OpenDatasetInfo,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 /**
  * Zod schema for the Data Explorer URL search params.

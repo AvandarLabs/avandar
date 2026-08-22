@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { render } from "@/test-utils";
 import { LayerSwatch } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerSwatch/LayerSwatch";
 

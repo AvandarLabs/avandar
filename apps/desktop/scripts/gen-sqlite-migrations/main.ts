@@ -24,7 +24,6 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-
 import { runGenerator } from "./runGenerator/runGenerator";
 
 const HERE = dirname(fileURLToPath(import.meta.url));

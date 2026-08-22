@@ -2,7 +2,6 @@ import {
   MAX_DISCOVERY_CANDIDATE_CHARS,
   MAX_DISCOVERY_CANDIDATE_VALUES,
 } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
-
 import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
 type DataExplorerToolDefinition = {

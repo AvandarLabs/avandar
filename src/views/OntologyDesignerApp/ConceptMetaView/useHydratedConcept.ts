@@ -1,11 +1,9 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-
 import { where } from "@avandar/utils";
 import { useMemo } from "react";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 
 /**
  * Given a concept, finish hydrating it.

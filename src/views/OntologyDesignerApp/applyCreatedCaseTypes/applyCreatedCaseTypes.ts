@@ -1,8 +1,4 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatCreatedCaseType } from "$/types/chat.types";
-
 import { where } from "@avandar/utils";
-
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -11,6 +7,8 @@ import {
   insertConceptFromFormValues,
   rollbackConceptFormInsert,
 } from "@/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatCreatedCaseType } from "$/types/chat.types";
 
 /**
  * Inserts each chat-created case type using the concept creator persist path.

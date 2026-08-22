@@ -1,14 +1,12 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { Divider, Stack } from "@mantine/core";
-
 import { ExportSheetHeaderLineFields } from "@/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields";
 import { ExportSheetMandatoryFurniture } from "@/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture";
 import { ExportSheetPaperOrientationFields } from "@/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields";
 import { ExportSheetSourceAndDisclaimerFields } from "@/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields";
 import { ExportSheetToggleFields } from "@/views/GisApp/export/ExportSheet/ExportSheetToggleFields";
 import { getExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   config: AvaMapConfig.T;

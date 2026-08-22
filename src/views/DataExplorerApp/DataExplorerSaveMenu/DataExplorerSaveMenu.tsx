@@ -1,16 +1,14 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Menu, Tooltip } from "@mantine/core";
 import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useNuxExplorerSaveMenu } from "@/components/Nux/NuxTour/useNuxExplorerSaveMenu";
 import { DataExplorerOpenDatasetMenuItems } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems";
 import { DataExplorerSaveAsMenuItems } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveAsMenuItems";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ReactNode } from "react";
 
 type Props = {
   savableSql: string | undefined;

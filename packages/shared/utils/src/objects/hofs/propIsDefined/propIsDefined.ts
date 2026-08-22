@@ -1,7 +1,6 @@
+import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
 import type { SetDefined } from "@utils/types/utilities.types.ts";
 import type { SetRequired } from "type-fest";
-
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
 
 /**
  * Returns a function that checks if an object's property at `key` is defined

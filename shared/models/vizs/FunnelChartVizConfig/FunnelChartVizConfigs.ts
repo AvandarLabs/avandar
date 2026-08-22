@@ -1,3 +1,7 @@
+import { match } from "ts-pattern";
+import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
+import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -15,12 +19,6 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-
-import { match } from "ts-pattern";
-
-import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
-import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 
 export const FunnelChartVizConfigs = {
   vizType: "funnel",

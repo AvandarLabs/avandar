@@ -1,6 +1,5 @@
 import { Container, ContainerProps, Flex, Paper } from "@mantine/core";
 import { CSSProperties, ReactNode } from "react";
-
 import css from "@/components/layouts/AppLayout/AppLayout.module.css";
 import { AppToolbar } from "@/components/layouts/AppLayout/AppToolbar/AppToolbar";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";

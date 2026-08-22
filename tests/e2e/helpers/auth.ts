@@ -1,10 +1,8 @@
-import type { Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./constants";
 import { dismissBillingModalIfVisible } from "./dismissBillingModal";
 import { LONG_WAIT } from "./timeouts";
+import type { Page } from "@playwright/test";
 
 type SignInOptions = {
   email: string;

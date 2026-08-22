@@ -1,6 +1,5 @@
-import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 const SCROLLABLE_OVERFLOW = /auto|scroll/;
 

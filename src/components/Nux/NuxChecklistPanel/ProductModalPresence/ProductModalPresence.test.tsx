@@ -1,6 +1,5 @@
 import { Modal } from "@mantine/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { ProductModalPresence } from "@/components/Nux/NuxChecklistPanel/ProductModalPresence/ProductModalPresence";
 import { PRODUCT_MODAL_ROOT_CLASSNAME } from "@/config/Theme";
 import { render, waitFor } from "@/test-utils";

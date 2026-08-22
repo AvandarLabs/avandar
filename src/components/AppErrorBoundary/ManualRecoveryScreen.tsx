@@ -1,6 +1,5 @@
 import { Trans } from "@lingui/react/macro";
 import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
-
 import { SessionRecovery } from "@/components/AppErrorBoundary/SessionRecovery/SessionRecovery";
 
 /**

@@ -1,6 +1,3 @@
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
-
 import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -22,8 +19,9 @@ import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runCh
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { z } from "zod";
-
 import { getAppURL } from "$/env/getAppURL.ts";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {

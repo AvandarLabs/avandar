@@ -1,8 +1,6 @@
-import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { extractGridTable } from "./extractGridTable";
+import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
 
 function item(text: string, x: number, y: number): TextItem {
   return {

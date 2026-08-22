@@ -1,9 +1,3 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  SqlDisplayCatalog,
-  SqlDisplaySegment,
-} from "@/components/sql/sql-helpers/sqlDisplay.types";
-
 /**
  * Helpers for reasoning about which datasets and columns are in scope inside
  * a SQL string. Used by {@link AvaSqlBlock} (and the SQL pill UI in
@@ -11,8 +5,12 @@ import type {
  * references as errors and to populate the column-pill dropdown.
  */
 import { prop } from "@avandar/utils";
-
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type {
+  SqlDisplayCatalog,
+  SqlDisplaySegment,
+} from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 export type SqlScope = {
   /** Datasets referenced anywhere in the SQL (catalog-resolved). */

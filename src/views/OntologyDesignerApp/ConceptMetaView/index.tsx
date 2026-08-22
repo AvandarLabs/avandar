@@ -1,13 +1,11 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-
 import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Container, Group, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconBlocks } from "@tabler/icons-react";
-
 import { CaseTypeActions } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions";
 import { CaseTypeAttributesList } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList";
 import { useHydratedConcept } from "@/views/OntologyDesignerApp/ConceptMetaView/useHydratedConcept";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 
 type Props = {
   concept: Concept.T;

@@ -1,6 +1,5 @@
-import type { ReactNode, RefObject } from "react";
-
 import css from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface.module.css";
+import type { ReactNode, RefObject } from "react";
 
 type Props = { containerRef: RefObject<HTMLDivElement | null> };
 

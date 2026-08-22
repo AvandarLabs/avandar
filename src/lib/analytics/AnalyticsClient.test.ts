@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 
 const CHAT_MESSAGE_SENT_EVENT = {

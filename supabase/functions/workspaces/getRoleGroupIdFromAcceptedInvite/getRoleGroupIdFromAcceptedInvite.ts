@@ -1,10 +1,8 @@
+import { z } from "zod";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type { AppType, RoleLevel } from "$/models/Permissions/Permissions.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
-
-import { z } from "zod";
-
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 
 /** Validates one app-role override stored on a workspace invite. */
 export const WorkspaceInviteRoleOverrideSchema = z.object({

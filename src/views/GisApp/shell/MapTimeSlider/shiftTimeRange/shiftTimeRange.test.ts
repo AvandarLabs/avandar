@@ -1,11 +1,9 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 /**
  * Play-step translation of a map clock window.
  */
 import { describe, expect, it } from "vitest";
-
 import { shiftTimeRange } from "./shiftTimeRange";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const EXTENT: AvaMapConfig.TimeRange = {
   start: "2026-01-01T00:00:00.000Z",

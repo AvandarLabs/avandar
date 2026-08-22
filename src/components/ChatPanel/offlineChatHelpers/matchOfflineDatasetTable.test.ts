@@ -3,7 +3,6 @@
  * remap them onto a preferred dataset.
  */
 import { describe, expect, it } from "vitest";
-
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
 
 const DEATHS_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";

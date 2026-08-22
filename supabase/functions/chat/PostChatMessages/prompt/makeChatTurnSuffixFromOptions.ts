@@ -1,8 +1,7 @@
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
-import type { ChatRetryContext } from "$/types/chat.types.ts";
-
 import { buildRetryContextNote } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { makeSpatialSqlDocumentationFromPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+import type { ChatRetryContext } from "$/types/chat.types.ts";
 
 function formatPreviousSql(lastSql: string | undefined): string {
   return lastSql ? `Previous SQL:\n\`\`\`sql\n${lastSql}\n\`\`\`` : "";

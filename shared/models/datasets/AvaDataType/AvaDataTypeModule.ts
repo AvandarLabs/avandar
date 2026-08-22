@@ -1,8 +1,7 @@
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
-
 import { matchLiteral, registry } from "@avandar/utils";
 import { match } from "ts-pattern";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 
 export const AvaDataTypeModule = {
   /** Data types that can be handled in Avandar. */

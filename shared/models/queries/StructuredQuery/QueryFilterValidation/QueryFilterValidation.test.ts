@@ -1,8 +1,6 @@
-import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
 import { describe, expect, it } from "vitest";
-
 import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation.ts";
+import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 function _rule(overrides: Partial<QueryFilterRule> = {}): QueryFilterRule {
   return {

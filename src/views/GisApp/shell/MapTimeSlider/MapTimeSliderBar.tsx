@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, RangeSlider } from "@mantine/core";
 import { IconPlayerPlay } from "@tabler/icons-react";
 import { useState } from "react";
-
 import css from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider.module.css";
+import type { ReactNode } from "react";
 
 const SLIDER_MAX = 1000;
 

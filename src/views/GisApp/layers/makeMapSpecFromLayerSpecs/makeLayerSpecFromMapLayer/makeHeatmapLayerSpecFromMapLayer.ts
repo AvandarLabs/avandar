@@ -1,8 +1,7 @@
+import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
 import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { ExpressionSpecification } from "maplibre-gl";
-
-import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 
 /** Makes an evenly spaced density expression from a heatmap ramp. */
 function _buildHeatmapColor(ramp: readonly string[]): ExpressionSpecification {

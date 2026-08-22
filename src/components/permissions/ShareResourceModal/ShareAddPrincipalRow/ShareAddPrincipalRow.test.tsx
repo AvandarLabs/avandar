@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import { ShareAddPrincipalRow } from "@/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow";
 import { render, screen } from "@/test-utils";
 

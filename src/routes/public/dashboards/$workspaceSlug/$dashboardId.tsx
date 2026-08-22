@@ -1,6 +1,5 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * Legacy canonical dashboard URL. Deprecated; do not add behavior here.

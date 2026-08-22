@@ -1,8 +1,7 @@
+import { TextInput } from "@mantine/core";
 import type { DatasetImportFormValues } from "./DatasetImportForm.types";
 import type { UseFormReturnType } from "@mantine/form";
 import type { ReactNode, RefObject } from "react";
-
-import { TextInput } from "@mantine/core";
 
 export type DatasetImportFieldsProps = {
   descriptionInputRef: RefObject<HTMLInputElement | null>;

@@ -2,7 +2,6 @@
  * Grid-bin compilation for compileMapLayerSpatialQuery.
  */
 import { describe, expect, it } from "vitest";
-
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
   createGridBinLayerFixture,

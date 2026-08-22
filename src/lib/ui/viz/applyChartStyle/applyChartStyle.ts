@@ -1,3 +1,7 @@
+import { matchLiteral } from "@avandar/utils";
+import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
+import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
   AxisRole,
@@ -11,12 +15,6 @@ import type {
   XAxisProps,
   YAxisProps,
 } from "recharts";
-
-import { matchLiteral } from "@avandar/utils";
-
-import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
-import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 
 const DEFAULT_TICK_FONT_SIZE = 12;
 const DEFAULT_Y_AXIS_WIDTH = 64;

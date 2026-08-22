@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
-
 import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Whether the viewer can offer a sign-in link to switch accounts. */

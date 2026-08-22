@@ -1,20 +1,18 @@
+import { isDefined } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { match } from "ts-pattern";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
+import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
+import { useSubscriptionPlans } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { SetRequired } from "type-fest";
-
-import { isDefined } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
-import { Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { match } from "ts-pattern";
-
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
-import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
-import { useSubscriptionPlans } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
 
 type Props = {
   hideTitle?: boolean;

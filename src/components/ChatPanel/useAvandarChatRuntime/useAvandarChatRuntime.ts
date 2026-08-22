@@ -1,12 +1,7 @@
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
-import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import type { ChatModelAdapter } from "@assistant-ui/react";
-
 import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
@@ -20,6 +15,9 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { ChatModelAdapter } from "@assistant-ui/react";
 
 /**
  * The Assistant UI runtime for the Avandar chat panel.

@@ -1,9 +1,3 @@
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type {
-  ResourceShareRow,
-  ResourceType,
-} from "@/clients/permissions/ResourceShareClient";
-
 import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -15,12 +9,15 @@ import {
   Text,
 } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
-
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type {
+  ResourceShareRow,
+  ResourceType,
+} from "@/clients/permissions/ResourceShareClient";
 
 type Props = {
   share: ResourceShareRow;

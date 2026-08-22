@@ -1,20 +1,17 @@
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { useState } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
+import { fireEvent, render, screen } from "@/test-utils";
+import { DatasetImportForm } from "./DatasetImportForm";
 import type {
   CsvDataSourceMetadata,
   DataSourceMetadata,
 } from "./DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
-import { useState } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { uuid } from "$/lib/uuid";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { fireEvent, render, screen } from "@/test-utils";
-
-import { DatasetImportForm } from "./DatasetImportForm";
 
 const CSV_DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
 const XLSX_DATASET_ID = "22222222-2222-2222-2222-222222222222" as Dataset.Id;

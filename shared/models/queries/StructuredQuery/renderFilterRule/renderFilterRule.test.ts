@@ -1,9 +1,7 @@
+import { describe, expect, it } from "vitest";
+import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { RenderFilterRuleOptions } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
-
-import { describe, expect, it } from "vitest";
-
-import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 
 function _render(
   overrides: Partial<QueryFilterRule>,

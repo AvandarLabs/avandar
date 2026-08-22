@@ -1,3 +1,12 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { modals } from "@mantine/modals";
+import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
+import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
+import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   ConsentDecision,
@@ -5,17 +14,6 @@ import type {
 } from "@/components/privacy/ConsentModal/ConsentModal";
 import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
-import { i18n } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
-import { modals } from "@mantine/modals";
-
-import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
-import { ConsentModal } from "@/components/privacy/ConsentModal/ConsentModal";
-import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
-import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
 
 export type CrossBoundaryContext =
   | "discovery_clarification"

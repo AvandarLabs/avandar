@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Combobox } from "@mantine/core";
-
 import { CREATE_OPTION_VALUE } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/DisputedValuesInput.constants";
+import type { ReactNode } from "react";
 
 type Props = {
   matchingSuggestions: readonly string[];

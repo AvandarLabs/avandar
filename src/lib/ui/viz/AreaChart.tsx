@@ -1,7 +1,3 @@
-import type { AreaSeries } from "$/models/vizs/SeriesConfig";
-import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
-
 /**
  * NOTE: This component uses Recharts directly instead of Mantine's
  * `AreaChart` wrapper. Mantine's wrapper wraps each series' gradient
@@ -33,12 +29,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
 import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
+import type { AreaSeries } from "$/models/vizs/SeriesConfig";
+import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
+import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 
 const DEFAULT_AREA_COLOR = "var(--mantine-color-blue-6)";
 const DEFAULT_AREA_FILL_OPACITY = 0.6;

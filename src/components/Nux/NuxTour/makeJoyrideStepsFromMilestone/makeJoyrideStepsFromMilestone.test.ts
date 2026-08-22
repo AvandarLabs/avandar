@@ -1,16 +1,14 @@
-import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
-import type { ReactElement } from "react";
-import type { Step } from "react-joyride";
-
 import { i18n } from "@lingui/core";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-
 import { makeJoyrideStepsFromMilestone } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
 import {
   FIRST_DASHBOARD_MILESTONES,
   FIRST_DASHBOARD_SAMPLE_CSV_HREF,
 } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { render, screen } from "@/test-utils";
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { ReactElement } from "react";
+import type { Step } from "react-joyride";
 
 const _LAID_OUT_RECT = {
   x: 100,

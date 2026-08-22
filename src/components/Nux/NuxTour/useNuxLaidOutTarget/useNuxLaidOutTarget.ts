@@ -1,8 +1,6 @@
-import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
-
 import { useCallback, useSyncExternalStore } from "react";
-
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 function _subscribeToLaidOutTarget(
   anchor: NuxAnchor | undefined,

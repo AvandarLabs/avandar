@@ -1,8 +1,6 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { describe, expect, it } from "vitest";
-
 import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const binding: MapLayer.GeoBindingColumnNames = {
   type: "latLngColumns",

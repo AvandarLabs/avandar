@@ -1,8 +1,8 @@
+import { readFileSync } from "node:fs";
 import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { readFileSync } from "node:fs";
 import { loadEnv } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { VitePWA } from "vite-plugin-pwa";

@@ -1,10 +1,4 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { Model } from "@avandar/models";
-
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   getCachedDatasetRowCount,
@@ -14,6 +8,10 @@ import {
   largeDatasetAutoLimitFromRowCount,
   shouldAutoLimitLargeDataset,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** Passed to `setDataSource` so limit and source commit atomically. */
 export type DataSourceCommitOptions = {

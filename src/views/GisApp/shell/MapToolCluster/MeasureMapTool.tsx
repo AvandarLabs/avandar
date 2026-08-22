@@ -1,11 +1,9 @@
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { ReactNode } from "react";
-
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { IconRuler2 } from "@tabler/icons-react";
-
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
 
 type Props = {
   mapToolMode: MapToolMode;

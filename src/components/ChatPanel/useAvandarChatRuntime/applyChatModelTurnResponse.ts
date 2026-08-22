@@ -1,18 +1,6 @@
-import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { ChatModelRunResult } from "@assistant-ui/react";
-import type { MutableRefObject } from "react";
-
 import { prop, propEq } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -34,6 +22,16 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { ChatModelRunResult } from "@assistant-ui/react";
+import type { MutableRefObject } from "react";
 
 type ApplyChatModelTurnResponseOptions = {
   response: ChatResponse.T;

@@ -1,6 +1,3 @@
-import type { FormatToken as Token } from "@utils/dates/date-utils/formatPatternConstants.ts";
-import type { LiteralUnion } from "type-fest";
-
 import { FORMAT_TOKEN_ORDER as TOKEN_ORDER } from "@utils/dates/date-utils/formatPatternConstants.ts";
 import { parseFormatSegments } from "@utils/dates/date-utils/parseFormatSegments.ts";
 import { getDateTimeFormatter } from "@utils/dates/formatDate/getDateTimeFormatter.ts";
@@ -9,6 +6,8 @@ import {
   PARSE_LOCALE,
 } from "@utils/dates/formatDate/getDisplayLocale.ts";
 import { isDate } from "@utils/guards/isDate/isDate.ts";
+import type { FormatToken as Token } from "@utils/dates/date-utils/formatPatternConstants.ts";
+import type { LiteralUnion } from "type-fest";
 
 export type FormattableTimezone = LiteralUnion<"local" | "UTC", string>;
 

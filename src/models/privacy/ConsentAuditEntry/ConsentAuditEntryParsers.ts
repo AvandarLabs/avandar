@@ -1,13 +1,7 @@
-import type { ConsentAuditEntry } from "./ConsentAuditEntry";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
-
 import { makeParserRegistry } from "@avandar/clients";
 import { identity } from "@avandar/utils";
 import { z } from "zod";
-
 import { uuidType } from "$/lib/zodHelpers";
-
 import {
   ConsentAuditContexts,
   ConsentAuditMedicalTiers,
@@ -15,6 +9,9 @@ import {
   ConsentAuditWarnings,
   ConsentDecisionKinds,
 } from "./ConsentAuditEntry";
+import type { ConsentAuditEntry } from "./ConsentAuditEntry";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
 
 const DBReadSchema = z.object({
   id: uuidType<ConsentAuditEntry.Id>(),

@@ -1,12 +1,10 @@
+import { describe, expect, it } from "vitest";
+import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type {
   QueryColumnId,
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
-
-import { describe, expect, it } from "vitest";
-
-import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
 
 /**
  * Builds a minimal `QueryColumn` fixture.

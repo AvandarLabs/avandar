@@ -1,10 +1,9 @@
+import { msg } from "@lingui/core/macro";
+import { match } from "ts-pattern";
 import type { GraphicType } from "@/workers/pdfSniff/detectGraphicType/detectGraphicType";
 import type { PdfRegionShape } from "@/workers/pdfSniff/pdfSniff.types";
 import type { PdfOutputModeResolution } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
 import type { I18n } from "@lingui/core";
-
-import { msg } from "@lingui/core/macro";
-import { match } from "ts-pattern";
 
 export type OutputModeCopy = {
   /** Heading for the group, naming what was detected. */

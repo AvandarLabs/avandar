@@ -1,15 +1,12 @@
-import type { ReplyEnvelope, RequestEnvelope } from "$/platform/ipc/envelopes";
-
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-
 import { DuckDbContracts } from "$/platform/ipc/contracts/DuckDbContracts";
-
 import { createDuckDbService } from "../../services/createDuckDbService/createDuckDbService";
 import { createIpcServer } from "../createIpcServer/createIpcServer";
 import { registerDuckDbHandlers } from "./registerDuckDbHandlers";
+import type { ReplyEnvelope, RequestEnvelope } from "$/platform/ipc/envelopes";
 
 type FakeTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;

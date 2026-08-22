@@ -5,7 +5,6 @@ import {
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 import { z } from "zod";
-
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 
 /**

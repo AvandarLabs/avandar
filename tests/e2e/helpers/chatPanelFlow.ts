@@ -1,8 +1,6 @@
-import type { Locator, Page } from "@playwright/test";
-
 import { expect } from "@playwright/test";
-
 import { MEDIUM_WAIT } from "./timeouts";
+import type { Locator, Page } from "@playwright/test";
 
 /**
  * Opens the AppShell chat Aside. Uses the keyboard shortcut so Mantine

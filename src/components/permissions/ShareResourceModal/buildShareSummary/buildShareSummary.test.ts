@@ -1,10 +1,8 @@
+import { describe, expect, it } from "vitest";
+import { buildShareSummary } from "./buildShareSummary";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import type { SummarySpan } from "./buildShareSummary";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
-
-import { describe, expect, it } from "vitest";
-
-import { buildShareSummary } from "./buildShareSummary";
 
 // `buildShareSummary` uses the global `t` macro from `@lingui/core/macro`
 // internally, which reads from the active Lingui i18n singleton. The vitest

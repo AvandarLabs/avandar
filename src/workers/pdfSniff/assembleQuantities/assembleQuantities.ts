@@ -1,10 +1,9 @@
-import type { BBox, PdfValueUnit, TextItem } from "../pdfSniff.types";
-
 import {
   getLineSpanFromTextItem,
   isSameLineRun,
 } from "../assembleLabels/assembleLabels";
 import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
+import type { BBox, PdfValueUnit, TextItem } from "../pdfSniff.types";
 
 /**
  * A text item that is entirely numeric, and so can head a quantity.

@@ -1,9 +1,7 @@
+import { expect } from "@playwright/test";
+import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { Locator, Page } from "@playwright/test";
-
-import { expect } from "@playwright/test";
-
-import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
 
 /**
  * Locator scoped to the open share modal (`role="dialog"`, title

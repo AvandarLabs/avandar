@@ -1,12 +1,10 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button, Menu } from "@mantine/core";
 import { IconBookmark } from "@tabler/icons-react";
-
 import { BookmarkMenuItems } from "@/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems";
 import css from "@/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.module.css";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   bookmarks: readonly AvaMapConfig.Bookmark[];

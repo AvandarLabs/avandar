@@ -1,3 +1,11 @@
+import { Model } from "@avandar/models";
+import { useQuery } from "@avandar/query-hooks";
+import { prop, sortObjList } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
+import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
+import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
 import type {
   QueryAnalyticsSurface,
   UserQueryAnalyticsTrigger,
@@ -10,16 +18,6 @@ import type {
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
-
-import { Model } from "@avandar/models";
-import { useQuery } from "@avandar/query-hooks";
-import { prop, sortObjList } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
-import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
-import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;

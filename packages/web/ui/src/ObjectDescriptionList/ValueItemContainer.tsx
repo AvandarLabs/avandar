@@ -1,3 +1,14 @@
+import { constant } from "@avandar/utils";
+import { Text } from "@mantine/core";
+import { match } from "ts-pattern";
+import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock/index";
+import {
+  isDescribableObject,
+  isDescribableValueArray,
+  isPrimitiveDescribableValue,
+} from "./guards";
+import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
+import { PrimitiveValueItem } from "./PrimitiveValueItem/PrimitiveValueItem";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -8,19 +19,6 @@ import type {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
-
-import { constant } from "@avandar/utils";
-import { Text } from "@mantine/core";
-import { match } from "ts-pattern";
-
-import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock/index";
-import {
-  isDescribableObject,
-  isDescribableValueArray,
-  isPrimitiveDescribableValue,
-} from "./guards";
-import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
-import { PrimitiveValueItem } from "./PrimitiveValueItem/PrimitiveValueItem";
 
 type Props<RootData extends GenericRootData> = {
   /**

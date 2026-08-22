@@ -1,10 +1,8 @@
-import type { Page } from "@playwright/test";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { expect } from "@playwright/test";
-
 import { isDatasetParquetInStorage } from "./supabaseAdminClient";
 import { LONG_WAIT } from "./timeouts";
+import type { Page } from "@playwright/test";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Deletes the dataset on the current Data Manager metadata page using the

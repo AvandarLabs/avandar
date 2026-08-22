@@ -1,6 +1,5 @@
-import type { RefObject } from "react";
-
 import { useLayoutEffect, useState } from "react";
+import type { RefObject } from "react";
 
 /**
  * Live height of the canvas the drawer is docked beneath. Measured into

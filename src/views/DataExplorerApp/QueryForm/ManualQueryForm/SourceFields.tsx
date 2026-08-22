@@ -1,13 +1,11 @@
+import { Model } from "@avandar/models";
+import { useLingui } from "@lingui/react/macro";
+import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
+import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
-
-import { Model } from "@avandar/models";
-import { useLingui } from "@lingui/react/macro";
-
-import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
-import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 
 type Props = {
   dataSource: QueryDataSource.T | undefined;

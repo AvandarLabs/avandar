@@ -1,10 +1,8 @@
 import { I18nProvider } from "@lingui/react";
 import { describe, expect, it, vi } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { i18n } from "@/i18n/i18n";
 import { render, screen } from "@/test-utils";
-
 import { AppDropzone } from "./AppDropzone";
 import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 

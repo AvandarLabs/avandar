@@ -1,15 +1,14 @@
+import { matchLiteral } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { Plural, useLingui } from "@lingui/react/macro";
+import { Button } from "@mantine/core";
+import { useMemo } from "react";
 import type {
   DropReason,
   GeometryDropReport,
 } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MessageDescriptor } from "@lingui/core";
 import type { ReactNode } from "react";
-
-import { matchLiteral } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { Plural, useLingui } from "@lingui/react/macro";
-import { Button } from "@mantine/core";
-import { useMemo } from "react";
 
 type Props = {
   drop: GeometryDropReport;

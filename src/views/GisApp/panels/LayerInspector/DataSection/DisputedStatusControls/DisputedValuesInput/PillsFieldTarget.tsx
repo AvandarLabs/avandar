@@ -1,8 +1,7 @@
-import type { ComboboxStore } from "@mantine/core";
-import type { KeyboardEvent, ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Combobox, Pill, PillsInput } from "@mantine/core";
+import type { ComboboxStore } from "@mantine/core";
+import type { KeyboardEvent, ReactNode } from "react";
 
 type Props = {
   combobox: ComboboxStore;

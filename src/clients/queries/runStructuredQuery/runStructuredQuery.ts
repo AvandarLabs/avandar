@@ -1,8 +1,7 @@
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { RunStructuredQueryParams } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-
-import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 
 /**
  * {@link runStructuredQueryWithMetadata} with the analytics metadata dropped,

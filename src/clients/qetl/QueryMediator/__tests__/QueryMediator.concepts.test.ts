@@ -1,9 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
-import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-
 /**
  * Tests the mediator's concept-relation wiring: expansion, leasing and order.
  *
@@ -15,8 +9,12 @@ import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediat
  * over missing tables.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;

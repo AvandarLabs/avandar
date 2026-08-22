@@ -1,12 +1,11 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 /**
  * Shared mocks and helpers for the LocalPublicDatasetRawDataClient tests.
  * Scenario files import this first so its `vi.mock` calls are registered
  * before the client module graph loads.
  */
 import { vi } from "vitest";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 export const DASHBOARD_A_ID =
   "11111111-1111-4111-8111-111111111111" as Dashboard.Id;

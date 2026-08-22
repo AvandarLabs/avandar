@@ -1,11 +1,9 @@
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-
 import { describe, expect, it } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { getRequiredColumnIds } from "@/views/GisApp/layers/MapLayerUpdates/getRequiredColumnIds";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 describe("getRequiredColumnIds with a disputed bind", () => {
   it("keeps a query-column disputed bind in the query", () => {

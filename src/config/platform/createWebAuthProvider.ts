@@ -1,11 +1,10 @@
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   AuthCredentials,
   AuthProvider,
   Session,
   Unsubscribe,
 } from "$/platform/types/AuthProvider.types";
-
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 const listeners = new Set<(session: Session | undefined) => void>();
 

@@ -1,9 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-
 import { useMutation } from "@avandar/query-hooks";
 import { propEq, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -23,13 +17,17 @@ import { IconSearch, IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSql: string) => void;

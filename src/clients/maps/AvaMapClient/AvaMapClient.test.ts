@@ -1,9 +1,7 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
 const { fromMock } = vi.hoisted(() => {
   return { fromMock: vi.fn() };

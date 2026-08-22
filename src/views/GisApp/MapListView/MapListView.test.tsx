@@ -1,16 +1,14 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { User } from "$/models/User/User";
-import type { UserProfile } from "$/models/User/UserProfile";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { Model } from "@avandar/models";
 import { modals } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { act, fireEvent, render, screen } from "@/test-utils";
 import { MapListView } from "@/views/GisApp/MapListView/MapListView";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const {
   insertMock,

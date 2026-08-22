@@ -1,13 +1,12 @@
-import type {
-  SupabaseStatusEntry,
-  SupabaseStatusReport,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-
+import path from "node:path";
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { SupabaseStatus } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
 import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import path from "node:path";
+import type {
+  SupabaseStatusEntry,
+  SupabaseStatusReport,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** Describes the current stack, in the words that fit this branch. */
 function _makeHeadlineDescription(

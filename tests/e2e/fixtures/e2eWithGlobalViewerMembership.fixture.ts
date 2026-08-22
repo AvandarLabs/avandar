@@ -1,13 +1,11 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "../helpers/supabaseAdminClient";
 import { getUserIdByEmail } from "../setup/e2eTestWorkspaceLifecycle";
 import { test as base, expect } from "./e2e.fixture";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export { expect };
 

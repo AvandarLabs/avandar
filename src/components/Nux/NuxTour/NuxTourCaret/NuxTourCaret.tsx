@@ -1,7 +1,6 @@
+import css from "@/components/Nux/NuxTour/NuxTourCaret/NuxTourCaret.module.css";
 import type { ReactNode } from "react";
 import type { ArrowRenderProps } from "react-joyride";
-
-import css from "@/components/Nux/NuxTour/NuxTourCaret/NuxTourCaret.module.css";
 
 /**
  * The tooltip caret, drawn as a bordered diamond the way Mantine paints

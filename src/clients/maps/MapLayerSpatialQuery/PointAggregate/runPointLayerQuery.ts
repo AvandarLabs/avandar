@@ -1,10 +1,3 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type {
-  PointAggregation,
-  PointCoordinateAudit,
-} from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
-
 import { compilePointAggregateSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointAggregateSql";
 import { compilePointCoordinateAuditSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointCoordinateAuditSql";
 import { getPointAggregateCellsAcross } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/getPointAggregateCellsAcross";
@@ -13,6 +6,12 @@ import {
   POINT_AGGREGATE_MAX_CELLS,
   POINT_AGGREGATE_ROW_THRESHOLD,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type {
+  PointAggregation,
+  PointCoordinateAudit,
+} from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 
 /** Result column carrying how many cells a grid resolution would produce. */
 export const POINT_AGGREGATE_CELL_COUNT_COLUMN = "point_aggregate_cell_count";

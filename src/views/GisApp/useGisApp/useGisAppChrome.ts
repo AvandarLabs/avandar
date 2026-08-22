@@ -1,10 +1,8 @@
-import type { Dispatch, SetStateAction } from "react";
-
 import { useState } from "react";
-
 import { FitBoundsRequest } from "@/views/GisApp/layers/FitBoundsRequest/FitBoundsRequest";
 import { ChromePanelState } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
 import { useMapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
+import type { Dispatch, SetStateAction } from "react";
 
 /** Panel measurements and map-fit controls shared by the GIS shell. */
 export type GisAppChrome = ReturnType<typeof useMapChromeInsets> &

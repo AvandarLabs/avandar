@@ -1,11 +1,10 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
-
 import {
   columnNameSet,
   pickCategoryColumnName,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
   xAxisKey: string | undefined;

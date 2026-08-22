@@ -1,13 +1,11 @@
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
-
 import { assertIsDefined } from "@avandar/utils";
 import { modals } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
 
 type Props = {
   label: string;

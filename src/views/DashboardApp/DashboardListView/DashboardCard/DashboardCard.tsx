@@ -1,13 +1,11 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
-
 import { mantineColorVar } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { BadgeRow } from "@/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
 
 /** How much of a dashboard is readable with no network. */
 export type DashboardOfflineStatus = "full" | "partial" | "none";

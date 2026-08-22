@@ -1,8 +1,7 @@
+import { RdbContracts } from "../../../../../shared/platform/ipc/contracts/RdbContracts";
 import type { AvaSqliteDatabase } from "../../services/SqliteService/Sqlite";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
 import type { SQLQueryBindings } from "bun:sqlite";
-
-import { RdbContracts } from "../../../../../shared/platform/ipc/contracts/RdbContracts";
 
 /*
  * Cast helper. The IPC contract types `params` as `unknown[]` (it has no

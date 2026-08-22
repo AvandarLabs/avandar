@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import * as dotenv from "dotenv";
 
 type DotenvConfigResult = Readonly<{
   error?: unknown;

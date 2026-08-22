@@ -1,15 +1,6 @@
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
-import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
-import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ReactElement } from "react";
-
 import { WithPuckProps } from "@puckeditor/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
@@ -20,6 +11,13 @@ import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQu
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
+import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ReactElement } from "react";
 
 export type Props = {
   /** Natural-language prompt + generated SQL configured by the editor. */

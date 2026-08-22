@@ -1,23 +1,8 @@
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type {
-  SettingsColumnGroup,
-  SettingsColumnsLayout,
-} from "@/components/SettingsColumns/SettingsColumns";
-import type { ReactNode } from "react";
-
 import { Model } from "@avandar/models";
 import { isDefined, matchLiteral, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns/pruneFilterColumns";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { notifyWarning } from "@/utils/notifications/notify";
@@ -31,8 +16,20 @@ import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
-
 import classes from "./ManualQueryForm.module.css";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
+import type { ReactNode } from "react";
 
 /**
  * Callbacks invoked when the user changes the form. Mirrors the action set on

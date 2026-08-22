@@ -1,14 +1,13 @@
-import type {
-  CommandResult,
-  ReleaseCommands,
-} from "@ava-cli/ReleaseCLI/createReleaseCommands";
-
 import {
   RELEASE_SOURCE_BRANCH,
   RELEASE_TARGET_BRANCH,
   runPreflight,
 } from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
 import { describe, expect, it } from "vitest";
+import type {
+  CommandResult,
+  ReleaseCommands,
+} from "@ava-cli/ReleaseCLI/createReleaseCommands";
 
 /** What a test wants the fake repository to look like. */
 type FakeRepoState = {

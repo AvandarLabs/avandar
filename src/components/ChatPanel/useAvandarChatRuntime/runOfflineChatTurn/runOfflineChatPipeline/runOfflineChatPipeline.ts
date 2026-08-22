@@ -1,8 +1,3 @@
-import type {
-  OfflineChatPipelineArgs,
-  OfflineChatPipelineResult,
-} from "$/types/offlineChat.types";
-
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
@@ -13,6 +8,10 @@ import {
 } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/buildOfflinePrompts/buildOfflinePrompts";
 import { narrowOfflineSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/narrowOfflineSchema";
 import { OfflineLlmOutput } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/OfflineLlmOutput/OfflineLlmOutput";
+import type {
+  OfflineChatPipelineArgs,
+  OfflineChatPipelineResult,
+} from "$/types/offlineChat.types";
 
 const ANALYZE_MAX_TOKENS = 220;
 const SQL_MAX_TOKENS = 450;

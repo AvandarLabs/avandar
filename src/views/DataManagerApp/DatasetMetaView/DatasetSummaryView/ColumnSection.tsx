@@ -1,14 +1,12 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Box, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { useIntersection } from "@mantine/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
-
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { ColumnSummaryBody } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody";
 import { buildFullDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
+import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;

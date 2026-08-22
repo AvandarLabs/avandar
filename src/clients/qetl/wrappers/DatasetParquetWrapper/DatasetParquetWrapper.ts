@@ -1,3 +1,14 @@
+import { where } from "@avandar/utils";
+import { match } from "ts-pattern";
+import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
+import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
@@ -10,19 +21,6 @@ import type {
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { OpenDataContentKind } from "$/open-data/acquireOpenDataResource";
-
-import { where } from "@avandar/utils";
-import { match } from "ts-pattern";
-
-import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
-import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
-import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
-import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
-import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
-import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 

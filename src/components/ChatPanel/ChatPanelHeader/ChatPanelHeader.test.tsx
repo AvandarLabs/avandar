@@ -1,8 +1,6 @@
 /** Behavioral tests for the chat panel header New chat control. */
 import { describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
-
 import { ChatPanelHeader } from "./ChatPanelHeader";
 
 describe("ChatPanelHeader", () => {

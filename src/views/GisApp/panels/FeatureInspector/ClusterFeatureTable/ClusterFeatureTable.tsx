@@ -1,13 +1,7 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { ReactNode, RefObject } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Loader, Text } from "@mantine/core";
 import { IconZoomIn } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { MapInstanceHelpers } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import css from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.module.css";
 import { ClusterFeatureTableBody } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody";
@@ -15,6 +9,10 @@ import {
   CLUSTER_LEAVES_PAGE_SIZE,
   useClusterLeavesPage,
 } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/useClusterLeavesPage/useClusterLeavesPage";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   cluster: ClusterSelection;

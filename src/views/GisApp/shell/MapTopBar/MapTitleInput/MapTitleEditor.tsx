@@ -1,9 +1,7 @@
-import type { KeyboardEvent, ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { useRef, useState } from "react";
-
 import css from "@/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleInput.module.css";
+import type { KeyboardEvent, ReactNode } from "react";
 
 type Props = {
   name: string;

@@ -1,17 +1,15 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import type { SourceWrapper } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-
 /**
  * Behaviour of the registry as the single resolution seam: which wrapper
  * answers a ref, what happens to a ref no wrapper claims, and which wiring
  * mistakes are rejected at construction.
  */
 import { describe, expect, it, vi } from "vitest";
-
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import type { SourceWrapper } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 
 // A source that can neither push down nor be acquired whole, so it needs no
 // optional method and the registration invariants have nothing to complain

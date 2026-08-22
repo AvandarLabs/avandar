@@ -1,10 +1,9 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import {
   columnNameSet,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;

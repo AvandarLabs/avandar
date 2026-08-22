@@ -1,6 +1,5 @@
-import type { TooltipProps } from "@mantine/core";
-
 import { Tooltip as MantineTooltip } from "@mantine/core";
+import type { TooltipProps } from "@mantine/core";
 
 type Props = TooltipProps;
 

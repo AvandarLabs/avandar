@@ -1,11 +1,9 @@
-import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
-
 import { Trans } from "@lingui/react/macro";
 import { Alert, Code, Stack, Text } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
-
 import { DiscoveryCustomFallback } from "./DiscoveryCustomFallback";
 import { DiscoveryRecoveryActions } from "./DiscoveryRecoveryActions";
+import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   column: string;

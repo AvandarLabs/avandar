@@ -1,13 +1,12 @@
+import { readMigrationsSnapshot } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/readMigrationsSnapshot/readMigrationsSnapshot";
+import { runMigrationChecks } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks";
+import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
+import { Acclimate } from "@avandar/acclimate";
 import type {
   MigrationCheckResult,
   MigrationCheckStatus,
   MigrationsSnapshot,
 } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks.types";
-
-import { readMigrationsSnapshot } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/readMigrationsSnapshot/readMigrationsSnapshot";
-import { runMigrationChecks } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks";
-import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
-import { Acclimate } from "@avandar/acclimate";
 
 /** Icon and colour per status, so the terminal reads at a glance. */
 const STATUS_STYLES: Record<

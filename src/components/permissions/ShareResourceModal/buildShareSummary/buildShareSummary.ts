@@ -1,17 +1,14 @@
+import { capitalize, propEq } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
+import { appLabel } from "$/copy/appLabel";
+import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
+import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-
-import { capitalize, propEq } from "@avandar/utils";
-import { t } from "@lingui/core/macro";
-
-import { appLabel } from "$/copy/appLabel";
-import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
-
-import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 
 /**
  * One run in the rendered summary line: a literal text segment or a labelled

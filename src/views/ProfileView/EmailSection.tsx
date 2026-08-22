@@ -3,7 +3,6 @@ import { useMutation } from "@avandar/query-hooks";
 import { InputTextForm } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
-
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 

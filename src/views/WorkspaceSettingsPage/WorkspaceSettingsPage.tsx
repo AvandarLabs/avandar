@@ -2,7 +2,6 @@ import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
-
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
@@ -11,7 +10,6 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
-
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceDangerZone } from "./WorkspaceDangerZone";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";

@@ -1,16 +1,14 @@
-import type { I18n } from "@lingui/core";
-
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-
 import { slugify } from "$/lib/strings/transformations";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { notifySuccess } from "@/utils/notifications/notify";
+import type { I18n } from "@lingui/core";
 
 type Props = {
   onSubmit?: (values: {

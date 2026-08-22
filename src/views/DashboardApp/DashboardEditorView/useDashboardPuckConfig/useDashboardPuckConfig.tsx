@@ -1,3 +1,26 @@
+import { Paper } from "@avandar/ui";
+import { makeArrayWithLength } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import {
+  Blockquote,
+  Box,
+  Divider,
+  Image,
+  List,
+  Table as MantineTable,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { useMemo } from "react";
+import { Dashboard } from "$/models/Dashboard/Dashboard";
+import { Workspace } from "$/models/Workspace/Workspace";
+import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
+import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
+import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";
+import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig";
+import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
+import puckConfigCss from "./useDashboardPuckConfig.module.css";
 import type {
   AvaPageConfig,
   AvaPageData,
@@ -19,32 +42,6 @@ import type {
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
-
-import { Paper } from "@avandar/ui";
-import { makeArrayWithLength } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import {
-  Blockquote,
-  Box,
-  Divider,
-  Image,
-  List,
-  Table as MantineTable,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { useMemo } from "react";
-
-import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { Workspace } from "$/models/Workspace/Workspace";
-import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
-import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
-import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";
-import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig";
-import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
-
-import puckConfigCss from "./useDashboardPuckConfig.module.css";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

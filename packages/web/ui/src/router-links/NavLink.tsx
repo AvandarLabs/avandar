@@ -1,5 +1,3 @@
-import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
-
 import { noop } from "@avandar/utils";
 import {
   DEFAULT_THEME,
@@ -18,6 +16,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
 
 const DEFAULT_PRIMARY_SHADE =
   typeof DEFAULT_THEME.primaryShade === "object"

@@ -15,15 +15,14 @@
  * with a clear pointer at the failing call site.
  */
 
+import { callIpc } from "$/platform/ipc/client.ts";
+import { DuckDbContracts } from "$/platform/ipc/contracts/DuckDbContracts.ts";
 import type {
   DatasetImportOptions,
   DatasetImportResult,
   DuckDbClient,
   UploadSource,
 } from "$/platform/types/DuckDbClient.types.ts";
-
-import { callIpc } from "$/platform/ipc/client.ts";
-import { DuckDbContracts } from "$/platform/ipc/contracts/DuckDbContracts.ts";
 
 async function runRawQuery<TRow extends Record<string, unknown>>(
   sql: string,

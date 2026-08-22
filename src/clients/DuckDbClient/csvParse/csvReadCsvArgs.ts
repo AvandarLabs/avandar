@@ -1,9 +1,8 @@
+import { REJECTED_ROW_STORAGE_LIMIT } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 import type {
   CsvParseResolvedOptions,
   CsvReadCsvMode,
 } from "@/clients/DuckDbClient/csvParse/csvParse.types";
-
-import { REJECTED_ROW_STORAGE_LIMIT } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 
 function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");

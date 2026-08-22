@@ -1,11 +1,9 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { RelationSchema } from "$/models/relations/RelationSchema/RelationSchema.types";
-
 import { where } from "@avandar/utils";
-
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { RelationSchema } from "$/models/relations/RelationSchema/RelationSchema.types";
 
 /**
  * Reads a dataset's columns from the stored column records, which every

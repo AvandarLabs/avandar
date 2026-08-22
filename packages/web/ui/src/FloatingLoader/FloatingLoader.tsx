@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import { Group, Loader, Paper, Text, Transition } from "@mantine/core";
+import type { ReactNode } from "react";
 
 type Props = {
   label: ReactNode;

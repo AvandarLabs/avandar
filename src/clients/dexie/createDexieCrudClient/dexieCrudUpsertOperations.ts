@@ -1,9 +1,4 @@
-import type { DexieCrudOperationContext } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
-import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
-
 import { isDefined, promiseMapSequential, promiseReduce } from "@avandar/utils";
-
 import {
   addAndGet,
   findConflictingRow,
@@ -12,6 +7,9 @@ import {
   putAndGet,
   rowsMatchOnConflictColumns,
 } from "@/clients/dexie/createDexieCrudClient/dexieCrudRowAccess";
+import type { DexieCrudOperationContext } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
+import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 
 type BulkAccumulator<M extends DexieCrudModelSpec> = {
   working: Array<M["DBRead"]>;

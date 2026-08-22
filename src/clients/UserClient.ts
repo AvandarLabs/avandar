@@ -1,3 +1,13 @@
+import { createServiceClient, withSupabaseClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { WithQueryHooks, withQueryHooks } from "@avandar/query-hooks";
+import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
+import { z } from "zod";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import { Tables } from "$/types/database.types";
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   RoleLevel,
   UserAppRolesMatrix,
@@ -11,18 +21,6 @@ import type {
 import type { Database } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
-
-import { createServiceClient, withSupabaseClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { WithQueryHooks, withQueryHooks } from "@avandar/query-hooks";
-import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
-import { z } from "zod";
-
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import { Tables } from "$/types/database.types";
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 

@@ -1,11 +1,9 @@
-import type { ActionIconProps, TooltipProps } from "@mantine/core";
-import type { ReactNode } from "react";
-
 import { ActionIcon as MantineActionIcon } from "@mantine/core";
 import clsx from "clsx";
-
 import { Tooltip } from "../Tooltip/Tooltip";
 import css from "./ActionIcon.module.css";
+import type { ActionIconProps, TooltipProps } from "@mantine/core";
+import type { ReactNode } from "react";
 
 type Props = {
   tooltip?: ReactNode;

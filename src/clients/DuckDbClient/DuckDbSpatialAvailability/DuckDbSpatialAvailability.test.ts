@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import { createDuckDbSpatialAvailabilityStore } from "./DuckDbSpatialAvailability";
 
 describe("createDuckDbSpatialAvailabilityStore", () => {

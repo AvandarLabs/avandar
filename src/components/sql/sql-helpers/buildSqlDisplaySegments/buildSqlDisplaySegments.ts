@@ -1,9 +1,3 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  SqlDisplayCatalog,
-  SqlDisplaySegment,
-} from "@/components/sql/sql-helpers/sqlDisplay.types";
-
 /**
  * Splits raw SQL into display segments for pills: known datasets (by id or
  * name) and known column identifiers. The concatenation of each segment's
@@ -11,6 +5,11 @@ import type {
  */
 import { prop } from "@avandar/utils";
 import { Parser } from "node-sql-parser";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type {
+  SqlDisplayCatalog,
+  SqlDisplaySegment,
+} from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 type AnnotatedSpan = {
   kind: "dataset" | "column";

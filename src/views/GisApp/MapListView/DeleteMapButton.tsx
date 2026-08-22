@@ -1,14 +1,12 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
-
 import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { notifySuccess } from "@/utils/notifications/notify";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ReactNode } from "react";
 
 type Props = { avaMap: AvaMap.T };
 

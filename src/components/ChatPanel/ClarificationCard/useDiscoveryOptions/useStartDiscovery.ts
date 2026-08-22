@@ -1,9 +1,7 @@
+import { useEffect } from "react";
+import { DiscoveryCandidateValues } from "../DiscoveryCandidateValues/DiscoveryCandidateValues";
 import type { DiscoveryResolution } from "./useDiscoveryOptions";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-
-import { useEffect } from "react";
-
-import { DiscoveryCandidateValues } from "../DiscoveryCandidateValues/DiscoveryCandidateValues";
 
 const MAX_DISCOVERY_ATTEMPTS = 3;
 

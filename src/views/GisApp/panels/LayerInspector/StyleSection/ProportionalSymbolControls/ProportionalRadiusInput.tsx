@@ -1,9 +1,8 @@
+import { isNumber } from "@avandar/utils";
+import { NumberInput } from "@mantine/core";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
-
-import { isNumber } from "@avandar/utils";
-import { NumberInput } from "@mantine/core";
 
 type Props = {
   label: string;

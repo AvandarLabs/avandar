@@ -1,14 +1,12 @@
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, SegmentedControl, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DateRangeFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput";
 import { EnumFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/EnumFilterInput";
 import { NumberRangeFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { ReactNode } from "react";
 
 type Props = {
   rowFilter: PublishSliceConfig.RowFilter;

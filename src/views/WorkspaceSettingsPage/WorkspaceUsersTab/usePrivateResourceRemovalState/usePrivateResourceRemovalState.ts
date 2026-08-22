@@ -1,7 +1,6 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { PrivateResourceAdminClient } from "@/clients/permissions/PrivateResourceAdminClient/PrivateResourceAdminClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** Loads fresh private-resource counts that guard member removal. */
 export function usePrivateResourceRemovalState(workspaceId: Workspace.Id): {

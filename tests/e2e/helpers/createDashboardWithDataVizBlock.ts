@@ -1,6 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { DashboardSeedHelpers } from "./DashboardSeedHelpers";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Shape of the per-viz-type config payload seeded into the DataViz block.

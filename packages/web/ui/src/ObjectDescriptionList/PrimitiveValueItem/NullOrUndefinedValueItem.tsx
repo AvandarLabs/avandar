@@ -1,8 +1,6 @@
-import type { ReactNode } from "react";
-
 import { Text } from "@mantine/core";
-
 import { isStringOrNumber } from "../guards";
+import type { ReactNode } from "react";
 
 type Props = {
   value: null | undefined;

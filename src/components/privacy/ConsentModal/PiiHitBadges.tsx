@@ -1,6 +1,5 @@
-import type { PiiPatternHit } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
 import { Badge, Group, Text } from "@mantine/core";
+import type { PiiPatternHit } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 type Props = {
   /** Caption shown before the badges (e.g. "Detected:", "PII detected:"). */

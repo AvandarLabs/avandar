@@ -1,10 +1,9 @@
-import type { ReactNode } from "react";
-
 import { Callout } from "@avandar/ui";
 import { objectValues } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { List, Text } from "@mantine/core";
 import { flattenError } from "zod";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Human-readable chart name, e.g. `bar chart`, shown in the error copy. */

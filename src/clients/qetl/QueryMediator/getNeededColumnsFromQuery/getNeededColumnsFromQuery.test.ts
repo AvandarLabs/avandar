@@ -1,12 +1,10 @@
 /** Pins needed-column attribution from SQL and from concept plans. */
 
+import { describe, expect, it } from "vitest";
+import { getNeededColumnsFromQuery } from "@/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-
-import { describe, expect, it } from "vitest";
-
-import { getNeededColumnsFromQuery } from "@/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;

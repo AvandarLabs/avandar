@@ -1,6 +1,5 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { describe, expect, it } from "vitest";
-
 import { buildManualDuckDbBundles } from "./duckDbManualBundles";
 
 describe("buildManualDuckDbBundles", () => {

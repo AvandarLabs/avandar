@@ -1,14 +1,11 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PlatformRegistry } from "@/config/platform/PlatformRegistry/PlatformRegistry";
+import { AuthClient } from "./AuthClient";
 import type {
   AuthProvider,
   Session as PlatformSession,
 } from "$/platform/types/AuthProvider.types";
 import type { PlatformImpls } from "@/config/platform/PlatformProvider/PlatformProvider";
-
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { PlatformRegistry } from "@/config/platform/PlatformRegistry/PlatformRegistry";
-
-import { AuthClient } from "./AuthClient";
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
   return {

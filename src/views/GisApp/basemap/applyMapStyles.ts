@@ -1,5 +1,4 @@
 import { Map as MapLibreMap } from "maplibre-gl";
-
 import { mapSemanticColors } from "@/views/GisApp/basemap/mapColors";
 
 /**

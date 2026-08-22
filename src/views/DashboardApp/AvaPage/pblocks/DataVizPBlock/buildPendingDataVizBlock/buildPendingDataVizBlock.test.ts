@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { buildPendingDataVizBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildPendingDataVizBlock/buildPendingDataVizBlock";
 
 describe("buildPendingDataVizBlock", () => {

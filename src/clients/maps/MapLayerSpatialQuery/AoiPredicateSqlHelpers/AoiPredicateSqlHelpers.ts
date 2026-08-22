@@ -1,6 +1,5 @@
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-
 import { quoteSqlLiteral } from "@avandar/utils/sql";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /**
  * DuckDB geometry for a map AOI polygon, quoted as a GeoJSON literal.

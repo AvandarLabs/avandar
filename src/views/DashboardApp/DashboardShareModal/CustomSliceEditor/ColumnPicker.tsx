@@ -1,12 +1,10 @@
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
-import type { ReactNode } from "react";
-
 import { prop } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, ScrollArea, Stack, Text } from "@mantine/core";
-
 import { ColumnCheckbox } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnCheckbox";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
+import type { ReactNode } from "react";
 
 type Props = {
   dataset: PublishSliceDataset;

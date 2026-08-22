@@ -1,10 +1,9 @@
+import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
+import { match } from "ts-pattern";
 import type {
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
 } from "$/types/chat.types.ts";
-
-import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
-import { match } from "ts-pattern";
 
 const ALLOWED_DASHBOARD_VIZ_TYPES = new Set<ChatDashboardVizType>([
   "table",

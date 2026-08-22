@@ -1,7 +1,6 @@
-import type { XlsxSniffResult } from "@/workers/xlsxSniff.worker";
-
 // eslint-disable-next-line import-x/extensions
 import XlsxSniffWorker from "@/workers/xlsxSniff.worker.ts?worker";
+import type { XlsxSniffResult } from "@/workers/xlsxSniff.worker";
 
 /**
  * Main-thread driver for the XLSX sniff worker. Owns one worker per call

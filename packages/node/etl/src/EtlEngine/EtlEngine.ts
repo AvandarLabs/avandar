@@ -1,3 +1,10 @@
+import { randomUUID } from "node:crypto";
+import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { createModuleFactory } from "@avandar/modules";
+import { getEtlLoadDir, getEtlOutputDir } from "@etl/EtlEngine/etlPaths";
+import { transformedCsvsToParquetBlobs } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
+import { createClient } from "@supabase/supabase-js";
 import type {
   BaseModule,
   Module,
@@ -6,14 +13,6 @@ import type {
 } from "@avandar/modules";
 import type { MIMEType, UUID } from "@avandar/utils";
 import type { TransformedDataDescriptionForParquet } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
-
-import { createModuleFactory } from "@avandar/modules";
-import { getEtlLoadDir, getEtlOutputDir } from "@etl/EtlEngine/etlPaths";
-import { transformedCsvsToParquetBlobs } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
-import { createClient } from "@supabase/supabase-js";
-import { randomUUID } from "node:crypto";
-import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 
 type PipelineRunId = UUID<"PipelineRun">;
 type PromisedOrValue<T> = Promise<T> | T;

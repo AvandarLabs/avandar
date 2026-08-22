@@ -1,11 +1,9 @@
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-
 import { prop, propEq } from "@avandar/utils";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { disputedStatusUpdates } from "@/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 function _getQueryColumnFromLayer(options: {
   layer: MapLayer.T;

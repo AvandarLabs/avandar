@@ -1,6 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 import { assertIsNonNullish, isString } from "@avandar/utils";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type SeedAvaMapOptions = {
   admin: SupabaseClient;

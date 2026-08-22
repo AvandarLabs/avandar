@@ -1,6 +1,5 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 function _isBoundaryLayer(layer: MapLayer.T): boolean {
   const bindingType = layer.geoBinding?.type;

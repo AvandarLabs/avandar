@@ -1,3 +1,4 @@
+import { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 import type {
   CrudModelSpec,
   ModelCrudClient,
@@ -17,8 +18,6 @@ import type {
   UseQueryResultTuple,
 } from "@query-hooks/useQuery/useQuery";
 import type { ConditionalKeys, Simplify } from "type-fest";
-
-import { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 
 /**
  * A union of all function names that have a *single* argument and

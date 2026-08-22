@@ -1,12 +1,6 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
-import type { ReactNode, RefObject } from "react";
-import type { Step } from "react-joyride";
-
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Joyride } from "react-joyride";
-
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { buildNuxTourFloatingOptions } from "@/components/Nux/NuxTour/buildNuxTourFloatingOptions/buildNuxTourFloatingOptions";
 import { NuxTooltip } from "@/components/Nux/NuxTour/NuxTooltip/NuxTooltip";
@@ -14,6 +8,10 @@ import { NuxTourCaret } from "@/components/Nux/NuxTour/NuxTourCaret/NuxTourCaret
 import { nuxTourJoyrideStyles } from "@/components/Nux/NuxTour/nuxTourJoyrideStyles";
 import { onNuxTourJoyrideEvent } from "@/components/Nux/NuxTour/onNuxTourJoyrideEvent";
 import { NUX_CHECKLIST_Z_INDEX } from "@/config/Theme/Theme";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
+import type { ReactNode, RefObject } from "react";
+import type { Step } from "react-joyride";
 
 const NUX_TOUR_JOYRIDE_OPTIONS = {
   zIndex: NUX_CHECKLIST_Z_INDEX,

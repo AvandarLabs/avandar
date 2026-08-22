@@ -1,17 +1,3 @@
-import type {
-  CsvParseResolvedOptions,
-  CsvParseUserHints,
-  DuckDbSniffCsvRow,
-} from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type {
-  DuckDbColumnSchema,
-  DuckDbCsvSniffResult,
-  DuckDbRejectedRow,
-  DuckDbScan,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbRunRawQuery } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-
 import { CSV_SNIFF_SAMPLE_SIZE } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 import { mergeSniffCsvRowIntoParseOptions } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import { applyQuoteProbeToParseOptions } from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
@@ -25,6 +11,19 @@ import {
   buildDuckDbCsvSniffResultFromSniffRow,
 } from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type {
+  CsvParseResolvedOptions,
+  CsvParseUserHints,
+  DuckDbSniffCsvRow,
+} from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type {
+  DuckDbColumnSchema,
+  DuckDbCsvSniffResult,
+  DuckDbRejectedRow,
+  DuckDbScan,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbRunRawQuery } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 
 /** The state carried between attempts of the CSV parse retry loop. */
 export type CsvParseAttemptState = {

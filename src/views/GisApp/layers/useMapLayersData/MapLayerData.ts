@@ -1,9 +1,7 @@
+import { propEq } from "@avandar/utils";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-
-import { propEq } from "@avandar/utils";
-
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** True when the layer's query returns every column a point binding names. */
 function _isPointBindingComplete(

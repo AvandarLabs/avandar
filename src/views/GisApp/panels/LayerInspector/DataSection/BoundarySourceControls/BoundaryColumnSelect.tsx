@@ -1,7 +1,6 @@
+import { Select } from "@mantine/core";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ReactNode } from "react";
-
-import { Select } from "@mantine/core";
 
 type Props = {
   label: string;

@@ -1,11 +1,9 @@
+import { useLingui } from "@lingui/react/macro";
+import { Stack, Text } from "@mantine/core";
+import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
-
-import { useLingui } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
-
-import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 
 type Props = { config: AvaMapConfig.T };
 

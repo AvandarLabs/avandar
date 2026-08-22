@@ -1,6 +1,5 @@
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-
 import { useGisAppState } from "@/views/GisApp/useGisApp/useGisAppState";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
 export type { GisAppState } from "@/views/GisApp/useGisApp/useGisAppState";
 

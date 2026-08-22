@@ -1,8 +1,6 @@
-import type { ReactNode } from "react";
-
 import { Box } from "@mantine/core";
-
 import css from "./SummaryTag.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

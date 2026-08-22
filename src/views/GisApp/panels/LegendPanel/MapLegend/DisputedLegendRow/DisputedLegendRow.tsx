@@ -1,9 +1,7 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
-
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.module.css";
+import type { ReactNode } from "react";
 
 /**
  * The locked legend entry shown whenever a disputed or undetermined boundary

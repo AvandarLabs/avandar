@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 
 // `NuxEvents` closes over a module-level listener set, so an unsubscribe left

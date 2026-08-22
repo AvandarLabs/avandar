@@ -1,8 +1,6 @@
-import type { ReactNode } from "react";
-
 import { ColorInput, Stack } from "@mantine/core";
-
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Distinct slice names found in the query result, in first-seen order. */

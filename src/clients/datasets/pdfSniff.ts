@@ -1,3 +1,5 @@
+// eslint-disable-next-line import-x/extensions
+import PdfSniffWorker from "@/workers/pdfSniff.worker/pdfSniff.worker.ts?worker";
 import type {
   PdfExtractResult,
   PdfSniffError,
@@ -9,9 +11,6 @@ import type {
   PageGeometry,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-
-// eslint-disable-next-line import-x/extensions
-import PdfSniffWorker from "@/workers/pdfSniff.worker/pdfSniff.worker.ts?worker";
 
 /**
  * Thrown when the worker rejects a document for a specific, explainable

@@ -1,11 +1,9 @@
-import type { FilterPBlockMode } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
-import type { PuckContext } from "@puckeditor/core";
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { fireEvent, render, screen } from "@/test-utils";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { FilterPBlockMode } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
+import type { PuckContext } from "@puckeditor/core";
 
 /** Exercises analytics emitted by user changes to dashboard filters. */
 

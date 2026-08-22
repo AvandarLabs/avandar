@@ -1,7 +1,6 @@
+import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { SetRequired, UnionToIntersection } from "type-fest";
-
-import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 
 type ValidMatchedValues<Key> =
   | ((key: Key) => unknown)

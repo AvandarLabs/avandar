@@ -1,11 +1,9 @@
-import type { MapPointerEventSource } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
-import type { MapMouseEvent } from "maplibre-gl";
-
 import { assertIsDefined } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-
 import { act, renderHook } from "@/test-utils";
 import { useMapPointerCoordinates } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
+import type { MapPointerEventSource } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
+import type { MapMouseEvent } from "maplibre-gl";
 
 describe("useMapPointerCoordinates", () => {
   it("tracks pointer coordinates and removes both listeners on cleanup", () => {

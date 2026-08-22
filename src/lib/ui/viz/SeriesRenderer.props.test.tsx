@@ -1,8 +1,3 @@
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
-
 /**
  * Renderer-level prop verification for the series-aware chart wrappers.
  *
@@ -14,13 +9,16 @@ import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/Rada
  * "changing a config setting updates what the chart renders".
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { render } from "@/test-utils";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
+import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 
 const mantineBarChartMock = vi.fn();
 const mantineLineChartMock = vi.fn();

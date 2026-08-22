@@ -1,3 +1,13 @@
+import {
+  assertIsDefined,
+  objectEntries,
+  objectKeys,
+  objectValuesMap,
+} from "@avandar/utils";
+import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
+import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
+import { match } from "ts-pattern";
+import { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
 import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
@@ -9,17 +19,6 @@ import type {
   SupabaseCrudClient,
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-import {
-  assertIsDefined,
-  objectEntries,
-  objectKeys,
-  objectValuesMap,
-} from "@avandar/utils";
-import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
-import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import { match } from "ts-pattern";
-import { EmptyObject } from "type-fest";
 
 /**
  * SQLite-backed CRUD client for the Electrobun desktop shell. Mirrors

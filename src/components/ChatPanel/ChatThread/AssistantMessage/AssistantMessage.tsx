@@ -6,10 +6,8 @@ import {
 import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
-
 import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
-
 import css from "./AssistantMessage.module.css";
 
 /**

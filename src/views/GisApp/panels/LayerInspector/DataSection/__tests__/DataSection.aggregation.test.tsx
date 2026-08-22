@@ -1,8 +1,4 @@
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
@@ -15,6 +11,8 @@ import {
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { BoundarySourceControls } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundarySourceControls";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 beforeEach(() => {
   resetDataSectionFixtures();

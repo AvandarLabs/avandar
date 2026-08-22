@@ -1,12 +1,11 @@
+import { Model } from "@avandar/models";
+import { registry } from "@avandar/utils";
+import { match } from "ts-pattern";
 import type {
   CanBeOfflineOnlyDatasetSourceModel,
   DatasetSourceModel,
   DatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
-
-import { Model } from "@avandar/models";
-import { registry } from "@avandar/utils";
-import { match } from "ts-pattern";
 
 function _canBeOfflineOnly(
   sourceType: DatasetSourceType,

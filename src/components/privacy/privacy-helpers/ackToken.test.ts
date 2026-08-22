@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
 
 /**

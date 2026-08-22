@@ -1,8 +1,6 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-
 import { isPlainObject, isString, traverse } from "@avandar/utils";
-
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 function _toTrimmedString(value: unknown): string {
   return isString(value) ? value.trim() : "";

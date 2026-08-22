@@ -1,11 +1,9 @@
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-
 import { Link } from "@avandar/ui";
 import { Box, Flex, Group, Text } from "@mantine/core";
-
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline/isAppLinkAvailableOffline";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
 
 type Props = {
   item: NavbarLink;

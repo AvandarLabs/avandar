@@ -1,11 +1,9 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { Individual } from "$/models/ontology/Individual/Individual";
-
 import { prop, where } from "@avandar/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { Individual } from "$/models/ontology/Individual/Individual";
 
 const PAGE_SIZE = 20;
 

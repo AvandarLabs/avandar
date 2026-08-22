@@ -1,9 +1,7 @@
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
-
 import { describe, expect, it, vi } from "vitest";
-
 import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
 import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 
 const FILE_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
 const ACCESS_TOKEN = "ya29.test-access-token";

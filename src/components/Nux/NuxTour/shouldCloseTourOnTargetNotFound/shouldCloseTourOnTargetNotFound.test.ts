@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { shouldCloseTourOnTargetNotFound } from "@/components/Nux/NuxTour/shouldCloseTourOnTargetNotFound/shouldCloseTourOnTargetNotFound";
 
 describe("shouldCloseTourOnTargetNotFound", () => {

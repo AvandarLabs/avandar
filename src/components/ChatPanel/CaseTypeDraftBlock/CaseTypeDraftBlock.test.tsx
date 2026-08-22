@@ -1,17 +1,14 @@
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatProposedCaseType } from "$/types/chat.types";
-
 /**
  * The draft card is the whole point of the Case Manager flow: it must arrive
  * prefilled, and confirming it must persist exactly what the user sees, so
  * these cover the prefill, the tweak, and the resulting insert payload.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
-
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DEATHS_DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATASET_ID = "0f2c9f3e-bbbb-4bbb-8ccc-ddddeeeeffff";

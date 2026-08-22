@@ -1,3 +1,8 @@
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { useDetectedSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
@@ -5,13 +10,6 @@ import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
-
-import { msg } from "@lingui/core/macro";
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
-
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { useDetectedSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
 
 type Props = {
   layer: MapLayer.T;

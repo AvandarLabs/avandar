@@ -1,6 +1,5 @@
-import type { PointerEvent, RefObject } from "react";
-
 import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
+import type { PointerEvent, RefObject } from "react";
 
 /** Pointer-drag snapshot used while resizing a canvas-docked drawer. */
 export type DrawerResizeDragState = {

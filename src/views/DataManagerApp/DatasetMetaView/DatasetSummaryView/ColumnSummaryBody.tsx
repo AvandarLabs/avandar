@@ -1,9 +1,5 @@
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, RingProgress, Skeleton, Stack, Text } from "@mantine/core";
-
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -11,6 +7,8 @@ import { DateColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/Datase
 import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary";
 import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
 import { SummaryTag } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/SummaryTag";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;

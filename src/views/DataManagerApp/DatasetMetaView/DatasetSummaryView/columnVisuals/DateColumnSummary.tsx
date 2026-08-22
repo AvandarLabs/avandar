@@ -1,10 +1,8 @@
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { ReactNode } from "react";
-
 import { Trans } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
-
 import { TimelineEndpoint } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TimelineEndpoint";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "date" };

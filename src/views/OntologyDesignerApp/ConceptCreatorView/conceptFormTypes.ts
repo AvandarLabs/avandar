@@ -1,3 +1,8 @@
+import { Model } from "@avandar/models";
+import { uuid } from "$/lib/uuid";
+import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
+import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {
@@ -15,13 +20,6 @@ import type {
 import type { FormType } from "@avandar/ui/hooks";
 import type { CamelCaseKeys, Expect } from "@avandar/utils";
 import type { SetOptional, SetRequired } from "type-fest";
-
-import { Model } from "@avandar/models";
-
-import { uuid } from "$/lib/uuid";
-import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 
 export type AttributeFormValues = SetRequired<
   SetOptional<ConceptAttributeModel["Insert"], "workspaceId">,

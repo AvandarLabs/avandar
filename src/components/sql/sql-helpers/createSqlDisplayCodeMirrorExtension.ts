@@ -1,6 +1,3 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-
 import { Extension, RangeSetBuilder } from "@codemirror/state";
 import {
   Decoration,
@@ -10,9 +7,10 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 export type SqlPillClickInfo =
   | {

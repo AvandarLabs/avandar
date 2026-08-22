@@ -1,16 +1,14 @@
-import type {
-  FreePlanVariants,
-  PaidPlanVariants,
-} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-
 import { Box, SegmentedControl } from "@mantine/core";
-
 import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
   useFreeChoices,
   usePaidChoices,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
+import type {
+  FreePlanVariants,
+  PaidPlanVariants,
+} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 type Props = {
   withHighlight?: boolean;

@@ -1,11 +1,9 @@
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
-
 import { expect, it, vi } from "vitest";
-
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { render, screen, waitFor } from "@/test-utils";
 import { LayerInspector } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
 
 vi.mock("@/views/GisApp/shell/MapChromePanel/MapChromePanel", () => {
   return {

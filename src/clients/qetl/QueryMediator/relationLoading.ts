@@ -1,3 +1,20 @@
+import {
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupRecord,
+  promiseMap,
+  prop,
+  where,
+} from "@avandar/utils";
+import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -20,25 +37,6 @@ import type {
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { ILogger } from "@avandar/logger";
-
-import {
-  isDefined,
-  makeBucketRecord,
-  makeIdLookupRecord,
-  promiseMap,
-  prop,
-  where,
-} from "@avandar/utils";
-
-import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
-import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { Logger } from "@/utils/Logger";
 
 type FetchRelationSourceOptions = {
   relationSource: RelationSource;

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { render, screen } from "@/test-utils";
 import { SizeLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend";
 

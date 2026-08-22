@@ -1,12 +1,7 @@
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { Workspace } from "$/models/Workspace/Workspace";
-
 import { MIMEType } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -21,6 +16,9 @@ import {
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { notifyError } from "@/utils/notifications/notify";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function _getTusHeaders(): Promise<Record<string, string>> {
   const session = await AuthClient.getCurrentSession();

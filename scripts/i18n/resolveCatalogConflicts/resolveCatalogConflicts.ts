@@ -30,15 +30,13 @@
  * choice is a guess.
  */
 
-import type { CatalogSides } from "./catalogConflictMerge";
-
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-
 import { PROJECT_ROOT } from "../translateWithLlm/config";
 import { CatalogConflictMerge } from "./catalogConflictMerge";
+import type { CatalogSides } from "./catalogConflictMerge";
 
 const CATALOG_DIR = path.join("src", "i18n", "locales");
 

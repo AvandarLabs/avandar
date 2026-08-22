@@ -1,6 +1,3 @@
-import type { PdfAnnotationTool } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotation";
-import type { ReactNode } from "react";
-
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -19,6 +16,8 @@ import {
   IconPencil,
   IconTypography,
 } from "@tabler/icons-react";
+import type { PdfAnnotationTool } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotation";
+import type { ReactNode } from "react";
 
 type Props = {
   tool: PdfAnnotationTool;

@@ -1,16 +1,14 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactNode } from "react";
-
 import { propIsDefined } from "@avandar/utils";
 import { useReducedMotion } from "@mantine/hooks";
 import { useEffect } from "react";
-
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { clampTimeRangeToExtent } from "@/views/GisApp/shell/MapTimeSlider/clampTimeRangeToExtent/clampTimeRangeToExtent";
 import { MapTimeSliderBar } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar";
 import { shiftTimeRange } from "@/views/GisApp/shell/MapTimeSlider/shiftTimeRange/shiftTimeRange";
 import { useMapTimeExtent } from "@/views/GisApp/shell/MapTimeSlider/useMapTimeExtent";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
 
 const SLIDER_MAX = 1000;
 const COLLAPSED_STEP_MS = 86_400_000;

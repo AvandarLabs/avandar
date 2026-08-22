@@ -1,6 +1,5 @@
-import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
-
 import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 /**
  * The dashboardId-based URL is always valid for any published dashboard.

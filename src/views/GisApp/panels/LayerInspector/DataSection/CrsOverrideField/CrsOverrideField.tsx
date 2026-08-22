@@ -1,9 +1,8 @@
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput, Select } from "@mantine/core";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = {
   sourceCrs: number | undefined;

@@ -1,8 +1,6 @@
-import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
-
 import { describe, expect, it } from "vitest";
-
 import { extractProseMeasures } from "./extractProseMeasures";
+import type { RegionGeometry, TextItem } from "../../pdfSniff.types";
 
 function lines(texts: readonly string[]): TextItem[] {
   return texts.map((text, index) => {

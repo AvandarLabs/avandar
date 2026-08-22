@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
-
 import { useLingui } from "@lingui/react/macro";
 import { Paper, Stack, Text, Title } from "@mantine/core";
+import type { ReactNode } from "react";
 
 /** Explains what maps contain when a workspace has none. */
 export function EmptyMapList(): ReactNode {

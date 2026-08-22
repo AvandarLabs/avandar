@@ -1,14 +1,12 @@
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ReactNode } from "react";
-
 import { NavLinkList } from "@avandar/ui";
 import { Box, BoxProps, Loader, ScrollArea } from "@mantine/core";
 import clsx from "clsx";
 import { useMemo } from "react";
-
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import css from "@/views/OntologyDesignerApp/ConceptNavbar.module.css";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ReactNode } from "react";
 
 type Props = {
   concepts: readonly Concept.T[];

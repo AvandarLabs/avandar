@@ -1,7 +1,6 @@
+import { getValue } from "@utils/objects/getValue/getValue.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
 import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
-
-import { getValue } from "@utils/objects/getValue/getValue.ts";
 
 /**
  * Returns a function that checks if an object's property at `path` **doesn't**

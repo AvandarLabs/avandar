@@ -1,5 +1,4 @@
 import { matchLiteral, prop, propEq } from "@avandar/utils";
-
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 
 /**

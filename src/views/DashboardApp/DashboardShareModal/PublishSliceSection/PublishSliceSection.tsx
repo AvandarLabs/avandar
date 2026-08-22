@@ -1,13 +1,8 @@
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
-import type { ReactNode } from "react";
-
 import { isNonEmptyArray, prop, where } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Accordion, Badge, Group, Stack, Text, Title } from "@mantine/core";
 import { IconDatabase, IconShieldLock } from "@tabler/icons-react";
 import { useMemo } from "react";
-
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
@@ -16,6 +11,9 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { SliceModeEditor } from "@/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
+import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T;

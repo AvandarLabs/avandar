@@ -1,18 +1,16 @@
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
-
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { NormalizationMultiplierSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;

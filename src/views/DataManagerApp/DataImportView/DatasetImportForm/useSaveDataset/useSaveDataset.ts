@@ -1,13 +1,3 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type {
-  DatasetImportFormValues,
-  DataSourceMetadata,
-} from "../DatasetImportForm.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
-import type { UseMutationResultTuple } from "@avandar/query-hooks";
-
 import { useMutation } from "@avandar/query-hooks";
 import { MIMEType, snakeCaseKeysShallow, where } from "@avandar/utils";
 import { i18n } from "@lingui/core";
@@ -15,7 +5,6 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -27,9 +16,17 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
 import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type {
+  DatasetImportFormValues,
+  DataSourceMetadata,
+} from "../DatasetImportForm.types";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
 export type CsvParseOptions = {
   type: "csv_file";

@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 /**
  * Map-level control that unsets the area-of-interest polygon.
  */

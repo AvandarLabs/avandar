@@ -1,6 +1,5 @@
-import type { ComboboxStore } from "@mantine/core";
-
 import { useCombobox } from "@mantine/core";
+import type { ComboboxStore } from "@mantine/core";
 
 /** Creates the keyboard-aware combobox store for the chat model picker. */
 export function useChatModelCombobox(): ComboboxStore {

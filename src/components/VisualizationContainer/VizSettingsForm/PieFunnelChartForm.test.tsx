@@ -1,16 +1,13 @@
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
-import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
-
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { describe, expect, it } from "vitest";
-
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
-
 import { FunnelChartForm } from "./FunnelChartForm";
 import { PieChartForm } from "./PieChartForm";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
+import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
 
 i18n.load("en", {});
 i18n.activate("en");

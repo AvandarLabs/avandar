@@ -2,7 +2,6 @@
  * Spherical-excess area of a closed geographic ring.
  */
 import { describe, expect, it } from "vitest";
-
 import { getSphericalPolygonAreaSquareMeters } from "@/views/GisApp/tools/geodesy/getSphericalPolygonAreaSquareMeters/getSphericalPolygonAreaSquareMeters";
 
 const EQUATOR_DEGREE_METERS = 111_195;

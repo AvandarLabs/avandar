@@ -1,12 +1,10 @@
+import { describe, expect, it } from "vitest";
+import { extractLabelledGraphic } from "./extractLabelledGraphic";
 import type {
   RegionGeometry,
   RuleSegment,
   TextItem,
 } from "../../pdfSniff.types";
-
-import { describe, expect, it } from "vitest";
-
-import { extractLabelledGraphic } from "./extractLabelledGraphic";
 
 function item(text: string, x: number, y: number, width?: number): TextItem {
   return {

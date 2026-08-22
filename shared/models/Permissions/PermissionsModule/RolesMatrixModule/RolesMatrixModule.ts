@@ -1,10 +1,3 @@
-import type {
-  AppType,
-  RoleLevel,
-  UserAppRolesList,
-  UserAppRolesMatrix,
-} from "$/models/Permissions/Permissions.types.ts";
-
 import {
   BUILTIN_GLOBAL_ADMIN_MATRIX,
   BUILTIN_GLOBAL_EDITOR_MATRIX,
@@ -13,6 +6,12 @@ import {
   EMPTY_USER_APP_ROLES_MATRIX,
   RESTRICTABLE_APPS,
 } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
+import type {
+  AppType,
+  RoleLevel,
+  UserAppRolesList,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types.ts";
 
 export const RolesMatrixModule = {
   Builtins: {

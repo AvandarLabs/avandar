@@ -1,10 +1,9 @@
+import { objectValuesMap } from "@avandar/utils";
 import type {
   AnyFunction,
   AnyFunctionWithReturn,
   IExternalStore,
 } from "@avandar/utils";
-
-import { objectValuesMap } from "@avandar/utils";
 
 /**
  * Creates an external store that can be used with React's

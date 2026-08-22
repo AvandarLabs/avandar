@@ -1,7 +1,6 @@
 import { mantineColorVar } from "@avandar/ui";
 import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
-
 import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";

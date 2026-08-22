@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 /**
  * Guards the viz setting label catalog against drift. The descriptor
  * registries hold untranslated labels as their stable message ids, so a new or
