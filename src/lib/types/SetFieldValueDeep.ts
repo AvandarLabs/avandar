@@ -81,8 +81,9 @@ export type SetFieldValueDeep<
           ? PathHead extends keyof T
             ? {
                 [Key in keyof T]: Key extends PathHead
-                  ? // We need to dig in recursively, but we need to assert our types
-                    // are still valid for the recursive SetFieldValueDeep call
+                  ? // We need to dig in recursively, but we need to
+                    // assert our types are still valid for the recursive
+                    // SetFieldValueDeep call
                     T[Key] extends UnknownObject | UnknownArray
                     ? PathTail extends ObjectPaths<T[Key]>
                       ? SetFieldValueDeep<

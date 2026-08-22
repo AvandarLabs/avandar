@@ -234,6 +234,12 @@ type DashboardPdfExportedPayload = {
  * Payloads must never contain raw PII: no email addresses, no SQL text, no
  * chat content.
  */
+/* eslint-disable max-len -- The chain below is 29 conditionals deep and
+   oxfmt indents each arm two columns further than the last, so the tail
+   arms start past column 80 no matter how short their contents are.
+   Prettier used to keep them in range with `experimentalTernaries`,
+   which oxfmt does not implement. Flattening this into a keyed payload
+   map would fix it properly and is tracked as follow-up work. */
 export type AnalyticsEventPayloads = {
   [K in AnalyticsEventName]: K extends "dataset.imported"
     ? DatasetImportedPayload
@@ -359,6 +365,7 @@ export type AnalyticsEventPayloads = {
                                                               }
                                                             : undefined;
 };
+/* eslint-enable max-len */
 
 type AnalyticsEventWithPayload<K extends AnalyticsEventName> =
   AnalyticsEventPayloads[K] extends undefined

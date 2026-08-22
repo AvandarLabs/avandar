@@ -120,9 +120,10 @@ export default defineConfig(({ mode }) => {
                     handler: "NetworkOnly" as const,
                   },
                   {
-                    // DuckDb fetches spatial / excel extension WASM from this CDN
-                    // on every fresh init; CacheFirst lets prod (PWA) keep
-                    // serving them when the user goes offline.
+                    // DuckDb fetches spatial / excel extension WASM
+                    // from this CDN on every fresh init; CacheFirst lets
+                    // prod (PWA) keep serving them when the user goes
+                    // offline.
                     urlPattern: ({ url }: { url: URL }) => {
                       return url.origin === "https://extensions.duckdb.org";
                     },
